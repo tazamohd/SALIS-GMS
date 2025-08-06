@@ -44,8 +44,7 @@ export const LoginDashboard = (): JSX.Element => {
                 Login
               </h1>
               <p className="relative self-stretch font-['Poppins',Helvetica] font-medium text-[#222029] text-base sm:text-lg lg:text-xl text-center tracking-[0] leading-normal px-4 sm:px-0">
-                Welcome again! type your email and password to access your
-                account
+                Welcome again! Click login to securely access your account
               </p>
             </div>
 
@@ -105,7 +104,10 @@ export const LoginDashboard = (): JSX.Element => {
               </div>
 
               {/* Login button */}
-              <Button className="flex items-center justify-center gap-2.5 px-8 sm:px-[84px] py-3 sm:py-4 w-full bg-accent-500 rounded-lg text-[#fbfbfc] text-lg sm:text-xl font-['Poppins',Helvetica] font-medium hover:bg-accent-500/90">
+              <Button 
+                onClick={() => window.location.href = '/api/login'}
+                className="flex items-center justify-center gap-2.5 px-8 sm:px-[84px] py-3 sm:py-4 w-full bg-accent-500 rounded-lg text-[#fbfbfc] text-lg sm:text-xl font-['Poppins',Helvetica] font-medium hover:bg-accent-500/90"
+              >
                 Login
               </Button>
             </div>
