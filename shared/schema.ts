@@ -308,6 +308,56 @@ export const serviceTemplates = pgTable("service_templates", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Tools Schema - Module 7: Tool Management
+export const tools = pgTable("tools", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: varchar("name").notNull(),
+  description: text("description"),
+  toolType: varchar("tool_type").notNull(), // "diagnostic", "mechanical", "electrical"
+  brand: varchar("brand"),
+  manufacturer: varchar("manufacturer"),
+  tags: jsonb("tags"), // Array of tags
+  compatibleVehicles: jsonb("compatible_vehicles"), // Array of vehicle models
+  linkedServiceIds: jsonb("linked_service_ids"), // Array of service template IDs
+  linkedPartIds: jsonb("linked_part_ids"), // Array of spare part IDs
+  media: jsonb("media"), // Array of image/video URLs
+  documents: jsonb("documents"), // Array of document URLs
+  isGlobal: boolean("is_global").default(false), // Shared globally or local
+  visibility: varchar("visibility").default("private"), // "public", "private", "shared"
+  editableBy: varchar("editable_by").default("garage_admin"), // "saas_admin", "garage_admin"
+  createdBy: varchar("created_by").notNull().references(() => users.id),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Tool Availability - tracks tool inventory per garage/branch
+export const toolAvailability = pgTable("tool_availability", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  toolId: uuid("tool_id").notNull().references(() => tools.id),
+  garageId: uuid("garage_id").notNull().references(() => garages.id),
+  branchId: uuid("branch_id").references(() => branches.id),
+  quantity: integer("quantity").default(1),
+  status: varchar("status").default("available"), // "available", "in_use", "under_maintenance"
+  allowOverrideFields: boolean("allow_override_fields").default(false),
+  isEnabled: boolean("is_enabled").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Tool Usage Logs - tracks when tools are used in job cards
+export const toolUsageLogs = pgTable("tool_usage_logs", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  toolId: uuid("tool_id").notNull().references(() => tools.id),
+  jobCardId: uuid("job_card_id").references(() => jobCards.id),
+  taskId: uuid("task_id").references(() => taskAssignments.id),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  startTime: timestamp("start_time").defaultNow(),
+  endTime: timestamp("end_time"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 export type JobCard = typeof jobCards.$inferSelect;
 export type InsertJobCard = typeof jobCards.$inferInsert;
 export type TaskAssignment = typeof taskAssignments.$inferSelect;
@@ -316,6 +366,12 @@ export type TaskProgressLog = typeof taskProgressLogs.$inferSelect;
 export type InsertTaskProgressLog = typeof taskProgressLogs.$inferInsert;
 export type ServiceTemplate = typeof serviceTemplates.$inferSelect;
 export type InsertServiceTemplate = typeof serviceTemplates.$inferInsert;
+export type Tool = typeof tools.$inferSelect;
+export type InsertTool = typeof tools.$inferInsert;
+export type ToolAvailability = typeof toolAvailability.$inferSelect;
+export type InsertToolAvailability = typeof toolAvailability.$inferInsert;
+export type ToolUsageLog = typeof toolUsageLogs.$inferSelect;
+export type InsertToolUsageLog = typeof toolUsageLogs.$inferInsert;
 export type Garage = typeof garages.$inferSelect;
 export type Branch = typeof branches.$inferSelect;
 export type Role = typeof roles.$inferSelect;

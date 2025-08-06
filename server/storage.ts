@@ -10,6 +10,9 @@ import {
   jobCards,
   taskAssignments,
   serviceTemplates,
+  tools,
+  toolAvailability,
+  toolUsageLogs,
   type User,
   type UpsertUser,
   type Garage,
@@ -18,9 +21,12 @@ import {
   type JobCard,
   type TaskAssignment,
   type ServiceTemplate,
+  type Tool,
+  type ToolAvailability,
+  type ToolUsageLog,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, or, inArray } from "drizzle-orm";
 
 // Interface for storage operations
 export interface IStorage {
@@ -59,6 +65,22 @@ export interface IStorage {
   
   // Service Template operations
   getServiceTemplates(garageId: string): Promise<ServiceTemplate[]>;
+  
+  // Tool Management operations - Module 7
+  getTools(garageId?: string, isGlobal?: boolean): Promise<Tool[]>;
+  getTool(id: string): Promise<Tool | undefined>;
+  createTool(data: any): Promise<Tool>;
+  updateTool(id: string, data: any): Promise<Tool>;
+  
+  // Tool Availability operations
+  getToolAvailability(garageId: string, toolId?: string): Promise<ToolAvailability[]>;
+  createToolAvailability(data: any): Promise<ToolAvailability>;
+  updateToolAvailability(id: string, data: any): Promise<ToolAvailability>;
+  
+  // Tool Usage operations
+  getToolUsageLogs(toolId: string): Promise<ToolUsageLog[]>;
+  createToolUsageLog(data: any): Promise<ToolUsageLog>;
+  updateToolUsageLog(id: string, data: any): Promise<ToolUsageLog>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -148,11 +170,10 @@ export class DatabaseStorage implements IStorage {
 
   // Job Card operations - Module 8: Job Cards & Task Assignment
   async getJobCards(garageId?: string): Promise<JobCard[]> {
-    let query = db.select().from(jobCards);
     if (garageId) {
-      query = query.where(eq(jobCards.garageId, garageId));
+      return await db.select().from(jobCards).where(eq(jobCards.garageId, garageId)).orderBy(desc(jobCards.createdAt));
     }
-    return await query.orderBy(desc(jobCards.createdAt));
+    return await db.select().from(jobCards).orderBy(desc(jobCards.createdAt));
   }
 
   async getJobCard(id: string): Promise<JobCard | undefined> {
@@ -190,6 +211,85 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(serviceTemplates)
       .where(eq(serviceTemplates.garageId, garageId))
       .orderBy(serviceTemplates.name);
+  }
+
+  // Tool Management operations - Module 7
+  async getTools(garageId?: string, isGlobal?: boolean): Promise<Tool[]> {
+    if (isGlobal) {
+      return await db.select().from(tools)
+        .where(eq(tools.isActive, true))
+        .where(eq(tools.isGlobal, true))
+        .orderBy(tools.name);
+    } else if (garageId) {
+      // Get tools created by users in this garage or global tools
+      return await db.select().from(tools)
+        .where(eq(tools.isActive, true))
+        .orderBy(tools.name);
+    }
+    
+    return await db.select().from(tools)
+      .where(eq(tools.isActive, true))
+      .orderBy(tools.name);
+  }
+
+  async getTool(id: string): Promise<Tool | undefined> {
+    const [tool] = await db.select().from(tools).where(eq(tools.id, id));
+    return tool;
+  }
+
+  async createTool(data: any): Promise<Tool> {
+    const [tool] = await db.insert(tools).values(data).returning();
+    return tool;
+  }
+
+  async updateTool(id: string, data: any): Promise<Tool> {
+    const [tool] = await db.update(tools).set({
+      ...data,
+      updatedAt: new Date()
+    }).where(eq(tools.id, id)).returning();
+    return tool;
+  }
+
+  // Tool Availability operations
+  async getToolAvailability(garageId: string, toolId?: string): Promise<ToolAvailability[]> {
+    if (toolId) {
+      return await db.select().from(toolAvailability)
+        .where(eq(toolAvailability.garageId, garageId))
+        .where(eq(toolAvailability.toolId, toolId));
+    }
+    
+    return await db.select().from(toolAvailability)
+      .where(eq(toolAvailability.garageId, garageId));
+  }
+
+  async createToolAvailability(data: any): Promise<ToolAvailability> {
+    const [availability] = await db.insert(toolAvailability).values(data).returning();
+    return availability;
+  }
+
+  async updateToolAvailability(id: string, data: any): Promise<ToolAvailability> {
+    const [availability] = await db.update(toolAvailability).set({
+      ...data,
+      updatedAt: new Date()
+    }).where(eq(toolAvailability.id, id)).returning();
+    return availability;
+  }
+
+  // Tool Usage operations
+  async getToolUsageLogs(toolId: string): Promise<ToolUsageLog[]> {
+    return await db.select().from(toolUsageLogs)
+      .where(eq(toolUsageLogs.toolId, toolId))
+      .orderBy(desc(toolUsageLogs.startTime));
+  }
+
+  async createToolUsageLog(data: any): Promise<ToolUsageLog> {
+    const [log] = await db.insert(toolUsageLogs).values(data).returning();
+    return log;
+  }
+
+  async updateToolUsageLog(id: string, data: any): Promise<ToolUsageLog> {
+    const [log] = await db.update(toolUsageLogs).set(data).where(eq(toolUsageLogs.id, id)).returning();
+    return log;
   }
 }
 

@@ -1,4 +1,4 @@
-import { EyeOffIcon, LogOut, UserIcon, BarChart3, Settings, Bell, Home, Users, FileText, TrendingUp, Building2, UserPlus, Shield, Wrench, ClipboardCheck, Clock, AlertCircle, CheckCircle, Play } from "lucide-react";
+import { EyeOffIcon, LogOut, UserIcon, BarChart3, Settings, Bell, Home, Users, FileText, TrendingUp, Building2, UserPlus, Shield, Wrench, ClipboardCheck, Clock, AlertCircle, CheckCircle, Play, Zap } from "lucide-react";
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -6,7 +6,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
-import type { User, Garage, JobCard, ServiceTemplate } from "@shared/schema";
+import type { User, Garage, JobCard, ServiceTemplate, Tool } from "@shared/schema";
 
 // Garage Overview Component
 const GarageOverview = () => {
@@ -45,6 +45,88 @@ const GarageOverview = () => {
       )) || (
         <p className="font-['Poppins',Helvetica] font-normal text-[#999999] text-sm">
           No garages found
+        </p>
+      )}
+    </div>
+  );
+};
+
+// Tools Overview Component - Module 7
+const ToolsOverview = () => {
+  const { data: tools, isLoading } = useQuery({
+    queryKey: ['/api/tools'],
+    retry: false,
+  });
+
+  if (isLoading) {
+    return (
+      <div className="space-y-3">
+        <div className="animate-pulse bg-gray-200 h-16 rounded-lg"></div>
+        <div className="animate-pulse bg-gray-200 h-16 rounded-lg"></div>
+        <div className="animate-pulse bg-gray-200 h-16 rounded-lg"></div>
+      </div>
+    );
+  }
+
+  const getToolIcon = (toolType: string) => {
+    switch (toolType) {
+      case 'diagnostic': return <Zap className="w-4 h-4 text-red-600" />;
+      case 'electrical': return <Zap className="w-4 h-4 text-yellow-600" />;
+      case 'mechanical': return <Wrench className="w-4 h-4 text-blue-600" />;
+      default: return <Wrench className="w-4 h-4 text-gray-600" />;
+    }
+  };
+
+  const getToolBadgeColor = (toolType: string) => {
+    switch (toolType) {
+      case 'diagnostic': return 'bg-red-100 text-red-700';
+      case 'electrical': return 'bg-yellow-100 text-yellow-700';
+      case 'mechanical': return 'bg-blue-100 text-blue-700';
+      default: return 'bg-gray-100 text-gray-700';
+    }
+  };
+
+  return (
+    <div className="space-y-3">
+      {(tools as Tool[])?.slice(0, 6).map((tool: Tool) => (
+        <div key={tool.id} className="flex items-center justify-between p-4 border border-[#e6e6e6] rounded-lg bg-gray-50">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center border border-gray-200">
+              {getToolIcon(tool.toolType)}
+            </div>
+            <div className="flex-1">
+              <h5 className="font-['Poppins',Helvetica] font-medium text-[#222029] text-sm">
+                {tool.name}
+              </h5>
+              <div className="flex items-center gap-2 mt-1">
+                <span className={`px-2 py-1 rounded-full text-xs font-medium ${getToolBadgeColor(tool.toolType)}`}>
+                  {tool.toolType}
+                </span>
+                {tool.brand && (
+                  <span className="font-['Poppins',Helvetica] font-normal text-[#999999] text-xs">
+                    {tool.brand}
+                  </span>
+                )}
+                <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                  tool.isGlobal ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-700'
+                }`}>
+                  {tool.isGlobal ? 'Global' : 'Local'}
+                </span>
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className={`w-2 h-2 rounded-full ${
+              tool.isActive ? 'bg-green-500' : 'bg-red-500'
+            }`}></span>
+            <span className="font-['Poppins',Helvetica] font-normal text-[#999999] text-xs">
+              {tool.isActive ? 'Available' : 'Unavailable'}
+            </span>
+          </div>
+        </div>
+      )) || (
+        <p className="font-['Poppins',Helvetica] font-normal text-[#999999] text-sm">
+          No tools found. Add your first tool to get started.
         </p>
       )}
     </div>
@@ -483,13 +565,95 @@ export const LoginDashboard = (): JSX.Element => {
                       <span className="w-2 h-2 bg-green-500 rounded-full"></span>
                       <span className="font-['Poppins',Helvetica] text-[#222029]">Task Assignment</span>
                     </div>
-                    <div className="flex items-center gap-2 p-2 bg-blue-50 rounded-md">
-                      <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                    <div className="flex items-center gap-2 p-2 bg-green-50 rounded-md">
+                      <span className="w-2 h-2 bg-green-500 rounded-full"></span>
                       <span className="font-['Poppins',Helvetica] text-[#222029]">Tool Management</span>
                     </div>
                     <div className="flex items-center gap-2 p-2 bg-gray-50 rounded-md">
                       <span className="w-2 h-2 bg-gray-400 rounded-full"></span>
                       <span className="font-['Poppins',Helvetica] text-[#999999]">Appointments</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Tool Management Section - Module 7 */}
+            <div className="mt-6">
+              <h3 className="font-['Poppins',Helvetica] font-semibold text-[#222029] text-xl mb-4">
+                Tool Management System
+              </h3>
+              
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Available Tools */}
+                <div className="lg:col-span-2 p-6 rounded-[10px] border border-solid border-[#e6e6e6] bg-white">
+                  <div className="flex items-center justify-between mb-4">
+                    <h4 className="font-['Poppins',Helvetica] font-semibold text-[#222029] text-lg">
+                      Available Tools
+                    </h4>
+                    <Button size="sm" className="bg-accent-500 hover:bg-accent-500/90 text-white">
+                      <Wrench className="w-4 h-4 mr-2" />
+                      Add Tool
+                    </Button>
+                  </div>
+                  <ToolsOverview />
+                </div>
+
+                {/* Tool Categories */}
+                <div className="p-6 rounded-[10px] border border-solid border-[#e6e6e6] bg-white">
+                  <h4 className="font-['Poppins',Helvetica] font-semibold text-[#222029] text-lg mb-4">
+                    Tool Categories
+                  </h4>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between p-3 border border-[#e6e6e6] rounded-lg bg-gray-50">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center">
+                          <Zap className="w-4 h-4 text-red-600" />
+                        </div>
+                        <div>
+                          <p className="font-['Poppins',Helvetica] font-medium text-[#222029] text-sm">
+                            Diagnostic
+                          </p>
+                          <p className="font-['Poppins',Helvetica] font-normal text-[#999999] text-xs">
+                            Scanners, Meters
+                          </p>
+                        </div>
+                      </div>
+                      <span className="font-['Poppins',Helvetica] font-semibold text-[#222029] text-sm">4</span>
+                    </div>
+                    
+                    <div className="flex items-center justify-between p-3 border border-[#e6e6e6] rounded-lg bg-gray-50">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                          <Wrench className="w-4 h-4 text-blue-600" />
+                        </div>
+                        <div>
+                          <p className="font-['Poppins',Helvetica] font-medium text-[#222029] text-sm">
+                            Mechanical
+                          </p>
+                          <p className="font-['Poppins',Helvetica] font-normal text-[#999999] text-xs">
+                            Wrenches, Jacks
+                          </p>
+                        </div>
+                      </div>
+                      <span className="font-['Poppins',Helvetica] font-semibold text-[#222029] text-sm">8</span>
+                    </div>
+                    
+                    <div className="flex items-center justify-between p-3 border border-[#e6e6e6] rounded-lg bg-gray-50">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 bg-yellow-100 rounded-lg flex items-center justify-center">
+                          <Zap className="w-4 h-4 text-yellow-600" />
+                        </div>
+                        <div>
+                          <p className="font-['Poppins',Helvetica] font-medium text-[#222029] text-sm">
+                            Electrical
+                          </p>
+                          <p className="font-['Poppins',Helvetica] font-normal text-[#999999] text-xs">
+                            Multimeters, Scopes
+                          </p>
+                        </div>
+                      </div>
+                      <span className="font-['Poppins',Helvetica] font-semibold text-[#222029] text-sm">6</span>
                     </div>
                   </div>
                 </div>
