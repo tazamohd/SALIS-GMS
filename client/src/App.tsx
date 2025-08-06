@@ -7,20 +7,11 @@ import NotFound from "@/pages/not-found";
 import { useAuth } from "@/hooks/useAuth";
 
 import { LoginDashboard } from "@/pages/LoginDashboard";
-import Home from "@/pages/Home";
 
 function Router() {
-  const { isAuthenticated, isLoading } = useAuth();
-
   return (
     <Switch>
-      {isLoading || !isAuthenticated ? (
-        <Route path="/" component={LoginDashboard} />
-      ) : (
-        <>
-          <Route path="/" component={Home} />
-        </>
-      )}
+      <Route path="/" component={LoginDashboard} />
       <Route component={NotFound} />
     </Switch>
   );
