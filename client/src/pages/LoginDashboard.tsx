@@ -24,10 +24,10 @@ export const LoginDashboard = (): JSX.Element => {
   ];
 
   return (
-    <main className="bg-transparent grid justify-items-center [align-items:start] w-screen min-h-screen h-full">
-      <div className="bg-[linear-gradient(180deg,rgba(14,51,77,1)_0%,rgba(0,13,32,1)_100%)] w-full max-w-[1440px] h-[1210px] relative flex">
-        {/* Left side with image */}
-        <div className="relative w-[622px]">
+    <main className="bg-transparent w-screen min-h-screen h-full">
+      <div className="bg-[linear-gradient(180deg,rgba(14,51,77,1)_0%,rgba(0,13,32,1)_100%)] w-full min-h-screen flex flex-col lg:flex-row">
+        {/* Left side with image - hidden on mobile */}
+        <div className="relative hidden lg:flex lg:w-[622px] lg:min-h-screen">
           <img
             className="absolute w-[538px] h-[458px] top-[396px] left-[60px] object-cover"
             alt="Login illustration"
@@ -36,14 +36,14 @@ export const LoginDashboard = (): JSX.Element => {
         </div>
 
         {/* Right side with login form */}
-        <Card className="flex flex-col w-[818px] h-full items-center justify-center gap-8 px-20 py-[92px] bg-[#fbfbfc] rounded-none border-none shadow-none">
-          <CardContent className="flex flex-col w-full max-w-[594px] items-center p-0 space-y-8">
+        <Card className="flex flex-col w-full lg:w-[818px] min-h-screen items-center justify-center gap-8 px-4 sm:px-8 lg:px-20 py-8 lg:py-[92px] bg-[#fbfbfc] rounded-none border-none shadow-none">
+          <CardContent className="flex flex-col w-full max-w-[594px] items-center p-0 space-y-6 lg:space-y-8">
             {/* Header */}
             <div className="flex flex-col w-full items-start gap-2">
-              <h1 className="relative self-stretch font-display-large-semibold font-semibold text-[#222029] text-[54px] text-center tracking-[-2.7px] leading-normal">
+              <h1 className="relative self-stretch font-display-large-semibold font-semibold text-[#222029] text-3xl sm:text-4xl lg:text-[54px] text-center tracking-[-2.7px] leading-normal">
                 Login
               </h1>
-              <p className="relative self-stretch font-['Poppins',Helvetica] font-medium text-[#222029] text-xl text-center tracking-[0] leading-normal">
+              <p className="relative self-stretch font-['Poppins',Helvetica] font-medium text-[#222029] text-base sm:text-lg lg:text-xl text-center tracking-[0] leading-normal px-4 sm:px-0">
                 Welcome again! type your email and password to access your
                 account
               </p>
@@ -59,7 +59,7 @@ export const LoginDashboard = (): JSX.Element => {
                       {formFields[0].label}
                     </label>
                     <Input
-                      className="h-[60px] px-5 py-3.5 rounded-[10px] border border-solid border-[#e6e6e6] font-['Poppins',Helvetica] text-primary-400 text-base"
+                      className="h-12 sm:h-[60px] px-4 sm:px-5 py-3 sm:py-3.5 rounded-[10px] border border-solid border-[#e6e6e6] font-['Poppins',Helvetica] text-primary-400 text-sm sm:text-base"
                       placeholder={formFields[0].placeholder}
                       type={formFields[0].type}
                     />
@@ -70,13 +70,13 @@ export const LoginDashboard = (): JSX.Element => {
                     <label className="font-['Poppins',Helvetica] font-medium text-[#222029] text-base leading-[22.4px]">
                       {formFields[1].label}
                     </label>
-                    <div className="flex h-[60px] items-center justify-between px-5 py-3.5 w-full rounded-[10px] border border-solid border-[#e6e6e6] relative">
+                    <div className="flex h-12 sm:h-[60px] items-center justify-between px-4 sm:px-5 py-3 sm:py-3.5 w-full rounded-[10px] border border-solid border-[#e6e6e6] relative">
                       <Input
-                        className="border-0 p-0 h-full shadow-none font-['Poppins',Helvetica] font-normal text-[#999999] text-base"
+                        className="border-0 p-0 h-full shadow-none font-['Poppins',Helvetica] font-normal text-[#999999] text-sm sm:text-base"
                         placeholder={formFields[1].placeholder}
                         type={formFields[1].type}
                       />
-                      <EyeOffIcon className="w-6 h-6 text-gray-500 absolute right-5" />
+                      <EyeOffIcon className="w-5 h-5 sm:w-6 sm:h-6 text-gray-500 absolute right-4 sm:right-5" />
                     </div>
                   </div>
 
@@ -85,18 +85,18 @@ export const LoginDashboard = (): JSX.Element => {
                     <div className="inline-flex items-center gap-2">
                       <Checkbox
                         id="remember-me"
-                        className="w-[22px] h-[22px] rounded-sm"
+                        className="w-5 h-5 sm:w-[22px] sm:h-[22px] rounded-sm"
                       />
                       <label
                         htmlFor="remember-me"
-                        className="font-['Poppins',Helvetica] font-medium text-[#222029] text-sm"
+                        className="font-['Poppins',Helvetica] font-medium text-[#222029] text-xs sm:text-sm"
                       >
                         Remember me
                       </label>
                     </div>
                     <a
                       href="#"
-                      className="font-['Poppins',Helvetica] font-normal text-accent-500 text-sm text-right underline"
+                      className="font-['Poppins',Helvetica] font-normal text-accent-500 text-xs sm:text-sm text-right underline"
                     >
                       Forgot Password?
                     </a>
@@ -105,7 +105,7 @@ export const LoginDashboard = (): JSX.Element => {
               </div>
 
               {/* Login button */}
-              <Button className="flex items-center justify-center gap-2.5 px-[84px] py-4 w-full bg-accent-500 rounded-lg text-[#fbfbfc] text-xl font-['Poppins',Helvetica] font-medium hover:bg-accent-500/90">
+              <Button className="flex items-center justify-center gap-2.5 px-8 sm:px-[84px] py-3 sm:py-4 w-full bg-accent-500 rounded-lg text-[#fbfbfc] text-lg sm:text-xl font-['Poppins',Helvetica] font-medium hover:bg-accent-500/90">
                 Login
               </Button>
             </div>
