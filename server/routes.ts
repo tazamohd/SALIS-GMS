@@ -19,6 +19,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Garage management routes
+  app.get('/api/garages', isAuthenticated, async (req, res) => {
+    try {
+      const garages = await storage.getGarages();
+      res.json(garages);
+    } catch (error) {
+      console.error("Error fetching garages:", error);
+      res.status(500).json({ message: "Failed to fetch garages" });
+    }
+  });
+
+  app.get('/api/garages/:id/branches', isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const branches = await storage.getBranchesByGarageId(id);
+      res.json(branches);
+    } catch (error) {
+      console.error("Error fetching branches:", error);
+      res.status(500).json({ message: "Failed to fetch branches" });
+    }
+  });
+
+  app.get('/api/roles', isAuthenticated, async (req, res) => {
+    try {
+      const roles = await storage.getRoles();
+      res.json(roles);
+    } catch (error) {
+      console.error("Error fetching roles:", error);
+      res.status(500).json({ message: "Failed to fetch roles" });
+    }
+  });
+
+  app.get('/api/user/:id/roles', isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const userRoles = await storage.getUserRoles(id);
+      res.json(userRoles);
+    } catch (error) {
+      console.error("Error fetching user roles:", error);
+      res.status(500).json({ message: "Failed to fetch user roles" });
+    }
+  });
+
   // Protected route example
   app.get("/api/protected", isAuthenticated, async (req: any, res) => {
     const userId = req.user?.claims?.sub;

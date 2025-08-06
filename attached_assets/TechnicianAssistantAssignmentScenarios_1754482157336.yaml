@@ -1,0 +1,23 @@
+sequenceDiagram
+    participant Lead as GarageLead
+    participant API as System API
+    participant DB as Database
+    participant Tech as Technician
+    participant Assist as AssistantTech
+
+    Lead->>API: Create JobCard (Vehicle, Service)
+    API->>DB: Save JobCard, split tasks
+    API->>Tech: Assign Task(s)
+    API->>Assist: Assign Prep Task(s)
+    API->>DB: Log assignments
+
+    Tech->>API: View Assigned Tasks
+    Assist->>API: Start Disassembly
+    API->>DB: Log Assistant Progress (e.g., 100%)
+
+    Tech->>API: Perform Service Steps
+    Tech->>API: Log Completion (% and Notes)
+    API->>DB: Update Task + JobCard status
+
+    API->>Lead: Notify Service Completion
+    API->>DB: Finalize Logs, Parts Used, Technician Report

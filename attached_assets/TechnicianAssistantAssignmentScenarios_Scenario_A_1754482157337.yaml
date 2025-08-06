@@ -1,0 +1,12 @@
+sequenceDiagram
+    participant Lead as GarageLead
+    participant API as System
+    participant Assist as AssistantTech
+    participant DB as Database
+
+    Lead->>API: Create JobCard (Assistant-only service)
+    API->>DB: Save JobCard
+    API->>Assist: Assign Task (e.g., Clean, Assemble)
+    Assist->>API: Log Start & Finish
+    API->>DB: Save Assistant Result
+    API->>Lead: Notify Completion

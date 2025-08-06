@@ -1,11 +1,55 @@
-import { EyeOffIcon, LogOut, UserIcon, BarChart3, Settings, Bell, Home, Users, FileText, TrendingUp } from "lucide-react";
+import { EyeOffIcon, LogOut, UserIcon, BarChart3, Settings, Bell, Home, Users, FileText, TrendingUp, Building2, UserPlus, Shield } from "lucide-react";
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/hooks/useAuth";
-import type { User } from "@shared/schema";
+import { useQuery } from "@tanstack/react-query";
+import type { User, Garage } from "@shared/schema";
+
+// Garage Overview Component
+const GarageOverview = () => {
+  const { data: garages, isLoading } = useQuery({
+    queryKey: ['/api/garages'],
+    retry: false,
+  });
+
+  if (isLoading) {
+    return (
+      <div className="space-y-3">
+        <div className="animate-pulse bg-gray-200 h-4 rounded w-3/4"></div>
+        <div className="animate-pulse bg-gray-200 h-4 rounded w-1/2"></div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-3">
+      {(garages as Garage[])?.map((garage: Garage) => (
+        <div key={garage.id} className="flex items-center justify-between p-3 border border-[#e6e6e6] rounded-lg bg-gray-50">
+          <div>
+            <h5 className="font-['Poppins',Helvetica] font-medium text-[#222029] text-sm">
+              {garage.name}
+            </h5>
+            <p className="font-['Poppins',Helvetica] font-normal text-[#999999] text-xs">
+              {garage.city}, {garage.country}
+            </p>
+          </div>
+          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+            garage.isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+          }`}>
+            {garage.isActive ? 'Active' : 'Inactive'}
+          </span>
+        </div>
+      )) || (
+        <p className="font-['Poppins',Helvetica] font-normal text-[#999999] text-sm">
+          No garages found
+        </p>
+      )}
+    </div>
+  );
+};
 
 export const LoginDashboard = (): JSX.Element => {
   const { user, isAuthenticated } = useAuth() as { user: User | undefined; isAuthenticated: boolean };
@@ -194,17 +238,71 @@ export const LoginDashboard = (): JSX.Element => {
                 </h3>
                 <div className="space-y-3">
                   <Button className="w-full justify-start gap-3 h-12 bg-accent-500 hover:bg-accent-500/90 text-white rounded-lg">
-                    <Home className="w-4 h-4" />
-                    New Project
+                    <Building2 className="w-4 h-4" />
+                    Manage Garages
                   </Button>
                   <Button variant="outline" className="w-full justify-start gap-3 h-12 border-[#e6e6e6] text-[#222029] hover:bg-gray-50 rounded-lg">
-                    <Users className="w-4 h-4" />
-                    Invite Team
+                    <UserPlus className="w-4 h-4" />
+                    Add User
+                  </Button>
+                  <Button variant="outline" className="w-full justify-start gap-3 h-12 border-[#e6e6e6] text-[#222029] hover:bg-gray-50 rounded-lg">
+                    <Shield className="w-4 h-4" />
+                    User Roles
                   </Button>
                   <Button variant="outline" className="w-full justify-start gap-3 h-12 border-[#e6e6e6] text-[#222029] hover:bg-gray-50 rounded-lg">
                     <Settings className="w-4 h-4" />
                     Settings
                   </Button>
+                </div>
+              </div>
+            </div>
+
+            {/* Garage Management Section */}
+            <div className="mt-6">
+              <h3 className="font-['Poppins',Helvetica] font-semibold text-[#222029] text-xl mb-4">
+                Garage Management System
+              </h3>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Garages Overview */}
+                <div className="p-6 rounded-[10px] border border-solid border-[#e6e6e6] bg-white">
+                  <h4 className="font-['Poppins',Helvetica] font-semibold text-[#222029] text-lg mb-4">
+                    Active Garages
+                  </h4>
+                  <GarageOverview />
+                </div>
+
+                {/* System Modules */}
+                <div className="p-6 rounded-[10px] border border-solid border-[#e6e6e6] bg-white">
+                  <h4 className="font-['Poppins',Helvetica] font-semibold text-[#222029] text-lg mb-4">
+                    Available Modules
+                  </h4>
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div className="flex items-center gap-2 p-2 bg-green-50 rounded-md">
+                      <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                      <span className="font-['Poppins',Helvetica] text-[#222029]">User Management</span>
+                    </div>
+                    <div className="flex items-center gap-2 p-2 bg-green-50 rounded-md">
+                      <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                      <span className="font-['Poppins',Helvetica] text-[#222029]">Branch Control</span>
+                    </div>
+                    <div className="flex items-center gap-2 p-2 bg-blue-50 rounded-md">
+                      <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                      <span className="font-['Poppins',Helvetica] text-[#222029]">Tool Management</span>
+                    </div>
+                    <div className="flex items-center gap-2 p-2 bg-blue-50 rounded-md">
+                      <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                      <span className="font-['Poppins',Helvetica] text-[#222029]">Job Cards</span>
+                    </div>
+                    <div className="flex items-center gap-2 p-2 bg-gray-50 rounded-md">
+                      <span className="w-2 h-2 bg-gray-400 rounded-full"></span>
+                      <span className="font-['Poppins',Helvetica] text-[#999999]">Appointments</span>
+                    </div>
+                    <div className="flex items-center gap-2 p-2 bg-gray-50 rounded-md">
+                      <span className="w-2 h-2 bg-gray-400 rounded-full"></span>
+                      <span className="font-['Poppins',Helvetica] text-[#999999]">Billing</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -243,64 +341,57 @@ export const LoginDashboard = (): JSX.Element => {
             <div className="flex flex-col w-full items-start gap-[21px] rounded-lg">
               <div className="flex flex-col items-start gap-6 w-full">
                 <div className="flex flex-col items-start gap-5 w-full">
-                  {/* Email field */}
-                  <div className="flex flex-col items-start gap-1 w-full">
-                    <label className="font-['Poppins',Helvetica] font-medium text-[#222029] text-base leading-[22.4px]">
-                      {formFields[0].label}
-                    </label>
-                    <Input
-                      className="h-12 sm:h-[60px] px-4 sm:px-5 py-3 sm:py-3.5 rounded-[10px] border border-solid border-[#e6e6e6] font-['Poppins',Helvetica] text-primary-400 text-sm sm:text-base"
-                      placeholder={formFields[0].placeholder}
-                      type={formFields[0].type}
-                    />
-                  </div>
-
-                  {/* Password field */}
-                  <div className="flex flex-col items-start gap-1 w-full">
-                    <label className="font-['Poppins',Helvetica] font-medium text-[#222029] text-base leading-[22.4px]">
-                      {formFields[1].label}
-                    </label>
-                    <div className="flex h-12 sm:h-[60px] items-center justify-between px-4 sm:px-5 py-3 sm:py-3.5 w-full rounded-[10px] border border-solid border-[#e6e6e6] relative">
-                      <Input
-                        className="border-0 p-0 h-full shadow-none font-['Poppins',Helvetica] font-normal text-[#999999] text-sm sm:text-base"
-                        placeholder={formFields[1].placeholder}
-                        type={formFields[1].type}
-                      />
-                      <EyeOffIcon className="w-5 h-5 sm:w-6 sm:h-6 text-gray-500 absolute right-4 sm:right-5" />
-                    </div>
-                  </div>
-
-                  {/* Remember me and Forgot Password */}
-                  <div className="flex items-center justify-between w-full">
-                    <div className="inline-flex items-center gap-2">
-                      <Checkbox
-                        id="remember-me"
-                        className="w-5 h-5 sm:w-[22px] sm:h-[22px] rounded-sm"
-                      />
-                      <label
-                        htmlFor="remember-me"
-                        className="font-['Poppins',Helvetica] font-medium text-[#222029] text-xs sm:text-sm"
-                      >
-                        Remember me
+                  {formFields.map((field) => (
+                    <div key={field.id} className="flex flex-col items-start gap-1 w-full">
+                      <label className="font-['Poppins',Helvetica] font-medium text-[#222029] text-base leading-[22.4px]">
+                        {field.label}
                       </label>
+                      <div className="relative w-full">
+                        <Input
+                          className="flex h-12 w-full items-center px-4 py-3 rounded-[10px] border border-solid border-[#999999] bg-[#fbfbfc] font-['Poppins',Helvetica] font-normal text-[#222029] text-base leading-[22.4px] placeholder:text-[#999999]"
+                          placeholder={field.placeholder}
+                          type={field.type}
+                        />
+                        {field.hasIcon && (
+                          <button
+                            className="absolute inset-y-0 right-0 flex items-center pr-4"
+                            type="button"
+                          >
+                            <EyeOffIcon className="w-5 h-5 text-[#999999]" />
+                          </button>
+                        )}
+                      </div>
                     </div>
-                    <a
-                      href="#"
-                      className="font-['Poppins',Helvetica] font-normal text-accent-500 text-xs sm:text-sm text-right underline"
-                    >
-                      Forgot Password?
-                    </a>
-                  </div>
+                  ))}
                 </div>
-              </div>
 
-              {/* Login button */}
-              <Button 
-                onClick={() => window.location.href = '/api/login'}
-                className="flex items-center justify-center gap-2.5 px-8 sm:px-[84px] py-3 sm:py-4 w-full bg-accent-500 rounded-lg text-[#fbfbfc] text-lg sm:text-xl font-['Poppins',Helvetica] font-medium hover:bg-accent-500/90"
-              >
-                Login
-              </Button>
+                {/* Remember me and Forgot password */}
+                <div className="flex items-center justify-between w-full">
+                  <div className="flex items-center gap-2">
+                    <Checkbox id="remember" />
+                    <label
+                      htmlFor="remember"
+                      className="font-['Poppins',Helvetica] font-normal text-[#222029] text-base leading-[22.4px]"
+                    >
+                      Remember me
+                    </label>
+                  </div>
+                  <a
+                    href="#"
+                    className="font-['Poppins',Helvetica] font-normal text-[#222029] text-base underline leading-[22.4px]"
+                  >
+                    Forgot password?
+                  </a>
+                </div>
+
+                {/* Login button */}
+                <Button 
+                  onClick={() => window.location.href = '/api/login'}
+                  className="flex items-center justify-center gap-2.5 px-8 sm:px-[84px] py-3 sm:py-4 w-full bg-accent-500 rounded-lg text-[#fbfbfc] text-lg sm:text-xl font-['Poppins',Helvetica] font-medium hover:bg-accent-500/90"
+                >
+                  Login
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>

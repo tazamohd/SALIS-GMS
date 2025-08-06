@@ -1,0 +1,12 @@
+sequenceDiagram
+    participant Lead as GarageLead
+    participant API as System
+    participant Tech as Technician
+    participant DB as Database
+
+    Lead->>API: Create JobCard (Technician-only)
+    API->>DB: Save JobCard
+    API->>Tech: Assign Task (e.g., Diagnose Engine)
+    Tech->>API: Log Step-by-step Execution
+    API->>DB: Save Technician Progress
+    API->>Lead: Notify Completion

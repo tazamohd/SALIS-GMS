@@ -1,0 +1,17 @@
+sequenceDiagram
+    participant Admin as GarageAdmin
+    participant API as System API
+    participant Email as EmailService
+    participant User as InvitedUser
+
+    Admin->>API: Send Invite(User Email, Role, Branch)
+    API->>API: Validate & Create User (Pending)
+    API->>API: Assign Role in UserRoleBranch
+    API->>API: Log Action (ActivityLog)
+    API->>Email: Send Invite Email with Setup Link
+
+    User->>Email: Open Invite Email
+    User->>API: Accept Invite + Set Password/Profile
+    API->>API: Activate User (IsActive = true)
+    API->>API: Log Session (SessionLog)
+    API->>Admin: Confirm Invite Completion (Notification)
