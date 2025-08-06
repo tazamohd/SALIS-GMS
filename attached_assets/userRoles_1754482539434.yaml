@@ -1,0 +1,142 @@
+classDiagram
+    class User {
+        +Guid Id
+        +string FullName
+        +string Email
+        +string Phone
+        +string ProfilePhotoUrl
+        +string NationalId
+        +bool IsActive
+        +datetime CreatedAt
+        +datetime? AccessEndDate
+        +Guid GarageId
+        +enum UserType
+    }
+
+    class Role {
+        +Guid Id
+        +string Name
+        +enum Scope
+        +bool IsSystemRole
+    }
+
+    class UserRoleBranch {
+        +Guid Id
+        +Guid UserId
+        +Guid RoleId
+        +Guid BranchId
+        +datetime AssignedAt
+        +bool IsPrimaryRole
+    }
+
+    User --> UserRoleBranch : assigned
+    Role --> UserRoleBranch : mapped
+
+    class Garage {
+        +Guid Id
+        +string Name
+        +string Country
+        +string City
+        +string LicenseNumber
+        +Guid SaasPlanId
+        +string WorkingHours
+        +bool IsActive
+    }
+
+    Garage <|-- User : belongs to
+
+    class Branch {
+        +Guid Id
+        +Guid GarageId
+        +string Name
+        +string Location
+        +datetime CreatedAt
+    }
+
+    Garage --> Branch : has many
+    Branch --> UserRoleBranch : assigned
+
+    class SessionLog {
+        +Guid Id
+        +Guid UserId
+        +datetime LoginTime
+        +datetime LogoutTime
+        +string IPAddress
+        +string DeviceType
+        +bool IsImpersonated
+    }
+
+    User --> SessionLog : has sessions
+
+    class ActivityLog {
+        +Guid Id
+        +Guid UserId
+        +string ActionType
+        +string Module
+        +string Metadata
+        +datetime CreatedAt
+    }
+
+    User --> ActivityLog : has logs
+
+    class MFAStatus {
+        +Guid UserId
+        +enum Method
+        +bool IsEnabled
+        +datetime LastChangedAt
+    }
+
+    User --> MFAStatus : has MFA
+
+    class NotificationPreference {
+        +Guid UserId
+        +string[] Channel
+        +string EventMap
+        +bool IsLockedByAdmin
+    }
+
+    User --> NotificationPreference : has preferences
+
+    class FeatureFlag {
+        +Guid Id
+        +Guid GarageId
+        +string FlagName
+        +bool IsEnabled
+        +enum Source
+    }
+
+    Garage --> FeatureFlag : has flags
+
+    class SaasPlan {
+        +Guid Id
+        +string Name
+        +string Description
+        +int MaxUsers
+        +datetime CreatedAt
+    }
+
+    SaasPlan --> Garage : linked to
+
+    class TechnicianProfile {
+        +Guid UserId
+        +string[] Skills
+        +bool IsLead
+        +string Certifications
+    }
+
+    class CustomerProfile {
+        +Guid UserId
+        +string Address
+        +string Nationality
+        +string PreferredLanguage
+    }
+
+    class AssistantProfile {
+        +Guid UserId
+        +string[] AssignedTasks
+        +string TrainingLevel
+    }
+
+    User --> TechnicianProfile : has tech profile
+    User --> CustomerProfile : has customer profile
+    User --> AssistantProfile : has assistant profile

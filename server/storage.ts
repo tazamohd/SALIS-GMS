@@ -7,14 +7,20 @@ import {
   technicianProfiles,
   customerProfiles,
   assistantProfiles,
+  jobCards,
+  taskAssignments,
+  serviceTemplates,
   type User,
   type UpsertUser,
   type Garage,
   type Branch,
   type Role,
+  type JobCard,
+  type TaskAssignment,
+  type ServiceTemplate,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 
 // Interface for storage operations
 export interface IStorage {
@@ -39,6 +45,20 @@ export interface IStorage {
   // User-Role-Branch operations
   assignUserRole(userId: string, roleId: string, branchId: string, isPrimary?: boolean): Promise<void>;
   getUserRoles(userId: string): Promise<any[]>;
+  
+  // Job Card operations - Module 8
+  getJobCards(garageId?: string): Promise<JobCard[]>;
+  getJobCard(id: string): Promise<JobCard | undefined>;
+  createJobCard(data: any): Promise<JobCard>;
+  updateJobCard(id: string, data: any): Promise<JobCard>;
+  
+  // Task Assignment operations
+  getTaskAssignments(jobCardId: string): Promise<TaskAssignment[]>;
+  createTaskAssignment(data: any): Promise<TaskAssignment>;
+  updateTaskAssignment(id: string, data: any): Promise<TaskAssignment>;
+  
+  // Service Template operations
+  getServiceTemplates(garageId: string): Promise<ServiceTemplate[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -124,6 +144,52 @@ export class DatabaseStorage implements IStorage {
       .leftJoin(branches, eq(userRoleBranch.branchId, branches.id))
       .leftJoin(garages, eq(branches.garageId, garages.id))
       .where(eq(userRoleBranch.userId, userId));
+  }
+
+  // Job Card operations - Module 8: Job Cards & Task Assignment
+  async getJobCards(garageId?: string): Promise<JobCard[]> {
+    let query = db.select().from(jobCards);
+    if (garageId) {
+      query = query.where(eq(jobCards.garageId, garageId));
+    }
+    return await query.orderBy(desc(jobCards.createdAt));
+  }
+
+  async getJobCard(id: string): Promise<JobCard | undefined> {
+    const [jobCard] = await db.select().from(jobCards).where(eq(jobCards.id, id));
+    return jobCard;
+  }
+
+  async createJobCard(data: any): Promise<JobCard> {
+    const [jobCard] = await db.insert(jobCards).values(data).returning();
+    return jobCard;
+  }
+
+  async updateJobCard(id: string, data: any): Promise<JobCard> {
+    const [jobCard] = await db.update(jobCards).set(data).where(eq(jobCards.id, id)).returning();
+    return jobCard;
+  }
+
+  // Task Assignment operations
+  async getTaskAssignments(jobCardId: string): Promise<TaskAssignment[]> {
+    return await db.select().from(taskAssignments).where(eq(taskAssignments.jobCardId, jobCardId));
+  }
+
+  async createTaskAssignment(data: any): Promise<TaskAssignment> {
+    const [task] = await db.insert(taskAssignments).values(data).returning();
+    return task;
+  }
+
+  async updateTaskAssignment(id: string, data: any): Promise<TaskAssignment> {
+    const [task] = await db.update(taskAssignments).set(data).where(eq(taskAssignments.id, id)).returning();
+    return task;
+  }
+
+  // Service Templates operations
+  async getServiceTemplates(garageId: string): Promise<ServiceTemplate[]> {
+    return await db.select().from(serviceTemplates)
+      .where(eq(serviceTemplates.garageId, garageId))
+      .orderBy(serviceTemplates.name);
   }
 }
 

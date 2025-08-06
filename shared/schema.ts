@@ -1,6 +1,7 @@
 import { sql } from 'drizzle-orm';
 import {
   boolean,
+  decimal,
   index,
   integer,
   jsonb,
@@ -231,6 +232,90 @@ export const selectRoleSchema = createSelectSchema(roles);
 // Types
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
+
+// Job Cards Schema - Module 8: Job Cards & Task Assignment
+export const jobCards = pgTable("job_cards", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  jobNumber: varchar("job_number").notNull().unique(),
+  garageId: uuid("garage_id").notNull().references(() => garages.id),
+  branchId: uuid("branch_id").references(() => branches.id),
+  customerId: varchar("customer_id"), // Will be connected to customers table later
+  vehicleInfo: jsonb("vehicle_info").notNull(), // {make, model, year, licensePlate, vin}
+  serviceType: varchar("service_type").notNull(), // "maintenance", "repair", "diagnostic", etc.
+  description: text("description").notNull(),
+  status: varchar("status").notNull().default("pending"), // "pending", "assigned", "in_progress", "completed", "cancelled"
+  priority: varchar("priority").notNull().default("medium"), // "low", "medium", "high", "urgent"
+  estimatedHours: decimal("estimated_hours", { precision: 4, scale: 2 }),
+  actualHours: decimal("actual_hours", { precision: 4, scale: 2 }),
+  totalCost: decimal("total_cost", { precision: 10, scale: 2 }),
+  createdBy: varchar("created_by").notNull().references(() => users.id),
+  assignedTo: varchar("assigned_to").references(() => users.id), // Primary technician
+  scheduledDate: timestamp("scheduled_date"),
+  startedAt: timestamp("started_at"),
+  completedAt: timestamp("completed_at"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Task Assignment Schema
+export const taskAssignments = pgTable("task_assignments", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  jobCardId: uuid("job_card_id").notNull().references(() => jobCards.id),
+  taskName: varchar("task_name").notNull(),
+  taskType: varchar("task_type").notNull(), // "diagnostic", "repair", "assembly", "disassembly", "cleaning", "inspection"
+  description: text("description").notNull(),
+  assignedTo: varchar("assigned_to").notNull().references(() => users.id),
+  assignedBy: varchar("assigned_by").notNull().references(() => users.id),
+  userType: varchar("user_type").notNull(), // "technician", "assistant", "both"
+  status: varchar("status").notNull().default("assigned"), // "assigned", "accepted", "rejected", "in_progress", "completed"
+  priority: varchar("priority").notNull().default("medium"),
+  estimatedMinutes: integer("estimated_minutes"),
+  actualMinutes: integer("actual_minutes"),
+  progressPercentage: integer("progress_percentage").default(0),
+  startedAt: timestamp("started_at"),
+  completedAt: timestamp("completed_at"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Task Progress Logs
+export const taskProgressLogs = pgTable("task_progress_logs", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  taskId: uuid("task_id").notNull().references(() => taskAssignments.id),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  progressPercentage: integer("progress_percentage").notNull(),
+  stepDescription: text("step_description"),
+  timeSpent: integer("time_spent"), // minutes
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Service Templates - for common service types
+export const serviceTemplates = pgTable("service_templates", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").notNull().references(() => garages.id),
+  name: varchar("name").notNull(),
+  category: varchar("category").notNull(), // "maintenance", "repair", "diagnostic"
+  description: text("description"),
+  estimatedHours: decimal("estimated_hours", { precision: 4, scale: 2 }),
+  standardCost: decimal("standard_cost", { precision: 10, scale: 2 }),
+  taskSteps: jsonb("task_steps").notNull(), // Array of predefined steps
+  requiredSkills: jsonb("required_skills"), // Array of skill requirements
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type JobCard = typeof jobCards.$inferSelect;
+export type InsertJobCard = typeof jobCards.$inferInsert;
+export type TaskAssignment = typeof taskAssignments.$inferSelect;
+export type InsertTaskAssignment = typeof taskAssignments.$inferInsert;
+export type TaskProgressLog = typeof taskProgressLogs.$inferSelect;
+export type InsertTaskProgressLog = typeof taskProgressLogs.$inferInsert;
+export type ServiceTemplate = typeof serviceTemplates.$inferSelect;
+export type InsertServiceTemplate = typeof serviceTemplates.$inferInsert;
 export type Garage = typeof garages.$inferSelect;
 export type Branch = typeof branches.$inferSelect;
 export type Role = typeof roles.$inferSelect;

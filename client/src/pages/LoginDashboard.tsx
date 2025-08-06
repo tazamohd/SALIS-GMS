@@ -1,4 +1,4 @@
-import { EyeOffIcon, LogOut, UserIcon, BarChart3, Settings, Bell, Home, Users, FileText, TrendingUp, Building2, UserPlus, Shield } from "lucide-react";
+import { EyeOffIcon, LogOut, UserIcon, BarChart3, Settings, Bell, Home, Users, FileText, TrendingUp, Building2, UserPlus, Shield, Wrench, ClipboardCheck, Clock, AlertCircle, CheckCircle, Play } from "lucide-react";
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -6,7 +6,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
-import type { User, Garage } from "@shared/schema";
+import type { User, Garage, JobCard, ServiceTemplate } from "@shared/schema";
 
 // Garage Overview Component
 const GarageOverview = () => {
@@ -45,6 +45,164 @@ const GarageOverview = () => {
       )) || (
         <p className="font-['Poppins',Helvetica] font-normal text-[#999999] text-sm">
           No garages found
+        </p>
+      )}
+    </div>
+  );
+};
+
+// Job Cards Overview Component
+const JobCardsOverview = () => {
+  const { data: jobCards, isLoading } = useQuery({
+    queryKey: ['/api/job-cards'],
+    retry: false,
+  });
+
+  if (isLoading) {
+    return (
+      <div className="space-y-3">
+        <div className="animate-pulse bg-gray-200 h-4 rounded w-3/4"></div>
+        <div className="animate-pulse bg-gray-200 h-4 rounded w-1/2"></div>
+      </div>
+    );
+  }
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'pending':
+        return <Clock className="w-4 h-4 text-yellow-500" />;
+      case 'assigned':
+        return <UserPlus className="w-4 h-4 text-blue-500" />;
+      case 'in_progress':
+        return <Play className="w-4 h-4 text-orange-500" />;
+      case 'completed':
+        return <CheckCircle className="w-4 h-4 text-green-500" />;
+      default:
+        return <AlertCircle className="w-4 h-4 text-gray-400" />;
+    }
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'pending':
+        return 'bg-yellow-100 text-yellow-700';
+      case 'assigned':
+        return 'bg-blue-100 text-blue-700';
+      case 'in_progress':
+        return 'bg-orange-100 text-orange-700';
+      case 'completed':
+        return 'bg-green-100 text-green-700';
+      default:
+        return 'bg-gray-100 text-gray-700';
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      {(jobCards as JobCard[])?.map((jobCard: JobCard) => (
+        <div key={jobCard.id} className="p-4 border border-[#e6e6e6] rounded-lg bg-white hover:bg-gray-50 transition-colors">
+          <div className="flex items-start justify-between">
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-2">
+                <h5 className="font-['Poppins',Helvetica] font-semibold text-[#222029] text-sm">
+                  {jobCard.jobNumber}
+                </h5>
+                <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(jobCard.status)}`}>
+                  {jobCard.status.replace('_', ' ')}
+                </span>
+                {jobCard.priority === 'high' && (
+                  <span className="px-2 py-1 bg-red-100 text-red-700 rounded-full text-xs font-medium">
+                    High Priority
+                  </span>
+                )}
+              </div>
+              <p className="font-['Poppins',Helvetica] font-medium text-[#222029] text-sm mb-1">
+                {(jobCard.vehicleInfo as any)?.make} {(jobCard.vehicleInfo as any)?.model} ({(jobCard.vehicleInfo as any)?.year})
+              </p>
+              <p className="font-['Poppins',Helvetica] font-normal text-[#999999] text-xs mb-2">
+                {jobCard.description}
+              </p>
+              <div className="flex items-center gap-4 text-xs text-[#999999]">
+                <span>Service: {jobCard.serviceType}</span>
+                {jobCard.estimatedHours && <span>Est: {jobCard.estimatedHours}h</span>}
+                {jobCard.scheduledDate && (
+                  <span>Due: {new Date(jobCard.scheduledDate).toLocaleDateString()}</span>
+                )}
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              {getStatusIcon(jobCard.status)}
+              <Wrench className="w-4 h-4 text-[#999999]" />
+            </div>
+          </div>
+        </div>
+      )) || (
+        <p className="font-['Poppins',Helvetica] font-normal text-[#999999] text-sm text-center py-4">
+          No active job cards
+        </p>
+      )}
+    </div>
+  );
+};
+
+// Service Templates Component
+const ServiceTemplatesOverview = () => {
+  const { data: garages } = useQuery({
+    queryKey: ['/api/garages'],
+    retry: false,
+  });
+
+  const firstGarage = (garages as Garage[])?.[0];
+  
+  const { data: templates, isLoading } = useQuery({
+    queryKey: ['/api/service-templates'],
+    queryFn: async () => {
+      const response = await fetch(`/api/service-templates?garage_id=${firstGarage?.id}`);
+      if (!response.ok) throw new Error('Failed to fetch templates');
+      return response.json();
+    },
+    enabled: !!firstGarage?.id,
+    retry: false,
+  });
+
+  if (isLoading || !firstGarage) {
+    return (
+      <div className="space-y-2">
+        <div className="animate-pulse bg-gray-200 h-4 rounded w-3/4"></div>
+        <div className="animate-pulse bg-gray-200 h-4 rounded w-1/2"></div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-3">
+      {(templates as ServiceTemplate[])?.map((template: ServiceTemplate) => (
+        <div key={template.id} className="flex items-center justify-between p-3 border border-[#e6e6e6] rounded-lg bg-gray-50">
+          <div>
+            <h5 className="font-['Poppins',Helvetica] font-medium text-[#222029] text-sm">
+              {template.name}
+            </h5>
+            <div className="flex items-center gap-2 mt-1">
+              <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">
+                {template.category}
+              </span>
+              {template.estimatedHours && (
+                <span className="font-['Poppins',Helvetica] font-normal text-[#999999] text-xs">
+                  {template.estimatedHours}h
+                </span>
+              )}
+              {template.standardCost && (
+                <span className="font-['Poppins',Helvetica] font-normal text-[#999999] text-xs">
+                  ${template.standardCost}
+                </span>
+              )}
+            </div>
+          </div>
+          <ClipboardCheck className="w-4 h-4 text-green-600" />
+        </div>
+      )) || (
+        <p className="font-['Poppins',Helvetica] font-normal text-[#999999] text-sm">
+          No service templates found
         </p>
       )}
     </div>
@@ -257,6 +415,37 @@ export const LoginDashboard = (): JSX.Element => {
               </div>
             </div>
 
+            {/* Job Cards & Task Management Section */}
+            <div className="mt-6">
+              <h3 className="font-['Poppins',Helvetica] font-semibold text-[#222029] text-xl mb-4">
+                Job Cards & Task Management
+              </h3>
+              
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Active Job Cards */}
+                <div className="lg:col-span-2 p-6 rounded-[10px] border border-solid border-[#e6e6e6] bg-white">
+                  <div className="flex items-center justify-between mb-4">
+                    <h4 className="font-['Poppins',Helvetica] font-semibold text-[#222029] text-lg">
+                      Active Job Cards
+                    </h4>
+                    <Button size="sm" className="bg-accent-500 hover:bg-accent-500/90 text-white">
+                      <FileText className="w-4 h-4 mr-2" />
+                      New Job Card
+                    </Button>
+                  </div>
+                  <JobCardsOverview />
+                </div>
+
+                {/* Service Templates */}
+                <div className="p-6 rounded-[10px] border border-solid border-[#e6e6e6] bg-white">
+                  <h4 className="font-['Poppins',Helvetica] font-semibold text-[#222029] text-lg mb-4">
+                    Service Templates
+                  </h4>
+                  <ServiceTemplatesOverview />
+                </div>
+              </div>
+            </div>
+
             {/* Garage Management Section */}
             <div className="mt-6">
               <h3 className="font-['Poppins',Helvetica] font-semibold text-[#222029] text-xl mb-4">
@@ -275,7 +464,7 @@ export const LoginDashboard = (): JSX.Element => {
                 {/* System Modules */}
                 <div className="p-6 rounded-[10px] border border-solid border-[#e6e6e6] bg-white">
                   <h4 className="font-['Poppins',Helvetica] font-semibold text-[#222029] text-lg mb-4">
-                    Available Modules
+                    System Progress
                   </h4>
                   <div className="grid grid-cols-2 gap-2 text-sm">
                     <div className="flex items-center gap-2 p-2 bg-green-50 rounded-md">
@@ -286,21 +475,118 @@ export const LoginDashboard = (): JSX.Element => {
                       <span className="w-2 h-2 bg-green-500 rounded-full"></span>
                       <span className="font-['Poppins',Helvetica] text-[#222029]">Branch Control</span>
                     </div>
-                    <div className="flex items-center gap-2 p-2 bg-blue-50 rounded-md">
-                      <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
-                      <span className="font-['Poppins',Helvetica] text-[#222029]">Tool Management</span>
+                    <div className="flex items-center gap-2 p-2 bg-green-50 rounded-md">
+                      <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                      <span className="font-['Poppins',Helvetica] text-[#222029]">Job Cards</span>
+                    </div>
+                    <div className="flex items-center gap-2 p-2 bg-green-50 rounded-md">
+                      <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                      <span className="font-['Poppins',Helvetica] text-[#222029]">Task Assignment</span>
                     </div>
                     <div className="flex items-center gap-2 p-2 bg-blue-50 rounded-md">
                       <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
-                      <span className="font-['Poppins',Helvetica] text-[#222029]">Job Cards</span>
+                      <span className="font-['Poppins',Helvetica] text-[#222029]">Tool Management</span>
                     </div>
                     <div className="flex items-center gap-2 p-2 bg-gray-50 rounded-md">
                       <span className="w-2 h-2 bg-gray-400 rounded-full"></span>
                       <span className="font-['Poppins',Helvetica] text-[#999999]">Appointments</span>
                     </div>
-                    <div className="flex items-center gap-2 p-2 bg-gray-50 rounded-md">
-                      <span className="w-2 h-2 bg-gray-400 rounded-full"></span>
-                      <span className="font-['Poppins',Helvetica] text-[#999999]">Billing</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Task Assignment Workflow */}
+            <div className="mt-6">
+              <h3 className="font-['Poppins',Helvetica] font-semibold text-[#222029] text-xl mb-4">
+                Task Assignment Workflow
+              </h3>
+              
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Technician Assignment Scenarios */}
+                <div className="p-6 rounded-[10px] border border-solid border-[#e6e6e6] bg-white">
+                  <h4 className="font-['Poppins',Helvetica] font-semibold text-[#222029] text-lg mb-4">
+                    Assignment Scenarios
+                  </h4>
+                  <div className="space-y-3">
+                    <div className="p-3 bg-green-50 rounded-lg border border-green-200">
+                      <div className="flex items-center gap-2 mb-1">
+                        <CheckCircle className="w-4 h-4 text-green-600" />
+                        <h5 className="font-['Poppins',Helvetica] font-medium text-green-800 text-sm">
+                          Scenario A: Direct Assignment
+                        </h5>
+                      </div>
+                      <p className="font-['Poppins',Helvetica] font-normal text-green-700 text-xs">
+                        Manager assigns tasks directly to technicians and assistants based on availability and skills
+                      </p>
+                    </div>
+                    
+                    <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+                      <div className="flex items-center gap-2 mb-1">
+                        <UserPlus className="w-4 h-4 text-blue-600" />
+                        <h5 className="font-['Poppins',Helvetica] font-medium text-blue-800 text-sm">
+                          Scenario B: Self-Assignment
+                        </h5>
+                      </div>
+                      <p className="font-['Poppins',Helvetica] font-normal text-blue-700 text-xs">
+                        Technicians can assign assistants to their tasks and manage sub-tasks independently
+                      </p>
+                    </div>
+                    
+                    <div className="p-3 bg-orange-50 rounded-lg border border-orange-200">
+                      <div className="flex items-center gap-2 mb-1">
+                        <AlertCircle className="w-4 h-4 text-orange-600" />
+                        <h5 className="font-['Poppins',Helvetica] font-medium text-orange-800 text-sm">
+                          Scenario C: Dynamic Reassignment
+                        </h5>
+                      </div>
+                      <p className="font-['Poppins',Helvetica] font-normal text-orange-700 text-xs">
+                        Real-time task reassignment based on priority changes and resource availability
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Task Progress Updates */}
+                <div className="p-6 rounded-[10px] border border-solid border-[#e6e6e6] bg-white">
+                  <h4 className="font-['Poppins',Helvetica] font-semibold text-[#222029] text-lg mb-4">
+                    Task Progress Updates
+                  </h4>
+                  <div className="space-y-3">
+                    <div className="flex items-start space-x-3">
+                      <div className="flex-shrink-0 w-2 h-2 bg-green-500 rounded-full mt-2"></div>
+                      <div className="flex-1">
+                        <p className="font-['Poppins',Helvetica] font-medium text-[#222029] text-sm">
+                          "Prepare Workspace" completed - JOB-2024-001
+                        </p>
+                        <p className="font-['Poppins',Helvetica] font-normal text-[#999999] text-xs mt-1">
+                          Assistant completed in 10 minutes • 15 min ago
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-start space-x-3">
+                      <div className="flex-shrink-0 w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
+                      <div className="flex-1">
+                        <p className="font-['Poppins',Helvetica] font-medium text-[#222029] text-sm">
+                          "Drain Old Oil" 75% complete - JOB-2024-001
+                        </p>
+                        <p className="font-['Poppins',Helvetica] font-normal text-[#999999] text-xs mt-1">
+                          Technician in progress • Est. 11 min remaining
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-start space-x-3">
+                      <div className="flex-shrink-0 w-2 h-2 bg-orange-500 rounded-full mt-2"></div>
+                      <div className="flex-1">
+                        <p className="font-['Poppins',Helvetica] font-medium text-[#222029] text-sm">
+                          "Engine Visual Inspection" 60% complete - JOB-2024-002
+                        </p>
+                        <p className="font-['Poppins',Helvetica] font-normal text-[#999999] text-xs mt-1">
+                          High priority diagnostic • Est. 12 min remaining
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
