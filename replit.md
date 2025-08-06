@@ -59,6 +59,8 @@ Full-stack React/Express application with a login dashboard imported from Figma.
 - TypeScript throughout
 - Component-based architecture
 - Responsive design
+- Continue developing and testing new features directly within the authenticated Figma interface
+- Preserve original Figma design while adding functionality
 
 ## Recent Changes
 - Migrated Figma design to Replit environment
