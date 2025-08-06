@@ -1,0 +1,120 @@
+Table Users {
+  Id uuid [pk]
+  FullName varchar
+  Email varchar
+  Phone varchar
+  ProfilePhotoUrl varchar
+  NationalId varchar
+  IsActive boolean
+  CreatedAt datetime
+  AccessEndDate datetime
+  GarageId uuid [ref: > Garages.Id]
+  UserType varchar
+}
+
+Table Roles {
+  Id uuid [pk]
+  Name varchar
+  Scope varchar
+  IsSystemRole boolean
+}
+
+Table UserRoleBranch {
+  Id uuid [pk]
+  UserId uuid [ref: > Users.Id]
+  RoleId uuid [ref: > Roles.Id]
+  BranchId uuid [ref: > Branches.Id]
+  AssignedAt datetime
+  IsPrimaryRole boolean
+}
+
+Table Garages {
+  Id uuid [pk]
+  Name varchar
+  Country varchar
+  City varchar
+  LicenseNumber varchar
+  SaasPlanId uuid [ref: > SaasPlans.Id]
+  WorkingHours varchar
+  IsActive boolean
+}
+
+Table Branches {
+  Id uuid [pk]
+  GarageId uuid [ref: > Garages.Id]
+  Name varchar
+  Location varchar
+  CreatedAt datetime
+}
+
+Table SaasPlans {
+  Id uuid [pk]
+  Name varchar
+  Description text
+  MaxUsers int
+  CreatedAt datetime
+}
+
+
+
+Table TechnicianProfiles {
+  UserId uuid [pk, ref: > Users.Id]
+  Skills text
+  IsLead boolean
+  Certifications text
+}
+
+Table CustomerProfiles {
+  UserId uuid [pk, ref: > Users.Id]
+  Address varchar
+  Nationality varchar
+  PreferredLanguage varchar
+}
+
+Table AssistantProfiles {
+  UserId uuid [pk, ref: > Users.Id]
+  AssignedTasks text
+  TrainingLevel varchar
+}
+
+Table SessionLogs {
+  Id uuid [pk]
+  UserId uuid [ref: > Users.Id]
+  LoginTime datetime
+  LogoutTime datetime
+  IPAddress varchar
+  DeviceType varchar
+  IsImpersonated boolean
+}
+
+Table ActivityLogs {
+  Id uuid [pk]
+  UserId uuid [ref: > Users.Id]
+  ActionType varchar
+  Module varchar
+  Metadata text
+  CreatedAt datetime
+}
+
+Table MFAStatuses {
+  UserId uuid [pk, ref: > Users.Id]
+  Method varchar
+  IsEnabled boolean
+  LastChangedAt datetime
+}
+
+Table NotificationPreferences {
+  UserId uuid [pk, ref: > Users.Id]
+  Channel text
+  EventMap text
+  IsLockedByAdmin boolean
+}
+
+Table FeatureFlags {
+  Id uuid [pk]
+  GarageId uuid [ref: > Garages.Id]
+  FlagName varchar
+  IsEnabled boolean
+  Source varchar  // could be 'SaasPlan', 'GarageOverride', etc.
+}
+
