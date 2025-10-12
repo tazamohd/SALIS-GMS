@@ -16,6 +16,7 @@ import { ServiceTemplatesDialog } from "@/components/ServiceTemplatesDialog";
 import { CrossBranchTransferDialog } from "@/components/CrossBranchTransferDialog";
 import { ReportsDialog } from "@/components/ReportsDialog";
 import { SystemSyncDialog } from "@/components/SystemSyncDialog";
+import { SmartAssignmentDialog } from "@/components/SmartAssignmentDialog";
 
 // Garage Overview Component
 const GarageOverview = () => {
@@ -387,6 +388,7 @@ export const LoginDashboard = (): JSX.Element => {
   const [crossBranchTransferOpen, setCrossBranchTransferOpen] = React.useState(false);
   const [reportsOpen, setReportsOpen] = React.useState(false);
   const [systemSyncOpen, setSystemSyncOpen] = React.useState(false);
+  const [smartAssignmentOpen, setSmartAssignmentOpen] = React.useState(false);
 
   // Interactive handlers for all buttons
   const handleCreateJobWithTools = async () => {
@@ -439,7 +441,7 @@ export const LoginDashboard = (): JSX.Element => {
   };
 
   const handleSmartToolAssignment = () => {
-    alert('Smart Assignment:\n\nAnalyzing job requirements...\nChecking tool availability...\nMatching technician skills...\n\nOptimal assignment created!');
+    setSmartAssignmentOpen(true);
   };
 
   // Form field data
@@ -1050,6 +1052,7 @@ export const LoginDashboard = (): JSX.Element => {
         <CrossBranchTransferDialog open={crossBranchTransferOpen} onOpenChange={setCrossBranchTransferOpen} />
         <ReportsDialog open={reportsOpen} onOpenChange={setReportsOpen} />
         <SystemSyncDialog open={systemSyncOpen} onOpenChange={setSystemSyncOpen} />
+        <SmartAssignmentDialog open={smartAssignmentOpen} onOpenChange={setSmartAssignmentOpen} />
       </main>
     );
   }
