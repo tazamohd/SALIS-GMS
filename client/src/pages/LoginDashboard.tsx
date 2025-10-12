@@ -17,6 +17,7 @@ import { CrossBranchTransferDialog } from "@/components/CrossBranchTransferDialo
 import { ReportsDialog } from "@/components/ReportsDialog";
 import { SystemSyncDialog } from "@/components/SystemSyncDialog";
 import { SmartAssignmentDialog } from "@/components/SmartAssignmentDialog";
+import { useToast } from "@/hooks/use-toast";
 
 // Garage Overview Component
 const GarageOverview = () => {
@@ -382,6 +383,7 @@ const IntegrationMetrics = () => {
 
 export const LoginDashboard = (): JSX.Element => {
   const { user, isAuthenticated } = useAuth() as { user: User | undefined; isAuthenticated: boolean };
+  const { toast } = useToast();
   const [toolAvailabilityOpen, setToolAvailabilityOpen] = React.useState(false);
   const [addToolOpen, setAddToolOpen] = React.useState(false);
   const [serviceTemplatesOpen, setServiceTemplatesOpen] = React.useState(false);
@@ -408,11 +410,18 @@ export const LoginDashboard = (): JSX.Element => {
       });
       
       if (response.ok) {
-        alert('Job card created successfully with auto-assigned tools!');
+        toast({
+          title: "Success!",
+          description: "Job card created successfully with auto-assigned tools!",
+        });
         window.location.reload();
       }
     } catch (error) {
-      alert('Error creating job card. Please try again.');
+      toast({
+        title: "Error",
+        description: "Error creating job card. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
