@@ -12,6 +12,8 @@ import { JobCardsList } from "@/components/JobCardsList";
 import { TaskAssignmentDialog } from "@/components/TaskAssignmentDialog";
 import { ToolAvailabilityDialog } from "@/components/ToolAvailabilityDialog";
 import { AddToolDialog } from "@/components/AddToolDialog";
+import { ServiceTemplatesDialog } from "@/components/ServiceTemplatesDialog";
+import { CrossBranchTransferDialog } from "@/components/CrossBranchTransferDialog";
 
 // Garage Overview Component
 const GarageOverview = () => {
@@ -379,6 +381,8 @@ export const LoginDashboard = (): JSX.Element => {
   const { user, isAuthenticated } = useAuth() as { user: User | undefined; isAuthenticated: boolean };
   const [toolAvailabilityOpen, setToolAvailabilityOpen] = React.useState(false);
   const [addToolOpen, setAddToolOpen] = React.useState(false);
+  const [serviceTemplatesOpen, setServiceTemplatesOpen] = React.useState(false);
+  const [crossBranchTransferOpen, setCrossBranchTransferOpen] = React.useState(false);
 
   // Interactive handlers for all buttons
   const handleCreateJobWithTools = async () => {
@@ -415,7 +419,11 @@ export const LoginDashboard = (): JSX.Element => {
   };
 
   const handleCrossBranchTransfer = () => {
-    alert('Cross-Branch Transfer:\n\nTransferring Diagnostic Scanner from Main Branch to Service Branch\nTransfer scheduled for today at 2:00 PM');
+    setCrossBranchTransferOpen(true);
+  };
+  
+  const handleViewServiceTemplates = () => {
+    setServiceTemplatesOpen(true);
   };
 
   const handleGenerateReport = () => {
@@ -976,6 +984,20 @@ All systems operating normally.`;
                       Add New Tool
                     </Button>
                     <Button 
+                      onClick={handleViewServiceTemplates}
+                      size="sm" variant="outline" className="w-full justify-start gap-2 h-9"
+                      data-testid="button-service-templates">
+                      <FileText className="w-3 h-3" />
+                      Service Templates
+                    </Button>
+                    <Button 
+                      onClick={handleCrossBranchTransfer}
+                      size="sm" variant="outline" className="w-full justify-start gap-2 h-9"
+                      data-testid="button-cross-branch-transfer">
+                      <Building2 className="w-3 h-3" />
+                      Cross-Branch Transfer
+                    </Button>
+                    <Button 
                       onClick={handleGenerateReport}
                       size="sm" variant="outline" className="w-full justify-start gap-2 h-9"
                       data-testid="button-generate-report">
@@ -1029,6 +1051,8 @@ All systems operating normally.`;
         {/* Dialogs */}
         <ToolAvailabilityDialog open={toolAvailabilityOpen} onOpenChange={setToolAvailabilityOpen} />
         <AddToolDialog open={addToolOpen} onOpenChange={setAddToolOpen} />
+        <ServiceTemplatesDialog open={serviceTemplatesOpen} onOpenChange={setServiceTemplatesOpen} />
+        <CrossBranchTransferDialog open={crossBranchTransferOpen} onOpenChange={setCrossBranchTransferOpen} />
       </main>
     );
   }

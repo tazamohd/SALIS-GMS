@@ -1,0 +1,142 @@
+import { useQuery } from "@tanstack/react-query";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import { FileText, Clock, DollarSign, CheckCircle, Wrench } from "lucide-react";
+import type { ServiceTemplate } from "@shared/schema";
+
+interface ServiceTemplatesDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}
+
+export function ServiceTemplatesDialog({ open, onOpenChange }: ServiceTemplatesDialogProps) {
+  const { data: templates = [], isLoading } = useQuery<ServiceTemplate[]>({
+    queryKey: ['/api/service-templates'],
+  });
+
+  const getCategoryColor = (category: string) => {
+    switch (category) {
+      case "maintenance": return "bg-blue-100 text-blue-700";
+      case "repair": return "bg-orange-100 text-orange-700";
+      case "diagnostic": return "bg-purple-100 text-purple-700";
+      default: return "bg-gray-100 text-gray-700";
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="font-['Poppins',Helvetica] font-semibold text-xl text-[#222029] flex items-center gap-2">
+            <FileText className="w-6 h-6" />
+            Service Templates
+          </DialogTitle>
+          <DialogDescription className="font-['Poppins',Helvetica] text-sm text-[#999999]">
+            Pre-configured service workflows with steps and requirements
+          </DialogDescription>
+        </DialogHeader>
+
+        {isLoading ? (
+          <div className="space-y-3">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="animate-pulse bg-gray-200 h-32 rounded"></div>
+            ))}
+          </div>
+        ) : templates.length === 0 ? (
+          <div className="text-center py-8">
+            <FileText className="w-12 h-12 mx-auto text-gray-400 mb-3" />
+            <p className="text-gray-500">No service templates found</p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {templates.map((template) => (
+              <Card key={template.id} className="border-2 hover:border-blue-400 transition-colors" data-testid={`template-${template.id}`}>
+                <CardContent className="p-4">
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <h4 className="font-semibold text-lg" data-testid={`text-template-name-${template.id}`}>
+                          {template.name}
+                        </h4>
+                        <Badge className={getCategoryColor(template.category)}>
+                          {template.category}
+                        </Badge>
+                        {template.isActive && (
+                          <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                            Active
+                          </Badge>
+                        )}
+                      </div>
+                      {template.description && (
+                        <p className="text-sm text-gray-600 mb-3">
+                          {template.description}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4 mb-3">
+                    {template.estimatedHours && (
+                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <Clock className="w-4 h-4" />
+                        <span>{template.estimatedHours}h estimated</span>
+                      </div>
+                    )}
+                    {template.standardCost && (
+                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <DollarSign className="w-4 h-4" />
+                        <span>${template.standardCost}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {template.taskSteps && typeof template.taskSteps === 'object' && Array.isArray(template.taskSteps) && template.taskSteps.length > 0 && (
+                    <div className="mt-3 p-3 bg-gray-50 rounded-lg">
+                      <h5 className="font-medium text-sm mb-2 flex items-center gap-1">
+                        <CheckCircle className="w-4 h-4" />
+                        Task Steps ({template.taskSteps.length})
+                      </h5>
+                      <ul className="space-y-1">
+                        {(template.taskSteps as any[]).slice(0, 3).map((step: any, index: number) => (
+                          <li key={index} className="text-sm text-gray-600 flex items-start gap-2">
+                            <span className="text-blue-600 font-medium">{index + 1}.</span>
+                            <span>{typeof step === 'string' ? step : step.description || step.name || 'Step'}</span>
+                          </li>
+                        ))}
+                        {(template.taskSteps as any[]).length > 3 && (
+                          <li className="text-sm text-gray-500 italic">
+                            +{(template.taskSteps as any[]).length - 3} more steps...
+                          </li>
+                        )}
+                      </ul>
+                    </div>
+                  )}
+
+                  {template.requiredSkills && typeof template.requiredSkills === 'object' && Array.isArray(template.requiredSkills) && template.requiredSkills.length > 0 && (
+                    <div className="mt-3 flex items-center gap-2 flex-wrap">
+                      <Wrench className="w-4 h-4 text-gray-500" />
+                      <span className="text-sm text-gray-500">Required Skills:</span>
+                      {(template.requiredSkills as any[]).map((skill: any, index: number) => (
+                        <Badge key={index} variant="secondary" className="text-xs">
+                          {typeof skill === 'string' ? skill : skill.name || 'Skill'}
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+
+        <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+          <p className="text-sm text-blue-700">
+            <strong>Total Templates:</strong> {templates.length} | 
+            <strong className="ml-2">Active:</strong> {templates.filter(t => t.isActive).length}
+          </p>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
