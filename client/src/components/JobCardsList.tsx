@@ -1,9 +1,12 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Car, Clock, User, Wrench } from "lucide-react";
 import { format } from "date-fns";
+import { TaskAssignmentDialog } from "@/components/TaskAssignmentDialog";
+import type { JobCard as JobCardType } from "@shared/schema";
 
 interface JobCard {
   id: string;
@@ -23,9 +26,17 @@ interface JobCard {
 }
 
 export function JobCardsList() {
+  const [selectedJobCard, setSelectedJobCard] = useState<JobCardType | null>(null);
+  const [taskDialogOpen, setTaskDialogOpen] = useState(false);
+  
   const { data: jobCards = [], isLoading } = useQuery<JobCard[]>({
     queryKey: ['/api/job-cards'],
   });
+
+  const handleAssignTask = (jobCard: any) => {
+    setSelectedJobCard(jobCard as JobCardType);
+    setTaskDialogOpen(true);
+  };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
@@ -119,9 +130,20 @@ export function JobCardsList() {
                   </div>
                   <p className="text-sm text-gray-500 capitalize">{jobCard.serviceType}</p>
                 </div>
-                <Button variant="outline" size="sm" data-testid={`button-view-${jobCard.id}`}>
-                  View Details
-                </Button>
+                <div className="flex gap-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => handleAssignTask(jobCard)}
+                    data-testid={`button-assign-task-${jobCard.id}`}
+                  >
+                    <User className="w-3 h-3 mr-1" />
+                    Assign Task
+                  </Button>
+                  <Button variant="outline" size="sm" data-testid={`button-view-${jobCard.id}`}>
+                    View Details
+                  </Button>
+                </div>
               </div>
 
               <div className="flex flex-wrap gap-4 text-sm">
@@ -159,6 +181,14 @@ export function JobCardsList() {
           ))}
         </div>
       </CardContent>
+
+      {selectedJobCard && (
+        <TaskAssignmentDialog
+          jobCard={selectedJobCard}
+          open={taskDialogOpen}
+          onOpenChange={setTaskDialogOpen}
+        />
+      )}
     </Card>
   );
 }

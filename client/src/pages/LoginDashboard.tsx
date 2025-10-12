@@ -10,6 +10,8 @@ import type { User, Garage, JobCard, ServiceTemplate, Tool } from "@shared/schem
 import { JobCardDialog } from "@/components/JobCardDialog";
 import { JobCardsList } from "@/components/JobCardsList";
 import { TaskAssignmentDialog } from "@/components/TaskAssignmentDialog";
+import { ToolAvailabilityDialog } from "@/components/ToolAvailabilityDialog";
+import { AddToolDialog } from "@/components/AddToolDialog";
 
 // Garage Overview Component
 const GarageOverview = () => {
@@ -375,6 +377,8 @@ const IntegrationMetrics = () => {
 
 export const LoginDashboard = (): JSX.Element => {
   const { user, isAuthenticated } = useAuth() as { user: User | undefined; isAuthenticated: boolean };
+  const [toolAvailabilityOpen, setToolAvailabilityOpen] = React.useState(false);
+  const [addToolOpen, setAddToolOpen] = React.useState(false);
 
   // Interactive handlers for all buttons
   const handleCreateJobWithTools = async () => {
@@ -403,18 +407,11 @@ export const LoginDashboard = (): JSX.Element => {
   };
 
   const handleToolAvailabilityCheck = () => {
-    const availableTools = [
-      'OBD-II Diagnostic Scanner: Available (2 units)',
-      'Digital Multimeter: Available (1 unit)', 
-      'Torque Wrench Set: Available (3 units)',
-      'Hydraulic Jack: In Use (2/3 units)',
-      'Brake Bleeder Kit: Available (3 units)'
-    ];
-    alert(`Tool Availability Status:\n\n${availableTools.join('\n')}`);
+    setToolAvailabilityOpen(true);
   };
 
-  const handleAssignTechnicianTools = () => {
-    alert('Technician Assignment:\n\nAssigning Ahmad Rasheed to JOB-2024-001\nTools reserved: OBD Scanner, Multimeter\nEstimated completion: 2 hours');
+  const handleAddNewTool = () => {
+    setAddToolOpen(true);
   };
 
   const handleCrossBranchTransfer = () => {
@@ -1021,6 +1018,10 @@ All systems operating normally.`;
             </p>
           </div>
         </div>
+
+        {/* Dialogs */}
+        <ToolAvailabilityDialog open={toolAvailabilityOpen} onOpenChange={setToolAvailabilityOpen} />
+        <AddToolDialog open={addToolOpen} onOpenChange={setAddToolOpen} />
       </main>
     );
   }
