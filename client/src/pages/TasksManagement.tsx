@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { TaskDetailsDialog } from "@/components/TaskDetailsDialog";
 import type { JobCard } from "@shared/schema";
 
 export function TasksManagement() {
@@ -14,6 +15,13 @@ export function TasksManagement() {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
+  const [selectedTask, setSelectedTask] = useState<JobCard | null>(null);
+  const [taskDetailsOpen, setTaskDetailsOpen] = useState(false);
+
+  const handleViewTask = (task: JobCard) => {
+    setSelectedTask(task);
+    setTaskDetailsOpen(true);
+  };
 
   const { data: jobCards, isLoading } = useQuery<JobCard[]>({
     queryKey: ['/api/job-cards'],
@@ -228,7 +236,14 @@ export function TasksManagement() {
                         </Badge>
                       </td>
                       <td className="py-4 px-4">
-                        <Button size="sm" variant="outline" data-testid={`button-view-${task.id}`}>View</Button>
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          onClick={() => handleViewTask(task)}
+                          data-testid={`button-view-${task.id}`}
+                        >
+                          View
+                        </Button>
                       </td>
                     </tr>
                   ))
@@ -276,6 +291,12 @@ export function TasksManagement() {
           )}
         </CardContent>
       </Card>
+
+      <TaskDetailsDialog 
+        open={taskDetailsOpen}
+        onOpenChange={setTaskDetailsOpen}
+        task={selectedTask}
+      />
     </div>
   );
 }
