@@ -9,6 +9,7 @@ import { useQuery } from "@tanstack/react-query";
 import type { User, Garage, JobCard, ServiceTemplate, Tool } from "@shared/schema";
 import { JobCardDialog } from "@/components/JobCardDialog";
 import { JobCardsList } from "@/components/JobCardsList";
+import { TaskAssignmentDialog } from "@/components/TaskAssignmentDialog";
 
 // Garage Overview Component
 const GarageOverview = () => {
