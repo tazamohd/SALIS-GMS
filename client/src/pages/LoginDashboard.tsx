@@ -7,6 +7,8 @@ import { Input } from "@/components/ui/input";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import type { User, Garage, JobCard, ServiceTemplate, Tool } from "@shared/schema";
+import { JobCardDialog } from "@/components/JobCardDialog";
+import { JobCardsList } from "@/components/JobCardsList";
 
 // Garage Overview Component
 const GarageOverview = () => {
@@ -918,6 +920,11 @@ All systems operating normally.`;
               </div>
             </div>
 
+            {/* Job Cards List */}
+            <div className="mt-6">
+              <JobCardsList />
+            </div>
+
             {/* System Integration Dashboard */}
             <div className="mt-6">
               <h3 className="font-['Poppins',Helvetica] font-semibold text-[#222029] text-xl mb-4">
@@ -939,27 +946,34 @@ All systems operating normally.`;
                     Cross-System Actions
                   </h4>
                   <div className="space-y-2">
-                    <Button 
-                      onClick={handleCreateJobWithTools}
-                      size="sm" className="w-full justify-start gap-2 h-9 bg-green-500 hover:bg-green-600 text-white">
-                      <CheckCircle className="w-3 h-3" />
-                      Auto-Create Job + Tools
-                    </Button>
+                    <JobCardDialog 
+                      trigger={
+                        <Button 
+                          size="sm" className="w-full justify-start gap-2 h-9 bg-green-500 hover:bg-green-600 text-white"
+                          data-testid="button-create-job-with-tools">
+                          <CheckCircle className="w-3 h-3" />
+                          Create New Job Card
+                        </Button>
+                      }
+                    />
                     <Button 
                       onClick={handleSmartToolAssignment}
-                      size="sm" variant="outline" className="w-full justify-start gap-2 h-9">
+                      size="sm" variant="outline" className="w-full justify-start gap-2 h-9"
+                      data-testid="button-smart-tool-assignment">
                       <Wrench className="w-3 h-3" />
                       Smart Tool Assignment
                     </Button>
                     <Button 
                       onClick={handleAssignTechnicianTools}
-                      size="sm" variant="outline" className="w-full justify-start gap-2 h-9">
+                      size="sm" variant="outline" className="w-full justify-start gap-2 h-9"
+                      data-testid="button-assign-technician-tools">
                       <Users className="w-3 h-3" />
                       Team + Tool Scheduler
                     </Button>
                     <Button 
                       onClick={handleGenerateReport}
-                      size="sm" variant="outline" className="w-full justify-start gap-2 h-9">
+                      size="sm" variant="outline" className="w-full justify-start gap-2 h-9"
+                      data-testid="button-generate-report">
                       <BarChart3 className="w-3 h-3" />
                       Full System Report
                     </Button>

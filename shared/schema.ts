@@ -360,6 +360,7 @@ export const toolUsageLogs = pgTable("tool_usage_logs", {
 
 export type JobCard = typeof jobCards.$inferSelect;
 export type InsertJobCard = typeof jobCards.$inferInsert;
+export const insertJobCardSchema = createInsertSchema(jobCards);
 export type TaskAssignment = typeof taskAssignments.$inferSelect;
 export type InsertTaskAssignment = typeof taskAssignments.$inferInsert;
 export type TaskProgressLog = typeof taskProgressLogs.$inferSelect;
