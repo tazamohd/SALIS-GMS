@@ -14,6 +14,8 @@ import { ToolAvailabilityDialog } from "@/components/ToolAvailabilityDialog";
 import { AddToolDialog } from "@/components/AddToolDialog";
 import { ServiceTemplatesDialog } from "@/components/ServiceTemplatesDialog";
 import { CrossBranchTransferDialog } from "@/components/CrossBranchTransferDialog";
+import { ReportsDialog } from "@/components/ReportsDialog";
+import { SystemSyncDialog } from "@/components/SystemSyncDialog";
 
 // Garage Overview Component
 const GarageOverview = () => {
@@ -383,6 +385,8 @@ export const LoginDashboard = (): JSX.Element => {
   const [addToolOpen, setAddToolOpen] = React.useState(false);
   const [serviceTemplatesOpen, setServiceTemplatesOpen] = React.useState(false);
   const [crossBranchTransferOpen, setCrossBranchTransferOpen] = React.useState(false);
+  const [reportsOpen, setReportsOpen] = React.useState(false);
+  const [systemSyncOpen, setSystemSyncOpen] = React.useState(false);
 
   // Interactive handlers for all buttons
   const handleCreateJobWithTools = async () => {
@@ -427,20 +431,11 @@ export const LoginDashboard = (): JSX.Element => {
   };
 
   const handleGenerateReport = () => {
-    const reportData = `Integration Report - ${new Date().toLocaleDateString()}
-    
-Active Job Cards: 3
-Tool Utilization: 85%
-Cross-Branch Transfers: 3 today
-System Health: 100%
-Integration Links: 18 active
-
-All systems operating normally.`;
-    alert(reportData);
+    setReportsOpen(true);
   };
 
   const handleSyncSystems = () => {
-    alert('System Sync Initiated:\n\nSynchronizing all modules...\nJob Cards, Tools, Technicians, Garages\n\nSync completed successfully!');
+    setSystemSyncOpen(true);
   };
 
   const handleSmartToolAssignment = () => {
@@ -1053,6 +1048,8 @@ All systems operating normally.`;
         <AddToolDialog open={addToolOpen} onOpenChange={setAddToolOpen} />
         <ServiceTemplatesDialog open={serviceTemplatesOpen} onOpenChange={setServiceTemplatesOpen} />
         <CrossBranchTransferDialog open={crossBranchTransferOpen} onOpenChange={setCrossBranchTransferOpen} />
+        <ReportsDialog open={reportsOpen} onOpenChange={setReportsOpen} />
+        <SystemSyncDialog open={systemSyncOpen} onOpenChange={setSystemSyncOpen} />
       </main>
     );
   }
