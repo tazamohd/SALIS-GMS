@@ -112,6 +112,26 @@ Full-stack garage management SaaS application with authentication dashboard impo
   - All components fully typed with TypeScript - no 'any' types
   - Production-ready after full architect review and approval
 
+- **NEW: Task Assignment & Tool Management UI (October 12, 2025 - Session 2)**
+  - **Task Assignment Dialog** - Assign technicians/assistants to job cards with task details
+    - Integrated directly into Job Cards List with "Assign Task" button on each card
+    - Form supports task name, type (diagnostic/repair/assembly/etc), description
+    - Technician selection with user type (technician/assistant/both)
+    - Priority levels and estimated minutes tracking
+    - Full API integration with /api/job-cards/:id/tasks endpoints
+  - **Tool Availability Checker Dialog** - Real-time tool availability across garages
+    - Shows all tools with status indicators (available/unavailable)
+    - Tool categorization by type (diagnostic/mechanical/electrical)
+    - Brand, manufacturer, and visibility information
+    - Summary metrics showing total tools, available count, in-use count
+  - **Add Tool Dialog** - Form to add new tools to inventory
+    - Tool name, description, type selection
+    - Brand and manufacturer fields
+    - Visibility settings (public/private/shared)
+    - Full validation and database persistence
+  - Replaced 3 alert() placeholders with fully functional dialogs
+  - All dialogs follow consistent design patterns with proper error handling
+
 ## Development Roadmap
 Based on attached module flow plan for garage management SaaS:
 

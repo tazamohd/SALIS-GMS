@@ -962,11 +962,18 @@ All systems operating normally.`;
                       Smart Tool Assignment
                     </Button>
                     <Button 
-                      onClick={handleAssignTechnicianTools}
+                      onClick={handleToolAvailabilityCheck}
                       size="sm" variant="outline" className="w-full justify-start gap-2 h-9"
-                      data-testid="button-assign-technician-tools">
+                      data-testid="button-tool-availability">
+                      <Wrench className="w-3 h-3" />
+                      Check Tool Availability
+                    </Button>
+                    <Button 
+                      onClick={handleAddNewTool}
+                      size="sm" variant="outline" className="w-full justify-start gap-2 h-9"
+                      data-testid="button-add-new-tool">
                       <Users className="w-3 h-3" />
-                      Team + Tool Scheduler
+                      Add New Tool
                     </Button>
                     <Button 
                       onClick={handleGenerateReport}
