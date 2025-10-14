@@ -410,6 +410,147 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Customer Management routes - Module 10
+  app.get('/api/customers', isAuthenticated, async (req, res) => {
+    try {
+      const { garage_id, search } = req.query;
+      const customers = await storage.getCustomers(garage_id as string, search as string);
+      res.json(customers);
+    } catch (error) {
+      console.error("Error fetching customers:", error);
+      res.status(500).json({ message: "Failed to fetch customers" });
+    }
+  });
+
+  app.get('/api/customers/:id', isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const customer = await storage.getCustomer(id);
+      if (!customer) {
+        return res.status(404).json({ message: "Customer not found" });
+      }
+      res.json(customer);
+    } catch (error) {
+      console.error("Error fetching customer:", error);
+      res.status(500).json({ message: "Failed to fetch customer" });
+    }
+  });
+
+  app.get('/api/customers/:id/vehicles', isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const vehicles = await storage.getCustomerVehicles(id);
+      res.json(vehicles);
+    } catch (error) {
+      console.error("Error fetching customer vehicles:", error);
+      res.status(500).json({ message: "Failed to fetch customer vehicles" });
+    }
+  });
+
+  app.post('/api/vehicles', isAuthenticated, async (req, res) => {
+    try {
+      const { insertVehicleSchema } = await import("@shared/schema");
+      const validationResult = insertVehicleSchema.safeParse(req.body);
+      
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          message: "Validation error", 
+          errors: validationResult.error.errors 
+        });
+      }
+      
+      const vehicle = await storage.createVehicle(validationResult.data);
+      res.status(201).json(vehicle);
+    } catch (error) {
+      console.error("Error creating vehicle:", error);
+      res.status(500).json({ message: "Failed to create vehicle" });
+    }
+  });
+
+  app.patch('/api/vehicles/:id', isAuthenticated, async (req, res) => {
+    try {
+      const { insertVehicleSchema } = await import("@shared/schema");
+      const { id } = req.params;
+      
+      const validationResult = insertVehicleSchema.partial().safeParse(req.body);
+      
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          message: "Validation error", 
+          errors: validationResult.error.errors 
+        });
+      }
+      
+      const updatedVehicle = await storage.updateVehicle(id, validationResult.data);
+      res.json(updatedVehicle);
+    } catch (error) {
+      console.error("Error updating vehicle:", error);
+      res.status(500).json({ message: "Failed to update vehicle" });
+    }
+  });
+
+  app.delete('/api/vehicles/:id', isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteVehicle(id);
+      res.json({ message: "Vehicle deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting vehicle:", error);
+      res.status(500).json({ message: "Failed to delete vehicle" });
+    }
+  });
+
+  app.get('/api/customers/:id/notes', isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const notes = await storage.getCustomerNotes(id);
+      res.json(notes);
+    } catch (error) {
+      console.error("Error fetching customer notes:", error);
+      res.status(500).json({ message: "Failed to fetch customer notes" });
+    }
+  });
+
+  app.post('/api/customers/:id/notes', isAuthenticated, async (req: any, res) => {
+    try {
+      const { insertCustomerNoteSchema } = await import("@shared/schema");
+      const { id } = req.params;
+      const userId = req.user.claims.sub;
+      
+      const validationResult = insertCustomerNoteSchema.safeParse(req.body);
+      
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          message: "Validation error", 
+          errors: validationResult.error.errors 
+        });
+      }
+      
+      const noteData = {
+        ...validationResult.data,
+        customerId: id,
+        createdBy: userId,
+      };
+      
+      const note = await storage.createCustomerNote(noteData as any);
+      res.status(201).json(note);
+    } catch (error) {
+      console.error("Error creating customer note:", error);
+      res.status(500).json({ message: "Failed to create customer note" });
+    }
+  });
+
+  app.delete('/api/customer-notes/:id', isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteCustomerNote(id);
+      res.json({ message: "Note deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting note:", error);
+      res.status(500).json({ message: "Failed to delete note" });
+    }
+  });
+
   // Integrated System Routes - Connecting All Modules
   app.get('/api/integrated/status', isAuthenticated, async (req, res) => {
     try {

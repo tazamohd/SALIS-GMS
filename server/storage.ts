@@ -15,6 +15,8 @@ import {
   toolUsageLogs,
   appointments,
   appointmentStatusHistory,
+  vehicles,
+  customerNotes,
   type User,
   type UpsertUser,
   type Garage,
@@ -29,9 +31,13 @@ import {
   type Appointment,
   type InsertAppointment,
   type AppointmentStatusHistory,
+  type Vehicle,
+  type InsertVehicle,
+  type CustomerNote,
+  type InsertCustomerNote,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, or, inArray, and, gte, lte } from "drizzle-orm";
+import { eq, desc, or, inArray, and, gte, lte, ilike } from "drizzle-orm";
 
 // Interface for storage operations
 export interface IStorage {
@@ -94,6 +100,18 @@ export interface IStorage {
   updateAppointment(id: string, data: Partial<Appointment>): Promise<Appointment>;
   deleteAppointment(id: string): Promise<void>;
   updateAppointmentStatus(id: string, status: string, userId: string, reason?: string): Promise<Appointment>;
+  
+  // Customer Management operations - Module 10
+  getCustomers(garageId?: string, searchQuery?: string): Promise<User[]>;
+  getCustomer(id: string): Promise<User | undefined>;
+  getCustomerVehicles(customerId: string): Promise<Vehicle[]>;
+  getVehicle(id: string): Promise<Vehicle | undefined>;
+  createVehicle(data: InsertVehicle): Promise<Vehicle>;
+  updateVehicle(id: string, data: Partial<Vehicle>): Promise<Vehicle>;
+  deleteVehicle(id: string): Promise<void>;
+  getCustomerNotes(customerId: string): Promise<CustomerNote[]>;
+  createCustomerNote(data: InsertCustomerNote): Promise<CustomerNote>;
+  deleteCustomerNote(id: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -360,6 +378,82 @@ export class DatabaseStorage implements IStorage {
     }).where(eq(appointments.id, id)).returning();
     
     return updatedAppointment;
+  }
+
+  // Customer Management operations - Module 10
+  async getCustomers(garageId?: string, searchQuery?: string): Promise<User[]> {
+    const conditions = [eq(users.userType, "customer")];
+    
+    if (garageId) {
+      conditions.push(eq(users.garageId, garageId));
+    }
+    
+    if (searchQuery) {
+      const searchPattern = `%${searchQuery}%`;
+      conditions.push(
+        or(
+          ilike(users.fullName, searchPattern),
+          ilike(users.email, searchPattern),
+          ilike(users.phone, searchPattern)
+        )!
+      );
+    }
+    
+    let query = db.select().from(users).where(and(...conditions));
+    
+    return await query.orderBy(desc(users.createdAt));
+  }
+
+  async getCustomer(id: string): Promise<User | undefined> {
+    const [customer] = await db.select().from(users)
+      .where(eq(users.id, id));
+    return customer;
+  }
+
+  async getCustomerVehicles(customerId: string): Promise<Vehicle[]> {
+    return await db.select().from(vehicles)
+      .where(and(
+        eq(vehicles.customerId, customerId),
+        eq(vehicles.isActive, true)
+      ))
+      .orderBy(desc(vehicles.createdAt));
+  }
+
+  async getVehicle(id: string): Promise<Vehicle | undefined> {
+    const [vehicle] = await db.select().from(vehicles).where(eq(vehicles.id, id));
+    return vehicle;
+  }
+
+  async createVehicle(data: InsertVehicle): Promise<Vehicle> {
+    const [vehicle] = await db.insert(vehicles).values(data).returning();
+    return vehicle;
+  }
+
+  async updateVehicle(id: string, data: Partial<Vehicle>): Promise<Vehicle> {
+    const [vehicle] = await db.update(vehicles).set({
+      ...data,
+      updatedAt: new Date()
+    }).where(eq(vehicles.id, id)).returning();
+    return vehicle;
+  }
+
+  async deleteVehicle(id: string): Promise<void> {
+    await db.update(vehicles).set({ isActive: false }).where(eq(vehicles.id, id));
+  }
+
+  async getCustomerNotes(customerId: string): Promise<CustomerNote[]> {
+    return await db.select().from(customerNotes)
+      .where(eq(customerNotes.customerId, customerId))
+      .orderBy(desc(customerNotes.createdAt));
+  }
+
+  async createCustomerNote(data: InsertCustomerNote): Promise<CustomerNote> {
+    const [note] = await db.insert(customerNotes).values(data).returning();
+    return note;
+  }
+
+  async deleteCustomerNote(id: string): Promise<void> {
+    await db.delete(customerNotes).where(eq(customerNotes.id, id));
   }
 }
 

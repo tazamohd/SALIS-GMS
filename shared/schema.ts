@@ -358,6 +358,38 @@ export const toolUsageLogs = pgTable("tool_usage_logs", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Module 10: Customer Management - Vehicles
+export const vehicles = pgTable("vehicles", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  customerId: varchar("customer_id").notNull().references(() => users.id),
+  garageId: uuid("garage_id").notNull().references(() => garages.id),
+  make: varchar("make", { length: 100 }).notNull(),
+  model: varchar("model", { length: 100 }).notNull(),
+  year: integer("year").notNull(),
+  licensePlate: varchar("license_plate", { length: 50 }).notNull(),
+  vin: varchar("vin", { length: 100 }),
+  color: varchar("color", { length: 50 }),
+  mileage: integer("mileage"),
+  engineType: varchar("engine_type", { length: 100 }), // "gasoline", "diesel", "electric", "hybrid"
+  transmissionType: varchar("transmission_type", { length: 50 }), // "automatic", "manual"
+  notes: text("notes"),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Customer Notes - for tracking customer interactions
+export const customerNotes = pgTable("customer_notes", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  customerId: varchar("customer_id").notNull().references(() => users.id),
+  createdBy: varchar("created_by").notNull().references(() => users.id),
+  noteType: varchar("note_type", { length: 50 }).notNull(), // "general", "complaint", "feedback", "reminder"
+  subject: varchar("subject", { length: 255 }),
+  content: text("content").notNull(),
+  isImportant: boolean("is_important").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Module 9: Appointments & Scheduling
 export const appointments = pgTable("appointments", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -435,6 +467,14 @@ export type AppointmentStatusHistory = typeof appointmentStatusHistory.$inferSel
 export type InsertAppointmentStatusHistory = typeof appointmentStatusHistory.$inferInsert;
 export type AppointmentReminder = typeof appointmentReminders.$inferSelect;
 export type InsertAppointmentReminder = typeof appointmentReminders.$inferInsert;
+
+export type Vehicle = typeof vehicles.$inferSelect;
+export type InsertVehicle = typeof vehicles.$inferInsert;
+export const insertVehicleSchema = createInsertSchema(vehicles).omit({ id: true, createdAt: true, updatedAt: true });
+export type CustomerNote = typeof customerNotes.$inferSelect;
+export type InsertCustomerNote = typeof customerNotes.$inferInsert;
+export const insertCustomerNoteSchema = createInsertSchema(customerNotes).omit({ id: true, createdBy: true, createdAt: true });
+
 export type Garage = typeof garages.$inferSelect;
 export type Branch = typeof branches.$inferSelect;
 export type Role = typeof roles.$inferSelect;

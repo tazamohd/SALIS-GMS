@@ -10,6 +10,7 @@ import { Layout } from "@/components/Layout";
 import { Dashboard } from "@/pages/Dashboard";
 import { TasksManagement } from "@/pages/TasksManagement";
 import { Appointments } from "@/pages/Appointments";
+import { Customers } from "@/pages/Customers";
 import { Profile } from "@/pages/Profile";
 
 function Router() {
@@ -30,6 +31,11 @@ function Router() {
       <Route path="/appointments">
         <Layout>
           <Appointments />
+        </Layout>
+      </Route>
+      <Route path="/customers">
+        <Layout>
+          <Customers />
         </Layout>
       </Route>
       <Route path="/profile">

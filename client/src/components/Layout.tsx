@@ -1,4 +1,4 @@
-import { Home, ClipboardCheck, UserIcon, LogOut, Search, Calendar } from "lucide-react";
+import { Home, ClipboardCheck, UserIcon, LogOut, Search, Calendar, Users } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,6 +20,7 @@ export function Layout({ children }: LayoutProps) {
     { path: "/dashboard", icon: Home, label: "Dashboard" },
     { path: "/tasks", icon: ClipboardCheck, label: "Tasks Management" },
     { path: "/appointments", icon: Calendar, label: "Appointments" },
+    { path: "/customers", icon: Users, label: "Customers" },
     { path: "/profile", icon: UserIcon, label: "My Profile" },
   ];
 
