@@ -301,6 +301,115 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Appointment Management routes - Module 9: Appointments & Scheduling
+  app.get('/api/appointments', isAuthenticated, async (req, res) => {
+    try {
+      const { garage_id, status, date_from, date_to } = req.query;
+      const appointments = await storage.getAppointments(
+        garage_id as string,
+        status as string,
+        date_from as string,
+        date_to as string
+      );
+      res.json(appointments);
+    } catch (error) {
+      console.error("Error fetching appointments:", error);
+      res.status(500).json({ message: "Failed to fetch appointments" });
+    }
+  });
+
+  app.get('/api/appointments/:id', isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const appointment = await storage.getAppointment(id);
+      if (!appointment) {
+        return res.status(404).json({ message: "Appointment not found" });
+      }
+      res.json(appointment);
+    } catch (error) {
+      console.error("Error fetching appointment:", error);
+      res.status(500).json({ message: "Failed to fetch appointment" });
+    }
+  });
+
+  app.post('/api/appointments', isAuthenticated, async (req: any, res) => {
+    try {
+      const { insertAppointmentSchema } = await import("@shared/schema");
+      const userId = req.user.claims.sub;
+      
+      const validationResult = insertAppointmentSchema.safeParse(req.body);
+      
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          message: "Validation error", 
+          errors: validationResult.error.errors 
+        });
+      }
+      
+      const appointmentData = {
+        ...validationResult.data,
+        createdBy: userId,
+      };
+      
+      const appointment = await storage.createAppointment(appointmentData as any);
+      res.status(201).json(appointment);
+    } catch (error) {
+      console.error("Error creating appointment:", error);
+      res.status(500).json({ message: "Failed to create appointment" });
+    }
+  });
+
+  app.patch('/api/appointments/:id', isAuthenticated, async (req, res) => {
+    try {
+      const { insertAppointmentSchema } = await import("@shared/schema");
+      const { id } = req.params;
+      
+      const validationResult = insertAppointmentSchema.partial().safeParse(req.body);
+      
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          message: "Validation error", 
+          errors: validationResult.error.errors 
+        });
+      }
+      
+      const updatedAppointment = await storage.updateAppointment(id, validationResult.data);
+      res.json(updatedAppointment);
+    } catch (error) {
+      console.error("Error updating appointment:", error);
+      res.status(500).json({ message: "Failed to update appointment" });
+    }
+  });
+
+  app.delete('/api/appointments/:id', isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteAppointment(id);
+      res.json({ message: "Appointment deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting appointment:", error);
+      res.status(500).json({ message: "Failed to delete appointment" });
+    }
+  });
+
+  app.post('/api/appointments/:id/status', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const { status, reason } = req.body;
+      const userId = req.user.claims.sub;
+      const updatedAppointment = await storage.updateAppointmentStatus(
+        id,
+        status,
+        userId,
+        reason
+      );
+      res.json(updatedAppointment);
+    } catch (error) {
+      console.error("Error updating appointment status:", error);
+      res.status(500).json({ message: "Failed to update appointment status" });
+    }
+  });
+
   // Integrated System Routes - Connecting All Modules
   app.get('/api/integrated/status', isAuthenticated, async (req, res) => {
     try {

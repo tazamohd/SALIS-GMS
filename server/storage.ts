@@ -13,6 +13,8 @@ import {
   tools,
   toolAvailability,
   toolUsageLogs,
+  appointments,
+  appointmentStatusHistory,
   type User,
   type UpsertUser,
   type Garage,
@@ -24,9 +26,12 @@ import {
   type Tool,
   type ToolAvailability,
   type ToolUsageLog,
+  type Appointment,
+  type InsertAppointment,
+  type AppointmentStatusHistory,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, or, inArray } from "drizzle-orm";
+import { eq, desc, or, inArray, and, gte, lte } from "drizzle-orm";
 
 // Interface for storage operations
 export interface IStorage {
@@ -81,6 +86,14 @@ export interface IStorage {
   getToolUsageLogs(toolId: string): Promise<ToolUsageLog[]>;
   createToolUsageLog(data: any): Promise<ToolUsageLog>;
   updateToolUsageLog(id: string, data: any): Promise<ToolUsageLog>;
+  
+  // Appointment operations - Module 9
+  getAppointments(garageId?: string, status?: string, dateFrom?: string, dateTo?: string): Promise<Appointment[]>;
+  getAppointment(id: string): Promise<Appointment | undefined>;
+  createAppointment(data: InsertAppointment): Promise<Appointment>;
+  updateAppointment(id: string, data: Partial<Appointment>): Promise<Appointment>;
+  deleteAppointment(id: string): Promise<void>;
+  updateAppointmentStatus(id: string, status: string, userId: string, reason?: string): Promise<Appointment>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -215,18 +228,6 @@ export class DatabaseStorage implements IStorage {
 
   // Tool Management operations - Module 7
   async getTools(garageId?: string, isGlobal?: boolean): Promise<Tool[]> {
-    if (isGlobal) {
-      return await db.select().from(tools)
-        .where(eq(tools.isActive, true))
-        .where(eq(tools.isGlobal, true))
-        .orderBy(tools.name);
-    } else if (garageId) {
-      // Get tools created by users in this garage or global tools
-      return await db.select().from(tools)
-        .where(eq(tools.isActive, true))
-        .orderBy(tools.name);
-    }
-    
     return await db.select().from(tools)
       .where(eq(tools.isActive, true))
       .orderBy(tools.name);
@@ -252,12 +253,6 @@ export class DatabaseStorage implements IStorage {
 
   // Tool Availability operations
   async getToolAvailability(garageId: string, toolId?: string): Promise<ToolAvailability[]> {
-    if (toolId) {
-      return await db.select().from(toolAvailability)
-        .where(eq(toolAvailability.garageId, garageId))
-        .where(eq(toolAvailability.toolId, toolId));
-    }
-    
     return await db.select().from(toolAvailability)
       .where(eq(toolAvailability.garageId, garageId));
   }
@@ -290,6 +285,81 @@ export class DatabaseStorage implements IStorage {
   async updateToolUsageLog(id: string, data: any): Promise<ToolUsageLog> {
     const [log] = await db.update(toolUsageLogs).set(data).where(eq(toolUsageLogs.id, id)).returning();
     return log;
+  }
+
+  // Appointment operations - Module 9: Appointments & Scheduling
+  async getAppointments(garageId?: string, status?: string, dateFrom?: string, dateTo?: string): Promise<Appointment[]> {
+    const conditions = [];
+    
+    if (garageId) {
+      conditions.push(eq(appointments.garageId, garageId));
+    }
+    if (status) {
+      conditions.push(eq(appointments.status, status));
+    }
+    if (dateFrom) {
+      conditions.push(gte(appointments.appointmentDate, new Date(dateFrom)));
+    }
+    if (dateTo) {
+      conditions.push(lte(appointments.appointmentDate, new Date(dateTo)));
+    }
+    
+    if (conditions.length > 0) {
+      return await db.select().from(appointments)
+        .where(and(...conditions))
+        .orderBy(desc(appointments.appointmentDate));
+    }
+    
+    return await db.select().from(appointments)
+      .orderBy(desc(appointments.appointmentDate));
+  }
+
+  async getAppointment(id: string): Promise<Appointment | undefined> {
+    const [appointment] = await db.select().from(appointments).where(eq(appointments.id, id));
+    return appointment;
+  }
+
+  async createAppointment(data: InsertAppointment): Promise<Appointment> {
+    const appointmentNumber = `APT-${Date.now()}`;
+    const [appointment] = await db.insert(appointments).values({
+      ...data,
+      appointmentNumber,
+    }).returning();
+    return appointment;
+  }
+
+  async updateAppointment(id: string, data: Partial<Appointment>): Promise<Appointment> {
+    const [appointment] = await db.update(appointments).set({
+      ...data,
+      updatedAt: new Date()
+    }).where(eq(appointments.id, id)).returning();
+    return appointment;
+  }
+
+  async deleteAppointment(id: string): Promise<void> {
+    await db.delete(appointments).where(eq(appointments.id, id));
+  }
+
+  async updateAppointmentStatus(id: string, status: string, userId: string, reason?: string): Promise<Appointment> {
+    const currentAppointment = await this.getAppointment(id);
+    if (!currentAppointment) {
+      throw new Error("Appointment not found");
+    }
+
+    await db.insert(appointmentStatusHistory).values({
+      appointmentId: id,
+      previousStatus: currentAppointment.status,
+      newStatus: status,
+      changedBy: userId,
+      reason: reason || null,
+    });
+
+    const [updatedAppointment] = await db.update(appointments).set({
+      status,
+      updatedAt: new Date()
+    }).where(eq(appointments.id, id)).returning();
+    
+    return updatedAppointment;
   }
 }
 

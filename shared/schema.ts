@@ -358,6 +358,55 @@ export const toolUsageLogs = pgTable("tool_usage_logs", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Module 9: Appointments & Scheduling
+export const appointments = pgTable("appointments", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  appointmentNumber: varchar("appointment_number").notNull().unique(),
+  garageId: uuid("garage_id").notNull().references(() => garages.id),
+  branchId: uuid("branch_id").references(() => branches.id),
+  customerId: varchar("customer_id").references(() => users.id),
+  customerName: varchar("customer_name").notNull(),
+  customerPhone: varchar("customer_phone").notNull(),
+  customerEmail: varchar("customer_email"),
+  vehicleInfo: jsonb("vehicle_info").notNull(), // {make, model, year, licensePlate}
+  serviceType: varchar("service_type").notNull(), // "maintenance", "repair", "diagnostic", "inspection"
+  description: text("description"),
+  appointmentDate: timestamp("appointment_date").notNull(),
+  duration: integer("duration").notNull().default(60), // Duration in minutes
+  status: varchar("status").notNull().default("scheduled"), // "scheduled", "confirmed", "in_progress", "completed", "cancelled", "no_show"
+  assignedTo: varchar("assigned_to").references(() => users.id), // Assigned technician
+  reminderSent: boolean("reminder_sent").default(false),
+  reminderSentAt: timestamp("reminder_sent_at"),
+  notes: text("notes"),
+  cancellationReason: text("cancellation_reason"),
+  createdBy: varchar("created_by").notNull().references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Appointment Status History - track all status changes
+export const appointmentStatusHistory = pgTable("appointment_status_history", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  appointmentId: uuid("appointment_id").notNull().references(() => appointments.id),
+  previousStatus: varchar("previous_status"),
+  newStatus: varchar("new_status").notNull(),
+  changedBy: varchar("changed_by").notNull().references(() => users.id),
+  reason: text("reason"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Appointment Reminders - automated reminder tracking
+export const appointmentReminders = pgTable("appointment_reminders", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  appointmentId: uuid("appointment_id").notNull().references(() => appointments.id),
+  reminderType: varchar("reminder_type").notNull(), // "sms", "email", "push"
+  scheduledFor: timestamp("scheduled_for").notNull(),
+  sentAt: timestamp("sent_at"),
+  status: varchar("status").notNull().default("pending"), // "pending", "sent", "failed"
+  failureReason: text("failure_reason"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 export type JobCard = typeof jobCards.$inferSelect;
 export type InsertJobCard = typeof jobCards.$inferInsert;
 export const insertJobCardSchema = createInsertSchema(jobCards);
@@ -373,6 +422,19 @@ export type ToolAvailability = typeof toolAvailability.$inferSelect;
 export type InsertToolAvailability = typeof toolAvailability.$inferInsert;
 export type ToolUsageLog = typeof toolUsageLogs.$inferSelect;
 export type InsertToolUsageLog = typeof toolUsageLogs.$inferInsert;
+export type Appointment = typeof appointments.$inferSelect;
+export type InsertAppointment = typeof appointments.$inferInsert;
+export const insertAppointmentSchema = createInsertSchema(appointments).omit({ 
+  id: true, 
+  appointmentNumber: true,
+  createdBy: true,
+  createdAt: true, 
+  updatedAt: true 
+});
+export type AppointmentStatusHistory = typeof appointmentStatusHistory.$inferSelect;
+export type InsertAppointmentStatusHistory = typeof appointmentStatusHistory.$inferInsert;
+export type AppointmentReminder = typeof appointmentReminders.$inferSelect;
+export type InsertAppointmentReminder = typeof appointmentReminders.$inferInsert;
 export type Garage = typeof garages.$inferSelect;
 export type Branch = typeof branches.$inferSelect;
 export type Role = typeof roles.$inferSelect;

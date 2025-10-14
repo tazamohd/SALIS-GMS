@@ -9,6 +9,7 @@ import { LoginDashboard } from "@/pages/LoginDashboard";
 import { Layout } from "@/components/Layout";
 import { Dashboard } from "@/pages/Dashboard";
 import { TasksManagement } from "@/pages/TasksManagement";
+import { Appointments } from "@/pages/Appointments";
 import { Profile } from "@/pages/Profile";
 
 function Router() {
@@ -24,6 +25,11 @@ function Router() {
       <Route path="/tasks">
         <Layout>
           <TasksManagement />
+        </Layout>
+      </Route>
+      <Route path="/appointments">
+        <Layout>
+          <Appointments />
         </Layout>
       </Route>
       <Route path="/profile">
