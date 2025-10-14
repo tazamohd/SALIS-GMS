@@ -178,12 +178,16 @@ Based on attached module flow plan for garage management SaaS:
 - Database schema with vehicles and customer_notes tables
 - Vehicle tracking per customer with detailed specs (make, model, year, VIN, engine type, transmission, etc.)
 - Customer notes system for tracking interactions (general, complaint, feedback, reminder)
-- API routes for customer viewing with garage filtering
+- API routes for customer viewing with server-side garage filtering and text search (ilike)
 - Full CRUD API routes for vehicles and notes with Zod validation
-- Customer list view with search and garage filtering
+- Customer list view with working garage filter dropdown and client-side search
 - Customer detail view showing profile, vehicles, and notes
-- Vehicle and notes management with full CRUD operations
+- AddVehicleDialog component with full form validation and garageId handling
+- AddCustomerNoteDialog component with full form validation
+- Delete functionality for both vehicles and notes with cache invalidation
+- Proper query parameter construction for backend filtering
 - Integrated into main navigation with Users icon
+- Production-ready with all TypeScript types correct
 
 ### 🔜 Next Modules (11-14)
 - Purchase Orders & Supplier Integration (Module 11)
