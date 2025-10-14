@@ -11,6 +11,7 @@ import { Dashboard } from "@/pages/Dashboard";
 import { TasksManagement } from "@/pages/TasksManagement";
 import { Appointments } from "@/pages/Appointments";
 import { Customers } from "@/pages/Customers";
+import { PurchaseOrders } from "@/pages/PurchaseOrders";
 import { Profile } from "@/pages/Profile";
 
 function Router() {
@@ -36,6 +37,11 @@ function Router() {
       <Route path="/customers">
         <Layout>
           <Customers />
+        </Layout>
+      </Route>
+      <Route path="/purchase-orders">
+        <Layout>
+          <PurchaseOrders />
         </Layout>
       </Route>
       <Route path="/profile">

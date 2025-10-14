@@ -17,6 +17,9 @@ import {
   appointmentStatusHistory,
   vehicles,
   customerNotes,
+  suppliers,
+  purchaseOrders,
+  purchaseOrderItems,
   type User,
   type UpsertUser,
   type Garage,
@@ -35,6 +38,12 @@ import {
   type InsertVehicle,
   type CustomerNote,
   type InsertCustomerNote,
+  type Supplier,
+  type InsertSupplier,
+  type PurchaseOrder,
+  type InsertPurchaseOrder,
+  type PurchaseOrderItem,
+  type InsertPurchaseOrderItem,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, or, inArray, and, gte, lte, ilike } from "drizzle-orm";
@@ -112,6 +121,22 @@ export interface IStorage {
   getCustomerNotes(customerId: string): Promise<CustomerNote[]>;
   createCustomerNote(data: InsertCustomerNote): Promise<CustomerNote>;
   deleteCustomerNote(id: string): Promise<void>;
+  
+  // Purchase Orders & Supplier Integration - Module 11
+  getSuppliers(garageId?: string): Promise<Supplier[]>;
+  getSupplier(id: string): Promise<Supplier | undefined>;
+  createSupplier(data: InsertSupplier): Promise<Supplier>;
+  updateSupplier(id: string, data: Partial<Supplier>): Promise<Supplier>;
+  deleteSupplier(id: string): Promise<void>;
+  getPurchaseOrders(garageId?: string, status?: string): Promise<PurchaseOrder[]>;
+  getPurchaseOrder(id: string): Promise<PurchaseOrder | undefined>;
+  createPurchaseOrder(data: InsertPurchaseOrder): Promise<PurchaseOrder>;
+  updatePurchaseOrder(id: string, data: Partial<PurchaseOrder>): Promise<PurchaseOrder>;
+  deletePurchaseOrder(id: string): Promise<void>;
+  getPurchaseOrderItems(purchaseOrderId: string): Promise<PurchaseOrderItem[]>;
+  createPurchaseOrderItem(data: InsertPurchaseOrderItem): Promise<PurchaseOrderItem>;
+  updatePurchaseOrderItem(id: string, data: Partial<PurchaseOrderItem>): Promise<PurchaseOrderItem>;
+  deletePurchaseOrderItem(id: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -454,6 +479,113 @@ export class DatabaseStorage implements IStorage {
 
   async deleteCustomerNote(id: string): Promise<void> {
     await db.delete(customerNotes).where(eq(customerNotes.id, id));
+  }
+
+  // Purchase Orders & Supplier Integration - Module 11
+  async getSuppliers(garageId?: string): Promise<Supplier[]> {
+    if (garageId) {
+      return await db.select().from(suppliers)
+        .where(and(
+          eq(suppliers.garageId, garageId),
+          eq(suppliers.isActive, true)
+        ))
+        .orderBy(desc(suppliers.createdAt));
+    }
+    return await db.select().from(suppliers)
+      .where(eq(suppliers.isActive, true))
+      .orderBy(desc(suppliers.createdAt));
+  }
+
+  async getSupplier(id: string): Promise<Supplier | undefined> {
+    const [supplier] = await db.select().from(suppliers).where(eq(suppliers.id, id));
+    return supplier;
+  }
+
+  async createSupplier(data: InsertSupplier): Promise<Supplier> {
+    const [supplier] = await db.insert(suppliers).values(data).returning();
+    return supplier;
+  }
+
+  async updateSupplier(id: string, data: Partial<Supplier>): Promise<Supplier> {
+    const [supplier] = await db.update(suppliers)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(suppliers.id, id))
+      .returning();
+    return supplier;
+  }
+
+  async deleteSupplier(id: string): Promise<void> {
+    await db.update(suppliers)
+      .set({ isActive: false })
+      .where(eq(suppliers.id, id));
+  }
+
+  async getPurchaseOrders(garageId?: string, status?: string): Promise<PurchaseOrder[]> {
+    const conditions = [];
+    
+    if (garageId) {
+      conditions.push(eq(purchaseOrders.garageId, garageId));
+    }
+    
+    if (status) {
+      conditions.push(eq(purchaseOrders.status, status));
+    }
+    
+    if (conditions.length > 0) {
+      return await db.select().from(purchaseOrders)
+        .where(and(...conditions))
+        .orderBy(desc(purchaseOrders.createdAt));
+    }
+    
+    return await db.select().from(purchaseOrders).orderBy(desc(purchaseOrders.createdAt));
+  }
+
+  async getPurchaseOrder(id: string): Promise<PurchaseOrder | undefined> {
+    const [po] = await db.select().from(purchaseOrders).where(eq(purchaseOrders.id, id));
+    return po;
+  }
+
+  async createPurchaseOrder(data: InsertPurchaseOrder): Promise<PurchaseOrder> {
+    const poNumber = `PO-${Date.now()}`;
+    const [po] = await db.insert(purchaseOrders)
+      .values({ ...data, poNumber })
+      .returning();
+    return po;
+  }
+
+  async updatePurchaseOrder(id: string, data: Partial<PurchaseOrder>): Promise<PurchaseOrder> {
+    const [po] = await db.update(purchaseOrders)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(purchaseOrders.id, id))
+      .returning();
+    return po;
+  }
+
+  async deletePurchaseOrder(id: string): Promise<void> {
+    await db.delete(purchaseOrders).where(eq(purchaseOrders.id, id));
+  }
+
+  async getPurchaseOrderItems(purchaseOrderId: string): Promise<PurchaseOrderItem[]> {
+    return await db.select().from(purchaseOrderItems)
+      .where(eq(purchaseOrderItems.purchaseOrderId, purchaseOrderId))
+      .orderBy(desc(purchaseOrderItems.createdAt));
+  }
+
+  async createPurchaseOrderItem(data: InsertPurchaseOrderItem): Promise<PurchaseOrderItem> {
+    const [item] = await db.insert(purchaseOrderItems).values(data).returning();
+    return item;
+  }
+
+  async updatePurchaseOrderItem(id: string, data: Partial<PurchaseOrderItem>): Promise<PurchaseOrderItem> {
+    const [item] = await db.update(purchaseOrderItems)
+      .set(data)
+      .where(eq(purchaseOrderItems.id, id))
+      .returning();
+    return item;
+  }
+
+  async deletePurchaseOrderItem(id: string): Promise<void> {
+    await db.delete(purchaseOrderItems).where(eq(purchaseOrderItems.id, id));
   }
 }
 

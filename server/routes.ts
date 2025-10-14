@@ -551,6 +551,212 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Purchase Orders & Supplier Integration - Module 11
+  app.get('/api/suppliers', isAuthenticated, async (req, res) => {
+    try {
+      const { garage_id } = req.query;
+      const suppliers = await storage.getSuppliers(garage_id as string);
+      res.json(suppliers);
+    } catch (error) {
+      console.error("Error fetching suppliers:", error);
+      res.status(500).json({ message: "Failed to fetch suppliers" });
+    }
+  });
+
+  app.get('/api/suppliers/:id', isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const supplier = await storage.getSupplier(id);
+      if (!supplier) {
+        return res.status(404).json({ message: "Supplier not found" });
+      }
+      res.json(supplier);
+    } catch (error) {
+      console.error("Error fetching supplier:", error);
+      res.status(500).json({ message: "Failed to fetch supplier" });
+    }
+  });
+
+  app.post('/api/suppliers', isAuthenticated, async (req, res) => {
+    try {
+      const { insertSupplierSchema } = await import("@shared/schema");
+      const validationResult = insertSupplierSchema.safeParse(req.body);
+      
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          message: "Validation error", 
+          errors: validationResult.error.errors 
+        });
+      }
+      
+      const supplier = await storage.createSupplier(validationResult.data);
+      res.status(201).json(supplier);
+    } catch (error) {
+      console.error("Error creating supplier:", error);
+      res.status(500).json({ message: "Failed to create supplier" });
+    }
+  });
+
+  app.patch('/api/suppliers/:id', isAuthenticated, async (req, res) => {
+    try {
+      const { insertSupplierSchema } = await import("@shared/schema");
+      const { id } = req.params;
+      
+      const validationResult = insertSupplierSchema.partial().safeParse(req.body);
+      
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          message: "Validation error", 
+          errors: validationResult.error.errors 
+        });
+      }
+      
+      const supplier = await storage.updateSupplier(id, validationResult.data);
+      res.json(supplier);
+    } catch (error) {
+      console.error("Error updating supplier:", error);
+      res.status(500).json({ message: "Failed to update supplier" });
+    }
+  });
+
+  app.delete('/api/suppliers/:id', isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteSupplier(id);
+      res.json({ message: "Supplier deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting supplier:", error);
+      res.status(500).json({ message: "Failed to delete supplier" });
+    }
+  });
+
+  app.get('/api/purchase-orders', isAuthenticated, async (req, res) => {
+    try {
+      const { garage_id, status } = req.query;
+      const orders = await storage.getPurchaseOrders(garage_id as string, status as string);
+      res.json(orders);
+    } catch (error) {
+      console.error("Error fetching purchase orders:", error);
+      res.status(500).json({ message: "Failed to fetch purchase orders" });
+    }
+  });
+
+  app.get('/api/purchase-orders/:id', isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const order = await storage.getPurchaseOrder(id);
+      if (!order) {
+        return res.status(404).json({ message: "Purchase order not found" });
+      }
+      res.json(order);
+    } catch (error) {
+      console.error("Error fetching purchase order:", error);
+      res.status(500).json({ message: "Failed to fetch purchase order" });
+    }
+  });
+
+  app.post('/api/purchase-orders', isAuthenticated, async (req: any, res) => {
+    try {
+      const { insertPurchaseOrderSchema } = await import("@shared/schema");
+      const userId = req.user.claims.sub;
+      
+      const validationResult = insertPurchaseOrderSchema.safeParse(req.body);
+      
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          message: "Validation error", 
+          errors: validationResult.error.errors 
+        });
+      }
+      
+      const orderData = {
+        ...validationResult.data,
+        createdBy: userId,
+      };
+      
+      const order = await storage.createPurchaseOrder(orderData as any);
+      res.status(201).json(order);
+    } catch (error) {
+      console.error("Error creating purchase order:", error);
+      res.status(500).json({ message: "Failed to create purchase order" });
+    }
+  });
+
+  app.patch('/api/purchase-orders/:id', isAuthenticated, async (req, res) => {
+    try {
+      const { insertPurchaseOrderSchema } = await import("@shared/schema");
+      const { id } = req.params;
+      
+      const validationResult = insertPurchaseOrderSchema.partial().safeParse(req.body);
+      
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          message: "Validation error", 
+          errors: validationResult.error.errors 
+        });
+      }
+      
+      const order = await storage.updatePurchaseOrder(id, validationResult.data);
+      res.json(order);
+    } catch (error) {
+      console.error("Error updating purchase order:", error);
+      res.status(500).json({ message: "Failed to update purchase order" });
+    }
+  });
+
+  app.delete('/api/purchase-orders/:id', isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deletePurchaseOrder(id);
+      res.json({ message: "Purchase order deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting purchase order:", error);
+      res.status(500).json({ message: "Failed to delete purchase order" });
+    }
+  });
+
+  app.get('/api/purchase-orders/:id/items', isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const items = await storage.getPurchaseOrderItems(id);
+      res.json(items);
+    } catch (error) {
+      console.error("Error fetching purchase order items:", error);
+      res.status(500).json({ message: "Failed to fetch purchase order items" });
+    }
+  });
+
+  app.post('/api/purchase-order-items', isAuthenticated, async (req, res) => {
+    try {
+      const { insertPurchaseOrderItemSchema } = await import("@shared/schema");
+      const validationResult = insertPurchaseOrderItemSchema.safeParse(req.body);
+      
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          message: "Validation error", 
+          errors: validationResult.error.errors 
+        });
+      }
+      
+      const item = await storage.createPurchaseOrderItem(validationResult.data);
+      res.status(201).json(item);
+    } catch (error) {
+      console.error("Error creating purchase order item:", error);
+      res.status(500).json({ message: "Failed to create purchase order item" });
+    }
+  });
+
+  app.delete('/api/purchase-order-items/:id', isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deletePurchaseOrderItem(id);
+      res.json({ message: "Item deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting item:", error);
+      res.status(500).json({ message: "Failed to delete item" });
+    }
+  });
+
   // Integrated System Routes - Connecting All Modules
   app.get('/api/integrated/status', isAuthenticated, async (req, res) => {
     try {

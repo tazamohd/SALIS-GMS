@@ -439,6 +439,59 @@ export const appointmentReminders = pgTable("appointment_reminders", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Module 11: Purchase Orders & Supplier Integration
+export const suppliers = pgTable("suppliers", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").notNull().references(() => garages.id),
+  name: varchar("name", { length: 255 }).notNull(),
+  contactPerson: varchar("contact_person", { length: 255 }),
+  email: varchar("email", { length: 255 }),
+  phone: varchar("phone", { length: 50 }),
+  address: text("address"),
+  city: varchar("city", { length: 100 }),
+  country: varchar("country", { length: 100 }),
+  taxId: varchar("tax_id", { length: 100 }),
+  paymentTerms: varchar("payment_terms", { length: 100 }), // "net30", "net60", "cod"
+  notes: text("notes"),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const purchaseOrders = pgTable("purchase_orders", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  poNumber: varchar("po_number").notNull().unique(),
+  garageId: uuid("garage_id").notNull().references(() => garages.id),
+  supplierId: uuid("supplier_id").notNull().references(() => suppliers.id),
+  orderDate: timestamp("order_date").notNull().defaultNow(),
+  expectedDeliveryDate: timestamp("expected_delivery_date"),
+  actualDeliveryDate: timestamp("actual_delivery_date"),
+  status: varchar("status").notNull().default("draft"), // "draft", "sent", "confirmed", "partial", "received", "cancelled"
+  subtotal: decimal("subtotal", { precision: 10, scale: 2 }).notNull().default("0"),
+  taxAmount: decimal("tax_amount", { precision: 10, scale: 2 }).notNull().default("0"),
+  totalAmount: decimal("total_amount", { precision: 10, scale: 2 }).notNull().default("0"),
+  notes: text("notes"),
+  createdBy: varchar("created_by").notNull().references(() => users.id),
+  approvedBy: varchar("approved_by").references(() => users.id),
+  approvedAt: timestamp("approved_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const purchaseOrderItems = pgTable("purchase_order_items", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  purchaseOrderId: uuid("purchase_order_id").notNull().references(() => purchaseOrders.id, { onDelete: "cascade" }),
+  partNumber: varchar("part_number", { length: 100 }),
+  partName: varchar("part_name", { length: 255 }).notNull(),
+  description: text("description"),
+  quantity: integer("quantity").notNull(),
+  receivedQuantity: integer("received_quantity").notNull().default(0),
+  unitPrice: decimal("unit_price", { precision: 10, scale: 2 }).notNull(),
+  lineTotal: decimal("line_total", { precision: 10, scale: 2 }).notNull(),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 export type JobCard = typeof jobCards.$inferSelect;
 export type InsertJobCard = typeof jobCards.$inferInsert;
 export const insertJobCardSchema = createInsertSchema(jobCards);
@@ -474,6 +527,16 @@ export const insertVehicleSchema = createInsertSchema(vehicles).omit({ id: true,
 export type CustomerNote = typeof customerNotes.$inferSelect;
 export type InsertCustomerNote = typeof customerNotes.$inferInsert;
 export const insertCustomerNoteSchema = createInsertSchema(customerNotes).omit({ id: true, createdBy: true, createdAt: true });
+
+export type Supplier = typeof suppliers.$inferSelect;
+export type InsertSupplier = typeof suppliers.$inferInsert;
+export const insertSupplierSchema = createInsertSchema(suppliers).omit({ id: true, createdAt: true, updatedAt: true });
+export type PurchaseOrder = typeof purchaseOrders.$inferSelect;
+export type InsertPurchaseOrder = typeof purchaseOrders.$inferInsert;
+export const insertPurchaseOrderSchema = createInsertSchema(purchaseOrders).omit({ id: true, poNumber: true, createdBy: true, createdAt: true, updatedAt: true });
+export type PurchaseOrderItem = typeof purchaseOrderItems.$inferSelect;
+export type InsertPurchaseOrderItem = typeof purchaseOrderItems.$inferInsert;
+export const insertPurchaseOrderItemSchema = createInsertSchema(purchaseOrderItems).omit({ id: true, createdAt: true });
 
 export type Garage = typeof garages.$inferSelect;
 export type Branch = typeof branches.$inferSelect;
