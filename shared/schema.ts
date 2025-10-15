@@ -601,6 +601,24 @@ export const payments = pgTable("payments", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Module 21: Notifications & Communication
+export const notifications = pgTable("notifications", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  type: varchar("type", { length: 50 }).notNull(), // "email", "sms", "in-app", "push"
+  category: varchar("category", { length: 50 }).notNull(), // "appointment", "invoice", "job_completed", "feedback_request", "general"
+  status: varchar("status", { length: 50 }).notNull().default("pending"), // "pending", "sent", "delivered", "failed", "read"
+  recipientId: varchar("recipient_id").notNull().references(() => users.id),
+  garageId: uuid("garage_id").references(() => garages.id),
+  title: varchar("title", { length: 255 }).notNull(),
+  message: text("message").notNull(),
+  metadata: jsonb("metadata"), // Additional data: appointmentId, invoiceId, jobCardId, etc.
+  sentAt: timestamp("sent_at"),
+  readAt: timestamp("read_at"),
+  failureReason: text("failure_reason"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 export type JobCard = typeof jobCards.$inferSelect;
 export type InsertJobCard = typeof jobCards.$inferInsert;
 export const insertJobCardSchema = createInsertSchema(jobCards);
@@ -674,3 +692,7 @@ export type InsertTechnicianProfile = typeof technicianProfiles.$inferInsert;
 export const insertTechnicianProfileSchema = createInsertSchema(technicianProfiles).omit({ createdAt: true, updatedAt: true });
 export type CustomerProfile = typeof customerProfiles.$inferSelect;
 export type AssistantProfile = typeof assistantProfiles.$inferSelect;
+
+export type Notification = typeof notifications.$inferSelect;
+export type InsertNotification = typeof notifications.$inferInsert;
+export const insertNotificationSchema = createInsertSchema(notifications).omit({ id: true, createdAt: true, updatedAt: true });
