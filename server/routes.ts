@@ -1478,6 +1478,106 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Notification routes - Module 21
+  app.get('/api/notifications', isAuthenticated, async (req: any, res) => {
+    try {
+      const { recipient_id, garage_id, status, type } = req.query;
+      const userId = req.user.claims.sub;
+      
+      // If no recipient_id specified, use current user
+      const recipientId = recipient_id || userId;
+      
+      const notifications = await storage.getNotifications(
+        recipientId as string,
+        garage_id as string | undefined,
+        status as string | undefined,
+        type as string | undefined
+      );
+      res.json(notifications);
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
+      res.status(500).json({ message: "Failed to fetch notifications" });
+    }
+  });
+
+  app.get('/api/notifications/unread-count', isAuthenticated, async (req: any, res) => {
+    try {
+      const { garage_id } = req.query;
+      const userId = req.user.claims.sub;
+      
+      const count = await storage.getUnreadCount(userId, garage_id as string | undefined);
+      res.json({ count });
+    } catch (error) {
+      console.error("Error fetching unread count:", error);
+      res.status(500).json({ message: "Failed to fetch unread count" });
+    }
+  });
+
+  app.get('/api/notifications/:id', isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const notification = await storage.getNotification(id);
+      
+      if (!notification) {
+        return res.status(404).json({ message: "Notification not found" });
+      }
+      
+      res.json(notification);
+    } catch (error) {
+      console.error("Error fetching notification:", error);
+      res.status(500).json({ message: "Failed to fetch notification" });
+    }
+  });
+
+  app.post('/api/notifications', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const notificationData = {
+        ...req.body,
+        status: req.body.status || 'pending'
+      };
+      
+      const notification = await storage.createNotification(notificationData);
+      res.status(201).json(notification);
+    } catch (error) {
+      console.error("Error creating notification:", error);
+      res.status(500).json({ message: "Failed to create notification" });
+    }
+  });
+
+  app.patch('/api/notifications/:id', isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const notification = await storage.updateNotification(id, req.body);
+      res.json(notification);
+    } catch (error) {
+      console.error("Error updating notification:", error);
+      res.status(500).json({ message: "Failed to update notification" });
+    }
+  });
+
+  app.patch('/api/notifications/:id/read', isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const notification = await storage.markNotificationAsRead(id);
+      res.json(notification);
+    } catch (error) {
+      console.error("Error marking notification as read:", error);
+      res.status(500).json({ message: "Failed to mark notification as read" });
+    }
+  });
+
+  app.delete('/api/notifications/:id', isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteNotification(id);
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting notification:", error);
+      res.status(500).json({ message: "Failed to delete notification" });
+    }
+  });
+
   // Protected route example
   app.get("/api/protected", isAuthenticated, async (req: any, res) => {
     const userId = req.user?.claims?.sub;

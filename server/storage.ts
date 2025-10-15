@@ -62,6 +62,9 @@ import {
   type InsertPurchaseOrderItem,
   type TechnicianProfile,
   type InsertTechnicianProfile,
+  notifications,
+  type Notification,
+  type InsertNotification,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, or, inArray, and, gte, lte, ilike } from "drizzle-orm";
@@ -262,6 +265,17 @@ export interface IStorage {
       status: string;
     }[];
   }>;
+  
+  // Notification operations - Module 21
+  getNotifications(recipientId?: string, garageId?: string, status?: string, type?: string): Promise<Notification[]>;
+  getNotification(id: string): Promise<Notification | undefined>;
+  createNotification(data: InsertNotification): Promise<Notification>;
+  updateNotification(id: string, data: Partial<Notification>): Promise<Notification>;
+  markNotificationAsRead(id: string): Promise<Notification>;
+  markNotificationAsSent(id: string): Promise<Notification>;
+  markNotificationAsFailed(id: string, reason: string): Promise<Notification>;
+  deleteNotification(id: string): Promise<void>;
+  getUnreadCount(recipientId: string, garageId?: string): Promise<number>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1597,6 +1611,110 @@ export class DatabaseStorage implements IStorage {
     return {
       customers: customerMetrics,
     };
+  }
+  
+  // Notification operations - Module 21
+  async getNotifications(
+    recipientId?: string,
+    garageId?: string,
+    status?: string,
+    type?: string
+  ): Promise<Notification[]> {
+    const conditions = [];
+    if (recipientId) conditions.push(eq(notifications.recipientId, recipientId));
+    if (garageId) conditions.push(eq(notifications.garageId, garageId));
+    if (status) conditions.push(eq(notifications.status, status));
+    if (type) conditions.push(eq(notifications.type, type));
+
+    const result = await db
+      .select()
+      .from(notifications)
+      .where(conditions.length > 0 ? and(...conditions) : undefined)
+      .orderBy(desc(notifications.createdAt));
+
+    return result;
+  }
+
+  async getNotification(id: string): Promise<Notification | undefined> {
+    const [notification] = await db
+      .select()
+      .from(notifications)
+      .where(eq(notifications.id, id));
+    return notification;
+  }
+
+  async createNotification(data: InsertNotification): Promise<Notification> {
+    const [notification] = await db
+      .insert(notifications)
+      .values(data)
+      .returning();
+    return notification;
+  }
+
+  async updateNotification(id: string, data: Partial<Notification>): Promise<Notification> {
+    const [notification] = await db
+      .update(notifications)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(notifications.id, id))
+      .returning();
+    return notification;
+  }
+
+  async markNotificationAsRead(id: string): Promise<Notification> {
+    const [notification] = await db
+      .update(notifications)
+      .set({ status: 'read', readAt: new Date(), updatedAt: new Date() })
+      .where(eq(notifications.id, id))
+      .returning();
+    return notification;
+  }
+
+  async markNotificationAsSent(id: string): Promise<Notification> {
+    const [notification] = await db
+      .update(notifications)
+      .set({ status: 'sent', sentAt: new Date(), updatedAt: new Date() })
+      .where(eq(notifications.id, id))
+      .returning();
+    return notification;
+  }
+
+  async markNotificationAsFailed(id: string, reason: string): Promise<Notification> {
+    const [notification] = await db
+      .update(notifications)
+      .set({ 
+        status: 'failed', 
+        failureReason: reason, 
+        updatedAt: new Date() 
+      })
+      .where(eq(notifications.id, id))
+      .returning();
+    return notification;
+  }
+
+  async deleteNotification(id: string): Promise<void> {
+    await db.delete(notifications).where(eq(notifications.id, id));
+  }
+
+  async getUnreadCount(recipientId: string, garageId?: string): Promise<number> {
+    const conditions = [
+      eq(notifications.recipientId, recipientId),
+      or(
+        eq(notifications.status, 'pending'),
+        eq(notifications.status, 'sent'),
+        eq(notifications.status, 'delivered')
+      )
+    ];
+    
+    if (garageId) {
+      conditions.push(eq(notifications.garageId, garageId));
+    }
+
+    const result = await db
+      .select()
+      .from(notifications)
+      .where(and(...conditions));
+
+    return result.length;
   }
 }
 
