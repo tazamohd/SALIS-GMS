@@ -918,6 +918,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
+      // Validate status workflow if status is being changed
+      if (validationResult.data.status) {
+        const currentInvoice = await storage.getInvoice(id);
+        if (!currentInvoice) {
+          return res.status(404).json({ message: "Invoice not found" });
+        }
+        
+        const validTransitions: Record<string, string[]> = {
+          draft: ["draft", "sent", "cancelled"],
+          sent: ["sent", "paid", "overdue", "cancelled"],
+          paid: ["paid", "cancelled"],
+          overdue: ["overdue", "paid", "cancelled"],
+          cancelled: ["cancelled"],
+        };
+        
+        const allowedStatuses = validTransitions[currentInvoice.status] || [currentInvoice.status];
+        if (!allowedStatuses.includes(validationResult.data.status)) {
+          return res.status(400).json({ 
+            message: `Invalid status transition from ${currentInvoice.status} to ${validationResult.data.status}` 
+          });
+        }
+      }
+      
       const invoice = await storage.updateInvoice(id, validationResult.data);
       res.json(invoice);
     } catch (error) {

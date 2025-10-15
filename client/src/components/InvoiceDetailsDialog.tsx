@@ -105,7 +105,28 @@ export function InvoiceDetailsDialog({ invoice, customer }: InvoiceDetailsDialog
     },
   });
 
+  const getValidNextStatuses = (currentStatus: string): string[] => {
+    const workflows: Record<string, string[]> = {
+      draft: ["draft", "sent", "cancelled"],
+      sent: ["sent", "paid", "overdue", "cancelled"],
+      paid: ["paid", "cancelled"],
+      overdue: ["overdue", "paid", "cancelled"],
+      cancelled: ["cancelled"],
+    };
+    return workflows[currentStatus] || [currentStatus];
+  };
+
   const handleStatusChange = (newStatus: string) => {
+    const validStatuses = getValidNextStatuses(invoice.status);
+    if (!validStatuses.includes(newStatus)) {
+      toast({
+        title: "Invalid Status Change",
+        description: `Cannot change status from ${invoice.status} to ${newStatus}`,
+        variant: "destructive",
+      });
+      setCurrentStatus(invoice.status);
+      return;
+    }
     setCurrentStatus(newStatus);
     updateStatusMutation.mutate(newStatus);
   };
@@ -148,11 +169,11 @@ export function InvoiceDetailsDialog({ invoice, customer }: InvoiceDetailsDialog
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="draft">Draft</SelectItem>
-                    <SelectItem value="sent">Sent</SelectItem>
-                    <SelectItem value="paid">Paid</SelectItem>
-                    <SelectItem value="overdue">Overdue</SelectItem>
-                    <SelectItem value="cancelled">Cancelled</SelectItem>
+                    {getValidNextStatuses(invoice.status).map((status) => (
+                      <SelectItem key={status} value={status}>
+                        {status.charAt(0).toUpperCase() + status.slice(1)}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
