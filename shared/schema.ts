@@ -103,6 +103,15 @@ export const technicianProfiles = pgTable("technician_profiles", {
   skills: text("skills"),
   isLead: boolean("is_lead").default(false),
   certifications: text("certifications"),
+  qualifications: text("qualifications"), // Education, diplomas, degrees
+  speciality: varchar("speciality", { length: 255 }), // Main area of expertise
+  level: varchar("level", { length: 50 }).default("junior"), // "junior", "intermediate", "senior", "master"
+  yearsOfExperience: integer("years_of_experience"),
+  hourlyRate: decimal("hourly_rate", { precision: 10, scale: 2 }),
+  schedule: jsonb("schedule"), // Working hours and availability {monday: {start: "08:00", end: "17:00", available: true}, ...}
+  maxConcurrentJobs: integer("max_concurrent_jobs").default(3),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 export const customerProfiles = pgTable("customer_profiles", {
@@ -661,5 +670,7 @@ export type Branch = typeof branches.$inferSelect;
 export type Role = typeof roles.$inferSelect;
 export type UserRoleBranch = typeof userRoleBranch.$inferSelect;
 export type TechnicianProfile = typeof technicianProfiles.$inferSelect;
+export type InsertTechnicianProfile = typeof technicianProfiles.$inferInsert;
+export const insertTechnicianProfileSchema = createInsertSchema(technicianProfiles).omit({ createdAt: true, updatedAt: true });
 export type CustomerProfile = typeof customerProfiles.$inferSelect;
 export type AssistantProfile = typeof assistantProfiles.$inferSelect;
