@@ -42,20 +42,21 @@ The application is built on a full-stack architecture with a clear separation be
 3. **Job Cards** - Service job cards management with vehicle info, technician assignment, and progress tracking
 4. **Service Templates** - Reusable service templates with predefined task steps and workflows
 5. **Tools Management** - Tool and equipment inventory tracking with availability status
-6. **Appointments** - Appointment scheduling and management
-7. **Customers** - Customer profiles, vehicles, and communication history
-8. **Purchase Orders** - Supplier integration and PO management
-9. **Invoices** - Invoice generation, billing, and payment tracking with status workflow validation
-10. **Reports & Dashboards** - Comprehensive analytics with 4 tabs:
+6. **Spare Parts & Inventory** - Spare parts catalog with inventory tracking, pricing, and stock management
+7. **Appointments** - Appointment scheduling and management
+8. **Customers** - Customer profiles, vehicles, and communication history
+9. **Purchase Orders** - Supplier integration and PO management
+10. **Invoices** - Invoice generation, billing, and payment tracking with status workflow validation
+11. **Reports & Dashboards** - Comprehensive analytics with 4 tabs:
    - Overview: Key business metrics (revenue, invoices, job cards, customers)
    - Revenue: Monthly trends, invoices by status, payments by method
    - Job Cards: Status/priority distribution, completion time metrics, technician performance
    - Inventory: Tool availability, category breakdown
    - Features: Garage-specific filtering, recharts visualization, real completion time calculation
-11. **My Profile** - User profile management and account settings
+12. **My Profile** - User profile management and account settings
 
 ### 🎯 Production Status
-All 11 modules are production-ready with architect approval, featuring:
+All 12 modules are production-ready with architect approval, featuring:
 - PostgreSQL database with Drizzle ORM
 - Comprehensive form validation with Zod schemas
 - Secure session management via Replit Auth
@@ -153,5 +154,44 @@ All 11 modules are production-ready with architect approval, featuring:
 - Proper cache invalidation
 - Complete data-testid attributes for testing
 - Error state handling with user-friendly messages
+
+**Production-ready** with full architect approval
+
+### Module 12: Spare Parts & Inventory (October 15, 2025)
+**Core Functionality**:
+- Complete CRUD operations for spare parts
+- Part categorization (engine, brakes, electrical, fluids, filters)
+- Part type classification (OEM, generic, consumable)
+- SKU and barcode tracking
+- Brand and manufacturer information
+- Inventory management per garage with stock levels
+- Pricing configuration (purchase, selling, cost)
+- Tax rate tracking for purchases and sales
+- Minimum threshold alerts
+- Compatible vehicles and linked services tracking
+- Unit of measure support (pieces, liters, kg, boxes)
+
+**UI Features**:
+- Card-based listing with responsive grid layout
+- Category filtering
+- Search by name, SKU, or brand
+- Comprehensive create dialog with all part details
+- Detailed view dialog showing complete part information
+- Delete functionality with confirmation
+- Error handling with retry affordance
+- Loading skeletons during data fetch
+- Empty states with helpful messaging
+
+**Technical Implementation**:
+- Uses insertSparePartSchema from @shared/schema for type safety
+- Form validation with Zod and react-hook-form
+- TanStack Query for data fetching and mutations
+- Proper cache invalidation for all operations
+- JSONB columns for compatible vehicles, linked services, tags, and media
+- Storage methods: getSpareParts, getSparePart, createSparePart, updateSparePart, deleteSparePart
+- Inventory storage methods: getSparePartInventories, createSparePartInventory, updateSparePartInventory
+- API routes with validation and error handling
+- Data-testid attributes for testing
+- Comprehensive error states with user-friendly messages
 
 **Production-ready** with full architect approval
