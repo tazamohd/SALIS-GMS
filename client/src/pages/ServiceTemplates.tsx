@@ -67,7 +67,7 @@ export default function ServiceTemplates() {
 
   const { data: templates, isLoading } = useQuery<ServiceTemplate[]>({
     queryKey: ["/api/service-templates", { garage_id: selectedGarage !== "all" ? selectedGarage : garages?.[0]?.id }],
-    enabled: !!garages && garages.length > 0,
+    enabled: !!garages && garages.length > 0 && selectedGarage !== "all",
   });
 
   const form = useForm<FormData>({
@@ -89,13 +89,16 @@ export default function ServiceTemplates() {
     mutationFn: async (data: FormData) => {
       return await apiRequest("/api/service-templates", "POST", {
         ...data,
-        taskSteps: JSON.stringify(data.taskSteps),
-        requiredSkills: JSON.stringify(data.requiredSkills || []),
+        taskSteps: data.taskSteps,
+        requiredSkills: data.requiredSkills || [],
       });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ 
-        predicate: (query) => query.queryKey[0] === "/api/service-templates" 
+        predicate: (query) => {
+          const key = query.queryKey[0];
+          return key === "/api/service-templates" || key === "/api/service-templates/all";
+        }
       });
       toast({ title: "Service template created successfully" });
       setCreateDialogOpen(false);
@@ -117,7 +120,10 @@ export default function ServiceTemplates() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ 
-        predicate: (query) => query.queryKey[0] === "/api/service-templates" 
+        predicate: (query) => {
+          const key = query.queryKey[0];
+          return key === "/api/service-templates" || key === "/api/service-templates/all";
+        }
       });
       toast({ title: "Service template deleted successfully" });
       setDetailsDialogOpen(false);
@@ -131,7 +137,16 @@ export default function ServiceTemplates() {
     },
   });
 
-  const filteredTemplates = templates?.filter((template) => {
+  // Fetch all templates when "all" is selected
+  const { data: allTemplates, isLoading: allIsLoading } = useQuery<ServiceTemplate[]>({
+    queryKey: ["/api/service-templates/all"],
+    enabled: !!garages && garages.length > 0 && selectedGarage === "all",
+  });
+
+  const displayTemplates = selectedGarage === "all" ? allTemplates : templates;
+  const activeLoading = selectedGarage === "all" ? allIsLoading : isLoading;
+
+  const filteredTemplates = displayTemplates?.filter((template) => {
     if (selectedGarage !== "all" && template.garageId !== selectedGarage) return false;
     if (selectedCategory !== "all" && template.category !== selectedCategory) return false;
     return true;
@@ -390,7 +405,7 @@ export default function ServiceTemplates() {
       </div>
 
       {/* Templates Grid */}
-      {isLoading ? (
+      {activeLoading ? (
         <div className="text-center py-12">
           <p className="text-muted-foreground">Loading templates...</p>
         </div>

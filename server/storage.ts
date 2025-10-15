@@ -94,6 +94,7 @@ export interface IStorage {
   updateTaskAssignment(id: string, data: any): Promise<TaskAssignment>;
   
   // Service Template operations
+  getAllServiceTemplates(): Promise<ServiceTemplate[]>;
   getServiceTemplates(garageId: string): Promise<ServiceTemplate[]>;
   getServiceTemplate(id: string): Promise<ServiceTemplate | undefined>;
   createServiceTemplate(data: InsertServiceTemplate): Promise<ServiceTemplate>;
@@ -326,6 +327,10 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Service Templates operations
+  async getAllServiceTemplates(): Promise<ServiceTemplate[]> {
+    return await db.select().from(serviceTemplates).orderBy(serviceTemplates.name);
+  }
+
   async getServiceTemplates(garageId: string): Promise<ServiceTemplate[]> {
     return await db.select().from(serviceTemplates)
       .where(eq(serviceTemplates.garageId, garageId))

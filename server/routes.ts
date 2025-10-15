@@ -155,6 +155,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Service Templates routes
+  app.get('/api/service-templates/all', isAuthenticated, async (req, res) => {
+    try {
+      const allTemplates = await storage.getAllServiceTemplates();
+      res.json(allTemplates);
+    } catch (error) {
+      console.error("Error fetching all service templates:", error);
+      res.status(500).json({ message: "Failed to fetch service templates" });
+    }
+  });
+
   app.get('/api/service-templates', isAuthenticated, async (req, res) => {
     try {
       const { garage_id } = req.query;
