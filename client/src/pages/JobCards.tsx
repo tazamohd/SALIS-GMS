@@ -95,6 +95,12 @@ export function JobCards() {
       ).then((r) => r.json()),
   });
 
+  // Fetch all technician profiles
+  const { data: technicianProfiles } = useQuery<TechnicianProfile[]>({
+    queryKey: ['/api/technician-profiles'],
+    enabled: !!technicians && technicians.length > 0,
+  });
+
   const jobCardsUrl = `/api/job-cards${filterGarageId !== "all" ? `?garage_id=${filterGarageId}` : ""}`;
   const { data: jobCards, isLoading } = useQuery<JobCard[]>({
     queryKey: [jobCardsUrl],
@@ -548,13 +554,7 @@ export function JobCards() {
                       </SelectTrigger>
                       <SelectContent>
                         {technicians?.map((tech) => {
-                          // Fetch technician profile inline
-                          const profileQuery = useQuery<TechnicianProfile>({
-                            queryKey: ['/api/technician-profiles', tech.id],
-                            queryFn: () => fetch(`/api/technician-profiles/${tech.id}`).then((r) => r.json()),
-                          });
-                          const profile = profileQuery.data;
-
+                          const profile = technicianProfiles?.find((p) => p.userId === tech.id);
                           return (
                             <SelectItem key={tech.id} value={tech.id} data-testid={`option-tech-${tech.id}`}>
                               <div className="flex items-center gap-2">
