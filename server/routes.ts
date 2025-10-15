@@ -74,6 +74,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post('/api/technicians', isAuthenticated, async (req, res) => {
+    try {
+      const technicianData = {
+        ...req.body,
+        userType: 'technician',
+        isActive: true,
+      };
+      const technician = await storage.createUser(technicianData);
+      res.status(201).json(technician);
+    } catch (error) {
+      console.error("Error creating technician:", error);
+      res.status(500).json({ message: "Failed to create technician" });
+    }
+  });
+
+  app.delete('/api/technicians/:id', isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteUser(id);
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting technician:", error);
+      res.status(500).json({ message: "Failed to delete technician" });
+    }
+  });
+
   // Technician Profile routes
   app.get('/api/technician-profiles/:userId', isAuthenticated, async (req, res) => {
     try {
