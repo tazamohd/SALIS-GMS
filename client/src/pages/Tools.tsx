@@ -55,7 +55,7 @@ export default function Tools() {
     queryKey: ["/api/garages"],
   });
 
-  const { data: tools, isLoading } = useQuery<Tool[]>({
+  const { data: tools, isLoading, isError, error } = useQuery<Tool[]>({
     queryKey: ["/api/tools"],
   });
 
@@ -281,8 +281,13 @@ export default function Tools() {
 
       {/* Tools Grid */}
       {isLoading ? (
-        <div className="text-center py-12">
+        <div className="text-center py-12" data-testid="loading-state">
           <p className="text-muted-foreground">Loading tools...</p>
+        </div>
+      ) : isError ? (
+        <div className="text-center py-12" data-testid="error-state">
+          <p className="text-red-600 font-semibold">Error loading tools</p>
+          <p className="text-sm text-muted-foreground mt-2">{error instanceof Error ? error.message : "Please try again later"}</p>
         </div>
       ) : filteredTools && filteredTools.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -300,17 +305,17 @@ export default function Tools() {
                     </Badge>
                   </div>
                   {tool.description && (
-                    <p className="text-sm text-muted-foreground line-clamp-2">{tool.description}</p>
+                    <p className="text-sm text-muted-foreground line-clamp-2" data-testid={`text-description-${tool.id}`}>{tool.description}</p>
                   )}
                   <div className="flex flex-col gap-2 text-sm text-muted-foreground">
                     {tool.brand && (
-                      <div className="flex justify-between">
+                      <div className="flex justify-between" data-testid={`text-brand-${tool.id}`}>
                         <span className="font-medium">Brand:</span>
                         <span>{tool.brand}</span>
                       </div>
                     )}
                     {tool.manufacturer && (
-                      <div className="flex justify-between">
+                      <div className="flex justify-between" data-testid={`text-manufacturer-${tool.id}`}>
                         <span className="font-medium">Manufacturer:</span>
                         <span>{tool.manufacturer}</span>
                       </div>
@@ -338,7 +343,7 @@ export default function Tools() {
           ))}
         </div>
       ) : (
-        <div className="text-center py-12">
+        <div className="text-center py-12" data-testid="empty-state">
           <p className="text-muted-foreground">No tools found</p>
           <p className="text-sm text-muted-foreground mt-2">Add your first tool to get started</p>
         </div>
