@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useQueries, useMutation } from "@tanstack/react-query";
 import { User, TechnicianProfile } from "@shared/schema";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -35,15 +35,14 @@ export default function TechnicianManagement() {
       ).then((r) => r.json()),
   });
 
-  // Fetch all technician profiles at component top level
-  const technicianIds = technicians?.map(t => t.id) || [];
-  const profileQueries = technicianIds.map(id =>
-    useQuery<TechnicianProfile>({
-      queryKey: ["/api/technician-profiles", id],
-      queryFn: () => fetch(`/api/technician-profiles/${id}`).then((r) => r.json()),
-      enabled: !!id,
-    })
-  );
+  // Fetch all technician profiles using useQueries
+  const profileQueries = useQueries({
+    queries: (technicians || []).map(technician => ({
+      queryKey: ["/api/technician-profiles", technician.id],
+      queryFn: () => fetch(`/api/technician-profiles/${technician.id}`).then((r) => r.json()),
+      enabled: !!technician.id,
+    })),
+  });
 
   const updateProfileMutation = useMutation({
     mutationFn: async ({ userId, data }: { userId: string; data: Partial<TechnicianProfile> }) => {
