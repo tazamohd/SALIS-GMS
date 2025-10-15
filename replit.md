@@ -40,20 +40,21 @@ The application is built on a full-stack architecture with a clear separation be
 1. **Dashboard** - Overview of key metrics, recent activity, quick actions
 2. **Tasks Management** - Task tracking and assignment system
 3. **Job Cards** - Service job cards management with vehicle info, technician assignment, and progress tracking
-4. **Appointments** - Appointment scheduling and management
-5. **Customers** - Customer profiles, vehicles, and communication history
-6. **Purchase Orders** - Supplier integration and PO management
-7. **Invoices** - Invoice generation, billing, and payment tracking with status workflow validation
-8. **Reports & Dashboards** - Comprehensive analytics with 4 tabs:
+4. **Service Templates** - Reusable service templates with predefined task steps and workflows
+5. **Appointments** - Appointment scheduling and management
+6. **Customers** - Customer profiles, vehicles, and communication history
+7. **Purchase Orders** - Supplier integration and PO management
+8. **Invoices** - Invoice generation, billing, and payment tracking with status workflow validation
+9. **Reports & Dashboards** - Comprehensive analytics with 4 tabs:
    - Overview: Key business metrics (revenue, invoices, job cards, customers)
    - Revenue: Monthly trends, invoices by status, payments by method
    - Job Cards: Status/priority distribution, completion time metrics, technician performance
    - Inventory: Tool availability, category breakdown
    - Features: Garage-specific filtering, recharts visualization, real completion time calculation
-9. **My Profile** - User profile management and account settings
+10. **My Profile** - User profile management and account settings
 
 ### 🎯 Production Status
-All 9 modules are production-ready with architect approval, featuring:
+All 10 modules are production-ready with architect approval, featuring:
 - PostgreSQL database with Drizzle ORM
 - Comprehensive form validation with Zod schemas
 - Secure session management via Replit Auth
@@ -88,6 +89,38 @@ All 9 modules are production-ready with architect approval, featuring:
 - Proper cache invalidation for filtered views
 - Timestamp logic that prevents duplicate entries
 - All required default values for form fields
+- Data-testid attributes for testing
+
+**Production-ready** with full architect approval
+
+### Module 10: Service Templates (October 15, 2025)
+**Core Functionality**:
+- Complete CRUD operations for service templates
+- Reusable service definitions with standardized workflows
+- Dynamic task steps builder for multi-step services
+- Category classification (maintenance, repair, diagnostic)
+- Estimated hours and standard cost tracking
+- Required skills tracking (stored as JSON array)
+- Active/inactive template status management
+
+**UI Features**:
+- Card-based listing with responsive grid layout
+- Two-level filtering (Garage, Category)
+- Comprehensive create dialog with dynamic task steps
+- Task steps builder with add/remove functionality
+- Detailed view dialog showing all template information
+- Delete confirmation in details view
+- Status badges with color coding
+- Empty states and loading indicators
+
+**Technical Implementation**:
+- Uses insertServiceTemplateSchema from @shared/schema for type safety
+- Form validation with Zod and react-hook-form
+- TanStack Query with dual query support (single-garage and all-garages views)
+- Proper cache invalidation for both query branches
+- JSONB columns for taskSteps and requiredSkills arrays
+- Storage methods: getAllServiceTemplates, getServiceTemplates, getServiceTemplate, create, update, delete
+- API routes including /all endpoint for cross-garage queries
 - Data-testid attributes for testing
 
 **Production-ready** with full architect approval
