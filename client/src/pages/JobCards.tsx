@@ -26,7 +26,7 @@ import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import type { JobCard, Garage, User as UserType, InsertJobCard } from "@shared/schema";
+import type { JobCard, Garage, User as UserType, InsertJobCard, TechnicianProfile } from "@shared/schema";
 import { insertJobCardSchema } from "@shared/schema";
 
 const statusColors = {
@@ -84,6 +84,15 @@ export function JobCards() {
 
   const { data: users } = useQuery<UserType[]>({
     queryKey: ['/api/users'],
+  });
+
+  // Fetch technicians for assignment dropdown
+  const { data: technicians } = useQuery<UserType[]>({
+    queryKey: ['/api/technicians', filterGarageId],
+    queryFn: () =>
+      fetch(
+        `/api/technicians${filterGarageId !== "all" ? `?garage_id=${filterGarageId}` : ""}`
+      ).then((r) => r.json()),
   });
 
   const jobCardsUrl = `/api/job-cards${filterGarageId !== "all" ? `?garage_id=${filterGarageId}` : ""}`;
@@ -196,8 +205,6 @@ export function JobCards() {
     if (filterPriority !== "all" && jc.priority !== filterPriority) return false;
     return true;
   });
-
-  const technicians = users?.filter(u => u.userType === 'technician') ?? [];
 
   return (
     <div className="p-8">
@@ -540,11 +547,28 @@ export function JobCards() {
                         <SelectValue placeholder="Select technician" />
                       </SelectTrigger>
                       <SelectContent>
-                        {technicians.map((tech) => (
-                          <SelectItem key={tech.id} value={tech.id}>
-                            {tech.fullName || tech.email}
-                          </SelectItem>
-                        ))}
+                        {technicians?.map((tech) => {
+                          // Fetch technician profile inline
+                          const profileQuery = useQuery<TechnicianProfile>({
+                            queryKey: ['/api/technician-profiles', tech.id],
+                            queryFn: () => fetch(`/api/technician-profiles/${tech.id}`).then((r) => r.json()),
+                          });
+                          const profile = profileQuery.data;
+
+                          return (
+                            <SelectItem key={tech.id} value={tech.id} data-testid={`option-tech-${tech.id}`}>
+                              <div className="flex items-center gap-2">
+                                <span>{tech.fullName || tech.email}</span>
+                                {profile?.level && (
+                                  <span className="text-xs text-muted-foreground">
+                                    ({profile.level}
+                                    {profile.speciality ? ` - ${profile.speciality}` : ""})
+                                  </span>
+                                )}
+                              </div>
+                            </SelectItem>
+                          );
+                        })}
                       </SelectContent>
                     </Select>
                   </div>
