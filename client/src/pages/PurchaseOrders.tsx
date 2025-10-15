@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { ShoppingCart, Package, Plus, Search, Building2 } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { ShoppingCart, Plus, Building2, Eye, Edit, Trash2, MoreVertical, CheckCircle, Send, XCircle, Package as PackageIcon } from "lucide-react";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
@@ -11,14 +11,37 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { AddSupplierDialog } from "@/components/AddSupplierDialog";
 import { CreatePurchaseOrderDialog } from "@/components/CreatePurchaseOrderDialog";
 import { PurchaseOrderDetailsDialog } from "@/components/PurchaseOrderDetailsDialog";
-import type { PurchaseOrder, Supplier, Garage } from "@shared/schema";
+import type { PurchaseOrder, Supplier, Garage, PurchaseOrderItem } from "@shared/schema";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export function PurchaseOrders() {
+  const { toast } = useToast();
   const [selectedGarageId, setSelectedGarageId] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [poToDelete, setPoToDelete] = useState<PurchaseOrder | null>(null);
 
   const { data: garages } = useQuery<Garage[]>({
     queryKey: ['/api/garages'],
@@ -41,6 +64,58 @@ export function PurchaseOrders() {
     queryKey: ['/api/suppliers'],
   });
 
+  // Delete mutation
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      return apiRequest("DELETE", `/api/purchase-orders/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ 
+        predicate: (query) => 
+          query.queryKey[0] === '/api/purchase-orders' || 
+          (typeof query.queryKey[0] === 'string' && query.queryKey[0].startsWith('/api/purchase-orders'))
+      });
+      toast({
+        title: "Success",
+        description: "Purchase order deleted successfully",
+      });
+      setDeleteConfirmOpen(false);
+      setPoToDelete(null);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete purchase order",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Status update mutation
+  const updateStatusMutation = useMutation({
+    mutationFn: async ({ id, status }: { id: string; status: string }) => {
+      return apiRequest("PATCH", `/api/purchase-orders/${id}`, { status });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ 
+        predicate: (query) => 
+          query.queryKey[0] === '/api/purchase-orders' || 
+          (typeof query.queryKey[0] === 'string' && query.queryKey[0].startsWith('/api/purchase-orders'))
+      });
+      toast({
+        title: "Success",
+        description: "Purchase order status updated",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update status",
+        variant: "destructive",
+      });
+    },
+  });
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'draft': return 'bg-gray-100 text-gray-700';
@@ -58,6 +133,15 @@ export function PurchaseOrders() {
     return supplier?.name || 'Unknown Supplier';
   };
 
+  const handleDelete = (po: PurchaseOrder) => {
+    setPoToDelete(po);
+    setDeleteConfirmOpen(true);
+  };
+
+  const handleStatusChange = (po: PurchaseOrder, newStatus: string) => {
+    updateStatusMutation.mutate({ id: po.id, status: newStatus });
+  };
+
   return (
     <div className="p-8">
       <div className="flex items-center justify-between mb-6">
@@ -66,7 +150,7 @@ export function PurchaseOrders() {
             Purchase Orders
           </h1>
           <p className="font-['Poppins',Helvetica] font-normal text-sm text-[#999999] mt-1">
-            Manage purchase orders and suppliers
+            Manage purchase orders and track supplier deliveries
           </p>
         </div>
         <div className="flex gap-2">
@@ -76,45 +160,114 @@ export function PurchaseOrders() {
       </div>
 
       {/* Filters */}
-      <div className="flex gap-4 mb-6">
-        <Select value={selectedGarageId} onValueChange={setSelectedGarageId}>
-          <SelectTrigger className="w-[200px]" data-testid="select-garage-filter-po">
-            <Building2 className="w-4 h-4 mr-2" />
-            <SelectValue placeholder="All Garages" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Garages</SelectItem>
-            {(garages ?? []).map((garage) => (
-              <SelectItem key={garage.id} value={garage.id}>
-                {garage.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+      <Card className="mb-6">
+        <CardContent className="pt-6">
+          <div className="flex gap-4">
+            <div className="w-[250px]">
+              <label className="text-sm font-medium text-gray-700 mb-2 block">Garage</label>
+              <Select value={selectedGarageId} onValueChange={setSelectedGarageId}>
+                <SelectTrigger data-testid="select-garage-filter-po">
+                  <Building2 className="w-4 h-4 mr-2" />
+                  <SelectValue placeholder="All Garages" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Garages</SelectItem>
+                  {(garages ?? []).map((garage) => (
+                    <SelectItem key={garage.id} value={garage.id}>
+                      {garage.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-        <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-[200px]" data-testid="select-status-filter">
-            <SelectValue placeholder="All Status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Status</SelectItem>
-            <SelectItem value="draft">Draft</SelectItem>
-            <SelectItem value="sent">Sent</SelectItem>
-            <SelectItem value="confirmed">Confirmed</SelectItem>
-            <SelectItem value="partial">Partial</SelectItem>
-            <SelectItem value="received">Received</SelectItem>
-            <SelectItem value="cancelled">Cancelled</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+            <div className="w-[250px]">
+              <label className="text-sm font-medium text-gray-700 mb-2 block">Status</label>
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger data-testid="select-status-filter">
+                  <SelectValue placeholder="All Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Status</SelectItem>
+                  <SelectItem value="draft">Draft</SelectItem>
+                  <SelectItem value="sent">Sent</SelectItem>
+                  <SelectItem value="confirmed">Confirmed</SelectItem>
+                  <SelectItem value="partial">Partially Received</SelectItem>
+                  <SelectItem value="received">Fully Received</SelectItem>
+                  <SelectItem value="cancelled">Cancelled</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Summary Cards */}
+      {!isLoading && purchaseOrders && purchaseOrders.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-500">Total Orders</p>
+                  <p className="text-2xl font-bold text-gray-900">{purchaseOrders.length}</p>
+                </div>
+                <ShoppingCart className="w-8 h-8 text-blue-600" />
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-500">Pending</p>
+                  <p className="text-2xl font-bold text-yellow-600">
+                    {purchaseOrders.filter(po => ['draft', 'sent'].includes(po.status)).length}
+                  </p>
+                </div>
+                <PackageIcon className="w-8 h-8 text-yellow-600" />
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-500">Confirmed</p>
+                  <p className="text-2xl font-bold text-purple-600">
+                    {purchaseOrders.filter(po => po.status === 'confirmed').length}
+                  </p>
+                </div>
+                <CheckCircle className="w-8 h-8 text-purple-600" />
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-500">Total Value</p>
+                  <p className="text-2xl font-bold text-green-600">
+                    ${purchaseOrders.reduce((sum, po) => sum + parseFloat(po.totalAmount), 0).toFixed(2)}
+                  </p>
+                </div>
+                <Building2 className="w-8 h-8 text-green-600" />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
       {/* Purchase Orders List */}
       <Card>
         <CardContent className="p-6">
           {isLoading ? (
-            <div className="text-center py-12">
-              <div className="animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-4"></div>
-              <p className="text-gray-500">Loading purchase orders...</p>
+            <div className="space-y-4">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="flex items-center gap-4">
+                  <Skeleton className="h-16 w-full" />
+                </div>
+              ))}
             </div>
           ) : (purchaseOrders ?? []).length === 0 ? (
             <div className="text-center py-12">
@@ -125,10 +278,7 @@ export function PurchaseOrders() {
               <p className="text-sm text-gray-400 mb-4">
                 Create your first purchase order to start managing inventory
               </p>
-              <Button className="bg-blue-600 hover:bg-blue-700">
-                <Plus className="w-4 h-4 mr-2" />
-                Create Purchase Order
-              </Button>
+              <CreatePurchaseOrderDialog />
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -187,15 +337,88 @@ export function PurchaseOrders() {
                         </span>
                       </td>
                       <td className="py-3 px-4">
-                        <span className={`px-2 py-1 rounded text-xs font-medium capitalize ${getStatusColor(po.status)}`}>
+                        <Badge className={`${getStatusColor(po.status)} capitalize`}>
                           {po.status}
-                        </span>
+                        </Badge>
                       </td>
                       <td className="py-3 px-4">
-                        <PurchaseOrderDetailsDialog
-                          purchaseOrder={po}
-                          supplier={suppliers?.find(s => s.id === po.supplierId)}
-                        />
+                        <div className="flex items-center gap-2">
+                          <PurchaseOrderDetailsDialog
+                            purchaseOrder={po}
+                            supplier={suppliers?.find(s => s.id === po.supplierId)}
+                          />
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                data-testid={`button-actions-${po.id}`}
+                              >
+                                <MoreVertical className="w-4 h-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              {po.status === 'draft' && (
+                                <>
+                                  <DropdownMenuItem onClick={() => handleStatusChange(po, 'sent')}>
+                                    <Send className="w-4 h-4 mr-2" />
+                                    Send to Supplier
+                                  </DropdownMenuItem>
+                                  <DropdownMenuSeparator />
+                                </>
+                              )}
+                              {po.status === 'sent' && (
+                                <>
+                                  <DropdownMenuItem onClick={() => handleStatusChange(po, 'confirmed')}>
+                                    <CheckCircle className="w-4 h-4 mr-2" />
+                                    Mark as Confirmed
+                                  </DropdownMenuItem>
+                                  <DropdownMenuSeparator />
+                                </>
+                              )}
+                              {po.status === 'confirmed' && (
+                                <>
+                                  <DropdownMenuItem onClick={() => handleStatusChange(po, 'partial')}>
+                                    <PackageIcon className="w-4 h-4 mr-2" />
+                                    Mark as Partially Received
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem onClick={() => handleStatusChange(po, 'received')}>
+                                    <CheckCircle className="w-4 h-4 mr-2" />
+                                    Mark as Fully Received
+                                  </DropdownMenuItem>
+                                  <DropdownMenuSeparator />
+                                </>
+                              )}
+                              {po.status === 'partial' && (
+                                <>
+                                  <DropdownMenuItem onClick={() => handleStatusChange(po, 'received')}>
+                                    <CheckCircle className="w-4 h-4 mr-2" />
+                                    Mark as Fully Received
+                                  </DropdownMenuItem>
+                                  <DropdownMenuSeparator />
+                                </>
+                              )}
+                              {['draft', 'sent'].includes(po.status) && (
+                                <>
+                                  <DropdownMenuItem onClick={() => handleStatusChange(po, 'cancelled')}>
+                                    <XCircle className="w-4 h-4 mr-2" />
+                                    Cancel Order
+                                  </DropdownMenuItem>
+                                  <DropdownMenuSeparator />
+                                </>
+                              )}
+                              {po.status === 'draft' && (
+                                <DropdownMenuItem 
+                                  onClick={() => handleDelete(po)}
+                                  className="text-red-600"
+                                >
+                                  <Trash2 className="w-4 h-4 mr-2" />
+                                  Delete
+                                </DropdownMenuItem>
+                              )}
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -205,6 +428,27 @@ export function PurchaseOrders() {
           )}
         </CardContent>
       </Card>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Purchase Order</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete PO {poToDelete?.poNumber}? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => poToDelete && deleteMutation.mutate(poToDelete.id)}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              {deleteMutation.isPending ? "Deleting..." : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

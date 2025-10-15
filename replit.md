@@ -33,3 +33,44 @@ The application uses a full-stack architecture with a clear separation between c
 - **Drizzle ORM**: TypeScript ORM for PostgreSQL.
 - **Zod**: Schema declaration and validation.
 - **recharts**: Data visualization for reports and dashboards.
+
+## Recent Changes
+
+### Module 15: Purchase Orders Management (October 15, 2025)
+**Core Functionality**:
+- Complete CRUD operations for purchase orders
+- Line item management with automatic calculations
+- Status workflow management (draft → sent → confirmed → partial → received → cancelled)
+- Supplier integration with supplier selection
+- Expected delivery date tracking
+- Automatic PO number generation
+- Subtotal, tax, and total calculations
+- Notes and special instructions support
+
+**UI Features**:
+- Enhanced table view with comprehensive filters (garage, status)
+- Summary cards showing total orders, pending, confirmed, and total value
+- Create dialog with inline line item management
+- Add/remove line items with quantity and unit price
+- Real-time calculation of subtotals, tax (10%), and totals
+- Details dialog showing complete PO information
+- Inline status editing within details view
+- Delete functionality with confirmation (draft orders only)
+- Status transition actions via dropdown menu
+- Responsive grid layout with skeleton loading states
+- Empty states with helpful messaging
+
+**Technical Implementation**:
+- Uses insertPurchaseOrderSchema and insertPurchaseOrderItemSchema from @shared/schema
+- Form validation with Zod and react-hook-form
+- TanStack Query for data fetching and mutations
+- Backend API routes: GET, POST, PATCH, DELETE at /api/purchase-orders
+- Batch creation endpoint: POST /api/purchase-orders/with-items for atomic PO+items creation
+- Storage methods: getPurchaseOrders, getPurchaseOrder, createPurchaseOrder, updatePurchaseOrder, deletePurchaseOrder
+- Line items storage: getPurchaseOrderItems, createPurchaseOrderItem, deletePurchaseOrderItem
+- Proper cache invalidation using predicate queries for all operations
+- Data-testid attributes for testing
+- Comprehensive error handling with user-friendly messages
+- Status workflow enforcement in UI
+
+**Production-ready** with full functionality
