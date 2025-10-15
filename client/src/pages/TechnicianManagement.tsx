@@ -35,6 +35,16 @@ export default function TechnicianManagement() {
       ).then((r) => r.json()),
   });
 
+  // Fetch all technician profiles at component top level
+  const technicianIds = technicians?.map(t => t.id) || [];
+  const profileQueries = technicianIds.map(id =>
+    useQuery<TechnicianProfile>({
+      queryKey: ["/api/technician-profiles", id],
+      queryFn: () => fetch(`/api/technician-profiles/${id}`).then((r) => r.json()),
+      enabled: !!id,
+    })
+  );
+
   const updateProfileMutation = useMutation({
     mutationFn: async ({ userId, data }: { userId: string; data: Partial<TechnicianProfile> }) => {
       return apiRequest("PATCH", `/api/technician-profiles/${userId}`, data);
@@ -167,14 +177,9 @@ export default function TechnicianManagement() {
         </div>
       ) : technicians && technicians.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {technicians.map((technician: User & { technicianProfile?: TechnicianProfile }) => {
-            // Fetch profile data inline
-            const profileQuery = useQuery<TechnicianProfile>({
-              queryKey: ["/api/technician-profiles", technician.id],
-              queryFn: () => fetch(`/api/technician-profiles/${technician.id}`).then((r) => r.json()),
-            });
-
-            const profile = profileQuery.data;
+          {technicians.map((technician: User & { technicianProfile?: TechnicianProfile }, index) => {
+            // Get the profile from the pre-fetched queries
+            const profile = profileQueries[index]?.data;
 
             return (
               <Card key={technician.id} data-testid={`card-technician-${technician.id}`}>
