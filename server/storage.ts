@@ -161,6 +161,40 @@ export interface IStorage {
   getPayments(invoiceId?: string): Promise<Payment[]>;
   createPayment(data: InsertPayment): Promise<Payment>;
   deletePayment(id: string): Promise<void>;
+  
+  // Reports & Dashboards - Module 13
+  getReportsOverview(garageId?: string): Promise<{
+    totalRevenue: string;
+    totalInvoices: number;
+    totalJobCards: number;
+    totalCustomers: number;
+    pendingInvoices: number;
+    activeJobCards: number;
+    recentInvoices: Invoice[];
+    recentJobCards: JobCard[];
+  }>;
+  getRevenueReport(garageId?: string, startDate?: Date, endDate?: Date): Promise<{
+    totalRevenue: string;
+    paidAmount: string;
+    pendingAmount: string;
+    invoicesByStatus: { status: string; count: number; total: string }[];
+    revenueByMonth: { month: string; revenue: string }[];
+    paymentsByMethod: { method: string; total: string; count: number }[];
+  }>;
+  getJobCardAnalytics(garageId?: string, startDate?: Date, endDate?: Date): Promise<{
+    totalJobCards: number;
+    byStatus: { status: string; count: number }[];
+    byPriority: { priority: string; count: number }[];
+    averageCompletionTime: number;
+    topTechnicians: { technicianId: string; jobCount: number }[];
+  }>;
+  getInventoryReport(garageId?: string): Promise<{
+    totalTools: number;
+    availableTools: number;
+    inUseTools: number;
+    toolsByCategory: { category: string; count: number }[];
+    lowStockItems: { itemName: string; currentStock: number }[];
+  }>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -739,6 +773,274 @@ export class DatabaseStorage implements IStorage {
   async deletePayment(id: string): Promise<void> {
     const { payments } = await import("@shared/schema");
     await db.delete(payments).where(eq(payments.id, id));
+  }
+
+  // Reports & Dashboards - Module 13
+  async getReportsOverview(garageId?: string): Promise<{
+    totalRevenue: string;
+    totalInvoices: number;
+    totalJobCards: number;
+    totalCustomers: number;
+    pendingInvoices: number;
+    activeJobCards: number;
+    recentInvoices: Invoice[];
+    recentJobCards: JobCard[];
+  }> {
+    const invoicesData = garageId 
+      ? await this.getInvoices(garageId)
+      : await this.getInvoices();
+    
+    const jobCardsData = await this.getJobCards();
+    const filteredJobCards = garageId
+      ? jobCardsData.filter(jc => jc.garageId === garageId)
+      : jobCardsData;
+    
+    const customersData = await db.select().from(users).where(eq(users.userType, 'customer'));
+    
+    const totalRevenue = invoicesData
+      .reduce((sum, inv) => sum + parseFloat(inv.totalAmount), 0)
+      .toFixed(2);
+    
+    const pendingInvoices = invoicesData.filter(inv => 
+      inv.status === 'draft' || inv.status === 'sent'
+    ).length;
+    
+    const activeJobCards = filteredJobCards.filter(jc => 
+      jc.status === 'pending' || jc.status === 'in_progress'
+    ).length;
+    
+    return {
+      totalRevenue,
+      totalInvoices: invoicesData.length,
+      totalJobCards: filteredJobCards.length,
+      totalCustomers: customersData.length,
+      pendingInvoices,
+      activeJobCards,
+      recentInvoices: invoicesData.slice(0, 5),
+      recentJobCards: filteredJobCards.slice(0, 5),
+    };
+  }
+
+  async getRevenueReport(garageId?: string, startDate?: Date, endDate?: Date): Promise<{
+    totalRevenue: string;
+    paidAmount: string;
+    pendingAmount: string;
+    invoicesByStatus: { status: string; count: number; total: string }[];
+    revenueByMonth: { month: string; revenue: string }[];
+    paymentsByMethod: { method: string; total: string; count: number }[];
+  }> {
+    const invoicesData = garageId 
+      ? await this.getInvoices(garageId)
+      : await this.getInvoices();
+    
+    // Filter by date range if provided
+    let filteredInvoices = invoicesData;
+    if (startDate || endDate) {
+      filteredInvoices = invoicesData.filter(inv => {
+        const invDate = new Date(inv.invoiceDate);
+        if (startDate && invDate < startDate) return false;
+        if (endDate && invDate > endDate) return false;
+        return true;
+      });
+    }
+    
+    const totalRevenue = filteredInvoices
+      .reduce((sum, inv) => sum + parseFloat(inv.totalAmount), 0)
+      .toFixed(2);
+    
+    const paidAmount = filteredInvoices
+      .reduce((sum, inv) => sum + parseFloat(inv.paidAmount), 0)
+      .toFixed(2);
+    
+    const pendingAmount = filteredInvoices
+      .reduce((sum, inv) => sum + parseFloat(inv.balanceAmount), 0)
+      .toFixed(2);
+    
+    // Group by status
+    const statusMap = new Map<string, { count: number; total: number }>();
+    filteredInvoices.forEach(inv => {
+      const existing = statusMap.get(inv.status) || { count: 0, total: 0 };
+      statusMap.set(inv.status, {
+        count: existing.count + 1,
+        total: existing.total + parseFloat(inv.totalAmount),
+      });
+    });
+    
+    const invoicesByStatus = Array.from(statusMap.entries()).map(([status, data]) => ({
+      status,
+      count: data.count,
+      total: data.total.toFixed(2),
+    }));
+    
+    // Group by month
+    const monthMap = new Map<string, number>();
+    filteredInvoices.forEach(inv => {
+      const date = new Date(inv.invoiceDate);
+      const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+      const existing = monthMap.get(monthKey) || 0;
+      monthMap.set(monthKey, existing + parseFloat(inv.totalAmount));
+    });
+    
+    const revenueByMonth = Array.from(monthMap.entries())
+      .sort((a, b) => a[0].localeCompare(b[0]))
+      .map(([month, revenue]) => ({
+        month,
+        revenue: revenue.toFixed(2),
+      }));
+    
+    // Get payments and group by method
+    const paymentsData = await this.getPayments();
+    const filteredPayments = paymentsData.filter(payment => {
+      const invoice = filteredInvoices.find(inv => inv.id === payment.invoiceId);
+      return !!invoice;
+    });
+    
+    const methodMap = new Map<string, { count: number; total: number }>();
+    filteredPayments.forEach(payment => {
+      const existing = methodMap.get(payment.paymentMethod) || { count: 0, total: 0 };
+      methodMap.set(payment.paymentMethod, {
+        count: existing.count + 1,
+        total: existing.total + parseFloat(payment.amount),
+      });
+    });
+    
+    const paymentsByMethod = Array.from(methodMap.entries()).map(([method, data]) => ({
+      method,
+      total: data.total.toFixed(2),
+      count: data.count,
+    }));
+    
+    return {
+      totalRevenue,
+      paidAmount,
+      pendingAmount,
+      invoicesByStatus,
+      revenueByMonth,
+      paymentsByMethod,
+    };
+  }
+
+  async getJobCardAnalytics(garageId?: string, startDate?: Date, endDate?: Date): Promise<{
+    totalJobCards: number;
+    byStatus: { status: string; count: number }[];
+    byPriority: { priority: string; count: number }[];
+    averageCompletionTime: number;
+    topTechnicians: { technicianId: string; jobCount: number }[];
+  }> {
+    const jobCardsData = await this.getJobCards();
+    let filteredJobCards = garageId
+      ? jobCardsData.filter(jc => jc.garageId === garageId)
+      : jobCardsData;
+    
+    // Filter by date range if provided
+    if (startDate || endDate) {
+      filteredJobCards = filteredJobCards.filter(jc => {
+        if (!jc.createdAt) return true;
+        const jcDate = new Date(jc.createdAt);
+        if (startDate && jcDate < startDate) return false;
+        if (endDate && jcDate > endDate) return false;
+        return true;
+      });
+    }
+    
+    // Group by status
+    const statusMap = new Map<string, number>();
+    filteredJobCards.forEach(jc => {
+      statusMap.set(jc.status, (statusMap.get(jc.status) || 0) + 1);
+    });
+    const byStatus = Array.from(statusMap.entries()).map(([status, count]) => ({
+      status,
+      count,
+    }));
+    
+    // Group by priority
+    const priorityMap = new Map<string, number>();
+    filteredJobCards.forEach(jc => {
+      priorityMap.set(jc.priority, (priorityMap.get(jc.priority) || 0) + 1);
+    });
+    const byPriority = Array.from(priorityMap.entries()).map(([priority, count]) => ({
+      priority,
+      count,
+    }));
+    
+    // Calculate average completion time (placeholder logic)
+    const averageCompletionTime = 48; // hours - placeholder
+    
+    // Get task assignments to find top technicians
+    const tasksData = await this.getTaskAssignments(undefined);
+    const techMap = new Map<string, number>();
+    tasksData.forEach(task => {
+      if (task.assignedTo) {
+        techMap.set(task.assignedTo, (techMap.get(task.assignedTo) || 0) + 1);
+      }
+    });
+    
+    const topTechnicians = Array.from(techMap.entries())
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5)
+      .map(([technicianId, jobCount]) => ({
+        technicianId,
+        jobCount,
+      }));
+    
+    return {
+      totalJobCards: filteredJobCards.length,
+      byStatus,
+      byPriority,
+      averageCompletionTime,
+      topTechnicians,
+    };
+  }
+
+  async getInventoryReport(garageId?: string): Promise<{
+    totalTools: number;
+    availableTools: number;
+    inUseTools: number;
+    toolsByCategory: { category: string; count: number }[];
+    lowStockItems: { itemName: string; currentStock: number }[];
+  }> {
+    const toolsData = await this.getTools();
+    
+    // Tools table doesn't have garageId - all tools are available system-wide
+    // We'll use all tools for now since they can be assigned to any garage
+    const filteredTools = toolsData;
+    
+    // Get tool availability records
+    const availabilityRecords = await db.select().from(toolAvailability);
+    
+    let availableTools = 0;
+    let inUseTools = 0;
+    
+    // Filter by garage if specified and count availability
+    const relevantAvailability = garageId
+      ? availabilityRecords.filter(a => a.garageId === garageId)
+      : availabilityRecords;
+    
+    relevantAvailability.forEach(avail => {
+      if (avail.status === 'available') availableTools++;
+      if (avail.status === 'in_use') inUseTools++;
+    });
+    
+    // Group by category (toolType)
+    const categoryMap = new Map<string, number>();
+    filteredTools.forEach(tool => {
+      categoryMap.set(tool.toolType, (categoryMap.get(tool.toolType) || 0) + 1);
+    });
+    const toolsByCategory = Array.from(categoryMap.entries()).map(([category, count]) => ({
+      category,
+      count,
+    }));
+    
+    // Placeholder for low stock items (would need actual stock tracking)
+    const lowStockItems: { itemName: string; currentStock: number }[] = [];
+    
+    return {
+      totalTools: filteredTools.length,
+      availableTools,
+      inUseTools,
+      toolsByCategory,
+      lowStockItems,
+    };
   }
 }
 

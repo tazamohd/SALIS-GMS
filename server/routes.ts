@@ -1036,6 +1036,63 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Reports & Dashboards - Module 13
+  app.get('/api/reports/overview', isAuthenticated, async (req, res) => {
+    try {
+      const { garage_id } = req.query;
+      const overview = await storage.getReportsOverview(garage_id as string | undefined);
+      res.json(overview);
+    } catch (error) {
+      console.error("Error fetching reports overview:", error);
+      res.status(500).json({ message: "Failed to fetch reports overview" });
+    }
+  });
+
+  app.get('/api/reports/revenue', isAuthenticated, async (req, res) => {
+    try {
+      const { garage_id, start_date, end_date } = req.query;
+      const startDate = start_date ? new Date(start_date as string) : undefined;
+      const endDate = end_date ? new Date(end_date as string) : undefined;
+      const report = await storage.getRevenueReport(
+        garage_id as string | undefined,
+        startDate,
+        endDate
+      );
+      res.json(report);
+    } catch (error) {
+      console.error("Error fetching revenue report:", error);
+      res.status(500).json({ message: "Failed to fetch revenue report" });
+    }
+  });
+
+  app.get('/api/reports/job-cards', isAuthenticated, async (req, res) => {
+    try {
+      const { garage_id, start_date, end_date } = req.query;
+      const startDate = start_date ? new Date(start_date as string) : undefined;
+      const endDate = end_date ? new Date(end_date as string) : undefined;
+      const analytics = await storage.getJobCardAnalytics(
+        garage_id as string | undefined,
+        startDate,
+        endDate
+      );
+      res.json(analytics);
+    } catch (error) {
+      console.error("Error fetching job card analytics:", error);
+      res.status(500).json({ message: "Failed to fetch job card analytics" });
+    }
+  });
+
+  app.get('/api/reports/inventory', isAuthenticated, async (req, res) => {
+    try {
+      const { garage_id } = req.query;
+      const report = await storage.getInventoryReport(garage_id as string | undefined);
+      res.json(report);
+    } catch (error) {
+      console.error("Error fetching inventory report:", error);
+      res.status(500).json({ message: "Failed to fetch inventory report" });
+    }
+  });
+
   // Integrated System Routes - Connecting All Modules
   app.get('/api/integrated/status', isAuthenticated, async (req, res) => {
     try {
