@@ -72,6 +72,8 @@ export interface IStorage {
   // (IMPORTANT) these user operations are mandatory for Replit Auth.
   getUser(id: string): Promise<User | undefined>;
   upsertUser(user: UpsertUser): Promise<User>;
+  createUser(user: UpsertUser): Promise<User>;
+  deleteUser(id: string): Promise<void>;
   getTechnicians(garageId?: string): Promise<User[]>;
   getTechnicianProfile(userId: string): Promise<TechnicianProfile | undefined>;
   createTechnicianProfile(data: InsertTechnicianProfile): Promise<TechnicianProfile>;
@@ -247,6 +249,15 @@ export class DatabaseStorage implements IStorage {
       })
       .returning();
     return user;
+  }
+
+  async createUser(userData: UpsertUser): Promise<User> {
+    const [user] = await db.insert(users).values(userData).returning();
+    return user;
+  }
+
+  async deleteUser(id: string): Promise<void> {
+    await db.delete(users).where(eq(users.id, id));
   }
 
   async getTechnicians(garageId?: string): Promise<User[]> {
