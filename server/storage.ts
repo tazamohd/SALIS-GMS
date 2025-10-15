@@ -70,6 +70,7 @@ export interface IStorage {
   // (IMPORTANT) these user operations are mandatory for Replit Auth.
   getUser(id: string): Promise<User | undefined>;
   upsertUser(user: UpsertUser): Promise<User>;
+  getTechnicians(garageId?: string): Promise<User[]>;
   
   // Garage operations
   getGarages(): Promise<Garage[]>;
@@ -241,6 +242,18 @@ export class DatabaseStorage implements IStorage {
       })
       .returning();
     return user;
+  }
+
+  async getTechnicians(garageId?: string): Promise<User[]> {
+    if (garageId) {
+      return await db.select().from(users).where(
+        and(
+          eq(users.userType, 'technician'),
+          eq(users.garageId, garageId)
+        )
+      );
+    }
+    return await db.select().from(users).where(eq(users.userType, 'technician'));
   }
 
   // Garage operations

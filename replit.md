@@ -40,24 +40,25 @@ The application is built on a full-stack architecture with a clear separation be
 1. **Dashboard** - Overview of key metrics, recent activity, quick actions
 2. **Tasks Management** - Task tracking and assignment system
 3. **Job Cards** - Service job cards management with vehicle info, technician assignment, and progress tracking
-4. **Service Templates** - Reusable service templates with predefined task steps and workflows
-5. **Tools Management** - Tool and equipment inventory tracking with availability status
-6. **Spare Parts & Inventory** - Spare parts catalog with inventory tracking, pricing, and stock management
-7. **Suppliers** - Supplier network management with contact information and payment terms
-8. **Appointments** - Appointment scheduling and management
-9. **Customers** - Customer profiles, vehicles, and communication history
-10. **Purchase Orders** - Supplier integration and PO management
-11. **Invoices** - Invoice generation, billing, and payment tracking with status workflow validation
-12. **Reports & Dashboards** - Comprehensive analytics with 4 tabs:
+4. **Technician Portal** - Dedicated technician workspace showing assigned jobs and status updates
+5. **Service Templates** - Reusable service templates with predefined task steps and workflows
+6. **Tools Management** - Tool and equipment inventory tracking with availability status
+7. **Spare Parts & Inventory** - Spare parts catalog with inventory tracking, pricing, and stock management
+8. **Suppliers** - Supplier network management with contact information and payment terms
+9. **Appointments** - Appointment scheduling and management
+10. **Customers** - Customer profiles, vehicles, and communication history
+11. **Purchase Orders** - Supplier integration and PO management
+12. **Invoices** - Invoice generation, billing, and payment tracking with status workflow validation
+13. **Reports & Dashboards** - Comprehensive analytics with 4 tabs:
    - Overview: Key business metrics (revenue, invoices, job cards, customers)
    - Revenue: Monthly trends, invoices by status, payments by method
    - Job Cards: Status/priority distribution, completion time metrics, technician performance
    - Inventory: Tool availability, category breakdown
    - Features: Garage-specific filtering, recharts visualization, real completion time calculation
-13. **My Profile** - User profile management and account settings
+14. **My Profile** - User profile management and account settings
 
 ### 🎯 Production Status
-All 13 modules are production-ready with architect approval, featuring:
+All 14 modules are production-ready (13 with architect approval + 1 new), featuring:
 - PostgreSQL database with Drizzle ORM
 - Comprehensive form validation with Zod schemas
 - Secure session management via Replit Auth
@@ -231,3 +232,44 @@ All 13 modules are production-ready with architect approval, featuring:
 - Shared form component for create and edit operations
 
 **Production-ready** with full architect approval
+### Module 14: Technician Portal (October 15, 2025)
+**Core Functionality**:
+- Dedicated workspace for technicians to view assigned work
+- Real-time job card filtering by assigned technician
+- Quick status update capability (assigned → in_progress → completed)
+- Performance statistics (total jobs, pending, in progress, completed)
+- Comprehensive job card details with vehicle and service information
+- Estimated time and scheduled date tracking
+
+**UI Features**:
+- Stats cards showing workload overview (total, pending, in-progress, completed)
+- Card-based job listing with responsive layout
+- Priority and status badges with color coding
+- Quick status change dropdown
+- Vehicle information display
+- Service type and timing details
+- Empty states with helpful messaging
+- Loading skeletons during data fetch
+
+**Technical Implementation**:
+- Uses User type from @shared/schema for type safety
+- TanStack Query for real-time data fetching
+- Backend filtering by assignedTo parameter
+- PATCH endpoint for job card status updates
+- Proper cache invalidation after mutations
+- Data-testid attributes for testing
+- Technician profile integration with skills and certifications
+
+**Database Updates**:
+- Added 6 technicians (3 per garage) with profiles
+- Technician skills tracking (Engine Repair, Diagnostics, Brake Systems, etc.)
+- Certifications management (ASE Master, HVAC Specialist, etc.)
+- Lead technician designation (is_lead flag)
+- Updated job card assignments to new technicians
+
+**Backend API Additions**:
+- GET /api/technicians?garage_id={id} - Fetch technicians by garage
+- GET /api/job-cards?assigned_to={userId} - Filter job cards by technician
+- PATCH /api/job-cards/:id - Partial update for status changes
+
+**Ready for production** - Pending architect review

@@ -62,6 +62,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Technician routes
+  app.get('/api/technicians', isAuthenticated, async (req, res) => {
+    try {
+      const { garage_id } = req.query;
+      const technicians = await storage.getTechnicians(garage_id as string);
+      res.json(technicians);
+    } catch (error) {
+      console.error("Error fetching technicians:", error);
+      res.status(500).json({ message: "Failed to fetch technicians" });
+    }
+  });
+
   // Job Card routes - Module 8: Job Cards & Task Assignment
   app.get('/api/job-cards', isAuthenticated, async (req, res) => {
     try {
