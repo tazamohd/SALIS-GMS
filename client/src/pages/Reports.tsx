@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { BarChart3, TrendingUp, FileText, Package, Building2, Users } from "lucide-react";
+import { BarChart3, TrendingUp, FileText, Package, Building2, Users, UserCheck } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -96,6 +96,24 @@ export function Reports() {
     queryKey: [technicianPerformanceUrl],
   });
 
+  const customerAnalyticsUrl = buildQueryUrl("/api/reports/customer-analytics");
+  const { data: customerAnalytics, isLoading: customerLoading } = useQuery<{
+    customers: {
+      id: string;
+      name: string;
+      email: string | null;
+      phone: string | null;
+      lifetimeValue: number;
+      totalInvoices: number;
+      totalVisits: number;
+      avgInvoiceValue: number;
+      lastVisit: Date | null;
+      status: string;
+    }[];
+  }>({
+    queryKey: [customerAnalyticsUrl],
+  });
+
   return (
     <div className="p-8">
       {/* Header */}
@@ -149,6 +167,10 @@ export function Reports() {
           <TabsTrigger value="technicians" data-testid="tab-technicians">
             <Users className="w-4 h-4 mr-2" />
             Technicians
+          </TabsTrigger>
+          <TabsTrigger value="customers" data-testid="tab-customers">
+            <UserCheck className="w-4 h-4 mr-2" />
+            Customers
           </TabsTrigger>
           <TabsTrigger value="inventory" data-testid="tab-inventory">
             <Package className="w-4 h-4 mr-2" />
@@ -554,6 +576,182 @@ export function Reports() {
                   <p className="text-gray-500 text-lg">No technician performance data available</p>
                   <p className="text-gray-400 text-sm mt-2">
                     Technicians will appear here once they start completing jobs
+                  </p>
+                </div>
+              )}
+            </>
+          )}
+        </TabsContent>
+
+        {/* Customers Analytics Tab */}
+        <TabsContent value="customers" className="space-y-6">
+          {customerLoading ? (
+            <div className="text-center py-12">
+              <div className="animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-4"></div>
+              <p className="text-gray-500">Loading customer analytics...</p>
+            </div>
+          ) : (
+            <>
+              {customerAnalytics?.customers && customerAnalytics.customers.length > 0 ? (
+                <>
+                  {/* Customer Performance Cards */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {customerAnalytics.customers.slice(0, 10).map((customer) => (
+                      <Card key={customer.id} data-testid={`card-customer-${customer.id}`}>
+                        <CardHeader className="pb-3">
+                          <div className="flex items-center justify-between">
+                            <CardTitle className="text-lg font-semibold">{customer.name}</CardTitle>
+                            <span 
+                              className={`text-xs px-2 py-1 rounded-full ${
+                                customer.status === 'active' ? 'bg-green-100 text-green-700' :
+                                customer.status === 'recent' ? 'bg-blue-100 text-blue-700' :
+                                'bg-gray-100 text-gray-700'
+                              }`}
+                              data-testid={`status-${customer.id}`}
+                            >
+                              {customer.status}
+                            </span>
+                          </div>
+                          {customer.email && (
+                            <p className="text-xs text-gray-500 truncate">{customer.email}</p>
+                          )}
+                        </CardHeader>
+                        <CardContent className="space-y-3">
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm text-gray-600">Lifetime Value</span>
+                            <span className="font-semibold text-green-600" data-testid={`text-ltv-${customer.id}`}>
+                              ${customer.lifetimeValue.toFixed(2)}
+                            </span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm text-gray-600">Total Invoices</span>
+                            <span className="font-semibold" data-testid={`text-invoices-${customer.id}`}>
+                              {customer.totalInvoices}
+                            </span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm text-gray-600">Total Visits</span>
+                            <span className="font-semibold" data-testid={`text-visits-${customer.id}`}>
+                              {customer.totalVisits}
+                            </span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm text-gray-600">Avg. Invoice</span>
+                            <span className="font-semibold" data-testid={`text-avg-invoice-${customer.id}`}>
+                              ${customer.avgInvoiceValue.toFixed(2)}
+                            </span>
+                          </div>
+                          {customer.lastVisit && (
+                            <div className="flex justify-between items-center pt-2 border-t">
+                              <span className="text-xs text-gray-500">Last Visit</span>
+                              <span className="text-xs font-medium">
+                                {new Date(customer.lastVisit).toLocaleDateString()}
+                              </span>
+                            </div>
+                          )}
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+
+                  {/* Customer Comparison Charts */}
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-6">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Top 10 Customers by Lifetime Value</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <ResponsiveContainer width="100%" height={300}>
+                          <BarChart data={customerAnalytics.customers.slice(0, 10)}>
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis dataKey="name" angle={-45} textAnchor="end" height={100} />
+                            <YAxis />
+                            <Tooltip />
+                            <Legend />
+                            <Bar dataKey="lifetimeValue" fill="#10b981" name="Lifetime Value ($)" />
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Visit Frequency</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <ResponsiveContainer width="100%" height={300}>
+                          <BarChart data={customerAnalytics.customers.slice(0, 10)}>
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis dataKey="name" angle={-45} textAnchor="end" height={100} />
+                            <YAxis />
+                            <Tooltip />
+                            <Legend />
+                            <Bar dataKey="totalVisits" fill="#3b82f6" name="Total Visits" />
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Average Invoice Value</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <ResponsiveContainer width="100%" height={300}>
+                          <BarChart data={customerAnalytics.customers.slice(0, 10)}>
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis dataKey="name" angle={-45} textAnchor="end" height={100} />
+                            <YAxis />
+                            <Tooltip />
+                            <Legend />
+                            <Bar dataKey="avgInvoiceValue" fill="#f59e0b" name="Avg. Invoice ($)" />
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Customer Status Distribution</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <ResponsiveContainer width="100%" height={300}>
+                          <PieChart>
+                            <Pie
+                              data={[
+                                { name: 'Active', value: customerAnalytics.customers.filter(c => c.status === 'active').length },
+                                { name: 'Recent', value: customerAnalytics.customers.filter(c => c.status === 'recent').length },
+                                { name: 'Inactive', value: customerAnalytics.customers.filter(c => c.status === 'inactive').length },
+                              ].filter(item => item.value > 0)}
+                              dataKey="value"
+                              nameKey="name"
+                              cx="50%"
+                              cy="50%"
+                              outerRadius={80}
+                              label
+                            >
+                              {[
+                                { name: 'Active', value: customerAnalytics.customers.filter(c => c.status === 'active').length },
+                                { name: 'Recent', value: customerAnalytics.customers.filter(c => c.status === 'recent').length },
+                                { name: 'Inactive', value: customerAnalytics.customers.filter(c => c.status === 'inactive').length },
+                              ].filter(item => item.value > 0).map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                              ))}
+                            </Pie>
+                            <Tooltip />
+                            <Legend />
+                          </PieChart>
+                        </ResponsiveContainer>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </>
+              ) : (
+                <div className="text-center py-12">
+                  <UserCheck className="w-16 h-16 mx-auto text-gray-400 mb-4" />
+                  <p className="text-gray-500 text-lg">No customer data available</p>
+                  <p className="text-gray-400 text-sm mt-2">
+                    Customer analytics will appear here once you have invoices and appointments
                   </p>
                 </div>
               )}

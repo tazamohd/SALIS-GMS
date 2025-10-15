@@ -1414,6 +1414,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get('/api/reports/customer-analytics', isAuthenticated, async (req, res) => {
+    try {
+      const { garage_id, start_date, end_date } = req.query;
+      
+      // Validate and parse dates
+      let startDate: Date | undefined;
+      let endDate: Date | undefined;
+      
+      if (start_date) {
+        startDate = new Date(start_date as string);
+        if (isNaN(startDate.getTime())) {
+          return res.status(400).json({ message: "Invalid start_date format" });
+        }
+        // Normalize to start of day
+        startDate.setHours(0, 0, 0, 0);
+      }
+      
+      if (end_date) {
+        endDate = new Date(end_date as string);
+        if (isNaN(endDate.getTime())) {
+          return res.status(400).json({ message: "Invalid end_date format" });
+        }
+        // Normalize to end of day
+        endDate.setHours(23, 59, 59, 999);
+      }
+      
+      const analytics = await storage.getCustomerAnalytics(
+        garage_id as string | undefined,
+        startDate,
+        endDate
+      );
+      res.json(analytics);
+    } catch (error) {
+      console.error("Error fetching customer analytics:", error);
+      res.status(500).json({ message: "Failed to fetch customer analytics" });
+    }
+  });
+
   // Integrated System Routes - Connecting All Modules
   app.get('/api/integrated/status', isAuthenticated, async (req, res) => {
     try {

@@ -236,6 +236,20 @@ export interface IStorage {
       jobsByStatus: { status: string; count: number }[];
     }[];
   }>;
+  getCustomerAnalytics(garageId?: string, startDate?: Date, endDate?: Date): Promise<{
+    customers: {
+      id: string;
+      name: string;
+      email: string | null;
+      phone: string | null;
+      lifetimeValue: number;
+      totalInvoices: number;
+      totalVisits: number;
+      avgInvoiceValue: number;
+      lastVisit: Date | null;
+      status: string;
+    }[];
+  }>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1349,6 +1363,144 @@ export class DatabaseStorage implements IStorage {
     
     return {
       technicians: technicianMetrics,
+    };
+  }
+
+  async getCustomerAnalytics(garageId?: string, startDate?: Date, endDate?: Date): Promise<{
+    customers: {
+      id: string;
+      name: string;
+      email: string | null;
+      phone: string | null;
+      lifetimeValue: number;
+      totalInvoices: number;
+      totalVisits: number;
+      avgInvoiceValue: number;
+      lastVisit: Date | null;
+      status: string;
+    }[];
+  }> {
+    // Get all customers (users with userType 'customer')
+    const allCustomers = await db.select().from(users);
+    const customerUsers = allCustomers.filter(u => u.userType === 'customer');
+    
+    // Filter by garage if specified (customers associated with that garage through invoices/appointments)
+    // For now, we'll get all customers and filter their data by garage
+    
+    // Build query conditions for invoices based on date range and garage
+    const invoiceConditions = [];
+    if (garageId) {
+      invoiceConditions.push(eq(invoices.garageId, garageId));
+    }
+    if (startDate) {
+      invoiceConditions.push(gte(invoices.createdAt, startDate));
+    }
+    if (endDate) {
+      invoiceConditions.push(lte(invoices.createdAt, endDate));
+    }
+    
+    // Get invoices with proper SQL filtering
+    const relevantInvoices = invoiceConditions.length > 0
+      ? await db.select().from(invoices).where(and(...invoiceConditions))
+      : await db.select().from(invoices);
+    
+    // Build query conditions for appointments based on date range and garage
+    const appointmentConditions = [];
+    if (garageId) {
+      appointmentConditions.push(eq(appointments.garageId, garageId));
+    }
+    if (startDate) {
+      appointmentConditions.push(gte(appointments.appointmentDate, startDate));
+    }
+    if (endDate) {
+      appointmentConditions.push(lte(appointments.appointmentDate, endDate));
+    }
+    
+    // Get appointments with proper SQL filtering
+    const relevantAppointments = appointmentConditions.length > 0
+      ? await db.select().from(appointments).where(and(...appointmentConditions))
+      : await db.select().from(appointments);
+    
+    // Get unique customer IDs from relevant invoices and appointments
+    const activeCustomerIds = new Set<string>();
+    relevantInvoices.forEach(inv => {
+      if (inv.customerId) activeCustomerIds.add(inv.customerId);
+    });
+    relevantAppointments.forEach(apt => {
+      if (apt.customerId) activeCustomerIds.add(apt.customerId);
+    });
+    
+    // Filter customers to only those with activity in the filtered data
+    const filteredCustomerUsers = garageId
+      ? customerUsers.filter(c => activeCustomerIds.has(c.id))
+      : customerUsers;
+    
+    // Calculate analytics for each customer
+    const customerMetrics = filteredCustomerUsers.map((customer) => {
+      // Get invoices for this customer
+      const customerInvoices = relevantInvoices.filter(inv => inv.customerId === customer.id);
+      
+      // Get appointments for this customer
+      const customerAppointments = relevantAppointments.filter(apt => apt.customerId === customer.id);
+      
+      // Calculate lifetime value (total amount from invoices)
+      const lifetimeValue = customerInvoices.reduce((sum, inv) => {
+        const amount = parseFloat(inv.totalAmount || '0');
+        return sum + (isNaN(amount) ? 0 : amount);
+      }, 0);
+      
+      // Calculate total invoices
+      const totalInvoices = customerInvoices.length;
+      
+      // Calculate average invoice value
+      const avgInvoiceValue = totalInvoices > 0 ? lifetimeValue / totalInvoices : 0;
+      
+      // Calculate total visits (appointments + job cards would be more accurate, but using appointments for now)
+      const totalVisits = customerAppointments.length;
+      
+      // Get last visit date (most recent appointment)
+      let lastVisit: Date | null = null;
+      if (customerAppointments.length > 0) {
+        const sortedAppointments = customerAppointments.sort((a, b) => {
+          const dateA = a.appointmentDate ? new Date(a.appointmentDate).getTime() : 0;
+          const dateB = b.appointmentDate ? new Date(b.appointmentDate).getTime() : 0;
+          return dateB - dateA;
+        });
+        if (sortedAppointments[0].appointmentDate) {
+          lastVisit = new Date(sortedAppointments[0].appointmentDate);
+        }
+      }
+      
+      // Determine customer status based on activity
+      let status = 'inactive';
+      if (lastVisit) {
+        const daysSinceLastVisit = Math.floor((new Date().getTime() - lastVisit.getTime()) / (1000 * 60 * 60 * 24));
+        if (daysSinceLastVisit <= 30) {
+          status = 'active';
+        } else if (daysSinceLastVisit <= 90) {
+          status = 'recent';
+        }
+      }
+      
+      return {
+        id: customer.id,
+        name: customer.fullName || 'Unknown',
+        email: customer.email,
+        phone: customer.phone,
+        lifetimeValue: Math.round(lifetimeValue * 100) / 100,
+        totalInvoices,
+        totalVisits,
+        avgInvoiceValue: Math.round(avgInvoiceValue * 100) / 100,
+        lastVisit,
+        status,
+      };
+    });
+    
+    // Sort by lifetime value descending
+    customerMetrics.sort((a, b) => b.lifetimeValue - a.lifetimeValue);
+    
+    return {
+      customers: customerMetrics,
     };
   }
 }
