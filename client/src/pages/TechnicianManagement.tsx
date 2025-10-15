@@ -8,12 +8,14 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/useAuth";
-import { Users, Edit, Award, Clock, DollarSign, Briefcase, GraduationCap } from "lucide-react";
+import { Users, Edit, Award, Clock, DollarSign, Briefcase, GraduationCap, UserPlus, Trash2 } from "lucide-react";
+import AddTechnicianDialog from "@/components/AddTechnicianDialog";
 
 export default function TechnicianManagement() {
   const { user } = useAuth();
@@ -22,6 +24,9 @@ export default function TechnicianManagement() {
   const [editingTechnician, setEditingTechnician] = useState<User | null>(null);
   const [editingProfile, setEditingProfile] = useState<TechnicianProfile | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [technicianToDelete, setTechnicianToDelete] = useState<User | null>(null);
 
   const { data: garages, isLoading: garagesLoading } = useQuery({
     queryKey: ["/api/garages"],
@@ -64,6 +69,43 @@ export default function TechnicianManagement() {
       });
     },
   });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      return apiRequest("DELETE", `/api/technicians/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ 
+        predicate: (query) => 
+          query.queryKey[0] === '/api/technicians' || 
+          (typeof query.queryKey[0] === 'string' && query.queryKey[0].startsWith('/api/technicians'))
+      });
+      toast({
+        title: "Success",
+        description: "Technician deleted successfully",
+      });
+      setDeleteConfirmOpen(false);
+      setTechnicianToDelete(null);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete technician",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleDelete = (technician: User) => {
+    setTechnicianToDelete(technician);
+    setDeleteConfirmOpen(true);
+  };
+
+  const confirmDelete = () => {
+    if (technicianToDelete) {
+      deleteMutation.mutate(technicianToDelete.id);
+    }
+  };
 
   const loadTechnicianProfile = async (technicianId: string) => {
     try {
@@ -130,6 +172,10 @@ export default function TechnicianManagement() {
             Manage technician profiles, skills, and assignments
           </p>
         </div>
+        <Button onClick={() => setIsAddDialogOpen(true)} data-testid="button-add-technician">
+          <UserPlus className="h-4 w-4 mr-2" />
+          Add Technician
+        </Button>
       </div>
 
       {/* Filters */}
@@ -192,14 +238,24 @@ export default function TechnicianManagement() {
                         {technician.email}
                       </CardDescription>
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleEdit(technician)}
-                      data-testid={`button-edit-${technician.id}`}
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
+                    <div className="flex gap-1">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleEdit(technician)}
+                        data-testid={`button-edit-${technician.id}`}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDelete(technician)}
+                        data-testid={`button-delete-${technician.id}`}
+                      >
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </div>
                   </div>
                   <div className="flex gap-2 mt-2">
                     {profile?.level && (
@@ -433,6 +489,35 @@ export default function TechnicianManagement() {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Add Technician Dialog */}
+      <AddTechnicianDialog
+        open={isAddDialogOpen}
+        onOpenChange={setIsAddDialogOpen}
+        garages={garages || []}
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+        <AlertDialogContent data-testid="dialog-delete-confirm">
+          <AlertDialogHeader>
+            <AlertDialogTitle data-testid="text-confirm-title">Delete Technician</AlertDialogTitle>
+            <AlertDialogDescription data-testid="text-confirm-description">
+              Are you sure you want to delete {technicianToDelete?.fullName}? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel data-testid="button-cancel-delete">Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              data-testid="button-confirm-delete"
+            >
+              {deleteMutation.isPending ? "Deleting..." : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
