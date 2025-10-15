@@ -357,6 +357,148 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Spare Parts Management routes - Module 12: Spare Parts & Inventory
+  app.get('/api/spare-parts', isAuthenticated, async (req, res) => {
+    try {
+      const parts = await storage.getSpareParts();
+      res.json(parts);
+    } catch (error) {
+      console.error("Error fetching spare parts:", error);
+      res.status(500).json({ message: "Failed to fetch spare parts" });
+    }
+  });
+
+  app.get('/api/spare-parts/:id', isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const part = await storage.getSparePart(id);
+      if (!part) {
+        return res.status(404).json({ message: "Spare part not found" });
+      }
+      res.json(part);
+    } catch (error) {
+      console.error("Error fetching spare part:", error);
+      res.status(500).json({ message: "Failed to fetch spare part" });
+    }
+  });
+
+  app.post('/api/spare-parts', isAuthenticated, async (req: any, res) => {
+    try {
+      const { insertSparePartSchema } = await import("@shared/schema");
+      const userId = req.user.claims.sub;
+
+      const validationResult = insertSparePartSchema.safeParse(req.body);
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          message: "Validation failed", 
+          errors: validationResult.error.errors 
+        });
+      }
+
+      const partData = {
+        ...validationResult.data,
+        createdBy: userId,
+      };
+
+      const part = await storage.createSparePart(partData);
+      res.status(201).json(part);
+    } catch (error) {
+      console.error("Error creating spare part:", error);
+      res.status(500).json({ message: "Failed to create spare part" });
+    }
+  });
+
+  app.patch('/api/spare-parts/:id', isAuthenticated, async (req, res) => {
+    try {
+      const { insertSparePartSchema } = await import("@shared/schema");
+      const { id } = req.params;
+
+      const validationResult = insertSparePartSchema.partial().safeParse(req.body);
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          message: "Validation failed", 
+          errors: validationResult.error.errors 
+        });
+      }
+
+      const updatedPart = await storage.updateSparePart(id, validationResult.data);
+      res.json(updatedPart);
+    } catch (error) {
+      console.error("Error updating spare part:", error);
+      res.status(500).json({ message: "Failed to update spare part" });
+    }
+  });
+
+  app.delete('/api/spare-parts/:id', isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteSparePart(id);
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting spare part:", error);
+      res.status(500).json({ message: "Failed to delete spare part" });
+    }
+  });
+
+  // Spare Part Inventory routes
+  app.get('/api/spare-part-inventories', isAuthenticated, async (req, res) => {
+    try {
+      const { garage_id, spare_part_id } = req.query;
+      if (!garage_id) {
+        return res.status(400).json({ message: "garage_id is required" });
+      }
+      const inventories = await storage.getSparePartInventories(
+        garage_id as string,
+        spare_part_id as string
+      );
+      res.json(inventories);
+    } catch (error) {
+      console.error("Error fetching spare part inventories:", error);
+      res.status(500).json({ message: "Failed to fetch spare part inventories" });
+    }
+  });
+
+  app.post('/api/spare-part-inventories', isAuthenticated, async (req, res) => {
+    try {
+      const { insertSparePartInventorySchema } = await import("@shared/schema");
+
+      const validationResult = insertSparePartInventorySchema.safeParse(req.body);
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          message: "Validation failed", 
+          errors: validationResult.error.errors 
+        });
+      }
+
+      const inventory = await storage.createSparePartInventory(validationResult.data);
+      res.status(201).json(inventory);
+    } catch (error) {
+      console.error("Error creating spare part inventory:", error);
+      res.status(500).json({ message: "Failed to create spare part inventory" });
+    }
+  });
+
+  app.patch('/api/spare-part-inventories/:id', isAuthenticated, async (req, res) => {
+    try {
+      const { insertSparePartInventorySchema } = await import("@shared/schema");
+      const { id } = req.params;
+
+      const validationResult = insertSparePartInventorySchema.partial().safeParse(req.body);
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          message: "Validation failed", 
+          errors: validationResult.error.errors 
+        });
+      }
+
+      const updatedInventory = await storage.updateSparePartInventory(id, validationResult.data);
+      res.json(updatedInventory);
+    } catch (error) {
+      console.error("Error updating spare part inventory:", error);
+      res.status(500).json({ message: "Failed to update spare part inventory" });
+    }
+  });
+
   // Appointment Management routes - Module 9: Appointments & Scheduling
   app.get('/api/appointments', isAuthenticated, async (req, res) => {
     try {
