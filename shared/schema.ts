@@ -492,6 +492,56 @@ export const purchaseOrderItems = pgTable("purchase_order_items", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Module 12: Invoice & Billing
+export const invoices = pgTable("invoices", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  invoiceNumber: varchar("invoice_number", { length: 50 }).notNull().unique(),
+  garageId: uuid("garage_id").notNull().references(() => garages.id),
+  customerId: varchar("customer_id").notNull().references(() => users.id),
+  vehicleId: uuid("vehicle_id").references(() => vehicles.id),
+  jobCardId: uuid("job_card_id").references(() => jobCards.id),
+  invoiceDate: timestamp("invoice_date").notNull().defaultNow(),
+  dueDate: timestamp("due_date").notNull(),
+  status: varchar("status").notNull().default("draft"), // "draft", "sent", "paid", "overdue", "cancelled"
+  subtotal: decimal("subtotal", { precision: 10, scale: 2 }).notNull().default("0"),
+  taxAmount: decimal("tax_amount", { precision: 10, scale: 2 }).notNull().default("0"),
+  discountAmount: decimal("discount_amount", { precision: 10, scale: 2 }).notNull().default("0"),
+  totalAmount: decimal("total_amount", { precision: 10, scale: 2 }).notNull().default("0"),
+  paidAmount: decimal("paid_amount", { precision: 10, scale: 2 }).notNull().default("0"),
+  balanceAmount: decimal("balance_amount", { precision: 10, scale: 2 }).notNull().default("0"),
+  notes: text("notes"),
+  termsAndConditions: text("terms_and_conditions"),
+  createdBy: varchar("created_by").notNull().references(() => users.id),
+  sentAt: timestamp("sent_at"),
+  paidAt: timestamp("paid_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const invoiceItems = pgTable("invoice_items", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  invoiceId: uuid("invoice_id").notNull().references(() => invoices.id, { onDelete: "cascade" }),
+  itemType: varchar("item_type", { length: 50 }).notNull(), // "service", "part", "labor"
+  description: text("description").notNull(),
+  quantity: integer("quantity").notNull().default(1),
+  unitPrice: decimal("unit_price", { precision: 10, scale: 2 }).notNull(),
+  lineTotal: decimal("line_total", { precision: 10, scale: 2 }).notNull(),
+  taxRate: decimal("tax_rate", { precision: 5, scale: 2 }).notNull().default("0"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const payments = pgTable("payments", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  invoiceId: uuid("invoice_id").notNull().references(() => invoices.id, { onDelete: "cascade" }),
+  paymentDate: timestamp("payment_date").notNull().defaultNow(),
+  amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+  paymentMethod: varchar("payment_method", { length: 50 }).notNull(), // "cash", "card", "transfer", "check"
+  referenceNumber: varchar("reference_number", { length: 100 }),
+  notes: text("notes"),
+  createdBy: varchar("created_by").notNull().references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 export type JobCard = typeof jobCards.$inferSelect;
 export type InsertJobCard = typeof jobCards.$inferInsert;
 export const insertJobCardSchema = createInsertSchema(jobCards);
@@ -537,6 +587,16 @@ export const insertPurchaseOrderSchema = createInsertSchema(purchaseOrders).omit
 export type PurchaseOrderItem = typeof purchaseOrderItems.$inferSelect;
 export type InsertPurchaseOrderItem = typeof purchaseOrderItems.$inferInsert;
 export const insertPurchaseOrderItemSchema = createInsertSchema(purchaseOrderItems).omit({ id: true, createdAt: true });
+
+export type Invoice = typeof invoices.$inferSelect;
+export type InsertInvoice = typeof invoices.$inferInsert;
+export const insertInvoiceSchema = createInsertSchema(invoices).omit({ id: true, invoiceNumber: true, createdBy: true, createdAt: true, updatedAt: true });
+export type InvoiceItem = typeof invoiceItems.$inferSelect;
+export type InsertInvoiceItem = typeof invoiceItems.$inferInsert;
+export const insertInvoiceItemSchema = createInsertSchema(invoiceItems).omit({ id: true, createdAt: true });
+export type Payment = typeof payments.$inferSelect;
+export type InsertPayment = typeof payments.$inferInsert;
+export const insertPaymentSchema = createInsertSchema(payments).omit({ id: true, createdBy: true, createdAt: true });
 
 export type Garage = typeof garages.$inferSelect;
 export type Branch = typeof branches.$inferSelect;

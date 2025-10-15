@@ -214,8 +214,30 @@ Based on attached module flow plan for garage management SaaS:
 - Integrated into main navigation with ShoppingCart icon
 - **Production-ready** with architect approval
 
-### 🔜 Next Modules (12-14)
-- Invoice & Billing (Module 12)
+### 🔄 Module 12 - Invoice & Billing (IN PROGRESS - October 15, 2025)
+- **Database schema** completed with 3 tables:
+  - `invoices` - Main invoice records with customer, vehicle, job card links
+  - `invoice_items` - Line items for services, parts, labor
+  - `payments` - Payment tracking with automatic invoice updates
+- **Storage layer** implemented:
+  - Full CRUD operations for invoices, items, and payments
+  - Atomic invoice creation with items using database transactions
+  - Payment tracking with automatic status updates (draft → sent → paid)
+- **API routes** completed:
+  - GET/POST/PATCH/DELETE for invoices
+  - Atomic `/api/invoices/with-items` endpoint
+  - Payment creation with automatic invoice balance updates
+  - Full Zod validation on all endpoints
+- **Frontend UI**:
+  - Invoices page with garage and status filtering
+  - Table view showing invoice #, customer, dates, amounts, balance, status
+  - Integrated into navigation with FileText icon
+- **Still needed**:
+  - Create Invoice dialog
+  - Invoice Details dialog with item viewing
+  - Add Payment dialog
+
+### 🔜 Next Modules (13-14)
 - Reports & Dashboards (Module 13)
 - Mobile Apps Integration (Module 14)
 

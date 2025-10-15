@@ -20,6 +20,9 @@ import {
   suppliers,
   purchaseOrders,
   purchaseOrderItems,
+  invoices,
+  invoiceItems,
+  payments,
   type User,
   type UpsertUser,
   type Garage,
@@ -43,6 +46,12 @@ import {
   type PurchaseOrder,
   type InsertPurchaseOrder,
   type PurchaseOrderItem,
+  type Invoice,
+  type InsertInvoice,
+  type InvoiceItem,
+  type InsertInvoiceItem,
+  type Payment,
+  type InsertPayment,
   type InsertPurchaseOrderItem,
 } from "@shared/schema";
 import { db } from "./db";
@@ -138,6 +147,20 @@ export interface IStorage {
   updatePurchaseOrderItem(id: string, data: Partial<PurchaseOrderItem>): Promise<PurchaseOrderItem>;
   deletePurchaseOrderItem(id: string): Promise<void>;
   createPurchaseOrderWithItems(poData: InsertPurchaseOrder, items: Omit<InsertPurchaseOrderItem, 'purchaseOrderId'>[]): Promise<PurchaseOrder>;
+  
+  // Invoice & Billing - Module 12
+  getInvoices(garageId?: string, status?: string): Promise<Invoice[]>;
+  getInvoice(id: string): Promise<Invoice | undefined>;
+  createInvoice(data: InsertInvoice): Promise<Invoice>;
+  updateInvoice(id: string, data: Partial<Invoice>): Promise<Invoice>;
+  deleteInvoice(id: string): Promise<void>;
+  getInvoiceItems(invoiceId: string): Promise<InvoiceItem[]>;
+  createInvoiceItem(data: InsertInvoiceItem): Promise<InvoiceItem>;
+  deleteInvoiceItem(id: string): Promise<void>;
+  createInvoiceWithItems(invoiceData: InsertInvoice, items: Omit<InsertInvoiceItem, 'invoiceId'>[]): Promise<Invoice>;
+  getPayments(invoiceId?: string): Promise<Payment[]>;
+  createPayment(data: InsertPayment): Promise<Payment>;
+  deletePayment(id: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -606,6 +629,116 @@ export class DatabaseStorage implements IStorage {
       
       return po;
     });
+  }
+
+  // Module 12: Invoice & Billing
+  async getInvoices(garageId?: string, status?: string): Promise<Invoice[]> {
+    const { invoices } = await import("@shared/schema");
+    const conditions = [];
+    
+    if (garageId) {
+      conditions.push(eq(invoices.garageId, garageId));
+    }
+    
+    if (status) {
+      conditions.push(eq(invoices.status, status));
+    }
+    
+    if (conditions.length > 0) {
+      return await db.select().from(invoices)
+        .where(and(...conditions))
+        .orderBy(desc(invoices.createdAt));
+    }
+    
+    return await db.select().from(invoices).orderBy(desc(invoices.createdAt));
+  }
+
+  async getInvoice(id: string): Promise<Invoice | undefined> {
+    const { invoices } = await import("@shared/schema");
+    const [invoice] = await db.select().from(invoices).where(eq(invoices.id, id));
+    return invoice;
+  }
+
+  async createInvoice(data: InsertInvoice): Promise<Invoice> {
+    const { invoices } = await import("@shared/schema");
+    const invoiceNumber = `INV-${Date.now()}`;
+    const [invoice] = await db.insert(invoices)
+      .values({ ...data, invoiceNumber })
+      .returning();
+    return invoice;
+  }
+
+  async updateInvoice(id: string, data: Partial<Invoice>): Promise<Invoice> {
+    const { invoices } = await import("@shared/schema");
+    const [invoice] = await db.update(invoices)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(invoices.id, id))
+      .returning();
+    return invoice;
+  }
+
+  async deleteInvoice(id: string): Promise<void> {
+    const { invoices } = await import("@shared/schema");
+    await db.delete(invoices).where(eq(invoices.id, id));
+  }
+
+  async getInvoiceItems(invoiceId: string): Promise<InvoiceItem[]> {
+    const { invoiceItems } = await import("@shared/schema");
+    return await db.select().from(invoiceItems)
+      .where(eq(invoiceItems.invoiceId, invoiceId))
+      .orderBy(desc(invoiceItems.createdAt));
+  }
+
+  async createInvoiceItem(data: InsertInvoiceItem): Promise<InvoiceItem> {
+    const { invoiceItems } = await import("@shared/schema");
+    const [item] = await db.insert(invoiceItems).values(data).returning();
+    return item;
+  }
+
+  async deleteInvoiceItem(id: string): Promise<void> {
+    const { invoiceItems } = await import("@shared/schema");
+    await db.delete(invoiceItems).where(eq(invoiceItems.id, id));
+  }
+
+  async createInvoiceWithItems(
+    invoiceData: InsertInvoice,
+    items: Omit<InsertInvoiceItem, 'invoiceId'>[]
+  ): Promise<Invoice> {
+    const { invoices, invoiceItems } = await import("@shared/schema");
+    return await db.transaction(async (tx) => {
+      const invoiceNumber = `INV-${Date.now()}`;
+      const [invoice] = await tx.insert(invoices)
+        .values({ ...invoiceData, invoiceNumber })
+        .returning();
+      
+      if (items.length > 0) {
+        await tx.insert(invoiceItems)
+          .values(items.map(item => ({ ...item, invoiceId: invoice.id })));
+      }
+      
+      return invoice;
+    });
+  }
+
+  async getPayments(invoiceId?: string): Promise<Payment[]> {
+    const { payments } = await import("@shared/schema");
+    if (invoiceId) {
+      return await db.select().from(payments)
+        .where(eq(payments.invoiceId, invoiceId))
+        .orderBy(desc(payments.createdAt));
+    }
+    return await db.select().from(payments).orderBy(desc(payments.createdAt));
+  }
+
+  async createPayment(data: InsertPayment): Promise<Payment> {
+    const { payments } = await import("@shared/schema");
+    const [payment] = await db.insert(payments).values(data).returning();
+    return payment;
+  }
+
+  async deletePayment(id: string): Promise<void> {
+    const { payments } = await import("@shared/schema");
+    await db.delete(payments).where(eq(payments.id, id));
   }
 }
 

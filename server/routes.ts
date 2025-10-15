@@ -804,6 +804,215 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Module 12: Invoice & Billing Routes
+  app.get('/api/invoices', isAuthenticated, async (req, res) => {
+    try {
+      const { garage_id, status } = req.query;
+      const invoices = await storage.getInvoices(garage_id as string, status as string);
+      res.json(invoices);
+    } catch (error) {
+      console.error("Error fetching invoices:", error);
+      res.status(500).json({ message: "Failed to fetch invoices" });
+    }
+  });
+
+  app.get('/api/invoices/:id', isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const invoice = await storage.getInvoice(id);
+      if (!invoice) {
+        return res.status(404).json({ message: "Invoice not found" });
+      }
+      res.json(invoice);
+    } catch (error) {
+      console.error("Error fetching invoice:", error);
+      res.status(500).json({ message: "Failed to fetch invoice" });
+    }
+  });
+
+  app.post('/api/invoices', isAuthenticated, async (req: any, res) => {
+    try {
+      const { insertInvoiceSchema } = await import("@shared/schema");
+      const userId = req.user.claims.sub;
+      
+      const validationResult = insertInvoiceSchema.safeParse(req.body);
+      
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          message: "Validation error", 
+          errors: validationResult.error.errors 
+        });
+      }
+      
+      const invoiceData = {
+        ...validationResult.data,
+        createdBy: userId,
+      };
+      
+      const invoice = await storage.createInvoice(invoiceData as any);
+      res.status(201).json(invoice);
+    } catch (error) {
+      console.error("Error creating invoice:", error);
+      res.status(500).json({ message: "Failed to create invoice" });
+    }
+  });
+
+  app.post('/api/invoices/with-items', isAuthenticated, async (req: any, res) => {
+    try {
+      const { insertInvoiceSchema, insertInvoiceItemSchema } = await import("@shared/schema");
+      const userId = req.user.claims.sub;
+      const { invoice, items } = req.body;
+      
+      if (!invoice || !items || !Array.isArray(items)) {
+        return res.status(400).json({ 
+          message: "Invalid request: invoice and items (array) required" 
+        });
+      }
+      
+      const invoiceValidation = insertInvoiceSchema.safeParse(invoice);
+      if (!invoiceValidation.success) {
+        return res.status(400).json({ 
+          message: "Invoice validation error", 
+          errors: invoiceValidation.error.errors 
+        });
+      }
+      
+      const itemsValidation = items.map((item: any) => 
+        insertInvoiceItemSchema.omit({ invoiceId: true }).safeParse(item)
+      );
+      
+      const invalidItems = itemsValidation.filter(v => !v.success);
+      if (invalidItems.length > 0) {
+        return res.status(400).json({ 
+          message: "Items validation error", 
+          errors: invalidItems.flatMap(v => v.success ? [] : v.error.errors)
+        });
+      }
+      
+      const invoiceData = {
+        ...invoiceValidation.data,
+        createdBy: userId,
+      };
+      
+      const validItems = itemsValidation.map(v => v.success ? v.data : null).filter(Boolean);
+      
+      const createdInvoice = await storage.createInvoiceWithItems(invoiceData as any, validItems as any);
+      res.status(201).json(createdInvoice);
+    } catch (error) {
+      console.error("Error creating invoice with items:", error);
+      res.status(500).json({ message: "Failed to create invoice with items" });
+    }
+  });
+
+  app.patch('/api/invoices/:id', isAuthenticated, async (req, res) => {
+    try {
+      const { insertInvoiceSchema } = await import("@shared/schema");
+      const { id } = req.params;
+      
+      const validationResult = insertInvoiceSchema.partial().safeParse(req.body);
+      
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          message: "Validation error", 
+          errors: validationResult.error.errors 
+        });
+      }
+      
+      const invoice = await storage.updateInvoice(id, validationResult.data);
+      res.json(invoice);
+    } catch (error) {
+      console.error("Error updating invoice:", error);
+      res.status(500).json({ message: "Failed to update invoice" });
+    }
+  });
+
+  app.delete('/api/invoices/:id', isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteInvoice(id);
+      res.json({ message: "Invoice deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting invoice:", error);
+      res.status(500).json({ message: "Failed to delete invoice" });
+    }
+  });
+
+  app.get('/api/invoices/:id/items', isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const items = await storage.getInvoiceItems(id);
+      res.json(items);
+    } catch (error) {
+      console.error("Error fetching invoice items:", error);
+      res.status(500).json({ message: "Failed to fetch invoice items" });
+    }
+  });
+
+  app.get('/api/payments', isAuthenticated, async (req, res) => {
+    try {
+      const { invoice_id } = req.query;
+      const payments = await storage.getPayments(invoice_id as string);
+      res.json(payments);
+    } catch (error) {
+      console.error("Error fetching payments:", error);
+      res.status(500).json({ message: "Failed to fetch payments" });
+    }
+  });
+
+  app.post('/api/payments', isAuthenticated, async (req: any, res) => {
+    try {
+      const { insertPaymentSchema } = await import("@shared/schema");
+      const userId = req.user.claims.sub;
+      
+      const validationResult = insertPaymentSchema.safeParse(req.body);
+      
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          message: "Validation error", 
+          errors: validationResult.error.errors 
+        });
+      }
+      
+      const paymentData = {
+        ...validationResult.data,
+        createdBy: userId,
+      };
+      
+      const payment = await storage.createPayment(paymentData as any);
+      
+      // Update invoice paid amount
+      const invoice = await storage.getInvoice(payment.invoiceId);
+      if (invoice) {
+        const newPaidAmount = parseFloat(invoice.paidAmount) + parseFloat(payment.amount);
+        const balanceAmount = parseFloat(invoice.totalAmount) - newPaidAmount;
+        const newStatus = balanceAmount <= 0 ? 'paid' : invoice.status;
+        
+        await storage.updateInvoice(payment.invoiceId, {
+          paidAmount: newPaidAmount.toFixed(2),
+          balanceAmount: balanceAmount.toFixed(2),
+          status: newStatus,
+          paidAt: balanceAmount <= 0 ? new Date() : invoice.paidAt,
+        });
+      }
+      
+      res.status(201).json(payment);
+    } catch (error) {
+      console.error("Error creating payment:", error);
+      res.status(500).json({ message: "Failed to create payment" });
+    }
+  });
+
+  app.delete('/api/payments/:id', isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deletePayment(id);
+      res.json({ message: "Payment deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting payment:", error);
+      res.status(500).json({ message: "Failed to delete payment" });
+    }
+  });
+
   // Integrated System Routes - Connecting All Modules
   app.get('/api/integrated/status', isAuthenticated, async (req, res) => {
     try {

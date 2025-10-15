@@ -12,6 +12,7 @@ import { TasksManagement } from "@/pages/TasksManagement";
 import { Appointments } from "@/pages/Appointments";
 import { Customers } from "@/pages/Customers";
 import { PurchaseOrders } from "@/pages/PurchaseOrders";
+import { Invoices } from "@/pages/Invoices";
 import { Profile } from "@/pages/Profile";
 
 function Router() {
@@ -42,6 +43,11 @@ function Router() {
       <Route path="/purchase-orders">
         <Layout>
           <PurchaseOrders />
+        </Layout>
+      </Route>
+      <Route path="/invoices">
+        <Layout>
+          <Invoices />
         </Layout>
       </Route>
       <Route path="/profile">
