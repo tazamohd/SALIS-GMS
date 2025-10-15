@@ -11,7 +11,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { Invoice, Garage } from "@shared/schema";
+import { CreateInvoiceDialog } from "@/components/CreateInvoiceDialog";
+import { InvoiceDetailsDialog } from "@/components/InvoiceDetailsDialog";
+import type { Invoice, Garage, User } from "@shared/schema";
 
 export function Invoices() {
   const [selectedGarageId, setSelectedGarageId] = useState<string>("all");
@@ -32,6 +34,10 @@ export function Invoices() {
 
   const { data: invoices, isLoading } = useQuery<Invoice[]>({
     queryKey: [invoiceUrl],
+  });
+
+  const { data: customers } = useQuery<User[]>({
+    queryKey: ['/api/customers'],
   });
 
   const getStatusColor = (status: string) => {
@@ -58,10 +64,7 @@ export function Invoices() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button className="bg-blue-600 hover:bg-blue-700" data-testid="button-create-invoice">
-            <Plus className="w-4 h-4 mr-2" />
-            Create Invoice
-          </Button>
+          <CreateInvoiceDialog />
         </div>
       </div>
 
@@ -167,7 +170,9 @@ export function Invoices() {
                       </td>
                       <td className="py-3 px-4">
                         <span className="text-sm text-gray-700">
-                          {invoice.customerId}
+                          {customers?.find(c => c.id === invoice.customerId)?.fullName || 
+                           customers?.find(c => c.id === invoice.customerId)?.email || 
+                           "Unknown"}
                         </span>
                       </td>
                       <td className="py-3 px-4">
@@ -196,9 +201,10 @@ export function Invoices() {
                         </span>
                       </td>
                       <td className="py-3 px-4">
-                        <Button variant="ghost" size="sm" data-testid={`button-view-invoice-${invoice.id}`}>
-                          View
-                        </Button>
+                        <InvoiceDetailsDialog 
+                          invoice={invoice}
+                          customer={customers?.find(c => c.id === invoice.customerId)}
+                        />
                       </td>
                     </tr>
                   ))}
