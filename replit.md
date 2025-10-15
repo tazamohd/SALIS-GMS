@@ -214,28 +214,35 @@ Based on attached module flow plan for garage management SaaS:
 - Integrated into main navigation with ShoppingCart icon
 - **Production-ready** with architect approval
 
-### 🔄 Module 12 - Invoice & Billing (IN PROGRESS - October 15, 2025)
-- **Database schema** completed with 3 tables:
+### ✅ Module 12 - Invoice & Billing (COMPLETED - October 15, 2025)
+- **Database schema** with 3 tables:
   - `invoices` - Main invoice records with customer, vehicle, job card links
   - `invoice_items` - Line items for services, parts, labor
   - `payments` - Payment tracking with automatic invoice updates
-- **Storage layer** implemented:
+- **Storage layer**:
   - Full CRUD operations for invoices, items, and payments
   - Atomic invoice creation with items using database transactions
-  - Payment tracking with automatic status updates (draft → sent → paid)
-- **API routes** completed:
-  - GET/POST/PATCH/DELETE for invoices
-  - Atomic `/api/invoices/with-items` endpoint
+  - Payment tracking with automatic invoice balance and status updates
+- **API routes**:
+  - GET/POST/PATCH/DELETE for invoices with full Zod validation
+  - Atomic `/api/invoices/with-items` endpoint ensuring data integrity
   - Payment creation with automatic invoice balance updates
-  - Full Zod validation on all endpoints
+  - **Status workflow validation** - server-side enforcement of transitions
 - **Frontend UI**:
   - Invoices page with garage and status filtering
-  - Table view showing invoice #, customer, dates, amounts, balance, status
+  - Customer information display with proper lookup
+  - **CreateInvoiceDialog** - Dynamic line items, real-time total calculation, atomic creation
+  - **InvoiceDetailsDialog** - Full invoice viewing, status management with workflow enforcement, delete functionality
+  - **AddPaymentDialog** - Payment recording with balance validation, automatic invoice updates
   - Integrated into navigation with FileText icon
-- **Still needed**:
-  - Create Invoice dialog
-  - Invoice Details dialog with item viewing
-  - Add Payment dialog
+- **Status workflow enforcement** (both client and server):
+  - draft → sent, cancelled
+  - sent → paid, overdue, cancelled
+  - paid → cancelled only (terminal)
+  - overdue → paid, cancelled
+  - cancelled → no changes (terminal)
+- **Sample data**: Two test invoices (INV-20251015-001, INV-20251015-002) with line items
+- **Production-ready** with full architect approval
 
 ### 🔜 Next Modules (13-14)
 - Reports & Dashboards (Module 13)
