@@ -13,6 +13,8 @@ import {
   tools,
   toolAvailability,
   toolUsageLogs,
+  spareParts,
+  sparePartInventories,
   appointments,
   appointmentStatusHistory,
   vehicles,
@@ -35,6 +37,10 @@ import {
   type Tool,
   type ToolAvailability,
   type ToolUsageLog,
+  type SparePart,
+  type InsertSparePart,
+  type SparePartInventory,
+  type InsertSparePartInventory,
   type Appointment,
   type InsertAppointment,
   type AppointmentStatusHistory,
@@ -106,6 +112,16 @@ export interface IStorage {
   getTool(id: string): Promise<Tool | undefined>;
   createTool(data: any): Promise<Tool>;
   updateTool(id: string, data: any): Promise<Tool>;
+
+  // Spare Parts operations - Module 12
+  getSpareParts(): Promise<SparePart[]>;
+  getSparePart(id: string): Promise<SparePart | undefined>;
+  createSparePart(data: InsertSparePart): Promise<SparePart>;
+  updateSparePart(id: string, data: Partial<SparePart>): Promise<SparePart>;
+  deleteSparePart(id: string): Promise<void>;
+  getSparePartInventories(garageId: string, sparePartId?: string): Promise<SparePartInventory[]>;
+  createSparePartInventory(data: InsertSparePartInventory): Promise<SparePartInventory>;
+  updateSparePartInventory(id: string, data: Partial<SparePartInventory>): Promise<SparePartInventory>;
   
   // Tool Availability operations
   getToolAvailability(garageId: string, toolId?: string): Promise<ToolAvailability[]>;
@@ -382,6 +398,60 @@ export class DatabaseStorage implements IStorage {
       updatedAt: new Date()
     }).where(eq(tools.id, id)).returning();
     return tool;
+  }
+
+  // Spare Parts operations - Module 12
+  async getSpareParts(): Promise<SparePart[]> {
+    return await db.select().from(spareParts)
+      .where(eq(spareParts.isActive, true))
+      .orderBy(spareParts.name);
+  }
+
+  async getSparePart(id: string): Promise<SparePart | undefined> {
+    const [part] = await db.select().from(spareParts).where(eq(spareParts.id, id));
+    return part;
+  }
+
+  async createSparePart(data: InsertSparePart): Promise<SparePart> {
+    const [part] = await db.insert(spareParts).values(data).returning();
+    return part;
+  }
+
+  async updateSparePart(id: string, data: Partial<SparePart>): Promise<SparePart> {
+    const [part] = await db.update(spareParts)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(spareParts.id, id))
+      .returning();
+    return part;
+  }
+
+  async deleteSparePart(id: string): Promise<void> {
+    await db.delete(spareParts).where(eq(spareParts.id, id));
+  }
+
+  async getSparePartInventories(garageId: string, sparePartId?: string): Promise<SparePartInventory[]> {
+    if (sparePartId) {
+      return await db.select().from(sparePartInventories)
+        .where(and(
+          eq(sparePartInventories.garageId, garageId),
+          eq(sparePartInventories.sparePartId, sparePartId)
+        ));
+    }
+    return await db.select().from(sparePartInventories)
+      .where(eq(sparePartInventories.garageId, garageId));
+  }
+
+  async createSparePartInventory(data: InsertSparePartInventory): Promise<SparePartInventory> {
+    const [inventory] = await db.insert(sparePartInventories).values(data).returning();
+    return inventory;
+  }
+
+  async updateSparePartInventory(id: string, data: Partial<SparePartInventory>): Promise<SparePartInventory> {
+    const [inventory] = await db.update(sparePartInventories)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(sparePartInventories.id, id))
+      .returning();
+    return inventory;
   }
 
   // Tool Availability operations

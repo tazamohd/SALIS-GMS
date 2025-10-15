@@ -358,6 +358,56 @@ export const toolUsageLogs = pgTable("tool_usage_logs", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Module 12: Spare Parts & Inventory Management
+export const spareParts = pgTable("spare_parts", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: varchar("name").notNull(),
+  description: text("description"),
+  category: varchar("category").notNull(), // "engine", "brakes", "electrical", "fluids", "filters"
+  subcategory: varchar("subcategory"),
+  brand: varchar("brand"),
+  manufacturer: varchar("manufacturer"),
+  sku: varchar("sku").notNull().unique(),
+  barcode: varchar("barcode"),
+  partType: varchar("part_type").notNull().default("generic"), // "oem", "generic", "consumable"
+  unitOfMeasure: varchar("unit_of_measure").default("pcs"), // "pcs", "liters", "kg", "boxes"
+  compatibleVehicles: jsonb("compatible_vehicles"), // Array of vehicle models
+  linkedServiceIds: jsonb("linked_service_ids"), // Array of service template IDs
+  linkedToolIds: jsonb("linked_tool_ids"), // Array of tool IDs
+  tags: jsonb("tags"), // Array of tags
+  media: jsonb("media"), // Array of image URLs
+  documents: jsonb("documents"), // Array of document URLs
+  notes: text("notes"),
+  isGlobal: boolean("is_global").default(false),
+  visibility: varchar("visibility").default("private"), // "public", "private", "shared"
+  editableBy: varchar("editable_by").default("garage_admin"),
+  createdBy: varchar("created_by").notNull().references(() => users.id),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Spare Part Inventory - tracks inventory per garage
+export const sparePartInventories = pgTable("spare_part_inventories", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  sparePartId: uuid("spare_part_id").notNull().references(() => spareParts.id),
+  garageId: uuid("garage_id").notNull().references(() => garages.id),
+  branchId: uuid("branch_id").references(() => branches.id),
+  stockQuantity: integer("stock_quantity").default(0),
+  minThreshold: integer("min_threshold").default(5),
+  purchasePrice: decimal("purchase_price", { precision: 10, scale: 2 }),
+  sellingPrice: decimal("selling_price", { precision: 10, scale: 2 }),
+  costPrice: decimal("cost_price", { precision: 10, scale: 2 }),
+  currency: varchar("currency").default("USD"),
+  purchaseTaxRate: decimal("purchase_tax_rate", { precision: 5, scale: 2 }).default("0"),
+  saleTaxRate: decimal("sale_tax_rate", { precision: 5, scale: 2 }).default("0"),
+  location: varchar("location"), // Storage location (shelf, bin, etc.)
+  lastRestockedAt: timestamp("last_restocked_at"),
+  isEnabled: boolean("is_enabled").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Module 10: Customer Management - Vehicles
 export const vehicles = pgTable("vehicles", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -557,6 +607,12 @@ export type InsertTool = typeof tools.$inferInsert;
 export const insertToolSchema = createInsertSchema(tools).omit({ id: true, createdBy: true, createdAt: true, updatedAt: true });
 export type ToolAvailability = typeof toolAvailability.$inferSelect;
 export type InsertToolAvailability = typeof toolAvailability.$inferInsert;
+export type SparePart = typeof spareParts.$inferSelect;
+export type InsertSparePart = typeof spareParts.$inferInsert;
+export const insertSparePartSchema = createInsertSchema(spareParts).omit({ id: true, createdBy: true, createdAt: true, updatedAt: true });
+export type SparePartInventory = typeof sparePartInventories.$inferSelect;
+export type InsertSparePartInventory = typeof sparePartInventories.$inferInsert;
+export const insertSparePartInventorySchema = createInsertSchema(sparePartInventories).omit({ id: true, createdAt: true, updatedAt: true });
 export type ToolUsageLog = typeof toolUsageLogs.$inferSelect;
 export type InsertToolUsageLog = typeof toolUsageLogs.$inferInsert;
 export type Appointment = typeof appointments.$inferSelect;
