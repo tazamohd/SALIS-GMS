@@ -554,6 +554,7 @@ export type InsertServiceTemplate = typeof serviceTemplates.$inferInsert;
 export const insertServiceTemplateSchema = createInsertSchema(serviceTemplates).omit({ id: true, createdAt: true, updatedAt: true });
 export type Tool = typeof tools.$inferSelect;
 export type InsertTool = typeof tools.$inferInsert;
+export const insertToolSchema = createInsertSchema(tools).omit({ id: true, createdBy: true, createdAt: true, updatedAt: true });
 export type ToolAvailability = typeof toolAvailability.$inferSelect;
 export type InsertToolAvailability = typeof toolAvailability.$inferInsert;
 export type ToolUsageLog = typeof toolUsageLogs.$inferSelect;
