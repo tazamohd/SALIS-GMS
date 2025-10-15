@@ -12,6 +12,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { AddSupplierDialog } from "@/components/AddSupplierDialog";
+import { CreatePurchaseOrderDialog } from "@/components/CreatePurchaseOrderDialog";
+import { PurchaseOrderDetailsDialog } from "@/components/PurchaseOrderDetailsDialog";
 import type { PurchaseOrder, Supplier, Garage } from "@shared/schema";
 
 export function PurchaseOrders() {
@@ -69,10 +71,7 @@ export function PurchaseOrders() {
         </div>
         <div className="flex gap-2">
           <AddSupplierDialog />
-          <Button className="bg-blue-600 hover:bg-blue-700" data-testid="button-create-po">
-            <Plus className="w-4 h-4 mr-2" />
-            Create Purchase Order
-          </Button>
+          <CreatePurchaseOrderDialog />
         </div>
       </div>
 
@@ -193,9 +192,10 @@ export function PurchaseOrders() {
                         </span>
                       </td>
                       <td className="py-3 px-4">
-                        <Button variant="ghost" size="sm" data-testid={`button-view-po-${po.id}`}>
-                          View
-                        </Button>
+                        <PurchaseOrderDetailsDialog
+                          purchaseOrder={po}
+                          supplier={suppliers?.find(s => s.id === po.supplierId)}
+                        />
                       </td>
                     </tr>
                   ))}

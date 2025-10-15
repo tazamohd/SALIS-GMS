@@ -682,6 +682,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post('/api/purchase-orders/with-items', isAuthenticated, async (req: any, res) => {
+    try {
+      const { insertPurchaseOrderSchema, insertPurchaseOrderItemSchema } = await import("@shared/schema");
+      const userId = req.user.claims.sub;
+      const { purchaseOrder, items } = req.body;
+      
+      if (!purchaseOrder || !items || !Array.isArray(items)) {
+        return res.status(400).json({ 
+          message: "Invalid request: purchaseOrder and items (array) required" 
+        });
+      }
+      
+      const poValidation = insertPurchaseOrderSchema.safeParse(purchaseOrder);
+      if (!poValidation.success) {
+        return res.status(400).json({ 
+          message: "Purchase order validation error", 
+          errors: poValidation.error.errors 
+        });
+      }
+      
+      const itemsValidation = items.map((item: any) => 
+        insertPurchaseOrderItemSchema.omit({ purchaseOrderId: true }).safeParse(item)
+      );
+      
+      const invalidItems = itemsValidation.filter(v => !v.success);
+      if (invalidItems.length > 0) {
+        return res.status(400).json({ 
+          message: "Items validation error", 
+          errors: invalidItems.flatMap(v => v.success ? [] : v.error.errors)
+        });
+      }
+      
+      const orderData = {
+        ...poValidation.data,
+        createdBy: userId,
+      };
+      
+      const validItems = itemsValidation.map(v => v.success ? v.data : null).filter(Boolean);
+      
+      const order = await storage.createPurchaseOrderWithItems(orderData as any, validItems as any);
+      res.status(201).json(order);
+    } catch (error) {
+      console.error("Error creating purchase order with items:", error);
+      res.status(500).json({ message: "Failed to create purchase order with items" });
+    }
+  });
+
   app.patch('/api/purchase-orders/:id', isAuthenticated, async (req, res) => {
     try {
       const { insertPurchaseOrderSchema } = await import("@shared/schema");

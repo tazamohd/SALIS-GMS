@@ -137,6 +137,7 @@ export interface IStorage {
   createPurchaseOrderItem(data: InsertPurchaseOrderItem): Promise<PurchaseOrderItem>;
   updatePurchaseOrderItem(id: string, data: Partial<PurchaseOrderItem>): Promise<PurchaseOrderItem>;
   deletePurchaseOrderItem(id: string): Promise<void>;
+  createPurchaseOrderWithItems(poData: InsertPurchaseOrder, items: Omit<InsertPurchaseOrderItem, 'purchaseOrderId'>[]): Promise<PurchaseOrder>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -586,6 +587,25 @@ export class DatabaseStorage implements IStorage {
 
   async deletePurchaseOrderItem(id: string): Promise<void> {
     await db.delete(purchaseOrderItems).where(eq(purchaseOrderItems.id, id));
+  }
+
+  async createPurchaseOrderWithItems(
+    poData: InsertPurchaseOrder,
+    items: Omit<InsertPurchaseOrderItem, 'purchaseOrderId'>[]
+  ): Promise<PurchaseOrder> {
+    return await db.transaction(async (tx) => {
+      const poNumber = `PO-${Date.now()}`;
+      const [po] = await tx.insert(purchaseOrders)
+        .values({ ...poData, poNumber })
+        .returning();
+      
+      if (items.length > 0) {
+        await tx.insert(purchaseOrderItems)
+          .values(items.map(item => ({ ...item, purchaseOrderId: po.id })));
+      }
+      
+      return po;
+    });
   }
 }
 

@@ -55,7 +55,11 @@ export function AddSupplierDialog() {
       return await apiRequest("POST", "/api/suppliers", data);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/suppliers'] });
+      queryClient.invalidateQueries({ 
+        predicate: (query) => 
+          query.queryKey[0] === '/api/suppliers' || 
+          (typeof query.queryKey[0] === 'string' && query.queryKey[0].startsWith('/api/suppliers'))
+      });
       toast({
         title: "Success",
         description: "Supplier added successfully",
