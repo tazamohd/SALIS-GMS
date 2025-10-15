@@ -18,6 +18,7 @@ import { JobCards } from "@/pages/JobCards";
 import { Profile } from "@/pages/Profile";
 import ServiceTemplates from "@/pages/ServiceTemplates";
 import Tools from "@/pages/Tools";
+import SpareParts from "@/pages/SpareParts";
 
 function Router() {
   return (
@@ -72,6 +73,11 @@ function Router() {
       <Route path="/tools">
         <Layout>
           <Tools />
+        </Layout>
+      </Route>
+      <Route path="/spare-parts">
+        <Layout>
+          <SpareParts />
         </Layout>
       </Route>
       <Route path="/profile">
