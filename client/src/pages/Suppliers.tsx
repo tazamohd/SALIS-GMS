@@ -12,13 +12,14 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Building2, Mail, Phone, MapPin, Trash2, Search } from "lucide-react";
+import { Plus, Building2, Mail, Phone, MapPin, Trash2, Search, Pencil } from "lucide-react";
 import type { Supplier, InsertSupplier } from "@shared/schema";
 import { insertSupplierSchema } from "@shared/schema";
 
 export default function Suppliers() {
   const { toast } = useToast();
   const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -73,6 +74,29 @@ export default function Suppliers() {
     }
   };
 
+  const updateSupplier = async (data: InsertSupplier) => {
+    if (!selectedSupplier) return;
+    
+    try {
+      await apiRequest("PATCH", `/api/suppliers/${selectedSupplier.id}`, data);
+      
+      queryClient.invalidateQueries({ queryKey: ["/api/suppliers"] });
+      setIsEditOpen(false);
+      setSelectedSupplier(null);
+      form.reset();
+      toast({
+        title: "Success",
+        description: "Supplier updated successfully",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to update supplier",
+        variant: "destructive",
+      });
+    }
+  };
+
   const deleteSupplier = async (id: string) => {
     try {
       await apiRequest("DELETE", `/api/suppliers/${id}`);
@@ -96,6 +120,26 @@ export default function Suppliers() {
   const handleViewDetails = (supplier: Supplier) => {
     setSelectedSupplier(supplier);
     setIsDetailsOpen(true);
+  };
+
+  const handleEdit = (supplier: Supplier) => {
+    setSelectedSupplier(supplier);
+    form.reset({
+      garageId: supplier.garageId,
+      name: supplier.name,
+      contactPerson: supplier.contactPerson ?? undefined,
+      email: supplier.email ?? undefined,
+      phone: supplier.phone ?? undefined,
+      address: supplier.address ?? undefined,
+      city: supplier.city ?? undefined,
+      country: supplier.country ?? undefined,
+      taxId: supplier.taxId ?? undefined,
+      paymentTerms: supplier.paymentTerms ?? "net30",
+      notes: supplier.notes ?? undefined,
+      isActive: supplier.isActive ?? true,
+    });
+    setIsDetailsOpen(false);
+    setIsEditOpen(true);
   };
 
   return (
@@ -282,6 +326,178 @@ export default function Suppliers() {
           </DialogContent>
         </Dialog>
       </div>
+
+      <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Edit Supplier</DialogTitle>
+            <DialogDescription>Update supplier information</DialogDescription>
+          </DialogHeader>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(updateSupplier)} className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem className="col-span-2">
+                      <FormLabel>Supplier Name *</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder="ABC Auto Parts" data-testid="input-edit-name" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="contactPerson"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Contact Person</FormLabel>
+                      <FormControl>
+                        <Input {...field} value={field.value ?? ""} placeholder="John Doe" data-testid="input-edit-contact-person" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input {...field} value={field.value ?? ""} type="email" placeholder="contact@supplier.com" data-testid="input-edit-email" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="phone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Phone</FormLabel>
+                      <FormControl>
+                        <Input {...field} value={field.value ?? ""} placeholder="+1 234 567 8900" data-testid="input-edit-phone" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="taxId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Tax ID</FormLabel>
+                      <FormControl>
+                        <Input {...field} value={field.value ?? ""} placeholder="TAX123456" data-testid="input-edit-tax-id" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="address"
+                  render={({ field }) => (
+                    <FormItem className="col-span-2">
+                      <FormLabel>Address</FormLabel>
+                      <FormControl>
+                        <Textarea {...field} value={field.value ?? ""} placeholder="123 Main Street" rows={2} data-testid="input-edit-address" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="city"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>City</FormLabel>
+                      <FormControl>
+                        <Input {...field} value={field.value ?? ""} placeholder="New York" data-testid="input-edit-city" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="country"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Country</FormLabel>
+                      <FormControl>
+                        <Input {...field} value={field.value ?? ""} placeholder="USA" data-testid="input-edit-country" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="paymentTerms"
+                  render={({ field }) => (
+                    <FormItem className="col-span-2">
+                      <FormLabel>Payment Terms</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value ?? undefined}>
+                        <FormControl>
+                          <SelectTrigger data-testid="select-edit-payment-terms">
+                            <SelectValue placeholder="Select payment terms" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="net30">Net 30</SelectItem>
+                          <SelectItem value="net60">Net 60</SelectItem>
+                          <SelectItem value="cod">Cash on Delivery</SelectItem>
+                          <SelectItem value="immediate">Immediate</SelectItem>
+                          <SelectItem value="advance">Advance Payment</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="notes"
+                  render={({ field }) => (
+                    <FormItem className="col-span-2">
+                      <FormLabel>Notes</FormLabel>
+                      <FormControl>
+                        <Textarea {...field} value={field.value ?? ""} placeholder="Additional information" rows={3} data-testid="input-edit-notes" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="flex justify-end gap-2">
+                <Button type="button" variant="outline" onClick={() => setIsEditOpen(false)} data-testid="button-edit-cancel">
+                  Cancel
+                </Button>
+                <Button type="submit" data-testid="button-edit-submit">Update Supplier</Button>
+              </div>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
 
       <div className="flex items-center gap-4">
         <div className="relative flex-1 max-w-md">
@@ -484,9 +700,14 @@ export default function Suppliers() {
                 >
                   <Trash2 className="mr-2 h-4 w-4" /> Delete Supplier
                 </Button>
-                <Button variant="outline" onClick={() => setIsDetailsOpen(false)} data-testid="button-close">
-                  Close
-                </Button>
+                <div className="flex gap-2">
+                  <Button variant="outline" onClick={() => handleEdit(selectedSupplier)} data-testid="button-edit">
+                    <Pencil className="mr-2 h-4 w-4" /> Edit
+                  </Button>
+                  <Button variant="outline" onClick={() => setIsDetailsOpen(false)} data-testid="button-close">
+                    Close
+                  </Button>
+                </div>
               </div>
             </div>
           )}
