@@ -88,7 +88,7 @@ export default function SpareParts() {
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
 
-  const { data: spareParts = [], isLoading } = useQuery<SparePart[]>({
+  const { data: spareParts = [], isLoading, error } = useQuery<SparePart[]>({
     queryKey: ["/api/spare-parts"],
   });
 
@@ -493,9 +493,36 @@ export default function SpareParts() {
         </Select>
       </div>
 
-      {isLoading ? (
-        <div className="text-center py-12">
-          <p className="text-muted-foreground">Loading spare parts...</p>
+      {error ? (
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center py-12">
+            <Package className="h-12 w-12 text-destructive mb-4" />
+            <p className="text-lg font-medium mb-2">Failed to load spare parts</p>
+            <p className="text-muted-foreground mb-4">
+              {error instanceof Error ? error.message : "An error occurred"}
+            </p>
+            <Button onClick={() => queryClient.invalidateQueries({ queryKey: ["/api/spare-parts"] })} data-testid="button-retry">
+              Retry
+            </Button>
+          </CardContent>
+        </Card>
+      ) : isLoading ? (
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <Card key={i} className="animate-pulse" data-testid={`skeleton-card-${i}`}>
+              <CardHeader className="pb-3">
+                <div className="h-6 bg-gray-200 rounded w-3/4 mb-2"></div>
+                <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="flex gap-2">
+                  <div className="h-6 bg-gray-200 rounded w-20"></div>
+                  <div className="h-6 bg-gray-200 rounded w-20"></div>
+                </div>
+                <div className="h-10 bg-gray-200 rounded"></div>
+              </CardContent>
+            </Card>
+          ))}
         </div>
       ) : filteredParts.length === 0 ? (
         <Card>
