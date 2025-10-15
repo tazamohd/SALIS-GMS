@@ -31,6 +31,7 @@ import {
   type JobCard,
   type TaskAssignment,
   type ServiceTemplate,
+  type InsertServiceTemplate,
   type Tool,
   type ToolAvailability,
   type ToolUsageLog,
@@ -94,6 +95,10 @@ export interface IStorage {
   
   // Service Template operations
   getServiceTemplates(garageId: string): Promise<ServiceTemplate[]>;
+  getServiceTemplate(id: string): Promise<ServiceTemplate | undefined>;
+  createServiceTemplate(data: InsertServiceTemplate): Promise<ServiceTemplate>;
+  updateServiceTemplate(id: string, data: Partial<ServiceTemplate>): Promise<ServiceTemplate>;
+  deleteServiceTemplate(id: string): Promise<void>;
   
   // Tool Management operations - Module 7
   getTools(garageId?: string, isGlobal?: boolean): Promise<Tool[]>;
@@ -325,6 +330,28 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(serviceTemplates)
       .where(eq(serviceTemplates.garageId, garageId))
       .orderBy(serviceTemplates.name);
+  }
+
+  async getServiceTemplate(id: string): Promise<ServiceTemplate | undefined> {
+    const [template] = await db.select().from(serviceTemplates).where(eq(serviceTemplates.id, id));
+    return template;
+  }
+
+  async createServiceTemplate(data: InsertServiceTemplate): Promise<ServiceTemplate> {
+    const [template] = await db.insert(serviceTemplates).values(data).returning();
+    return template;
+  }
+
+  async updateServiceTemplate(id: string, data: Partial<ServiceTemplate>): Promise<ServiceTemplate> {
+    const [template] = await db.update(serviceTemplates)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(serviceTemplates.id, id))
+      .returning();
+    return template;
+  }
+
+  async deleteServiceTemplate(id: string): Promise<void> {
+    await db.delete(serviceTemplates).where(eq(serviceTemplates.id, id));
   }
 
   // Tool Management operations - Module 7
