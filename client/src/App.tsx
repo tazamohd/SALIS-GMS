@@ -20,8 +20,27 @@ import ServiceTemplates from "@/pages/ServiceTemplates";
 import Tools from "@/pages/Tools";
 import SpareParts from "@/pages/SpareParts";
 import Suppliers from "@/pages/Suppliers";
+import Landing from "@/pages/Landing";
+import { useAuth } from "@/hooks/useAuth";
 
 function Router() {
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return <Landing />;
+  }
+
   return (
     <Switch>
       <Route path="/" component={() => <Redirect to="/dashboard" />} />
