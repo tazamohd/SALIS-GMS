@@ -143,3 +143,42 @@ The application uses a full-stack architecture with a clear separation between c
 - Type-safe implementation with proper TypeScript interfaces
 
 **Production-ready** with architect-approved implementation
+
+### Module 18: Customer Analytics (October 15, 2025)
+**Core Functionality**:
+- Customer performance analytics with comprehensive metrics
+- Lifetime value calculation (total revenue from invoices)
+- Total invoices and total visits tracking
+- Average invoice value calculation
+- Last visit date tracking
+- Customer status determination (active: visit in last 30 days, recent: 30-90 days, inactive: >90 days)
+- Garage-scoped and date-filtered analytics
+- Activity-based customer filtering (only customers with relevant invoices/appointments)
+
+**UI Features**:
+- New "Customers" tab in Reports page
+- Individual customer cards with key metrics (lifetime value, invoices, visits, avg invoice)
+- Color-coded status badges (active, recent, inactive)
+- Comparison charts: Top 10 by Lifetime Value, Visit Frequency, Average Invoice Value
+- Pie chart showing customer status distribution
+- Empty state messaging when no data available
+- Loading states with spinner
+- Responsive grid layout for customer cards
+- Email display on customer cards when available
+
+**Technical Implementation**:
+- Backend API route: GET /api/reports/customer-analytics with garage and date filters
+- Storage method: getCustomerAnalytics with SQL-based filtering
+- SQL filtering applied to users, invoices, and appointments
+- Customer filtering based on activity in selected garage/date range
+- activeCustomerIds set to capture customers with relevant invoices/appointments
+- Optional date range support (start/end) with proper handling of partial ranges
+- Date normalization to day boundaries (start: 00:00:00, end: 23:59:59)
+- API validation with 400 errors for invalid dates
+- Revenue and metrics returned as numbers from backend
+- Garage-scoped queries preventing cross-garage data leakage
+- Data-testid attributes throughout for testing
+- Type-safe implementation with proper TypeScript interfaces
+- Sorted by lifetime value descending
+
+**Production-ready** with architect-approved implementation
