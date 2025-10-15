@@ -210,6 +210,18 @@ export interface IStorage {
     invoicesByStatus: { status: string; count: number; total: string }[];
     revenueByMonth: { month: string; revenue: string }[];
     paymentsByMethod: { method: string; total: string; count: number }[];
+    comparison?: {
+      previousMonth: {
+        revenue: number;
+        change: number;
+        percentChange: number;
+      };
+      previousYear: {
+        revenue: number;
+        change: number;
+        percentChange: number;
+      };
+    };
   }>;
   getJobCardAnalytics(garageId?: string, startDate?: Date, endDate?: Date): Promise<{
     totalJobCards: number;
@@ -1093,7 +1105,84 @@ export class DatabaseStorage implements IStorage {
       count: data.count,
     }));
     
-    return {
+    // Calculate comparison metrics if date range is provided
+    let comparison;
+    if (startDate && endDate) {
+      const currentRevenue = parseFloat(totalRevenue);
+      
+      // Calculate previous month (same date range, 1 month earlier)
+      // Use the original invoicesData (before current date filter) for comparison
+      const prevMonthStart = new Date(startDate);
+      prevMonthStart.setMonth(prevMonthStart.getMonth() - 1);
+      const prevMonthEnd = new Date(endDate);
+      prevMonthEnd.setMonth(prevMonthEnd.getMonth() - 1);
+      
+      const prevMonthInvoices = invoicesData.filter(inv => {
+        const invDate = new Date(inv.invoiceDate);
+        return invDate >= prevMonthStart && invDate <= prevMonthEnd;
+      });
+      
+      const prevMonthRevenue = prevMonthInvoices
+        .reduce((sum, inv) => sum + parseFloat(inv.totalAmount), 0);
+      
+      const monthChange = currentRevenue - prevMonthRevenue;
+      const monthPercentChange = prevMonthRevenue > 0 
+        ? (monthChange / prevMonthRevenue) * 100 
+        : 0;
+      
+      // Calculate previous year (same date range, 1 year earlier)
+      const prevYearStart = new Date(startDate);
+      prevYearStart.setFullYear(prevYearStart.getFullYear() - 1);
+      const prevYearEnd = new Date(endDate);
+      prevYearEnd.setFullYear(prevYearEnd.getFullYear() - 1);
+      
+      const prevYearInvoices = invoicesData.filter(inv => {
+        const invDate = new Date(inv.invoiceDate);
+        return invDate >= prevYearStart && invDate <= prevYearEnd;
+      });
+      
+      const prevYearRevenue = prevYearInvoices
+        .reduce((sum, inv) => sum + parseFloat(inv.totalAmount), 0);
+      
+      const yearChange = currentRevenue - prevYearRevenue;
+      const yearPercentChange = prevYearRevenue > 0 
+        ? (yearChange / prevYearRevenue) * 100 
+        : 0;
+      
+      comparison = {
+        previousMonth: {
+          revenue: Math.round(prevMonthRevenue * 100) / 100,
+          change: Math.round(monthChange * 100) / 100,
+          percentChange: Math.round(monthPercentChange * 100) / 100,
+        },
+        previousYear: {
+          revenue: Math.round(prevYearRevenue * 100) / 100,
+          change: Math.round(yearChange * 100) / 100,
+          percentChange: Math.round(yearPercentChange * 100) / 100,
+        },
+      };
+    }
+    
+    const result: {
+      totalRevenue: string;
+      paidAmount: string;
+      pendingAmount: string;
+      invoicesByStatus: { status: string; count: number; total: string }[];
+      revenueByMonth: { month: string; revenue: string }[];
+      paymentsByMethod: { method: string; total: string; count: number }[];
+      comparison?: {
+        previousMonth: {
+          revenue: number;
+          change: number;
+          percentChange: number;
+        };
+        previousYear: {
+          revenue: number;
+          change: number;
+          percentChange: number;
+        };
+      };
+    } = {
       totalRevenue,
       paidAmount,
       pendingAmount,
@@ -1101,6 +1190,12 @@ export class DatabaseStorage implements IStorage {
       revenueByMonth,
       paymentsByMethod,
     };
+    
+    if (comparison) {
+      result.comparison = comparison;
+    }
+    
+    return result;
   }
 
   async getJobCardAnalytics(garageId?: string, startDate?: Date, endDate?: Date): Promise<{

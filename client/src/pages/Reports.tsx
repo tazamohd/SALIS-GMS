@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { BarChart3, TrendingUp, FileText, Package, Building2, Users, UserCheck } from "lucide-react";
+import { BarChart3, TrendingUp, FileText, Package, Building2, Users, UserCheck, ArrowUp, ArrowDown } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -16,6 +16,55 @@ import { subDays } from "date-fns";
 import type { Garage } from "@shared/schema";
 
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'];
+
+// Custom Tooltip Components for better formatting
+const CustomCurrencyTooltip = ({ active, payload, label }: any) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
+        <p className="font-semibold text-gray-800 mb-1">{label}</p>
+        {payload.map((entry: any, index: number) => (
+          <p key={index} className="text-sm" style={{ color: entry.color }}>
+            {entry.name}: <span className="font-bold">${parseFloat(entry.value).toFixed(2)}</span>
+          </p>
+        ))}
+      </div>
+    );
+  }
+  return null;
+};
+
+const CustomCountTooltip = ({ active, payload, label }: any) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
+        <p className="font-semibold text-gray-800 mb-1">{label}</p>
+        {payload.map((entry: any, index: number) => (
+          <p key={index} className="text-sm" style={{ color: entry.color }}>
+            {entry.name}: <span className="font-bold">{entry.value}</span>
+          </p>
+        ))}
+      </div>
+    );
+  }
+  return null;
+};
+
+const CustomPercentTooltip = ({ active, payload, label }: any) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
+        <p className="font-semibold text-gray-800 mb-1">{label}</p>
+        {payload.map((entry: any, index: number) => (
+          <p key={index} className="text-sm" style={{ color: entry.color }}>
+            {entry.name}: <span className="font-bold">{entry.value.toFixed(1)}%</span>
+          </p>
+        ))}
+      </div>
+    );
+  }
+  return null;
+};
 
 export function Reports() {
   const [selectedGarageId, setSelectedGarageId] = useState<string>("all");
@@ -57,6 +106,18 @@ export function Reports() {
     invoicesByStatus: { status: string; count: number; total: string }[];
     revenueByMonth: { month: string; revenue: string }[];
     paymentsByMethod: { method: string; total: string; count: number }[];
+    comparison?: {
+      previousMonth: {
+        revenue: number;
+        change: number;
+        percentChange: number;
+      };
+      previousYear: {
+        revenue: number;
+        change: number;
+        percentChange: number;
+      };
+    };
   }>({
     queryKey: [revenueUrl],
   });
@@ -267,6 +328,65 @@ export function Reports() {
                 </Card>
               </div>
 
+              {/* Comparison Metrics */}
+              {revenueReport?.comparison && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm font-medium text-gray-600">Month-over-Month</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-gray-500">Previous Month</span>
+                          <span className="text-sm font-medium">${revenueReport.comparison.previousMonth.revenue.toFixed(2)}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {revenueReport.comparison.previousMonth.change >= 0 ? (
+                            <ArrowUp className="w-4 h-4 text-green-600" data-testid="icon-mom-up" />
+                          ) : (
+                            <ArrowDown className="w-4 h-4 text-red-600" data-testid="icon-mom-down" />
+                          )}
+                          <span className={`text-xl font-bold ${revenueReport.comparison.previousMonth.change >= 0 ? 'text-green-600' : 'text-red-600'}`} data-testid="text-mom-change">
+                            {revenueReport.comparison.previousMonth.change >= 0 ? '+' : ''}${revenueReport.comparison.previousMonth.change.toFixed(2)}
+                          </span>
+                          <span className={`text-sm ${revenueReport.comparison.previousMonth.percentChange >= 0 ? 'text-green-600' : 'text-red-600'}`} data-testid="text-mom-percent">
+                            ({revenueReport.comparison.previousMonth.percentChange >= 0 ? '+' : ''}{revenueReport.comparison.previousMonth.percentChange.toFixed(1)}%)
+                          </span>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm font-medium text-gray-600">Year-over-Year</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-gray-500">Same Period Last Year</span>
+                          <span className="text-sm font-medium">${revenueReport.comparison.previousYear.revenue.toFixed(2)}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {revenueReport.comparison.previousYear.change >= 0 ? (
+                            <ArrowUp className="w-4 h-4 text-green-600" data-testid="icon-yoy-up" />
+                          ) : (
+                            <ArrowDown className="w-4 h-4 text-red-600" data-testid="icon-yoy-down" />
+                          )}
+                          <span className={`text-xl font-bold ${revenueReport.comparison.previousYear.change >= 0 ? 'text-green-600' : 'text-red-600'}`} data-testid="text-yoy-change">
+                            {revenueReport.comparison.previousYear.change >= 0 ? '+' : ''}${revenueReport.comparison.previousYear.change.toFixed(2)}
+                          </span>
+                          <span className={`text-sm ${revenueReport.comparison.previousYear.percentChange >= 0 ? 'text-green-600' : 'text-red-600'}`} data-testid="text-yoy-percent">
+                            ({revenueReport.comparison.previousYear.percentChange >= 0 ? '+' : ''}{revenueReport.comparison.previousYear.percentChange.toFixed(1)}%)
+                          </span>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              )}
+
               {/* Revenue by Month Chart */}
               {revenueReport?.revenueByMonth && revenueReport.revenueByMonth.length > 0 && (
                 <Card>
@@ -278,10 +398,10 @@ export function Reports() {
                       <LineChart data={revenueReport.revenueByMonth}>
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis dataKey="month" />
-                        <YAxis />
-                        <Tooltip />
+                        <YAxis tickFormatter={(value) => `$${value}`} />
+                        <Tooltip content={<CustomCurrencyTooltip />} />
                         <Legend />
-                        <Line type="monotone" dataKey="revenue" stroke="#3b82f6" strokeWidth={2} />
+                        <Line type="monotone" dataKey="revenue" stroke="#3b82f6" strokeWidth={2} name="Revenue" />
                       </LineChart>
                     </ResponsiveContainer>
                   </CardContent>
@@ -329,9 +449,9 @@ export function Reports() {
                           <BarChart data={revenueReport.paymentsByMethod}>
                             <CartesianGrid strokeDasharray="3 3" />
                             <XAxis dataKey="method" />
-                            <YAxis />
-                            <Tooltip />
-                            <Bar dataKey="total" fill="#10b981" />
+                            <YAxis tickFormatter={(value) => `$${value}`} />
+                            <Tooltip content={<CustomCurrencyTooltip />} />
+                            <Bar dataKey="total" fill="#10b981" name="Total Amount" />
                           </BarChart>
                         </ResponsiveContainer>
                       </CardContent>
@@ -413,8 +533,8 @@ export function Reports() {
                             <CartesianGrid strokeDasharray="3 3" />
                             <XAxis dataKey="priority" />
                             <YAxis />
-                            <Tooltip />
-                            <Bar dataKey="count" fill="#8b5cf6" />
+                            <Tooltip content={<CustomCountTooltip />} />
+                            <Bar dataKey="count" fill="#8b5cf6" name="Count" />
                           </BarChart>
                         </ResponsiveContainer>
                       </CardContent>
@@ -507,7 +627,7 @@ export function Reports() {
                             <CartesianGrid strokeDasharray="3 3" />
                             <XAxis dataKey="name" />
                             <YAxis />
-                            <Tooltip />
+                            <Tooltip content={<CustomCountTooltip />} />
                             <Legend />
                             <Bar dataKey="jobsCompleted" fill="#3b82f6" name="Jobs Completed" />
                           </BarChart>
@@ -524,10 +644,10 @@ export function Reports() {
                           <BarChart data={technicianPerformance.technicians}>
                             <CartesianGrid strokeDasharray="3 3" />
                             <XAxis dataKey="name" />
-                            <YAxis />
-                            <Tooltip />
+                            <YAxis tickFormatter={(value) => `$${value}`} />
+                            <Tooltip content={<CustomCurrencyTooltip />} />
                             <Legend />
-                            <Bar dataKey="revenueGenerated" fill="#10b981" name="Revenue ($)" />
+                            <Bar dataKey="revenueGenerated" fill="#10b981" name="Revenue" />
                           </BarChart>
                         </ResponsiveContainer>
                       </CardContent>
@@ -543,7 +663,7 @@ export function Reports() {
                             <CartesianGrid strokeDasharray="3 3" />
                             <XAxis dataKey="name" />
                             <YAxis />
-                            <Tooltip />
+                            <Tooltip content={<CustomCountTooltip />} />
                             <Legend />
                             <Bar dataKey="avgCompletionTime" fill="#f59e0b" name="Avg. Days" />
                           </BarChart>
@@ -560,10 +680,10 @@ export function Reports() {
                           <BarChart data={technicianPerformance.technicians}>
                             <CartesianGrid strokeDasharray="3 3" />
                             <XAxis dataKey="name" />
-                            <YAxis />
-                            <Tooltip />
+                            <YAxis tickFormatter={(value) => `${value}%`} />
+                            <Tooltip content={<CustomPercentTooltip />} />
                             <Legend />
-                            <Bar dataKey="efficiencyRating" fill="#8b5cf6" name="Efficiency (%)" />
+                            <Bar dataKey="efficiencyRating" fill="#8b5cf6" name="Efficiency" />
                           </BarChart>
                         </ResponsiveContainer>
                       </CardContent>
@@ -665,10 +785,10 @@ export function Reports() {
                           <BarChart data={customerAnalytics.customers.slice(0, 10)}>
                             <CartesianGrid strokeDasharray="3 3" />
                             <XAxis dataKey="name" angle={-45} textAnchor="end" height={100} />
-                            <YAxis />
-                            <Tooltip />
+                            <YAxis tickFormatter={(value) => `$${value}`} />
+                            <Tooltip content={<CustomCurrencyTooltip />} />
                             <Legend />
-                            <Bar dataKey="lifetimeValue" fill="#10b981" name="Lifetime Value ($)" />
+                            <Bar dataKey="lifetimeValue" fill="#10b981" name="Lifetime Value" />
                           </BarChart>
                         </ResponsiveContainer>
                       </CardContent>
@@ -684,7 +804,7 @@ export function Reports() {
                             <CartesianGrid strokeDasharray="3 3" />
                             <XAxis dataKey="name" angle={-45} textAnchor="end" height={100} />
                             <YAxis />
-                            <Tooltip />
+                            <Tooltip content={<CustomCountTooltip />} />
                             <Legend />
                             <Bar dataKey="totalVisits" fill="#3b82f6" name="Total Visits" />
                           </BarChart>
@@ -701,10 +821,10 @@ export function Reports() {
                           <BarChart data={customerAnalytics.customers.slice(0, 10)}>
                             <CartesianGrid strokeDasharray="3 3" />
                             <XAxis dataKey="name" angle={-45} textAnchor="end" height={100} />
-                            <YAxis />
-                            <Tooltip />
+                            <YAxis tickFormatter={(value) => `$${value}`} />
+                            <Tooltip content={<CustomCurrencyTooltip />} />
                             <Legend />
-                            <Bar dataKey="avgInvoiceValue" fill="#f59e0b" name="Avg. Invoice ($)" />
+                            <Bar dataKey="avgInvoiceValue" fill="#f59e0b" name="Avg. Invoice" />
                           </BarChart>
                         </ResponsiveContainer>
                       </CardContent>
@@ -808,8 +928,8 @@ export function Reports() {
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis dataKey="category" />
                         <YAxis />
-                        <Tooltip />
-                        <Bar dataKey="count" fill="#06b6d4" />
+                        <Tooltip content={<CustomCountTooltip />} />
+                        <Bar dataKey="count" fill="#06b6d4" name="Count" />
                       </BarChart>
                     </ResponsiveContainer>
                   </CardContent>
