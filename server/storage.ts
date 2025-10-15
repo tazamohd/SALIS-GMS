@@ -60,6 +60,8 @@ import {
   type Payment,
   type InsertPayment,
   type InsertPurchaseOrderItem,
+  type TechnicianProfile,
+  type InsertTechnicianProfile,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, or, inArray, and, gte, lte, ilike } from "drizzle-orm";
@@ -71,6 +73,9 @@ export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
   upsertUser(user: UpsertUser): Promise<User>;
   getTechnicians(garageId?: string): Promise<User[]>;
+  getTechnicianProfile(userId: string): Promise<TechnicianProfile | undefined>;
+  createTechnicianProfile(data: InsertTechnicianProfile): Promise<TechnicianProfile>;
+  updateTechnicianProfile(userId: string, data: Partial<TechnicianProfile>): Promise<TechnicianProfile>;
   
   // Garage operations
   getGarages(): Promise<Garage[]>;
@@ -254,6 +259,25 @@ export class DatabaseStorage implements IStorage {
       );
     }
     return await db.select().from(users).where(eq(users.userType, 'technician'));
+  }
+
+  async getTechnicianProfile(userId: string): Promise<TechnicianProfile | undefined> {
+    const [profile] = await db.select().from(technicianProfiles).where(eq(technicianProfiles.userId, userId));
+    return profile;
+  }
+
+  async createTechnicianProfile(data: InsertTechnicianProfile): Promise<TechnicianProfile> {
+    const [profile] = await db.insert(technicianProfiles).values(data).returning();
+    return profile;
+  }
+
+  async updateTechnicianProfile(userId: string, data: Partial<TechnicianProfile>): Promise<TechnicianProfile> {
+    const [profile] = await db
+      .update(technicianProfiles)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(technicianProfiles.userId, userId))
+      .returning();
+    return profile;
   }
 
   // Garage operations

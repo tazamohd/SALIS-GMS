@@ -21,6 +21,7 @@ import Tools from "@/pages/Tools";
 import SpareParts from "@/pages/SpareParts";
 import Suppliers from "@/pages/Suppliers";
 import { TechnicianPortal } from "@/pages/TechnicianPortal";
+import TechnicianManagement from "@/pages/TechnicianManagement";
 import Landing from "@/pages/Landing";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -109,6 +110,11 @@ function Router() {
       <Route path="/technician-portal">
         <Layout>
           <TechnicianPortal />
+        </Layout>
+      </Route>
+      <Route path="/technician-management">
+        <Layout>
+          <TechnicianManagement />
         </Layout>
       </Route>
       <Route path="/profile">

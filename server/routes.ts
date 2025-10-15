@@ -74,6 +74,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Technician Profile routes
+  app.get('/api/technician-profiles/:userId', isAuthenticated, async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const profile = await storage.getTechnicianProfile(userId);
+      if (!profile) {
+        return res.status(404).json({ message: "Technician profile not found" });
+      }
+      res.json(profile);
+    } catch (error) {
+      console.error("Error fetching technician profile:", error);
+      res.status(500).json({ message: "Failed to fetch technician profile" });
+    }
+  });
+
+  app.post('/api/technician-profiles', isAuthenticated, async (req, res) => {
+    try {
+      const profile = await storage.createTechnicianProfile(req.body);
+      res.status(201).json(profile);
+    } catch (error) {
+      console.error("Error creating technician profile:", error);
+      res.status(500).json({ message: "Failed to create technician profile" });
+    }
+  });
+
+  app.patch('/api/technician-profiles/:userId', isAuthenticated, async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const profile = await storage.updateTechnicianProfile(userId, req.body);
+      res.json(profile);
+    } catch (error) {
+      console.error("Error updating technician profile:", error);
+      res.status(500).json({ message: "Failed to update technician profile" });
+    }
+  });
+
   // Job Card routes - Module 8: Job Cards & Task Assignment
   app.get('/api/job-cards', isAuthenticated, async (req, res) => {
     try {
