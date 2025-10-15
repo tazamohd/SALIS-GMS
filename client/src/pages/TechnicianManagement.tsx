@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery, useQueries, useMutation } from "@tanstack/react-query";
-import { User, TechnicianProfile } from "@shared/schema";
+import { User, TechnicianProfile, Garage } from "@shared/schema";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,7 +28,7 @@ export default function TechnicianManagement() {
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [technicianToDelete, setTechnicianToDelete] = useState<User | null>(null);
 
-  const { data: garages, isLoading: garagesLoading } = useQuery({
+  const { data: garages, isLoading: garagesLoading } = useQuery<Garage[]>({
     queryKey: ["/api/garages"],
   });
 
@@ -54,7 +54,15 @@ export default function TechnicianManagement() {
       return apiRequest("PATCH", `/api/technician-profiles/${userId}`, data);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/technicians"] });
+      queryClient.invalidateQueries({ 
+        predicate: (query) => 
+          query.queryKey[0] === '/api/technicians' || 
+          query.queryKey[0] === '/api/technician-profiles' ||
+          (typeof query.queryKey[0] === 'string' && (
+            query.queryKey[0].startsWith('/api/technicians') ||
+            query.queryKey[0].startsWith('/api/technician-profiles')
+          ))
+      });
       setIsEditDialogOpen(false);
       toast({
         title: "Success",
@@ -78,7 +86,11 @@ export default function TechnicianManagement() {
       queryClient.invalidateQueries({ 
         predicate: (query) => 
           query.queryKey[0] === '/api/technicians' || 
-          (typeof query.queryKey[0] === 'string' && query.queryKey[0].startsWith('/api/technicians'))
+          query.queryKey[0] === '/api/technician-profiles' ||
+          (typeof query.queryKey[0] === 'string' && (
+            query.queryKey[0].startsWith('/api/technicians') ||
+            query.queryKey[0].startsWith('/api/technician-profiles')
+          ))
       });
       toast({
         title: "Success",
@@ -193,7 +205,7 @@ export default function TechnicianManagement() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all" data-testid="option-all-garages">All Garages</SelectItem>
-                  {Array.isArray(garages) && garages.map((garage: any) => (
+                  {garages?.map((garage) => (
                     <SelectItem key={garage.id} value={garage.id} data-testid={`option-garage-${garage.id}`}>
                       {garage.name}
                     </SelectItem>

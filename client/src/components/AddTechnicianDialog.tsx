@@ -3,7 +3,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { insertUserSchema } from "@shared/schema";
+import { insertUserSchema, Garage } from "@shared/schema";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,7 +26,7 @@ type TechnicianFormValues = z.infer<typeof technicianFormSchema>;
 interface AddTechnicianDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  garages: any[];
+  garages: Garage[];
 }
 
 export default function AddTechnicianDialog({ open, onOpenChange, garages }: AddTechnicianDialogProps) {
@@ -139,7 +139,7 @@ export default function AddTechnicianDialog({ open, onOpenChange, garages }: Add
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {garages?.map((garage: any) => (
+                      {garages.map((garage) => (
                         <SelectItem key={garage.id} value={garage.id} data-testid={`option-garage-${garage.id}`}>
                           {garage.name}
                         </SelectItem>
