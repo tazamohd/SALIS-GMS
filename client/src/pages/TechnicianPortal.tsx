@@ -4,16 +4,23 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Calendar, Clock, Wrench, CheckCircle, AlertCircle, User as UserIcon } from "lucide-react";
+import { Calendar, Clock, Wrench, CheckCircle, AlertCircle, User as UserIcon, Award, Briefcase, GraduationCap } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import type { JobCard, User } from "@shared/schema";
+import type { JobCard, User, TechnicianProfile } from "@shared/schema";
 
 export function TechnicianPortal() {
   const { user } = useAuth();
   const { toast } = useToast();
 
   const currentUser = user as User | undefined;
+
+  // Fetch technician profile
+  const { data: technicianProfile } = useQuery<TechnicianProfile>({
+    queryKey: ['/api/technician-profiles', currentUser?.id],
+    enabled: !!currentUser?.id,
+    queryFn: () => fetch(`/api/technician-profiles/${currentUser?.id}`).then((r) => r.json()),
+  });
 
   // Fetch job cards assigned to this technician
   const { data: jobCards, isLoading } = useQuery<JobCard[]>({
@@ -90,12 +97,116 @@ export function TechnicianPortal() {
     );
   }
 
+  const getLevelBadgeVariant = (level?: string) => {
+    switch (level) {
+      case "master":
+        return "default";
+      case "senior":
+        return "secondary";
+      case "intermediate":
+        return "outline";
+      default:
+        return "outline";
+    }
+  };
+
   return (
     <div className="p-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Technician Portal</h1>
         <p className="text-gray-600">Welcome back, {currentUser?.fullName || 'Technician'}! Here are your assigned tasks.</p>
       </div>
+
+      {/* Profile Card */}
+      {technicianProfile && (
+        <Card className="mb-8" data-testid="card-profile">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle data-testid="text-profile-title">My Profile</CardTitle>
+                <CardDescription data-testid="text-profile-subtitle">Your technician information and qualifications</CardDescription>
+              </div>
+              <div className="flex gap-2">
+                {technicianProfile.level && (
+                  <Badge variant={getLevelBadgeVariant(technicianProfile.level)} data-testid="badge-level">
+                    {technicianProfile.level}
+                  </Badge>
+                )}
+                {technicianProfile.isLead && (
+                  <Badge variant="default" data-testid="badge-lead">Lead Technician</Badge>
+                )}
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {technicianProfile.speciality && (
+                <div className="flex items-start gap-3" data-testid="text-speciality">
+                  <Briefcase className="h-5 w-5 mt-0.5 text-blue-600" />
+                  <div>
+                    <div className="font-medium text-sm text-gray-700">Speciality</div>
+                    <div className="text-sm text-gray-900">{technicianProfile.speciality}</div>
+                  </div>
+                </div>
+              )}
+
+              {technicianProfile.yearsOfExperience !== undefined && (
+                <div className="flex items-start gap-3" data-testid="text-experience">
+                  <Clock className="h-5 w-5 mt-0.5 text-blue-600" />
+                  <div>
+                    <div className="font-medium text-sm text-gray-700">Experience</div>
+                    <div className="text-sm text-gray-900">{technicianProfile.yearsOfExperience} years</div>
+                  </div>
+                </div>
+              )}
+
+              {technicianProfile.maxConcurrentJobs !== undefined && (
+                <div className="flex items-start gap-3" data-testid="text-capacity">
+                  <Wrench className="h-5 w-5 mt-0.5 text-blue-600" />
+                  <div>
+                    <div className="font-medium text-sm text-gray-700">Job Capacity</div>
+                    <div className="text-sm text-gray-900">Up to {technicianProfile.maxConcurrentJobs} jobs</div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {(technicianProfile.qualifications || technicianProfile.certifications || technicianProfile.skills) && (
+              <div className="mt-6 pt-6 border-t grid grid-cols-1 md:grid-cols-3 gap-6">
+                {technicianProfile.qualifications && (
+                  <div className="flex items-start gap-3" data-testid="text-qualifications">
+                    <GraduationCap className="h-5 w-5 mt-0.5 text-green-600" />
+                    <div>
+                      <div className="font-medium text-sm text-gray-700">Qualifications</div>
+                      <div className="text-sm text-gray-600">{technicianProfile.qualifications}</div>
+                    </div>
+                  </div>
+                )}
+
+                {technicianProfile.certifications && (
+                  <div className="flex items-start gap-3" data-testid="text-certifications">
+                    <Award className="h-5 w-5 mt-0.5 text-yellow-600" />
+                    <div>
+                      <div className="font-medium text-sm text-gray-700">Certifications</div>
+                      <div className="text-sm text-gray-600">{technicianProfile.certifications}</div>
+                    </div>
+                  </div>
+                )}
+
+                {technicianProfile.skills && (
+                  <div className="flex items-start gap-3" data-testid="text-skills">
+                    <Wrench className="h-5 w-5 mt-0.5 text-purple-600" />
+                    <div>
+                      <div className="font-medium text-sm text-gray-700">Skills</div>
+                      <div className="text-sm text-gray-600">{technicianProfile.skills}</div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
