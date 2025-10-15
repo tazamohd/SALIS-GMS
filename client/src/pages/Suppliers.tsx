@@ -32,15 +32,15 @@ export default function Suppliers() {
     defaultValues: {
       garageId: "d290f1ee-6c54-4b01-90e6-d701748f0851",
       name: "",
-      contactPerson: "",
-      email: "",
-      phone: "",
-      address: "",
-      city: "",
-      country: "",
-      taxId: "",
+      contactPerson: undefined,
+      email: undefined,
+      phone: undefined,
+      address: undefined,
+      city: undefined,
+      country: undefined,
+      taxId: undefined,
       paymentTerms: "net30",
-      notes: "",
+      notes: undefined,
       isActive: true,
     },
   });
@@ -55,10 +55,7 @@ export default function Suppliers() {
 
   const createSupplier = async (data: InsertSupplier) => {
     try {
-      await apiRequest("/api/suppliers", {
-        method: "POST",
-        body: JSON.stringify(data),
-      });
+      await apiRequest("POST", "/api/suppliers", data);
       
       queryClient.invalidateQueries({ queryKey: ["/api/suppliers"] });
       setIsCreateOpen(false);
@@ -78,9 +75,7 @@ export default function Suppliers() {
 
   const deleteSupplier = async (id: string) => {
     try {
-      await apiRequest(`/api/suppliers/${id}`, {
-        method: "DELETE",
-      });
+      await apiRequest("DELETE", `/api/suppliers/${id}`);
       
       queryClient.invalidateQueries({ queryKey: ["/api/suppliers"] });
       setIsDetailsOpen(false);
@@ -145,7 +140,7 @@ export default function Suppliers() {
                       <FormItem>
                         <FormLabel>Contact Person</FormLabel>
                         <FormControl>
-                          <Input {...field} placeholder="John Doe" data-testid="input-contact-person" />
+                          <Input {...field} value={field.value ?? ""} placeholder="John Doe" data-testid="input-contact-person" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -159,7 +154,7 @@ export default function Suppliers() {
                       <FormItem>
                         <FormLabel>Email</FormLabel>
                         <FormControl>
-                          <Input {...field} type="email" placeholder="contact@supplier.com" data-testid="input-email" />
+                          <Input {...field} value={field.value ?? ""} type="email" placeholder="contact@supplier.com" data-testid="input-email" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -173,7 +168,7 @@ export default function Suppliers() {
                       <FormItem>
                         <FormLabel>Phone</FormLabel>
                         <FormControl>
-                          <Input {...field} placeholder="+1 234 567 8900" data-testid="input-phone" />
+                          <Input {...field} value={field.value ?? ""} placeholder="+1 234 567 8900" data-testid="input-phone" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -187,7 +182,7 @@ export default function Suppliers() {
                       <FormItem>
                         <FormLabel>Tax ID</FormLabel>
                         <FormControl>
-                          <Input {...field} placeholder="TAX123456" data-testid="input-tax-id" />
+                          <Input {...field} value={field.value ?? ""} placeholder="TAX123456" data-testid="input-tax-id" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -201,7 +196,7 @@ export default function Suppliers() {
                       <FormItem className="col-span-2">
                         <FormLabel>Address</FormLabel>
                         <FormControl>
-                          <Textarea {...field} placeholder="123 Main Street" rows={2} data-testid="input-address" />
+                          <Textarea {...field} value={field.value ?? ""} placeholder="123 Main Street" rows={2} data-testid="input-address" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -215,7 +210,7 @@ export default function Suppliers() {
                       <FormItem>
                         <FormLabel>City</FormLabel>
                         <FormControl>
-                          <Input {...field} placeholder="New York" data-testid="input-city" />
+                          <Input {...field} value={field.value ?? ""} placeholder="New York" data-testid="input-city" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -229,7 +224,7 @@ export default function Suppliers() {
                       <FormItem>
                         <FormLabel>Country</FormLabel>
                         <FormControl>
-                          <Input {...field} placeholder="USA" data-testid="input-country" />
+                          <Input {...field} value={field.value ?? ""} placeholder="USA" data-testid="input-country" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -242,7 +237,7 @@ export default function Suppliers() {
                     render={({ field }) => (
                       <FormItem className="col-span-2">
                         <FormLabel>Payment Terms</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select onValueChange={field.onChange} defaultValue={field.value ?? undefined}>
                           <FormControl>
                             <SelectTrigger data-testid="select-payment-terms">
                               <SelectValue placeholder="Select payment terms" />
@@ -268,7 +263,7 @@ export default function Suppliers() {
                       <FormItem className="col-span-2">
                         <FormLabel>Notes</FormLabel>
                         <FormControl>
-                          <Textarea {...field} placeholder="Additional information" rows={3} data-testid="input-notes" />
+                          <Textarea {...field} value={field.value ?? ""} placeholder="Additional information" rows={3} data-testid="input-notes" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>

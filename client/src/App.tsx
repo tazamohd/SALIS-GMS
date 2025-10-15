@@ -19,6 +19,7 @@ import { Profile } from "@/pages/Profile";
 import ServiceTemplates from "@/pages/ServiceTemplates";
 import Tools from "@/pages/Tools";
 import SpareParts from "@/pages/SpareParts";
+import Suppliers from "@/pages/Suppliers";
 
 function Router() {
   return (
@@ -78,6 +79,11 @@ function Router() {
       <Route path="/spare-parts">
         <Layout>
           <SpareParts />
+        </Layout>
+      </Route>
+      <Route path="/suppliers">
+        <Layout>
+          <Suppliers />
         </Layout>
       </Route>
       <Route path="/profile">
