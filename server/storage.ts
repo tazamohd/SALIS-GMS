@@ -225,6 +225,17 @@ export interface IStorage {
     toolsByCategory: { category: string; count: number }[];
     lowStockItems: { itemName: string; currentStock: number }[];
   }>;
+  getTechnicianPerformance(garageId?: string, startDate?: Date, endDate?: Date): Promise<{
+    technicians: {
+      id: string;
+      name: string;
+      jobsCompleted: number;
+      avgCompletionTime: number;
+      revenueGenerated: number;
+      efficiencyRating: number;
+      jobsByStatus: { status: string; count: number }[];
+    }[];
+  }>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1214,6 +1225,130 @@ export class DatabaseStorage implements IStorage {
       inUseTools,
       toolsByCategory,
       lowStockItems,
+    };
+  }
+
+  async getTechnicianPerformance(garageId?: string, startDate?: Date, endDate?: Date): Promise<{
+    technicians: {
+      id: string;
+      name: string;
+      jobsCompleted: number;
+      avgCompletionTime: number;
+      revenueGenerated: number;
+      efficiencyRating: number;
+      jobsByStatus: { status: string; count: number }[];
+    }[];
+  }> {
+    // Build query conditions for technicians
+    const technicianConditions = [eq(users.userType, 'technician')];
+    if (garageId) {
+      technicianConditions.push(eq(users.garageId, garageId));
+    }
+    
+    // Get technicians with proper SQL filtering
+    const filteredTechnicians = await db
+      .select()
+      .from(users)
+      .where(and(...technicianConditions));
+    
+    // Build query conditions for job cards based on date range and garage
+    const jobCardConditions = [];
+    if (garageId) {
+      jobCardConditions.push(eq(jobCards.garageId, garageId));
+    }
+    if (startDate) {
+      jobCardConditions.push(gte(jobCards.createdAt, startDate));
+    }
+    if (endDate) {
+      jobCardConditions.push(lte(jobCards.createdAt, endDate));
+    }
+    
+    // Get job cards with proper SQL filtering
+    const relevantJobCards = jobCardConditions.length > 0
+      ? await db.select().from(jobCards).where(and(...jobCardConditions))
+      : await db.select().from(jobCards);
+    
+    // Build query conditions for invoices based on date range and garage
+    const invoiceConditions = [];
+    if (garageId) {
+      invoiceConditions.push(eq(invoices.garageId, garageId));
+    }
+    if (startDate) {
+      invoiceConditions.push(gte(invoices.createdAt, startDate));
+    }
+    if (endDate) {
+      invoiceConditions.push(lte(invoices.createdAt, endDate));
+    }
+    
+    // Get invoices with proper SQL filtering
+    const relevantInvoices = invoiceConditions.length > 0
+      ? await db.select().from(invoices).where(and(...invoiceConditions))
+      : await db.select().from(invoices);
+    
+    // Calculate performance metrics for each technician
+    const technicianMetrics = await Promise.all(
+      filteredTechnicians.map(async (tech) => {
+        // Get job cards assigned to this technician
+        const techJobCards = relevantJobCards.filter(jc => jc.assignedTo === tech.id);
+        
+        // Count jobs by status
+        const statusMap = new Map<string, number>();
+        techJobCards.forEach(jc => {
+          statusMap.set(jc.status, (statusMap.get(jc.status) || 0) + 1);
+        });
+        
+        const jobsByStatus = Array.from(statusMap.entries()).map(([status, count]) => ({
+          status,
+          count,
+        }));
+        
+        // Calculate completed jobs
+        const completedJobs = techJobCards.filter(jc => jc.status === 'completed');
+        const jobsCompleted = completedJobs.length;
+        
+        // Calculate average completion time (in days) - only for jobs with completedAt
+        let avgCompletionTime = 0;
+        const jobsWithCompletionDate = completedJobs.filter(jc => jc.createdAt && jc.completedAt);
+        if (jobsWithCompletionDate.length > 0) {
+          const totalDays = jobsWithCompletionDate.reduce((sum, jc) => {
+            const created = new Date(jc.createdAt!);
+            const completed = new Date(jc.completedAt!);
+            const diffTime = Math.abs(completed.getTime() - created.getTime());
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            return sum + diffDays;
+          }, 0);
+          avgCompletionTime = totalDays / jobsWithCompletionDate.length;
+        }
+        
+        // Calculate revenue generated from job cards linked to invoices (parse as number)
+        const techInvoices = relevantInvoices.filter(inv => 
+          techJobCards.some(jc => jc.id === inv.jobCardId)
+        );
+        const totalRevenue = techInvoices.reduce((sum, inv) => {
+          const amount = parseFloat(inv.totalAmount || '0');
+          return sum + (isNaN(amount) ? 0 : amount);
+        }, 0);
+        
+        // Calculate efficiency rating (percentage of jobs completed on time)
+        // For now, use completion rate as efficiency
+        const efficiencyRating = techJobCards.length > 0 
+          ? (completedJobs.length / techJobCards.length) * 100 
+          : 0;
+        
+        return {
+          id: tech.id,
+          name: tech.fullName || 'Unknown',
+          jobsCompleted,
+          avgCompletionTime: Math.round(avgCompletionTime * 10) / 10, // Round to 1 decimal
+          revenueGenerated: Math.round(totalRevenue * 100) / 100, // Round to 2 decimals, return as number
+          efficiencyRating: Math.round(efficiencyRating),
+          jobsByStatus,
+        };
+      })
+    );
+    
+    return {
+      technicians: technicianMetrics,
     };
   }
 }

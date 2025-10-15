@@ -71,7 +71,7 @@ export function Reports() {
     queryKey: [jobCardsUrl],
   });
 
-  const inventoryUrl = `/api/reports/inventory${selectedGarageId !== "all" ? `?garage_id=${selectedGarageId}` : ""}`;
+  const inventoryUrl = buildQueryUrl("/api/reports/inventory");
   const { data: inventoryReport, isLoading: inventoryLoading } = useQuery<{
     totalTools: number;
     availableTools: number;
@@ -79,6 +79,21 @@ export function Reports() {
     toolsByCategory: { category: string; count: number }[];
   }>({
     queryKey: [inventoryUrl],
+  });
+
+  const technicianPerformanceUrl = buildQueryUrl("/api/reports/technician-performance");
+  const { data: technicianPerformance, isLoading: technicianLoading } = useQuery<{
+    technicians: {
+      id: string;
+      name: string;
+      jobsCompleted: number;
+      avgCompletionTime: number;
+      revenueGenerated: number;
+      efficiencyRating: number;
+      jobsByStatus: { status: string; count: number }[];
+    }[];
+  }>({
+    queryKey: [technicianPerformanceUrl],
   });
 
   return (
@@ -130,6 +145,10 @@ export function Reports() {
           <TabsTrigger value="job-cards" data-testid="tab-job-cards">
             <FileText className="w-4 h-4 mr-2" />
             Job Cards
+          </TabsTrigger>
+          <TabsTrigger value="technicians" data-testid="tab-technicians">
+            <Users className="w-4 h-4 mr-2" />
+            Technicians
           </TabsTrigger>
           <TabsTrigger value="inventory" data-testid="tab-inventory">
             <Package className="w-4 h-4 mr-2" />
@@ -379,6 +398,163 @@ export function Reports() {
                       </CardContent>
                     </Card>
                   )}
+                </div>
+              )}
+            </>
+          )}
+        </TabsContent>
+
+        {/* Technicians Performance Tab */}
+        <TabsContent value="technicians" className="space-y-6">
+          {technicianLoading ? (
+            <div className="text-center py-12">
+              <div className="animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-4"></div>
+              <p className="text-gray-500">Loading technician performance...</p>
+            </div>
+          ) : (
+            <>
+              {technicianPerformance?.technicians && technicianPerformance.technicians.length > 0 ? (
+                <>
+                  {/* Technician Performance Cards */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {technicianPerformance.technicians.map((tech) => (
+                      <Card key={tech.id} data-testid={`card-technician-${tech.id}`}>
+                        <CardHeader className="pb-3">
+                          <CardTitle className="text-lg font-semibold">{tech.name}</CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-3">
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm text-gray-600">Jobs Completed</span>
+                            <span className="font-semibold text-blue-600" data-testid={`text-jobs-${tech.id}`}>
+                              {tech.jobsCompleted}
+                            </span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm text-gray-600">Avg. Completion</span>
+                            <span className="font-semibold" data-testid={`text-avg-time-${tech.id}`}>
+                              {tech.avgCompletionTime} days
+                            </span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm text-gray-600">Revenue Generated</span>
+                            <span className="font-semibold text-green-600" data-testid={`text-revenue-${tech.id}`}>
+                              ${tech.revenueGenerated.toFixed(2)}
+                            </span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm text-gray-600">Efficiency Rating</span>
+                            <div className="flex items-center gap-2">
+                              <span className="font-semibold" data-testid={`text-efficiency-${tech.id}`}>
+                                {tech.efficiencyRating}%
+                              </span>
+                              <div className="w-20 h-2 bg-gray-200 rounded-full overflow-hidden">
+                                <div
+                                  className="h-full bg-blue-600 rounded-full"
+                                  style={{ width: `${tech.efficiencyRating}%` }}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                          {tech.jobsByStatus && tech.jobsByStatus.length > 0 && (
+                            <div className="mt-3 pt-3 border-t">
+                              <div className="text-xs text-gray-500 mb-2">Job Status Breakdown</div>
+                              <div className="grid grid-cols-2 gap-2">
+                                {tech.jobsByStatus.map((status) => (
+                                  <div key={status.status} className="flex justify-between text-xs">
+                                    <span className="text-gray-600 capitalize">{status.status}:</span>
+                                    <span className="font-medium">{status.count}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+
+                  {/* Technician Comparison Charts */}
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-6">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Jobs Completed by Technician</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <ResponsiveContainer width="100%" height={300}>
+                          <BarChart data={technicianPerformance.technicians}>
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis dataKey="name" />
+                            <YAxis />
+                            <Tooltip />
+                            <Legend />
+                            <Bar dataKey="jobsCompleted" fill="#3b82f6" name="Jobs Completed" />
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Revenue Generated by Technician</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <ResponsiveContainer width="100%" height={300}>
+                          <BarChart data={technicianPerformance.technicians}>
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis dataKey="name" />
+                            <YAxis />
+                            <Tooltip />
+                            <Legend />
+                            <Bar dataKey="revenueGenerated" fill="#10b981" name="Revenue ($)" />
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Average Completion Time</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <ResponsiveContainer width="100%" height={300}>
+                          <BarChart data={technicianPerformance.technicians}>
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis dataKey="name" />
+                            <YAxis />
+                            <Tooltip />
+                            <Legend />
+                            <Bar dataKey="avgCompletionTime" fill="#f59e0b" name="Avg. Days" />
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Efficiency Rating</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <ResponsiveContainer width="100%" height={300}>
+                          <BarChart data={technicianPerformance.technicians}>
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis dataKey="name" />
+                            <YAxis />
+                            <Tooltip />
+                            <Legend />
+                            <Bar dataKey="efficiencyRating" fill="#8b5cf6" name="Efficiency (%)" />
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </>
+              ) : (
+                <div className="text-center py-12">
+                  <Users className="w-16 h-16 mx-auto text-gray-400 mb-4" />
+                  <p className="text-gray-500 text-lg">No technician performance data available</p>
+                  <p className="text-gray-400 text-sm mt-2">
+                    Technicians will appear here once they start completing jobs
+                  </p>
                 </div>
               )}
             </>
