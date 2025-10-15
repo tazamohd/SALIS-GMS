@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { BarChart3, TrendingUp, FileText, Package, Building2 } from "lucide-react";
+import { BarChart3, TrendingUp, FileText, Package, Building2, Users } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -11,13 +11,18 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { DateRangePicker, type DateRange } from "@/components/DateRangePicker";
+import { subDays } from "date-fns";
 import type { Garage } from "@shared/schema";
 
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'];
 
 export function Reports() {
   const [selectedGarageId, setSelectedGarageId] = useState<string>("all");
-  const [dateRange, setDateRange] = useState<string>("30");
+  const [dateRange, setDateRange] = useState<DateRange>({
+    from: subDays(new Date(), 30),
+    to: new Date(),
+  });
 
   const { data: garages } = useQuery<Garage[]>({
     queryKey: ['/api/garages'],
@@ -35,7 +40,16 @@ export function Reports() {
     queryKey: [overviewUrl],
   });
 
-  const revenueUrl = `/api/reports/revenue${selectedGarageId !== "all" ? `?garage_id=${selectedGarageId}` : ""}`;
+  const buildQueryUrl = (base: string) => {
+    const params = new URLSearchParams();
+    if (selectedGarageId !== "all") params.append("garage_id", selectedGarageId);
+    if (dateRange.from) params.append("start_date", dateRange.from.toISOString());
+    if (dateRange.to) params.append("end_date", dateRange.to.toISOString());
+    const queryString = params.toString();
+    return queryString ? `${base}?${queryString}` : base;
+  };
+
+  const revenueUrl = buildQueryUrl("/api/reports/revenue");
   const { data: revenueReport, isLoading: revenueLoading } = useQuery<{
     totalRevenue: string;
     paidAmount: string;
@@ -47,7 +61,7 @@ export function Reports() {
     queryKey: [revenueUrl],
   });
 
-  const jobCardsUrl = `/api/reports/job-cards${selectedGarageId !== "all" ? `?garage_id=${selectedGarageId}` : ""}`;
+  const jobCardsUrl = buildQueryUrl("/api/reports/job-cards");
   const { data: jobCardAnalytics, isLoading: jobCardsLoading } = useQuery<{
     totalJobCards: number;
     byStatus: { status: string; count: number }[];
@@ -80,6 +94,11 @@ export function Reports() {
           </p>
         </div>
         <div className="flex gap-2">
+          <DateRangePicker
+            value={dateRange}
+            onChange={setDateRange}
+            className="w-[280px]"
+          />
           <Select value={selectedGarageId} onValueChange={setSelectedGarageId}>
             <SelectTrigger className="w-[200px]" data-testid="select-garage-filter">
               <Building2 className="w-4 h-4 mr-2" />
