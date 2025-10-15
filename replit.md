@@ -182,3 +182,57 @@ The application uses a full-stack architecture with a clear separation between c
 - Sorted by lifetime value descending
 
 **Production-ready** with architect-approved implementation
+
+### Module 19: Revenue Comparison Analytics (October 15, 2025)
+**Core Functionality**:
+- Month-over-month revenue comparison with automatic date range shifting
+- Year-over-year revenue comparison tracking growth trends
+- Percentage change calculations for both MoM and YoY
+- Absolute revenue change metrics
+- Historical data analysis using garage-filtered invoice data
+- Automatic display when date range is selected
+
+**UI Features**:
+- Month-over-Month comparison card showing previous month revenue and change
+- Year-over-Year comparison card showing same period last year and change
+- Visual indicators with arrow icons (up/down) for positive/negative changes
+- Color-coded metrics (green for positive, red for negative)
+- Percentage and absolute change display side-by-side
+- Clean, modern card-based design
+
+**Technical Implementation**:
+- Backend calculation in getRevenueReport method
+- Date range shifting logic (month -1, year -1) preserving range length
+- Uses unfiltered invoicesData for accurate historical comparisons
+- Frontend type-safe implementation with optional comparison field
+- Data-testid attributes for testing
+- Proper handling of zero previous revenue (0% change)
+
+**Production-ready** with architect-approved implementation
+
+### Module 20: Chart Enhancements & Custom Tooltips (October 15, 2025)
+**Core Functionality**:
+- Custom tooltip components for different data types
+- Currency formatting with $ symbol and 2 decimal places
+- Count formatting for whole numbers
+- Percentage formatting with % symbol and 1 decimal place
+- Context-aware tooltip labels showing data names
+
+**UI Features**:
+- CustomCurrencyTooltip for revenue and payment charts
+- CustomCountTooltip for job cards, technician, and customer counts
+- CustomPercentTooltip for efficiency rating charts
+- Y-axis formatters for better chart readability
+- Enhanced chart legends with clear data labels
+- Professional tooltip styling with borders and shadows
+- White background for better contrast
+
+**Technical Implementation**:
+- Three reusable tooltip components with consistent styling
+- Integration with Recharts Tooltip component via content prop
+- Y-axis tickFormatter for currency ($), percentage (%), and count displays
+- Applied to all charts across Revenue, Job Cards, Technicians, Customers, and Inventory tabs
+- Type-safe implementation with any typing for flexibility
+- Clean separation of concerns between data and presentation
+
+**Production-ready** with architect-approved implementation
