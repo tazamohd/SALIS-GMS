@@ -1,4 +1,4 @@
-import { Home, ClipboardCheck, UserIcon, LogOut, Search, Calendar, Users, ShoppingCart, FileText, BarChart3, Wrench } from "lucide-react";
+import { Home, ClipboardCheck, UserIcon, LogOut, Search, Calendar, Users, ShoppingCart, FileText, BarChart3, Wrench, ClipboardList } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,6 +20,7 @@ export function Layout({ children }: LayoutProps) {
     { path: "/dashboard", icon: Home, label: "Dashboard" },
     { path: "/tasks", icon: ClipboardCheck, label: "Tasks Management" },
     { path: "/job-cards", icon: Wrench, label: "Job Cards" },
+    { path: "/service-templates", icon: ClipboardList, label: "Service Templates" },
     { path: "/appointments", icon: Calendar, label: "Appointments" },
     { path: "/customers", icon: Users, label: "Customers" },
     { path: "/purchase-orders", icon: ShoppingCart, label: "Purchase Orders" },

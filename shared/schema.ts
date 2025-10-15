@@ -551,6 +551,7 @@ export type TaskProgressLog = typeof taskProgressLogs.$inferSelect;
 export type InsertTaskProgressLog = typeof taskProgressLogs.$inferInsert;
 export type ServiceTemplate = typeof serviceTemplates.$inferSelect;
 export type InsertServiceTemplate = typeof serviceTemplates.$inferInsert;
+export const insertServiceTemplateSchema = createInsertSchema(serviceTemplates).omit({ id: true, createdAt: true, updatedAt: true });
 export type Tool = typeof tools.$inferSelect;
 export type InsertTool = typeof tools.$inferInsert;
 export type ToolAvailability = typeof toolAvailability.$inferSelect;

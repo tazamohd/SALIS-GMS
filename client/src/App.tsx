@@ -16,6 +16,7 @@ import { Invoices } from "@/pages/Invoices";
 import { Reports } from "@/pages/Reports";
 import { JobCards } from "@/pages/JobCards";
 import { Profile } from "@/pages/Profile";
+import ServiceTemplates from "@/pages/ServiceTemplates";
 
 function Router() {
   return (
@@ -60,6 +61,11 @@ function Router() {
       <Route path="/job-cards">
         <Layout>
           <JobCards />
+        </Layout>
+      </Route>
+      <Route path="/service-templates">
+        <Layout>
+          <ServiceTemplates />
         </Layout>
       </Route>
       <Route path="/profile">
