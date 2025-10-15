@@ -1,58 +1,7 @@
 # Login Dashboard Project
 
 ## Overview
-Full-stack garage management SaaS application with authentication dashboard imported from Figma. Features a modern UI with shadcn/ui components, Tailwind CSS styling, and TypeScript throughout. Currently building module-based features for garage operations, technician management, and customer service workflows.
-
-## Project Architecture
-- **Frontend**: React 18 with Vite, wouter for routing, TanStack Query for state management
-- **Backend**: Express server with TypeScript, PostgreSQL database
-- **Authentication**: Replit Auth with secure session management
-- **UI**: shadcn/ui components with Radix UI primitives, preserving original Figma design
-- **Styling**: Tailwind CSS with custom design tokens from Figma
-- **Database**: PostgreSQL with Drizzle ORM for user sessions and profiles
-
-## Tech Stack
-- React 18 + TypeScript
-- Express.js backend
-- Vite build tool
-- wouter (routing)
-- @tanstack/react-query (state management)
-- shadcn/ui + Radix UI (components)
-- Tailwind CSS (styling)
-- Drizzle ORM (schema definitions)
-- Zod (validation)
-
-## Project Structure
-```
-├── client/
-│   ├── src/
-│   │   ├── components/ui/     # shadcn/ui components
-│   │   ├── pages/            # Application pages
-│   │   ├── hooks/            # Custom React hooks
-│   │   ├── lib/              # Utilities and query client
-│   │   └── App.tsx           # Main app component
-│   └── public/figmaAssets/   # Figma exported assets
-├── server/
-│   ├── index.ts             # Express server setup
-│   ├── routes.ts            # API routes
-│   ├── storage.ts           # In-memory storage interface
-│   └── vite.ts              # Vite development setup
-├── shared/
-│   └── schema.ts            # Shared TypeScript types and Zod schemas
-└── package.json             # Dependencies and scripts
-```
-
-## Key Features
-- Login dashboard with email/password form
-- Responsive design matching Figma mockup
-- Custom design tokens and typography
-- Form validation ready (hooks available)
-- API-ready architecture with storage interface
-
-## Development Setup
-- Run `npm run dev` to start both frontend and backend
-- Frontend served on port 5000 (same as backend)
-- Hot reloading enabled for development
+This project is a full-stack garage management SaaS application. Its core purpose is to provide a comprehensive system for managing garage operations, technician workflows, customer service, and business analytics. The application features a modern, responsive UI built with shadcn/ui and Tailwind CSS, leveraging TypeScript for robust development. The ambition is to offer a complete, module-based solution for garage businesses, covering everything from job cards and appointments to invoicing and reporting.
 
 ## User Preferences
 - Modern React patterns with hooks
@@ -62,197 +11,25 @@ Full-stack garage management SaaS application with authentication dashboard impo
 - Continue developing and testing new features directly within the authenticated Figma interface
 - Preserve original Figma design while adding functionality
 
-## Recent Changes
-- Migrated Figma design to Replit environment
-- Set up full-stack architecture with proper client/server separation
-- Configured shadcn/ui components with custom design tokens
-- Implemented PostgreSQL database with Replit Auth integration
-- Created login dashboard page matching Figma design exactly
-- Made login dashboard fully responsive for mobile devices
-- Integrated secure Replit authentication preserving 100% of original Figma design
-- Authentication flow works entirely within original design - no separate pages
-- Users can now build and test additional features within the authenticated Figma interface
-- Added comprehensive main dashboard with stats, activity feed, and quick actions
-- **MAJOR UPDATE: Implemented complete garage management database schema**
-  - 15 database tables covering users, garages, branches, roles, profiles, logging, security
-  - Full API routes for garage/branch/role management
-  - Real-time garage overview component showing active garages
-  - Module status tracking system (completed vs. in progress vs. planned)
-  - Database populated with sample data for testing
-- **NEW: Module 8 Completed - Job Cards & Task Assignment**
-  - Complete job cards system with real vehicle data and service tracking
-  - Task assignment workflow supporting technician-assistant scenarios A, B, C
-  - Service templates with step-by-step procedures and time estimates
-  - Real-time task progress tracking with status updates
-  - Comprehensive UI showing active job cards, service templates, and assignment scenarios
-  - Database populated with sample job cards, tasks, and progress data
-  - Full API integration with secure authentication and data validation
+## System Architecture
+The application is built on a full-stack architecture with a clear separation between client and server.
+- **Frontend**: React 18 with Vite, utilizing `wouter` for routing and `TanStack Query` for state management. UI components are built with `shadcn/ui` based on Radix UI primitives, strictly adhering to the original Figma design, including custom design tokens and typography.
+- **Backend**: An Express server written in TypeScript, connected to a PostgreSQL database.
+- **Authentication**: Secure session management is handled via Replit Auth.
+- **Database**: PostgreSQL is used with Drizzle ORM for schema definition and interaction, supporting complex schemas for garage management, users, roles, job cards, appointments, inventory, purchase orders, and invoicing.
+- **Key Features**: The system includes a login dashboard, comprehensive module-based features for garage operations (e.g., Job Cards, Appointments, Tool Management, Customer Management, Purchase Orders, Invoicing), and reporting capabilities. Form validation is implemented using Zod schemas shared between frontend and backend.
+- **UI/UX Decisions**: The project emphasizes preserving the original Figma design, ensuring responsiveness, and using a consistent component-based approach with shadcn/ui.
 
-- **MAJOR ACHIEVEMENT: Complete System Integration (January 6, 2025)**
-  - Successfully connected ALL 8 completed modules into unified workflow system
-  - Tool management fully integrated with job card assignments
-  - Real-time cross-system data connections showing live tool-job assignments
-  - Advanced integration dashboard with system health monitoring
-  - Auto-assignment workflows connecting jobs → tools → technicians → garages
-  - Cross-branch tool sharing and availability tracking
-  - Comprehensive integration API endpoints for system-wide operations
-  - Live metrics showing 8/10 job-tool links, 12 auto-assignments today, 100% system health
-
-- **LATEST: Real Working Job Card Forms (October 12, 2025)**
-  - Built fully functional Job Card Creation Dialog with database persistence
-  - Created Job Cards List View displaying all existing job cards in table format
-  - Replaced placeholder alert() buttons with real working UI components
-  - Implemented proper form validation using shared Zod schemas from @shared/schema
-  - Added vehicle information form (make, model, year, license plate)
-  - Integrated garage selection with live data from backend
-  - Service type, priority, and description fields with validation
-  - Optional estimated hours field with proper null/undefined handling
-  - Toast notifications for success/error feedback
-  - Real-time cache invalidation after mutations
-  - All components fully typed with TypeScript - no 'any' types
-  - Production-ready after full architect review and approval
-
-- **NEW: Module 9 Completed - Appointments & Scheduling (October 14, 2025)**
-  - Built comprehensive appointments management system
-  - Database schema with appointments tracking and status history
-  - Full API endpoints for CRUD operations
-  - Appointments page with search, filtering, and pagination
-  - Customer and vehicle information display
-  - Date/time management with duration tracking
-  - Status workflow (scheduled → confirmed → in_progress → completed)
-  - Integrated into sidebar navigation with Calendar icon
-
-- **NEW: Task Assignment & Tool Management UI (October 12, 2025 - Session 2)**
-  - **Task Assignment Dialog** - Assign technicians/assistants to job cards with task details
-    - Integrated directly into Job Cards List with "Assign Task" button on each card
-    - Form supports task name, type (diagnostic/repair/assembly/etc), description
-    - Technician selection with user type (technician/assistant/both)
-    - Priority levels and estimated minutes tracking
-    - Full API integration with /api/job-cards/:id/tasks endpoints
-  - **Tool Availability Checker Dialog** - Real-time tool availability across garages
-    - Shows all tools with status indicators (available/unavailable)
-    - Tool categorization by type (diagnostic/mechanical/electrical)
-    - Brand, manufacturer, and visibility information
-    - Summary metrics showing total tools, available count, in-use count
-  - **Add Tool Dialog** - Form to add new tools to inventory
-    - Tool name, description, type selection
-    - Brand and manufacturer fields
-    - Visibility settings (public/private/shared)
-    - Full validation and database persistence
-  - Replaced 3 alert() placeholders with fully functional dialogs
-  - All dialogs follow consistent design patterns with proper error handling
-
-## Development Roadmap
-Based on attached module flow plan for garage management SaaS:
-
-### ✅ Completed & Fully Integrated Modules (1-8)
-- **Garage & Branch Management** - Connected to all systems
-- **User, Role, and Permission Management** - Integrated authentication flow
-- **Technician, Assistant, and Customer Profiles** - Linked to job assignments
-- **SaaS Subscription & Feature Flags** - Active system monitoring
-- **Service Template & Step Configuration** - Connected to tool requirements
-- **Spare Parts & Inventory** - Basic implementation completed
-- **Tool Management (Module 7)** - Full database with cross-system integration
-- **Job Cards & Task Assignment (Module 8)** - Complete with tool integration
-  - All modules now work together as unified system
-  - Real-time data flow between modules
-  - Cross-system workflow automation
-  - Live integration monitoring dashboard
-
-### 🔄 Module 7 - Tool Management (90% Complete)
-- Database schema implemented with 3 tables (tools, tool_availability, tool_usage_logs)
-- Complete API routes for all tool operations
-- Frontend UI integrated into main dashboard
-- Tool categorization and availability tracking
-
-### ✅ Module 9 - Appointments & Scheduling (COMPLETED - October 14, 2025)
-- Complete database schema with 3 tables (appointments, appointment_status_history, appointment_reminders)
-- Full CRUD API routes for appointment management
-- Appointments page with filtering, search, and pagination
-- Real-time appointment tracking with status management
-- Customer information and vehicle details integration
-- Integrated into main navigation
-
-### ✅ Module 10 - Customer Management (COMPLETED - October 14, 2025)
-- **Scope Note**: Customers are users managed via authentication system (not created separately in this module)
-- Database schema with vehicles and customer_notes tables
-- Vehicle tracking per customer with detailed specs (make, model, year, VIN, engine type, transmission, etc.)
-- Customer notes system for tracking interactions (general, complaint, feedback, reminder)
-- API routes for customer viewing with server-side garage filtering and text search (ilike)
-- Full CRUD API routes for vehicles and notes with Zod validation
-- Customer list view with working garage filter dropdown and client-side search
-- Customer detail view showing profile, vehicles, and notes
-- AddVehicleDialog component with full form validation and garageId handling
-- AddCustomerNoteDialog component with full form validation
-- Delete functionality for both vehicles and notes with cache invalidation
-- Proper query parameter construction for backend filtering
-- Integrated into main navigation with Users icon
-- Production-ready with all TypeScript types correct
-
-### ✅ Module 11 - Purchase Orders & Supplier Integration (COMPLETED - October 15, 2025)
-- **Database schema** with suppliers, purchase_orders, and purchase_order_items tables
-- **AddSupplierDialog** - Complete supplier CRUD with all fields (contact, address, payment terms)
-- **CreatePurchaseOrderDialog** - Atomic PO creation with:
-  - Dynamic line items management (add/remove)
-  - Real-time subtotal, tax (10%), and total calculation
-  - Transactional backend endpoint ensuring data integrity
-  - Minimum 1 item validation
-- **PurchaseOrderDetailsDialog** - Full PO management:
-  - View all order details and line items in table format
-  - Status workflow transitions (draft → sent → confirmed → partial → received → cancelled)
-  - Delete functionality with confirmation
-  - Supplier information display
-- **Backend improvements**:
-  - Atomic `/api/purchase-orders/with-items` endpoint using database transactions
-  - Rollback protection for failed item insertions
-  - Full Zod validation for PO and all line items
-- **Query optimization**:
-  - Predicate-based cache invalidation for filtered views
-  - Proper refresh after all mutations (create/update/delete)
-- **Purchase Orders page** with garage and status filtering
-- Auto-generated PO numbers with timestamp
-- Integrated into main navigation with ShoppingCart icon
-- **Production-ready** with architect approval
-
-### ✅ Module 12 - Invoice & Billing (COMPLETED - October 15, 2025)
-- **Database schema** with 3 tables:
-  - `invoices` - Main invoice records with customer, vehicle, job card links
-  - `invoice_items` - Line items for services, parts, labor
-  - `payments` - Payment tracking with automatic invoice updates
-- **Storage layer**:
-  - Full CRUD operations for invoices, items, and payments
-  - Atomic invoice creation with items using database transactions
-  - Payment tracking with automatic invoice balance and status updates
-- **API routes**:
-  - GET/POST/PATCH/DELETE for invoices with full Zod validation
-  - Atomic `/api/invoices/with-items` endpoint ensuring data integrity
-  - Payment creation with automatic invoice balance updates
-  - **Status workflow validation** - server-side enforcement of transitions
-- **Frontend UI**:
-  - Invoices page with garage and status filtering
-  - Customer information display with proper lookup
-  - **CreateInvoiceDialog** - Dynamic line items, real-time total calculation, atomic creation
-  - **InvoiceDetailsDialog** - Full invoice viewing, status management with workflow enforcement, delete functionality
-  - **AddPaymentDialog** - Payment recording with balance validation, automatic invoice updates
-  - Integrated into navigation with FileText icon
-- **Status workflow enforcement** (both client and server):
-  - draft → sent, cancelled
-  - sent → paid, overdue, cancelled
-  - paid → cancelled only (terminal)
-  - overdue → paid, cancelled
-  - cancelled → no changes (terminal)
-- **Sample data**: Two test invoices (INV-20251015-001, INV-20251015-002) with line items
-- **Production-ready** with full architect approval
-
-### 🔜 Next Modules (13-14)
-- Reports & Dashboards (Module 13)
-- Mobile Apps Integration (Module 14)
-
-## Migration Status
-Successfully migrated from Figma to Replit with:
-- ✅ All packages installed and configured
-- ✅ Proper project structure established
-- ✅ Security best practices implemented
-- ✅ Client/server separation maintained
-- ✅ Development workflow configured
-- ✅ Authentication and main dashboard working
+## External Dependencies
+- **Replit Auth**: For user authentication and secure session management.
+- **PostgreSQL**: The primary database for all application data.
+- **Express.js**: Backend web framework.
+- **React**: Frontend library.
+- **Vite**: Build tool for the frontend.
+- **wouter**: Frontend routing library.
+- **@tanstack/react-query**: Data fetching and state management for the frontend.
+- **shadcn/ui**: UI component library based on Radix UI.
+- **Tailwind CSS**: Utility-first CSS framework for styling.
+- **Drizzle ORM**: TypeScript ORM for interacting with PostgreSQL.
+- **Zod**: Schema declaration and validation library.
+- **recharts**: Used for data visualization in reports and dashboards.

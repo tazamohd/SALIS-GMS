@@ -963,13 +963,29 @@ export class DatabaseStorage implements IStorage {
       count,
     }));
     
-    // Calculate average completion time (placeholder logic)
-    const averageCompletionTime = 48; // hours - placeholder
+    // Calculate average completion time from completed job cards
+    const completedJobCards = filteredJobCards.filter(jc => 
+      jc.status === 'completed' && jc.createdAt && jc.completedAt
+    );
+    let averageCompletionTime = 0;
+    if (completedJobCards.length > 0) {
+      const totalHours = completedJobCards.reduce((sum, jc) => {
+        const start = new Date(jc.createdAt!).getTime();
+        const end = new Date(jc.completedAt!).getTime();
+        return sum + ((end - start) / (1000 * 60 * 60)); // Convert to hours
+      }, 0);
+      averageCompletionTime = Math.round(totalHours / completedJobCards.length);
+    }
     
-    // Get task assignments to find top technicians
-    const tasksData = await this.getTaskAssignments(undefined);
+    // Get task assignments for the filtered job cards only
+    const jobCardIds = filteredJobCards.map(jc => jc.id);
+    const relevantTasks = jobCardIds.length > 0
+      ? await db.select().from(taskAssignments)
+          .where(inArray(taskAssignments.jobCardId, jobCardIds))
+      : [];
+    
     const techMap = new Map<string, number>();
-    tasksData.forEach(task => {
+    relevantTasks.forEach(task => {
       if (task.assignedTo) {
         techMap.set(task.assignedTo, (techMap.get(task.assignedTo) || 0) + 1);
       }
