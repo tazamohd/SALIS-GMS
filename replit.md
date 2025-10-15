@@ -105,3 +105,41 @@ The application uses a full-stack architecture with a clear separation between c
 - Comprehensive error handling with user-friendly messages
 
 **Production-ready** with architect-approved implementation
+
+### Module 17: Analytics & Reporting Enhancements (October 15, 2025)
+**Core Functionality**:
+- Date range picker with preset options (Last 7 days, Last 30 days, Last 90 days, This Month, Last Month, Custom)
+- Technician performance analytics with comprehensive metrics
+- Jobs completed tracking per technician
+- Average completion time calculation (in days)
+- Revenue generated attribution by technician
+- Efficiency rating based on job completion rate
+- Job status breakdown for each technician
+- Garage-scoped and date-filtered analytics
+
+**UI Features**:
+- Interactive date range picker with calendar and preset buttons
+- New "Technicians" tab in Reports page
+- Individual performance cards for each technician with key metrics
+- Visual efficiency rating with progress bar
+- Comparison charts: Jobs Completed, Revenue Generated, Avg. Completion Time, Efficiency Rating
+- Bar charts for technician performance comparison
+- Empty state messaging when no data available
+- Loading states with spinner
+- Responsive grid layout for performance cards
+
+**Technical Implementation**:
+- Backend API route: GET /api/reports/technician-performance with garage and date filters
+- Storage method: getTechnicianPerformance with SQL-based filtering
+- SQL filtering applied to technicians, job cards, and invoices for performance
+- Optional date range support (start/end) with proper handling of partial ranges
+- Date normalization to day boundaries (start: 00:00:00, end: 23:59:59)
+- API validation with 400 errors for invalid dates
+- Revenue returned as number from backend, formatted as currency in frontend
+- Completion time calculated only for jobs with both createdAt and completedAt
+- Proper handling of NaN in revenue calculations
+- Garage-scoped queries preventing cross-garage data leakage
+- Data-testid attributes throughout for testing
+- Type-safe implementation with proper TypeScript interfaces
+
+**Production-ready** with architect-approved implementation
