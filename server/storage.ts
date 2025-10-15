@@ -89,7 +89,7 @@ export interface IStorage {
   getUserRoles(userId: string): Promise<any[]>;
   
   // Job Card operations - Module 8
-  getJobCards(garageId?: string): Promise<JobCard[]>;
+  getJobCards(garageId?: string, assignedTo?: string): Promise<JobCard[]>;
   getJobCard(id: string): Promise<JobCard | undefined>;
   createJobCard(data: any): Promise<JobCard>;
   updateJobCard(id: string, data: any): Promise<JobCard>;
@@ -305,9 +305,17 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Job Card operations - Module 8: Job Cards & Task Assignment
-  async getJobCards(garageId?: string): Promise<JobCard[]> {
+  async getJobCards(garageId?: string, assignedTo?: string): Promise<JobCard[]> {
+    const conditions = [];
     if (garageId) {
-      return await db.select().from(jobCards).where(eq(jobCards.garageId, garageId)).orderBy(desc(jobCards.createdAt));
+      conditions.push(eq(jobCards.garageId, garageId));
+    }
+    if (assignedTo) {
+      conditions.push(eq(jobCards.assignedTo, assignedTo));
+    }
+    
+    if (conditions.length > 0) {
+      return await db.select().from(jobCards).where(and(...conditions)).orderBy(desc(jobCards.createdAt));
     }
     return await db.select().from(jobCards).orderBy(desc(jobCards.createdAt));
   }

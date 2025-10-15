@@ -65,8 +65,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Job Card routes - Module 8: Job Cards & Task Assignment
   app.get('/api/job-cards', isAuthenticated, async (req, res) => {
     try {
-      const { garage_id } = req.query;
-      const jobCards = await storage.getJobCards(garage_id as string);
+      const { garage_id, assigned_to } = req.query;
+      const jobCards = await storage.getJobCards(garage_id as string, assigned_to as string);
       res.json(jobCards);
     } catch (error) {
       console.error("Error fetching job cards:", error);
@@ -104,6 +104,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.put('/api/job-cards/:id', isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updatedJobCard = await storage.updateJobCard(id, req.body);
+      res.json(updatedJobCard);
+    } catch (error) {
+      console.error("Error updating job card:", error);
+      res.status(500).json({ message: "Failed to update job card" });
+    }
+  });
+
+  app.patch('/api/job-cards/:id', isAuthenticated, async (req, res) => {
     try {
       const { id } = req.params;
       const updatedJobCard = await storage.updateJobCard(id, req.body);
