@@ -21,7 +21,11 @@ import {
   insertAIMaintenancePredictionSchema,
   insertAIPartsRecommendationSchema,
   insertAIScheduleOptimizationSchema,
-  insertAIChatConversationSchema
+  insertAIChatConversationSchema,
+  insertIntegrationConnectionSchema,
+  insertIntegrationSyncLogSchema,
+  insertAccountingTransactionSchema,
+  insertOBDDiagnosticDataSchema
 } from "@shared/schema";
 import Stripe from "stripe";
 import { createPaypalOrder, capturePaypalOrder, loadPaypalDefault } from "./paypal";
@@ -5343,6 +5347,310 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error importing data:", error);
       res.status(500).json({ message: "Failed to import data" });
+    }
+  });
+
+  // Module 33: Third-Party Integrations
+  
+  // Integration Connections Routes
+  app.get('/api/integrations/connections', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const connections = await storage.getIntegrationConnections(userGarageId);
+      res.json(connections);
+    } catch (error) {
+      console.error("Error fetching integration connections:", error);
+      res.status(500).json({ message: "Failed to fetch integration connections" });
+    }
+  });
+
+  app.post('/api/integrations/connections', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const validatedData = insertIntegrationConnectionSchema.parse({
+        ...req.body,
+        garageId: userGarageId,
+      });
+      const connection = await storage.createIntegrationConnection(validatedData);
+      res.json(connection);
+    } catch (error: any) {
+      console.error("Error creating integration connection:", error);
+      res.status(500).json({ message: "Failed to create integration connection", error: error.message });
+    }
+  });
+
+  app.patch('/api/integrations/connections/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const existing = await storage.getIntegrationConnection(req.params.id);
+      
+      if (!existing || existing.garageId !== userGarageId) {
+        return res.status(404).json({ message: "Integration connection not found" });
+      }
+
+      const connection = await storage.updateIntegrationConnection(req.params.id, req.body);
+      res.json(connection);
+    } catch (error) {
+      console.error("Error updating integration connection:", error);
+      res.status(500).json({ message: "Failed to update integration connection" });
+    }
+  });
+
+  app.delete('/api/integrations/connections/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const existing = await storage.getIntegrationConnection(req.params.id);
+      
+      if (!existing || existing.garageId !== userGarageId) {
+        return res.status(404).json({ message: "Integration connection not found" });
+      }
+
+      await storage.deleteIntegrationConnection(req.params.id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting integration connection:", error);
+      res.status(500).json({ message: "Failed to delete integration connection" });
+    }
+  });
+
+  // Integration Sync Logs Routes
+  app.get('/api/integrations/sync-logs', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const { connectionId } = req.query;
+      const logs = await storage.getIntegrationSyncLogs(userGarageId, connectionId as string);
+      res.json(logs);
+    } catch (error) {
+      console.error("Error fetching integration sync logs:", error);
+      res.status(500).json({ message: "Failed to fetch integration sync logs" });
+    }
+  });
+
+  // Google Calendar Sync Routes
+  app.post('/api/integrations/google-calendar/sync-appointment', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const { syncAppointmentToGoogleCalendar } = await import('./integrations/googleCalendar.js');
+      
+      const result = await syncAppointmentToGoogleCalendar(req.body);
+      
+      // Log sync activity
+      await storage.createIntegrationSyncLog({
+        garageId: userGarageId,
+        syncType: 'google-calendar-appointment',
+        status: result.success ? 'success' : 'failed',
+        recordsProcessed: result.success ? 1 : 0,
+        errorMessage: result.error,
+        syncData: result
+      });
+
+      res.json(result);
+    } catch (error: any) {
+      console.error("Error syncing to Google Calendar:", error);
+      res.status(500).json({ message: "Failed to sync to Google Calendar", error: error.message });
+    }
+  });
+
+  app.post('/api/integrations/google-calendar/update-event', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const { updateGoogleCalendarEvent } = await import('./integrations/googleCalendar.js');
+      const { eventId, appointment } = req.body;
+      
+      const result = await updateGoogleCalendarEvent(eventId, appointment);
+      
+      await storage.createIntegrationSyncLog({
+        garageId: userGarageId,
+        syncType: 'google-calendar-update',
+        status: result.success ? 'success' : 'failed',
+        recordsProcessed: result.success ? 1 : 0,
+        errorMessage: result.error,
+        syncData: result
+      });
+
+      res.json(result);
+    } catch (error: any) {
+      console.error("Error updating Google Calendar event:", error);
+      res.status(500).json({ message: "Failed to update Google Calendar event", error: error.message });
+    }
+  });
+
+  app.delete('/api/integrations/google-calendar/delete-event/:eventId', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const { deleteGoogleCalendarEvent } = await import('./integrations/googleCalendar.js');
+      
+      const result = await deleteGoogleCalendarEvent(req.params.eventId);
+      
+      await storage.createIntegrationSyncLog({
+        garageId: userGarageId,
+        syncType: 'google-calendar-delete',
+        status: result.success ? 'success' : 'failed',
+        recordsProcessed: result.success ? 1 : 0,
+        errorMessage: result.error,
+        syncData: result
+      });
+
+      res.json(result);
+    } catch (error: any) {
+      console.error("Error deleting Google Calendar event:", error);
+      res.status(500).json({ message: "Failed to delete Google Calendar event", error: error.message });
+    }
+  });
+
+  // Gmail Routes
+  app.post('/api/integrations/gmail/send-email', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const { sendEmail } = await import('./integrations/gmail.js');
+      
+      const result = await sendEmail(req.body);
+      
+      await storage.createIntegrationSyncLog({
+        garageId: userGarageId,
+        syncType: 'gmail-send',
+        status: result.success ? 'success' : 'failed',
+        recordsProcessed: result.success ? 1 : 0,
+        errorMessage: result.error,
+        syncData: result
+      });
+
+      res.json(result);
+    } catch (error: any) {
+      console.error("Error sending email via Gmail:", error);
+      res.status(500).json({ message: "Failed to send email", error: error.message });
+    }
+  });
+
+  app.post('/api/integrations/gmail/send-appointment-confirmation', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const { sendAppointmentConfirmationEmail } = await import('./integrations/gmail.js');
+      const { appointment, customer } = req.body;
+      
+      const result = await sendAppointmentConfirmationEmail(appointment, customer);
+      
+      await storage.createIntegrationSyncLog({
+        garageId: userGarageId,
+        syncType: 'gmail-appointment-confirmation',
+        status: result.success ? 'success' : 'failed',
+        recordsProcessed: result.success ? 1 : 0,
+        errorMessage: result.error,
+        syncData: result
+      });
+
+      res.json(result);
+    } catch (error: any) {
+      console.error("Error sending appointment confirmation:", error);
+      res.status(500).json({ message: "Failed to send appointment confirmation", error: error.message });
+    }
+  });
+
+  app.post('/api/integrations/gmail/send-invoice', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const { sendInvoiceEmail } = await import('./integrations/gmail.js');
+      const { invoice, customer } = req.body;
+      
+      const result = await sendInvoiceEmail(invoice, customer);
+      
+      await storage.createIntegrationSyncLog({
+        garageId: userGarageId,
+        syncType: 'gmail-invoice',
+        status: result.success ? 'success' : 'failed',
+        recordsProcessed: result.success ? 1 : 0,
+        errorMessage: result.error,
+        syncData: result
+      });
+
+      res.json(result);
+    } catch (error: any) {
+      console.error("Error sending invoice email:", error);
+      res.status(500).json({ message: "Failed to send invoice email", error: error.message });
+    }
+  });
+
+  app.post('/api/integrations/gmail/send-service-reminder', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const { sendServiceReminderEmail } = await import('./integrations/gmail.js');
+      const { reminder, customer, vehicle } = req.body;
+      
+      const result = await sendServiceReminderEmail(reminder, customer, vehicle);
+      
+      await storage.createIntegrationSyncLog({
+        garageId: userGarageId,
+        syncType: 'gmail-service-reminder',
+        status: result.success ? 'success' : 'failed',
+        recordsProcessed: result.success ? 1 : 0,
+        errorMessage: result.error,
+        syncData: result
+      });
+
+      res.json(result);
+    } catch (error: any) {
+      console.error("Error sending service reminder:", error);
+      res.status(500).json({ message: "Failed to send service reminder", error: error.message });
+    }
+  });
+
+  // Accounting Integration Routes (Stub for QuickBooks/Xero)
+  app.get('/api/integrations/accounting/transactions', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const { syncStatus } = req.query;
+      const transactions = await storage.getAccountingTransactions(userGarageId, syncStatus as string);
+      res.json(transactions);
+    } catch (error) {
+      console.error("Error fetching accounting transactions:", error);
+      res.status(500).json({ message: "Failed to fetch accounting transactions" });
+    }
+  });
+
+  app.post('/api/integrations/accounting/sync', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      
+      // Placeholder for QuickBooks/Xero integration
+      // Will be implemented when user provides API credentials
+      
+      res.json({ 
+        success: false, 
+        message: "Accounting integration not configured. Please provide QuickBooks or Xero API credentials." 
+      });
+    } catch (error: any) {
+      console.error("Error syncing accounting data:", error);
+      res.status(500).json({ message: "Failed to sync accounting data", error: error.message });
+    }
+  });
+
+  // OBD-II Diagnostics Routes (Stub)
+  app.get('/api/integrations/obd/diagnostics', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const { vehicleId } = req.query;
+      const diagnostics = await storage.getOBDDiagnostics(userGarageId, vehicleId as string);
+      res.json(diagnostics);
+    } catch (error) {
+      console.error("Error fetching OBD diagnostics:", error);
+      res.status(500).json({ message: "Failed to fetch OBD diagnostics" });
+    }
+  });
+
+  app.post('/api/integrations/obd/scan', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      
+      // Placeholder for OBD-II adapter integration
+      // Will be implemented when user provides OBD adapter API/SDK
+      
+      res.json({ 
+        success: false, 
+        message: "OBD-II diagnostics integration not configured. Please connect an OBD-II adapter." 
+      });
+    } catch (error: any) {
+      console.error("Error scanning OBD data:", error);
+      res.status(500).json({ message: "Failed to scan OBD data", error: error.message });
     }
   });
 

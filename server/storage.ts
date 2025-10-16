@@ -160,6 +160,18 @@ import {
   aiPartsRecommendations,
   aiScheduleOptimizations,
   aiChatConversations,
+  integrationConnections,
+  integrationSyncLogs,
+  accountingTransactions,
+  obdDiagnosticData,
+  type IntegrationConnection,
+  type InsertIntegrationConnection,
+  type IntegrationSyncLog,
+  type InsertIntegrationSyncLog,
+  type AccountingTransaction,
+  type InsertAccountingTransaction,
+  type OBDDiagnosticData,
+  type InsertOBDDiagnosticData,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, or, inArray, and, gte, lte, ilike, sql } from "drizzle-orm";
@@ -4321,6 +4333,82 @@ export class DatabaseStorage implements IStorage {
       .where(eq(aiChatConversations.id, id))
       .returning();
     return conversation;
+  }
+
+  // Module 33: Third-Party Integrations
+  async getIntegrationConnections(garageId: string): Promise<IntegrationConnection[]> {
+    return await db.select().from(integrationConnections)
+      .where(eq(integrationConnections.garageId, garageId))
+      .orderBy(desc(integrationConnections.createdAt));
+  }
+
+  async getIntegrationConnection(id: string): Promise<IntegrationConnection | undefined> {
+    const [connection] = await db.select().from(integrationConnections)
+      .where(eq(integrationConnections.id, id));
+    return connection;
+  }
+
+  async createIntegrationConnection(data: InsertIntegrationConnection): Promise<IntegrationConnection> {
+    const [connection] = await db.insert(integrationConnections).values(data).returning();
+    return connection;
+  }
+
+  async updateIntegrationConnection(id: string, data: Partial<IntegrationConnection>): Promise<IntegrationConnection> {
+    const [connection] = await db.update(integrationConnections)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(integrationConnections.id, id))
+      .returning();
+    return connection;
+  }
+
+  async deleteIntegrationConnection(id: string): Promise<void> {
+    await db.delete(integrationConnections).where(eq(integrationConnections.id, id));
+  }
+
+  async getIntegrationSyncLogs(garageId: string, connectionId?: string): Promise<IntegrationSyncLog[]> {
+    const conditions = [eq(integrationSyncLogs.garageId, garageId)];
+    if (connectionId) {
+      conditions.push(eq(integrationSyncLogs.connectionId, connectionId));
+    }
+    return await db.select().from(integrationSyncLogs)
+      .where(and(...conditions))
+      .orderBy(desc(integrationSyncLogs.createdAt))
+      .limit(100);
+  }
+
+  async createIntegrationSyncLog(data: InsertIntegrationSyncLog): Promise<IntegrationSyncLog> {
+    const [log] = await db.insert(integrationSyncLogs).values(data).returning();
+    return log;
+  }
+
+  async getAccountingTransactions(garageId: string, syncStatus?: string): Promise<AccountingTransaction[]> {
+    const conditions = [eq(accountingTransactions.garageId, garageId)];
+    if (syncStatus) {
+      conditions.push(eq(accountingTransactions.syncStatus, syncStatus));
+    }
+    return await db.select().from(accountingTransactions)
+      .where(and(...conditions))
+      .orderBy(desc(accountingTransactions.createdAt));
+  }
+
+  async createAccountingTransaction(data: InsertAccountingTransaction): Promise<AccountingTransaction> {
+    const [transaction] = await db.insert(accountingTransactions).values(data).returning();
+    return transaction;
+  }
+
+  async getOBDDiagnostics(garageId: string, vehicleId?: string): Promise<OBDDiagnosticData[]> {
+    const conditions = [eq(obdDiagnosticData.garageId, garageId)];
+    if (vehicleId) {
+      conditions.push(eq(obdDiagnosticData.vehicleId, vehicleId));
+    }
+    return await db.select().from(obdDiagnosticData)
+      .where(and(...conditions))
+      .orderBy(desc(obdDiagnosticData.createdAt));
+  }
+
+  async createOBDDiagnostic(data: InsertOBDDiagnosticData): Promise<OBDDiagnosticData> {
+    const [diagnostic] = await db.insert(obdDiagnosticData).values(data).returning();
+    return diagnostic;
   }
 }
 
