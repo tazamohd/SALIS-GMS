@@ -1190,6 +1190,150 @@ export const exportJobs = pgTable("export_jobs", {
   completedAt: timestamp("completed_at"),
 });
 
+// ============= Module 31: Staff & HR Management =============
+
+// Employee Attendance
+export const employeeAttendance = pgTable("employee_attendance", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").notNull().references(() => garages.id),
+  employeeId: varchar("employee_id").notNull().references(() => users.id),
+  date: timestamp("date").notNull(),
+  clockIn: timestamp("clock_in").notNull(),
+  clockOut: timestamp("clock_out"),
+  breakStart: timestamp("break_start"),
+  breakEnd: timestamp("break_end"),
+  totalHours: decimal("total_hours", { precision: 5, scale: 2 }),
+  overtimeHours: decimal("overtime_hours", { precision: 5, scale: 2 }),
+  status: varchar("status", { length: 20 }).notNull().default("present"), // "present", "absent", "late", "half_day", "on_leave"
+  notes: text("notes"),
+  approvedBy: varchar("approved_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Shift Templates
+export const shiftTemplates = pgTable("shift_templates", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").notNull().references(() => garages.id),
+  name: varchar("name", { length: 100 }).notNull(),
+  startTime: varchar("start_time", { length: 10 }).notNull(), // "09:00"
+  endTime: varchar("end_time", { length: 10 }).notNull(), // "17:00"
+  breakDuration: integer("break_duration").notNull().default(60), // in minutes
+  daysOfWeek: text("days_of_week").array().notNull(), // ["monday", "tuesday", ...]
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Shift Assignments
+export const shiftAssignments = pgTable("shift_assignments", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").notNull().references(() => garages.id),
+  employeeId: varchar("employee_id").notNull().references(() => users.id),
+  shiftTemplateId: uuid("shift_template_id").references(() => shiftTemplates.id),
+  date: timestamp("date").notNull(),
+  startTime: timestamp("start_time").notNull(),
+  endTime: timestamp("end_time").notNull(),
+  status: varchar("status", { length: 20 }).notNull().default("scheduled"), // "scheduled", "completed", "cancelled", "no_show"
+  notes: text("notes"),
+  createdBy: varchar("created_by").notNull().references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Commission Rules
+export const commissionRules = pgTable("commission_rules", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").notNull().references(() => garages.id),
+  name: varchar("name", { length: 100 }).notNull(),
+  description: text("description"),
+  ruleType: varchar("rule_type", { length: 30 }).notNull(), // "percentage", "fixed_per_job", "tiered"
+  basePercentage: decimal("base_percentage", { precision: 5, scale: 2 }), // For percentage type
+  fixedAmount: decimal("fixed_amount", { precision: 10, scale: 2 }), // For fixed type
+  tierConfig: jsonb("tier_config"), // For tiered: [{minRevenue: 0, maxRevenue: 1000, percentage: 5}, ...]
+  applicableServices: text("applicable_services").array(), // Specific service types
+  minJobValue: decimal("min_job_value", { precision: 10, scale: 2 }),
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Calculated Commissions
+export const commissions = pgTable("commissions", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").notNull().references(() => garages.id),
+  technicianId: varchar("technician_id").notNull().references(() => users.id),
+  jobCardId: uuid("job_card_id").references(() => jobCards.id),
+  invoiceId: uuid("invoice_id").references(() => invoices.id),
+  commissionRuleId: uuid("commission_rule_id").references(() => commissionRules.id),
+  baseAmount: decimal("base_amount", { precision: 10, scale: 2 }).notNull(), // Job/Invoice amount
+  commissionAmount: decimal("commission_amount", { precision: 10, scale: 2 }).notNull(),
+  commissionRate: decimal("commission_rate", { precision: 5, scale: 2 }), // Percentage used
+  period: varchar("period", { length: 20 }).notNull(), // "2025-01" for monthly
+  status: varchar("status", { length: 20 }).notNull().default("pending"), // "pending", "approved", "paid"
+  paidAt: timestamp("paid_at"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Performance Reviews
+export const performanceReviews = pgTable("performance_reviews", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").notNull().references(() => garages.id),
+  employeeId: varchar("employee_id").notNull().references(() => users.id),
+  reviewerId: varchar("reviewer_id").notNull().references(() => users.id),
+  reviewPeriod: varchar("review_period", { length: 50 }).notNull(), // "Q1 2025", "2024-Annual"
+  overallRating: decimal("overall_rating", { precision: 3, scale: 2 }).notNull(), // 1.00 to 5.00
+  technicalSkills: decimal("technical_skills", { precision: 3, scale: 2 }),
+  customerService: decimal("customer_service", { precision: 3, scale: 2 }),
+  teamwork: decimal("teamwork", { precision: 3, scale: 2 }),
+  punctuality: decimal("punctuality", { precision: 3, scale: 2 }),
+  productivity: decimal("productivity", { precision: 3, scale: 2 }),
+  strengths: text("strengths"),
+  areasForImprovement: text("areas_for_improvement"),
+  goals: text("goals"), // Goals for next period
+  comments: text("comments"),
+  employeeComments: text("employee_comments"), // Employee's response
+  status: varchar("status", { length: 20 }).notNull().default("draft"), // "draft", "submitted", "acknowledged"
+  acknowledgedAt: timestamp("acknowledged_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Training & Certifications
+export const trainings = pgTable("trainings", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").notNull().references(() => garages.id),
+  name: varchar("name", { length: 200 }).notNull(),
+  description: text("description"),
+  provider: varchar("provider", { length: 200 }),
+  trainingType: varchar("training_type", { length: 50 }).notNull(), // "certification", "workshop", "online_course", "on_job"
+  duration: integer("duration"), // in hours
+  cost: decimal("cost", { precision: 10, scale: 2 }),
+  isRecurring: boolean("is_recurring").notNull().default(false),
+  validityPeriod: integer("validity_period"), // in months, for certifications
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Employee Training Records
+export const employeeTrainings = pgTable("employee_trainings", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").notNull().references(() => garages.id),
+  employeeId: varchar("employee_id").notNull().references(() => users.id),
+  trainingId: uuid("training_id").notNull().references(() => trainings.id),
+  status: varchar("status", { length: 20 }).notNull().default("enrolled"), // "enrolled", "in_progress", "completed", "failed", "expired"
+  enrolledDate: timestamp("enrolled_date").notNull().defaultNow(),
+  completedDate: timestamp("completed_date"),
+  expiryDate: timestamp("expiry_date"), // For certifications
+  score: decimal("score", { precision: 5, scale: 2 }), // If applicable
+  certificateUrl: text("certificate_url"), // Document storage URL
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 export type PaymentPlan = typeof paymentPlans.$inferSelect;
 export type InsertPaymentPlan = typeof paymentPlans.$inferInsert;
 export const insertPaymentPlanSchema = createInsertSchema(paymentPlans).omit({ id: true, createdAt: true, updatedAt: true });
@@ -1221,3 +1365,36 @@ export const insertSavedFilterPresetSchema = createInsertSchema(savedFilterPrese
 export type ExportJob = typeof exportJobs.$inferSelect;
 export type InsertExportJob = typeof exportJobs.$inferInsert;
 export const insertExportJobSchema = createInsertSchema(exportJobs).omit({ id: true, createdAt: true, completedAt: true });
+
+// Module 31: Staff & HR types
+export type EmployeeAttendance = typeof employeeAttendance.$inferSelect;
+export type InsertEmployeeAttendance = typeof employeeAttendance.$inferInsert;
+export const insertEmployeeAttendanceSchema = createInsertSchema(employeeAttendance).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type ShiftTemplate = typeof shiftTemplates.$inferSelect;
+export type InsertShiftTemplate = typeof shiftTemplates.$inferInsert;
+export const insertShiftTemplateSchema = createInsertSchema(shiftTemplates).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type ShiftAssignment = typeof shiftAssignments.$inferSelect;
+export type InsertShiftAssignment = typeof shiftAssignments.$inferInsert;
+export const insertShiftAssignmentSchema = createInsertSchema(shiftAssignments).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type CommissionRule = typeof commissionRules.$inferSelect;
+export type InsertCommissionRule = typeof commissionRules.$inferInsert;
+export const insertCommissionRuleSchema = createInsertSchema(commissionRules).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type Commission = typeof commissions.$inferSelect;
+export type InsertCommission = typeof commissions.$inferInsert;
+export const insertCommissionSchema = createInsertSchema(commissions).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type PerformanceReview = typeof performanceReviews.$inferSelect;
+export type InsertPerformanceReview = typeof performanceReviews.$inferInsert;
+export const insertPerformanceReviewSchema = createInsertSchema(performanceReviews).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type Training = typeof trainings.$inferSelect;
+export type InsertTraining = typeof trainings.$inferInsert;
+export const insertTrainingSchema = createInsertSchema(trainings).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type EmployeeTraining = typeof employeeTrainings.$inferSelect;
+export type InsertEmployeeTraining = typeof employeeTrainings.$inferInsert;
+export const insertEmployeeTrainingSchema = createInsertSchema(employeeTrainings).omit({ id: true, createdAt: true, updatedAt: true });
