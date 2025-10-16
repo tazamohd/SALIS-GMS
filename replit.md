@@ -34,3 +34,53 @@ The application utilizes a full-stack architecture with clear client-server sepa
 - **Zod**: Schema declaration and validation.
 - **recharts**: Data visualization.
 - **GetResponse**: Email marketing and automation (for notifications).
+### Module 22: Vehicle Management (October 16, 2025)
+**Core Functionality**:
+- Complete vehicle management system for tracking customer vehicles
+- Add, edit, and delete vehicle records with full CRUD operations
+- Vehicle database with make, model, year, license plate, VIN, color, mileage tracking
+- Support for engine type (gasoline, diesel, electric, hybrid) and transmission type
+- Customer association for each vehicle
+- Garage-scoped vehicle listing and filtering
+- Search functionality across make, model, license plate, VIN, and owner name
+- Soft delete with isActive flag
+
+**UI Features**:
+- Vehicles page with grid layout showing all vehicles
+- Vehicle cards displaying key information (make, model, year, owner, license plate)
+- Add/Edit vehicle modal with comprehensive form
+- Search bar for quick vehicle lookup
+- Visual indicators for active vehicles with status badges
+- Empty states for no vehicles or search results
+- Delete confirmation dialogs for safety
+- Responsive design for all screen sizes
+
+**Form Fields**:
+- Customer selection (required) - dropdown of all customers
+- Make and Model (required) - text inputs
+- Year (required) - numeric input
+- License Plate (required) - text input
+- VIN (optional) - text input
+- Color (optional) - text input
+- Engine Type (optional) - dropdown (gasoline, diesel, electric, hybrid)
+- Transmission Type (optional) - dropdown (automatic, manual)
+- Mileage (optional) - numeric input
+- Notes (optional) - textarea for additional information
+
+**Technical Implementation**:
+- Database schema: vehicles table with customer/garage relationships
+- Storage methods: getVehicles, getCustomerVehicles, getVehicle, createVehicle, updateVehicle, deleteVehicle
+- Backend API routes: GET/POST /api/vehicles, PATCH/DELETE /api/vehicles/:id with Zod validation
+- Frontend: React Hook Form with insertVehicleSchema validation from shared schema
+- React Query for data fetching with automatic cache invalidation
+- Navigation integration in sidebar and Quick Actions modal
+- Data-testid attributes throughout for testing
+- Type-safe implementation with Vehicle and InsertVehicle types
+
+**Integration Points**:
+- Links to customer records
+- Added to sidebar navigation
+- Included in Quick Actions modal for rapid access
+- Backend routes support garage filtering for multi-tenant isolation
+
+**Production-ready** and fully integrated with existing system
