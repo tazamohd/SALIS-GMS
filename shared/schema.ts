@@ -431,7 +431,71 @@ export const vehicles = pgTable("vehicles", {
   mileage: integer("mileage"),
   engineType: varchar("engine_type", { length: 100 }), // "gasoline", "diesel", "electric", "hybrid"
   transmissionType: varchar("transmission_type", { length: 50 }), // "automatic", "manual"
+  
+  // Warranty tracking
+  warrantyProvider: varchar("warranty_provider", { length: 255 }),
+  warrantyType: varchar("warranty_type", { length: 100 }), // "manufacturer", "extended", "powertrain", "bumper-to-bumper"
+  warrantyStartDate: timestamp("warranty_start_date"),
+  warrantyEndDate: timestamp("warranty_end_date"),
+  warrantyMileageLimit: integer("warranty_mileage_limit"),
+  warrantyNotes: text("warranty_notes"),
+  
+  // Vehicle photos
+  photos: text("photos").array(), // Array of image URLs
+  
   notes: text("notes"),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Vehicle Service History - tracks all services performed on a vehicle
+export const vehicleServiceHistory = pgTable("vehicle_service_history", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  vehicleId: uuid("vehicle_id").notNull().references(() => vehicles.id, { onDelete: "cascade" }),
+  jobCardId: uuid("job_card_id").references(() => jobCards.id),
+  serviceDate: timestamp("service_date").notNull(),
+  serviceType: varchar("service_type", { length: 255 }).notNull(),
+  description: text("description"),
+  mileageAtService: integer("mileage_at_service"),
+  cost: decimal("cost", { precision: 10, scale: 2 }),
+  performedBy: varchar("performed_by").references(() => users.id),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Maintenance Schedules - manufacturer recommended maintenance
+export const maintenanceSchedules = pgTable("maintenance_schedules", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  vehicleId: uuid("vehicle_id").notNull().references(() => vehicles.id, { onDelete: "cascade" }),
+  serviceName: varchar("service_name", { length: 255 }).notNull(),
+  description: text("description"),
+  intervalType: varchar("interval_type").notNull(), // "mileage", "time", "both"
+  intervalMileage: integer("interval_mileage"), // Miles between services
+  intervalMonths: integer("interval_months"), // Months between services
+  lastServiceDate: timestamp("last_service_date"),
+  lastServiceMileage: integer("last_service_mileage"),
+  nextDueDate: timestamp("next_due_date"),
+  nextDueMileage: integer("next_due_mileage"),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Service Reminders - automated reminders for upcoming services
+export const serviceReminders = pgTable("service_reminders", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  vehicleId: uuid("vehicle_id").notNull().references(() => vehicles.id, { onDelete: "cascade" }),
+  maintenanceScheduleId: uuid("maintenance_schedule_id").references(() => maintenanceSchedules.id, { onDelete: "cascade" }),
+  reminderType: varchar("reminder_type").notNull(), // "mileage", "date", "both"
+  reminderTitle: varchar("reminder_title", { length: 255 }).notNull(),
+  reminderMessage: text("reminder_message"),
+  triggerMileage: integer("trigger_mileage"), // Trigger when vehicle reaches this mileage
+  triggerDate: timestamp("trigger_date"), // Trigger on specific date
+  advanceDays: integer("advance_days").default(7), // Days before due date to send reminder
+  advanceMiles: integer("advance_miles").default(500), // Miles before due mileage to send reminder
+  status: varchar("status").default("pending"), // "pending", "sent", "acknowledged", "completed"
+  sentAt: timestamp("sent_at"),
   isActive: boolean("is_active").default(true),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
@@ -701,6 +765,19 @@ export type InsertAppointmentReminder = typeof appointmentReminders.$inferInsert
 export type Vehicle = typeof vehicles.$inferSelect;
 export type InsertVehicle = typeof vehicles.$inferInsert;
 export const insertVehicleSchema = createInsertSchema(vehicles).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type VehicleServiceHistory = typeof vehicleServiceHistory.$inferSelect;
+export type InsertVehicleServiceHistory = typeof vehicleServiceHistory.$inferInsert;
+export const insertVehicleServiceHistorySchema = createInsertSchema(vehicleServiceHistory).omit({ id: true, createdAt: true });
+
+export type MaintenanceSchedule = typeof maintenanceSchedules.$inferSelect;
+export type InsertMaintenanceSchedule = typeof maintenanceSchedules.$inferInsert;
+export const insertMaintenanceScheduleSchema = createInsertSchema(maintenanceSchedules).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type ServiceReminder = typeof serviceReminders.$inferSelect;
+export type InsertServiceReminder = typeof serviceReminders.$inferInsert;
+export const insertServiceReminderSchema = createInsertSchema(serviceReminders).omit({ id: true, createdAt: true, updatedAt: true });
+
 export type CustomerNote = typeof customerNotes.$inferSelect;
 export type InsertCustomerNote = typeof customerNotes.$inferInsert;
 export const insertCustomerNoteSchema = createInsertSchema(customerNotes).omit({ id: true, createdBy: true, createdAt: true });
