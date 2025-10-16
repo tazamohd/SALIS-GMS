@@ -3274,6 +3274,301 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Module 28: Advanced Financial Features
+  // Payment Plans
+  app.get('/api/payment-plans', isAuthenticated, async (req: any, res) => {
+    try {
+      const { invoiceId } = req.query;
+      const plans = await storage.getPaymentPlans(invoiceId);
+      res.json(plans);
+    } catch (error) {
+      console.error("Error fetching payment plans:", error);
+      res.status(500).json({ message: "Failed to fetch payment plans" });
+    }
+  });
+
+  app.get('/api/payment-plans/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const plan = await storage.getPaymentPlan(id);
+      if (!plan) {
+        return res.status(404).json({ message: "Payment plan not found" });
+      }
+      res.json(plan);
+    } catch (error) {
+      console.error("Error fetching payment plan:", error);
+      res.status(500).json({ message: "Failed to fetch payment plan" });
+    }
+  });
+
+  app.post('/api/payment-plans', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const plan = await storage.createPaymentPlan({ ...req.body, createdBy: userId });
+      res.status(201).json(plan);
+    } catch (error) {
+      console.error("Error creating payment plan:", error);
+      res.status(500).json({ message: "Failed to create payment plan" });
+    }
+  });
+
+  app.patch('/api/payment-plans/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const plan = await storage.updatePaymentPlan(id, req.body);
+      res.json(plan);
+    } catch (error) {
+      console.error("Error updating payment plan:", error);
+      res.status(500).json({ message: "Failed to update payment plan" });
+    }
+  });
+
+  // Installments
+  app.get('/api/installments', isAuthenticated, async (req: any, res) => {
+    try {
+      const { paymentPlanId } = req.query;
+      if (!paymentPlanId) {
+        return res.status(400).json({ message: "paymentPlanId is required" });
+      }
+      const installments = await storage.getInstallments(paymentPlanId);
+      res.json(installments);
+    } catch (error) {
+      console.error("Error fetching installments:", error);
+      res.status(500).json({ message: "Failed to fetch installments" });
+    }
+  });
+
+  app.patch('/api/installments/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const installment = await storage.updateInstallment(id, req.body);
+      res.json(installment);
+    } catch (error) {
+      console.error("Error updating installment:", error);
+      res.status(500).json({ message: "Failed to update installment" });
+    }
+  });
+
+  // Refunds
+  app.get('/api/refunds', isAuthenticated, async (req: any, res) => {
+    try {
+      const { garageId, status } = req.query;
+      const refunds = await storage.getRefunds(garageId, status);
+      res.json(refunds);
+    } catch (error) {
+      console.error("Error fetching refunds:", error);
+      res.status(500).json({ message: "Failed to fetch refunds" });
+    }
+  });
+
+  app.get('/api/refunds/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const refund = await storage.getRefund(id);
+      if (!refund) {
+        return res.status(404).json({ message: "Refund not found" });
+      }
+      res.json(refund);
+    } catch (error) {
+      console.error("Error fetching refund:", error);
+      res.status(500).json({ message: "Failed to fetch refund" });
+    }
+  });
+
+  app.post('/api/refunds', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const refund = await storage.createRefund({ ...req.body, requestedBy: userId });
+      res.status(201).json(refund);
+    } catch (error) {
+      console.error("Error creating refund:", error);
+      res.status(500).json({ message: "Failed to create refund" });
+    }
+  });
+
+  app.patch('/api/refunds/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const refund = await storage.updateRefund(id, req.body);
+      res.json(refund);
+    } catch (error) {
+      console.error("Error updating refund:", error);
+      res.status(500).json({ message: "Failed to update refund" });
+    }
+  });
+
+  app.post('/api/refunds/:id/approve', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const userId = req.user.claims.sub;
+      const refund = await storage.updateRefund(id, {
+        status: 'approved',
+        approvedBy: userId,
+        approvedAt: new Date(),
+      });
+      res.json(refund);
+    } catch (error) {
+      console.error("Error approving refund:", error);
+      res.status(500).json({ message: "Failed to approve refund" });
+    }
+  });
+
+  app.post('/api/refunds/:id/process', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const userId = req.user.claims.sub;
+      const refund = await storage.updateRefund(id, {
+        status: 'processed',
+        processedBy: userId,
+        processedAt: new Date(),
+      });
+      res.json(refund);
+    } catch (error) {
+      console.error("Error processing refund:", error);
+      res.status(500).json({ message: "Failed to process refund" });
+    }
+  });
+
+  // Tax Configurations
+  app.get('/api/tax-configurations', isAuthenticated, async (req: any, res) => {
+    try {
+      const { garageId, isActive } = req.query;
+      if (!garageId) {
+        return res.status(400).json({ message: "garageId is required" });
+      }
+      const configs = await storage.getTaxConfigurations(
+        garageId, 
+        isActive === 'true' ? true : isActive === 'false' ? false : undefined
+      );
+      res.json(configs);
+    } catch (error) {
+      console.error("Error fetching tax configurations:", error);
+      res.status(500).json({ message: "Failed to fetch tax configurations" });
+    }
+  });
+
+  app.post('/api/tax-configurations', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const config = await storage.createTaxConfiguration({ ...req.body, createdBy: userId });
+      res.status(201).json(config);
+    } catch (error) {
+      console.error("Error creating tax configuration:", error);
+      res.status(500).json({ message: "Failed to create tax configuration" });
+    }
+  });
+
+  app.patch('/api/tax-configurations/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const config = await storage.updateTaxConfiguration(id, req.body);
+      res.json(config);
+    } catch (error) {
+      console.error("Error updating tax configuration:", error);
+      res.status(500).json({ message: "Failed to update tax configuration" });
+    }
+  });
+
+  app.delete('/api/tax-configurations/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteTaxConfiguration(id);
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting tax configuration:", error);
+      res.status(500).json({ message: "Failed to delete tax configuration" });
+    }
+  });
+
+  // Discounts & Promotions
+  app.get('/api/discounts', isAuthenticated, async (req: any, res) => {
+    try {
+      const { garageId, isActive } = req.query;
+      if (!garageId) {
+        return res.status(400).json({ message: "garageId is required" });
+      }
+      const discounts = await storage.getDiscounts(
+        garageId,
+        isActive === 'true' ? true : isActive === 'false' ? false : undefined
+      );
+      res.json(discounts);
+    } catch (error) {
+      console.error("Error fetching discounts:", error);
+      res.status(500).json({ message: "Failed to fetch discounts" });
+    }
+  });
+
+  app.get('/api/discounts/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const discount = await storage.getDiscount(id);
+      if (!discount) {
+        return res.status(404).json({ message: "Discount not found" });
+      }
+      res.json(discount);
+    } catch (error) {
+      console.error("Error fetching discount:", error);
+      res.status(500).json({ message: "Failed to fetch discount" });
+    }
+  });
+
+  app.post('/api/discounts', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const discount = await storage.createDiscount({ ...req.body, createdBy: userId });
+      res.status(201).json(discount);
+    } catch (error) {
+      console.error("Error creating discount:", error);
+      res.status(500).json({ message: "Failed to create discount" });
+    }
+  });
+
+  app.patch('/api/discounts/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const discount = await storage.updateDiscount(id, req.body);
+      res.json(discount);
+    } catch (error) {
+      console.error("Error updating discount:", error);
+      res.status(500).json({ message: "Failed to update discount" });
+    }
+  });
+
+  app.delete('/api/discounts/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteDiscount(id);
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting discount:", error);
+      res.status(500).json({ message: "Failed to delete discount" });
+    }
+  });
+
+  app.post('/api/discounts/validate', isAuthenticated, async (req: any, res) => {
+    try {
+      const { code, garageId, amount } = req.body;
+      const userId = req.user.claims.sub;
+      const result = await storage.validateDiscount(code, garageId, userId, amount);
+      res.json(result);
+    } catch (error) {
+      console.error("Error validating discount:", error);
+      res.status(500).json({ message: "Failed to validate discount" });
+    }
+  });
+
+  // Tax Calculation
+  app.post('/api/calculate-tax', isAuthenticated, async (req: any, res) => {
+    try {
+      const { garageId, amount, category } = req.body;
+      const result = await storage.calculateTax(garageId, amount, category);
+      res.json(result);
+    } catch (error) {
+      console.error("Error calculating tax:", error);
+      res.status(500).json({ message: "Failed to calculate tax" });
+    }
+  });
+
   // Protected route example
   app.get("/api/protected", isAuthenticated, async (req: any, res) => {
     const userId = req.user?.claims?.sub;
