@@ -107,6 +107,24 @@ import {
   type InsertInventoryTransfer,
   type TecDocCache,
   type InsertTecDocCache,
+  paymentPlans,
+  installments,
+  refunds,
+  taxConfigurations,
+  discountsPromotions,
+  discountUsage,
+  type PaymentPlan,
+  type InsertPaymentPlan,
+  type Installment,
+  type InsertInstallment,
+  type Refund,
+  type InsertRefund,
+  type TaxConfiguration,
+  type InsertTaxConfiguration,
+  type DiscountPromotion,
+  type InsertDiscountPromotion,
+  type DiscountUsage,
+  type InsertDiscountUsage,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, or, inArray, and, gte, lte, ilike } from "drizzle-orm";
@@ -369,6 +387,48 @@ export interface IStorage {
   createStockAlert(data: any): Promise<any>;
   updateStockAlert(id: string, data: any): Promise<any>;
   acknowledgeStockAlert(id: string, userId: string): Promise<any>;
+  
+  // Module 28: Advanced Financial Features
+  // Payment Plans
+  getPaymentPlans(invoiceId?: string): Promise<PaymentPlan[]>;
+  getPaymentPlan(id: string): Promise<PaymentPlan | undefined>;
+  createPaymentPlan(data: InsertPaymentPlan): Promise<PaymentPlan>;
+  updatePaymentPlan(id: string, data: Partial<PaymentPlan>): Promise<PaymentPlan>;
+  
+  // Installments
+  getInstallments(paymentPlanId: string): Promise<Installment[]>;
+  getInstallment(id: string): Promise<Installment | undefined>;
+  createInstallment(data: InsertInstallment): Promise<Installment>;
+  updateInstallment(id: string, data: Partial<Installment>): Promise<Installment>;
+  
+  // Refunds
+  getRefunds(garageId?: string, status?: string): Promise<Refund[]>;
+  getRefund(id: string): Promise<Refund | undefined>;
+  createRefund(data: InsertRefund): Promise<Refund>;
+  updateRefund(id: string, data: Partial<Refund>): Promise<Refund>;
+  
+  // Tax Configurations
+  getTaxConfigurations(garageId: string, isActive?: boolean): Promise<TaxConfiguration[]>;
+  getTaxConfiguration(id: string): Promise<TaxConfiguration | undefined>;
+  createTaxConfiguration(data: InsertTaxConfiguration): Promise<TaxConfiguration>;
+  updateTaxConfiguration(id: string, data: Partial<TaxConfiguration>): Promise<TaxConfiguration>;
+  deleteTaxConfiguration(id: string): Promise<void>;
+  
+  // Discounts & Promotions
+  getDiscounts(garageId: string, isActive?: boolean): Promise<DiscountPromotion[]>;
+  getDiscount(id: string): Promise<DiscountPromotion | undefined>;
+  getDiscountByCode(code: string): Promise<DiscountPromotion | undefined>;
+  createDiscount(data: InsertDiscountPromotion): Promise<DiscountPromotion>;
+  updateDiscount(id: string, data: Partial<DiscountPromotion>): Promise<DiscountPromotion>;
+  deleteDiscount(id: string): Promise<void>;
+  
+  // Discount Usage
+  getDiscountUsage(discountId: string): Promise<DiscountUsage[]>;
+  createDiscountUsage(data: InsertDiscountUsage): Promise<DiscountUsage>;
+  
+  // Helpers
+  calculateTax(garageId: string, amount: number, category: string): Promise<{ taxAmount: number; taxRate: number; taxName: string }>;
+  validateDiscount(code: string, garageId: string, customerId: string, amount: number): Promise<{ valid: boolean; discount?: DiscountPromotion; discountAmount?: number; message?: string }>;
   
   // Reorder Settings
   getReorderSettings(garageId: string, sparePartId?: string): Promise<any[]>;
@@ -2834,6 +2894,267 @@ export class DatabaseStorage implements IStorage {
       })
       .returning();
     return cached;
+  }
+
+  // Module 28: Advanced Financial Features
+  // Payment Plans
+  async getPaymentPlans(invoiceId?: string): Promise<PaymentPlan[]> {
+    if (invoiceId) {
+      return await db.select().from(paymentPlans).where(eq(paymentPlans.invoiceId, invoiceId));
+    }
+    return await db.select().from(paymentPlans).orderBy(desc(paymentPlans.createdAt));
+  }
+
+  async getPaymentPlan(id: string): Promise<PaymentPlan | undefined> {
+    const [plan] = await db.select().from(paymentPlans).where(eq(paymentPlans.id, id));
+    return plan;
+  }
+
+  async createPaymentPlan(data: InsertPaymentPlan): Promise<PaymentPlan> {
+    const [plan] = await db.insert(paymentPlans).values(data).returning();
+    return plan;
+  }
+
+  async updatePaymentPlan(id: string, data: Partial<PaymentPlan>): Promise<PaymentPlan> {
+    const [plan] = await db.update(paymentPlans)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(paymentPlans.id, id))
+      .returning();
+    return plan;
+  }
+
+  // Installments
+  async getInstallments(paymentPlanId: string): Promise<Installment[]> {
+    return await db.select().from(installments)
+      .where(eq(installments.paymentPlanId, paymentPlanId))
+      .orderBy(installments.installmentNumber);
+  }
+
+  async getInstallment(id: string): Promise<Installment | undefined> {
+    const [installment] = await db.select().from(installments).where(eq(installments.id, id));
+    return installment;
+  }
+
+  async createInstallment(data: InsertInstallment): Promise<Installment> {
+    const [installment] = await db.insert(installments).values(data).returning();
+    return installment;
+  }
+
+  async updateInstallment(id: string, data: Partial<Installment>): Promise<Installment> {
+    const [installment] = await db.update(installments)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(installments.id, id))
+      .returning();
+    return installment;
+  }
+
+  // Refunds
+  async getRefunds(garageId?: string, status?: string): Promise<Refund[]> {
+    const conditions = [];
+    if (garageId) conditions.push(eq(refunds.garageId, garageId));
+    if (status) conditions.push(eq(refunds.status, status));
+
+    if (conditions.length > 0) {
+      return await db.select().from(refunds).where(and(...conditions)).orderBy(desc(refunds.requestedAt));
+    }
+    return await db.select().from(refunds).orderBy(desc(refunds.requestedAt));
+  }
+
+  async getRefund(id: string): Promise<Refund | undefined> {
+    const [refund] = await db.select().from(refunds).where(eq(refunds.id, id));
+    return refund;
+  }
+
+  async createRefund(data: InsertRefund): Promise<Refund> {
+    const refundNumber = `RFD${Date.now()}${Math.floor(Math.random() * 1000)}`;
+    const [refund] = await db.insert(refunds).values({ ...data, refundNumber }).returning();
+    return refund;
+  }
+
+  async updateRefund(id: string, data: Partial<Refund>): Promise<Refund> {
+    const [refund] = await db.update(refunds)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(refunds.id, id))
+      .returning();
+    return refund;
+  }
+
+  // Tax Configurations
+  async getTaxConfigurations(garageId: string, isActive?: boolean): Promise<TaxConfiguration[]> {
+    const conditions = [eq(taxConfigurations.garageId, garageId)];
+    if (isActive !== undefined) {
+      conditions.push(eq(taxConfigurations.isActive, isActive));
+    }
+    return await db.select().from(taxConfigurations)
+      .where(and(...conditions))
+      .orderBy(desc(taxConfigurations.isDefault), desc(taxConfigurations.createdAt));
+  }
+
+  async getTaxConfiguration(id: string): Promise<TaxConfiguration | undefined> {
+    const [config] = await db.select().from(taxConfigurations).where(eq(taxConfigurations.id, id));
+    return config;
+  }
+
+  async createTaxConfiguration(data: InsertTaxConfiguration): Promise<TaxConfiguration> {
+    const [config] = await db.insert(taxConfigurations).values(data).returning();
+    return config;
+  }
+
+  async updateTaxConfiguration(id: string, data: Partial<TaxConfiguration>): Promise<TaxConfiguration> {
+    const [config] = await db.update(taxConfigurations)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(taxConfigurations.id, id))
+      .returning();
+    return config;
+  }
+
+  async deleteTaxConfiguration(id: string): Promise<void> {
+    await db.delete(taxConfigurations).where(eq(taxConfigurations.id, id));
+  }
+
+  // Discounts & Promotions
+  async getDiscounts(garageId: string, isActive?: boolean): Promise<DiscountPromotion[]> {
+    const conditions = [eq(discountsPromotions.garageId, garageId)];
+    if (isActive !== undefined) {
+      conditions.push(eq(discountsPromotions.isActive, isActive));
+    }
+    return await db.select().from(discountsPromotions)
+      .where(and(...conditions))
+      .orderBy(desc(discountsPromotions.createdAt));
+  }
+
+  async getDiscount(id: string): Promise<DiscountPromotion | undefined> {
+    const [discount] = await db.select().from(discountsPromotions).where(eq(discountsPromotions.id, id));
+    return discount;
+  }
+
+  async getDiscountByCode(code: string): Promise<DiscountPromotion | undefined> {
+    const [discount] = await db.select().from(discountsPromotions).where(eq(discountsPromotions.code, code));
+    return discount;
+  }
+
+  async createDiscount(data: InsertDiscountPromotion): Promise<DiscountPromotion> {
+    const [discount] = await db.insert(discountsPromotions).values(data).returning();
+    return discount;
+  }
+
+  async updateDiscount(id: string, data: Partial<DiscountPromotion>): Promise<DiscountPromotion> {
+    const [discount] = await db.update(discountsPromotions)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(discountsPromotions.id, id))
+      .returning();
+    return discount;
+  }
+
+  async deleteDiscount(id: string): Promise<void> {
+    await db.delete(discountsPromotions).where(eq(discountsPromotions.id, id));
+  }
+
+  // Discount Usage Tracking
+  async getDiscountUsage(discountId: string): Promise<DiscountUsage[]> {
+    return await db.select().from(discountUsage)
+      .where(eq(discountUsage.discountId, discountId))
+      .orderBy(desc(discountUsage.appliedAt));
+  }
+
+  async createDiscountUsage(data: InsertDiscountUsage): Promise<DiscountUsage> {
+    const [usage] = await db.insert(discountUsage).values(data).returning();
+    
+    // Increment usage count
+    const discount = await this.getDiscount(data.discountId);
+    if (discount) {
+      await this.updateDiscount(data.discountId, {
+        usageCount: (discount.usageCount || 0) + 1,
+      });
+    }
+    
+    return usage;
+  }
+
+  // Tax Calculation Helper
+  async calculateTax(garageId: string, amount: number, category: string): Promise<{ taxAmount: number; taxRate: number; taxName: string }> {
+    const configs = await this.getTaxConfigurations(garageId, true);
+    
+    // Find applicable tax
+    const applicableTax = configs.find(config => {
+      if (config.applicableCategories && !config.applicableCategories.includes(category)) {
+        return false;
+      }
+      if (config.minAmount && amount < Number(config.minAmount)) {
+        return false;
+      }
+      if (config.maxAmount && amount > Number(config.maxAmount)) {
+        return false;
+      }
+      return true;
+    });
+
+    if (!applicableTax) {
+      return { taxAmount: 0, taxRate: 0, taxName: '' };
+    }
+
+    const taxRate = Number(applicableTax.taxRate);
+    const taxAmount = (amount * taxRate) / 100;
+
+    return {
+      taxAmount,
+      taxRate,
+      taxName: applicableTax.taxName,
+    };
+  }
+
+  // Discount Validation Helper
+  async validateDiscount(code: string, garageId: string, customerId: string, amount: number): Promise<{ valid: boolean; discount?: DiscountPromotion; discountAmount?: number; message?: string }> {
+    const discount = await this.getDiscountByCode(code);
+
+    if (!discount) {
+      return { valid: false, message: 'Invalid discount code' };
+    }
+
+    if (discount.garageId !== garageId) {
+      return { valid: false, message: 'Discount not available for this garage' };
+    }
+
+    if (!discount.isActive) {
+      return { valid: false, message: 'Discount is not active' };
+    }
+
+    const now = new Date();
+    if (now < new Date(discount.startDate) || now > new Date(discount.endDate)) {
+      return { valid: false, message: 'Discount has expired or not yet started' };
+    }
+
+    if (discount.minPurchaseAmount && amount < Number(discount.minPurchaseAmount)) {
+      return { valid: false, message: `Minimum purchase amount is $${discount.minPurchaseAmount}` };
+    }
+
+    if (discount.usageLimit && discount.usageCount >= discount.usageLimit) {
+      return { valid: false, message: 'Discount usage limit reached' };
+    }
+
+    // Check per-customer limit
+    if (discount.perCustomerLimit) {
+      const usage = await this.getDiscountUsage(discount.id);
+      const customerUsage = usage.filter(u => u.customerId === customerId).length;
+      if (customerUsage >= discount.perCustomerLimit) {
+        return { valid: false, message: 'You have reached the usage limit for this discount' };
+      }
+    }
+
+    // Calculate discount amount
+    let discountAmount = 0;
+    if (discount.discountType === 'percentage') {
+      discountAmount = (amount * Number(discount.discountValue)) / 100;
+    } else if (discount.discountType === 'fixed_amount') {
+      discountAmount = Number(discount.discountValue);
+    }
+
+    // Apply max discount cap
+    if (discount.maxDiscountAmount && discountAmount > Number(discount.maxDiscountAmount)) {
+      discountAmount = Number(discount.maxDiscountAmount);
+    }
+
+    return { valid: true, discount, discountAmount };
   }
 }
 
