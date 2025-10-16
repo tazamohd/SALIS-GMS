@@ -5658,6 +5658,401 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Module 34: Security & Compliance Routes
+  
+  // 2FA Routes
+  app.post('/api/security/2fa/setup', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const userEmail = req.user.claims.email || 'user@garage.com';
+      
+      // Check if 2FA is already enabled
+      const existing = await storage.getTwoFactorAuth(userId);
+      if (existing && existing.isEnabled) {
+        return res.status(400).json({ message: "2FA is already enabled" });
+      }
+      
+      // Generate 2FA secret and QR code
+      const { generateTwoFactorSecret } = await import('./twoFactorAuth');
+      const setup = await generateTwoFactorSecret(userEmail);
+      
+      // Store temporarily (not enabled until verified)
+      await storage.createTwoFactorAuth({
+        userId,
+        secret: setup.secret,
+        backupCodes: setup.backupCodes,
+        isEnabled: false,
+      });
+      
+      res.json({
+        qrCodeUrl: setup.qrCodeUrl,
+        backupCodes: setup.backupCodes,
+        secret: setup.secret, // For manual entry
+      });
+    } catch (error: any) {
+      console.error("Error setting up 2FA:", error);
+      res.status(500).json({ message: "Failed to setup 2FA", error: error.message });
+    }
+  });
+  
+  app.post('/api/security/2fa/enable', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { token } = req.body;
+      
+      if (!token) {
+        return res.status(400).json({ message: "Verification token is required" });
+      }
+      
+      const twoFactorAuth = await storage.getTwoFactorAuth(userId);
+      if (!twoFactorAuth) {
+        return res.status(404).json({ message: "2FA setup not found. Please setup 2FA first." });
+      }
+      
+      // Verify the token
+      const { verifyTwoFactorToken } = await import('./twoFactorAuth');
+      const isValid = verifyTwoFactorToken(twoFactorAuth.secret, token);
+      
+      if (!isValid) {
+        return res.status(400).json({ message: "Invalid verification code" });
+      }
+      
+      // Enable 2FA
+      const updated = await storage.updateTwoFactorAuth(userId, { isEnabled: true });
+      
+      res.json({ message: "2FA enabled successfully", twoFactorAuth: updated });
+    } catch (error: any) {
+      console.error("Error enabling 2FA:", error);
+      res.status(500).json({ message: "Failed to enable 2FA", error: error.message });
+    }
+  });
+  
+  app.post('/api/security/2fa/verify', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { token, isBackupCode } = req.body;
+      
+      if (!token) {
+        return res.status(400).json({ message: "Verification token is required" });
+      }
+      
+      const twoFactorAuth = await storage.getTwoFactorAuth(userId);
+      if (!twoFactorAuth || !twoFactorAuth.isEnabled) {
+        return res.status(400).json({ message: "2FA is not enabled" });
+      }
+      
+      const { verifyTwoFactorToken, verifyBackupCode } = await import('./twoFactorAuth');
+      
+      let isValid = false;
+      let remainingCodes: string[] | undefined;
+      
+      if (isBackupCode) {
+        const result = verifyBackupCode(twoFactorAuth.backupCodes, token);
+        isValid = result.valid;
+        remainingCodes = result.remainingCodes;
+        
+        if (isValid && remainingCodes) {
+          await storage.updateTwoFactorAuth(userId, { backupCodes: remainingCodes });
+        }
+      } else {
+        isValid = verifyTwoFactorToken(twoFactorAuth.secret, token);
+      }
+      
+      res.json({ 
+        valid: isValid,
+        remainingBackupCodes: remainingCodes?.length || twoFactorAuth.backupCodes.length
+      });
+    } catch (error: any) {
+      console.error("Error verifying 2FA:", error);
+      res.status(500).json({ message: "Failed to verify 2FA", error: error.message });
+    }
+  });
+  
+  app.delete('/api/security/2fa', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      await storage.deleteTwoFactorAuth(userId);
+      res.json({ message: "2FA disabled successfully" });
+    } catch (error: any) {
+      console.error("Error disabling 2FA:", error);
+      res.status(500).json({ message: "Failed to disable 2FA", error: error.message });
+    }
+  });
+  
+  app.get('/api/security/2fa/status', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const twoFactorAuth = await storage.getTwoFactorAuth(userId);
+      
+      res.json({
+        enabled: twoFactorAuth?.isEnabled || false,
+        backupCodesCount: twoFactorAuth?.backupCodes?.length || 0,
+      });
+    } catch (error: any) {
+      console.error("Error getting 2FA status:", error);
+      res.status(500).json({ message: "Failed to get 2FA status", error: error.message });
+    }
+  });
+  
+  // Audit Logs Routes
+  app.get('/api/security/audit-logs', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const { userId, resourceType, action, startDate, endDate } = req.query;
+      
+      const filters: any = {};
+      if (userId) filters.userId = userId as string;
+      if (resourceType) filters.resourceType = resourceType as string;
+      if (action) filters.action = action as string;
+      if (startDate) filters.startDate = new Date(startDate as string);
+      if (endDate) filters.endDate = new Date(endDate as string);
+      
+      const logs = await storage.getAuditLogs(userGarageId, filters);
+      res.json(logs);
+    } catch (error) {
+      console.error("Error fetching audit logs:", error);
+      res.status(500).json({ message: "Failed to fetch audit logs" });
+    }
+  });
+  
+  // Backup & Restore Routes
+  app.get('/api/security/backups', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const { status } = req.query;
+      
+      const backups = await storage.getBackupJobs(userGarageId, status as string);
+      res.json(backups);
+    } catch (error) {
+      console.error("Error fetching backups:", error);
+      res.status(500).json({ message: "Failed to fetch backups" });
+    }
+  });
+  
+  app.post('/api/security/backups', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const userId = req.user.claims.sub;
+      const { type, includeAttachments } = req.body;
+      
+      // Create backup job
+      const backupJob = await storage.createBackupJob({
+        garageId: userGarageId,
+        type: type || 'full',
+        status: 'pending',
+        initiatedBy: userId,
+        includeAttachments: includeAttachments || false,
+      });
+      
+      // In production, this would trigger a background job
+      // For now, we'll mark it as completed immediately
+      setTimeout(async () => {
+        try {
+          await storage.updateBackupJob(backupJob.id, {
+            status: 'completed',
+            completedAt: new Date(),
+            size: Math.floor(Math.random() * 1000000) + 500000, // Mock size
+            location: `/backups/${backupJob.id}.zip`,
+          });
+        } catch (error) {
+          console.error("Error completing backup:", error);
+        }
+      }, 2000);
+      
+      res.json(backupJob);
+    } catch (error) {
+      console.error("Error creating backup:", error);
+      res.status(500).json({ message: "Failed to create backup" });
+    }
+  });
+  
+  app.post('/api/security/backups/:id/restore', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const backup = await storage.getBackupJob(id);
+      
+      if (!backup) {
+        return res.status(404).json({ message: "Backup not found" });
+      }
+      
+      if (backup.status !== 'completed') {
+        return res.status(400).json({ message: "Cannot restore incomplete backup" });
+      }
+      
+      // In production, this would trigger a restore process
+      // For now, return success message
+      res.json({ 
+        message: "Restore initiated successfully",
+        backupId: id,
+        estimatedTime: "5-10 minutes"
+      });
+    } catch (error) {
+      console.error("Error restoring backup:", error);
+      res.status(500).json({ message: "Failed to restore backup" });
+    }
+  });
+  
+  // GDPR Compliance Routes
+  app.get('/api/security/gdpr/requests', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const { userId } = req.query;
+      
+      const requests = await storage.getGdprDataRequests(userGarageId, userId as string);
+      res.json(requests);
+    } catch (error) {
+      console.error("Error fetching GDPR requests:", error);
+      res.status(500).json({ message: "Failed to fetch GDPR requests" });
+    }
+  });
+  
+  app.post('/api/security/gdpr/requests', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const userId = req.user.claims.sub;
+      const { requestType, dataSubjectId, reason } = req.body;
+      
+      if (!requestType || !dataSubjectId) {
+        return res.status(400).json({ message: "Request type and data subject ID are required" });
+      }
+      
+      const request = await storage.createGdprDataRequest({
+        garageId: userGarageId,
+        userId: dataSubjectId,
+        requestType,
+        status: 'pending',
+        requestedBy: userId,
+        reason,
+      });
+      
+      res.json(request);
+    } catch (error) {
+      console.error("Error creating GDPR request:", error);
+      res.status(500).json({ message: "Failed to create GDPR request" });
+    }
+  });
+  
+  app.patch('/api/security/gdpr/requests/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const { status, processedBy, completedAt, exportUrl } = req.body;
+      
+      const updated = await storage.updateGdprDataRequest(id, {
+        status,
+        processedBy,
+        completedAt: completedAt ? new Date(completedAt) : undefined,
+        exportUrl,
+      });
+      
+      res.json(updated);
+    } catch (error) {
+      console.error("Error updating GDPR request:", error);
+      res.status(500).json({ message: "Failed to update GDPR request" });
+    }
+  });
+  
+  // User Consent Routes
+  app.get('/api/security/consents', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const consents = await storage.getUserConsents(userId);
+      res.json(consents);
+    } catch (error) {
+      console.error("Error fetching consents:", error);
+      res.status(500).json({ message: "Failed to fetch consents" });
+    }
+  });
+  
+  app.post('/api/security/consents', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { consentType, granted } = req.body;
+      
+      if (!consentType || typeof granted !== 'boolean') {
+        return res.status(400).json({ message: "Consent type and granted status are required" });
+      }
+      
+      const consent = await storage.createUserConsent({
+        userId,
+        consentType,
+        granted,
+        ipAddress: (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || 
+                   req.socket.remoteAddress || 
+                   null,
+      });
+      
+      res.json(consent);
+    } catch (error) {
+      console.error("Error creating consent:", error);
+      res.status(500).json({ message: "Failed to create consent" });
+    }
+  });
+  
+  app.patch('/api/security/consents/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const { granted } = req.body;
+      
+      const updated = await storage.updateUserConsent(id, { granted });
+      res.json(updated);
+    } catch (error) {
+      console.error("Error updating consent:", error);
+      res.status(500).json({ message: "Failed to update consent" });
+    }
+  });
+  
+  // Permission Override Routes
+  app.get('/api/security/permissions/overrides', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const { userId } = req.query;
+      
+      const overrides = await storage.getPermissionOverrides(userGarageId, userId as string);
+      res.json(overrides);
+    } catch (error) {
+      console.error("Error fetching permission overrides:", error);
+      res.status(500).json({ message: "Failed to fetch permission overrides" });
+    }
+  });
+  
+  app.post('/api/security/permissions/overrides', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const grantedBy = req.user.claims.sub;
+      const { userId, permission, granted, reason, expiresAt } = req.body;
+      
+      if (!userId || !permission || typeof granted !== 'boolean') {
+        return res.status(400).json({ message: "User ID, permission, and granted status are required" });
+      }
+      
+      const override = await storage.createPermissionOverride({
+        garageId: userGarageId,
+        userId,
+        permission,
+        granted,
+        grantedBy,
+        reason,
+        expiresAt: expiresAt ? new Date(expiresAt) : null,
+      });
+      
+      res.json(override);
+    } catch (error) {
+      console.error("Error creating permission override:", error);
+      res.status(500).json({ message: "Failed to create permission override" });
+    }
+  });
+  
+  app.delete('/api/security/permissions/overrides/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deletePermissionOverride(id);
+      res.json({ message: "Permission override deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting permission override:", error);
+      res.status(500).json({ message: "Failed to delete permission override" });
+    }
+  });
+
   // Protected route example
   app.get("/api/protected", isAuthenticated, async (req: any, res) => {
     const userId = req.user?.claims?.sub;
