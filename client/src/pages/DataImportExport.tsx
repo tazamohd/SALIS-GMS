@@ -26,7 +26,7 @@ export default function DataImportExport() {
   const [garageId, setGarageId] = useState("");
 
   // Get garages
-  const { data: garages } = useQuery({
+  const { data: garages } = useQuery<any[]>({
     queryKey: ['/api/garages'],
   });
 
@@ -329,7 +329,7 @@ export default function DataImportExport() {
                       <span className="text-sm text-muted-foreground">({job.format.toUpperCase()})</span>
                     </div>
                     <div className="text-sm text-muted-foreground">
-                      {new Date(job.createdAt).toLocaleString()}
+                      {job.createdAt && new Date(job.createdAt).toLocaleString()}
                       {job.recordCount && ` • ${job.recordCount} records`}
                     </div>
                     {job.errorMessage && (

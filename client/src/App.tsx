@@ -31,6 +31,7 @@ import Landing from "@/pages/Landing";
 import Calendar from "@/pages/Calendar";
 import FinancialSettings from "@/pages/FinancialSettings";
 import RefundManagement from "@/pages/RefundManagement";
+import DataImportExport from "@/pages/DataImportExport";
 import { CustomerDashboard } from "@/pages/customer/CustomerDashboard";
 import { CustomerAppointments } from "@/pages/customer/CustomerAppointments";
 import { CustomerInvoices } from "@/pages/customer/CustomerInvoices";
@@ -209,6 +210,11 @@ function Router() {
       <Route path="/refund-management">
         <Layout>
           <RefundManagement />
+        </Layout>
+      </Route>
+      <Route path="/data-import-export">
+        <Layout>
+          <DataImportExport />
         </Layout>
       </Route>
       <Route component={NotFound} />
