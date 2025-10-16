@@ -177,3 +177,67 @@ The application utilizes a full-stack architecture with clear client-server sepa
 - Notification records for audit trail
 
 **Production-ready** and architect-approved
+
+### Module 26: Scheduling & Calendar (October 16, 2025)
+**Core Functionality**:
+- Visual calendar view for appointments with day/week/month/agenda views
+- Drag-and-drop scheduling interface for appointment management
+- Technician availability management with working hours and time off tracking
+- Recurring appointment support with multiple patterns (daily, weekly, biweekly, monthly)
+- Time slot optimization for efficient scheduling
+- Resource conflict detection to prevent double-booking
+- Calendar events and blocked time management
+- Real-time workload tracking per technician
+
+**Calendar Features**:
+- **Multiple View Modes**: Month, Week, Day, and Agenda views using react-big-calendar
+- **Garage Filtering**: View appointments by specific garage
+- **Technician Filtering**: Filter by individual technician or view all
+- **Event Display**: Appointments, calendar events, and blocked times with color coding
+- **Interactive Selection**: Click calendar slots to create new appointments
+- **Event Details**: Click events to view full appointment or event information
+- **Color Coding**: Visual status indicators (completed=green, cancelled=red, active=blue)
+
+**Availability Management**:
+- Working hours configuration per technician
+- Time off and break scheduling
+- Recurring availability patterns (weekly schedules)
+- Specific date range availability
+- Availability types: working_hours, time_off, break, meeting
+- Garage-wide availability view for resource planning
+
+**Recurring Appointments**:
+- Multiple recurrence patterns: daily, weekly, biweekly, monthly
+- Configurable recurrence intervals
+- Day of week/month selection for patterns
+- Start and end date or max occurrences limit
+- Auto-generation of appointments from recurring patterns
+- Active/inactive status management
+
+**Conflict Detection & Optimization**:
+- Real-time appointment conflict checking
+- Technician availability validation
+- Overlapping appointment detection
+- Available time slot calculation with gap analysis
+- Workload tracking and utilization metrics
+- Appointment duration consideration in scheduling
+
+**Technical Implementation**:
+- **Database Schema**: technician_availability, recurring_appointments, calendar_events tables
+- **Storage Methods**: Full CRUD for availability, recurring appointments, calendar events, plus conflict detection and time slot optimization
+- **Backend API Routes**: 
+  - Availability: GET/POST/PATCH/DELETE /api/availability/*
+  - Recurring: GET/POST/PATCH/DELETE /api/recurring-appointments/*
+  - Events: GET/POST/PATCH/DELETE /api/calendar-events/*
+  - Optimization: POST /api/appointments/check-conflicts, GET /api/time-slots/:technicianId, GET /api/technician-workload/:technicianId
+- **Frontend**: react-big-calendar with dateFnsLocalizer, garage/technician filtering, selectable slots
+- **Type-safe**: TechnicianAvailability, RecurringAppointment, CalendarEvent types
+
+**Integration Points**:
+- Integrates with existing appointments module for unified scheduling
+- Links to technicians for assignment and workload tracking
+- Calendar events for garage-wide blocked times and meetings
+- Sidebar navigation and routing integration
+- Real-time conflict detection when creating appointments
+
+**Production-ready** with comprehensive scheduling capabilities
