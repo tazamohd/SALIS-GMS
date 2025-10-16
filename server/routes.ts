@@ -944,6 +944,214 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Vehicle Service History Routes - Module 22 Enhancements
+  app.get('/api/vehicles/:id/service-history', isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const history = await storage.getVehicleServiceHistory(id);
+      res.json(history);
+    } catch (error) {
+      console.error("Error fetching service history:", error);
+      res.status(500).json({ message: "Failed to fetch service history" });
+    }
+  });
+
+  app.post('/api/vehicles/:id/service-history', isAuthenticated, async (req: any, res) => {
+    try {
+      const { insertVehicleServiceHistorySchema } = await import("@shared/schema");
+      const { id } = req.params;
+      const userId = req.user?.claims?.sub;
+
+      const validationResult = insertVehicleServiceHistorySchema.safeParse({
+        ...req.body,
+        vehicleId: id,
+        performedBy: userId
+      });
+
+      if (!validationResult.success) {
+        return res.status(400).json({
+          message: "Validation error",
+          errors: validationResult.error.errors
+        });
+      }
+
+      const history = await storage.createServiceHistory(validationResult.data);
+      res.status(201).json(history);
+    } catch (error) {
+      console.error("Error creating service history:", error);
+      res.status(500).json({ message: "Failed to create service history" });
+    }
+  });
+
+  app.delete('/api/service-history/:id', isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteServiceHistory(id);
+      res.json({ message: "Service history deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting service history:", error);
+      res.status(500).json({ message: "Failed to delete service history" });
+    }
+  });
+
+  // Maintenance Schedules Routes - Module 22 Enhancements
+  app.get('/api/vehicles/:id/maintenance-schedules', isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const schedules = await storage.getMaintenanceSchedules(id);
+      res.json(schedules);
+    } catch (error) {
+      console.error("Error fetching maintenance schedules:", error);
+      res.status(500).json({ message: "Failed to fetch maintenance schedules" });
+    }
+  });
+
+  app.post('/api/vehicles/:id/maintenance-schedules', isAuthenticated, async (req, res) => {
+    try {
+      const { insertMaintenanceScheduleSchema } = await import("@shared/schema");
+      const { id } = req.params;
+
+      const validationResult = insertMaintenanceScheduleSchema.safeParse({
+        ...req.body,
+        vehicleId: id
+      });
+
+      if (!validationResult.success) {
+        return res.status(400).json({
+          message: "Validation error",
+          errors: validationResult.error.errors
+        });
+      }
+
+      const schedule = await storage.createMaintenanceSchedule(validationResult.data);
+      res.status(201).json(schedule);
+    } catch (error) {
+      console.error("Error creating maintenance schedule:", error);
+      res.status(500).json({ message: "Failed to create maintenance schedule" });
+    }
+  });
+
+  app.patch('/api/maintenance-schedules/:id', isAuthenticated, async (req, res) => {
+    try {
+      const { insertMaintenanceScheduleSchema } = await import("@shared/schema");
+      const { id } = req.params;
+
+      const validationResult = insertMaintenanceScheduleSchema.partial().safeParse(req.body);
+
+      if (!validationResult.success) {
+        return res.status(400).json({
+          message: "Validation error",
+          errors: validationResult.error.errors
+        });
+      }
+
+      const schedule = await storage.updateMaintenanceSchedule(id, validationResult.data);
+      res.json(schedule);
+    } catch (error) {
+      console.error("Error updating maintenance schedule:", error);
+      res.status(500).json({ message: "Failed to update maintenance schedule" });
+    }
+  });
+
+  app.delete('/api/maintenance-schedules/:id', isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteMaintenanceSchedule(id);
+      res.json({ message: "Maintenance schedule deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting maintenance schedule:", error);
+      res.status(500).json({ message: "Failed to delete maintenance schedule" });
+    }
+  });
+
+  // Service Reminders Routes - Module 22 Enhancements
+  app.get('/api/vehicles/:id/service-reminders', isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { status } = req.query;
+      const reminders = await storage.getServiceReminders(id, status as string | undefined);
+      res.json(reminders);
+    } catch (error) {
+      console.error("Error fetching service reminders:", error);
+      res.status(500).json({ message: "Failed to fetch service reminders" });
+    }
+  });
+
+  app.post('/api/vehicles/:id/service-reminders', isAuthenticated, async (req, res) => {
+    try {
+      const { insertServiceReminderSchema } = await import("@shared/schema");
+      const { id } = req.params;
+
+      const validationResult = insertServiceReminderSchema.safeParse({
+        ...req.body,
+        vehicleId: id
+      });
+
+      if (!validationResult.success) {
+        return res.status(400).json({
+          message: "Validation error",
+          errors: validationResult.error.errors
+        });
+      }
+
+      const reminder = await storage.createServiceReminder(validationResult.data);
+      res.status(201).json(reminder);
+    } catch (error) {
+      console.error("Error creating service reminder:", error);
+      res.status(500).json({ message: "Failed to create service reminder" });
+    }
+  });
+
+  app.patch('/api/service-reminders/:id', isAuthenticated, async (req, res) => {
+    try {
+      const { insertServiceReminderSchema } = await import("@shared/schema");
+      const { id } = req.params;
+
+      const validationResult = insertServiceReminderSchema.partial().safeParse(req.body);
+
+      if (!validationResult.success) {
+        return res.status(400).json({
+          message: "Validation error",
+          errors: validationResult.error.errors
+        });
+      }
+
+      const reminder = await storage.updateServiceReminder(id, validationResult.data);
+      res.json(reminder);
+    } catch (error) {
+      console.error("Error updating service reminder:", error);
+      res.status(500).json({ message: "Failed to update service reminder" });
+    }
+  });
+
+  app.delete('/api/service-reminders/:id', isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteServiceReminder(id);
+      res.json({ message: "Service reminder deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting service reminder:", error);
+      res.status(500).json({ message: "Failed to delete service reminder" });
+    }
+  });
+
+  // VIN Decoder Route - Module 22 Enhancements
+  app.get('/api/decode-vin/:vin', isAuthenticated, async (req, res) => {
+    try {
+      const { vin } = req.params;
+      const vinData = await storage.decodeVIN(vin);
+      
+      if (!vinData) {
+        return res.status(404).json({ message: "VIN not found or invalid" });
+      }
+
+      res.json(vinData);
+    } catch (error) {
+      console.error("Error decoding VIN:", error);
+      res.status(500).json({ message: "Failed to decode VIN" });
+    }
+  });
+
   app.get('/api/customers/:id/notes', isAuthenticated, async (req, res) => {
     try {
       const { id } = req.params;
