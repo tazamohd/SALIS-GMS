@@ -325,3 +325,221 @@
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 }
+
+/* Print Styles */
+@media print {
+  /* Hide navigation and non-essential elements */
+  nav,
+  aside,
+  .no-print,
+  button:not(.print-visible),
+  [data-print-hide="true"] {
+    display: none !important;
+  }
+
+  /* Reset page styles for printing */
+  body {
+    background: white !important;
+    color: black !important;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Ensure proper page breaks */
+  .page-break {
+    page-break-after: always;
+  }
+
+  .page-break-before {
+    page-break-before: always;
+  }
+
+  .avoid-break {
+    page-break-inside: avoid;
+  }
+
+  /* Invoice and document styles */
+  .print-document {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    padding: 20mm;
+    background: white;
+    color: black;
+  }
+
+  /* Table styles for print */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    page-break-inside: auto;
+  }
+
+  tr {
+    page-break-inside: avoid;
+    page-break-after: auto;
+  }
+
+  thead {
+    display: table-header-group;
+  }
+
+  tfoot {
+    display: table-footer-group;
+  }
+
+  /* Headers and footers */
+  .print-header {
+    position: running(header);
+    padding-bottom: 10mm;
+    border-bottom: 1px solid #ddd;
+  }
+
+  .print-footer {
+    position: running(footer);
+    padding-top: 10mm;
+    border-top: 1px solid #ddd;
+  }
+
+  /* Typography adjustments */
+  h1 {
+    font-size: 24pt;
+    margin-bottom: 12pt;
+  }
+
+  h2 {
+    font-size: 18pt;
+    margin-bottom: 10pt;
+  }
+
+  h3 {
+    font-size: 14pt;
+    margin-bottom: 8pt;
+  }
+
+  p, li {
+    font-size: 11pt;
+    line-height: 1.5;
+  }
+
+  /* Links */
+  a {
+    color: black !important;
+    text-decoration: none;
+  }
+
+  a[href]:after {
+    content: " (" attr(href) ")";
+    font-size: 9pt;
+    color: #666;
+  }
+
+  /* Remove shadows and effects */
+  * {
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  /* Card and container styles */
+  .card,
+  [class*="Card"] {
+    border: 1px solid #ddd !important;
+    box-shadow: none !important;
+    page-break-inside: avoid;
+  }
+
+  /* Ensure images fit properly */
+  img {
+    max-width: 100% !important;
+    height: auto !important;
+    page-break-inside: avoid;
+  }
+
+  /* QR codes and barcodes */
+  .qr-code,
+  .barcode {
+    page-break-inside: avoid;
+    margin: 10px 0;
+  }
+
+  /* Invoice specific styles */
+  .invoice-header {
+    margin-bottom: 20mm;
+  }
+
+  .invoice-details {
+    margin-bottom: 15mm;
+  }
+
+  .invoice-items {
+    margin-bottom: 15mm;
+  }
+
+  .invoice-total {
+    margin-top: 10mm;
+    font-weight: bold;
+  }
+
+  /* Job card styles */
+  .job-card {
+    border: 2px solid black;
+    padding: 15mm;
+    margin: 0;
+  }
+
+  .job-card-header {
+    border-bottom: 2px solid black;
+    padding-bottom: 10mm;
+    margin-bottom: 10mm;
+  }
+
+  /* Report styles */
+  .report-chart {
+    page-break-inside: avoid;
+    margin: 15mm 0;
+  }
+
+  /* Signature lines */
+  .signature-line {
+    border-top: 1px solid black;
+    margin-top: 15mm;
+    padding-top: 5mm;
+    width: 60%;
+  }
+
+  /* Terms and conditions */
+  .terms {
+    font-size: 9pt;
+    margin-top: 20mm;
+    border-top: 1px solid #ddd;
+    padding-top: 10mm;
+  }
+
+  /* Color adjustments for better print quality */
+  .bg-primary,
+  .bg-secondary,
+  .bg-accent {
+    background: transparent !important;
+    color: black !important;
+    border: 1px solid black;
+  }
+
+  /* Status badges */
+  .badge,
+  [class*="badge"] {
+    border: 1px solid black !important;
+    background: white !important;
+    color: black !important;
+  }
+}
+
+/* Print-specific classes that can be added to elements */
+.print-only {
+  display: none;
+}
+
+@media print {
+  .print-only {
+    display: block !important;
+  }
+}
