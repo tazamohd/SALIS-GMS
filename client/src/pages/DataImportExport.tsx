@@ -67,6 +67,7 @@ export default function DataImportExport() {
   const importMutation = useMutation({
     mutationFn: async (data: any[]) => {
       return apiRequest("POST", "/api/import", {
+        garageId,
         module: selectedModule,
         data,
       });
@@ -105,6 +106,11 @@ export default function DataImportExport() {
   };
 
   const handleImport = async () => {
+    if (!garageId) {
+      toast({ title: "Error", description: "Please select a garage", variant: "destructive" });
+      return;
+    }
+    
     if (!importFile) {
       toast({ title: "Error", description: "Please select a file", variant: "destructive" });
       return;

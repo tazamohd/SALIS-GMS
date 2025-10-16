@@ -3790,8 +3790,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Data Import
   app.post('/api/import', isAuthenticated, async (req: any, res) => {
     try {
-      const { module, data, conflictResolution = 'skip' } = req.body;
+      const { garageId, module, data, conflictResolution = 'skip' } = req.body;
       const userId = req.user.claims.sub;
+      
+      if (!garageId) {
+        return res.status(400).json({ message: "Garage ID is required" });
+      }
       
       if (!module || !data || !Array.isArray(data)) {
         return res.status(400).json({ message: "Invalid import data" });
@@ -3803,15 +3807,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
         try {
           switch (module) {
             case 'customers':
-              await storage.createCustomer({ ...item, createdBy: userId });
+              await storage.createCustomer({ ...item, garageId, createdBy: userId });
               results.imported++;
               break;
             case 'vehicles':
-              await storage.createVehicle(item);
+              await storage.createVehicle({ ...item, garageId });
               results.imported++;
               break;
             case 'spareParts':
-              await storage.createSparePart(item);
+              await storage.createSparePart({ ...item, garageId });
+              results.imported++;
+              break;
+            case 'jobCards':
+              await storage.createJobCard({ ...item, garageId });
+              results.imported++;
+              break;
+            case 'invoices':
+              await storage.createInvoice({ ...item, garageId });
+              results.imported++;
+              break;
+            case 'estimates':
+              await storage.createEstimate({ ...item, garageId });
               results.imported++;
               break;
             default:
