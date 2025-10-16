@@ -3021,6 +3021,245 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Module 27: Inventory & Parts Management
+  // Stock Alerts
+  app.get('/api/stock-alerts', isAuthenticated, async (req: any, res) => {
+    try {
+      const { garageId, status } = req.query;
+      if (!garageId) {
+        return res.status(400).json({ message: "garageId is required" });
+      }
+      const alerts = await storage.getStockAlerts(garageId as string, status as string);
+      res.json(alerts);
+    } catch (error) {
+      console.error("Error fetching stock alerts:", error);
+      res.status(500).json({ message: "Failed to fetch stock alerts" });
+    }
+  });
+
+  app.post('/api/stock-alerts', isAuthenticated, async (req: any, res) => {
+    try {
+      const alert = await storage.createStockAlert(req.body);
+      res.status(201).json(alert);
+    } catch (error) {
+      console.error("Error creating stock alert:", error);
+      res.status(500).json({ message: "Failed to create stock alert" });
+    }
+  });
+
+  app.patch('/api/stock-alerts/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const alert = await storage.updateStockAlert(id, req.body);
+      res.json(alert);
+    } catch (error) {
+      console.error("Error updating stock alert:", error);
+      res.status(500).json({ message: "Failed to update stock alert" });
+    }
+  });
+
+  app.post('/api/stock-alerts/:id/acknowledge', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const userId = req.user.claims.sub;
+      const alert = await storage.acknowledgeStockAlert(id, userId);
+      res.json(alert);
+    } catch (error) {
+      console.error("Error acknowledging stock alert:", error);
+      res.status(500).json({ message: "Failed to acknowledge stock alert" });
+    }
+  });
+
+  // Reorder Settings
+  app.get('/api/reorder-settings', isAuthenticated, async (req: any, res) => {
+    try {
+      const { garageId, sparePartId } = req.query;
+      if (!garageId) {
+        return res.status(400).json({ message: "garageId is required" });
+      }
+      const settings = await storage.getReorderSettings(garageId as string, sparePartId as string);
+      res.json(settings);
+    } catch (error) {
+      console.error("Error fetching reorder settings:", error);
+      res.status(500).json({ message: "Failed to fetch reorder settings" });
+    }
+  });
+
+  app.post('/api/reorder-settings', isAuthenticated, async (req: any, res) => {
+    try {
+      const setting = await storage.createReorderSetting(req.body);
+      res.status(201).json(setting);
+    } catch (error) {
+      console.error("Error creating reorder setting:", error);
+      res.status(500).json({ message: "Failed to create reorder setting" });
+    }
+  });
+
+  app.patch('/api/reorder-settings/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const setting = await storage.updateReorderSetting(id, req.body);
+      res.json(setting);
+    } catch (error) {
+      console.error("Error updating reorder setting:", error);
+      res.status(500).json({ message: "Failed to update reorder setting" });
+    }
+  });
+
+  app.post('/api/reorder-settings/process', isAuthenticated, async (req: any, res) => {
+    try {
+      const { garageId } = req.body;
+      if (!garageId) {
+        return res.status(400).json({ message: "garageId is required" });
+      }
+      const reorders = await storage.processAutoReorders(garageId);
+      res.json({ reorders, count: reorders.length });
+    } catch (error) {
+      console.error("Error processing auto reorders:", error);
+      res.status(500).json({ message: "Failed to process auto reorders" });
+    }
+  });
+
+  // Pricing History
+  app.get('/api/pricing-history/:sparePartId', isAuthenticated, async (req: any, res) => {
+    try {
+      const { sparePartId } = req.params;
+      const history = await storage.getPricingHistory(sparePartId);
+      res.json(history);
+    } catch (error) {
+      console.error("Error fetching pricing history:", error);
+      res.status(500).json({ message: "Failed to fetch pricing history" });
+    }
+  });
+
+  app.post('/api/pricing-history', isAuthenticated, async (req: any, res) => {
+    try {
+      const history = await storage.createPricingHistory(req.body);
+      res.status(201).json(history);
+    } catch (error) {
+      console.error("Error creating pricing history:", error);
+      res.status(500).json({ message: "Failed to create pricing history" });
+    }
+  });
+
+  // Inventory Audit Trail
+  app.get('/api/inventory-audit-trail', isAuthenticated, async (req: any, res) => {
+    try {
+      const { garageId, sparePartId, limit } = req.query;
+      if (!garageId) {
+        return res.status(400).json({ message: "garageId is required" });
+      }
+      const trail = await storage.getInventoryAuditTrail(
+        garageId as string,
+        sparePartId as string,
+        limit ? parseInt(limit as string) : 100
+      );
+      res.json(trail);
+    } catch (error) {
+      console.error("Error fetching inventory audit trail:", error);
+      res.status(500).json({ message: "Failed to fetch inventory audit trail" });
+    }
+  });
+
+  app.post('/api/inventory-audit-trail', isAuthenticated, async (req: any, res) => {
+    try {
+      const entry = await storage.createAuditTrailEntry(req.body);
+      res.status(201).json(entry);
+    } catch (error) {
+      console.error("Error creating audit trail entry:", error);
+      res.status(500).json({ message: "Failed to create audit trail entry" });
+    }
+  });
+
+  // Inventory Transfers
+  app.get('/api/inventory-transfers', isAuthenticated, async (req: any, res) => {
+    try {
+      const { garageId, status } = req.query;
+      if (!garageId) {
+        return res.status(400).json({ message: "garageId is required" });
+      }
+      const transfers = await storage.getInventoryTransfers(garageId as string, status as string);
+      res.json(transfers);
+    } catch (error) {
+      console.error("Error fetching inventory transfers:", error);
+      res.status(500).json({ message: "Failed to fetch inventory transfers" });
+    }
+  });
+
+  app.get('/api/inventory-transfers/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const transfer = await storage.getInventoryTransfer(id);
+      if (!transfer) {
+        return res.status(404).json({ message: "Transfer not found" });
+      }
+      res.json(transfer);
+    } catch (error) {
+      console.error("Error fetching inventory transfer:", error);
+      res.status(500).json({ message: "Failed to fetch inventory transfer" });
+    }
+  });
+
+  app.post('/api/inventory-transfers', isAuthenticated, async (req: any, res) => {
+    try {
+      const transfer = await storage.createInventoryTransfer(req.body);
+      res.status(201).json(transfer);
+    } catch (error) {
+      console.error("Error creating inventory transfer:", error);
+      res.status(500).json({ message: "Failed to create inventory transfer" });
+    }
+  });
+
+  app.patch('/api/inventory-transfers/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const transfer = await storage.updateInventoryTransfer(id, req.body);
+      res.json(transfer);
+    } catch (error) {
+      console.error("Error updating inventory transfer:", error);
+      res.status(500).json({ message: "Failed to update inventory transfer" });
+    }
+  });
+
+  app.post('/api/inventory-transfers/:id/approve', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const userId = req.user.claims.sub;
+      const transfer = await storage.approveInventoryTransfer(id, userId);
+      res.json(transfer);
+    } catch (error) {
+      console.error("Error approving inventory transfer:", error);
+      res.status(500).json({ message: "Failed to approve inventory transfer" });
+    }
+  });
+
+  app.post('/api/inventory-transfers/:id/complete', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const userId = req.user.claims.sub;
+      const transfer = await storage.completeInventoryTransfer(id, userId);
+      res.json(transfer);
+    } catch (error) {
+      console.error("Error completing inventory transfer:", error);
+      res.status(500).json({ message: "Failed to complete inventory transfer" });
+    }
+  });
+
+  // TecDoc Integration
+  app.post('/api/tecdoc/search', isAuthenticated, async (req: any, res) => {
+    try {
+      const { query, searchType } = req.body;
+      if (!query || !searchType) {
+        return res.status(400).json({ message: "query and searchType are required" });
+      }
+      const results = await storage.searchTecDoc(query, searchType);
+      res.json(results);
+    } catch (error: any) {
+      console.error("Error searching TecDoc:", error);
+      res.status(500).json({ message: error.message || "Failed to search TecDoc" });
+    }
+  });
+
   // Protected route example
   app.get("/api/protected", isAuthenticated, async (req: any, res) => {
     const userId = req.user?.claims?.sub;
