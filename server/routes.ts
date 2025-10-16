@@ -6085,6 +6085,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Action History Routes (Undo/Redo)
+  app.post('/api/action-history', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const userId = req.user.claims.sub;
+      const { actionType, actionDescription, metadata } = req.body;
+      
+      const history = await storage.createActionHistory({
+        garageId: userGarageId,
+        userId,
+        actionType,
+        actionDescription,
+        metadata: metadata || {},
+      });
+      res.json(history);
+    } catch (error) {
+      console.error("Error creating action history:", error);
+      res.status(500).json({ message: "Failed to create action history" });
+    }
+  });
+
   app.get('/api/history', isAuthenticated, async (req: any, res) => {
     try {
       const userGarageId = req.user.claims.garageId;

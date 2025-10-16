@@ -16,7 +16,7 @@ export default function Settings() {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("general");
 
-  const { data: settings, isLoading } = useQuery<UserSettings>({
+  const { data: settings, isLoading, isError, error } = useQuery<UserSettings>({
     queryKey: ['/api/settings'],
   });
 
@@ -38,7 +38,7 @@ export default function Settings() {
     updateSettingsMutation.mutate(updates);
   };
 
-  if (isLoading || !settings) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
@@ -47,6 +47,27 @@ export default function Settings() {
         </div>
       </div>
     );
+  }
+
+  if (isError) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="text-red-500 text-5xl mb-4">⚠️</div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Failed to Load Settings</h2>
+          <p className="text-gray-600 mb-4">
+            {error instanceof Error ? error.message : 'Unable to connect to server'}
+          </p>
+          <Button onClick={() => window.location.reload()} data-testid="button-retry">
+            Retry
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!settings) {
+    return null;
   }
 
   return (
