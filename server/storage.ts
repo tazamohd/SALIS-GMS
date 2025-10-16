@@ -65,6 +65,12 @@ import {
   notifications,
   type Notification,
   type InsertNotification,
+  estimates,
+  estimateItems,
+  type Estimate,
+  type InsertEstimate,
+  type EstimateItem,
+  type InsertEstimateItem,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, or, inArray, and, gte, lte, ilike } from "drizzle-orm";
@@ -195,6 +201,17 @@ export interface IStorage {
   getPayments(invoiceId?: string): Promise<Payment[]>;
   createPayment(data: InsertPayment): Promise<Payment>;
   deletePayment(id: string): Promise<void>;
+  
+  // Estimates & Quotes - Module 23
+  getEstimates(garageId?: string, status?: string): Promise<Estimate[]>;
+  getEstimate(id: string): Promise<Estimate | undefined>;
+  createEstimate(data: InsertEstimate): Promise<Estimate>;
+  updateEstimate(id: string, data: Partial<Estimate>): Promise<Estimate>;
+  deleteEstimate(id: string): Promise<void>;
+  getEstimateItems(estimateId: string): Promise<EstimateItem[]>;
+  createEstimateItem(data: InsertEstimateItem): Promise<EstimateItem>;
+  deleteEstimateItem(id: string): Promise<void>;
+  createEstimateWithItems(estimateData: InsertEstimate, items: Omit<InsertEstimateItem, 'estimateId'>[]): Promise<Estimate>;
   
   // Reports & Dashboards - Module 13
   getReportsOverview(garageId?: string): Promise<{
@@ -997,6 +1014,86 @@ export class DatabaseStorage implements IStorage {
   async deletePayment(id: string): Promise<void> {
     const { payments } = await import("@shared/schema");
     await db.delete(payments).where(eq(payments.id, id));
+  }
+
+  // Estimates & Quotes - Module 23
+  async getEstimates(garageId?: string, status?: string): Promise<Estimate[]> {
+    const conditions = [];
+    
+    if (garageId) {
+      conditions.push(eq(estimates.garageId, garageId));
+    }
+    
+    if (status) {
+      conditions.push(eq(estimates.status, status));
+    }
+    
+    if (conditions.length > 0) {
+      return await db.select().from(estimates)
+        .where(and(...conditions))
+        .orderBy(desc(estimates.createdAt));
+    }
+    
+    return await db.select().from(estimates).orderBy(desc(estimates.createdAt));
+  }
+
+  async getEstimate(id: string): Promise<Estimate | undefined> {
+    const [estimate] = await db.select().from(estimates).where(eq(estimates.id, id));
+    return estimate;
+  }
+
+  async createEstimate(data: InsertEstimate): Promise<Estimate> {
+    const estimateNumber = `EST-${Date.now()}`;
+    const [estimate] = await db.insert(estimates)
+      .values({ ...data, estimateNumber })
+      .returning();
+    return estimate;
+  }
+
+  async updateEstimate(id: string, data: Partial<Estimate>): Promise<Estimate> {
+    const [estimate] = await db.update(estimates)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(estimates.id, id))
+      .returning();
+    return estimate;
+  }
+
+  async deleteEstimate(id: string): Promise<void> {
+    await db.delete(estimates).where(eq(estimates.id, id));
+  }
+
+  async getEstimateItems(estimateId: string): Promise<EstimateItem[]> {
+    return await db.select().from(estimateItems)
+      .where(eq(estimateItems.estimateId, estimateId))
+      .orderBy(desc(estimateItems.createdAt));
+  }
+
+  async createEstimateItem(data: InsertEstimateItem): Promise<EstimateItem> {
+    const [item] = await db.insert(estimateItems).values(data).returning();
+    return item;
+  }
+
+  async deleteEstimateItem(id: string): Promise<void> {
+    await db.delete(estimateItems).where(eq(estimateItems.id, id));
+  }
+
+  async createEstimateWithItems(
+    estimateData: InsertEstimate,
+    items: Omit<InsertEstimateItem, 'estimateId'>[]
+  ): Promise<Estimate> {
+    return await db.transaction(async (tx) => {
+      const estimateNumber = `EST-${Date.now()}`;
+      const [estimate] = await tx.insert(estimates)
+        .values({ ...estimateData, estimateNumber })
+        .returning();
+      
+      if (items.length > 0) {
+        await tx.insert(estimateItems)
+          .values(items.map(item => ({ ...item, estimateId: estimate.id })));
+      }
+      
+      return estimate;
+    });
   }
 
   // Reports & Dashboards - Module 13

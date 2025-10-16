@@ -498,6 +498,48 @@ export const appointmentReminders = pgTable("appointment_reminders", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Module 23: Estimates & Quotes
+export const estimates = pgTable("estimates", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  estimateNumber: varchar("estimate_number", { length: 50 }).notNull().unique(),
+  garageId: uuid("garage_id").notNull().references(() => garages.id),
+  customerId: varchar("customer_id").notNull().references(() => users.id),
+  vehicleId: uuid("vehicle_id").references(() => vehicles.id),
+  vehicleInfo: jsonb("vehicle_info"), // {make, model, year, licensePlate}
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description"),
+  status: varchar("status").notNull().default("draft"), // "draft", "sent", "viewed", "approved", "rejected", "expired", "converted"
+  subtotal: decimal("subtotal", { precision: 10, scale: 2 }).notNull().default("0"),
+  taxRate: decimal("tax_rate", { precision: 5, scale: 2 }).notNull().default("0"),
+  taxAmount: decimal("tax_amount", { precision: 10, scale: 2 }).notNull().default("0"),
+  discountAmount: decimal("discount_amount", { precision: 10, scale: 2 }).notNull().default("0"),
+  totalAmount: decimal("total_amount", { precision: 10, scale: 2 }).notNull().default("0"),
+  validUntil: timestamp("valid_until"),
+  sentAt: timestamp("sent_at"),
+  viewedAt: timestamp("viewed_at"),
+  approvedAt: timestamp("approved_at"),
+  rejectedAt: timestamp("rejected_at"),
+  convertedToJobCardId: uuid("converted_to_job_card_id").references(() => jobCards.id),
+  convertedToInvoiceId: uuid("converted_to_invoice_id").references(() => invoices.id),
+  notes: text("notes"),
+  terms: text("terms"), // Terms and conditions
+  createdBy: varchar("created_by").notNull().references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const estimateItems = pgTable("estimate_items", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  estimateId: uuid("estimate_id").notNull().references(() => estimates.id, { onDelete: "cascade" }),
+  itemType: varchar("item_type").notNull(), // "service", "part", "labor", "other"
+  description: text("description").notNull(),
+  quantity: decimal("quantity", { precision: 10, scale: 2 }).notNull().default("1"),
+  unitPrice: decimal("unit_price", { precision: 10, scale: 2 }).notNull(),
+  lineTotal: decimal("line_total", { precision: 10, scale: 2 }).notNull(),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Module 11: Purchase Orders & Supplier Integration
 export const suppliers = pgTable("suppliers", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -696,3 +738,10 @@ export type AssistantProfile = typeof assistantProfiles.$inferSelect;
 export type Notification = typeof notifications.$inferSelect;
 export type InsertNotification = typeof notifications.$inferInsert;
 export const insertNotificationSchema = createInsertSchema(notifications).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type Estimate = typeof estimates.$inferSelect;
+export type InsertEstimate = typeof estimates.$inferInsert;
+export const insertEstimateSchema = createInsertSchema(estimates).omit({ id: true, estimateNumber: true, createdBy: true, createdAt: true, updatedAt: true });
+export type EstimateItem = typeof estimateItems.$inferSelect;
+export type InsertEstimateItem = typeof estimateItems.$inferInsert;
+export const insertEstimateItemSchema = createInsertSchema(estimateItems).omit({ id: true, createdAt: true });

@@ -1392,6 +1392,126 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Estimates & Quotes - Module 23
+  app.get('/api/estimates', isAuthenticated, async (req, res) => {
+    try {
+      const { garage_id, status } = req.query;
+      const estimates = await storage.getEstimates(
+        garage_id as string | undefined,
+        status as string | undefined
+      );
+      res.json(estimates);
+    } catch (error) {
+      console.error("Error fetching estimates:", error);
+      res.status(500).json({ message: "Failed to fetch estimates" });
+    }
+  });
+
+  app.get('/api/estimates/:id', isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const estimate = await storage.getEstimate(id);
+      if (!estimate) {
+        return res.status(404).json({ message: "Estimate not found" });
+      }
+      res.json(estimate);
+    } catch (error) {
+      console.error("Error fetching estimate:", error);
+      res.status(500).json({ message: "Failed to fetch estimate" });
+    }
+  });
+
+  app.post('/api/estimates/with-items', isAuthenticated, async (req: any, res) => {
+    try {
+      const { insertEstimateSchema, insertEstimateItemSchema } = await import("@shared/schema");
+      const userId = req.user.claims.sub;
+      const { estimate, items } = req.body;
+      
+      if (!estimate || !items || !Array.isArray(items)) {
+        return res.status(400).json({ 
+          message: "Invalid request: estimate and items (array) required" 
+        });
+      }
+      
+      const estimateValidation = insertEstimateSchema.safeParse(estimate);
+      if (!estimateValidation.success) {
+        return res.status(400).json({ 
+          message: "Estimate validation error", 
+          errors: estimateValidation.error.errors 
+        });
+      }
+      
+      const itemsValidation = items.map((item: any) => 
+        insertEstimateItemSchema.omit({ estimateId: true }).safeParse(item)
+      );
+      
+      const invalidItems = itemsValidation.filter(v => !v.success);
+      if (invalidItems.length > 0) {
+        return res.status(400).json({ 
+          message: "Items validation error", 
+          errors: invalidItems.flatMap(v => v.success ? [] : v.error.errors)
+        });
+      }
+      
+      const estimateData = {
+        ...estimateValidation.data,
+        createdBy: userId,
+      };
+      
+      const validItems = itemsValidation.map(v => v.success ? v.data : null).filter(Boolean);
+      
+      const createdEstimate = await storage.createEstimateWithItems(estimateData as any, validItems as any);
+      res.status(201).json(createdEstimate);
+    } catch (error) {
+      console.error("Error creating estimate with items:", error);
+      res.status(500).json({ message: "Failed to create estimate with items" });
+    }
+  });
+
+  app.patch('/api/estimates/:id', isAuthenticated, async (req, res) => {
+    try {
+      const { insertEstimateSchema } = await import("@shared/schema");
+      const { id } = req.params;
+      
+      const validationResult = insertEstimateSchema.partial().safeParse(req.body);
+      
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          message: "Validation error", 
+          errors: validationResult.error.errors 
+        });
+      }
+      
+      const estimate = await storage.updateEstimate(id, validationResult.data);
+      res.json(estimate);
+    } catch (error) {
+      console.error("Error updating estimate:", error);
+      res.status(500).json({ message: "Failed to update estimate" });
+    }
+  });
+
+  app.delete('/api/estimates/:id', isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteEstimate(id);
+      res.json({ message: "Estimate deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting estimate:", error);
+      res.status(500).json({ message: "Failed to delete estimate" });
+    }
+  });
+
+  app.get('/api/estimates/:id/items', isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const items = await storage.getEstimateItems(id);
+      res.json(items);
+    } catch (error) {
+      console.error("Error fetching estimate items:", error);
+      res.status(500).json({ message: "Failed to fetch estimate items" });
+    }
+  });
+
   // Reports & Dashboards - Module 13
   app.get('/api/reports/overview', isAuthenticated, async (req, res) => {
     try {
