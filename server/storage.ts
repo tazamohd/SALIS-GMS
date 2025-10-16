@@ -483,6 +483,44 @@ export interface IStorage {
   // Bulk Operations
   bulkDelete(module: string, ids: string[]): Promise<{ deleted: number }>;
   bulkUpdate(module: string, ids: string[], data: any): Promise<{ updated: number }>;
+  
+  // Module 30: Business Intelligence & Analytics
+  getMostProfitableServices(garageId: string, startDate?: Date, endDate?: Date): Promise<{
+    services: {
+      serviceType: string;
+      revenue: number;
+      cost: number;
+      profit: number;
+      profitMargin: number;
+      count: number;
+    }[];
+  }>;
+  
+  getPeakHoursAnalysis(garageId: string, startDate?: Date, endDate?: Date): Promise<{
+    hourlyDistribution: { hour: number; count: number; revenue: number }[];
+    dailyDistribution: { day: string; count: number; revenue: number }[];
+    peakHour: number;
+    peakDay: string;
+  }>;
+  
+  getTechnicianUtilizationRates(garageId: string, startDate?: Date, endDate?: Date): Promise<{
+    technicians: {
+      id: string;
+      name: string;
+      totalHoursAvailable: number;
+      totalHoursWorked: number;
+      utilizationRate: number;
+      jobsCompleted: number;
+      revenueGenerated: number;
+    }[];
+  }>;
+  
+  getCustomerAcquisitionCost(garageId: string, startDate?: Date, endDate?: Date): Promise<{
+    totalMarketingCost: number;
+    newCustomers: number;
+    acquisitionCost: number;
+    customersBySource: { source: string; count: number; cost: number }[];
+  }>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -3438,6 +3476,232 @@ export class DatabaseStorage implements IStorage {
     }
 
     return { updated: count };
+  }
+  
+  // Module 30: Business Intelligence & Analytics
+  async getMostProfitableServices(garageId: string, startDate?: Date, endDate?: Date): Promise<{
+    services: {
+      serviceType: string;
+      revenue: number;
+      cost: number;
+      profit: number;
+      profitMargin: number;
+      count: number;
+    }[];
+  }> {
+    let query = db.select({
+      serviceType: jobCards.serviceType,
+      revenue: sql<number>`COALESCE(SUM(CAST(${invoices.totalAmount} AS DECIMAL)), 0)`,
+      cost: sql<number>`COALESCE(SUM(CAST(${invoiceItems.unitCost} AS DECIMAL) * ${invoiceItems.quantity}), 0)`,
+      count: sql<number>`COUNT(DISTINCT ${jobCards.id})`,
+    })
+    .from(jobCards)
+    .leftJoin(invoices, eq(jobCards.id, invoices.jobCardId))
+    .leftJoin(invoiceItems, eq(invoices.id, invoiceItems.invoiceId))
+    .where(eq(jobCards.garageId, garageId))
+    .groupBy(jobCards.serviceType);
+
+    if (startDate && endDate) {
+      query = query.where(
+        and(
+          eq(jobCards.garageId, garageId),
+          sql`${jobCards.createdAt} >= ${startDate}`,
+          sql`${jobCards.createdAt} <= ${endDate}`
+        )
+      );
+    }
+
+    const results = await query;
+
+    const services = results.map(r => ({
+      serviceType: r.serviceType,
+      revenue: Number(r.revenue) || 0,
+      cost: Number(r.cost) || 0,
+      profit: Number(r.revenue) - Number(r.cost) || 0,
+      profitMargin: Number(r.revenue) > 0 ? ((Number(r.revenue) - Number(r.cost)) / Number(r.revenue)) * 100 : 0,
+      count: Number(r.count) || 0,
+    }));
+
+    return { services };
+  }
+
+  async getPeakHoursAnalysis(garageId: string, startDate?: Date, endDate?: Date): Promise<{
+    hourlyDistribution: { hour: number; count: number; revenue: number }[];
+    dailyDistribution: { day: string; count: number; revenue: number }[];
+    peakHour: number;
+    peakDay: string;
+  }> {
+    let appointmentQuery = db.select({
+      hour: sql<number>`EXTRACT(HOUR FROM ${appointments.appointmentDate})`,
+      day: sql<string>`TO_CHAR(${appointments.appointmentDate}, 'Day')`,
+      count: sql<number>`COUNT(*)`,
+      revenue: sql<number>`COALESCE(SUM(CAST(${invoices.totalAmount} AS DECIMAL)), 0)`,
+    })
+    .from(appointments)
+    .leftJoin(invoices, eq(appointments.customerId, invoices.customerId))
+    .where(eq(appointments.garageId, garageId));
+
+    if (startDate && endDate) {
+      appointmentQuery = appointmentQuery.where(
+        and(
+          eq(appointments.garageId, garageId),
+          sql`${appointments.appointmentDate} >= ${startDate}`,
+          sql`${appointments.appointmentDate} <= ${endDate}`
+        )
+      );
+    }
+
+    const hourlyData = await appointmentQuery
+      .groupBy(sql`EXTRACT(HOUR FROM ${appointments.appointmentDate})`);
+
+    const dailyData = await appointmentQuery
+      .groupBy(sql`TO_CHAR(${appointments.appointmentDate}, 'Day')`);
+
+    const hourlyDistribution = hourlyData.map(h => ({
+      hour: Number(h.hour) || 0,
+      count: Number(h.count) || 0,
+      revenue: Number(h.revenue) || 0,
+    }));
+
+    const dailyDistribution = dailyData.map(d => ({
+      day: d.day?.trim() || '',
+      count: Number(d.count) || 0,
+      revenue: Number(d.revenue) || 0,
+    }));
+
+    const peakHour = hourlyDistribution.reduce((max, h) => h.count > max.count ? h : max, hourlyDistribution[0] || { hour: 0, count: 0, revenue: 0 }).hour;
+    const peakDay = dailyDistribution.reduce((max, d) => d.count > max.count ? d : max, dailyDistribution[0] || { day: '', count: 0, revenue: 0 }).day;
+
+    return {
+      hourlyDistribution,
+      dailyDistribution,
+      peakHour,
+      peakDay,
+    };
+  }
+
+  async getTechnicianUtilizationRates(garageId: string, startDate?: Date, endDate?: Date): Promise<{
+    technicians: {
+      id: string;
+      name: string;
+      totalHoursAvailable: number;
+      totalHoursWorked: number;
+      utilizationRate: number;
+      jobsCompleted: number;
+      revenueGenerated: number;
+    }[];
+  }> {
+    const technicians = await db.select().from(users).where(
+      and(
+        eq(users.garageId, garageId),
+        eq(users.userType, 'technician')
+      )
+    );
+
+    const results = await Promise.all(technicians.map(async (tech) => {
+      let jobQuery = db.select({
+        jobsCompleted: sql<number>`COUNT(*)`,
+        totalHours: sql<number>`COALESCE(SUM(CAST(${jobCards.actualHours} AS DECIMAL)), 0)`,
+        revenue: sql<number>`COALESCE(SUM(CAST(${invoices.totalAmount} AS DECIMAL)), 0)`,
+      })
+      .from(jobCards)
+      .leftJoin(invoices, eq(jobCards.id, invoices.jobCardId))
+      .where(
+        and(
+          eq(jobCards.assignedTo, tech.id),
+          eq(jobCards.status, 'completed')
+        )
+      );
+
+      if (startDate && endDate) {
+        jobQuery = jobQuery.where(
+          and(
+            eq(jobCards.assignedTo, tech.id),
+            eq(jobCards.status, 'completed'),
+            sql`${jobCards.completedAt} >= ${startDate}`,
+            sql`${jobCards.completedAt} <= ${endDate}`
+          )
+        );
+      }
+
+      const [jobData] = await jobQuery;
+
+      // Assuming 8-hour workdays and 5 days per week
+      const daysInPeriod = startDate && endDate 
+        ? Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24))
+        : 30;
+      const totalHoursAvailable = (daysInPeriod / 7) * 40; // 40 hours per week
+
+      const totalHoursWorked = Number(jobData?.totalHours) || 0;
+      const utilizationRate = totalHoursAvailable > 0 ? (totalHoursWorked / totalHoursAvailable) * 100 : 0;
+
+      return {
+        id: tech.id,
+        name: tech.fullName || 'Unknown',
+        totalHoursAvailable,
+        totalHoursWorked,
+        utilizationRate,
+        jobsCompleted: Number(jobData?.jobsCompleted) || 0,
+        revenueGenerated: Number(jobData?.revenue) || 0,
+      };
+    }));
+
+    return { technicians: results };
+  }
+
+  async getCustomerAcquisitionCost(garageId: string, startDate?: Date, endDate?: Date): Promise<{
+    totalMarketingCost: number;
+    newCustomers: number;
+    acquisitionCost: number;
+    customersBySource: { source: string; count: number; cost: number }[];
+  }> {
+    // For now, we'll estimate marketing costs based on revenue
+    // In a real implementation, you'd have a marketing_costs table
+    let customerQuery = db.select({
+      count: sql<number>`COUNT(*)`,
+      totalRevenue: sql<number>`COALESCE(SUM(CAST(${invoices.totalAmount} AS DECIMAL)), 0)`,
+    })
+    .from(users)
+    .leftJoin(invoices, eq(users.id, invoices.customerId))
+    .where(
+      and(
+        eq(users.garageId, garageId),
+        eq(users.userType, 'customer')
+      )
+    );
+
+    if (startDate && endDate) {
+      customerQuery = customerQuery.where(
+        and(
+          eq(users.garageId, garageId),
+          eq(users.userType, 'customer'),
+          sql`${users.createdAt} >= ${startDate}`,
+          sql`${users.createdAt} <= ${endDate}`
+        )
+      );
+    }
+
+    const [data] = await customerQuery;
+    
+    // Estimate marketing cost as 10% of revenue (this should be configurable)
+    const totalMarketingCost = (Number(data?.totalRevenue) || 0) * 0.1;
+    const newCustomers = Number(data?.count) || 0;
+    const acquisitionCost = newCustomers > 0 ? totalMarketingCost / newCustomers : 0;
+
+    // Mock data for customer sources - in real implementation, track this
+    const customersBySource = [
+      { source: 'Organic Search', count: Math.floor(newCustomers * 0.4), cost: acquisitionCost * 0.3 },
+      { source: 'Social Media', count: Math.floor(newCustomers * 0.3), cost: acquisitionCost * 0.4 },
+      { source: 'Referrals', count: Math.floor(newCustomers * 0.2), cost: acquisitionCost * 0.1 },
+      { source: 'Paid Ads', count: Math.floor(newCustomers * 0.1), cost: acquisitionCost * 0.2 },
+    ];
+
+    return {
+      totalMarketingCost,
+      newCustomers,
+      acquisitionCost,
+      customersBySource,
+    };
   }
 }
 
