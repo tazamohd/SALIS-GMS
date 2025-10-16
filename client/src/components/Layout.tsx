@@ -3,6 +3,7 @@ import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/hooks/useAuth";
+import { NotificationBell } from "@/components/NotificationBell";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -88,7 +89,7 @@ export function Layout({ children }: LayoutProps) {
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
         {/* Header */}
-        <header className="h-16 border-b border-[#e6e6e6] px-8 flex items-center justify-end">
+        <header className="h-16 border-b border-[#e6e6e6] px-8 flex items-center justify-end gap-4">
           <div className="relative w-96">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[#999999]" />
             <Input
@@ -98,6 +99,7 @@ export function Layout({ children }: LayoutProps) {
               data-testid="input-search"
             />
           </div>
+          <NotificationBell />
         </header>
 
         {/* Page Content */}

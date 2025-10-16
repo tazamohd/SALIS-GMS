@@ -2,6 +2,68 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
+import { emailService } from "./services/emailService";
+import { z } from "zod";
+import { insertNotificationSchema } from "@shared/schema";
+
+// Email notification validation schemas
+const appointmentConfirmationSchema = z.object({
+  customerEmail: z.string().email(),
+  recipientId: z.string(),
+  garageId: z.string().optional(),
+  customerName: z.string(),
+  appointmentDate: z.string(),
+  appointmentTime: z.string(),
+  serviceName: z.string(),
+  garageName: z.string(),
+  garagePhone: z.string().optional(),
+});
+
+const invoiceNotificationSchema = z.object({
+  customerEmail: z.string().email(),
+  recipientId: z.string(),
+  garageId: z.string().optional(),
+  customerName: z.string(),
+  invoiceNumber: z.string(),
+  totalAmount: z.string(),
+  dueDate: z.string(),
+  garageName: z.string(),
+  invoiceLink: z.string().optional(),
+});
+
+const jobCompletedSchema = z.object({
+  customerEmail: z.string().email(),
+  recipientId: z.string(),
+  garageId: z.string().optional(),
+  customerName: z.string(),
+  jobCardNumber: z.string(),
+  vehicleInfo: z.string(),
+  completedDate: z.string(),
+  garageName: z.string(),
+  pickupInstructions: z.string().optional(),
+});
+
+const feedbackRequestSchema = z.object({
+  customerEmail: z.string().email(),
+  recipientId: z.string(),
+  garageId: z.string().optional(),
+  customerName: z.string(),
+  serviceName: z.string(),
+  garageName: z.string(),
+  feedbackLink: z.string().optional(),
+});
+
+const appointmentReminderSchema = z.object({
+  customerEmail: z.string().email(),
+  recipientId: z.string(),
+  garageId: z.string().optional(),
+  customerName: z.string(),
+  appointmentDate: z.string(),
+  appointmentTime: z.string(),
+  serviceName: z.string(),
+  garageName: z.string(),
+  garageAddress: z.string().optional(),
+});
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
@@ -1575,6 +1637,112 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error deleting notification:", error);
       res.status(500).json({ message: "Failed to delete notification" });
+    }
+  });
+
+  // Email notification routes - Module 21
+  app.post('/api/notifications/email/appointment-confirmation', isAuthenticated, async (req, res) => {
+    try {
+      const { customerEmail, recipientId, garageId, ...params } = req.body;
+      const template = emailService.appointmentConfirmation(params);
+      
+      await emailService.sendEmail({
+        to: customerEmail,
+        recipientId,
+        garageId,
+        template,
+        category: 'appointment',
+        metadata: { type: 'confirmation', ...params }
+      });
+      
+      res.json({ message: 'Appointment confirmation sent' });
+    } catch (error) {
+      console.error("Error sending appointment confirmation:", error);
+      res.status(500).json({ message: "Failed to send appointment confirmation" });
+    }
+  });
+
+  app.post('/api/notifications/email/invoice', isAuthenticated, async (req, res) => {
+    try {
+      const { customerEmail, recipientId, garageId, ...params } = req.body;
+      const template = emailService.invoiceNotification(params);
+      
+      await emailService.sendEmail({
+        to: customerEmail,
+        recipientId,
+        garageId,
+        template,
+        category: 'invoice',
+        metadata: { type: 'invoice', ...params }
+      });
+      
+      res.json({ message: 'Invoice notification sent' });
+    } catch (error) {
+      console.error("Error sending invoice notification:", error);
+      res.status(500).json({ message: "Failed to send invoice notification" });
+    }
+  });
+
+  app.post('/api/notifications/email/job-completed', isAuthenticated, async (req, res) => {
+    try {
+      const { customerEmail, recipientId, garageId, ...params } = req.body;
+      const template = emailService.jobCompletedNotification(params);
+      
+      await emailService.sendEmail({
+        to: customerEmail,
+        recipientId,
+        garageId,
+        template,
+        category: 'job_completed',
+        metadata: { type: 'job_completed', ...params }
+      });
+      
+      res.json({ message: 'Job completion notification sent' });
+    } catch (error) {
+      console.error("Error sending job completion notification:", error);
+      res.status(500).json({ message: "Failed to send job completion notification" });
+    }
+  });
+
+  app.post('/api/notifications/email/feedback-request', isAuthenticated, async (req, res) => {
+    try {
+      const { customerEmail, recipientId, garageId, ...params } = req.body;
+      const template = emailService.feedbackRequest(params);
+      
+      await emailService.sendEmail({
+        to: customerEmail,
+        recipientId,
+        garageId,
+        template,
+        category: 'feedback_request',
+        metadata: { type: 'feedback_request', ...params }
+      });
+      
+      res.json({ message: 'Feedback request sent' });
+    } catch (error) {
+      console.error("Error sending feedback request:", error);
+      res.status(500).json({ message: "Failed to send feedback request" });
+    }
+  });
+
+  app.post('/api/notifications/email/appointment-reminder', isAuthenticated, async (req, res) => {
+    try {
+      const { customerEmail, recipientId, garageId, ...params } = req.body;
+      const template = emailService.appointmentReminder(params);
+      
+      await emailService.sendEmail({
+        to: customerEmail,
+        recipientId,
+        garageId,
+        template,
+        category: 'appointment',
+        metadata: { type: 'reminder', ...params }
+      });
+      
+      res.json({ message: 'Appointment reminder sent' });
+    } catch (error) {
+      console.error("Error sending appointment reminder:", error);
+      res.status(500).json({ message: "Failed to send appointment reminder" });
     }
   });
 

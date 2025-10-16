@@ -22,6 +22,7 @@ import SpareParts from "@/pages/SpareParts";
 import Suppliers from "@/pages/Suppliers";
 import { TechnicianPortal } from "@/pages/TechnicianPortal";
 import TechnicianManagement from "@/pages/TechnicianManagement";
+import Notifications from "@/pages/Notifications";
 import Landing from "@/pages/Landing";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -120,6 +121,11 @@ function Router() {
       <Route path="/profile">
         <Layout>
           <Profile />
+        </Layout>
+      </Route>
+      <Route path="/notifications">
+        <Layout>
+          <Notifications />
         </Layout>
       </Route>
       <Route component={NotFound} />
