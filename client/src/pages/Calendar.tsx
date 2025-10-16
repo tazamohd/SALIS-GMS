@@ -134,11 +134,52 @@ export default function Calendar() {
 
   // Create appointment mutation
   const createAppointmentMutation = useMutation({
-    mutationFn: async (data: InsertAppointment) => {
-      return await apiRequest('/api/appointments', {
+    mutationFn: async (data: InsertAppointment & { syncToCalendar?: boolean; sendEmail?: boolean }) => {
+      const appointment = await apiRequest('/api/appointments', {
         method: 'POST',
         body: JSON.stringify(data),
       });
+
+      // Sync to Google Calendar if enabled
+      if (data.syncToCalendar) {
+        try {
+          await apiRequest('/api/integrations/google-calendar/sync-appointment', {
+            method: 'POST',
+            body: JSON.stringify({
+              appointmentDate: data.appointmentDate,
+              service: data.serviceType,
+              notes: data.notes,
+              customerEmail: data.customerEmail,
+            }),
+          });
+        } catch (error) {
+          console.error('Failed to sync to Google Calendar:', error);
+        }
+      }
+
+      // Send email confirmation if enabled
+      if (data.sendEmail && data.customerEmail) {
+        try {
+          await apiRequest('/api/integrations/gmail/send-appointment-confirmation', {
+            method: 'POST',
+            body: JSON.stringify({
+              appointment: {
+                service: data.serviceType,
+                appointmentDate: data.appointmentDate,
+                notes: data.notes,
+              },
+              customer: {
+                fullName: data.customerName,
+                email: data.customerEmail,
+              },
+            }),
+          });
+        } catch (error) {
+          console.error('Failed to send confirmation email:', error);
+        }
+      }
+
+      return appointment;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/appointments'] });
