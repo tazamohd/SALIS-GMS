@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -76,7 +76,7 @@ export default function VehiclesEnhanced() {
     })),
     defaultValues: {
       customerId: "",
-      garageId: garages[0]?.id || "",
+      garageId: "",
       make: "",
       model: "",
       year: new Date().getFullYear(),
@@ -90,6 +90,13 @@ export default function VehiclesEnhanced() {
       isActive: true,
     },
   });
+
+  // Set garageId when garages load
+  useEffect(() => {
+    if (garages.length > 0 && !form.getValues("garageId")) {
+      form.setValue("garageId", garages[0].id);
+    }
+  }, [garages, form]);
 
   // VIN decoder
   const decodeVIN = async (vin: string) => {
@@ -140,7 +147,21 @@ export default function VehiclesEnhanced() {
       queryClient.invalidateQueries({ queryKey: ['/api/vehicles'] });
       toast({ title: "Success", description: "Vehicle added successfully" });
       setIsDialogOpen(false);
-      form.reset();
+      form.reset({
+        customerId: "",
+        garageId: garages[0]?.id || "",
+        make: "",
+        model: "",
+        year: new Date().getFullYear(),
+        licensePlate: "",
+        vin: "",
+        color: "",
+        mileage: 0,
+        engineType: "",
+        transmissionType: "",
+        notes: "",
+        isActive: true,
+      });
     },
     onError: (error: any) => {
       toast({ title: "Error", description: error.message, variant: "destructive" });
@@ -155,7 +176,21 @@ export default function VehiclesEnhanced() {
       queryClient.invalidateQueries({ queryKey: ['/api/vehicles'] });
       toast({ title: "Success", description: "Vehicle updated successfully" });
       setIsDialogOpen(false);
-      form.reset();
+      form.reset({
+        customerId: "",
+        garageId: garages[0]?.id || "",
+        make: "",
+        model: "",
+        year: new Date().getFullYear(),
+        licensePlate: "",
+        vin: "",
+        color: "",
+        mileage: 0,
+        engineType: "",
+        transmissionType: "",
+        notes: "",
+        isActive: true,
+      });
     },
     onError: (error: any) => {
       toast({ title: "Error", description: error.message, variant: "destructive" });
@@ -195,7 +230,21 @@ export default function VehiclesEnhanced() {
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <Button onClick={() => {
             setSelectedVehicle(null);
-            form.reset();
+            form.reset({
+              customerId: "",
+              garageId: garages[0]?.id || "",
+              make: "",
+              model: "",
+              year: new Date().getFullYear(),
+              licensePlate: "",
+              vin: "",
+              color: "",
+              mileage: 0,
+              engineType: "",
+              transmissionType: "",
+              notes: "",
+              isActive: true,
+            });
             setIsDialogOpen(true);
           }} data-testid="button-add-vehicle">
             <Plus className="w-4 h-4 mr-2" />
