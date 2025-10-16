@@ -16,6 +16,7 @@ import {
   ShoppingCart,
   Search,
   Command,
+  Car,
 } from "lucide-react";
 
 interface QuickAction {
@@ -60,6 +61,14 @@ export function QuickActionsModal({ open, onOpenChange }: QuickActionsModalProps
       icon: Users,
       path: "/customers",
       keywords: ["customer", "client", "add", "new", "register"],
+    },
+    {
+      id: "view-vehicles",
+      label: "View Vehicles",
+      description: "Manage customer vehicles",
+      icon: Car,
+      path: "/vehicles",
+      keywords: ["vehicle", "car", "truck", "auto", "fleet", "manage"],
     },
     {
       id: "create-invoice",

@@ -155,6 +155,7 @@ export interface IStorage {
   // Customer Management operations - Module 10
   getCustomers(garageId?: string, searchQuery?: string): Promise<User[]>;
   getCustomer(id: string): Promise<User | undefined>;
+  getVehicles(garageId?: string): Promise<Vehicle[]>;
   getCustomerVehicles(customerId: string): Promise<Vehicle[]>;
   getVehicle(id: string): Promise<Vehicle | undefined>;
   createVehicle(data: InsertVehicle): Promise<Vehicle>;
@@ -700,6 +701,20 @@ export class DatabaseStorage implements IStorage {
     const [customer] = await db.select().from(users)
       .where(eq(users.id, id));
     return customer;
+  }
+
+  async getVehicles(garageId?: string): Promise<Vehicle[]> {
+    if (garageId) {
+      return await db.select().from(vehicles)
+        .where(and(
+          eq(vehicles.garageId, garageId),
+          eq(vehicles.isActive, true)
+        ))
+        .orderBy(desc(vehicles.createdAt));
+    }
+    return await db.select().from(vehicles)
+      .where(eq(vehicles.isActive, true))
+      .orderBy(desc(vehicles.createdAt));
   }
 
   async getCustomerVehicles(customerId: string): Promise<Vehicle[]> {
