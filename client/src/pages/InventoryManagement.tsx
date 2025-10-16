@@ -53,12 +53,15 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { BarcodeScanner } from "@/components/BarcodeScanner";
 
 export default function InventoryManagement() {
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("overview");
   const [selectedGarageId, setSelectedGarageId] = useState<string>("");
+  const [isScannerOpen, setIsScannerOpen] = useState(false);
+  const [scannedBarcode, setScannedBarcode] = useState<string>("");
 
   // Fetch garages
   const { data: garages = [] } = useQuery<any[]>({
@@ -107,6 +110,28 @@ export default function InventoryManagement() {
       });
     },
   });
+
+  // Handle barcode scan
+  const handleBarcodeScan = (barcode: string) => {
+    setScannedBarcode(barcode);
+    setIsScannerOpen(false);
+    
+    // Search for part with this barcode
+    const part = spareParts.find((p: any) => p.barcode === barcode);
+    if (part) {
+      setSearchQuery(part.name);
+      toast({
+        title: "Part Found",
+        description: `Found: ${part.name} (${part.sku})`,
+      });
+    } else {
+      toast({
+        title: "Part Not Found",
+        description: "No part found with this barcode. Try TecDoc search.",
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -495,29 +520,21 @@ export default function InventoryManagement() {
         </TabsContent>
       </Tabs>
 
-      {/* TecDoc Search Dialog */}
-      <Dialog>
-        <DialogTrigger asChild>
-          <Button className="fixed bottom-8 right-8 rounded-full h-14 w-14 shadow-lg" data-testid="button-tecdoc-search">
-            <Barcode className="h-6 w-6" />
-          </Button>
-        </DialogTrigger>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>TecDoc Parts Search</DialogTitle>
-            <DialogDescription>
-              Search the TecDoc catalog for parts
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            <Input placeholder="Enter part number or description..." data-testid="input-tecdoc-search" />
-            <Button className="w-full" data-testid="button-search-tecdoc">
-              <SearchIcon className="mr-2 h-4 w-4" />
-              Search
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      {/* Barcode Scanner FAB */}
+      <Button
+        onClick={() => setIsScannerOpen(true)}
+        className="fixed bottom-8 right-8 rounded-full h-14 w-14 shadow-lg"
+        data-testid="button-barcode-scanner"
+      >
+        <Barcode className="h-6 w-6" />
+      </Button>
+
+      {/* Barcode Scanner Component */}
+      <BarcodeScanner
+        open={isScannerOpen}
+        onClose={() => setIsScannerOpen(false)}
+        onScan={handleBarcodeScan}
+      />
     </div>
   );
 }
