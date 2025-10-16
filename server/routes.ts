@@ -3787,6 +3787,112 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Module 30: Business Intelligence & Analytics
+  app.get('/api/bi/profitable-services', isAuthenticated, async (req: any, res) => {
+    try {
+      const { garageId, startDate, endDate } = req.query;
+      
+      if (!garageId) {
+        return res.status(400).json({ message: "Garage ID is required" });
+      }
+
+      const result = await storage.getMostProfitableServices(
+        garageId as string,
+        startDate ? new Date(startDate as string) : undefined,
+        endDate ? new Date(endDate as string) : undefined
+      );
+
+      res.json(result);
+    } catch (error) {
+      console.error("Error fetching profitable services:", error);
+      res.status(500).json({ message: "Failed to fetch profitable services data" });
+    }
+  });
+
+  app.get('/api/bi/peak-hours', isAuthenticated, async (req: any, res) => {
+    try {
+      const { garageId, startDate, endDate } = req.query;
+      
+      if (!garageId) {
+        return res.status(400).json({ message: "Garage ID is required" });
+      }
+
+      const result = await storage.getPeakHoursAnalysis(
+        garageId as string,
+        startDate ? new Date(startDate as string) : undefined,
+        endDate ? new Date(endDate as string) : undefined
+      );
+
+      res.json(result);
+    } catch (error) {
+      console.error("Error fetching peak hours:", error);
+      res.status(500).json({ message: "Failed to fetch peak hours data" });
+    }
+  });
+
+  app.get('/api/bi/technician-utilization', isAuthenticated, async (req: any, res) => {
+    try {
+      const { garageId, startDate, endDate } = req.query;
+      
+      if (!garageId) {
+        return res.status(400).json({ message: "Garage ID is required" });
+      }
+
+      const result = await storage.getTechnicianUtilizationRates(
+        garageId as string,
+        startDate ? new Date(startDate as string) : undefined,
+        endDate ? new Date(endDate as string) : undefined
+      );
+
+      res.json(result);
+    } catch (error) {
+      console.error("Error fetching technician utilization:", error);
+      res.status(500).json({ message: "Failed to fetch technician utilization data" });
+    }
+  });
+
+  app.get('/api/bi/customer-acquisition-cost', isAuthenticated, async (req: any, res) => {
+    try {
+      const { garageId, startDate, endDate } = req.query;
+      
+      if (!garageId) {
+        return res.status(400).json({ message: "Garage ID is required" });
+      }
+
+      const result = await storage.getCustomerAcquisitionCost(
+        garageId as string,
+        startDate ? new Date(startDate as string) : undefined,
+        endDate ? new Date(endDate as string) : undefined
+      );
+
+      res.json(result);
+    } catch (error) {
+      console.error("Error fetching customer acquisition cost:", error);
+      res.status(500).json({ message: "Failed to fetch customer acquisition cost data" });
+    }
+  });
+
+  app.get('/api/bi/customer-lifetime-value', isAuthenticated, async (req: any, res) => {
+    try {
+      const { garageId, startDate, endDate } = req.query;
+      
+      if (!garageId) {
+        return res.status(400).json({ message: "Garage ID is required" });
+      }
+
+      const result = await storage.getCustomerAnalytics(
+        garageId as string,
+        startDate ? new Date(startDate as string) : undefined,
+        endDate ? new Date(endDate as string) : undefined
+      );
+
+      res.json(result);
+    } catch (error) {
+      console.error("Error fetching customer lifetime value:", error);
+      res.status(500).json({ message: "Failed to fetch customer lifetime value data" });
+    }
+  });
+
   // Data Import
   app.post('/api/import', isAuthenticated, async (req: any, res) => {
     try {

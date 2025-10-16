@@ -133,7 +133,7 @@ import {
   type InsertExportJob,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, or, inArray, and, gte, lte, ilike } from "drizzle-orm";
+import { eq, desc, or, inArray, and, gte, lte, ilike, sql } from "drizzle-orm";
 
 // Interface for storage operations
 export interface IStorage {
@@ -3489,7 +3489,14 @@ export class DatabaseStorage implements IStorage {
       count: number;
     }[];
   }> {
-    let query = db.select({
+    const whereConditions = [eq(jobCards.garageId, garageId)];
+    
+    if (startDate && endDate) {
+      whereConditions.push(sql`${jobCards.createdAt} >= ${startDate}`);
+      whereConditions.push(sql`${jobCards.createdAt} <= ${endDate}`);
+    }
+
+    const results = await db.select({
       serviceType: jobCards.serviceType,
       revenue: sql<number>`COALESCE(SUM(CAST(${invoices.totalAmount} AS DECIMAL)), 0)`,
       cost: sql<number>`COALESCE(SUM(CAST(${invoiceItems.unitCost} AS DECIMAL) * ${invoiceItems.quantity}), 0)`,
@@ -3498,20 +3505,8 @@ export class DatabaseStorage implements IStorage {
     .from(jobCards)
     .leftJoin(invoices, eq(jobCards.id, invoices.jobCardId))
     .leftJoin(invoiceItems, eq(invoices.id, invoiceItems.invoiceId))
-    .where(eq(jobCards.garageId, garageId))
+    .where(and(...whereConditions))
     .groupBy(jobCards.serviceType);
-
-    if (startDate && endDate) {
-      query = query.where(
-        and(
-          eq(jobCards.garageId, garageId),
-          sql`${jobCards.createdAt} >= ${startDate}`,
-          sql`${jobCards.createdAt} <= ${endDate}`
-        )
-      );
-    }
-
-    const results = await query;
 
     const services = results.map(r => ({
       serviceType: r.serviceType,
@@ -3531,7 +3526,14 @@ export class DatabaseStorage implements IStorage {
     peakHour: number;
     peakDay: string;
   }> {
-    let appointmentQuery = db.select({
+    const appointmentConditions = [eq(appointments.garageId, garageId)];
+    
+    if (startDate && endDate) {
+      appointmentConditions.push(sql`${appointments.appointmentDate} >= ${startDate}`);
+      appointmentConditions.push(sql`${appointments.appointmentDate} <= ${endDate}`);
+    }
+
+    const baseQuery = db.select({
       hour: sql<number>`EXTRACT(HOUR FROM ${appointments.appointmentDate})`,
       day: sql<string>`TO_CHAR(${appointments.appointmentDate}, 'Day')`,
       count: sql<number>`COUNT(*)`,
@@ -3539,22 +3541,12 @@ export class DatabaseStorage implements IStorage {
     })
     .from(appointments)
     .leftJoin(invoices, eq(appointments.customerId, invoices.customerId))
-    .where(eq(appointments.garageId, garageId));
+    .where(and(...appointmentConditions));
 
-    if (startDate && endDate) {
-      appointmentQuery = appointmentQuery.where(
-        and(
-          eq(appointments.garageId, garageId),
-          sql`${appointments.appointmentDate} >= ${startDate}`,
-          sql`${appointments.appointmentDate} <= ${endDate}`
-        )
-      );
-    }
-
-    const hourlyData = await appointmentQuery
+    const hourlyData = await baseQuery
       .groupBy(sql`EXTRACT(HOUR FROM ${appointments.appointmentDate})`);
 
-    const dailyData = await appointmentQuery
+    const dailyData = await baseQuery
       .groupBy(sql`TO_CHAR(${appointments.appointmentDate}, 'Day')`);
 
     const hourlyDistribution = hourlyData.map(h => ({
@@ -3599,32 +3591,24 @@ export class DatabaseStorage implements IStorage {
     );
 
     const results = await Promise.all(technicians.map(async (tech) => {
-      let jobQuery = db.select({
+      const jobConditions = [
+        eq(jobCards.assignedTo, tech.id),
+        eq(jobCards.status, 'completed')
+      ];
+
+      if (startDate && endDate) {
+        jobConditions.push(sql`${jobCards.completedAt} >= ${startDate}`);
+        jobConditions.push(sql`${jobCards.completedAt} <= ${endDate}`);
+      }
+
+      const [jobData] = await db.select({
         jobsCompleted: sql<number>`COUNT(*)`,
         totalHours: sql<number>`COALESCE(SUM(CAST(${jobCards.actualHours} AS DECIMAL)), 0)`,
         revenue: sql<number>`COALESCE(SUM(CAST(${invoices.totalAmount} AS DECIMAL)), 0)`,
       })
       .from(jobCards)
       .leftJoin(invoices, eq(jobCards.id, invoices.jobCardId))
-      .where(
-        and(
-          eq(jobCards.assignedTo, tech.id),
-          eq(jobCards.status, 'completed')
-        )
-      );
-
-      if (startDate && endDate) {
-        jobQuery = jobQuery.where(
-          and(
-            eq(jobCards.assignedTo, tech.id),
-            eq(jobCards.status, 'completed'),
-            sql`${jobCards.completedAt} >= ${startDate}`,
-            sql`${jobCards.completedAt} <= ${endDate}`
-          )
-        );
-      }
-
-      const [jobData] = await jobQuery;
+      .where(and(...jobConditions));
 
       // Assuming 8-hour workdays and 5 days per week
       const daysInPeriod = startDate && endDate 
@@ -3657,31 +3641,23 @@ export class DatabaseStorage implements IStorage {
   }> {
     // For now, we'll estimate marketing costs based on revenue
     // In a real implementation, you'd have a marketing_costs table
-    let customerQuery = db.select({
+    const customerConditions = [
+      eq(users.garageId, garageId),
+      eq(users.userType, 'customer')
+    ];
+
+    if (startDate && endDate) {
+      customerConditions.push(sql`${users.createdAt} >= ${startDate}`);
+      customerConditions.push(sql`${users.createdAt} <= ${endDate}`);
+    }
+
+    const [data] = await db.select({
       count: sql<number>`COUNT(*)`,
       totalRevenue: sql<number>`COALESCE(SUM(CAST(${invoices.totalAmount} AS DECIMAL)), 0)`,
     })
     .from(users)
     .leftJoin(invoices, eq(users.id, invoices.customerId))
-    .where(
-      and(
-        eq(users.garageId, garageId),
-        eq(users.userType, 'customer')
-      )
-    );
-
-    if (startDate && endDate) {
-      customerQuery = customerQuery.where(
-        and(
-          eq(users.garageId, garageId),
-          eq(users.userType, 'customer'),
-          sql`${users.createdAt} >= ${startDate}`,
-          sql`${users.createdAt} <= ${endDate}`
-        )
-      );
-    }
-
-    const [data] = await customerQuery;
+    .where(and(...customerConditions));
     
     // Estimate marketing cost as 10% of revenue (this should be configurable)
     const totalMarketingCost = (Number(data?.totalRevenue) || 0) * 0.1;
