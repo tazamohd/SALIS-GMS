@@ -2330,6 +2330,106 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Customer Portal API Routes - Module 25
+  // Get customer's appointments
+  app.get('/api/customer/appointments', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const appointments = await storage.getCustomerAppointments(userId);
+      res.json(appointments);
+    } catch (error) {
+      console.error("Error fetching customer appointments:", error);
+      res.status(500).json({ message: "Failed to fetch appointments" });
+    }
+  });
+
+  // Get customer's invoices
+  app.get('/api/customer/invoices', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const invoices = await storage.getCustomerInvoices(userId);
+      res.json(invoices);
+    } catch (error) {
+      console.error("Error fetching customer invoices:", error);
+      res.status(500).json({ message: "Failed to fetch invoices" });
+    }
+  });
+
+  // Get customer's vehicles
+  app.get('/api/customer/vehicles', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const vehicles = await storage.getCustomerVehicles(userId);
+      res.json(vehicles);
+    } catch (error) {
+      console.error("Error fetching customer vehicles:", error);
+      res.status(500).json({ message: "Failed to fetch vehicles" });
+    }
+  });
+
+  // Get customer's job cards (service history)
+  app.get('/api/customer/job-cards', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const jobCards = await storage.getCustomerJobCards(userId);
+      res.json(jobCards);
+    } catch (error) {
+      console.error("Error fetching customer job cards:", error);
+      res.status(500).json({ message: "Failed to fetch service history" });
+    }
+  });
+
+  // Get customer's communications (notes)
+  app.get('/api/customer/communications', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const communications = await storage.getCustomerNotes(userId);
+      res.json(communications);
+    } catch (error) {
+      console.error("Error fetching customer communications:", error);
+      res.status(500).json({ message: "Failed to fetch communications" });
+    }
+  });
+
+  // Book appointment (customer-facing)
+  app.post('/api/customer/book-appointment', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { insertAppointmentSchema } = await import("@shared/schema");
+      const validatedData = insertAppointmentSchema.parse(req.body);
+      
+      // Ensure customerId is set to logged-in user
+      const appointmentData = {
+        ...validatedData,
+        customerId: userId,
+        createdBy: userId,
+        status: 'scheduled'
+      };
+      
+      const appointment = await storage.createAppointment(appointmentData);
+      res.json(appointment);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid appointment data", errors: error.errors });
+      }
+      console.error("Error booking appointment:", error);
+      res.status(500).json({ message: "Failed to book appointment" });
+    }
+  });
+
+  // Get customer profile
+  app.get('/api/customer/profile', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      const profile = await storage.getCustomerProfile(userId);
+      res.json({ ...user, profile });
+    } catch (error) {
+      console.error("Error fetching customer profile:", error);
+      res.status(500).json({ message: "Failed to fetch profile" });
+    }
+  });
+
   // Protected route example
   app.get("/api/protected", isAuthenticated, async (req: any, res) => {
     const userId = req.user?.claims?.sub;

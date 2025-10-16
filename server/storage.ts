@@ -651,7 +651,7 @@ export class DatabaseStorage implements IStorage {
     return appointment;
   }
 
-  async createAppointment(data: InsertAppointment): Promise<Appointment> {
+  async createAppointment(data: Omit<InsertAppointment, 'appointmentNumber' | 'id'>): Promise<Appointment> {
     const appointmentNumber = `APT-${Date.now()}`;
     const [appointment] = await db.insert(appointments).values({
       ...data,
@@ -1854,6 +1854,46 @@ export class DatabaseStorage implements IStorage {
       })
       .returning();
     return prefs;
+  }
+
+  // Customer Portal Methods - Module 25
+  async getCustomerAppointments(customerId: string) {
+    const { appointments } = await import("@shared/schema");
+    const result = await db
+      .select()
+      .from(appointments)
+      .where(eq(appointments.customerId, customerId))
+      .orderBy(desc(appointments.appointmentDate));
+    return result;
+  }
+
+  async getCustomerInvoices(customerId: string) {
+    const { invoices } = await import("@shared/schema");
+    const result = await db
+      .select()
+      .from(invoices)
+      .where(eq(invoices.customerId, customerId))
+      .orderBy(desc(invoices.invoiceDate));
+    return result;
+  }
+
+  async getCustomerJobCards(customerId: string) {
+    const { jobCards } = await import("@shared/schema");
+    const result = await db
+      .select()
+      .from(jobCards)
+      .where(eq(jobCards.customerId, customerId))
+      .orderBy(desc(jobCards.createdAt));
+    return result;
+  }
+
+  async getCustomerProfile(userId: string) {
+    const { customerProfiles } = await import("@shared/schema");
+    const [profile] = await db
+      .select()
+      .from(customerProfiles)
+      .where(eq(customerProfiles.userId, userId));
+    return profile || null;
   }
 }
 
