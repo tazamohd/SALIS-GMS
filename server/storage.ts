@@ -155,6 +155,11 @@ import {
   type InsertTraining,
   type EmployeeTraining,
   type InsertEmployeeTraining,
+  aiJobEstimations,
+  aiMaintenancePredictions,
+  aiPartsRecommendations,
+  aiScheduleOptimizations,
+  aiChatConversations,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, or, inArray, and, gte, lte, ilike, sql } from "drizzle-orm";
@@ -599,6 +604,33 @@ export interface IStorage {
   createEmployeeTraining(data: any): Promise<any>;
   updateEmployeeTraining(id: string, data: any): Promise<any>;
   deleteEmployeeTraining(id: string): Promise<void>;
+  
+  // Module 32: AI Automation & Insights
+  getAIJobEstimations(garageId: string, vehicleId?: string): Promise<any[]>;
+  getAIJobEstimation(id: string): Promise<any | undefined>;
+  createAIJobEstimation(data: any): Promise<any>;
+  updateAIJobEstimation(id: string, data: any): Promise<any>;
+  
+  getAIMaintenancePredictions(garageId: string, vehicleId?: string, status?: string): Promise<any[]>;
+  getAIMaintenancePrediction(id: string): Promise<any | undefined>;
+  createAIMaintenancePrediction(data: any): Promise<any>;
+  updateAIMaintenancePrediction(id: string, data: any): Promise<any>;
+  acknowledgeMaintenancePrediction(id: string, userId: string): Promise<any>;
+  
+  getAIPartsRecommendations(garageId: string, vehicleId?: string, status?: string): Promise<any[]>;
+  getAIPartsRecommendation(id: string): Promise<any | undefined>;
+  createAIPartsRecommendation(data: any): Promise<any>;
+  updateAIPartsRecommendation(id: string, data: any): Promise<any>;
+  
+  getAIScheduleOptimizations(garageId: string, status?: string): Promise<any[]>;
+  getAIScheduleOptimization(id: string): Promise<any | undefined>;
+  createAIScheduleOptimization(data: any): Promise<any>;
+  updateAIScheduleOptimization(id: string, data: any): Promise<any>;
+  
+  getAIChatConversations(garageId: string, customerId?: string, status?: string): Promise<any[]>;
+  getAIChatConversation(id: string): Promise<any | undefined>;
+  createAIChatConversation(data: any): Promise<any>;
+  updateAIChatConversation(id: string, data: any): Promise<any>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -4127,6 +4159,168 @@ export class DatabaseStorage implements IStorage {
 
   async deleteEmployeeTraining(id: string): Promise<void> {
     await db.delete(employeeTrainings).where(eq(employeeTrainings.id, id));
+  }
+
+  // Module 32: AI Automation & Insights
+  async getAIJobEstimations(garageId: string, vehicleId?: string): Promise<any[]> {
+    const conditions = [eq(aiJobEstimations.garageId, garageId)];
+    if (vehicleId) {
+      conditions.push(eq(aiJobEstimations.vehicleId, vehicleId));
+    }
+    return await db.select().from(aiJobEstimations)
+      .where(and(...conditions))
+      .orderBy(desc(aiJobEstimations.createdAt));
+  }
+
+  async getAIJobEstimation(id: string): Promise<any | undefined> {
+    const [estimation] = await db.select().from(aiJobEstimations).where(eq(aiJobEstimations.id, id));
+    return estimation;
+  }
+
+  async createAIJobEstimation(data: any): Promise<any> {
+    const [estimation] = await db.insert(aiJobEstimations).values(data).returning();
+    return estimation;
+  }
+
+  async updateAIJobEstimation(id: string, data: any): Promise<any> {
+    const [estimation] = await db.update(aiJobEstimations)
+      .set(data)
+      .where(eq(aiJobEstimations.id, id))
+      .returning();
+    return estimation;
+  }
+
+  async getAIMaintenancePredictions(garageId: string, vehicleId?: string, status?: string): Promise<any[]> {
+    const conditions = [eq(aiMaintenancePredictions.garageId, garageId)];
+    if (vehicleId) {
+      conditions.push(eq(aiMaintenancePredictions.vehicleId, vehicleId));
+    }
+    if (status) {
+      conditions.push(eq(aiMaintenancePredictions.status, status));
+    }
+    return await db.select().from(aiMaintenancePredictions)
+      .where(and(...conditions))
+      .orderBy(desc(aiMaintenancePredictions.createdAt));
+  }
+
+  async getAIMaintenancePrediction(id: string): Promise<any | undefined> {
+    const [prediction] = await db.select().from(aiMaintenancePredictions).where(eq(aiMaintenancePredictions.id, id));
+    return prediction;
+  }
+
+  async createAIMaintenancePrediction(data: any): Promise<any> {
+    const [prediction] = await db.insert(aiMaintenancePredictions).values(data).returning();
+    return prediction;
+  }
+
+  async updateAIMaintenancePrediction(id: string, data: any): Promise<any> {
+    const [prediction] = await db.update(aiMaintenancePredictions)
+      .set(data)
+      .where(eq(aiMaintenancePredictions.id, id))
+      .returning();
+    return prediction;
+  }
+
+  async acknowledgeMaintenancePrediction(id: string, userId: string): Promise<any> {
+    const [prediction] = await db.update(aiMaintenancePredictions)
+      .set({ 
+        acknowledgedBy: userId,
+        acknowledgedAt: new Date(),
+        status: 'acknowledged'
+      })
+      .where(eq(aiMaintenancePredictions.id, id))
+      .returning();
+    return prediction;
+  }
+
+  async getAIPartsRecommendations(garageId: string, vehicleId?: string, status?: string): Promise<any[]> {
+    const conditions = [eq(aiPartsRecommendations.garageId, garageId)];
+    if (vehicleId) {
+      conditions.push(eq(aiPartsRecommendations.vehicleId, vehicleId));
+    }
+    if (status) {
+      conditions.push(eq(aiPartsRecommendations.status, status));
+    }
+    return await db.select().from(aiPartsRecommendations)
+      .where(and(...conditions))
+      .orderBy(desc(aiPartsRecommendations.createdAt));
+  }
+
+  async getAIPartsRecommendation(id: string): Promise<any | undefined> {
+    const [recommendation] = await db.select().from(aiPartsRecommendations).where(eq(aiPartsRecommendations.id, id));
+    return recommendation;
+  }
+
+  async createAIPartsRecommendation(data: any): Promise<any> {
+    const [recommendation] = await db.insert(aiPartsRecommendations).values(data).returning();
+    return recommendation;
+  }
+
+  async updateAIPartsRecommendation(id: string, data: any): Promise<any> {
+    const [recommendation] = await db.update(aiPartsRecommendations)
+      .set(data)
+      .where(eq(aiPartsRecommendations.id, id))
+      .returning();
+    return recommendation;
+  }
+
+  async getAIScheduleOptimizations(garageId: string, status?: string): Promise<any[]> {
+    const conditions = [eq(aiScheduleOptimizations.garageId, garageId)];
+    if (status) {
+      conditions.push(eq(aiScheduleOptimizations.status, status));
+    }
+    return await db.select().from(aiScheduleOptimizations)
+      .where(and(...conditions))
+      .orderBy(desc(aiScheduleOptimizations.createdAt));
+  }
+
+  async getAIScheduleOptimization(id: string): Promise<any | undefined> {
+    const [optimization] = await db.select().from(aiScheduleOptimizations).where(eq(aiScheduleOptimizations.id, id));
+    return optimization;
+  }
+
+  async createAIScheduleOptimization(data: any): Promise<any> {
+    const [optimization] = await db.insert(aiScheduleOptimizations).values(data).returning();
+    return optimization;
+  }
+
+  async updateAIScheduleOptimization(id: string, data: any): Promise<any> {
+    const [optimization] = await db.update(aiScheduleOptimizations)
+      .set(data)
+      .where(eq(aiScheduleOptimizations.id, id))
+      .returning();
+    return optimization;
+  }
+
+  async getAIChatConversations(garageId: string, customerId?: string, status?: string): Promise<any[]> {
+    const conditions = [eq(aiChatConversations.garageId, garageId)];
+    if (customerId) {
+      conditions.push(eq(aiChatConversations.customerId, customerId));
+    }
+    if (status) {
+      conditions.push(eq(aiChatConversations.status, status));
+    }
+    return await db.select().from(aiChatConversations)
+      .where(and(...conditions))
+      .orderBy(desc(aiChatConversations.createdAt));
+  }
+
+  async getAIChatConversation(id: string): Promise<any | undefined> {
+    const [conversation] = await db.select().from(aiChatConversations).where(eq(aiChatConversations.id, id));
+    return conversation;
+  }
+
+  async createAIChatConversation(data: any): Promise<any> {
+    const [conversation] = await db.insert(aiChatConversations).values(data).returning();
+    return conversation;
+  }
+
+  async updateAIChatConversation(id: string, data: any): Promise<any> {
+    const [conversation] = await db.update(aiChatConversations)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(aiChatConversations.id, id))
+      .returning();
+    return conversation;
   }
 }
 
