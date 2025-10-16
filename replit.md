@@ -51,3 +51,48 @@ The application utilizes a full-stack architecture with clear client-server sepa
 - **HubSpot CRM**: User declined the connector integration. For CRM functionality, request HubSpot API credentials to store as secrets for manual integration if needed in the future.
 - **QuickBooks/Xero**: No native Replit connector available. Will implement manual integration with user-provided API credentials when requested.
 - **OBD-II Diagnostics**: No native connector. Will implement manual integration with OBD adapter API/SDK when requested.
+
+## Recent Updates (Module 35 - System Improvements)
+### Settings & Preferences (Completed)
+- **User Settings Database**: Created user_settings table with comprehensive preference storage including timezone, date/time formats, language, currency, theme, font size, notification preferences, and custom print settings
+- **Settings UI**: Built tabbed interface with 6 sections:
+  - General: Timezone, date/time formats, notifications, sounds
+  - Language: Multi-language support (UI ready, translations pending)
+  - Currency: Multi-currency support with 9 major currencies (USD, EUR, GBP, JPY, CAD, AUD, CHF, CNY, INR)
+  - Appearance: Theme (light/dark/auto), font size, compact mode
+  - Print: Paper size, header/footer options, logo display
+  - Keyboard Shortcuts: Display of available shortcuts with enable/disable toggle
+
+### Print System (Completed)
+- **Print Styles**: Comprehensive CSS media queries in index.css for professional printing
+- **Document Types**: Specialized styles for invoices, job cards, reports, and general documents
+- **Print Features**: Page breaks, signature lines, header/footer support, QR code/barcode printing, terms and conditions formatting
+
+### Undo/Redo System (Completed)
+- **UndoRedoContext**: React context provider with action history tracking (max 50 actions)
+- **Action Tracking**: Backend integration saves action history to database for audit trail
+- **API**: Full undo/redo functionality with async action execution
+- **UI Integration**: Available via keyboard shortcuts and will integrate into future UI controls
+
+### Keyboard Shortcuts (Completed)
+- **Global Shortcuts Hook**: Created useKeyboardShortcuts with platform-aware handling (Mac/Windows)
+- **Default Shortcuts**:
+  - Cmd/Ctrl + Z: Undo last action
+  - Cmd/Ctrl + Shift + Z / Cmd/Ctrl + Y: Redo action
+  - Cmd/Ctrl + P: Print current page
+  - Cmd/Ctrl + S: Save prompt
+  - Cmd/Ctrl + K: Quick actions (already implemented)
+  - Esc: Close dialogs/modals
+- **Settings Integration**: Keyboard shortcuts can be enabled/disabled in Settings page
+- **Custom Shortcuts**: useCustomShortcut hook available for component-specific shortcuts
+
+### Currency System (Completed)
+- **Currency Utilities**: Created comprehensive currency formatting library in client/src/lib/currency.ts
+- **Features**: Format amounts, convert between currencies, parse currency strings, get symbols
+- **Exchange Rates**: Mock exchange rates included (ready for real-time API integration)
+- **User Preferences**: Integration with user settings for default currency display
+
+### Action History (Completed)
+- **Database**: action_history table tracks all user actions with type, description, and metadata
+- **API Routes**: POST endpoint for creating action history records
+- **Integration**: UndoRedoContext automatically saves actions to backend for persistence and audit trail
