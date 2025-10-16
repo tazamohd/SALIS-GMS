@@ -1643,7 +1643,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Email notification routes - Module 21
   app.post('/api/notifications/email/appointment-confirmation', isAuthenticated, async (req, res) => {
     try {
-      const { customerEmail, recipientId, garageId, ...params } = req.body;
+      const validatedData = appointmentConfirmationSchema.parse(req.body);
+      const { customerEmail, recipientId, garageId, ...params } = validatedData;
       const template = emailService.appointmentConfirmation(params);
       
       await emailService.sendEmail({
@@ -1657,6 +1658,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json({ message: 'Appointment confirmation sent' });
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid request data", errors: error.errors });
+      }
       console.error("Error sending appointment confirmation:", error);
       res.status(500).json({ message: "Failed to send appointment confirmation" });
     }
@@ -1664,7 +1668,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/notifications/email/invoice', isAuthenticated, async (req, res) => {
     try {
-      const { customerEmail, recipientId, garageId, ...params } = req.body;
+      const validatedData = invoiceNotificationSchema.parse(req.body);
+      const { customerEmail, recipientId, garageId, ...params } = validatedData;
       const template = emailService.invoiceNotification(params);
       
       await emailService.sendEmail({
@@ -1678,6 +1683,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json({ message: 'Invoice notification sent' });
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid request data", errors: error.errors });
+      }
       console.error("Error sending invoice notification:", error);
       res.status(500).json({ message: "Failed to send invoice notification" });
     }
@@ -1685,7 +1693,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/notifications/email/job-completed', isAuthenticated, async (req, res) => {
     try {
-      const { customerEmail, recipientId, garageId, ...params } = req.body;
+      const validatedData = jobCompletedSchema.parse(req.body);
+      const { customerEmail, recipientId, garageId, ...params } = validatedData;
       const template = emailService.jobCompletedNotification(params);
       
       await emailService.sendEmail({
@@ -1699,6 +1708,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json({ message: 'Job completion notification sent' });
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid request data", errors: error.errors });
+      }
       console.error("Error sending job completion notification:", error);
       res.status(500).json({ message: "Failed to send job completion notification" });
     }
@@ -1706,7 +1718,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/notifications/email/feedback-request', isAuthenticated, async (req, res) => {
     try {
-      const { customerEmail, recipientId, garageId, ...params } = req.body;
+      const validatedData = feedbackRequestSchema.parse(req.body);
+      const { customerEmail, recipientId, garageId, ...params } = validatedData;
       const template = emailService.feedbackRequest(params);
       
       await emailService.sendEmail({
@@ -1720,6 +1733,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json({ message: 'Feedback request sent' });
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid request data", errors: error.errors });
+      }
       console.error("Error sending feedback request:", error);
       res.status(500).json({ message: "Failed to send feedback request" });
     }
@@ -1727,7 +1743,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/notifications/email/appointment-reminder', isAuthenticated, async (req, res) => {
     try {
-      const { customerEmail, recipientId, garageId, ...params } = req.body;
+      const validatedData = appointmentReminderSchema.parse(req.body);
+      const { customerEmail, recipientId, garageId, ...params } = validatedData;
       const template = emailService.appointmentReminder(params);
       
       await emailService.sendEmail({
@@ -1741,6 +1758,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json({ message: 'Appointment reminder sent' });
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid request data", errors: error.errors });
+      }
       console.error("Error sending appointment reminder:", error);
       res.status(500).json({ message: "Failed to send appointment reminder" });
     }
