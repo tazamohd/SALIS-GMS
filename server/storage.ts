@@ -125,6 +125,12 @@ import {
   type InsertDiscountPromotion,
   type DiscountUsage,
   type InsertDiscountUsage,
+  savedFilterPresets,
+  exportJobs,
+  type SavedFilterPreset,
+  type InsertSavedFilterPreset,
+  type ExportJob,
+  type InsertExportJob,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, or, inArray, and, gte, lte, ilike } from "drizzle-orm";
@@ -456,6 +462,27 @@ export interface IStorage {
   searchTecDoc(query: string, searchType: string): Promise<any>;
   getTecDocCache(query: string, searchType: string): Promise<any | undefined>;
   cacheTecDocResponse(query: string, searchType: string, response: any): Promise<any>;
+  
+  // Module 29: Search & Filtering
+  // Global Search
+  globalSearch(garageId: string, query: string, modules?: string[]): Promise<any>;
+  
+  // Saved Filter Presets
+  getSavedFilterPresets(garageId: string, userId?: string, module?: string): Promise<SavedFilterPreset[]>;
+  getSavedFilterPreset(id: string): Promise<SavedFilterPreset | undefined>;
+  createSavedFilterPreset(data: InsertSavedFilterPreset): Promise<SavedFilterPreset>;
+  updateSavedFilterPreset(id: string, data: Partial<SavedFilterPreset>): Promise<SavedFilterPreset>;
+  deleteSavedFilterPreset(id: string): Promise<void>;
+  
+  // Export Jobs
+  getExportJobs(garageId: string, userId?: string): Promise<ExportJob[]>;
+  getExportJob(id: string): Promise<ExportJob | undefined>;
+  createExportJob(data: InsertExportJob): Promise<ExportJob>;
+  updateExportJob(id: string, data: Partial<ExportJob>): Promise<ExportJob>;
+  
+  // Bulk Operations
+  bulkDelete(module: string, ids: string[]): Promise<{ deleted: number }>;
+  bulkUpdate(module: string, ids: string[], data: any): Promise<{ updated: number }>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -3155,6 +3182,265 @@ export class DatabaseStorage implements IStorage {
     }
 
     return { valid: true, discount, discountAmount };
+  }
+
+  // ============= Module 29: Search & Filtering =============
+  
+  // Global Search across multiple modules
+  async globalSearch(garageId: string, query: string, modules?: string[]): Promise<any> {
+    const searchTerm = `%${query}%`;
+    const results: any = { jobCards: [], customers: [], vehicles: [], invoices: [], estimates: [], spareParts: [] };
+
+    // If modules are specified, only search those
+    const searchModules = modules || ['jobCards', 'customers', 'vehicles', 'invoices', 'estimates', 'spareParts'];
+
+    if (searchModules.includes('jobCards')) {
+      results.jobCards = await db.select().from(jobCards)
+        .where(
+          and(
+            eq(jobCards.garageId, garageId),
+            or(
+              ilike(jobCards.jobCardNumber, searchTerm),
+              ilike(jobCards.description, searchTerm)
+            )
+          )
+        )
+        .limit(10);
+    }
+
+    if (searchModules.includes('customers')) {
+      results.customers = await db.select().from(users)
+        .where(
+          and(
+            eq(users.garageId, garageId),
+            eq(users.userType, 'customer'),
+            or(
+              ilike(users.fullName, searchTerm),
+              ilike(users.email, searchTerm),
+              ilike(users.phone, searchTerm)
+            )
+          )
+        )
+        .limit(10);
+    }
+
+    if (searchModules.includes('vehicles')) {
+      results.vehicles = await db.select().from(vehicles)
+        .where(
+          and(
+            eq(vehicles.garageId, garageId),
+            or(
+              ilike(vehicles.plateNumber, searchTerm),
+              ilike(vehicles.vin, searchTerm),
+              ilike(vehicles.make, searchTerm),
+              ilike(vehicles.model, searchTerm)
+            )
+          )
+        )
+        .limit(10);
+    }
+
+    if (searchModules.includes('invoices')) {
+      results.invoices = await db.select().from(invoices)
+        .where(
+          and(
+            eq(invoices.garageId, garageId),
+            or(
+              ilike(invoices.invoiceNumber, searchTerm),
+              ilike(invoices.notes, searchTerm)
+            )
+          )
+        )
+        .limit(10);
+    }
+
+    if (searchModules.includes('estimates')) {
+      results.estimates = await db.select().from(estimates)
+        .where(
+          and(
+            eq(estimates.garageId, garageId),
+            or(
+              ilike(estimates.estimateNumber, searchTerm),
+              ilike(estimates.notes, searchTerm)
+            )
+          )
+        )
+        .limit(10);
+    }
+
+    if (searchModules.includes('spareParts')) {
+      results.spareParts = await db.select().from(spareParts)
+        .where(
+          and(
+            eq(spareParts.garageId, garageId),
+            or(
+              ilike(spareParts.partNumber, searchTerm),
+              ilike(spareParts.name, searchTerm),
+              ilike(spareParts.description, searchTerm)
+            )
+          )
+        )
+        .limit(10);
+    }
+
+    return results;
+  }
+
+  // Saved Filter Presets
+  async getSavedFilterPresets(garageId: string, userId?: string, module?: string): Promise<SavedFilterPreset[]> {
+    const conditions = [eq(savedFilterPresets.garageId, garageId)];
+    
+    if (userId) {
+      conditions.push(or(
+        eq(savedFilterPresets.userId, userId),
+        eq(savedFilterPresets.isGlobal, true)
+      ) as any);
+    }
+    
+    if (module) {
+      conditions.push(eq(savedFilterPresets.module, module));
+    }
+
+    return await db.select().from(savedFilterPresets)
+      .where(and(...conditions))
+      .orderBy(desc(savedFilterPresets.createdAt));
+  }
+
+  async getSavedFilterPreset(id: string): Promise<SavedFilterPreset | undefined> {
+    const [preset] = await db.select().from(savedFilterPresets)
+      .where(eq(savedFilterPresets.id, id));
+    return preset;
+  }
+
+  async createSavedFilterPreset(data: InsertSavedFilterPreset): Promise<SavedFilterPreset> {
+    const [preset] = await db.insert(savedFilterPresets).values(data).returning();
+    return preset;
+  }
+
+  async updateSavedFilterPreset(id: string, data: Partial<SavedFilterPreset>): Promise<SavedFilterPreset> {
+    const [preset] = await db.update(savedFilterPresets)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(savedFilterPresets.id, id))
+      .returning();
+    return preset;
+  }
+
+  async deleteSavedFilterPreset(id: string): Promise<void> {
+    await db.delete(savedFilterPresets).where(eq(savedFilterPresets.id, id));
+  }
+
+  // Export Jobs
+  async getExportJobs(garageId: string, userId?: string): Promise<ExportJob[]> {
+    const conditions = [eq(exportJobs.garageId, garageId)];
+    if (userId) {
+      conditions.push(eq(exportJobs.userId, userId));
+    }
+
+    return await db.select().from(exportJobs)
+      .where(and(...conditions))
+      .orderBy(desc(exportJobs.createdAt));
+  }
+
+  async getExportJob(id: string): Promise<ExportJob | undefined> {
+    const [job] = await db.select().from(exportJobs)
+      .where(eq(exportJobs.id, id));
+    return job;
+  }
+
+  async createExportJob(data: InsertExportJob): Promise<ExportJob> {
+    const [job] = await db.insert(exportJobs).values(data).returning();
+    return job;
+  }
+
+  async updateExportJob(id: string, data: Partial<ExportJob>): Promise<ExportJob> {
+    const [job] = await db.update(exportJobs)
+      .set(data)
+      .where(eq(exportJobs.id, id))
+      .returning();
+    return job;
+  }
+
+  // Bulk Operations
+  async bulkDelete(module: string, ids: string[]): Promise<{ deleted: number }> {
+    let count = 0;
+
+    switch (module) {
+      case 'jobCards':
+        const deleteJobCards = await db.delete(jobCards).where(inArray(jobCards.id, ids));
+        count = deleteJobCards.rowCount || 0;
+        break;
+      case 'customers':
+        const deleteCustomers = await db.delete(users).where(inArray(users.id, ids));
+        count = deleteCustomers.rowCount || 0;
+        break;
+      case 'vehicles':
+        const deleteVehicles = await db.delete(vehicles).where(inArray(vehicles.id, ids));
+        count = deleteVehicles.rowCount || 0;
+        break;
+      case 'invoices':
+        const deleteInvoices = await db.delete(invoices).where(inArray(invoices.id, ids));
+        count = deleteInvoices.rowCount || 0;
+        break;
+      case 'estimates':
+        const deleteEstimates = await db.delete(estimates).where(inArray(estimates.id, ids));
+        count = deleteEstimates.rowCount || 0;
+        break;
+      case 'spareParts':
+        const deleteSpareParts = await db.delete(spareParts).where(inArray(spareParts.id, ids));
+        count = deleteSpareParts.rowCount || 0;
+        break;
+      default:
+        throw new Error(`Bulk delete not supported for module: ${module}`);
+    }
+
+    return { deleted: count };
+  }
+
+  async bulkUpdate(module: string, ids: string[], data: any): Promise<{ updated: number }> {
+    let count = 0;
+
+    switch (module) {
+      case 'jobCards':
+        const updateJobCards = await db.update(jobCards)
+          .set(data)
+          .where(inArray(jobCards.id, ids));
+        count = updateJobCards.rowCount || 0;
+        break;
+      case 'customers':
+        const updateCustomers = await db.update(users)
+          .set(data)
+          .where(inArray(users.id, ids));
+        count = updateCustomers.rowCount || 0;
+        break;
+      case 'vehicles':
+        const updateVehicles = await db.update(vehicles)
+          .set(data)
+          .where(inArray(vehicles.id, ids));
+        count = updateVehicles.rowCount || 0;
+        break;
+      case 'invoices':
+        const updateInvoices = await db.update(invoices)
+          .set(data)
+          .where(inArray(invoices.id, ids));
+        count = updateInvoices.rowCount || 0;
+        break;
+      case 'estimates':
+        const updateEstimates = await db.update(estimates)
+          .set(data)
+          .where(inArray(estimates.id, ids));
+        count = updateEstimates.rowCount || 0;
+        break;
+      case 'spareParts':
+        const updateSpareParts = await db.update(spareParts)
+          .set(data)
+          .where(inArray(spareParts.id, ids));
+        count = updateSpareParts.rowCount || 0;
+        break;
+      default:
+        throw new Error(`Bulk update not supported for module: ${module}`);
+    }
+
+    return { updated: count };
   }
 }
 
