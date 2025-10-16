@@ -1512,6 +1512,133 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Convert estimate to job card
+  app.post('/api/estimates/:id/convert-to-job-card', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const userId = req.user.claims.sub;
+      
+      const estimate = await storage.getEstimate(id);
+      if (!estimate) {
+        return res.status(404).json({ message: "Estimate not found" });
+      }
+      
+      if (estimate.convertedToJobCardId) {
+        return res.status(400).json({ message: "Estimate already converted to job card" });
+      }
+      
+      const items = await storage.getEstimateItems(id);
+      
+      // Create job card from estimate
+      const jobCardData = {
+        garageId: estimate.garageId,
+        customerId: estimate.customerId,
+        vehicleId: estimate.vehicleId,
+        title: estimate.title,
+        description: estimate.description || "",
+        status: "pending" as const,
+        priority: "medium" as const,
+        estimatedCost: estimate.totalAmount,
+        actualCost: "0.00",
+      };
+      
+      const jobCard = await storage.createJobCard(jobCardData);
+      
+      // Create task assignments from estimate items
+      for (const item of items) {
+        await storage.createTaskAssignment({
+          jobCardId: jobCard.id,
+          taskName: item.description.substring(0, 100), // Limit to reasonable length
+          taskType: item.itemType === 'service' ? 'repair' : 'inspection',
+          description: item.description,
+          assignedTo: userId,
+          assignedBy: userId,
+          userType: "technician",
+          status: "assigned",
+          priority: "medium",
+          estimatedMinutes: 60, // default 1 hour
+        });
+      }
+      
+      // Update estimate
+      await storage.updateEstimate(id, {
+        status: "converted",
+        convertedToJobCardId: jobCard.id,
+      });
+      
+      res.json({ jobCard, message: "Estimate converted to job card successfully" });
+    } catch (error) {
+      console.error("Error converting estimate to job card:", error);
+      res.status(500).json({ message: "Failed to convert estimate to job card" });
+    }
+  });
+
+  // Convert estimate to invoice
+  app.post('/api/estimates/:id/convert-to-invoice', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const userId = req.user.claims.sub;
+      
+      const estimate = await storage.getEstimate(id);
+      if (!estimate) {
+        return res.status(404).json({ message: "Estimate not found" });
+      }
+      
+      if (estimate.convertedToInvoiceId) {
+        return res.status(400).json({ message: "Estimate already converted to invoice" });
+      }
+      
+      const items = await storage.getEstimateItems(id);
+      
+      // Create invoice from estimate
+      const invoiceData = {
+        garageId: estimate.garageId,
+        customerId: estimate.customerId,
+        vehicleId: estimate.vehicleId,
+        dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
+        status: "draft" as const,
+        subtotal: estimate.subtotal,
+        taxAmount: estimate.taxAmount,
+        discountAmount: estimate.discountAmount,
+        totalAmount: estimate.totalAmount,
+        paidAmount: "0.00",
+        balanceAmount: estimate.totalAmount,
+        notes: estimate.notes,
+      };
+      
+      const invoiceNumber = `INV-${Date.now()}`;
+      const { invoices } = await import("@shared/schema");
+      const [invoice] = await db.insert(invoices)
+        .values({ ...invoiceData, invoiceNumber, createdBy: userId })
+        .returning();
+      
+      // Create invoice items from estimate items
+      const { invoiceItems } = await import("@shared/schema");
+      for (const item of items) {
+        await db.insert(invoiceItems).values({
+          invoiceId: invoice.id,
+          itemType: item.itemType,
+          description: item.description,
+          quantity: item.quantity,
+          unitPrice: item.unitPrice,
+          lineTotal: item.lineTotal,
+          taxRate: item.taxRate,
+        });
+      }
+      
+      // Update estimate
+      await storage.updateEstimate(id, {
+        status: "converted",
+        convertedToInvoiceId: invoice.id,
+      });
+      
+      res.json({ invoice, message: "Estimate converted to invoice successfully" });
+    } catch (error) {
+      console.error("Error converting estimate to invoice:", error);
+      res.status(500).json({ message: "Failed to convert estimate to invoice" });
+    }
+  });
+
   // Reports & Dashboards - Module 13
   app.get('/api/reports/overview', isAuthenticated, async (req, res) => {
     try {

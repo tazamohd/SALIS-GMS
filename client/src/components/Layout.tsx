@@ -1,4 +1,4 @@
-import { Home, ClipboardCheck, UserIcon, LogOut, Search, Calendar, Users, ShoppingCart, FileText, BarChart3, Wrench, ClipboardList, Hammer, Package, Building2, HardHat, UserCog, Zap, Car } from "lucide-react";
+import { Home, ClipboardCheck, UserIcon, LogOut, Search, Calendar, Users, ShoppingCart, FileText, BarChart3, Wrench, ClipboardList, Hammer, Package, Building2, HardHat, UserCog, Zap, Car, Receipt } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -47,6 +47,7 @@ export function Layout({ children }: LayoutProps) {
     { path: "/vehicles", icon: Car, label: "Vehicles" },
     { path: "/purchase-orders", icon: ShoppingCart, label: "Purchase Orders" },
     { path: "/invoices", icon: FileText, label: "Invoices" },
+    { path: "/estimates", icon: Receipt, label: "Estimates" },
     { path: "/reports", icon: BarChart3, label: "Reports" },
     { path: "/profile", icon: UserIcon, label: "My Profile" },
   ];

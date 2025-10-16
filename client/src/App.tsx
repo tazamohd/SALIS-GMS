@@ -14,6 +14,7 @@ import { Customers } from "@/pages/Customers";
 import Vehicles from "@/pages/Vehicles";
 import { PurchaseOrders } from "@/pages/PurchaseOrders";
 import { Invoices } from "@/pages/Invoices";
+import { Estimates } from "@/pages/Estimates";
 import { Reports } from "@/pages/Reports";
 import { JobCards } from "@/pages/JobCards";
 import { Profile } from "@/pages/Profile";
@@ -82,6 +83,11 @@ function Router() {
       <Route path="/invoices">
         <Layout>
           <Invoices />
+        </Layout>
+      </Route>
+      <Route path="/estimates">
+        <Layout>
+          <Estimates />
         </Layout>
       </Route>
       <Route path="/reports">

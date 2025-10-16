@@ -17,6 +17,7 @@ import {
   Search,
   Command,
   Car,
+  Receipt,
 } from "lucide-react";
 
 interface QuickAction {
@@ -77,6 +78,14 @@ export function QuickActionsModal({ open, onOpenChange }: QuickActionsModalProps
       icon: FileText,
       path: "/invoices",
       keywords: ["invoice", "bill", "payment", "charge", "create"],
+    },
+    {
+      id: "create-estimate",
+      label: "Create Estimate",
+      description: "Create a quote or estimate",
+      icon: Receipt,
+      path: "/estimates",
+      keywords: ["estimate", "quote", "quotation", "proposal", "create"],
     },
     {
       id: "add-technician",
