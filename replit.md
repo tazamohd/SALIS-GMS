@@ -17,7 +17,7 @@ The application utilizes a full-stack architecture with clear client-server sepa
 - **Backend**: Express server written in TypeScript.
 - **Authentication**: Replit Auth handles secure session management.
 - **Database**: PostgreSQL with Drizzle ORM for schema definition and interaction, supporting complex schemas for various garage management entities.
-- **Key Features**: Includes a login dashboard and modules for Job Cards, Appointments, Tool Management, Customer Management, Purchase Orders, Invoicing, Reporting, Vehicle Management (including service history, maintenance schedules, VIN decoding, photo gallery, service reminders, warranty tracking), Estimates & Quotes (with status workflow and conversion to job cards/invoices), SMS Notifications (via Twilio with granular preferences), and Scheduling & Calendar (with multiple views, technician availability, recurring appointments, and conflict detection). Form validation is implemented using Zod schemas shared between frontend and backend.
+- **Key Features**: Includes a login dashboard and modules for Job Cards, Appointments, Tool Management, Customer Management, Purchase Orders, Invoicing, Reporting, Vehicle Management (including service history, maintenance schedules, VIN decoding, photo gallery, service reminders, warranty tracking), Estimates & Quotes (with status workflow and conversion to job cards/invoices), SMS Notifications (via Twilio with granular preferences), Scheduling & Calendar (with multiple views, technician availability, recurring appointments, and conflict detection), and Inventory & Parts Management (Module 27: featuring low stock alerts with acknowledgment workflow, automatic reordering based on thresholds, barcode scanning with HTML5 camera API, pricing history tracking, complete inventory audit trail, multi-location transfers with approval workflow, and TecDoc integration for parts catalog lookup with response caching). Form validation is implemented using Zod schemas shared between frontend and backend.
 - **UI/UX Decisions**: Emphasizes preserving the original Figma design, ensuring responsiveness, and utilizing a consistent component-based approach with tabbed interfaces for complex modules.
 
 ## External Dependencies
@@ -35,5 +35,6 @@ The application utilizes a full-stack architecture with clear client-server sepa
 - **recharts**: Data visualization.
 - **Twilio**: SMS notification integration.
 - **NHTSA API**: Free VIN decoding service.
+- **TecDoc API**: Parts catalog lookup service (requires TECDOC_API_URL and TECDOC_API_KEY environment variables).
 - **react-big-calendar**: Calendar component for scheduling.
 - **date-fns**: Date utility library (used with react-big-calendar).
