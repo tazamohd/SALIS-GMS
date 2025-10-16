@@ -29,6 +29,8 @@ import TechnicianManagement from "@/pages/TechnicianManagement";
 import Notifications from "@/pages/Notifications";
 import Landing from "@/pages/Landing";
 import Calendar from "@/pages/Calendar";
+import FinancialSettings from "@/pages/FinancialSettings";
+import RefundManagement from "@/pages/RefundManagement";
 import { CustomerDashboard } from "@/pages/customer/CustomerDashboard";
 import { CustomerAppointments } from "@/pages/customer/CustomerAppointments";
 import { CustomerInvoices } from "@/pages/customer/CustomerInvoices";
@@ -197,6 +199,16 @@ function Router() {
       <Route path="/calendar">
         <Layout>
           <Calendar />
+        </Layout>
+      </Route>
+      <Route path="/financial-settings">
+        <Layout>
+          <FinancialSettings />
+        </Layout>
+      </Route>
+      <Route path="/refund-management">
+        <Layout>
+          <RefundManagement />
         </Layout>
       </Route>
       <Route component={NotFound} />
