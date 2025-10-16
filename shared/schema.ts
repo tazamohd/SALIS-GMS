@@ -1490,3 +1490,72 @@ export const insertAIScheduleOptimizationSchema = createInsertSchema(aiScheduleO
 export type AIChatConversation = typeof aiChatConversations.$inferSelect;
 export type InsertAIChatConversation = typeof aiChatConversations.$inferInsert;
 export const insertAIChatConversationSchema = createInsertSchema(aiChatConversations).omit({ id: true, createdAt: true, updatedAt: true });
+
+// Module 33: Third-Party Integrations
+export const integrationConnections = pgTable("integration_connections", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  integrationType: varchar("integration_type", { length: 100 }).notNull(),
+  isActive: boolean("is_active").default(true),
+  settings: jsonb("settings"),
+  lastSyncAt: timestamp("last_sync_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const integrationSyncLogs = pgTable("integration_sync_logs", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  connectionId: uuid("connection_id").references(() => integrationConnections.id),
+  syncType: varchar("sync_type", { length: 100 }).notNull(),
+  status: varchar("status", { length: 50 }).notNull(),
+  recordsProcessed: integer("records_processed").default(0),
+  errorMessage: text("error_message"),
+  syncData: jsonb("sync_data"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const accountingTransactions = pgTable("accounting_transactions", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  invoiceId: uuid("invoice_id").references(() => invoices.id),
+  externalId: varchar("external_id", { length: 255 }),
+  transactionType: varchar("transaction_type", { length: 100 }).notNull(),
+  amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+  currency: varchar("currency", { length: 10 }).default("USD"),
+  description: text("description"),
+  transactionDate: timestamp("transaction_date").notNull(),
+  syncStatus: varchar("sync_status", { length: 50 }).default("pending"),
+  syncedAt: timestamp("synced_at"),
+  accountingData: jsonb("accounting_data"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const obdDiagnosticData = pgTable("obd_diagnostic_data", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  vehicleId: uuid("vehicle_id").references(() => vehicles.id).notNull(),
+  jobCardId: uuid("job_card_id").references(() => jobCards.id),
+  diagnosticCodes: jsonb("diagnostic_codes").notNull(),
+  liveData: jsonb("live_data"),
+  freezeFrameData: jsonb("freeze_frame_data"),
+  readinessStatus: jsonb("readiness_status"),
+  vehicleInfo: jsonb("vehicle_info"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export type IntegrationConnection = typeof integrationConnections.$inferSelect;
+export type InsertIntegrationConnection = typeof integrationConnections.$inferInsert;
+export const insertIntegrationConnectionSchema = createInsertSchema(integrationConnections).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type IntegrationSyncLog = typeof integrationSyncLogs.$inferSelect;
+export type InsertIntegrationSyncLog = typeof integrationSyncLogs.$inferInsert;
+export const insertIntegrationSyncLogSchema = createInsertSchema(integrationSyncLogs).omit({ id: true, createdAt: true });
+
+export type AccountingTransaction = typeof accountingTransactions.$inferSelect;
+export type InsertAccountingTransaction = typeof accountingTransactions.$inferInsert;
+export const insertAccountingTransactionSchema = createInsertSchema(accountingTransactions).omit({ id: true, createdAt: true });
+
+export type OBDDiagnosticData = typeof obdDiagnosticData.$inferSelect;
+export type InsertOBDDiagnosticData = typeof obdDiagnosticData.$inferInsert;
+export const insertOBDDiagnosticDataSchema = createInsertSchema(obdDiagnosticData).omit({ id: true, createdAt: true });

@@ -42,3 +42,10 @@ The application utilizes a full-stack architecture with clear client-server sepa
 - **date-fns**: Date utility library (used with react-big-calendar).
 - **@zxing/library**: Barcode scanning library for inventory management.
 - **Replit AI Integrations (OpenAI)**: AI-powered features using gpt-5 model for job estimation, predictive maintenance, parts recommendations, schedule optimization, and customer support chatbot (requires AI_INTEGRATIONS_OPENAI_BASE_URL and AI_INTEGRATIONS_OPENAI_API_KEY environment variables, automatically set by Replit).
+- **Google Calendar**: Replit connector integration for appointment syncing (connection:conn_google-calendar_01K7P5FJS6Q2VZMWCN5FGWYBFN).
+- **Gmail**: Replit connector integration for email notifications (connection:conn_google-mail_01K7P5HHZF5PMG9XG1NW7AK0Y9).
+
+## Integration Notes
+- **HubSpot CRM**: User declined the connector integration. For CRM functionality, request HubSpot API credentials to store as secrets for manual integration if needed in the future.
+- **QuickBooks/Xero**: No native Replit connector available. Will implement manual integration with user-provided API credentials when requested.
+- **OBD-II Diagnostics**: No native connector. Will implement manual integration with OBD adapter API/SDK when requested.
