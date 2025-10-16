@@ -172,6 +172,24 @@ import {
   type InsertAccountingTransaction,
   type OBDDiagnosticData,
   type InsertOBDDiagnosticData,
+  auditLogs,
+  twoFactorAuth,
+  backupJobs,
+  gdprDataRequests,
+  userConsents,
+  permissionOverrides,
+  type AuditLog,
+  type InsertAuditLog,
+  type TwoFactorAuth,
+  type InsertTwoFactorAuth,
+  type BackupJob,
+  type InsertBackupJob,
+  type GdprDataRequest,
+  type InsertGdprDataRequest,
+  type UserConsent,
+  type InsertUserConsent,
+  type PermissionOverride,
+  type InsertPermissionOverride,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, or, inArray, and, gte, lte, ilike, sql } from "drizzle-orm";
@@ -4409,6 +4427,163 @@ export class DatabaseStorage implements IStorage {
   async createOBDDiagnostic(data: InsertOBDDiagnosticData): Promise<OBDDiagnosticData> {
     const [diagnostic] = await db.insert(obdDiagnosticData).values(data).returning();
     return diagnostic;
+  }
+
+  // Module 34: Security & Compliance
+  async getAuditLogs(garageId: string, filters?: {
+    userId?: string;
+    resourceType?: string;
+    action?: string;
+    startDate?: Date;
+    endDate?: Date;
+  }): Promise<AuditLog[]> {
+    const conditions = [eq(auditLogs.garageId, garageId)];
+    
+    if (filters?.userId) {
+      conditions.push(eq(auditLogs.userId, filters.userId));
+    }
+    if (filters?.resourceType) {
+      conditions.push(eq(auditLogs.resourceType, filters.resourceType));
+    }
+    if (filters?.action) {
+      conditions.push(eq(auditLogs.action, filters.action));
+    }
+    if (filters?.startDate) {
+      conditions.push(gte(auditLogs.timestamp, filters.startDate));
+    }
+    if (filters?.endDate) {
+      conditions.push(lte(auditLogs.timestamp, filters.endDate));
+    }
+    
+    return await db.select().from(auditLogs)
+      .where(and(...conditions))
+      .orderBy(desc(auditLogs.timestamp))
+      .limit(1000);
+  }
+
+  async createAuditLog(data: InsertAuditLog): Promise<AuditLog> {
+    const [log] = await db.insert(auditLogs).values(data).returning();
+    return log;
+  }
+
+  async getTwoFactorAuth(userId: string): Promise<TwoFactorAuth | undefined> {
+    const [auth] = await db.select().from(twoFactorAuth).where(eq(twoFactorAuth.userId, userId));
+    return auth;
+  }
+
+  async createTwoFactorAuth(data: InsertTwoFactorAuth): Promise<TwoFactorAuth> {
+    const [auth] = await db.insert(twoFactorAuth).values(data).returning();
+    return auth;
+  }
+
+  async updateTwoFactorAuth(userId: string, data: Partial<TwoFactorAuth>): Promise<TwoFactorAuth> {
+    const [auth] = await db.update(twoFactorAuth)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(twoFactorAuth.userId, userId))
+      .returning();
+    return auth;
+  }
+
+  async deleteTwoFactorAuth(userId: string): Promise<void> {
+    await db.delete(twoFactorAuth).where(eq(twoFactorAuth.userId, userId));
+  }
+
+  async getBackupJobs(garageId: string, status?: string): Promise<BackupJob[]> {
+    const conditions = [eq(backupJobs.garageId, garageId)];
+    if (status) {
+      conditions.push(eq(backupJobs.status, status));
+    }
+    return await db.select().from(backupJobs)
+      .where(and(...conditions))
+      .orderBy(desc(backupJobs.createdAt));
+  }
+
+  async getBackupJob(id: string): Promise<BackupJob | undefined> {
+    const [job] = await db.select().from(backupJobs).where(eq(backupJobs.id, id));
+    return job;
+  }
+
+  async createBackupJob(data: InsertBackupJob): Promise<BackupJob> {
+    const [job] = await db.insert(backupJobs).values(data).returning();
+    return job;
+  }
+
+  async updateBackupJob(id: string, data: Partial<BackupJob>): Promise<BackupJob> {
+    const [job] = await db.update(backupJobs)
+      .set(data)
+      .where(eq(backupJobs.id, id))
+      .returning();
+    return job;
+  }
+
+  async getGdprDataRequests(garageId: string, userId?: string): Promise<GdprDataRequest[]> {
+    const conditions = [eq(gdprDataRequests.garageId, garageId)];
+    if (userId) {
+      conditions.push(eq(gdprDataRequests.userId, userId));
+    }
+    return await db.select().from(gdprDataRequests)
+      .where(and(...conditions))
+      .orderBy(desc(gdprDataRequests.createdAt));
+  }
+
+  async createGdprDataRequest(data: InsertGdprDataRequest): Promise<GdprDataRequest> {
+    const [request] = await db.insert(gdprDataRequests).values(data).returning();
+    return request;
+  }
+
+  async updateGdprDataRequest(id: string, data: Partial<GdprDataRequest>): Promise<GdprDataRequest> {
+    const [request] = await db.update(gdprDataRequests)
+      .set(data)
+      .where(eq(gdprDataRequests.id, id))
+      .returning();
+    return request;
+  }
+
+  async getUserConsents(userId: string): Promise<UserConsent[]> {
+    return await db.select().from(userConsents)
+      .where(eq(userConsents.userId, userId))
+      .orderBy(desc(userConsents.createdAt));
+  }
+
+  async createUserConsent(data: InsertUserConsent): Promise<UserConsent> {
+    const [consent] = await db.insert(userConsents).values(data).returning();
+    return consent;
+  }
+
+  async updateUserConsent(id: string, data: Partial<UserConsent>): Promise<UserConsent> {
+    const [consent] = await db.update(userConsents)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(userConsents.id, id))
+      .returning();
+    return consent;
+  }
+
+  async getPermissionOverrides(garageId: string, userId?: string): Promise<PermissionOverride[]> {
+    const conditions = [eq(permissionOverrides.garageId, garageId)];
+    if (userId) {
+      conditions.push(eq(permissionOverrides.userId, userId));
+    }
+    
+    // Filter out expired overrides
+    conditions.push(
+      or(
+        eq(permissionOverrides.expiresAt, null),
+        gte(permissionOverrides.expiresAt, new Date())
+      ) as any
+    );
+    
+    return await db.select().from(permissionOverrides)
+      .where(and(...conditions))
+      .orderBy(desc(permissionOverrides.createdAt));
+  }
+
+  async createPermissionOverride(data: InsertPermissionOverride): Promise<PermissionOverride> {
+    const [override] = await db.insert(permissionOverrides).values(data).returning();
+    return override;
+  }
+
+  async deletePermissionOverride(id: string): Promise<void> {
+    await db.delete(permissionOverrides).where(eq(permissionOverrides.id, id));
   }
 }
 

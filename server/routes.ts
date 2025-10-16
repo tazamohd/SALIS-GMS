@@ -30,6 +30,7 @@ import {
 import Stripe from "stripe";
 import { createPaypalOrder, capturePaypalOrder, loadPaypalDefault } from "./paypal";
 import { estimateJobTime, predictMaintenance, recommendParts, optimizeSchedule, chatWithCustomer } from './ai';
+import { auditLog } from './auditMiddleware';
 
 // Initialize Stripe (Stripe integration - Module 25)
 const stripe = process.env.STRIPE_SECRET_KEY 
@@ -179,6 +180,9 @@ const smsFeedbackRequestSchema = z.object({
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
   await setupAuth(app);
+
+  // Audit logging middleware (applied after auth so user is available)
+  app.use(auditLog);
 
   // Auth routes
   app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
