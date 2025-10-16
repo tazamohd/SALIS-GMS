@@ -59,7 +59,8 @@ interface ScheduleOptimizationInput {
 }
 
 export async function estimateJobTime(input: JobEstimationInput) {
-  const prompt = `You are an expert automotive service estimator. Analyze the following job and provide a time and cost estimation.
+  try {
+    const prompt = `You are an expert automotive service estimator. Analyze the following job and provide a time and cost estimation.
 
 Service Type: ${input.serviceType}
 Vehicle: ${input.vehicleMake || 'Unknown'} ${input.vehicleModel || 'Unknown'} (${input.vehicleYear || 'Unknown'})
@@ -75,28 +76,56 @@ Provide your estimation in JSON format with the following structure:
   "reasoning": "explanation of your estimation"
 }`;
 
-  const completion = await openai.chat.completions.create({
-    model: AI_MODEL,
-    messages: [
-      {
-        role: "system",
-        content: "You are an expert automotive service estimator. Provide accurate time and cost estimates based on industry standards and historical data. Always respond with valid JSON."
-      },
-      {
-        role: "user",
-        content: prompt
-      }
-    ],
-    response_format: { type: "json_object" },
-    max_completion_tokens: AI_MAX_TOKENS
-  });
+    const completion = await openai.chat.completions.create({
+      model: AI_MODEL,
+      messages: [
+        {
+          role: "system",
+          content: "You are an expert automotive service estimator. Provide accurate time and cost estimates based on industry standards and historical data. Always respond with valid JSON."
+        },
+        {
+          role: "user",
+          content: prompt
+        }
+      ],
+      response_format: { type: "json_object" },
+      max_completion_tokens: AI_MAX_TOKENS
+    });
 
-  const result = JSON.parse(completion.choices[0].message.content || '{}');
-  return result;
+    const content = completion.choices[0]?.message?.content;
+    if (!content) {
+      return {
+        estimatedHours: 0,
+        estimatedCost: 0,
+        confidence: 0,
+        reasoning: "AI service unavailable",
+        error: "No response from AI service"
+      };
+    }
+
+    const result = JSON.parse(content);
+    
+    return {
+      estimatedHours: result.estimatedHours || 0,
+      estimatedCost: result.estimatedCost || 0,
+      confidence: result.confidence || 0,
+      reasoning: result.reasoning || "No reasoning provided"
+    };
+  } catch (error: any) {
+    console.error("AI estimation error:", error);
+    return {
+      estimatedHours: 0,
+      estimatedCost: 0,
+      confidence: 0,
+      reasoning: "AI estimation failed",
+      error: error.message || "Unknown error occurred"
+    };
+  }
 }
 
 export async function predictMaintenance(input: MaintenancePredictionInput) {
-  const prompt = `You are an expert automotive diagnostician. Analyze the vehicle service history and predict potential maintenance needs.
+  try {
+    const prompt = `You are an expert automotive diagnostician. Analyze the vehicle service history and predict potential maintenance needs.
 
 Vehicle: ${input.vehicleMake} ${input.vehicleModel} (${input.vehicleYear})
 Current Mileage: ${input.mileage}
@@ -117,28 +146,47 @@ Identify potential upcoming maintenance needs or issues. Provide your analysis i
   ]
 }`;
 
-  const completion = await openai.chat.completions.create({
-    model: AI_MODEL,
-    messages: [
-      {
-        role: "system",
-        content: "You are an expert automotive diagnostician specializing in predictive maintenance. Analyze service history to identify potential future issues. Always respond with valid JSON."
-      },
-      {
-        role: "user",
-        content: prompt
-      }
-    ],
-    response_format: { type: "json_object" },
-    max_completion_tokens: AI_MAX_TOKENS
-  });
+    const completion = await openai.chat.completions.create({
+      model: AI_MODEL,
+      messages: [
+        {
+          role: "system",
+          content: "You are an expert automotive diagnostician specializing in predictive maintenance. Analyze service history to identify potential future issues. Always respond with valid JSON."
+        },
+        {
+          role: "user",
+          content: prompt
+        }
+      ],
+      response_format: { type: "json_object" },
+      max_completion_tokens: AI_MAX_TOKENS
+    });
 
-  const result = JSON.parse(completion.choices[0].message.content || '{}');
-  return result;
+    const content = completion.choices[0]?.message?.content;
+    if (!content) {
+      return {
+        predictions: [],
+        error: "No response from AI service"
+      };
+    }
+
+    const result = JSON.parse(content);
+    
+    return {
+      predictions: Array.isArray(result.predictions) ? result.predictions : []
+    };
+  } catch (error: any) {
+    console.error("AI maintenance prediction error:", error);
+    return {
+      predictions: [],
+      error: error.message || "Unknown error occurred"
+    };
+  }
 }
 
 export async function recommendParts(input: PartsRecommendationInput) {
-  const prompt = `You are an expert automotive parts specialist. Recommend the necessary parts for the following service.
+  try {
+    const prompt = `You are an expert automotive parts specialist. Recommend the necessary parts for the following service.
 
 Service Type: ${input.serviceType}
 Vehicle: ${input.vehicleMake} ${input.vehicleModel} (${input.vehicleYear})
@@ -160,28 +208,56 @@ Provide parts recommendations in JSON format:
   "confidence": number (0-100)
 }`;
 
-  const completion = await openai.chat.completions.create({
-    model: AI_MODEL,
-    messages: [
-      {
-        role: "system",
-        content: "You are an expert automotive parts specialist. Recommend appropriate parts based on the service type and vehicle details. Always respond with valid JSON."
-      },
-      {
-        role: "user",
-        content: prompt
-      }
-    ],
-    response_format: { type: "json_object" },
-    max_completion_tokens: AI_MAX_TOKENS
-  });
+    const completion = await openai.chat.completions.create({
+      model: AI_MODEL,
+      messages: [
+        {
+          role: "system",
+          content: "You are an expert automotive parts specialist. Recommend appropriate parts based on the service type and vehicle details. Always respond with valid JSON."
+        },
+        {
+          role: "user",
+          content: prompt
+        }
+      ],
+      response_format: { type: "json_object" },
+      max_completion_tokens: AI_MAX_TOKENS
+    });
 
-  const result = JSON.parse(completion.choices[0].message.content || '{}');
-  return result;
+    const content = completion.choices[0]?.message?.content;
+    if (!content) {
+      return {
+        parts: [],
+        totalEstimatedCost: 0,
+        reasoning: "AI service unavailable",
+        confidence: 0,
+        error: "No response from AI service"
+      };
+    }
+
+    const result = JSON.parse(content);
+    
+    return {
+      parts: Array.isArray(result.parts) ? result.parts : [],
+      totalEstimatedCost: result.totalEstimatedCost || 0,
+      reasoning: result.reasoning || "No reasoning provided",
+      confidence: result.confidence || 0
+    };
+  } catch (error: any) {
+    console.error("AI parts recommendation error:", error);
+    return {
+      parts: [],
+      totalEstimatedCost: 0,
+      reasoning: "AI recommendation failed",
+      confidence: 0,
+      error: error.message || "Unknown error occurred"
+    };
+  }
 }
 
 export async function optimizeSchedule(input: ScheduleOptimizationInput) {
-  const prompt = `You are an expert in automotive service scheduling optimization. Analyze the current schedule and provide optimization suggestions.
+  try {
+    const prompt = `You are an expert in automotive service scheduling optimization. Analyze the current schedule and provide optimization suggestions.
 
 Current Appointments:
 ${input.appointments.map(apt => `- ${apt.startTime} to ${apt.endTime}: Technician ${apt.technicianId}, Duration: ${apt.estimatedDuration} min`).join('\n')}
@@ -210,28 +286,56 @@ Identify scheduling conflicts, inefficiencies, and provide optimization suggesti
   "reasoning": "overall optimization strategy"
 }`;
 
-  const completion = await openai.chat.completions.create({
-    model: AI_MODEL,
-    messages: [
-      {
-        role: "system",
-        content: "You are an expert in automotive service scheduling optimization. Analyze schedules to minimize conflicts and maximize efficiency. Always respond with valid JSON."
-      },
-      {
-        role: "user",
-        content: prompt
-      }
-    ],
-    response_format: { type: "json_object" },
-    max_completion_tokens: AI_MAX_TOKENS
-  });
+    const completion = await openai.chat.completions.create({
+      model: AI_MODEL,
+      messages: [
+        {
+          role: "system",
+          content: "You are an expert in automotive service scheduling optimization. Analyze schedules to minimize conflicts and maximize efficiency. Always respond with valid JSON."
+        },
+        {
+          role: "user",
+          content: prompt
+        }
+      ],
+      response_format: { type: "json_object" },
+      max_completion_tokens: AI_MAX_TOKENS
+    });
 
-  const result = JSON.parse(completion.choices[0].message.content || '{}');
-  return result;
+    const content = completion.choices[0]?.message?.content;
+    if (!content) {
+      return {
+        conflicts: [],
+        suggestions: [],
+        totalPotentialTimeSaved: 0,
+        reasoning: "AI service unavailable",
+        error: "No response from AI service"
+      };
+    }
+
+    const result = JSON.parse(content);
+    
+    return {
+      conflicts: Array.isArray(result.conflicts) ? result.conflicts : [],
+      suggestions: Array.isArray(result.suggestions) ? result.suggestions : [],
+      totalPotentialTimeSaved: result.totalPotentialTimeSaved || 0,
+      reasoning: result.reasoning || "No reasoning provided"
+    };
+  } catch (error: any) {
+    console.error("AI schedule optimization error:", error);
+    return {
+      conflicts: [],
+      suggestions: [],
+      totalPotentialTimeSaved: 0,
+      reasoning: "AI optimization failed",
+      error: error.message || "Unknown error occurred"
+    };
+  }
 }
 
 export async function chatWithCustomer(message: string, conversationHistory: Array<{ role: string; content: string }>, garageContext: any) {
-  const systemPrompt = `You are a helpful customer support assistant for an automotive service garage. 
+  try {
+    const systemPrompt = `You are a helpful customer support assistant for an automotive service garage. 
 
 Garage Information:
 - Name: ${garageContext.garageName}
@@ -248,27 +352,44 @@ If you cannot answer a question or if the customer needs immediate assistance, p
 
 Always be professional, friendly, and helpful.`;
 
-  const messages: any[] = [
-    {
-      role: "system",
-      content: systemPrompt
-    },
-    ...conversationHistory,
-    {
-      role: "user",
-      content: message
+    const messages: any[] = [
+      {
+        role: "system",
+        content: systemPrompt
+      },
+      ...conversationHistory,
+      {
+        role: "user",
+        content: message
+      }
+    ];
+
+    const completion = await openai.chat.completions.create({
+      model: AI_MODEL,
+      messages,
+      max_completion_tokens: AI_MAX_TOKENS
+    });
+
+    const content = completion.choices[0]?.message?.content;
+    if (!content) {
+      return {
+        response: "I apologize, but I'm experiencing technical difficulties. Please contact staff for assistance.",
+        shouldHandoff: true,
+        error: "No response from AI service"
+      };
     }
-  ];
 
-  const completion = await openai.chat.completions.create({
-    model: AI_MODEL,
-    messages,
-    max_completion_tokens: AI_MAX_TOKENS
-  });
-
-  return {
-    response: completion.choices[0].message.content,
-    shouldHandoff: completion.choices[0].message.content?.toLowerCase().includes('connect you with') || 
-                   completion.choices[0].message.content?.toLowerCase().includes('speak with a staff')
-  };
+    return {
+      response: content,
+      shouldHandoff: content.toLowerCase().includes('connect you with') || 
+                     content.toLowerCase().includes('speak with a staff')
+    };
+  } catch (error: any) {
+    console.error("AI customer chat error:", error);
+    return {
+      response: "I apologize, but I'm experiencing technical difficulties. Please contact staff for assistance.",
+      shouldHandoff: true,
+      error: error.message || "Unknown error occurred"
+    };
+  }
 }

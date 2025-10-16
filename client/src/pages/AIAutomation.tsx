@@ -79,10 +79,25 @@ export default function AIAutomation() {
     mutationFn: async (data: any) => {
       return await apiRequest('/api/ai/estimate-job', 'POST', data);
     },
-    onSuccess: () => {
+    onSuccess: (data: any) => {
       queryClient.invalidateQueries({ queryKey: ['/api/ai/job-estimations'] });
-      toast({ title: "Job estimation completed", description: "AI has generated time and cost estimates" });
+      if (data?.error) {
+        toast({ 
+          title: "Estimation completed with warnings", 
+          description: data.error,
+          variant: "destructive" 
+        });
+      } else {
+        toast({ title: "Job estimation completed", description: "AI has generated time and cost estimates" });
+      }
       setEstimationForm({ serviceType: "", vehicleId: "", vehicleMake: "", vehicleModel: "", vehicleYear: "" });
+    },
+    onError: (error: any) => {
+      toast({ 
+        title: "Estimation failed", 
+        description: error.message || "Failed to generate AI estimation",
+        variant: "destructive" 
+      });
     },
   });
 
@@ -90,10 +105,25 @@ export default function AIAutomation() {
     mutationFn: async (data: any) => {
       return await apiRequest('/api/ai/predict-maintenance', 'POST', data);
     },
-    onSuccess: () => {
+    onSuccess: (data: any) => {
       queryClient.invalidateQueries({ queryKey: ['/api/ai/maintenance-predictions'] });
-      toast({ title: "Maintenance prediction created", description: "AI has analyzed the vehicle and made predictions" });
+      if (data?.error) {
+        toast({ 
+          title: "Prediction completed with warnings", 
+          description: data.error,
+          variant: "destructive" 
+        });
+      } else {
+        toast({ title: "Maintenance prediction created", description: "AI has analyzed the vehicle and made predictions" });
+      }
       setPredictionForm({ vehicleId: "", vehicleMake: "", vehicleModel: "", vehicleYear: "", mileage: "" });
+    },
+    onError: (error: any) => {
+      toast({ 
+        title: "Maintenance prediction failed", 
+        description: error.message || "Failed to analyze vehicle and predict maintenance issues",
+        variant: "destructive" 
+      });
     },
   });
 
@@ -101,10 +131,25 @@ export default function AIAutomation() {
     mutationFn: async (data: any) => {
       return await apiRequest('/api/ai/recommend-parts', 'POST', data);
     },
-    onSuccess: () => {
+    onSuccess: (data: any) => {
       queryClient.invalidateQueries({ queryKey: ['/api/ai/parts-recommendations'] });
-      toast({ title: "Parts recommendation ready", description: "AI has suggested parts for this service" });
+      if (data?.error) {
+        toast({ 
+          title: "Recommendation completed with warnings", 
+          description: data.error,
+          variant: "destructive" 
+        });
+      } else {
+        toast({ title: "Parts recommendation ready", description: "AI has suggested parts for this service" });
+      }
       setPartsForm({ serviceType: "", vehicleId: "", vehicleMake: "", vehicleModel: "", vehicleYear: "", description: "" });
+    },
+    onError: (error: any) => {
+      toast({ 
+        title: "Parts recommendation failed", 
+        description: error.message || "Failed to generate parts recommendations",
+        variant: "destructive" 
+      });
     },
   });
 
@@ -112,9 +157,24 @@ export default function AIAutomation() {
     mutationFn: async () => {
       return await apiRequest('/api/ai/optimize-schedule', 'POST', { appointments: [], technicians: [] });
     },
-    onSuccess: () => {
+    onSuccess: (data: any) => {
       queryClient.invalidateQueries({ queryKey: ['/api/ai/schedule-optimizations'] });
-      toast({ title: "Schedule optimized", description: "AI has analyzed your schedule and made optimization suggestions" });
+      if (data?.error) {
+        toast({ 
+          title: "Optimization completed with warnings", 
+          description: data.error,
+          variant: "destructive" 
+        });
+      } else {
+        toast({ title: "Schedule optimized", description: "AI has analyzed your schedule and made optimization suggestions" });
+      }
+    },
+    onError: (error: any) => {
+      toast({ 
+        title: "Schedule optimization failed", 
+        description: error.message || "Failed to optimize schedule",
+        variant: "destructive" 
+      });
     },
   });
 
@@ -122,9 +182,23 @@ export default function AIAutomation() {
     mutationFn: async (data: { message: string; conversationId?: string }) => {
       return await apiRequest('/api/ai/chat', 'POST', data);
     },
-    onSuccess: () => {
+    onSuccess: (data: any) => {
       queryClient.invalidateQueries({ queryKey: ['/api/ai/chat-conversations'] });
+      if (data?.error) {
+        toast({ 
+          title: "Chat message completed with warnings", 
+          description: data.error,
+          variant: "destructive" 
+        });
+      }
       setChatMessage("");
+    },
+    onError: (error: any) => {
+      toast({ 
+        title: "Chat message failed", 
+        description: error.message || "Failed to send message to AI chatbot",
+        variant: "destructive" 
+      });
     },
   });
 
@@ -135,6 +209,13 @@ export default function AIAutomation() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/ai/maintenance-predictions'] });
       toast({ title: "Prediction acknowledged" });
+    },
+    onError: (error: any) => {
+      toast({ 
+        title: "Acknowledgement failed", 
+        description: error.message || "Failed to acknowledge prediction",
+        variant: "destructive" 
+      });
     },
   });
 
