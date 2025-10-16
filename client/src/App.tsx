@@ -23,6 +23,7 @@ import ServiceTemplates from "@/pages/ServiceTemplates";
 import Tools from "@/pages/Tools";
 import SpareParts from "@/pages/SpareParts";
 import Suppliers from "@/pages/Suppliers";
+import InventoryManagement from "@/pages/InventoryManagement";
 import { TechnicianPortal } from "@/pages/TechnicianPortal";
 import TechnicianManagement from "@/pages/TechnicianManagement";
 import Notifications from "@/pages/Notifications";
@@ -161,6 +162,11 @@ function Router() {
       <Route path="/spare-parts">
         <Layout>
           <SpareParts />
+        </Layout>
+      </Route>
+      <Route path="/inventory-management">
+        <Layout>
+          <InventoryManagement />
         </Layout>
       </Route>
       <Route path="/suppliers">
