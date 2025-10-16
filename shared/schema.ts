@@ -1559,3 +1559,105 @@ export const insertAccountingTransactionSchema = createInsertSchema(accountingTr
 export type OBDDiagnosticData = typeof obdDiagnosticData.$inferSelect;
 export type InsertOBDDiagnosticData = typeof obdDiagnosticData.$inferInsert;
 export const insertOBDDiagnosticDataSchema = createInsertSchema(obdDiagnosticData).omit({ id: true, createdAt: true });
+
+// Module 34: Security & Compliance
+export const auditLogs = pgTable("audit_logs", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  action: varchar("action", { length: 100 }).notNull(),
+  resourceType: varchar("resource_type", { length: 100 }).notNull(),
+  resourceId: varchar("resource_id", { length: 255 }),
+  details: jsonb("details"),
+  ipAddress: varchar("ip_address", { length: 45 }),
+  userAgent: text("user_agent"),
+  timestamp: timestamp("timestamp").defaultNow().notNull(),
+});
+
+export const twoFactorAuth = pgTable("two_factor_auth", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id).notNull().unique(),
+  secret: varchar("secret", { length: 255 }).notNull(),
+  isEnabled: boolean("is_enabled").default(false),
+  backupCodes: jsonb("backup_codes"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const backupJobs = pgTable("backup_jobs", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  jobType: varchar("job_type", { length: 50 }).notNull(),
+  status: varchar("status", { length: 50 }).default("pending"),
+  fileName: varchar("file_name", { length: 255 }),
+  fileSize: integer("file_size"),
+  dataTypes: jsonb("data_types"),
+  startedAt: timestamp("started_at"),
+  completedAt: timestamp("completed_at"),
+  errorMessage: text("error_message"),
+  createdBy: varchar("created_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const gdprDataRequests = pgTable("gdpr_data_requests", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  userId: varchar("user_id").references(() => users.id),
+  requestType: varchar("request_type", { length: 50 }).notNull(),
+  status: varchar("status", { length: 50 }).default("pending"),
+  requestData: jsonb("request_data"),
+  responseData: jsonb("response_data"),
+  completedAt: timestamp("completed_at"),
+  expiresAt: timestamp("expires_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const userConsents = pgTable("user_consents", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  consentType: varchar("consent_type", { length: 100 }).notNull(),
+  consentGiven: boolean("consent_given").notNull(),
+  consentVersion: varchar("consent_version", { length: 50 }),
+  ipAddress: varchar("ip_address", { length: 45 }),
+  userAgent: text("user_agent"),
+  metadata: jsonb("metadata"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const permissionOverrides = pgTable("permission_overrides", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  resource: varchar("resource", { length: 100 }).notNull(),
+  action: varchar("action", { length: 50 }).notNull(),
+  allowed: boolean("allowed").notNull(),
+  reason: text("reason"),
+  createdBy: varchar("created_by").references(() => users.id),
+  expiresAt: timestamp("expires_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export type AuditLog = typeof auditLogs.$inferSelect;
+export type InsertAuditLog = typeof auditLogs.$inferInsert;
+export const insertAuditLogSchema = createInsertSchema(auditLogs).omit({ id: true, timestamp: true });
+
+export type TwoFactorAuth = typeof twoFactorAuth.$inferSelect;
+export type InsertTwoFactorAuth = typeof twoFactorAuth.$inferInsert;
+export const insertTwoFactorAuthSchema = createInsertSchema(twoFactorAuth).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type BackupJob = typeof backupJobs.$inferSelect;
+export type InsertBackupJob = typeof backupJobs.$inferInsert;
+export const insertBackupJobSchema = createInsertSchema(backupJobs).omit({ id: true, createdAt: true });
+
+export type GdprDataRequest = typeof gdprDataRequests.$inferSelect;
+export type InsertGdprDataRequest = typeof gdprDataRequests.$inferInsert;
+export const insertGdprDataRequestSchema = createInsertSchema(gdprDataRequests).omit({ id: true, createdAt: true });
+
+export type UserConsent = typeof userConsents.$inferSelect;
+export type InsertUserConsent = typeof userConsents.$inferInsert;
+export const insertUserConsentSchema = createInsertSchema(userConsents).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type PermissionOverride = typeof permissionOverrides.$inferSelect;
+export type InsertPermissionOverride = typeof permissionOverrides.$inferInsert;
+export const insertPermissionOverrideSchema = createInsertSchema(permissionOverrides).omit({ id: true, createdAt: true });
