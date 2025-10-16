@@ -1158,6 +1158,38 @@ export const discountUsage = pgTable("discount_usage", {
   appliedAt: timestamp("applied_at").defaultNow(),
 });
 
+// ============= Module 29: Search & Filtering =============
+
+// Saved Filter Presets
+export const savedFilterPresets = pgTable("saved_filter_presets", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").notNull().references(() => garages.id),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  name: varchar("name", { length: 100 }).notNull(),
+  module: varchar("module", { length: 50 }).notNull(), // "job_cards", "invoices", "customers", etc.
+  filterConfig: jsonb("filter_config").notNull(), // Stores the filter configuration {field: "status", operator: "equals", value: "completed"}
+  isGlobal: boolean("is_global").notNull().default(false), // If true, shared with all users in garage
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Export Jobs (for tracking async export operations)
+export const exportJobs = pgTable("export_jobs", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").notNull().references(() => garages.id),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  module: varchar("module", { length: 50 }).notNull(), // Module being exported
+  format: varchar("format", { length: 20 }).notNull(), // "csv", "json", "excel"
+  status: varchar("status", { length: 20 }).notNull().default("pending"), // "pending", "processing", "completed", "failed"
+  fileName: varchar("file_name", { length: 255 }),
+  fileUrl: text("file_url"), // S3 or local storage URL
+  filterConfig: jsonb("filter_config"), // Optional filters applied to export
+  recordCount: integer("record_count"),
+  errorMessage: text("error_message"),
+  createdAt: timestamp("created_at").defaultNow(),
+  completedAt: timestamp("completed_at"),
+});
+
 export type PaymentPlan = typeof paymentPlans.$inferSelect;
 export type InsertPaymentPlan = typeof paymentPlans.$inferInsert;
 export const insertPaymentPlanSchema = createInsertSchema(paymentPlans).omit({ id: true, createdAt: true, updatedAt: true });
@@ -1181,3 +1213,11 @@ export const insertDiscountPromotionSchema = createInsertSchema(discountsPromoti
 export type DiscountUsage = typeof discountUsage.$inferSelect;
 export type InsertDiscountUsage = typeof discountUsage.$inferInsert;
 export const insertDiscountUsageSchema = createInsertSchema(discountUsage).omit({ id: true });
+
+export type SavedFilterPreset = typeof savedFilterPresets.$inferSelect;
+export type InsertSavedFilterPreset = typeof savedFilterPresets.$inferInsert;
+export const insertSavedFilterPresetSchema = createInsertSchema(savedFilterPresets).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type ExportJob = typeof exportJobs.$inferSelect;
+export type InsertExportJob = typeof exportJobs.$inferInsert;
+export const insertExportJobSchema = createInsertSchema(exportJobs).omit({ id: true, createdAt: true, completedAt: true });
