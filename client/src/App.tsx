@@ -32,6 +32,7 @@ import Calendar from "@/pages/Calendar";
 import FinancialSettings from "@/pages/FinancialSettings";
 import RefundManagement from "@/pages/RefundManagement";
 import DataImportExport from "@/pages/DataImportExport";
+import BusinessIntelligence from "@/pages/BusinessIntelligence";
 import { CustomerDashboard } from "@/pages/customer/CustomerDashboard";
 import { CustomerAppointments } from "@/pages/customer/CustomerAppointments";
 import { CustomerInvoices } from "@/pages/customer/CustomerInvoices";
@@ -215,6 +216,11 @@ function Router() {
       <Route path="/data-import-export">
         <Layout>
           <DataImportExport />
+        </Layout>
+      </Route>
+      <Route path="/business-intelligence">
+        <Layout>
+          <BusinessIntelligence />
         </Layout>
       </Route>
       <Route component={NotFound} />
