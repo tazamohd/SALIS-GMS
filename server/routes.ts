@@ -1689,22 +1689,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       };
       
       const invoiceNumber = `INV-${Date.now()}`;
-      const { invoices } = await import("@shared/schema");
-      const [invoice] = await db.insert(invoices)
-        .values({ ...invoiceData, invoiceNumber, createdBy: userId })
-        .returning();
+      const invoice = await storage.createInvoice({ 
+        ...invoiceData, 
+        invoiceNumber, 
+        createdBy: userId 
+      });
       
       // Create invoice items from estimate items
-      const { invoiceItems } = await import("@shared/schema");
       for (const item of items) {
-        await db.insert(invoiceItems).values({
+        await storage.createInvoiceItem({
           invoiceId: invoice.id,
           itemType: item.itemType,
           description: item.description,
-          quantity: item.quantity,
+          quantity: parseFloat(item.quantity),
           unitPrice: item.unitPrice,
           lineTotal: item.lineTotal,
-          taxRate: item.taxRate,
         });
       }
       
@@ -2304,6 +2303,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       console.error("Error sending SMS feedback request:", error);
       res.status(500).json({ message: "Failed to send SMS feedback request" });
+    }
+  });
+
+  // Notification preferences routes - Module 24
+  app.get('/api/notification-preferences', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const preferences = await storage.getNotificationPreferences(userId);
+      res.json(preferences || { userId, eventMap: '{}', channel: 'all', isLockedByAdmin: false });
+    } catch (error) {
+      console.error("Error fetching notification preferences:", error);
+      res.status(500).json({ message: "Failed to fetch notification preferences" });
+    }
+  });
+
+  app.post('/api/notification-preferences', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { eventMap } = req.body;
+      const preferences = await storage.upsertNotificationPreferences(userId, eventMap);
+      res.json(preferences);
+    } catch (error) {
+      console.error("Error saving notification preferences:", error);
+      res.status(500).json({ message: "Failed to save notification preferences" });
     }
   });
 

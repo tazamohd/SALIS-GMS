@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { Bell, Mail, MessageSquare, CheckCircle, XCircle, Trash2 } from "lucide-react";
+import { Bell, Mail, MessageSquare, CheckCircle, XCircle, Trash2, Settings } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -9,9 +9,11 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { formatDistanceToNow } from "date-fns";
 import type { Notification } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
+import { NotificationPreferences } from "@/components/NotificationPreferences";
 
 export default function Notifications() {
   const [selectedTab, setSelectedTab] = useState("all");
+  const [showPreferences, setShowPreferences] = useState(false);
   const { toast } = useToast();
 
   // Fetch all notifications
@@ -96,11 +98,37 @@ export default function Notifications() {
     );
   };
 
+  if (showPreferences) {
+    return (
+      <div className="p-6">
+        <Button
+          variant="ghost"
+          onClick={() => setShowPreferences(false)}
+          className="mb-4"
+          data-testid="button-back-to-notifications"
+        >
+          ← Back to Notifications
+        </Button>
+        <NotificationPreferences />
+      </div>
+    );
+  }
+
   return (
     <div className="p-6 space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-[#222029]">Notifications</h1>
-        <p className="text-[#999999] mt-2">Manage your notifications and alerts</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-[#222029]">Notifications</h1>
+          <p className="text-[#999999] mt-2">Manage your notifications and alerts</p>
+        </div>
+        <Button
+          variant="outline"
+          onClick={() => setShowPreferences(true)}
+          data-testid="button-notification-preferences"
+        >
+          <Settings className="w-4 h-4 mr-2" />
+          Preferences
+        </Button>
       </div>
 
       <Tabs value={selectedTab} onValueChange={setSelectedTab}>

@@ -294,6 +294,10 @@ export interface IStorage {
   markNotificationAsFailed(id: string, reason: string): Promise<Notification>;
   deleteNotification(id: string): Promise<void>;
   getUnreadCount(recipientId: string, garageId?: string): Promise<number>;
+  
+  // Notification preferences - Module 24
+  getNotificationPreferences(userId: string): Promise<any | undefined>;
+  upsertNotificationPreferences(userId: string, eventMap: string): Promise<any>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1827,6 +1831,29 @@ export class DatabaseStorage implements IStorage {
       .where(and(...conditions));
 
     return result.length;
+  }
+
+  // Notification Preferences - Module 24
+  async getNotificationPreferences(userId: string) {
+    const { notificationPreferences } = await import("@shared/schema");
+    const [prefs] = await db
+      .select()
+      .from(notificationPreferences)
+      .where(eq(notificationPreferences.userId, userId));
+    return prefs;
+  }
+
+  async upsertNotificationPreferences(userId: string, eventMap: string) {
+    const { notificationPreferences } = await import("@shared/schema");
+    const [prefs] = await db
+      .insert(notificationPreferences)
+      .values({ userId, eventMap, channel: 'all' })
+      .onConflictDoUpdate({
+        target: notificationPreferences.userId,
+        set: { eventMap },
+      })
+      .returning();
+    return prefs;
   }
 }
 
