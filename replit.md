@@ -96,3 +96,32 @@ The application utilizes a full-stack architecture with clear client-server sepa
 - **Database**: action_history table tracks all user actions with type, description, and metadata
 - **API Routes**: POST endpoint for creating action history records
 - **Integration**: UndoRedoContext automatically saves actions to backend for persistence and audit trail
+
+## Recent Updates (Module 36 - Mobile & Accessibility)
+### Progressive Web App (PWA) Support (Completed)
+- **PWA Manifest**: Complete manifest.json with app metadata, icons, screenshots, and shortcuts
+- **Service Worker**: Comprehensive offline caching with cache-first for static assets, network-first for API calls
+- **Install Prompts**: Automatic PWA install prompt with beforeinstallprompt handling
+- **Push Notifications**: Service worker support for push notifications and notification clicks
+- **Background Sync**: Foundation for syncing offline data when connection is restored
+
+### Mobile-Responsive Navigation (Completed)
+- **Hamburger Menu**: Mobile-friendly navigation with slide-in sidebar and overlay
+- **Responsive Header**: Adaptive header with mobile menu toggle and responsive search bar
+- **Touch-Friendly**: Large touch targets (min 44x44px) for mobile interactions
+- **Auto-Close**: Mobile menu automatically closes on route change
+- **Smooth Transitions**: CSS transitions for drawer open/close animations
+
+### Accessibility Features (WCAG 2.1 AA) (Completed)
+- **Skip Links**: Keyboard-accessible skip to main content link
+- **ARIA Labels**: Comprehensive aria-label, aria-live, role attributes throughout UI
+- **Keyboard Navigation**: Full keyboard support with visible focus states
+- **Screen Reader Support**: Semantic HTML, proper heading hierarchy, and ARIA live regions
+- **Offline Indicator**: Visual and screen reader accessible offline/online status with aria-live regions
+
+### Offline Mode (Completed)
+- **Service Worker Caching**: Cache-first strategy for static assets, network-first with cache fallback for API
+- **Offline Detection**: Real-time online/offline status monitoring
+- **Visual Indicators**: Toast notifications when going offline/back online
+- **Cached API Responses**: GET API requests cached for offline access
+- **Graceful Degradation**: App continues to work with cached data when offline

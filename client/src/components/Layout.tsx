@@ -5,6 +5,8 @@ import { Input } from "@/components/ui/input";
 import { useAuth } from "@/hooks/useAuth";
 import { NotificationBell } from "@/components/NotificationBell";
 import { QuickActionsModal } from "@/components/QuickActionsModal";
+import { SkipLink } from "@/components/SkipLink";
+import { OfflineIndicator } from "@/components/OfflineIndicator";
 import { useState, useEffect } from "react";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { useQuery } from "@tanstack/react-query";
@@ -81,15 +83,20 @@ export function Layout({ children }: LayoutProps) {
   ];
 
   return (
-    <div className="flex h-screen bg-white">
-      {/* Mobile Menu Overlay */}
-      {mobileMenuOpen && (
-        <div 
-          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
-          onClick={() => setMobileMenuOpen(false)}
-          aria-label="Close mobile menu"
-        />
-      )}
+    <>
+      <SkipLink />
+      <div className="flex h-screen bg-white">
+        {/* Mobile Menu Overlay */}
+        {mobileMenuOpen && (
+          <div 
+            className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+            onClick={() => setMobileMenuOpen(false)}
+            aria-label="Close mobile menu"
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => e.key === 'Enter' && setMobileMenuOpen(false)}
+          />
+        )}
 
       {/* Sidebar */}
       <aside className={`
@@ -189,13 +196,17 @@ export function Layout({ children }: LayoutProps) {
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 overflow-auto">
+        <main id="main-content" className="flex-1 overflow-auto" tabIndex={-1}>
           {children}
         </main>
       </div>
 
       {/* Quick Actions Modal */}
       <QuickActionsModal open={quickActionsOpen} onOpenChange={setQuickActionsOpen} />
-    </div>
+      
+      {/* Offline Indicator */}
+      <OfflineIndicator />
+      </div>
+    </>
   );
 }
