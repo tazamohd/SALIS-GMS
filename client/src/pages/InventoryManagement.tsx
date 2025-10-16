@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -69,11 +69,11 @@ export default function InventoryManagement() {
   });
 
   // Set default garage
-  useState(() => {
+  useEffect(() => {
     if (garages.length > 0 && !selectedGarageId) {
       setSelectedGarageId(garages[0].id);
     }
-  });
+  }, [garages, selectedGarageId]);
 
   // Fetch spare parts
   const { data: spareParts = [] } = useQuery<any[]>({
@@ -103,7 +103,7 @@ export default function InventoryManagement() {
     mutationFn: (alertId: string) =>
       apiRequest("POST", `/api/stock-alerts/${alertId}/acknowledge`, {}),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/stock-alerts"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/stock-alerts", selectedGarageId] });
       toast({
         title: "Alert Acknowledged",
         description: "Stock alert has been acknowledged successfully",

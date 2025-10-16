@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { Camera, X, CheckCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { BrowserMultiFormatReader } from "@zxing/library";
 
 interface BarcodeScannerProps {
   open: boolean;
@@ -19,11 +20,10 @@ interface BarcodeScannerProps {
 export function BarcodeScanner({ open, onClose, onScan }: BarcodeScannerProps) {
   const { toast } = useToast();
   const videoRef = useRef<HTMLVideoElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isScanning, setIsScanning] = useState(false);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [scannedCode, setScannedCode] = useState<string>("");
-  const scanIntervalRef = useRef<number | null>(null);
+  const codeReaderRef = useRef<BrowserMultiFormatReader | null>(null);
 
   useEffect(() => {
     if (open) {
@@ -39,18 +39,35 @@ export function BarcodeScanner({ open, onClose, onScan }: BarcodeScannerProps) {
 
   const startCamera = async () => {
     try {
-      const mediaStream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "environment" },
-      });
-      setStream(mediaStream);
+      const codeReader = new BrowserMultiFormatReader();
+      codeReaderRef.current = codeReader;
+
+      // Get video input devices
+      const videoInputDevices = await codeReader.listVideoInputDevices();
       
-      if (videoRef.current) {
-        videoRef.current.srcObject = mediaStream;
-        videoRef.current.play();
+      if (videoInputDevices.length === 0) {
+        throw new Error("No camera found");
       }
 
+      // Prefer back camera on mobile devices
+      const selectedDeviceId = videoInputDevices.find(device => 
+        device.label.toLowerCase().includes('back') || 
+        device.label.toLowerCase().includes('rear')
+      )?.deviceId || videoInputDevices[0].deviceId;
+
       setIsScanning(true);
-      startScanning();
+
+      // Start continuous decode from video device
+      codeReader.decodeFromVideoDevice(
+        selectedDeviceId,
+        videoRef.current!,
+        (result, error) => {
+          if (result) {
+            handleBarcodeDetected(result.getText());
+          }
+          // Ignore errors - they're normal when no barcode is in view
+        }
+      );
     } catch (error) {
       console.error("Error accessing camera:", error);
       toast({
@@ -62,43 +79,11 @@ export function BarcodeScanner({ open, onClose, onScan }: BarcodeScannerProps) {
   };
 
   const stopCamera = () => {
-    if (stream) {
-      stream.getTracks().forEach((track) => track.stop());
-      setStream(null);
+    if (codeReaderRef.current) {
+      codeReaderRef.current.reset();
+      codeReaderRef.current = null;
     }
     setIsScanning(false);
-    if (scanIntervalRef.current) {
-      clearInterval(scanIntervalRef.current);
-      scanIntervalRef.current = null;
-    }
-  };
-
-  const startScanning = () => {
-    // Simple barcode detection using canvas
-    // In production, use a library like @zxing/library or quagga2
-    scanIntervalRef.current = window.setInterval(() => {
-      if (videoRef.current && canvasRef.current) {
-        const video = videoRef.current;
-        const canvas = canvasRef.current;
-        const context = canvas.getContext("2d");
-
-        if (context && video.readyState === video.HAVE_ENOUGH_DATA) {
-          canvas.width = video.videoWidth;
-          canvas.height = video.videoHeight;
-          context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-          // Get image data for barcode detection
-          const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-          
-          // Note: This is a placeholder. In production, integrate a proper barcode library
-          // For demo purposes, we'll simulate scanning with a random code
-          if (Math.random() > 0.95) {
-            const mockBarcode = `BC${Math.floor(Math.random() * 1000000)}`;
-            handleBarcodeDetected(mockBarcode);
-          }
-        }
-      }
-    }, 100);
   };
 
   const handleBarcodeDetected = (barcode: string) => {
@@ -154,7 +139,6 @@ export function BarcodeScanner({ open, onClose, onScan }: BarcodeScannerProps) {
                 playsInline
                 muted
               />
-              <canvas ref={canvasRef} className="hidden" />
               
               {isScanning && (
                 <div className="absolute inset-0 flex items-center justify-center">
@@ -189,7 +173,7 @@ export function BarcodeScanner({ open, onClose, onScan }: BarcodeScannerProps) {
           </div>
 
           <p className="text-xs text-muted-foreground text-center">
-            Note: For production use, integrate a barcode scanning library like @zxing/library or quagga2
+            Powered by ZXing library for real-time barcode detection
           </p>
         </div>
       </DialogContent>
