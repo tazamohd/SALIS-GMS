@@ -44,6 +44,7 @@ import { CustomerInvoices } from "@/pages/customer/CustomerInvoices";
 import { CustomerVehicles } from "@/pages/customer/CustomerVehicles";
 import { CustomerCommunications } from "@/pages/customer/CustomerCommunications";
 import { useAuth } from "@/hooks/useAuth";
+import { UndoRedoProvider } from "@/contexts/UndoRedoContext";
 import type { User } from "@shared/schema";
 
 function Router() {
@@ -261,10 +262,12 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Router />
-      </TooltipProvider>
+      <UndoRedoProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Router />
+        </TooltipProvider>
+      </UndoRedoProvider>
     </QueryClientProvider>
   );
 }

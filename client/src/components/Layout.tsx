@@ -6,6 +6,9 @@ import { useAuth } from "@/hooks/useAuth";
 import { NotificationBell } from "@/components/NotificationBell";
 import { QuickActionsModal } from "@/components/QuickActionsModal";
 import { useState, useEffect } from "react";
+import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
+import { useQuery } from "@tanstack/react-query";
+import type { UserSettings } from "@shared/schema";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -15,6 +18,14 @@ export function Layout({ children }: LayoutProps) {
   const [location] = useLocation();
   const { user } = useAuth();
   const [quickActionsOpen, setQuickActionsOpen] = useState(false);
+  
+  // Get user settings for keyboard shortcuts
+  const { data: settings } = useQuery<UserSettings>({
+    queryKey: ['/api/settings'],
+  });
+  
+  // Enable global keyboard shortcuts
+  useKeyboardShortcuts(settings?.enableKeyboardShortcuts ?? true);
 
   const handleLogout = () => {
     window.location.href = '/api/logout';
