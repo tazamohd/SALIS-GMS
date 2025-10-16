@@ -55,6 +55,49 @@ const getActionName = (method: string, url: string): string => {
   return resourceType ? `${action}_${resourceType}` : action;
 };
 
+// Sensitive fields that should never be logged
+const SENSITIVE_FIELDS = [
+  'password',
+  'token',
+  'secret',
+  'apiKey',
+  'apiSecret',
+  'backupCodes',
+  'backupCode',
+  'verificationCode',
+  'qrCodeUrl',
+  'creditCard',
+  'cvv',
+  'ssn',
+  'dateOfBirth',
+];
+
+// Sanitize request body to remove sensitive fields
+const sanitizeBody = (body: any): any => {
+  if (!body || typeof body !== 'object') {
+    return body;
+  }
+
+  const sanitized: any = Array.isArray(body) ? [] : {};
+
+  for (const [key, value] of Object.entries(body)) {
+    // Check if field name contains sensitive keywords
+    const isSensitive = SENSITIVE_FIELDS.some(field => 
+      key.toLowerCase().includes(field.toLowerCase())
+    );
+
+    if (isSensitive) {
+      sanitized[key] = '[REDACTED]';
+    } else if (value && typeof value === 'object') {
+      sanitized[key] = sanitizeBody(value);
+    } else {
+      sanitized[key] = value;
+    }
+  }
+
+  return sanitized;
+};
+
 // Audit logging middleware
 export const auditLog = async (req: Request, res: Response, next: NextFunction) => {
   const user = (req as any).user;
@@ -111,7 +154,7 @@ export const auditLog = async (req: Request, res: Response, next: NextFunction) 
           details: {
             method: req.method,
             url: req.url,
-            body: req.body,
+            body: sanitizeBody(req.body), // Sanitize request body
             query: req.query,
             responseStatus: statusCode,
           },
