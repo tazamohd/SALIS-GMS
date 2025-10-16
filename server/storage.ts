@@ -3200,7 +3200,7 @@ export class DatabaseStorage implements IStorage {
           and(
             eq(jobCards.garageId, garageId),
             or(
-              ilike(jobCards.jobCardNumber, searchTerm),
+              ilike(jobCards.jobNumber, searchTerm),
               ilike(jobCards.description, searchTerm)
             )
           )
@@ -3230,7 +3230,7 @@ export class DatabaseStorage implements IStorage {
           and(
             eq(vehicles.garageId, garageId),
             or(
-              ilike(vehicles.plateNumber, searchTerm),
+              ilike(vehicles.licensePlate, searchTerm),
               ilike(vehicles.vin, searchTerm),
               ilike(vehicles.make, searchTerm),
               ilike(vehicles.model, searchTerm)
@@ -3271,13 +3271,10 @@ export class DatabaseStorage implements IStorage {
     if (searchModules.includes('spareParts')) {
       results.spareParts = await db.select().from(spareParts)
         .where(
-          and(
-            eq(spareParts.garageId, garageId),
-            or(
-              ilike(spareParts.partNumber, searchTerm),
-              ilike(spareParts.name, searchTerm),
-              ilike(spareParts.description, searchTerm)
-            )
+          or(
+            ilike(spareParts.sku, searchTerm),
+            ilike(spareParts.name, searchTerm),
+            ilike(spareParts.description, searchTerm)
           )
         )
         .limit(10);

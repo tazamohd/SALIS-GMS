@@ -5,7 +5,11 @@ import { setupAuth, isAuthenticated } from "./replitAuth";
 import { emailService } from "./services/emailService";
 import { smsService } from "./services/smsService";
 import { z } from "zod";
-import { insertNotificationSchema } from "@shared/schema";
+import { 
+  insertNotificationSchema, 
+  insertSavedFilterPresetSchema, 
+  insertExportJobSchema 
+} from "@shared/schema";
 import Stripe from "stripe";
 import { createPaypalOrder, capturePaypalOrder, loadPaypalDefault } from "./paypal";
 
@@ -3566,6 +3570,266 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error calculating tax:", error);
       res.status(500).json({ message: "Failed to calculate tax" });
+    }
+  });
+
+  // ============= Module 29: Search & Filtering =============
+  
+  // Global Search
+  app.get('/api/global-search', isAuthenticated, async (req: any, res) => {
+    try {
+      const { garageId, query, modules } = req.query;
+      
+      if (!garageId || !query) {
+        return res.status(400).json({ message: "Missing required parameters" });
+      }
+      
+      const modulesList = modules ? modules.split(',') : undefined;
+      const results = await storage.globalSearch(garageId, query, modulesList);
+      res.json(results);
+    } catch (error) {
+      console.error("Error in global search:", error);
+      res.status(500).json({ message: "Failed to search" });
+    }
+  });
+
+  // Saved Filter Presets
+  app.get('/api/filter-presets', isAuthenticated, async (req: any, res) => {
+    try {
+      const { garageId, module } = req.query;
+      const userId = req.user.claims.sub;
+      const presets = await storage.getSavedFilterPresets(garageId, userId, module);
+      res.json(presets);
+    } catch (error) {
+      console.error("Error getting filter presets:", error);
+      res.status(500).json({ message: "Failed to get filter presets" });
+    }
+  });
+
+  app.post('/api/filter-presets', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const validated = insertSavedFilterPresetSchema.parse({ ...req.body, userId });
+      const preset = await storage.createSavedFilterPreset(validated);
+      res.status(201).json(preset);
+    } catch (error: any) {
+      console.error("Error creating filter preset:", error);
+      if (error.errors) {
+        return res.status(400).json({ message: "Validation failed", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create filter preset" });
+    }
+  });
+
+  app.put('/api/filter-presets/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const preset = await storage.updateSavedFilterPreset(id, req.body);
+      res.json(preset);
+    } catch (error) {
+      console.error("Error updating filter preset:", error);
+      res.status(500).json({ message: "Failed to update filter preset" });
+    }
+  });
+
+  app.delete('/api/filter-presets/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteSavedFilterPreset(id);
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting filter preset:", error);
+      res.status(500).json({ message: "Failed to delete filter preset" });
+    }
+  });
+
+  // Export Jobs
+  app.get('/api/export-jobs', isAuthenticated, async (req: any, res) => {
+    try {
+      const { garageId } = req.query;
+      const userId = req.user.claims.sub;
+      const jobs = await storage.getExportJobs(garageId, userId);
+      res.json(jobs);
+    } catch (error) {
+      console.error("Error getting export jobs:", error);
+      res.status(500).json({ message: "Failed to get export jobs" });
+    }
+  });
+
+  app.post('/api/export', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { garageId, module, format, filterConfig } = req.body;
+      
+      const validated = insertExportJobSchema.parse({
+        garageId,
+        userId,
+        module,
+        format,
+        filterConfig,
+        status: 'processing',
+      });
+      
+      const job = await storage.createExportJob(validated);
+      
+      // Start async export process (simplified - in production, use a queue)
+      (async () => {
+        try {
+          let data: any[] = [];
+          
+          // Fetch data based on module
+          switch (module) {
+            case 'jobCards':
+              data = await storage.getJobCards(garageId);
+              break;
+            case 'customers':
+              data = await storage.getCustomers(garageId);
+              break;
+            case 'vehicles':
+              data = await storage.getVehicles(garageId);
+              break;
+            case 'invoices':
+              data = await storage.getInvoices(garageId);
+              break;
+            case 'estimates':
+              data = await storage.getEstimates(garageId);
+              break;
+            default:
+              throw new Error(`Export not supported for module: ${module}`);
+          }
+          
+          // Generate export file content
+          let fileContent = '';
+          const fileName = `${module}-export-${Date.now()}.${format}`;
+          
+          if (format === 'csv') {
+            if (data.length > 0) {
+              const headers = Object.keys(data[0]).join(',');
+              const rows = data.map(row => Object.values(row).join(','));
+              fileContent = [headers, ...rows].join('\n');
+            }
+          } else if (format === 'json') {
+            fileContent = JSON.stringify(data, null, 2);
+          }
+          
+          // Update job with completion status
+          await storage.updateExportJob(job.id, {
+            status: 'completed',
+            fileName,
+            fileUrl: `/exports/${fileName}`, // In production, upload to S3
+            recordCount: data.length,
+            completedAt: new Date(),
+          });
+        } catch (error: any) {
+          await storage.updateExportJob(job.id, {
+            status: 'failed',
+            errorMessage: error.message,
+          });
+        }
+      })();
+      
+      res.status(202).json(job);
+    } catch (error: any) {
+      console.error("Error creating export:", error);
+      if (error.errors) {
+        return res.status(400).json({ message: "Validation failed", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create export" });
+    }
+  });
+
+  app.get('/api/export-jobs/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const job = await storage.getExportJob(id);
+      
+      if (!job) {
+        return res.status(404).json({ message: "Export job not found" });
+      }
+      
+      res.json(job);
+    } catch (error) {
+      console.error("Error getting export job:", error);
+      res.status(500).json({ message: "Failed to get export job" });
+    }
+  });
+
+  // Bulk Operations
+  app.post('/api/bulk-delete', isAuthenticated, async (req: any, res) => {
+    try {
+      const { module, ids } = req.body;
+      
+      if (!module || !ids || !Array.isArray(ids) || ids.length === 0) {
+        return res.status(400).json({ message: "Invalid request data" });
+      }
+      
+      const result = await storage.bulkDelete(module, ids);
+      res.json(result);
+    } catch (error: any) {
+      console.error("Error in bulk delete:", error);
+      res.status(500).json({ message: error.message || "Failed to delete items" });
+    }
+  });
+
+  app.post('/api/bulk-update', isAuthenticated, async (req: any, res) => {
+    try {
+      const { module, ids, data } = req.body;
+      
+      if (!module || !ids || !Array.isArray(ids) || ids.length === 0 || !data) {
+        return res.status(400).json({ message: "Invalid request data" });
+      }
+      
+      const result = await storage.bulkUpdate(module, ids, data);
+      res.json(result);
+    } catch (error: any) {
+      console.error("Error in bulk update:", error);
+      res.status(500).json({ message: error.message || "Failed to update items" });
+    }
+  });
+
+  // Data Import
+  app.post('/api/import', isAuthenticated, async (req: any, res) => {
+    try {
+      const { module, data, conflictResolution = 'skip' } = req.body;
+      const userId = req.user.claims.sub;
+      
+      if (!module || !data || !Array.isArray(data)) {
+        return res.status(400).json({ message: "Invalid import data" });
+      }
+      
+      const results = { imported: 0, skipped: 0, errors: [] as any[] };
+      
+      for (const item of data) {
+        try {
+          switch (module) {
+            case 'customers':
+              await storage.createCustomer({ ...item, createdBy: userId });
+              results.imported++;
+              break;
+            case 'vehicles':
+              await storage.createVehicle(item);
+              results.imported++;
+              break;
+            case 'spareParts':
+              await storage.createSparePart(item);
+              results.imported++;
+              break;
+            default:
+              results.errors.push({ item, error: `Import not supported for module: ${module}` });
+          }
+        } catch (error: any) {
+          if (conflictResolution === 'skip') {
+            results.skipped++;
+          } else {
+            results.errors.push({ item, error: error.message });
+          }
+        }
+      }
+      
+      res.json(results);
+    } catch (error) {
+      console.error("Error importing data:", error);
+      res.status(500).json({ message: "Failed to import data" });
     }
   });
 
