@@ -131,6 +131,30 @@ import {
   type InsertSavedFilterPreset,
   type ExportJob,
   type InsertExportJob,
+  employeeAttendance,
+  shiftTemplates,
+  shiftAssignments,
+  commissionRules,
+  commissions,
+  performanceReviews,
+  trainings,
+  employeeTrainings,
+  type EmployeeAttendance,
+  type InsertEmployeeAttendance,
+  type ShiftTemplate,
+  type InsertShiftTemplate,
+  type ShiftAssignment,
+  type InsertShiftAssignment,
+  type CommissionRule,
+  type InsertCommissionRule,
+  type Commission,
+  type InsertCommission,
+  type PerformanceReview,
+  type InsertPerformanceReview,
+  type Training,
+  type InsertTraining,
+  type EmployeeTraining,
+  type InsertEmployeeTraining,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, or, inArray, and, gte, lte, ilike, sql } from "drizzle-orm";
@@ -521,6 +545,60 @@ export interface IStorage {
     acquisitionCost: number;
     customersBySource: { source: string; count: number; cost: number }[];
   }>;
+  
+  // Module 31: Staff & HR Management
+  // Employee Attendance
+  getEmployeeAttendance(garageId: string, employeeId?: string, startDate?: Date, endDate?: Date): Promise<any[]>;
+  getAttendance(id: string): Promise<any | undefined>;
+  createAttendance(data: any): Promise<any>;
+  updateAttendance(id: string, data: any): Promise<any>;
+  clockIn(employeeId: string, garageId: string): Promise<any>;
+  clockOut(attendanceId: string): Promise<any>;
+  startBreak(attendanceId: string): Promise<any>;
+  endBreak(attendanceId: string): Promise<any>;
+  
+  // Shift Management
+  getShiftTemplates(garageId: string): Promise<any[]>;
+  getShiftTemplate(id: string): Promise<any | undefined>;
+  createShiftTemplate(data: any): Promise<any>;
+  updateShiftTemplate(id: string, data: any): Promise<any>;
+  deleteShiftTemplate(id: string): Promise<void>;
+  getShiftAssignments(garageId: string, employeeId?: string, startDate?: Date, endDate?: Date): Promise<any[]>;
+  getShiftAssignment(id: string): Promise<any | undefined>;
+  createShiftAssignment(data: any): Promise<any>;
+  updateShiftAssignment(id: string, data: any): Promise<any>;
+  deleteShiftAssignment(id: string): Promise<void>;
+  
+  // Commission Management
+  getCommissionRules(garageId: string): Promise<any[]>;
+  getCommissionRule(id: string): Promise<any | undefined>;
+  createCommissionRule(data: any): Promise<any>;
+  updateCommissionRule(id: string, data: any): Promise<any>;
+  deleteCommissionRule(id: string): Promise<void>;
+  getCommissions(garageId: string, technicianId?: string, period?: string, status?: string): Promise<any[]>;
+  getCommission(id: string): Promise<any | undefined>;
+  createCommission(data: any): Promise<any>;
+  updateCommission(id: string, data: any): Promise<any>;
+  calculateCommission(jobCardId: string, garageId: string): Promise<any>;
+  
+  // Performance Reviews
+  getPerformanceReviews(garageId: string, employeeId?: string): Promise<any[]>;
+  getPerformanceReview(id: string): Promise<any | undefined>;
+  createPerformanceReview(data: any): Promise<any>;
+  updatePerformanceReview(id: string, data: any): Promise<any>;
+  deletePerformanceReview(id: string): Promise<void>;
+  
+  // Training & Certifications
+  getTrainings(garageId: string): Promise<any[]>;
+  getTraining(id: string): Promise<any | undefined>;
+  createTraining(data: any): Promise<any>;
+  updateTraining(id: string, data: any): Promise<any>;
+  deleteTraining(id: string): Promise<void>;
+  getEmployeeTrainings(garageId: string, employeeId?: string, status?: string): Promise<any[]>;
+  getEmployeeTraining(id: string): Promise<any | undefined>;
+  createEmployeeTraining(data: any): Promise<any>;
+  updateEmployeeTraining(id: string, data: any): Promise<any>;
+  deleteEmployeeTraining(id: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -3678,6 +3756,377 @@ export class DatabaseStorage implements IStorage {
       acquisitionCost,
       customersBySource,
     };
+  }
+
+  // Module 31: Staff & HR Management
+  
+  // Employee Attendance
+  async getEmployeeAttendance(garageId: string, employeeId?: string, startDate?: Date, endDate?: Date): Promise<EmployeeAttendance[]> {
+    const conditions = [eq(employeeAttendance.garageId, garageId)];
+    
+    if (employeeId) {
+      conditions.push(eq(employeeAttendance.employeeId, employeeId));
+    }
+    if (startDate) {
+      conditions.push(gte(employeeAttendance.date, startDate));
+    }
+    if (endDate) {
+      conditions.push(lte(employeeAttendance.date, endDate));
+    }
+    
+    return await db.select().from(employeeAttendance)
+      .where(and(...conditions))
+      .orderBy(desc(employeeAttendance.date));
+  }
+
+  async getAttendance(id: string): Promise<EmployeeAttendance | undefined> {
+    const [record] = await db.select().from(employeeAttendance).where(eq(employeeAttendance.id, id));
+    return record;
+  }
+
+  async createAttendance(data: InsertEmployeeAttendance): Promise<EmployeeAttendance> {
+    const [record] = await db.insert(employeeAttendance).values(data).returning();
+    return record;
+  }
+
+  async updateAttendance(id: string, data: Partial<EmployeeAttendance>): Promise<EmployeeAttendance> {
+    const [record] = await db.update(employeeAttendance)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(employeeAttendance.id, id))
+      .returning();
+    return record;
+  }
+
+  async clockIn(employeeId: string, garageId: string): Promise<EmployeeAttendance> {
+    const now = new Date();
+    const [record] = await db.insert(employeeAttendance).values({
+      garageId,
+      employeeId,
+      date: now,
+      clockIn: now,
+      status: 'present'
+    }).returning();
+    return record;
+  }
+
+  async clockOut(attendanceId: string): Promise<EmployeeAttendance> {
+    const now = new Date();
+    const [record] = await db.select().from(employeeAttendance).where(eq(employeeAttendance.id, attendanceId));
+    
+    if (!record) throw new Error('Attendance record not found');
+    
+    const clockInTime = new Date(record.clockIn);
+    const totalMinutes = (now.getTime() - clockInTime.getTime()) / (1000 * 60);
+    const breakMinutes = record.breakStart && record.breakEnd 
+      ? (new Date(record.breakEnd).getTime() - new Date(record.breakStart).getTime()) / (1000 * 60)
+      : 0;
+    const totalHours = ((totalMinutes - breakMinutes) / 60).toFixed(2);
+    
+    const [updated] = await db.update(employeeAttendance)
+      .set({ 
+        clockOut: now, 
+        totalHours,
+        updatedAt: new Date() 
+      })
+      .where(eq(employeeAttendance.id, attendanceId))
+      .returning();
+    return updated;
+  }
+
+  async startBreak(attendanceId: string): Promise<EmployeeAttendance> {
+    const [updated] = await db.update(employeeAttendance)
+      .set({ breakStart: new Date(), updatedAt: new Date() })
+      .where(eq(employeeAttendance.id, attendanceId))
+      .returning();
+    return updated;
+  }
+
+  async endBreak(attendanceId: string): Promise<EmployeeAttendance> {
+    const [updated] = await db.update(employeeAttendance)
+      .set({ breakEnd: new Date(), updatedAt: new Date() })
+      .where(eq(employeeAttendance.id, attendanceId))
+      .returning();
+    return updated;
+  }
+
+  // Shift Management
+  async getShiftTemplates(garageId: string): Promise<ShiftTemplate[]> {
+    return await db.select().from(shiftTemplates)
+      .where(eq(shiftTemplates.garageId, garageId))
+      .orderBy(shiftTemplates.name);
+  }
+
+  async getShiftTemplate(id: string): Promise<ShiftTemplate | undefined> {
+    const [template] = await db.select().from(shiftTemplates).where(eq(shiftTemplates.id, id));
+    return template;
+  }
+
+  async createShiftTemplate(data: InsertShiftTemplate): Promise<ShiftTemplate> {
+    const [template] = await db.insert(shiftTemplates).values(data).returning();
+    return template;
+  }
+
+  async updateShiftTemplate(id: string, data: Partial<ShiftTemplate>): Promise<ShiftTemplate> {
+    const [template] = await db.update(shiftTemplates)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(shiftTemplates.id, id))
+      .returning();
+    return template;
+  }
+
+  async deleteShiftTemplate(id: string): Promise<void> {
+    await db.delete(shiftTemplates).where(eq(shiftTemplates.id, id));
+  }
+
+  async getShiftAssignments(garageId: string, employeeId?: string, startDate?: Date, endDate?: Date): Promise<ShiftAssignment[]> {
+    const conditions = [eq(shiftAssignments.garageId, garageId)];
+    
+    if (employeeId) {
+      conditions.push(eq(shiftAssignments.employeeId, employeeId));
+    }
+    if (startDate) {
+      conditions.push(gte(shiftAssignments.date, startDate));
+    }
+    if (endDate) {
+      conditions.push(lte(shiftAssignments.date, endDate));
+    }
+    
+    return await db.select().from(shiftAssignments)
+      .where(and(...conditions))
+      .orderBy(desc(shiftAssignments.date));
+  }
+
+  async getShiftAssignment(id: string): Promise<ShiftAssignment | undefined> {
+    const [assignment] = await db.select().from(shiftAssignments).where(eq(shiftAssignments.id, id));
+    return assignment;
+  }
+
+  async createShiftAssignment(data: InsertShiftAssignment): Promise<ShiftAssignment> {
+    const [assignment] = await db.insert(shiftAssignments).values(data).returning();
+    return assignment;
+  }
+
+  async updateShiftAssignment(id: string, data: Partial<ShiftAssignment>): Promise<ShiftAssignment> {
+    const [assignment] = await db.update(shiftAssignments)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(shiftAssignments.id, id))
+      .returning();
+    return assignment;
+  }
+
+  async deleteShiftAssignment(id: string): Promise<void> {
+    await db.delete(shiftAssignments).where(eq(shiftAssignments.id, id));
+  }
+
+  // Commission Management
+  async getCommissionRules(garageId: string): Promise<CommissionRule[]> {
+    return await db.select().from(commissionRules)
+      .where(eq(commissionRules.garageId, garageId))
+      .orderBy(commissionRules.name);
+  }
+
+  async getCommissionRule(id: string): Promise<CommissionRule | undefined> {
+    const [rule] = await db.select().from(commissionRules).where(eq(commissionRules.id, id));
+    return rule;
+  }
+
+  async createCommissionRule(data: InsertCommissionRule): Promise<CommissionRule> {
+    const [rule] = await db.insert(commissionRules).values(data).returning();
+    return rule;
+  }
+
+  async updateCommissionRule(id: string, data: Partial<CommissionRule>): Promise<CommissionRule> {
+    const [rule] = await db.update(commissionRules)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(commissionRules.id, id))
+      .returning();
+    return rule;
+  }
+
+  async deleteCommissionRule(id: string): Promise<void> {
+    await db.delete(commissionRules).where(eq(commissionRules.id, id));
+  }
+
+  async getCommissions(garageId: string, technicianId?: string, period?: string, status?: string): Promise<Commission[]> {
+    const conditions = [eq(commissions.garageId, garageId)];
+    
+    if (technicianId) {
+      conditions.push(eq(commissions.technicianId, technicianId));
+    }
+    if (period) {
+      conditions.push(eq(commissions.period, period));
+    }
+    if (status) {
+      conditions.push(eq(commissions.status, status));
+    }
+    
+    return await db.select().from(commissions)
+      .where(and(...conditions))
+      .orderBy(desc(commissions.createdAt));
+  }
+
+  async getCommission(id: string): Promise<Commission | undefined> {
+    const [commission] = await db.select().from(commissions).where(eq(commissions.id, id));
+    return commission;
+  }
+
+  async createCommission(data: InsertCommission): Promise<Commission> {
+    const [commission] = await db.insert(commissions).values(data).returning();
+    return commission;
+  }
+
+  async updateCommission(id: string, data: Partial<Commission>): Promise<Commission> {
+    const [commission] = await db.update(commissions)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(commissions.id, id))
+      .returning();
+    return commission;
+  }
+
+  async calculateCommission(jobCardId: string, garageId: string): Promise<Commission | null> {
+    const [jobCard] = await db.select().from(jobCards).where(eq(jobCards.id, jobCardId));
+    if (!jobCard) return null;
+    
+    const [invoice] = await db.select().from(invoices).where(eq(invoices.jobCardId, jobCardId));
+    if (!invoice) return null;
+    
+    const rules = await db.select().from(commissionRules)
+      .where(and(
+        eq(commissionRules.garageId, garageId),
+        eq(commissionRules.isActive, true)
+      ));
+    
+    let applicableRule = rules[0];
+    if (!applicableRule) return null;
+    
+    const baseAmount = parseFloat(invoice.totalAmount);
+    let commissionAmount = 0;
+    let commissionRate = 0;
+    
+    if (applicableRule.ruleType === 'percentage') {
+      commissionRate = parseFloat(applicableRule.basePercentage || '0');
+      commissionAmount = (baseAmount * commissionRate) / 100;
+    } else if (applicableRule.ruleType === 'fixed_per_job') {
+      commissionAmount = parseFloat(applicableRule.fixedAmount || '0');
+    }
+    
+    const period = new Date().toISOString().slice(0, 7);
+    
+    const [commission] = await db.insert(commissions).values({
+      garageId,
+      technicianId: jobCard.assignedTo,
+      jobCardId,
+      invoiceId: invoice.id,
+      commissionRuleId: applicableRule.id,
+      baseAmount: baseAmount.toFixed(2),
+      commissionAmount: commissionAmount.toFixed(2),
+      commissionRate: commissionRate.toFixed(2),
+      period,
+      status: 'pending'
+    }).returning();
+    
+    return commission;
+  }
+
+  // Performance Reviews
+  async getPerformanceReviews(garageId: string, employeeId?: string): Promise<PerformanceReview[]> {
+    const conditions = [eq(performanceReviews.garageId, garageId)];
+    
+    if (employeeId) {
+      conditions.push(eq(performanceReviews.employeeId, employeeId));
+    }
+    
+    return await db.select().from(performanceReviews)
+      .where(and(...conditions))
+      .orderBy(desc(performanceReviews.createdAt));
+  }
+
+  async getPerformanceReview(id: string): Promise<PerformanceReview | undefined> {
+    const [review] = await db.select().from(performanceReviews).where(eq(performanceReviews.id, id));
+    return review;
+  }
+
+  async createPerformanceReview(data: InsertPerformanceReview): Promise<PerformanceReview> {
+    const [review] = await db.insert(performanceReviews).values(data).returning();
+    return review;
+  }
+
+  async updatePerformanceReview(id: string, data: Partial<PerformanceReview>): Promise<PerformanceReview> {
+    const [review] = await db.update(performanceReviews)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(performanceReviews.id, id))
+      .returning();
+    return review;
+  }
+
+  async deletePerformanceReview(id: string): Promise<void> {
+    await db.delete(performanceReviews).where(eq(performanceReviews.id, id));
+  }
+
+  // Training & Certifications
+  async getTrainings(garageId: string): Promise<Training[]> {
+    return await db.select().from(trainings)
+      .where(eq(trainings.garageId, garageId))
+      .orderBy(trainings.name);
+  }
+
+  async getTraining(id: string): Promise<Training | undefined> {
+    const [training] = await db.select().from(trainings).where(eq(trainings.id, id));
+    return training;
+  }
+
+  async createTraining(data: InsertTraining): Promise<Training> {
+    const [training] = await db.insert(trainings).values(data).returning();
+    return training;
+  }
+
+  async updateTraining(id: string, data: Partial<Training>): Promise<Training> {
+    const [training] = await db.update(trainings)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(trainings.id, id))
+      .returning();
+    return training;
+  }
+
+  async deleteTraining(id: string): Promise<void> {
+    await db.delete(trainings).where(eq(trainings.id, id));
+  }
+
+  async getEmployeeTrainings(garageId: string, employeeId?: string, status?: string): Promise<EmployeeTraining[]> {
+    const conditions = [eq(employeeTrainings.garageId, garageId)];
+    
+    if (employeeId) {
+      conditions.push(eq(employeeTrainings.employeeId, employeeId));
+    }
+    if (status) {
+      conditions.push(eq(employeeTrainings.status, status));
+    }
+    
+    return await db.select().from(employeeTrainings)
+      .where(and(...conditions))
+      .orderBy(desc(employeeTrainings.enrolledDate));
+  }
+
+  async getEmployeeTraining(id: string): Promise<EmployeeTraining | undefined> {
+    const [record] = await db.select().from(employeeTrainings).where(eq(employeeTrainings.id, id));
+    return record;
+  }
+
+  async createEmployeeTraining(data: InsertEmployeeTraining): Promise<EmployeeTraining> {
+    const [record] = await db.insert(employeeTrainings).values(data).returning();
+    return record;
+  }
+
+  async updateEmployeeTraining(id: string, data: Partial<EmployeeTraining>): Promise<EmployeeTraining> {
+    const [record] = await db.update(employeeTrainings)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(employeeTrainings.id, id))
+      .returning();
+    return record;
+  }
+
+  async deleteEmployeeTraining(id: string): Promise<void> {
+    await db.delete(employeeTrainings).where(eq(employeeTrainings.id, id));
   }
 }
 

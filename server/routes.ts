@@ -8,7 +8,15 @@ import { z } from "zod";
 import { 
   insertNotificationSchema, 
   insertSavedFilterPresetSchema, 
-  insertExportJobSchema 
+  insertExportJobSchema,
+  insertEmployeeAttendanceSchema,
+  insertShiftTemplateSchema,
+  insertShiftAssignmentSchema,
+  insertCommissionRuleSchema,
+  insertCommissionSchema,
+  insertPerformanceReviewSchema,
+  insertTrainingSchema,
+  insertEmployeeTrainingSchema
 } from "@shared/schema";
 import Stripe from "stripe";
 import { createPaypalOrder, capturePaypalOrder, loadPaypalDefault } from "./paypal";
@@ -3890,6 +3898,848 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching customer lifetime value:", error);
       res.status(500).json({ message: "Failed to fetch customer lifetime value data" });
+    }
+  });
+
+  // Module 31: Staff & HR Management
+  
+  // Employee Attendance Routes
+  app.get('/api/hr/attendance', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const { employeeId, startDate, endDate } = req.query;
+
+      const records = await storage.getEmployeeAttendance(
+        userGarageId,
+        employeeId as string,
+        startDate ? new Date(startDate as string) : undefined,
+        endDate ? new Date(endDate as string) : undefined
+      );
+
+      res.json(records);
+    } catch (error) {
+      console.error("Error fetching attendance:", error);
+      res.status(500).json({ message: "Failed to fetch attendance records" });
+    }
+  });
+
+  app.get('/api/hr/attendance/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const record = await storage.getAttendance(req.params.id);
+      
+      if (!record) {
+        return res.status(404).json({ message: "Attendance record not found" });
+      }
+      
+      if (record.garageId !== userGarageId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      res.json(record);
+    } catch (error) {
+      console.error("Error fetching attendance:", error);
+      res.status(500).json({ message: "Failed to fetch attendance record" });
+    }
+  });
+
+  app.post('/api/hr/attendance', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const validated = insertEmployeeAttendanceSchema.parse(req.body);
+      
+      if (validated.garageId !== userGarageId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      const record = await storage.createAttendance(validated);
+      res.json(record);
+    } catch (error: any) {
+      console.error("Error creating attendance:", error);
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ message: "Invalid request data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create attendance record" });
+    }
+  });
+
+  app.patch('/api/hr/attendance/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const existing = await storage.getAttendance(req.params.id);
+      
+      if (!existing) {
+        return res.status(404).json({ message: "Attendance record not found" });
+      }
+      
+      if (existing.garageId !== userGarageId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      const validated = insertEmployeeAttendanceSchema.partial().parse(req.body);
+      
+      if (validated.garageId && validated.garageId !== userGarageId) {
+        return res.status(403).json({ message: "Cannot change garage ID" });
+      }
+      
+      const record = await storage.updateAttendance(req.params.id, validated);
+      res.json(record);
+    } catch (error: any) {
+      console.error("Error updating attendance:", error);
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ message: "Invalid request data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to update attendance record" });
+    }
+  });
+
+  app.post('/api/hr/clock-in', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const userId = req.user.claims.sub;
+      
+      const record = await storage.clockIn(userId, userGarageId);
+      res.json(record);
+    } catch (error) {
+      console.error("Error clocking in:", error);
+      res.status(500).json({ message: "Failed to clock in" });
+    }
+  });
+
+  app.post('/api/hr/clock-out/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const existing = await storage.getAttendance(req.params.id);
+      
+      if (!existing) {
+        return res.status(404).json({ message: "Attendance record not found" });
+      }
+      
+      if (existing.garageId !== userGarageId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      const record = await storage.clockOut(req.params.id);
+      res.json(record);
+    } catch (error) {
+      console.error("Error clocking out:", error);
+      res.status(500).json({ message: "Failed to clock out" });
+    }
+  });
+
+  app.post('/api/hr/break-start/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const existing = await storage.getAttendance(req.params.id);
+      
+      if (!existing) {
+        return res.status(404).json({ message: "Attendance record not found" });
+      }
+      
+      if (existing.garageId !== userGarageId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      const record = await storage.startBreak(req.params.id);
+      res.json(record);
+    } catch (error) {
+      console.error("Error starting break:", error);
+      res.status(500).json({ message: "Failed to start break" });
+    }
+  });
+
+  app.post('/api/hr/break-end/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const existing = await storage.getAttendance(req.params.id);
+      
+      if (!existing) {
+        return res.status(404).json({ message: "Attendance record not found" });
+      }
+      
+      if (existing.garageId !== userGarageId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      const record = await storage.endBreak(req.params.id);
+      res.json(record);
+    } catch (error) {
+      console.error("Error ending break:", error);
+      res.status(500).json({ message: "Failed to end break" });
+    }
+  });
+
+  // Shift Management Routes
+  app.get('/api/hr/shift-templates', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+
+      const templates = await storage.getShiftTemplates(userGarageId);
+      res.json(templates);
+    } catch (error) {
+      console.error("Error fetching shift templates:", error);
+      res.status(500).json({ message: "Failed to fetch shift templates" });
+    }
+  });
+
+  app.get('/api/hr/shift-templates/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const template = await storage.getShiftTemplate(req.params.id);
+      
+      if (!template) {
+        return res.status(404).json({ message: "Shift template not found" });
+      }
+      
+      if (template.garageId !== userGarageId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      res.json(template);
+    } catch (error) {
+      console.error("Error fetching shift template:", error);
+      res.status(500).json({ message: "Failed to fetch shift template" });
+    }
+  });
+
+  app.post('/api/hr/shift-templates', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const validated = insertShiftTemplateSchema.parse(req.body);
+      
+      if (validated.garageId !== userGarageId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      const template = await storage.createShiftTemplate(validated);
+      res.json(template);
+    } catch (error: any) {
+      console.error("Error creating shift template:", error);
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ message: "Invalid request data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create shift template" });
+    }
+  });
+
+  app.patch('/api/hr/shift-templates/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const existing = await storage.getShiftTemplate(req.params.id);
+      
+      if (!existing) {
+        return res.status(404).json({ message: "Shift template not found" });
+      }
+      
+      if (existing.garageId !== userGarageId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      const validated = insertShiftTemplateSchema.partial().safeParse(req.body);
+      
+      if (!validated.success) {
+        return res.status(400).json({ 
+          message: "Validation failed", 
+          errors: validated.error.errors 
+        });
+      }
+      
+      if (validated.data.garageId && validated.data.garageId !== userGarageId) {
+        return res.status(403).json({ message: "Cannot change garage" });
+      }
+      
+      const template = await storage.updateShiftTemplate(req.params.id, validated.data);
+      res.json(template);
+    } catch (error) {
+      console.error("Error updating shift template:", error);
+      res.status(500).json({ message: "Failed to update shift template" });
+    }
+  });
+
+  app.delete('/api/hr/shift-templates/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const existing = await storage.getShiftTemplate(req.params.id);
+      
+      if (!existing) {
+        return res.status(404).json({ message: "Shift template not found" });
+      }
+      
+      if (existing.garageId !== userGarageId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      await storage.deleteShiftTemplate(req.params.id);
+      res.json({ message: "Shift template deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting shift template:", error);
+      res.status(500).json({ message: "Failed to delete shift template" });
+    }
+  });
+
+  app.get('/api/hr/shift-assignments', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const { employeeId, startDate, endDate } = req.query;
+
+      const assignments = await storage.getShiftAssignments(
+        userGarageId,
+        employeeId as string,
+        startDate ? new Date(startDate as string) : undefined,
+        endDate ? new Date(endDate as string) : undefined
+      );
+
+      res.json(assignments);
+    } catch (error) {
+      console.error("Error fetching shift assignments:", error);
+      res.status(500).json({ message: "Failed to fetch shift assignments" });
+    }
+  });
+
+  app.post('/api/hr/shift-assignments', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const validated = insertShiftAssignmentSchema.parse(req.body);
+      
+      if (validated.garageId !== userGarageId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      const assignment = await storage.createShiftAssignment(validated);
+      res.json(assignment);
+    } catch (error: any) {
+      console.error("Error creating shift assignment:", error);
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ message: "Invalid request data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create shift assignment" });
+    }
+  });
+
+  app.patch('/api/hr/shift-assignments/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const existing = await storage.getShiftAssignment(req.params.id);
+      
+      if (!existing) {
+        return res.status(404).json({ message: "Shift assignment not found" });
+      }
+      
+      if (existing.garageId !== userGarageId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      const validated = insertShiftAssignmentSchema.partial().safeParse(req.body);
+      
+      if (!validated.success) {
+        return res.status(400).json({ 
+          message: "Validation failed", 
+          errors: validated.error.errors 
+        });
+      }
+      
+      if (validated.data.garageId && validated.data.garageId !== userGarageId) {
+        return res.status(403).json({ message: "Cannot change garage" });
+      }
+      
+      const assignment = await storage.updateShiftAssignment(req.params.id, validated.data);
+      res.json(assignment);
+    } catch (error) {
+      console.error("Error updating shift assignment:", error);
+      res.status(500).json({ message: "Failed to update shift assignment" });
+    }
+  });
+
+  app.delete('/api/hr/shift-assignments/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const existing = await storage.getShiftAssignment(req.params.id);
+      
+      if (!existing) {
+        return res.status(404).json({ message: "Shift assignment not found" });
+      }
+      
+      if (existing.garageId !== userGarageId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      await storage.deleteShiftAssignment(req.params.id);
+      res.json({ message: "Shift assignment deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting shift assignment:", error);
+      res.status(500).json({ message: "Failed to delete shift assignment" });
+    }
+  });
+
+  // Commission Management Routes
+  app.get('/api/hr/commission-rules', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+
+      const rules = await storage.getCommissionRules(userGarageId);
+      res.json(rules);
+    } catch (error) {
+      console.error("Error fetching commission rules:", error);
+      res.status(500).json({ message: "Failed to fetch commission rules" });
+    }
+  });
+
+  app.post('/api/hr/commission-rules', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const validated = insertCommissionRuleSchema.parse(req.body);
+      
+      if (validated.garageId !== userGarageId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      const rule = await storage.createCommissionRule(validated);
+      res.json(rule);
+    } catch (error: any) {
+      console.error("Error creating commission rule:", error);
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ message: "Invalid request data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create commission rule" });
+    }
+  });
+
+  app.patch('/api/hr/commission-rules/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const existing = await storage.getCommissionRule(req.params.id);
+      
+      if (!existing) {
+        return res.status(404).json({ message: "Commission rule not found" });
+      }
+      
+      if (existing.garageId !== userGarageId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      const validated = insertCommissionRuleSchema.partial().safeParse(req.body);
+      
+      if (!validated.success) {
+        return res.status(400).json({ 
+          message: "Validation failed", 
+          errors: validated.error.errors 
+        });
+      }
+      
+      if (validated.data.garageId && validated.data.garageId !== userGarageId) {
+        return res.status(403).json({ message: "Cannot change garage" });
+      }
+      
+      const rule = await storage.updateCommissionRule(req.params.id, validated.data);
+      res.json(rule);
+    } catch (error) {
+      console.error("Error updating commission rule:", error);
+      res.status(500).json({ message: "Failed to update commission rule" });
+    }
+  });
+
+  app.delete('/api/hr/commission-rules/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const existing = await storage.getCommissionRule(req.params.id);
+      
+      if (!existing) {
+        return res.status(404).json({ message: "Commission rule not found" });
+      }
+      
+      if (existing.garageId !== userGarageId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      await storage.deleteCommissionRule(req.params.id);
+      res.json({ message: "Commission rule deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting commission rule:", error);
+      res.status(500).json({ message: "Failed to delete commission rule" });
+    }
+  });
+
+  app.get('/api/hr/commissions', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const { technicianId, period, status } = req.query;
+
+      const commissions = await storage.getCommissions(
+        userGarageId,
+        technicianId as string,
+        period as string,
+        status as string
+      );
+
+      res.json(commissions);
+    } catch (error) {
+      console.error("Error fetching commissions:", error);
+      res.status(500).json({ message: "Failed to fetch commissions" });
+    }
+  });
+
+  app.post('/api/hr/commissions', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const validated = insertCommissionSchema.parse(req.body);
+      
+      if (validated.garageId !== userGarageId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      const commission = await storage.createCommission(validated);
+      res.json(commission);
+    } catch (error: any) {
+      console.error("Error creating commission:", error);
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ message: "Invalid request data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create commission" });
+    }
+  });
+
+  app.patch('/api/hr/commissions/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const existing = await storage.getCommission(req.params.id);
+      
+      if (!existing) {
+        return res.status(404).json({ message: "Commission not found" });
+      }
+      
+      if (existing.garageId !== userGarageId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      const validated = insertCommissionSchema.partial().safeParse(req.body);
+      
+      if (!validated.success) {
+        return res.status(400).json({ 
+          message: "Validation failed", 
+          errors: validated.error.errors 
+        });
+      }
+      
+      if (validated.data.garageId && validated.data.garageId !== userGarageId) {
+        return res.status(403).json({ message: "Cannot change garage" });
+      }
+      
+      const commission = await storage.updateCommission(req.params.id, validated.data);
+      res.json(commission);
+    } catch (error) {
+      console.error("Error updating commission:", error);
+      res.status(500).json({ message: "Failed to update commission" });
+    }
+  });
+
+  app.post('/api/hr/calculate-commission/:jobCardId', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const { garageId } = req.body;
+      
+      if (garageId !== userGarageId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      const commission = await storage.calculateCommission(req.params.jobCardId, garageId);
+      res.json(commission);
+    } catch (error) {
+      console.error("Error calculating commission:", error);
+      res.status(500).json({ message: "Failed to calculate commission" });
+    }
+  });
+
+  // Performance Review Routes
+  app.get('/api/hr/performance-reviews', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const { employeeId } = req.query;
+
+      const reviews = await storage.getPerformanceReviews(
+        userGarageId,
+        employeeId as string
+      );
+
+      res.json(reviews);
+    } catch (error) {
+      console.error("Error fetching performance reviews:", error);
+      res.status(500).json({ message: "Failed to fetch performance reviews" });
+    }
+  });
+
+  app.get('/api/hr/performance-reviews/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const review = await storage.getPerformanceReview(req.params.id);
+      
+      if (!review) {
+        return res.status(404).json({ message: "Performance review not found" });
+      }
+      
+      if (review.garageId !== userGarageId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      res.json(review);
+    } catch (error) {
+      console.error("Error fetching performance review:", error);
+      res.status(500).json({ message: "Failed to fetch performance review" });
+    }
+  });
+
+  app.post('/api/hr/performance-reviews', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const validated = insertPerformanceReviewSchema.parse(req.body);
+      
+      if (validated.garageId !== userGarageId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      const review = await storage.createPerformanceReview(validated);
+      res.json(review);
+    } catch (error: any) {
+      console.error("Error creating performance review:", error);
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ message: "Invalid request data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create performance review" });
+    }
+  });
+
+  app.patch('/api/hr/performance-reviews/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const existing = await storage.getPerformanceReview(req.params.id);
+      
+      if (!existing) {
+        return res.status(404).json({ message: "Performance review not found" });
+      }
+      
+      if (existing.garageId !== userGarageId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      const validated = insertPerformanceReviewSchema.partial().safeParse(req.body);
+      
+      if (!validated.success) {
+        return res.status(400).json({ 
+          message: "Validation failed", 
+          errors: validated.error.errors 
+        });
+      }
+      
+      if (validated.data.garageId && validated.data.garageId !== userGarageId) {
+        return res.status(403).json({ message: "Cannot change garage" });
+      }
+      
+      const review = await storage.updatePerformanceReview(req.params.id, validated.data);
+      res.json(review);
+    } catch (error) {
+      console.error("Error updating performance review:", error);
+      res.status(500).json({ message: "Failed to update performance review" });
+    }
+  });
+
+  app.delete('/api/hr/performance-reviews/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const existing = await storage.getPerformanceReview(req.params.id);
+      
+      if (!existing) {
+        return res.status(404).json({ message: "Performance review not found" });
+      }
+      
+      if (existing.garageId !== userGarageId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      await storage.deletePerformanceReview(req.params.id);
+      res.json({ message: "Performance review deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting performance review:", error);
+      res.status(500).json({ message: "Failed to delete performance review" });
+    }
+  });
+
+  // Training & Certifications Routes
+  app.get('/api/hr/trainings', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+
+      const trainings = await storage.getTrainings(userGarageId);
+      res.json(trainings);
+    } catch (error) {
+      console.error("Error fetching trainings:", error);
+      res.status(500).json({ message: "Failed to fetch trainings" });
+    }
+  });
+
+  app.post('/api/hr/trainings', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const validated = insertTrainingSchema.parse(req.body);
+      
+      if (validated.garageId !== userGarageId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      const training = await storage.createTraining(validated);
+      res.json(training);
+    } catch (error: any) {
+      console.error("Error creating training:", error);
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ message: "Invalid request data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create training" });
+    }
+  });
+
+  app.patch('/api/hr/trainings/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const existing = await storage.getTraining(req.params.id);
+      
+      if (!existing) {
+        return res.status(404).json({ message: "Training not found" });
+      }
+      
+      if (existing.garageId !== userGarageId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      const validated = insertTrainingSchema.partial().safeParse(req.body);
+      
+      if (!validated.success) {
+        return res.status(400).json({ 
+          message: "Validation failed", 
+          errors: validated.error.errors 
+        });
+      }
+      
+      if (validated.data.garageId && validated.data.garageId !== userGarageId) {
+        return res.status(403).json({ message: "Cannot change garage" });
+      }
+      
+      const training = await storage.updateTraining(req.params.id, validated.data);
+      res.json(training);
+    } catch (error) {
+      console.error("Error updating training:", error);
+      res.status(500).json({ message: "Failed to update training" });
+    }
+  });
+
+  app.delete('/api/hr/trainings/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const existing = await storage.getTraining(req.params.id);
+      
+      if (!existing) {
+        return res.status(404).json({ message: "Training not found" });
+      }
+      
+      if (existing.garageId !== userGarageId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      await storage.deleteTraining(req.params.id);
+      res.json({ message: "Training deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting training:", error);
+      res.status(500).json({ message: "Failed to delete training" });
+    }
+  });
+
+  app.get('/api/hr/employee-trainings', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const { employeeId, status } = req.query;
+
+      const records = await storage.getEmployeeTrainings(
+        userGarageId,
+        employeeId as string,
+        status as string
+      );
+
+      res.json(records);
+    } catch (error) {
+      console.error("Error fetching employee trainings:", error);
+      res.status(500).json({ message: "Failed to fetch employee trainings" });
+    }
+  });
+
+  app.post('/api/hr/employee-trainings', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const validated = insertEmployeeTrainingSchema.parse(req.body);
+      
+      if (validated.garageId !== userGarageId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      const record = await storage.createEmployeeTraining(validated);
+      res.json(record);
+    } catch (error: any) {
+      console.error("Error creating employee training:", error);
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ message: "Invalid request data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create employee training" });
+    }
+  });
+
+  app.patch('/api/hr/employee-trainings/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const existing = await storage.getEmployeeTraining(req.params.id);
+      
+      if (!existing) {
+        return res.status(404).json({ message: "Employee training not found" });
+      }
+      
+      if (existing.garageId !== userGarageId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      const validated = insertEmployeeTrainingSchema.partial().safeParse(req.body);
+      
+      if (!validated.success) {
+        return res.status(400).json({ 
+          message: "Validation failed", 
+          errors: validated.error.errors 
+        });
+      }
+      
+      if (validated.data.garageId && validated.data.garageId !== userGarageId) {
+        return res.status(403).json({ message: "Cannot change garage" });
+      }
+      
+      const record = await storage.updateEmployeeTraining(req.params.id, validated.data);
+      res.json(record);
+    } catch (error) {
+      console.error("Error updating employee training:", error);
+      res.status(500).json({ message: "Failed to update employee training" });
+    }
+  });
+
+  app.delete('/api/hr/employee-trainings/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const existing = await storage.getEmployeeTraining(req.params.id);
+      
+      if (!existing) {
+        return res.status(404).json({ message: "Employee training not found" });
+      }
+      
+      if (existing.garageId !== userGarageId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      await storage.deleteEmployeeTraining(req.params.id);
+      res.json({ message: "Employee training deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting employee training:", error);
+      res.status(500).json({ message: "Failed to delete employee training" });
     }
   });
 

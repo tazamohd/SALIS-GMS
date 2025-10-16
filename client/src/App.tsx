@@ -33,6 +33,7 @@ import FinancialSettings from "@/pages/FinancialSettings";
 import RefundManagement from "@/pages/RefundManagement";
 import DataImportExport from "@/pages/DataImportExport";
 import BusinessIntelligence from "@/pages/BusinessIntelligence";
+import HRManagement from "@/pages/HRManagement";
 import { CustomerDashboard } from "@/pages/customer/CustomerDashboard";
 import { CustomerAppointments } from "@/pages/customer/CustomerAppointments";
 import { CustomerInvoices } from "@/pages/customer/CustomerInvoices";
@@ -221,6 +222,11 @@ function Router() {
       <Route path="/business-intelligence">
         <Layout>
           <BusinessIntelligence />
+        </Layout>
+      </Route>
+      <Route path="/hr-management">
+        <Layout>
+          <HRManagement />
         </Layout>
       </Route>
       <Route component={NotFound} />
