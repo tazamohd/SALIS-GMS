@@ -1,0 +1,426 @@
+import { useState } from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { queryClient, apiRequest } from "@/lib/queryClient";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { useToast } from "@/hooks/use-toast";
+import { 
+  CheckCircle2, 
+  XCircle, 
+  Calendar, 
+  Mail, 
+  DollarSign, 
+  Activity,
+  Settings,
+  RefreshCw,
+  Clock,
+  AlertCircle
+} from "lucide-react";
+
+export default function Integrations() {
+  const { toast } = useToast();
+  const [activeTab, setActiveTab] = useState("overview");
+
+  // Fetch integration connections
+  const { data: connections = [], isLoading: connectionsLoading } = useQuery({
+    queryKey: ['/api/integrations/connections'],
+  });
+
+  // Fetch sync logs
+  const { data: syncLogs = [], isLoading: logsLoading } = useQuery({
+    queryKey: ['/api/integrations/sync-logs'],
+  });
+
+  // Fetch accounting transactions
+  const { data: accountingTransactions = [], isLoading: accountingLoading } = useQuery({
+    queryKey: ['/api/integrations/accounting/transactions'],
+  });
+
+  // Toggle connection status
+  const toggleConnectionMutation = useMutation({
+    mutationFn: async ({ id, isActive }: { id: string; isActive: boolean }) => {
+      return await apiRequest(`/api/integrations/connections/${id}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ isActive }),
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/integrations/connections'] });
+      toast({
+        title: "Success",
+        description: "Integration status updated successfully",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to update integration status",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Sync accounting data
+  const syncAccountingMutation = useMutation({
+    mutationFn: async () => {
+      return await apiRequest('/api/integrations/accounting/sync', {
+        method: 'POST',
+      });
+    },
+    onSuccess: (result) => {
+      queryClient.invalidateQueries({ queryKey: ['/api/integrations/sync-logs'] });
+      if (result.success) {
+        toast({
+          title: "Success",
+          description: "Accounting data synced successfully",
+        });
+      } else {
+        toast({
+          title: "Information",
+          description: result.message || "Accounting integration not configured",
+        });
+      }
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to sync accounting data",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // OBD scan
+  const obdScanMutation = useMutation({
+    mutationFn: async () => {
+      return await apiRequest('/api/integrations/obd/scan', {
+        method: 'POST',
+      });
+    },
+    onSuccess: (result) => {
+      if (result.success) {
+        toast({
+          title: "Success",
+          description: "OBD diagnostic scan completed",
+        });
+      } else {
+        toast({
+          title: "Information",
+          description: result.message || "OBD-II diagnostics not configured",
+        });
+      }
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to perform OBD scan",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const integrationCards = [
+    {
+      id: 'google-calendar',
+      name: 'Google Calendar',
+      description: 'Sync appointments to Google Calendar automatically',
+      icon: Calendar,
+      color: 'text-blue-600',
+      bgColor: 'bg-blue-50',
+      status: 'active',
+      type: 'Connected'
+    },
+    {
+      id: 'gmail',
+      name: 'Gmail',
+      description: 'Send automated email notifications via Gmail',
+      icon: Mail,
+      color: 'text-red-600',
+      bgColor: 'bg-red-50',
+      status: 'active',
+      type: 'Connected'
+    },
+    {
+      id: 'accounting',
+      name: 'Accounting Software',
+      description: 'Sync invoices and transactions with QuickBooks or Xero',
+      icon: DollarSign,
+      color: 'text-green-600',
+      bgColor: 'bg-green-50',
+      status: 'inactive',
+      type: 'Available'
+    },
+    {
+      id: 'obd',
+      name: 'OBD-II Diagnostics',
+      description: 'Connect OBD-II adapters for vehicle diagnostics',
+      icon: Activity,
+      color: 'text-purple-600',
+      bgColor: 'bg-purple-50',
+      status: 'inactive',
+      type: 'Available'
+    },
+  ];
+
+  return (
+    <div className="min-h-screen bg-white dark:bg-black p-6">
+      <div className="max-w-7xl mx-auto space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold text-black dark:text-white">Integrations</h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-1">
+            Connect and manage third-party services
+          </p>
+        </div>
+
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList data-testid="tabs-integrations">
+            <TabsTrigger value="overview" data-testid="tab-overview">Overview</TabsTrigger>
+            <TabsTrigger value="sync-logs" data-testid="tab-sync-logs">Sync Logs</TabsTrigger>
+            <TabsTrigger value="accounting" data-testid="tab-accounting">Accounting</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="overview" className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {integrationCards.map((integration) => {
+                const Icon = integration.icon;
+                const isActive = integration.status === 'active';
+
+                return (
+                  <Card key={integration.id} data-testid={`card-integration-${integration.id}`}>
+                    <CardHeader>
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className={`p-3 rounded-lg ${integration.bgColor}`}>
+                            <Icon className={`h-6 w-6 ${integration.color}`} />
+                          </div>
+                          <div>
+                            <CardTitle className="text-black dark:text-white">{integration.name}</CardTitle>
+                            <CardDescription>{integration.description}</CardDescription>
+                          </div>
+                        </div>
+                        <Badge variant={isActive ? "default" : "secondary"} data-testid={`badge-status-${integration.id}`}>
+                          {integration.type}
+                        </Badge>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          {isActive ? (
+                            <CheckCircle2 className="h-5 w-5 text-green-600" />
+                          ) : (
+                            <XCircle className="h-5 w-5 text-gray-400" />
+                          )}
+                          <span className={`text-sm ${isActive ? 'text-green-600' : 'text-gray-500 dark:text-gray-400'}`}>
+                            {isActive ? 'Active' : 'Not Configured'}
+                          </span>
+                        </div>
+                        {integration.id === 'accounting' && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => syncAccountingMutation.mutate()}
+                            disabled={syncAccountingMutation.isPending}
+                            data-testid="button-sync-accounting"
+                          >
+                            <RefreshCw className={`h-4 w-4 mr-2 ${syncAccountingMutation.isPending ? 'animate-spin' : ''}`} />
+                            Sync
+                          </Button>
+                        )}
+                        {integration.id === 'obd' && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => obdScanMutation.mutate()}
+                            disabled={obdScanMutation.isPending}
+                            data-testid="button-scan-obd"
+                          >
+                            <Activity className={`h-4 w-4 mr-2 ${obdScanMutation.isPending ? 'animate-spin' : ''}`} />
+                            Scan
+                          </Button>
+                        )}
+                        {isActive && (
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            data-testid={`button-settings-${integration.id}`}
+                          >
+                            <Settings className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-black dark:text-white">Integration Status</CardTitle>
+                <CardDescription>Recent sync activity and status</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {logsLoading ? (
+                  <div className="text-center py-8 text-gray-500 dark:text-gray-400">Loading sync logs...</div>
+                ) : syncLogs.length === 0 ? (
+                  <div className="text-center py-8 text-gray-500 dark:text-gray-400">No sync activity yet</div>
+                ) : (
+                  <div className="space-y-3">
+                    {syncLogs.slice(0, 5).map((log: any, index: number) => (
+                      <div 
+                        key={log.id || index} 
+                        className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900 rounded-lg"
+                        data-testid={`log-entry-${index}`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className={`p-2 rounded-lg ${
+                            log.status === 'success' ? 'bg-green-100' : 
+                            log.status === 'failed' ? 'bg-red-100' : 'bg-gray-100'
+                          }`}>
+                            {log.status === 'success' ? (
+                              <CheckCircle2 className="h-4 w-4 text-green-600" />
+                            ) : log.status === 'failed' ? (
+                              <AlertCircle className="h-4 w-4 text-red-600" />
+                            ) : (
+                              <Clock className="h-4 w-4 text-gray-600" />
+                            )}
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium text-black dark:text-white">
+                              {log.syncType?.replace(/-/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
+                            </p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">
+                              {log.recordsProcessed} record{log.recordsProcessed !== 1 ? 's' : ''} • {new Date(log.createdAt).toLocaleString()}
+                            </p>
+                          </div>
+                        </div>
+                        <Badge variant={log.status === 'success' ? 'default' : 'destructive'}>
+                          {log.status}
+                        </Badge>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="sync-logs" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-black dark:text-white">Sync History</CardTitle>
+                <CardDescription>Detailed history of all integration syncs</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ScrollArea className="h-[600px]">
+                  {logsLoading ? (
+                    <div className="text-center py-8 text-gray-500 dark:text-gray-400">Loading...</div>
+                  ) : syncLogs.length === 0 ? (
+                    <div className="text-center py-8 text-gray-500 dark:text-gray-400">No sync logs available</div>
+                  ) : (
+                    <div className="space-y-3">
+                      {syncLogs.map((log: any, index: number) => (
+                        <div 
+                          key={log.id || index} 
+                          className="p-4 border border-gray-200 dark:border-gray-800 rounded-lg"
+                          data-testid={`sync-log-${index}`}
+                        >
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-2">
+                                <h4 className="font-medium text-black dark:text-white">
+                                  {log.syncType?.replace(/-/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
+                                </h4>
+                                <Badge variant={log.status === 'success' ? 'default' : 'destructive'}>
+                                  {log.status}
+                                </Badge>
+                              </div>
+                              <div className="space-y-1 text-sm text-gray-600 dark:text-gray-400">
+                                <p>Records: {log.recordsProcessed}</p>
+                                <p>Time: {new Date(log.createdAt).toLocaleString()}</p>
+                                {log.errorMessage && (
+                                  <p className="text-red-600">Error: {log.errorMessage}</p>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </ScrollArea>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="accounting" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="text-black dark:text-white">Accounting Transactions</CardTitle>
+                    <CardDescription>Transactions pending sync with accounting software</CardDescription>
+                  </div>
+                  <Button
+                    onClick={() => syncAccountingMutation.mutate()}
+                    disabled={syncAccountingMutation.isPending}
+                    data-testid="button-sync-all-accounting"
+                  >
+                    <RefreshCw className={`h-4 w-4 mr-2 ${syncAccountingMutation.isPending ? 'animate-spin' : ''}`} />
+                    Sync All
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <ScrollArea className="h-[600px]">
+                  {accountingLoading ? (
+                    <div className="text-center py-8 text-gray-500 dark:text-gray-400">Loading...</div>
+                  ) : accountingTransactions.length === 0 ? (
+                    <div className="text-center py-8">
+                      <DollarSign className="h-12 w-12 mx-auto text-gray-300 dark:text-gray-700 mb-3" />
+                      <p className="text-gray-500 dark:text-gray-400 mb-2">No accounting transactions</p>
+                      <p className="text-sm text-gray-400 dark:text-gray-500">
+                        Configure QuickBooks or Xero integration to sync transactions
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {accountingTransactions.map((transaction: any, index: number) => (
+                        <div 
+                          key={transaction.id || index} 
+                          className="p-4 border border-gray-200 dark:border-gray-800 rounded-lg"
+                          data-testid={`transaction-${index}`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <h4 className="font-medium text-black dark:text-white">{transaction.transactionType}</h4>
+                              <p className="text-sm text-gray-600 dark:text-gray-400">
+                                {new Date(transaction.transactionDate).toLocaleDateString()}
+                              </p>
+                            </div>
+                            <div className="text-right">
+                              <p className="font-semibold text-black dark:text-white">
+                                {transaction.currency} {transaction.amount}
+                              </p>
+                              <Badge variant={transaction.syncStatus === 'synced' ? 'default' : 'secondary'}>
+                                {transaction.syncStatus}
+                              </Badge>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </ScrollArea>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </div>
+    </div>
+  );
+}

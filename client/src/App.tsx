@@ -35,6 +35,7 @@ import DataImportExport from "@/pages/DataImportExport";
 import BusinessIntelligence from "@/pages/BusinessIntelligence";
 import HRManagement from "@/pages/HRManagement";
 import AIAutomation from "@/pages/AIAutomation";
+import Integrations from "@/pages/Integrations";
 import { CustomerDashboard } from "@/pages/customer/CustomerDashboard";
 import { CustomerAppointments } from "@/pages/customer/CustomerAppointments";
 import { CustomerInvoices } from "@/pages/customer/CustomerInvoices";
@@ -233,6 +234,11 @@ function Router() {
       <Route path="/ai-automation">
         <Layout>
           <AIAutomation />
+        </Layout>
+      </Route>
+      <Route path="/integrations">
+        <Layout>
+          <Integrations />
         </Layout>
       </Route>
       <Route component={NotFound} />
