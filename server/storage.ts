@@ -18,6 +18,9 @@ import {
   appointments,
   appointmentStatusHistory,
   vehicles,
+  vehicleServiceHistory,
+  maintenanceSchedules,
+  serviceReminders,
   customerNotes,
   suppliers,
   purchaseOrders,
@@ -46,6 +49,12 @@ import {
   type AppointmentStatusHistory,
   type Vehicle,
   type InsertVehicle,
+  type VehicleServiceHistory,
+  type InsertVehicleServiceHistory,
+  type MaintenanceSchedule,
+  type InsertMaintenanceSchedule,
+  type ServiceReminder,
+  type InsertServiceReminder,
   type CustomerNote,
   type InsertCustomerNote,
   type Supplier,
@@ -804,6 +813,110 @@ export class DatabaseStorage implements IStorage {
 
   async deleteVehicle(id: string): Promise<void> {
     await db.update(vehicles).set({ isActive: false }).where(eq(vehicles.id, id));
+  }
+
+  // Vehicle Service History - Module 22 Enhancements
+  async getVehicleServiceHistory(vehicleId: string): Promise<VehicleServiceHistory[]> {
+    return await db.select().from(vehicleServiceHistory)
+      .where(eq(vehicleServiceHistory.vehicleId, vehicleId))
+      .orderBy(desc(vehicleServiceHistory.serviceDate));
+  }
+
+  async createServiceHistory(data: InsertVehicleServiceHistory): Promise<VehicleServiceHistory> {
+    const [history] = await db.insert(vehicleServiceHistory).values(data).returning();
+    return history;
+  }
+
+  async deleteServiceHistory(id: string): Promise<void> {
+    await db.delete(vehicleServiceHistory).where(eq(vehicleServiceHistory.id, id));
+  }
+
+  // Maintenance Schedules - Module 22 Enhancements
+  async getMaintenanceSchedules(vehicleId: string): Promise<MaintenanceSchedule[]> {
+    return await db.select().from(maintenanceSchedules)
+      .where(and(
+        eq(maintenanceSchedules.vehicleId, vehicleId),
+        eq(maintenanceSchedules.isActive, true)
+      ))
+      .orderBy(maintenanceSchedules.nextDueDate);
+  }
+
+  async getMaintenanceSchedule(id: string): Promise<MaintenanceSchedule | undefined> {
+    const [schedule] = await db.select().from(maintenanceSchedules)
+      .where(eq(maintenanceSchedules.id, id));
+    return schedule;
+  }
+
+  async createMaintenanceSchedule(data: InsertMaintenanceSchedule): Promise<MaintenanceSchedule> {
+    const [schedule] = await db.insert(maintenanceSchedules).values(data).returning();
+    return schedule;
+  }
+
+  async updateMaintenanceSchedule(id: string, data: Partial<MaintenanceSchedule>): Promise<MaintenanceSchedule> {
+    const [schedule] = await db.update(maintenanceSchedules)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(maintenanceSchedules.id, id))
+      .returning();
+    return schedule;
+  }
+
+  async deleteMaintenanceSchedule(id: string): Promise<void> {
+    await db.update(maintenanceSchedules)
+      .set({ isActive: false })
+      .where(eq(maintenanceSchedules.id, id));
+  }
+
+  // Service Reminders - Module 22 Enhancements
+  async getServiceReminders(vehicleId: string, status?: string): Promise<ServiceReminder[]> {
+    const conditions = [
+      eq(serviceReminders.vehicleId, vehicleId),
+      eq(serviceReminders.isActive, true)
+    ];
+    
+    if (status) {
+      conditions.push(eq(serviceReminders.status, status));
+    }
+    
+    return await db.select().from(serviceReminders)
+      .where(and(...conditions))
+      .orderBy(serviceReminders.triggerDate);
+  }
+
+  async getServiceReminder(id: string): Promise<ServiceReminder | undefined> {
+    const [reminder] = await db.select().from(serviceReminders)
+      .where(eq(serviceReminders.id, id));
+    return reminder;
+  }
+
+  async createServiceReminder(data: InsertServiceReminder): Promise<ServiceReminder> {
+    const [reminder] = await db.insert(serviceReminders).values(data).returning();
+    return reminder;
+  }
+
+  async updateServiceReminder(id: string, data: Partial<ServiceReminder>): Promise<ServiceReminder> {
+    const [reminder] = await db.update(serviceReminders)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(serviceReminders.id, id))
+      .returning();
+    return reminder;
+  }
+
+  async deleteServiceReminder(id: string): Promise<void> {
+    await db.update(serviceReminders)
+      .set({ isActive: false })
+      .where(eq(serviceReminders.id, id));
+  }
+
+  // VIN decoder helper
+  async decodeVIN(vin: string): Promise<any> {
+    try {
+      const response = await fetch(`https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVin/${vin}?format=json`);
+      const data = await response.json();
+      return data.Results;
+    } catch (error) {
+      console.error('VIN decode error:', error);
+      return null;
+    }
   }
 
   async getCustomerNotes(customerId: string): Promise<CustomerNote[]> {
