@@ -71,6 +71,15 @@ import {
   type InsertEstimate,
   type EstimateItem,
   type InsertEstimateItem,
+  technicianAvailability,
+  recurringAppointments,
+  calendarEvents,
+  type TechnicianAvailability,
+  type InsertTechnicianAvailability,
+  type RecurringAppointment,
+  type InsertRecurringAppointment,
+  type CalendarEvent,
+  type InsertCalendarEvent,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, or, inArray, and, gte, lte, ilike } from "drizzle-orm";
@@ -298,6 +307,34 @@ export interface IStorage {
   // Notification preferences - Module 24
   getNotificationPreferences(userId: string): Promise<any | undefined>;
   upsertNotificationPreferences(userId: string, eventMap: string): Promise<any>;
+
+  // Calendar & Scheduling - Module 26
+  // Technician availability
+  getTechnicianAvailability(technicianId: string, startDate?: Date, endDate?: Date): Promise<any[]>;
+  createTechnicianAvailability(data: any): Promise<any>;
+  updateTechnicianAvailability(id: string, data: any): Promise<any>;
+  deleteTechnicianAvailability(id: string): Promise<void>;
+  getGarageAvailability(garageId: string, startDate: Date, endDate: Date): Promise<any[]>;
+  
+  // Recurring appointments
+  getRecurringAppointments(garageId: string): Promise<any[]>;
+  getRecurringAppointment(id: string): Promise<any | undefined>;
+  createRecurringAppointment(data: any): Promise<any>;
+  updateRecurringAppointment(id: string, data: any): Promise<any>;
+  deleteRecurringAppointment(id: string): Promise<void>;
+  generateAppointmentsFromRecurring(recurringId: string, startDate: Date, endDate: Date): Promise<Appointment[]>;
+  
+  // Calendar events
+  getCalendarEvents(garageId: string, startDate: Date, endDate: Date): Promise<any[]>;
+  getCalendarEvent(id: string): Promise<any | undefined>;
+  createCalendarEvent(data: any): Promise<any>;
+  updateCalendarEvent(id: string, data: any): Promise<any>;
+  deleteCalendarEvent(id: string): Promise<void>;
+  
+  // Conflict detection & optimization
+  checkAppointmentConflicts(appointmentData: any): Promise<any[]>;
+  getAvailableTimeSlots(technicianId: string, date: Date, duration: number): Promise<any[]>;
+  getTechnicianWorkload(technicianId: string, startDate: Date, endDate: Date): Promise<any>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1894,6 +1931,355 @@ export class DatabaseStorage implements IStorage {
       .from(customerProfiles)
       .where(eq(customerProfiles.userId, userId));
     return profile || null;
+  }
+
+  // Calendar & Scheduling Methods - Module 26
+  // Technician Availability
+  async getTechnicianAvailability(technicianId: string, startDate?: Date, endDate?: Date) {
+    if (startDate && endDate) {
+      return await db
+        .select()
+        .from(technicianAvailability)
+        .where(
+          and(
+            eq(technicianAvailability.technicianId, technicianId),
+            or(
+              and(
+                gte(technicianAvailability.startDate, startDate),
+                lte(technicianAvailability.startDate, endDate)
+              ),
+              and(
+                gte(technicianAvailability.endDate, startDate),
+                lte(technicianAvailability.endDate, endDate)
+              )
+            )
+          )
+        );
+    }
+
+    return await db
+      .select()
+      .from(technicianAvailability)
+      .where(eq(technicianAvailability.technicianId, technicianId));
+  }
+
+  async createTechnicianAvailability(data: InsertTechnicianAvailability) {
+    const [availability] = await db
+      .insert(technicianAvailability)
+      .values(data)
+      .returning();
+    return availability;
+  }
+
+  async updateTechnicianAvailability(id: string, data: Partial<TechnicianAvailability>) {
+    const [updated] = await db
+      .update(technicianAvailability)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(technicianAvailability.id, id))
+      .returning();
+    return updated;
+  }
+
+  async deleteTechnicianAvailability(id: string) {
+    await db.delete(technicianAvailability).where(eq(technicianAvailability.id, id));
+  }
+
+  async getGarageAvailability(garageId: string, startDate: Date, endDate: Date) {
+    return await db
+      .select()
+      .from(technicianAvailability)
+      .where(
+        and(
+          eq(technicianAvailability.garageId, garageId),
+          or(
+            and(
+              gte(technicianAvailability.startDate, startDate),
+              lte(technicianAvailability.startDate, endDate)
+            ),
+            and(
+              gte(technicianAvailability.endDate, startDate),
+              lte(technicianAvailability.endDate, endDate)
+            )
+          )
+        )
+      );
+  }
+
+  // Recurring Appointments
+  async getRecurringAppointments(garageId: string) {
+    return await db
+      .select()
+      .from(recurringAppointments)
+      .where(
+        and(
+          eq(recurringAppointments.garageId, garageId),
+          eq(recurringAppointments.isActive, true)
+        )
+      )
+      .orderBy(desc(recurringAppointments.createdAt));
+  }
+
+  async getRecurringAppointment(id: string) {
+    const [appointment] = await db
+      .select()
+      .from(recurringAppointments)
+      .where(eq(recurringAppointments.id, id));
+    return appointment;
+  }
+
+  async createRecurringAppointment(data: InsertRecurringAppointment) {
+    const [appointment] = await db
+      .insert(recurringAppointments)
+      .values(data)
+      .returning();
+    return appointment;
+  }
+
+  async updateRecurringAppointment(id: string, data: Partial<RecurringAppointment>) {
+    const [updated] = await db
+      .update(recurringAppointments)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(recurringAppointments.id, id))
+      .returning();
+    return updated;
+  }
+
+  async deleteRecurringAppointment(id: string) {
+    await db
+      .update(recurringAppointments)
+      .set({ isActive: false, updatedAt: new Date() })
+      .where(eq(recurringAppointments.id, id));
+  }
+
+  async generateAppointmentsFromRecurring(recurringId: string, startDate: Date, endDate: Date): Promise<Appointment[]> {
+    const recurring = await this.getRecurringAppointment(recurringId);
+    if (!recurring) return [];
+
+    const generatedAppointments: Appointment[] = [];
+    const currentDate = new Date(startDate);
+    
+    while (currentDate <= endDate) {
+      // Logic to generate appointments based on recurrence pattern
+      // This is a simplified version - full implementation would handle all patterns
+      if (recurring.recurrencePattern === 'weekly' && currentDate.getDay() === recurring.dayOfWeek) {
+        const appointmentDate = new Date(currentDate);
+        const [hours, minutes] = recurring.startTime.split(':');
+        appointmentDate.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+
+        const appointmentNumber = `APT-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        const [appointment] = await db
+          .insert(appointments)
+          .values({
+            appointmentNumber,
+            garageId: recurring.garageId,
+            customerId: recurring.customerId,
+            customerName: recurring.customerName,
+            customerPhone: recurring.customerPhone,
+            customerEmail: recurring.customerEmail,
+            vehicleInfo: recurring.vehicleInfo,
+            serviceType: recurring.serviceType,
+            description: recurring.description,
+            appointmentDate,
+            duration: recurring.duration,
+            status: 'scheduled',
+            assignedTo: recurring.assignedTo,
+            createdBy: recurring.createdBy,
+          })
+          .returning();
+        
+        generatedAppointments.push(appointment);
+      }
+      
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+
+    return generatedAppointments;
+  }
+
+  // Calendar Events
+  async getCalendarEvents(garageId: string, startDate: Date, endDate: Date) {
+    return await db
+      .select()
+      .from(calendarEvents)
+      .where(
+        and(
+          eq(calendarEvents.garageId, garageId),
+          gte(calendarEvents.startTime, startDate),
+          lte(calendarEvents.endTime, endDate)
+        )
+      )
+      .orderBy(calendarEvents.startTime);
+  }
+
+  async getCalendarEvent(id: string) {
+    const [event] = await db
+      .select()
+      .from(calendarEvents)
+      .where(eq(calendarEvents.id, id));
+    return event;
+  }
+
+  async createCalendarEvent(data: InsertCalendarEvent) {
+    const [event] = await db
+      .insert(calendarEvents)
+      .values(data)
+      .returning();
+    return event;
+  }
+
+  async updateCalendarEvent(id: string, data: Partial<CalendarEvent>) {
+    const [updated] = await db
+      .update(calendarEvents)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(calendarEvents.id, id))
+      .returning();
+    return updated;
+  }
+
+  async deleteCalendarEvent(id: string) {
+    await db.delete(calendarEvents).where(eq(calendarEvents.id, id));
+  }
+
+  // Conflict Detection & Optimization
+  async checkAppointmentConflicts(appointmentData: any) {
+    const conflicts = [];
+    const { appointmentDate, duration, assignedTo } = appointmentData;
+    const endTime = new Date(appointmentDate.getTime() + duration * 60000);
+
+    // Check for overlapping appointments
+    const overlappingAppointments = await db
+      .select()
+      .from(appointments)
+      .where(
+        and(
+          eq(appointments.assignedTo, assignedTo),
+          or(
+            and(
+              gte(appointments.appointmentDate, appointmentDate),
+              lte(appointments.appointmentDate, endTime)
+            ),
+            and(
+              lte(appointments.appointmentDate, appointmentDate),
+              gte(
+                appointments.appointmentDate,
+                new Date(appointmentDate.getTime() - duration * 60000)
+              )
+            )
+          )
+        )
+      );
+
+    if (overlappingAppointments.length > 0) {
+      conflicts.push({
+        type: 'appointment_overlap',
+        conflicts: overlappingAppointments,
+      });
+    }
+
+    // Check for technician availability/time off
+    const techAvailability = await this.getTechnicianAvailability(
+      assignedTo,
+      appointmentDate,
+      endTime
+    );
+
+    const unavailable = techAvailability.filter(
+      (avail) => !avail.isAvailable && avail.availabilityType === 'time_off'
+    );
+
+    if (unavailable.length > 0) {
+      conflicts.push({
+        type: 'technician_unavailable',
+        conflicts: unavailable,
+      });
+    }
+
+    return conflicts;
+  }
+
+  async getAvailableTimeSlots(technicianId: string, date: Date, duration: number) {
+    const slots = [];
+    const workingHours = { start: 9, end: 17 }; // 9 AM to 5 PM default
+    
+    // Get technician's appointments for the day
+    const dayStart = new Date(date);
+    dayStart.setHours(0, 0, 0, 0);
+    const dayEnd = new Date(date);
+    dayEnd.setHours(23, 59, 59, 999);
+
+    const dayAppointments = await db
+      .select()
+      .from(appointments)
+      .where(
+        and(
+          eq(appointments.assignedTo, technicianId),
+          gte(appointments.appointmentDate, dayStart),
+          lte(appointments.appointmentDate, dayEnd)
+        )
+      )
+      .orderBy(appointments.appointmentDate);
+
+    // Calculate available slots
+    let currentTime = new Date(date);
+    currentTime.setHours(workingHours.start, 0, 0, 0);
+    const endTime = new Date(date);
+    endTime.setHours(workingHours.end, 0, 0, 0);
+
+    for (const appointment of dayAppointments) {
+      const appointmentStart = new Date(appointment.appointmentDate);
+      const appointmentEnd = new Date(appointmentStart.getTime() + appointment.duration * 60000);
+
+      // If there's a gap before this appointment
+      if (currentTime < appointmentStart) {
+        const availableMinutes = (appointmentStart.getTime() - currentTime.getTime()) / 60000;
+        if (availableMinutes >= duration) {
+          slots.push({
+            start: new Date(currentTime),
+            end: new Date(appointmentStart),
+            duration: availableMinutes,
+          });
+        }
+      }
+
+      currentTime = appointmentEnd;
+    }
+
+    // Check if there's time after the last appointment
+    if (currentTime < endTime) {
+      const availableMinutes = (endTime.getTime() - currentTime.getTime()) / 60000;
+      if (availableMinutes >= duration) {
+        slots.push({
+          start: new Date(currentTime),
+          end: new Date(endTime),
+          duration: availableMinutes,
+        });
+      }
+    }
+
+    return slots;
+  }
+
+  async getTechnicianWorkload(technicianId: string, startDate: Date, endDate: Date) {
+    const appointmentsList = await db
+      .select()
+      .from(appointments)
+      .where(
+        and(
+          eq(appointments.assignedTo, technicianId),
+          gte(appointments.appointmentDate, startDate),
+          lte(appointments.appointmentDate, endDate)
+        )
+      );
+
+    const totalMinutes = appointmentsList.reduce((sum, apt) => sum + apt.duration, 0);
+    const totalDays = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+
+    return {
+      totalAppointments: appointmentsList.length,
+      totalHours: totalMinutes / 60,
+      averagePerDay: appointmentsList.length / totalDays,
+      utilizationRate: (totalMinutes / (totalDays * 8 * 60)) * 100, // Assuming 8-hour workdays
+    };
   }
 }
 
