@@ -16,10 +16,16 @@ import {
   insertCommissionSchema,
   insertPerformanceReviewSchema,
   insertTrainingSchema,
-  insertEmployeeTrainingSchema
+  insertEmployeeTrainingSchema,
+  insertAIJobEstimationSchema,
+  insertAIMaintenancePredictionSchema,
+  insertAIPartsRecommendationSchema,
+  insertAIScheduleOptimizationSchema,
+  insertAIChatConversationSchema
 } from "@shared/schema";
 import Stripe from "stripe";
 import { createPaypalOrder, capturePaypalOrder, loadPaypalDefault } from "./paypal";
+import { estimateJobTime, predictMaintenance, recommendParts, optimizeSchedule, chatWithCustomer } from './ai';
 
 // Initialize Stripe (Stripe integration - Module 25)
 const stripe = process.env.STRIPE_SECRET_KEY 
@@ -4747,6 +4753,537 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Module 32: AI Automation
+
+  // Job Time Estimation Routes
+  app.post('/api/ai/estimate-job', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const { serviceType, vehicleId, jobCardId, vehicleMake, vehicleModel, vehicleYear, historicalJobs } = req.body;
+
+      const aiResult = await estimateJobTime({
+        serviceType: serviceType || '',
+        vehicleMake,
+        vehicleModel,
+        vehicleYear,
+        historicalJobs
+      });
+
+      const estimationData = {
+        garageId: userGarageId,
+        serviceType,
+        vehicleId,
+        jobCardId,
+        estimatedHours: aiResult.estimatedHours?.toString(),
+        estimatedCost: aiResult.estimatedCost?.toString(),
+        confidence: aiResult.confidence?.toString(),
+        reasoning: aiResult.reasoning
+      };
+
+      const estimation = await storage.createAIJobEstimation(estimationData);
+      res.json(estimation);
+    } catch (error: any) {
+      console.error("Error creating job estimation:", error);
+      res.status(500).json({ message: "Failed to create job estimation", error: error.message });
+    }
+  });
+
+  app.get('/api/ai/job-estimations', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const { vehicleId } = req.query;
+
+      const estimations = await storage.getAIJobEstimations(userGarageId, vehicleId as string);
+      res.json(estimations);
+    } catch (error) {
+      console.error("Error fetching job estimations:", error);
+      res.status(500).json({ message: "Failed to fetch job estimations" });
+    }
+  });
+
+  app.get('/api/ai/job-estimations/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const estimation = await storage.getAIJobEstimation(req.params.id);
+      
+      if (!estimation) {
+        return res.status(404).json({ message: "Job estimation not found" });
+      }
+      
+      if (estimation.garageId !== userGarageId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      res.json(estimation);
+    } catch (error) {
+      console.error("Error fetching job estimation:", error);
+      res.status(500).json({ message: "Failed to fetch job estimation" });
+    }
+  });
+
+  app.patch('/api/ai/job-estimations/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const existing = await storage.getAIJobEstimation(req.params.id);
+      
+      if (!existing) {
+        return res.status(404).json({ message: "Job estimation not found" });
+      }
+      
+      if (existing.garageId !== userGarageId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      const validated = insertAIJobEstimationSchema.partial().safeParse(req.body);
+      
+      if (!validated.success) {
+        return res.status(400).json({ 
+          message: "Validation failed", 
+          errors: validated.error.errors 
+        });
+      }
+      
+      if (validated.data.garageId && validated.data.garageId !== userGarageId) {
+        return res.status(403).json({ message: "Cannot change garage" });
+      }
+      
+      const estimation = await storage.updateAIJobEstimation(req.params.id, validated.data);
+      res.json(estimation);
+    } catch (error) {
+      console.error("Error updating job estimation:", error);
+      res.status(500).json({ message: "Failed to update job estimation" });
+    }
+  });
+
+  // Maintenance Prediction Routes
+  app.post('/api/ai/predict-maintenance', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const { vehicleId, vehicleMake, vehicleModel, vehicleYear, mileage, serviceHistory } = req.body;
+
+      const aiResult = await predictMaintenance({
+        vehicleMake,
+        vehicleModel,
+        vehicleYear,
+        mileage,
+        serviceHistory: serviceHistory || []
+      });
+
+      const predictionData = {
+        garageId: userGarageId,
+        vehicleId,
+        vehicleMake,
+        vehicleModel,
+        vehicleYear,
+        mileage,
+        serviceHistory: serviceHistory || [],
+        predictions: aiResult.predictions,
+        status: 'pending'
+      };
+
+      const prediction = await storage.createAIMaintenancePrediction(predictionData);
+      res.json(prediction);
+    } catch (error: any) {
+      console.error("Error creating maintenance prediction:", error);
+      res.status(500).json({ message: "Failed to create maintenance prediction", error: error.message });
+    }
+  });
+
+  app.get('/api/ai/maintenance-predictions', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const { vehicleId, status } = req.query;
+
+      const predictions = await storage.getAIMaintenancePredictions(
+        userGarageId, 
+        vehicleId as string,
+        status as string
+      );
+      res.json(predictions);
+    } catch (error) {
+      console.error("Error fetching maintenance predictions:", error);
+      res.status(500).json({ message: "Failed to fetch maintenance predictions" });
+    }
+  });
+
+  app.get('/api/ai/maintenance-predictions/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const prediction = await storage.getAIMaintenancePrediction(req.params.id);
+      
+      if (!prediction) {
+        return res.status(404).json({ message: "Maintenance prediction not found" });
+      }
+      
+      if (prediction.garageId !== userGarageId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      res.json(prediction);
+    } catch (error) {
+      console.error("Error fetching maintenance prediction:", error);
+      res.status(500).json({ message: "Failed to fetch maintenance prediction" });
+    }
+  });
+
+  app.post('/api/ai/maintenance-predictions/:id/acknowledge', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const existing = await storage.getAIMaintenancePrediction(req.params.id);
+      
+      if (!existing) {
+        return res.status(404).json({ message: "Maintenance prediction not found" });
+      }
+      
+      if (existing.garageId !== userGarageId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      const prediction = await storage.updateAIMaintenancePrediction(req.params.id, {
+        status: 'acknowledged',
+        acknowledgedAt: new Date().toISOString()
+      });
+      res.json(prediction);
+    } catch (error) {
+      console.error("Error acknowledging maintenance prediction:", error);
+      res.status(500).json({ message: "Failed to acknowledge maintenance prediction" });
+    }
+  });
+
+  // Parts Recommendation Routes
+  app.post('/api/ai/recommend-parts', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const { vehicleId, serviceType, vehicleMake, vehicleModel, vehicleYear, description, jobCardId } = req.body;
+
+      const aiResult = await recommendParts({
+        serviceType,
+        vehicleMake,
+        vehicleModel,
+        vehicleYear,
+        description: description || undefined
+      });
+
+      const recommendationData = {
+        garageId: userGarageId,
+        vehicleId,
+        serviceType,
+        jobCardId,
+        recommendedParts: aiResult.parts,
+        totalEstimatedCost: aiResult.totalEstimatedCost,
+        reasoning: aiResult.reasoning,
+        confidence: aiResult.confidence,
+        status: 'pending'
+      };
+
+      const recommendation = await storage.createAIPartsRecommendation(recommendationData);
+      res.json(recommendation);
+    } catch (error: any) {
+      console.error("Error creating parts recommendation:", error);
+      res.status(500).json({ message: "Failed to create parts recommendation", error: error.message });
+    }
+  });
+
+  app.get('/api/ai/parts-recommendations', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const { vehicleId, status } = req.query;
+
+      const recommendations = await storage.getAIPartsRecommendations(
+        userGarageId,
+        vehicleId as string,
+        status as string
+      );
+      res.json(recommendations);
+    } catch (error) {
+      console.error("Error fetching parts recommendations:", error);
+      res.status(500).json({ message: "Failed to fetch parts recommendations" });
+    }
+  });
+
+  app.get('/api/ai/parts-recommendations/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const recommendation = await storage.getAIPartsRecommendation(req.params.id);
+      
+      if (!recommendation) {
+        return res.status(404).json({ message: "Parts recommendation not found" });
+      }
+      
+      if (recommendation.garageId !== userGarageId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      res.json(recommendation);
+    } catch (error) {
+      console.error("Error fetching parts recommendation:", error);
+      res.status(500).json({ message: "Failed to fetch parts recommendation" });
+    }
+  });
+
+  app.patch('/api/ai/parts-recommendations/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const existing = await storage.getAIPartsRecommendation(req.params.id);
+      
+      if (!existing) {
+        return res.status(404).json({ message: "Parts recommendation not found" });
+      }
+      
+      if (existing.garageId !== userGarageId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      const validated = insertAIPartsRecommendationSchema.partial().safeParse(req.body);
+      
+      if (!validated.success) {
+        return res.status(400).json({ 
+          message: "Validation failed", 
+          errors: validated.error.errors 
+        });
+      }
+      
+      if (validated.data.garageId && validated.data.garageId !== userGarageId) {
+        return res.status(403).json({ message: "Cannot change garage" });
+      }
+      
+      const recommendation = await storage.updateAIPartsRecommendation(req.params.id, validated.data);
+      res.json(recommendation);
+    } catch (error) {
+      console.error("Error updating parts recommendation:", error);
+      res.status(500).json({ message: "Failed to update parts recommendation" });
+    }
+  });
+
+  // Schedule Optimization Routes
+  app.post('/api/ai/optimize-schedule', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const { appointments, technicians } = req.body;
+
+      const aiResult = await optimizeSchedule({
+        appointments: appointments || [],
+        technicians: technicians || []
+      });
+
+      const optimizationData = {
+        garageId: userGarageId,
+        conflicts: aiResult.conflicts,
+        suggestions: aiResult.suggestions,
+        potentialTimeSaved: aiResult.totalPotentialTimeSaved,
+        reasoning: aiResult.reasoning,
+        status: 'pending'
+      };
+
+      const optimization = await storage.createAIScheduleOptimization(optimizationData);
+      res.json(optimization);
+    } catch (error: any) {
+      console.error("Error creating schedule optimization:", error);
+      res.status(500).json({ message: "Failed to create schedule optimization", error: error.message });
+    }
+  });
+
+  app.get('/api/ai/schedule-optimizations', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const { status } = req.query;
+
+      const optimizations = await storage.getAIScheduleOptimizations(
+        userGarageId,
+        status as string
+      );
+      res.json(optimizations);
+    } catch (error) {
+      console.error("Error fetching schedule optimizations:", error);
+      res.status(500).json({ message: "Failed to fetch schedule optimizations" });
+    }
+  });
+
+  app.get('/api/ai/schedule-optimizations/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const optimization = await storage.getAIScheduleOptimization(req.params.id);
+      
+      if (!optimization) {
+        return res.status(404).json({ message: "Schedule optimization not found" });
+      }
+      
+      if (optimization.garageId !== userGarageId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      res.json(optimization);
+    } catch (error) {
+      console.error("Error fetching schedule optimization:", error);
+      res.status(500).json({ message: "Failed to fetch schedule optimization" });
+    }
+  });
+
+  app.patch('/api/ai/schedule-optimizations/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const existing = await storage.getAIScheduleOptimization(req.params.id);
+      
+      if (!existing) {
+        return res.status(404).json({ message: "Schedule optimization not found" });
+      }
+      
+      if (existing.garageId !== userGarageId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      const validated = insertAIScheduleOptimizationSchema.partial().safeParse(req.body);
+      
+      if (!validated.success) {
+        return res.status(400).json({ 
+          message: "Validation failed", 
+          errors: validated.error.errors 
+        });
+      }
+      
+      if (validated.data.garageId && validated.data.garageId !== userGarageId) {
+        return res.status(403).json({ message: "Cannot change garage" });
+      }
+      
+      const optimization = await storage.updateAIScheduleOptimization(req.params.id, validated.data);
+      res.json(optimization);
+    } catch (error) {
+      console.error("Error updating schedule optimization:", error);
+      res.status(500).json({ message: "Failed to update schedule optimization" });
+    }
+  });
+
+  // Chat Bot Routes
+  app.post('/api/ai/chat', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const { message, conversationId, garageContext } = req.body;
+
+      if (!message) {
+        return res.status(400).json({ message: "Message is required" });
+      }
+
+      let conversation;
+      let conversationHistory: any[] = [];
+
+      if (conversationId) {
+        conversation = await storage.getAIChatConversation(conversationId);
+        
+        if (!conversation) {
+          return res.status(404).json({ message: "Conversation not found" });
+        }
+        
+        if (conversation.garageId !== userGarageId) {
+          return res.status(403).json({ message: "Access denied" });
+        }
+
+        conversationHistory = conversation.messages || [];
+      } else {
+        const validated = insertAIChatConversationSchema.parse({
+          garageId: userGarageId,
+          customerId: req.body.customerId,
+          messages: [],
+          status: 'active'
+        });
+        
+        conversation = await storage.createAIChatConversation(validated);
+      }
+
+      const aiResult = await chatWithCustomer(
+        message, 
+        conversationHistory,
+        garageContext || { garageName: 'Our Garage' }
+      );
+
+      const updatedMessages = [
+        ...conversationHistory,
+        { role: 'user', content: message, timestamp: new Date().toISOString() },
+        { role: 'assistant', content: aiResult.response, timestamp: new Date().toISOString() }
+      ];
+
+      const updatedConversation = await storage.updateAIChatConversation(conversation.id, {
+        messages: updatedMessages,
+        status: aiResult.shouldHandoff ? 'pending_handoff' : 'active'
+      });
+
+      res.json({
+        conversation: updatedConversation,
+        response: aiResult.response,
+        shouldHandoff: aiResult.shouldHandoff
+      });
+    } catch (error: any) {
+      console.error("Error processing chat:", error);
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ message: "Invalid request data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to process chat" });
+    }
+  });
+
+  app.get('/api/ai/chat-conversations', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const { customerId, status } = req.query;
+
+      const conversations = await storage.getAIChatConversations(
+        userGarageId,
+        customerId as string,
+        status as string
+      );
+      res.json(conversations);
+    } catch (error) {
+      console.error("Error fetching chat conversations:", error);
+      res.status(500).json({ message: "Failed to fetch chat conversations" });
+    }
+  });
+
+  app.get('/api/ai/chat-conversations/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const conversation = await storage.getAIChatConversation(req.params.id);
+      
+      if (!conversation) {
+        return res.status(404).json({ message: "Conversation not found" });
+      }
+      
+      if (conversation.garageId !== userGarageId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      res.json(conversation);
+    } catch (error) {
+      console.error("Error fetching chat conversation:", error);
+      res.status(500).json({ message: "Failed to fetch chat conversation" });
+    }
+  });
+
+  app.post('/api/ai/chat-conversations/:id/handoff', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const existing = await storage.getAIChatConversation(req.params.id);
+      
+      if (!existing) {
+        return res.status(404).json({ message: "Conversation not found" });
+      }
+      
+      if (existing.garageId !== userGarageId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      const { assignedTo } = req.body;
+
+      const conversation = await storage.updateAIChatConversation(req.params.id, {
+        status: 'handed_off',
+        handoffTo: assignedTo,
+        handoffAt: new Date().toISOString()
+      });
+      res.json(conversation);
+    } catch (error) {
+      console.error("Error handing off conversation:", error);
+      res.status(500).json({ message: "Failed to hand off conversation" });
+    }
+  });
+
   // Data Import
   app.post('/api/import', isAuthenticated, async (req: any, res) => {
     try {
@@ -4767,7 +5304,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         try {
           switch (module) {
             case 'customers':
-              await storage.createCustomer({ ...item, garageId, createdBy: userId });
+              await storage.createUser({ ...item, garageId, createdBy: userId });
               results.imported++;
               break;
             case 'vehicles':
