@@ -4435,13 +4435,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/hr/calculate-commission/:jobCardId', isAuthenticated, async (req: any, res) => {
     try {
       const userGarageId = req.user.claims.garageId;
-      const { garageId } = req.body;
       
-      if (garageId !== userGarageId) {
+      const jobCard = await storage.getJobCard(req.params.jobCardId);
+      if (!jobCard) {
+        return res.status(404).json({ message: "Job card not found" });
+      }
+      
+      if (jobCard.garageId !== userGarageId) {
         return res.status(403).json({ message: "Access denied" });
       }
       
-      const commission = await storage.calculateCommission(req.params.jobCardId, garageId);
+      const commission = await storage.calculateCommission(req.params.jobCardId, userGarageId);
       res.json(commission);
     } catch (error) {
       console.error("Error calculating commission:", error);
