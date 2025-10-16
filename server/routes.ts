@@ -2436,6 +2436,304 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Calendar & Scheduling Routes - Module 26
+  // Technician Availability
+  app.get('/api/availability/technician/:technicianId', isAuthenticated, async (req: any, res) => {
+    try {
+      const { technicianId } = req.params;
+      const { startDate, endDate } = req.query;
+      
+      const availability = await storage.getTechnicianAvailability(
+        technicianId,
+        startDate ? new Date(startDate as string) : undefined,
+        endDate ? new Date(endDate as string) : undefined
+      );
+      res.json(availability);
+    } catch (error) {
+      console.error("Error fetching technician availability:", error);
+      res.status(500).json({ message: "Failed to fetch availability" });
+    }
+  });
+
+  app.get('/api/availability/garage/:garageId', isAuthenticated, async (req: any, res) => {
+    try {
+      const { garageId } = req.params;
+      const { startDate, endDate } = req.query;
+      
+      if (!startDate || !endDate) {
+        return res.status(400).json({ message: "startDate and endDate are required" });
+      }
+
+      const availability = await storage.getGarageAvailability(
+        garageId,
+        new Date(startDate as string),
+        new Date(endDate as string)
+      );
+      res.json(availability);
+    } catch (error) {
+      console.error("Error fetching garage availability:", error);
+      res.status(500).json({ message: "Failed to fetch availability" });
+    }
+  });
+
+  app.post('/api/availability', isAuthenticated, async (req: any, res) => {
+    try {
+      const { insertTechnicianAvailabilitySchema } = await import("@shared/schema");
+      const userId = req.user.claims.sub;
+      const validatedData = insertTechnicianAvailabilitySchema.parse(req.body);
+      
+      const availability = await storage.createTechnicianAvailability({
+        ...validatedData,
+        technicianId: userId,
+      });
+      res.json(availability);
+    } catch (error: any) {
+      console.error("Error creating availability:", error);
+      res.status(400).json({ message: error.message || "Failed to create availability" });
+    }
+  });
+
+  app.patch('/api/availability/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const updated = await storage.updateTechnicianAvailability(id, req.body);
+      res.json(updated);
+    } catch (error: any) {
+      console.error("Error updating availability:", error);
+      res.status(400).json({ message: error.message || "Failed to update availability" });
+    }
+  });
+
+  app.delete('/api/availability/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteTechnicianAvailability(id);
+      res.json({ message: "Availability deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting availability:", error);
+      res.status(500).json({ message: "Failed to delete availability" });
+    }
+  });
+
+  // Recurring Appointments
+  app.get('/api/recurring-appointments/:garageId', isAuthenticated, async (req: any, res) => {
+    try {
+      const { garageId } = req.params;
+      const appointments = await storage.getRecurringAppointments(garageId);
+      res.json(appointments);
+    } catch (error) {
+      console.error("Error fetching recurring appointments:", error);
+      res.status(500).json({ message: "Failed to fetch recurring appointments" });
+    }
+  });
+
+  app.get('/api/recurring-appointments/detail/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const appointment = await storage.getRecurringAppointment(id);
+      if (!appointment) {
+        return res.status(404).json({ message: "Recurring appointment not found" });
+      }
+      res.json(appointment);
+    } catch (error) {
+      console.error("Error fetching recurring appointment:", error);
+      res.status(500).json({ message: "Failed to fetch recurring appointment" });
+    }
+  });
+
+  app.post('/api/recurring-appointments', isAuthenticated, async (req: any, res) => {
+    try {
+      const { insertRecurringAppointmentSchema } = await import("@shared/schema");
+      const userId = req.user.claims.sub;
+      const validatedData = insertRecurringAppointmentSchema.parse(req.body);
+      
+      const appointment = await storage.createRecurringAppointment({
+        ...validatedData,
+        createdBy: userId,
+      });
+      res.json(appointment);
+    } catch (error: any) {
+      console.error("Error creating recurring appointment:", error);
+      res.status(400).json({ message: error.message || "Failed to create recurring appointment" });
+    }
+  });
+
+  app.patch('/api/recurring-appointments/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const updated = await storage.updateRecurringAppointment(id, req.body);
+      res.json(updated);
+    } catch (error: any) {
+      console.error("Error updating recurring appointment:", error);
+      res.status(400).json({ message: error.message || "Failed to update recurring appointment" });
+    }
+  });
+
+  app.delete('/api/recurring-appointments/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteRecurringAppointment(id);
+      res.json({ message: "Recurring appointment deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting recurring appointment:", error);
+      res.status(500).json({ message: "Failed to delete recurring appointment" });
+    }
+  });
+
+  app.post('/api/recurring-appointments/:id/generate', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const { startDate, endDate } = req.body;
+      
+      if (!startDate || !endDate) {
+        return res.status(400).json({ message: "startDate and endDate are required" });
+      }
+
+      const appointments = await storage.generateAppointmentsFromRecurring(
+        id,
+        new Date(startDate),
+        new Date(endDate)
+      );
+      res.json(appointments);
+    } catch (error) {
+      console.error("Error generating appointments:", error);
+      res.status(500).json({ message: "Failed to generate appointments" });
+    }
+  });
+
+  // Calendar Events
+  app.get('/api/calendar-events/:garageId', isAuthenticated, async (req: any, res) => {
+    try {
+      const { garageId } = req.params;
+      const { startDate, endDate } = req.query;
+      
+      if (!startDate || !endDate) {
+        return res.status(400).json({ message: "startDate and endDate are required" });
+      }
+
+      const events = await storage.getCalendarEvents(
+        garageId,
+        new Date(startDate as string),
+        new Date(endDate as string)
+      );
+      res.json(events);
+    } catch (error) {
+      console.error("Error fetching calendar events:", error);
+      res.status(500).json({ message: "Failed to fetch calendar events" });
+    }
+  });
+
+  app.get('/api/calendar-events/detail/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const event = await storage.getCalendarEvent(id);
+      if (!event) {
+        return res.status(404).json({ message: "Calendar event not found" });
+      }
+      res.json(event);
+    } catch (error) {
+      console.error("Error fetching calendar event:", error);
+      res.status(500).json({ message: "Failed to fetch calendar event" });
+    }
+  });
+
+  app.post('/api/calendar-events', isAuthenticated, async (req: any, res) => {
+    try {
+      const { insertCalendarEventSchema } = await import("@shared/schema");
+      const userId = req.user.claims.sub;
+      const validatedData = insertCalendarEventSchema.parse(req.body);
+      
+      const event = await storage.createCalendarEvent({
+        ...validatedData,
+        createdBy: userId,
+      });
+      res.json(event);
+    } catch (error: any) {
+      console.error("Error creating calendar event:", error);
+      res.status(400).json({ message: error.message || "Failed to create calendar event" });
+    }
+  });
+
+  app.patch('/api/calendar-events/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const updated = await storage.updateCalendarEvent(id, req.body);
+      res.json(updated);
+    } catch (error: any) {
+      console.error("Error updating calendar event:", error);
+      res.status(400).json({ message: error.message || "Failed to update calendar event" });
+    }
+  });
+
+  app.delete('/api/calendar-events/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteCalendarEvent(id);
+      res.json({ message: "Calendar event deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting calendar event:", error);
+      res.status(500).json({ message: "Failed to delete calendar event" });
+    }
+  });
+
+  // Conflict Detection & Optimization
+  app.post('/api/appointments/check-conflicts', isAuthenticated, async (req: any, res) => {
+    try {
+      const appointmentData = {
+        ...req.body,
+        appointmentDate: new Date(req.body.appointmentDate),
+      };
+      
+      const conflicts = await storage.checkAppointmentConflicts(appointmentData);
+      res.json({ hasConflicts: conflicts.length > 0, conflicts });
+    } catch (error) {
+      console.error("Error checking conflicts:", error);
+      res.status(500).json({ message: "Failed to check conflicts" });
+    }
+  });
+
+  app.get('/api/time-slots/:technicianId', isAuthenticated, async (req: any, res) => {
+    try {
+      const { technicianId } = req.params;
+      const { date, duration } = req.query;
+      
+      if (!date || !duration) {
+        return res.status(400).json({ message: "date and duration are required" });
+      }
+
+      const slots = await storage.getAvailableTimeSlots(
+        technicianId,
+        new Date(date as string),
+        parseInt(duration as string)
+      );
+      res.json(slots);
+    } catch (error) {
+      console.error("Error fetching time slots:", error);
+      res.status(500).json({ message: "Failed to fetch time slots" });
+    }
+  });
+
+  app.get('/api/technician-workload/:technicianId', isAuthenticated, async (req: any, res) => {
+    try {
+      const { technicianId } = req.params;
+      const { startDate, endDate } = req.query;
+      
+      if (!startDate || !endDate) {
+        return res.status(400).json({ message: "startDate and endDate are required" });
+      }
+
+      const workload = await storage.getTechnicianWorkload(
+        technicianId,
+        new Date(startDate as string),
+        new Date(endDate as string)
+      );
+      res.json(workload);
+    } catch (error) {
+      console.error("Error fetching technician workload:", error);
+      res.status(500).json({ message: "Failed to fetch technician workload" });
+    }
+  });
+
   // Stripe Payment Routes - Module 25
   // Create payment intent for invoice
   app.post('/api/customer/create-payment-intent', isAuthenticated, async (req: any, res) => {
