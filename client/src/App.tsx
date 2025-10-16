@@ -12,7 +12,7 @@ import { Dashboard } from "@/pages/Dashboard";
 import { TasksManagement } from "@/pages/TasksManagement";
 import { Appointments } from "@/pages/Appointments";
 import { Customers } from "@/pages/Customers";
-import Vehicles from "@/pages/Vehicles";
+import VehiclesEnhanced from "@/pages/VehiclesEnhanced";
 import { PurchaseOrders } from "@/pages/PurchaseOrders";
 import { Invoices } from "@/pages/Invoices";
 import { Estimates } from "@/pages/Estimates";
@@ -120,7 +120,7 @@ function Router() {
       </Route>
       <Route path="/vehicles">
         <Layout>
-          <Vehicles />
+          <VehiclesEnhanced />
         </Layout>
       </Route>
       <Route path="/purchase-orders">
