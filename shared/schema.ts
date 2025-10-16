@@ -1398,3 +1398,95 @@ export const insertTrainingSchema = createInsertSchema(trainings).omit({ id: tru
 export type EmployeeTraining = typeof employeeTrainings.$inferSelect;
 export type InsertEmployeeTraining = typeof employeeTrainings.$inferInsert;
 export const insertEmployeeTrainingSchema = createInsertSchema(employeeTrainings).omit({ id: true, createdAt: true, updatedAt: true });
+
+// Module 32: AI Automation & Insights
+
+export const aiJobEstimations = pgTable("ai_job_estimations", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  jobCardId: uuid("job_card_id").references(() => jobCards.id),
+  vehicleId: uuid("vehicle_id").references(() => vehicles.id),
+  serviceType: varchar("service_type", { length: 255 }),
+  estimatedHours: decimal("estimated_hours", { precision: 10, scale: 2 }),
+  estimatedCost: decimal("estimated_cost", { precision: 10, scale: 2 }),
+  confidence: decimal("confidence", { precision: 5, scale: 2 }),
+  reasoning: text("reasoning"),
+  actualHours: decimal("actual_hours", { precision: 10, scale: 2 }),
+  actualCost: decimal("actual_cost", { precision: 10, scale: 2 }),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const aiMaintenancePredictions = pgTable("ai_maintenance_predictions", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  vehicleId: uuid("vehicle_id").references(() => vehicles.id).notNull(),
+  predictedIssue: text("predicted_issue").notNull(),
+  severity: varchar("severity", { length: 50 }),
+  recommendedAction: text("recommended_action"),
+  estimatedTimeframe: varchar("estimated_timeframe", { length: 100 }),
+  confidence: decimal("confidence", { precision: 5, scale: 2 }),
+  basedOnData: jsonb("based_on_data"),
+  status: varchar("status", { length: 50 }).default("pending"),
+  acknowledgedBy: varchar("acknowledged_by").references(() => users.id),
+  acknowledgedAt: timestamp("acknowledged_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const aiPartsRecommendations = pgTable("ai_parts_recommendations", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  jobCardId: uuid("job_card_id").references(() => jobCards.id),
+  vehicleId: uuid("vehicle_id").references(() => vehicles.id).notNull(),
+  recommendedParts: jsonb("recommended_parts").notNull(),
+  reasoning: text("reasoning"),
+  totalEstimatedCost: decimal("total_estimated_cost", { precision: 10, scale: 2 }),
+  confidence: decimal("confidence", { precision: 5, scale: 2 }),
+  status: varchar("status", { length: 50 }).default("pending"),
+  appliedToJobCard: boolean("applied_to_job_card").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const aiScheduleOptimizations = pgTable("ai_schedule_optimizations", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  optimizationType: varchar("optimization_type", { length: 100 }),
+  suggestions: jsonb("suggestions").notNull(),
+  reasoning: text("reasoning"),
+  potentialTimeSaved: decimal("potential_time_saved", { precision: 10, scale: 2 }),
+  status: varchar("status", { length: 50 }).default("pending"),
+  appliedAt: timestamp("applied_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const aiChatConversations = pgTable("ai_chat_conversations", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  customerId: varchar("customer_id").references(() => users.id),
+  sessionId: varchar("session_id", { length: 255 }),
+  messages: jsonb("messages").notNull(),
+  status: varchar("status", { length: 50 }).default("active"),
+  handoffTo: varchar("handoff_to").references(() => users.id),
+  handoffReason: text("handoff_reason"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type AIJobEstimation = typeof aiJobEstimations.$inferSelect;
+export type InsertAIJobEstimation = typeof aiJobEstimations.$inferInsert;
+export const insertAIJobEstimationSchema = createInsertSchema(aiJobEstimations).omit({ id: true, createdAt: true });
+
+export type AIMaintenancePrediction = typeof aiMaintenancePredictions.$inferSelect;
+export type InsertAIMaintenancePrediction = typeof aiMaintenancePredictions.$inferInsert;
+export const insertAIMaintenancePredictionSchema = createInsertSchema(aiMaintenancePredictions).omit({ id: true, createdAt: true });
+
+export type AIPartsRecommendation = typeof aiPartsRecommendations.$inferSelect;
+export type InsertAIPartsRecommendation = typeof aiPartsRecommendations.$inferInsert;
+export const insertAIPartsRecommendationSchema = createInsertSchema(aiPartsRecommendations).omit({ id: true, createdAt: true });
+
+export type AIScheduleOptimization = typeof aiScheduleOptimizations.$inferSelect;
+export type InsertAIScheduleOptimization = typeof aiScheduleOptimizations.$inferInsert;
+export const insertAIScheduleOptimizationSchema = createInsertSchema(aiScheduleOptimizations).omit({ id: true, createdAt: true });
+
+export type AIChatConversation = typeof aiChatConversations.$inferSelect;
+export type InsertAIChatConversation = typeof aiChatConversations.$inferInsert;
+export const insertAIChatConversationSchema = createInsertSchema(aiChatConversations).omit({ id: true, createdAt: true, updatedAt: true });
