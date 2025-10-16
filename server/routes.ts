@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 import { emailService } from "./services/emailService";
+import { smsService } from "./services/smsService";
 import { z } from "zod";
 import { insertNotificationSchema } from "@shared/schema";
 
@@ -63,6 +64,87 @@ const appointmentReminderSchema = z.object({
   serviceName: z.string(),
   garageName: z.string(),
   garageAddress: z.string().optional(),
+});
+
+// SMS notification validation schemas
+const smsAppointmentReminderSchema = z.object({
+  customerPhone: z.string(),
+  recipientId: z.string(),
+  garageId: z.string().optional(),
+  customerName: z.string(),
+  appointmentDate: z.string(),
+  appointmentTime: z.string(),
+  garageName: z.string(),
+});
+
+const smsAppointmentConfirmationSchema = z.object({
+  customerPhone: z.string(),
+  recipientId: z.string(),
+  garageId: z.string().optional(),
+  customerName: z.string(),
+  appointmentDate: z.string(),
+  appointmentTime: z.string(),
+  garageName: z.string(),
+});
+
+const smsJobStatusSchema = z.object({
+  customerPhone: z.string(),
+  recipientId: z.string(),
+  garageId: z.string().optional(),
+  customerName: z.string(),
+  jobCardNumber: z.string(),
+  status: z.string(),
+  garageName: z.string(),
+});
+
+const smsJobCompletedSchema = z.object({
+  customerPhone: z.string(),
+  recipientId: z.string(),
+  garageId: z.string().optional(),
+  customerName: z.string(),
+  jobCardNumber: z.string(),
+  garageName: z.string(),
+  totalAmount: z.string().optional(),
+});
+
+const smsInvoiceSchema = z.object({
+  customerPhone: z.string(),
+  recipientId: z.string(),
+  garageId: z.string().optional(),
+  customerName: z.string(),
+  invoiceNumber: z.string(),
+  amount: z.string(),
+  dueDate: z.string(),
+  garageName: z.string(),
+});
+
+const smsPaymentReceivedSchema = z.object({
+  customerPhone: z.string(),
+  recipientId: z.string(),
+  garageId: z.string().optional(),
+  customerName: z.string(),
+  invoiceNumber: z.string(),
+  amount: z.string(),
+  garageName: z.string(),
+});
+
+const smsEstimateSchema = z.object({
+  customerPhone: z.string(),
+  recipientId: z.string(),
+  garageId: z.string().optional(),
+  customerName: z.string(),
+  estimateNumber: z.string(),
+  amount: z.string(),
+  garageName: z.string(),
+});
+
+const smsFeedbackRequestSchema = z.object({
+  customerPhone: z.string(),
+  recipientId: z.string(),
+  garageId: z.string().optional(),
+  customerName: z.string(),
+  garageName: z.string(),
+  feedbackLink: z.string().optional(),
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -2021,6 +2103,207 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       console.error("Error sending appointment reminder:", error);
       res.status(500).json({ message: "Failed to send appointment reminder" });
+    }
+  });
+
+  // SMS notification routes - Module 24
+  app.post('/api/notifications/sms/appointment-reminder', isAuthenticated, async (req, res) => {
+    try {
+      const validatedData = smsAppointmentReminderSchema.parse(req.body);
+      const { customerPhone, recipientId, garageId, ...params } = validatedData;
+      const template = smsService.appointmentReminder(params);
+      
+      await smsService.sendSMS({
+        to: customerPhone,
+        recipientId,
+        garageId: garageId || '',
+        template,
+        category: 'appointment',
+        metadata: { type: 'reminder', ...params }
+      });
+      
+      res.json({ message: 'SMS appointment reminder sent' });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid request data", errors: error.errors });
+      }
+      console.error("Error sending SMS appointment reminder:", error);
+      res.status(500).json({ message: "Failed to send SMS appointment reminder" });
+    }
+  });
+
+  app.post('/api/notifications/sms/appointment-confirmation', isAuthenticated, async (req, res) => {
+    try {
+      const validatedData = smsAppointmentConfirmationSchema.parse(req.body);
+      const { customerPhone, recipientId, garageId, ...params } = validatedData;
+      const template = smsService.appointmentConfirmation(params);
+      
+      await smsService.sendSMS({
+        to: customerPhone,
+        recipientId,
+        garageId: garageId || '',
+        template,
+        category: 'appointment',
+        metadata: { type: 'confirmation', ...params }
+      });
+      
+      res.json({ message: 'SMS appointment confirmation sent' });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid request data", errors: error.errors });
+      }
+      console.error("Error sending SMS appointment confirmation:", error);
+      res.status(500).json({ message: "Failed to send SMS appointment confirmation" });
+    }
+  });
+
+  app.post('/api/notifications/sms/job-status', isAuthenticated, async (req, res) => {
+    try {
+      const validatedData = smsJobStatusSchema.parse(req.body);
+      const { customerPhone, recipientId, garageId, ...params } = validatedData;
+      const template = smsService.jobStatusUpdate(params);
+      
+      await smsService.sendSMS({
+        to: customerPhone,
+        recipientId,
+        garageId: garageId || '',
+        template,
+        category: 'job_update',
+        metadata: { type: 'status_update', ...params }
+      });
+      
+      res.json({ message: 'SMS job status update sent' });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid request data", errors: error.errors });
+      }
+      console.error("Error sending SMS job status:", error);
+      res.status(500).json({ message: "Failed to send SMS job status update" });
+    }
+  });
+
+  app.post('/api/notifications/sms/job-completed', isAuthenticated, async (req, res) => {
+    try {
+      const validatedData = smsJobCompletedSchema.parse(req.body);
+      const { customerPhone, recipientId, garageId, ...params } = validatedData;
+      const template = smsService.jobCompleted(params);
+      
+      await smsService.sendSMS({
+        to: customerPhone,
+        recipientId,
+        garageId: garageId || '',
+        template,
+        category: 'job_completed',
+        metadata: { type: 'job_completed', ...params }
+      });
+      
+      res.json({ message: 'SMS job completion notification sent' });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid request data", errors: error.errors });
+      }
+      console.error("Error sending SMS job completed:", error);
+      res.status(500).json({ message: "Failed to send SMS job completion notification" });
+    }
+  });
+
+  app.post('/api/notifications/sms/invoice', isAuthenticated, async (req, res) => {
+    try {
+      const validatedData = smsInvoiceSchema.parse(req.body);
+      const { customerPhone, recipientId, garageId, ...params } = validatedData;
+      const template = smsService.invoiceNotification(params);
+      
+      await smsService.sendSMS({
+        to: customerPhone,
+        recipientId,
+        garageId: garageId || '',
+        template,
+        category: 'invoice',
+        metadata: { type: 'invoice', ...params }
+      });
+      
+      res.json({ message: 'SMS invoice notification sent' });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid request data", errors: error.errors });
+      }
+      console.error("Error sending SMS invoice:", error);
+      res.status(500).json({ message: "Failed to send SMS invoice notification" });
+    }
+  });
+
+  app.post('/api/notifications/sms/payment-received', isAuthenticated, async (req, res) => {
+    try {
+      const validatedData = smsPaymentReceivedSchema.parse(req.body);
+      const { customerPhone, recipientId, garageId, ...params } = validatedData;
+      const template = smsService.paymentReceived(params);
+      
+      await smsService.sendSMS({
+        to: customerPhone,
+        recipientId,
+        garageId: garageId || '',
+        template,
+        category: 'payment',
+        metadata: { type: 'payment_received', ...params }
+      });
+      
+      res.json({ message: 'SMS payment confirmation sent' });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid request data", errors: error.errors });
+      }
+      console.error("Error sending SMS payment received:", error);
+      res.status(500).json({ message: "Failed to send SMS payment confirmation" });
+    }
+  });
+
+  app.post('/api/notifications/sms/estimate', isAuthenticated, async (req, res) => {
+    try {
+      const validatedData = smsEstimateSchema.parse(req.body);
+      const { customerPhone, recipientId, garageId, ...params } = validatedData;
+      const template = smsService.estimateReady(params);
+      
+      await smsService.sendSMS({
+        to: customerPhone,
+        recipientId,
+        garageId: garageId || '',
+        template,
+        category: 'estimate',
+        metadata: { type: 'estimate_ready', ...params }
+      });
+      
+      res.json({ message: 'SMS estimate notification sent' });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid request data", errors: error.errors });
+      }
+      console.error("Error sending SMS estimate:", error);
+      res.status(500).json({ message: "Failed to send SMS estimate notification" });
+    }
+  });
+
+  app.post('/api/notifications/sms/feedback-request', isAuthenticated, async (req, res) => {
+    try {
+      const validatedData = smsFeedbackRequestSchema.parse(req.body);
+      const { customerPhone, recipientId, garageId, ...params } = validatedData;
+      const template = smsService.feedbackRequest(params);
+      
+      await smsService.sendSMS({
+        to: customerPhone,
+        recipientId,
+        garageId: garageId || '',
+        template,
+        category: 'feedback_request',
+        metadata: { type: 'feedback_request', ...params }
+      });
+      
+      res.json({ message: 'SMS feedback request sent' });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid request data", errors: error.errors });
+      }
+      console.error("Error sending SMS feedback request:", error);
+      res.status(500).json({ message: "Failed to send SMS feedback request" });
     }
   });
 
