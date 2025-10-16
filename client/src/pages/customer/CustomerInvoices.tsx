@@ -1,17 +1,52 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { FileText, DollarSign, Filter, CreditCard } from "lucide-react";
 import { format } from "date-fns";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
+import { PaymentDialog } from "@/components/customer/PaymentDialog";
 import type { Invoice } from "@shared/schema";
 
 export function CustomerInvoices() {
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
+  const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
+  const [clientSecret, setClientSecret] = useState<string>('');
+  const { toast } = useToast();
 
   const { data: invoices = [], isLoading } = useQuery<Invoice[]>({
     queryKey: ['/api/customer/invoices'],
   });
+
+  const createPaymentIntentMutation = useMutation({
+    mutationFn: async (invoiceId: string) => {
+      return apiRequest('POST', '/api/customer/create-payment-intent', { invoiceId });
+    },
+    onSuccess: (data: any) => {
+      setClientSecret(data.clientSecret);
+      setPaymentDialogOpen(true);
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to initiate payment",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handlePayInvoice = (invoice: Invoice) => {
+    setSelectedInvoice(invoice);
+    createPaymentIntentMutation.mutate(invoice.id);
+  };
+
+  const handlePaymentSuccess = () => {
+    queryClient.invalidateQueries({ queryKey: ['/api/customer/invoices'] });
+    setSelectedInvoice(null);
+    setClientSecret('');
+  };
 
   const filteredInvoices = invoices.filter(inv => 
     statusFilter === 'all' || inv.status === statusFilter
@@ -140,9 +175,16 @@ export function CustomerInvoices() {
 
                   {inv.status !== 'paid' && Number(inv.balanceAmount) > 0 && (
                     <div className="flex gap-2 pt-4 border-t">
-                      <Button className="flex-1" disabled data-testid={`button-pay-invoice-${inv.id}`}>
+                      <Button 
+                        className="flex-1" 
+                        onClick={() => handlePayInvoice(inv)}
+                        disabled={createPaymentIntentMutation.isPending}
+                        data-testid={`button-pay-invoice-${inv.id}`}
+                      >
                         <CreditCard className="h-4 w-4 mr-2" />
-                        Pay ${Number(inv.balanceAmount).toFixed(2)}
+                        {createPaymentIntentMutation.isPending && selectedInvoice?.id === inv.id 
+                          ? 'Loading...' 
+                          : `Pay $${Number(inv.balanceAmount).toFixed(2)}`}
                       </Button>
                       <Button variant="outline" disabled data-testid={`button-download-invoice-${inv.id}`}>
                         <FileText className="h-4 w-4 mr-2" />
@@ -162,6 +204,17 @@ export function CustomerInvoices() {
             </Card>
           ))}
         </div>
+      )}
+
+      {selectedInvoice && clientSecret && (
+        <PaymentDialog
+          open={paymentDialogOpen}
+          onOpenChange={setPaymentDialogOpen}
+          invoiceId={selectedInvoice.id}
+          amount={Number(selectedInvoice.balanceAmount)}
+          clientSecret={clientSecret}
+          onSuccess={handlePaymentSuccess}
+        />
       )}
     </div>
   );

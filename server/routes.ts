@@ -6,6 +6,12 @@ import { emailService } from "./services/emailService";
 import { smsService } from "./services/smsService";
 import { z } from "zod";
 import { insertNotificationSchema } from "@shared/schema";
+import Stripe from "stripe";
+
+// Initialize Stripe (Stripe integration - Module 25)
+const stripe = process.env.STRIPE_SECRET_KEY 
+  ? new Stripe(process.env.STRIPE_SECRET_KEY)
+  : null;
 
 // Email notification validation schemas
 const appointmentConfirmationSchema = z.object({
@@ -2427,6 +2433,85 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching customer profile:", error);
       res.status(500).json({ message: "Failed to fetch profile" });
+    }
+  });
+
+  // Stripe Payment Routes - Module 25
+  // Create payment intent for invoice
+  app.post('/api/customer/create-payment-intent', isAuthenticated, async (req: any, res) => {
+    if (!stripe) {
+      return res.status(500).json({ message: "Stripe is not configured" });
+    }
+
+    try {
+      const { invoiceId } = req.body;
+      const userId = req.user.claims.sub;
+
+      // Get invoice and verify ownership
+      const invoice = await storage.getInvoice(invoiceId);
+      if (!invoice) {
+        return res.status(404).json({ message: "Invoice not found" });
+      }
+      if (invoice.customerId !== userId) {
+        return res.status(403).json({ message: "Unauthorized" });
+      }
+      if (invoice.status === 'paid') {
+        return res.status(400).json({ message: "Invoice already paid" });
+      }
+
+      const amount = Number(invoice.balanceAmount);
+      if (amount <= 0) {
+        return res.status(400).json({ message: "Invalid payment amount" });
+      }
+
+      // Create payment intent
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: Math.round(amount * 100), // Convert to cents
+        currency: "usd",
+        metadata: {
+          invoiceId: invoice.id,
+          invoiceNumber: invoice.invoiceNumber,
+          customerId: userId,
+        },
+      });
+
+      res.json({ clientSecret: paymentIntent.client_secret });
+    } catch (error: any) {
+      console.error("Error creating payment intent:", error);
+      res.status(500).json({ message: "Error creating payment intent: " + error.message });
+    }
+  });
+
+  // Webhook to handle Stripe events
+  app.post('/api/stripe/webhook', async (req, res) => {
+    if (!stripe) {
+      return res.status(500).json({ message: "Stripe is not configured" });
+    }
+
+    try {
+      const event = req.body;
+
+      // Handle the event
+      if (event.type === 'payment_intent.succeeded') {
+        const paymentIntent = event.data.object;
+        const { invoiceId } = paymentIntent.metadata;
+
+        if (invoiceId) {
+          // Update invoice as paid
+          const paidAmount = Number(paymentIntent.amount) / 100;
+          await storage.updateInvoice(invoiceId, {
+            status: 'paid',
+            paidAmount: paidAmount.toString(),
+            balanceAmount: '0',
+            paidAt: new Date(),
+          });
+        }
+      }
+
+      res.json({ received: true });
+    } catch (error: any) {
+      console.error("Webhook error:", error);
+      res.status(400).json({ message: `Webhook Error: ${error.message}` });
     }
   });
 
