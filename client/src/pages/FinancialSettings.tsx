@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -66,9 +66,11 @@ export default function FinancialSettings() {
   });
 
   // Set default garage
-  if (!selectedGarageId && garages.length > 0) {
-    setSelectedGarageId(garages[0].id);
-  }
+  useEffect(() => {
+    if (!selectedGarageId && garages.length > 0) {
+      setSelectedGarageId(garages[0].id);
+    }
+  }, [garages, selectedGarageId]);
 
   // Fetch tax configurations
   const { data: taxConfigs = [], isLoading: taxLoading } = useQuery<any[]>({
@@ -123,7 +125,10 @@ export default function FinancialSettings() {
       return apiRequest("POST", "/api/tax-configurations", data);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/tax-configurations"] });
+      queryClient.invalidateQueries({ 
+        predicate: (query) => 
+          typeof query.queryKey[0] === 'string' && query.queryKey[0].includes('/api/tax-configurations')
+      });
       toast({ title: editingTax ? "Tax updated" : "Tax created successfully" });
       setTaxDialogOpen(false);
       setEditingTax(null);
@@ -140,7 +145,10 @@ export default function FinancialSettings() {
       return apiRequest("DELETE", `/api/tax-configurations/${id}`, {});
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/tax-configurations"] });
+      queryClient.invalidateQueries({ 
+        predicate: (query) => 
+          typeof query.queryKey[0] === 'string' && query.queryKey[0].includes('/api/tax-configurations')
+      });
       toast({ title: "Tax configuration deleted" });
     },
     onError: () => {
@@ -164,7 +172,10 @@ export default function FinancialSettings() {
       return apiRequest("POST", "/api/discounts", payload);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/discounts"] });
+      queryClient.invalidateQueries({ 
+        predicate: (query) => 
+          typeof query.queryKey[0] === 'string' && query.queryKey[0].includes('/api/discounts')
+      });
       toast({ title: editingDiscount ? "Discount updated" : "Discount created successfully" });
       setDiscountDialogOpen(false);
       setEditingDiscount(null);
@@ -181,7 +192,10 @@ export default function FinancialSettings() {
       return apiRequest("DELETE", `/api/discounts/${id}`, {});
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/discounts"] });
+      queryClient.invalidateQueries({ 
+        predicate: (query) => 
+          typeof query.queryKey[0] === 'string' && query.queryKey[0].includes('/api/discounts')
+      });
       toast({ title: "Discount deleted" });
     },
     onError: () => {

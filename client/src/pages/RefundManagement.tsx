@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -41,9 +41,11 @@ export default function RefundManagement() {
   });
 
   // Set default garage
-  if (!selectedGarageId && garages.length > 0) {
-    setSelectedGarageId(garages[0].id);
-  }
+  useEffect(() => {
+    if (!selectedGarageId && garages.length > 0) {
+      setSelectedGarageId(garages[0].id);
+    }
+  }, [garages, selectedGarageId]);
 
   // Fetch refunds
   const { data: refunds = [], isLoading } = useQuery<any[]>({
@@ -83,7 +85,10 @@ export default function RefundManagement() {
       return apiRequest("POST", "/api/refunds", payload);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/refunds"] });
+      queryClient.invalidateQueries({ 
+        predicate: (query) => 
+          typeof query.queryKey[0] === 'string' && query.queryKey[0].includes('/api/refunds')
+      });
       toast({ title: "Refund request created successfully" });
       setRefundDialogOpen(false);
       refundForm.reset();
@@ -99,7 +104,10 @@ export default function RefundManagement() {
       return apiRequest("POST", `/api/refunds/${id}/approve`, {});
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/refunds"] });
+      queryClient.invalidateQueries({ 
+        predicate: (query) => 
+          typeof query.queryKey[0] === 'string' && query.queryKey[0].includes('/api/refunds')
+      });
       toast({ title: "Refund approved" });
     },
     onError: () => {
@@ -113,7 +121,10 @@ export default function RefundManagement() {
       return apiRequest("POST", `/api/refunds/${id}/process`, {});
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/refunds"] });
+      queryClient.invalidateQueries({ 
+        predicate: (query) => 
+          typeof query.queryKey[0] === 'string' && query.queryKey[0].includes('/api/refunds')
+      });
       toast({ title: "Refund processed successfully" });
     },
     onError: () => {
