@@ -896,3 +896,138 @@ export const insertRecurringAppointmentSchema = createInsertSchema(recurringAppo
 export type CalendarEvent = typeof calendarEvents.$inferSelect;
 export type InsertCalendarEvent = typeof calendarEvents.$inferInsert;
 export const insertCalendarEventSchema = createInsertSchema(calendarEvents).omit({ id: true, createdBy: true, createdAt: true, updatedAt: true });
+
+// Module 27: Inventory & Parts Management
+// Stock Alerts - Low stock alert configurations
+export const stockAlerts = pgTable("stock_alerts", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  sparePartId: uuid("spare_part_id").notNull().references(() => spareParts.id),
+  garageId: uuid("garage_id").notNull().references(() => garages.id),
+  branchId: uuid("branch_id").references(() => branches.id),
+  alertType: varchar("alert_type", { length: 50 }).notNull(), // "low_stock", "out_of_stock", "expiring_soon"
+  threshold: integer("threshold").notNull(),
+  currentQuantity: integer("current_quantity").notNull(),
+  alertStatus: varchar("alert_status", { length: 50 }).default("active"), // "active", "acknowledged", "resolved"
+  notifiedUsers: jsonb("notified_users"), // Array of user IDs who were notified
+  lastNotifiedAt: timestamp("last_notified_at"),
+  acknowledgedBy: varchar("acknowledged_by").references(() => users.id),
+  acknowledgedAt: timestamp("acknowledged_at"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Reorder Settings - Automatic reordering configuration
+export const reorderSettings = pgTable("reorder_settings", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  sparePartId: uuid("spare_part_id").notNull().references(() => spareParts.id),
+  garageId: uuid("garage_id").notNull().references(() => garages.id),
+  branchId: uuid("branch_id").references(() => branches.id),
+  isAutoReorderEnabled: boolean("is_auto_reorder_enabled").default(false),
+  reorderPoint: integer("reorder_point").notNull(), // Quantity threshold to trigger reorder
+  reorderQuantity: integer("reorder_quantity").notNull(), // Quantity to order
+  maxStockLevel: integer("max_stock_level"), // Maximum stock to maintain
+  supplierId: uuid("supplier_id").references(() => suppliers.id),
+  leadTimeDays: integer("lead_time_days").default(7), // Expected delivery time
+  lastReorderDate: timestamp("last_reorder_date"),
+  nextReorderDate: timestamp("next_reorder_date"),
+  createdBy: varchar("created_by").notNull().references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Pricing History - Track price changes over time
+export const pricingHistory = pgTable("pricing_history", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  sparePartId: uuid("spare_part_id").notNull().references(() => spareParts.id),
+  garageId: uuid("garage_id").notNull().references(() => garages.id),
+  priceType: varchar("price_type", { length: 50 }).notNull(), // "purchase", "selling", "cost"
+  oldPrice: decimal("old_price", { precision: 10, scale: 2 }),
+  newPrice: decimal("new_price", { precision: 10, scale: 2 }).notNull(),
+  currency: varchar("currency").default("USD"),
+  changeReason: varchar("change_reason", { length: 255 }), // "market_adjustment", "supplier_change", "promotion", "manual"
+  notes: text("notes"),
+  effectiveDate: timestamp("effective_date").defaultNow(),
+  changedBy: varchar("changed_by").notNull().references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Inventory Audit Trail - Track all inventory changes
+export const inventoryAuditTrail = pgTable("inventory_audit_trail", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  sparePartId: uuid("spare_part_id").notNull().references(() => spareParts.id),
+  garageId: uuid("garage_id").notNull().references(() => garages.id),
+  branchId: uuid("branch_id").references(() => branches.id),
+  actionType: varchar("action_type", { length: 50 }).notNull(), // "add", "remove", "adjust", "transfer", "purchase", "sale", "return", "damage", "theft"
+  quantityBefore: integer("quantity_before").notNull(),
+  quantityChange: integer("quantity_change").notNull(), // Positive for add, negative for remove
+  quantityAfter: integer("quantity_after").notNull(),
+  unitCost: decimal("unit_cost", { precision: 10, scale: 2 }),
+  totalCost: decimal("total_cost", { precision: 10, scale: 2 }),
+  referenceType: varchar("reference_type", { length: 50 }), // "job_card", "purchase_order", "invoice", "transfer", "manual"
+  referenceId: uuid("reference_id"), // ID of the related document
+  reason: varchar("reason", { length: 255 }),
+  notes: text("notes"),
+  performedBy: varchar("performed_by").notNull().references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Inventory Transfers - Multi-location inventory movement
+export const inventoryTransfers = pgTable("inventory_transfers", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  transferNumber: varchar("transfer_number", { length: 50 }).notNull().unique(),
+  sparePartId: uuid("spare_part_id").notNull().references(() => spareParts.id),
+  fromGarageId: uuid("from_garage_id").notNull().references(() => garages.id),
+  fromBranchId: uuid("from_branch_id").references(() => branches.id),
+  toGarageId: uuid("to_garage_id").notNull().references(() => garages.id),
+  toBranchId: uuid("to_branch_id").references(() => branches.id),
+  quantity: integer("quantity").notNull(),
+  transferStatus: varchar("transfer_status", { length: 50 }).default("pending"), // "pending", "in_transit", "completed", "cancelled"
+  requestedBy: varchar("requested_by").notNull().references(() => users.id),
+  approvedBy: varchar("approved_by").references(() => users.id),
+  completedBy: varchar("completed_by").references(() => users.id),
+  requestedAt: timestamp("requested_at").defaultNow(),
+  approvedAt: timestamp("approved_at"),
+  shippedAt: timestamp("shipped_at"),
+  completedAt: timestamp("completed_at"),
+  expectedDeliveryDate: timestamp("expected_delivery_date"),
+  actualDeliveryDate: timestamp("actual_delivery_date"),
+  reason: varchar("reason", { length: 255 }),
+  notes: text("notes"),
+  trackingNumber: varchar("tracking_number", { length: 100 }),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// TecDoc Integration Cache - Cache TecDoc API responses
+export const tecDocCache = pgTable("tecdoc_cache", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  searchQuery: varchar("search_query", { length: 500 }).notNull(),
+  searchType: varchar("search_type", { length: 50 }).notNull(), // "part_number", "vin", "vehicle_model"
+  response: jsonb("response").notNull(), // Cached API response
+  expiresAt: timestamp("expires_at").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export type StockAlert = typeof stockAlerts.$inferSelect;
+export type InsertStockAlert = typeof stockAlerts.$inferInsert;
+export const insertStockAlertSchema = createInsertSchema(stockAlerts).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type ReorderSetting = typeof reorderSettings.$inferSelect;
+export type InsertReorderSetting = typeof reorderSettings.$inferInsert;
+export const insertReorderSettingSchema = createInsertSchema(reorderSettings).omit({ id: true, createdBy: true, createdAt: true, updatedAt: true });
+
+export type PricingHistory = typeof pricingHistory.$inferSelect;
+export type InsertPricingHistory = typeof pricingHistory.$inferInsert;
+export const insertPricingHistorySchema = createInsertSchema(pricingHistory).omit({ id: true, createdAt: true });
+
+export type InventoryAuditTrail = typeof inventoryAuditTrail.$inferSelect;
+export type InsertInventoryAuditTrail = typeof inventoryAuditTrail.$inferInsert;
+export const insertInventoryAuditTrailSchema = createInsertSchema(inventoryAuditTrail).omit({ id: true, createdAt: true });
+
+export type InventoryTransfer = typeof inventoryTransfers.$inferSelect;
+export type InsertInventoryTransfer = typeof inventoryTransfers.$inferInsert;
+export const insertInventoryTransferSchema = createInsertSchema(inventoryTransfers).omit({ id: true, transferNumber: true, createdAt: true, updatedAt: true });
+
+export type TecDocCache = typeof tecDocCache.$inferSelect;
+export type InsertTecDocCache = typeof tecDocCache.$inferInsert;
