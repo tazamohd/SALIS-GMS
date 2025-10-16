@@ -27,6 +27,7 @@ import { TechnicianPortal } from "@/pages/TechnicianPortal";
 import TechnicianManagement from "@/pages/TechnicianManagement";
 import Notifications from "@/pages/Notifications";
 import Landing from "@/pages/Landing";
+import Calendar from "@/pages/Calendar";
 import { CustomerDashboard } from "@/pages/customer/CustomerDashboard";
 import { CustomerAppointments } from "@/pages/customer/CustomerAppointments";
 import { CustomerInvoices } from "@/pages/customer/CustomerInvoices";
@@ -185,6 +186,11 @@ function Router() {
       <Route path="/notifications">
         <Layout>
           <Notifications />
+        </Layout>
+      </Route>
+      <Route path="/calendar">
+        <Layout>
+          <Calendar />
         </Layout>
       </Route>
       <Route component={NotFound} />

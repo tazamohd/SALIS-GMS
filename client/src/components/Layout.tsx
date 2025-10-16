@@ -34,6 +34,7 @@ export function Layout({ children }: LayoutProps) {
 
   const navItems = [
     { path: "/dashboard", icon: Home, label: "Dashboard" },
+    { path: "/calendar", icon: Calendar, label: "Scheduling & Calendar" },
     { path: "/tasks", icon: ClipboardCheck, label: "Tasks Management" },
     { path: "/job-cards", icon: Wrench, label: "Job Cards" },
     { path: "/technician-portal", icon: HardHat, label: "Technician Portal" },
