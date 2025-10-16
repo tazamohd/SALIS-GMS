@@ -205,11 +205,12 @@ async function seed() {
     const priorities = ['low', 'medium', 'high', 'urgent'];
 
     const createdJobCards = [];
+    const timestamp = Date.now();
     for (let i = 0; i < 15; i++) {
       const vehicle = createdVehicles[i % createdVehicles.length];
       const status = statuses[Math.floor(Math.random() * statuses.length)];
       const [jobCard] = await db.insert(jobCards).values({
-        jobNumber: `JOB-2025-${String(1000 + i).padStart(4, '0')}`,
+        jobNumber: `JOB-${timestamp}-${String(i).padStart(4, '0')}`,
         garageId,
         branchId,
         customerId: vehicle.customerId,
@@ -243,22 +244,28 @@ async function seed() {
     const appointmentStatuses = ['scheduled', 'confirmed', 'in_progress', 'completed', 'cancelled'];
     for (let i = 0; i < 20; i++) {
       const vehicle = createdVehicles[i % createdVehicles.length];
-      const startDate = new Date(Date.now() + (i - 10) * 24 * 60 * 60 * 1000);
-      startDate.setHours(9 + (i % 8), 0, 0, 0);
-      const endDate = new Date(startDate);
-      endDate.setHours(startDate.getHours() + 2);
+      const customer = customers.find(c => c.id === vehicle.customerId);
+      const appointmentDate = new Date(Date.now() + (i - 10) * 24 * 60 * 60 * 1000);
+      appointmentDate.setHours(9 + (i % 8), 0, 0, 0);
       
       await db.insert(appointments).values({
-        appointmentNumber: `APT-${String(2000 + i).padStart(4, '0')}`,
+        appointmentNumber: `APT-${timestamp}-${String(i).padStart(4, '0')}`,
         garageId,
         branchId,
         customerId: vehicle.customerId,
-        vehicleId: vehicle.id,
-        appointmentType: ['service', 'repair', 'diagnostic', 'consultation'][i % 4],
-        title: `${vehicle.make} ${vehicle.model} - ${['Service', 'Repair', 'Diagnostic', 'Consultation'][i % 4]}`,
-        description: `Appointment for ${['routine maintenance', 'brake inspection', 'engine diagnostic', 'general consultation'][i % 4]}`,
-        startTime: startDate,
-        endTime: endDate,
+        customerName: customer?.fullName || 'Unknown Customer',
+        customerPhone: customer?.phone || '+1-555-0000',
+        customerEmail: customer?.email || null,
+        vehicleInfo: {
+          make: vehicle.make,
+          model: vehicle.model,
+          year: vehicle.year,
+          licensePlate: vehicle.licensePlate,
+        },
+        serviceType: ['maintenance', 'repair', 'diagnostic', 'inspection'][i % 4],
+        description: `Appointment for ${['routine maintenance', 'brake inspection', 'engine diagnostic', 'general inspection'][i % 4]}`,
+        appointmentDate,
+        duration: 60 + (i % 3) * 30,
         status: appointmentStatuses[Math.floor(Math.random() * appointmentStatuses.length)],
         assignedTo: technicians[i % technicians.length].id,
         createdBy: userId,
@@ -280,7 +287,7 @@ async function seed() {
       const total = subtotal + tax;
       
       const [invoice] = await db.insert(invoices).values({
-        invoiceNumber: `INV-2025-${String(3000 + i).padStart(4, '0')}`,
+        invoiceNumber: `INV-${timestamp}-${String(i).padStart(4, '0')}`,
         garageId,
         customerId: jobCard.customerId,
         jobCardId: jobCard.id,
@@ -302,18 +309,13 @@ async function seed() {
       // Create payment if invoice is paid
       if (status === 'paid') {
         await db.insert(payments).values({
-          paymentNumber: `PAY-${String(4000 + i).padStart(4, '0')}`,
-          garageId,
           invoiceId: invoice.id,
-          customerId: invoice.customerId,
+          paymentDate: new Date(),
           amount: total.toFixed(2),
-          paymentMethod: ['card', 'cash', 'bank_transfer'][i % 3],
-          paymentProvider: i % 3 === 0 ? 'stripe' : i % 3 === 1 ? 'cash' : 'bank',
-          status: 'completed',
-          transactionId: i % 3 === 0 ? `txn_${Math.random().toString(36).substring(7)}` : null,
-          paidAt: new Date(),
-          processedBy: userId,
+          paymentMethod: ['cash', 'card', 'transfer'][i % 3],
+          referenceNumber: i % 3 === 0 ? `REF-${Math.random().toString(36).substring(7).toUpperCase()}` : null,
           notes: 'Payment processed successfully',
+          createdBy: userId,
         });
       }
     }
@@ -330,7 +332,7 @@ async function seed() {
       const total = subtotal + tax;
       
       await db.insert(estimates).values({
-        estimateNumber: `EST-2025-${String(5000 + i).padStart(4, '0')}`,
+        estimateNumber: `EST-${timestamp}-${String(i).padStart(4, '0')}`,
         garageId,
         customerId: vehicle.customerId,
         vehicleId: vehicle.id,
@@ -447,24 +449,27 @@ async function seed() {
     console.log('✅ Created tax configurations');
 
     // Create discounts/promotions
-    await db.insert(discountsPromotions).values({
-      garageId,
-      code: 'SPRING2025',
-      name: 'Spring Service Special',
-      description: '15% off all services',
-      discountType: 'percentage',
-      discountValue: '15.00',
-      minPurchaseAmount: '100.00',
-      applicableCategories: ['service'],
-      usageLimit: 100,
-      usageCount: 0,
-      startDate: new Date(),
-      endDate: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000),
-      isActive: true,
-      createdBy: userId,
-    });
+    const [existingDiscount] = await db.select().from(discountsPromotions).where(sql`${discountsPromotions.code} = 'SPRING2025'`).limit(1);
+    if (!existingDiscount) {
+      await db.insert(discountsPromotions).values({
+        garageId,
+        code: 'SPRING2025',
+        name: 'Spring Service Special',
+        description: '15% off all services',
+        discountType: 'percentage',
+        discountValue: '15.00',
+        minPurchaseAmount: '100.00',
+        applicableCategories: ['service'],
+        usageLimit: 100,
+        usageCount: 0,
+        startDate: new Date(),
+        endDate: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000),
+        isActive: true,
+        createdBy: userId,
+      });
+    }
 
-    console.log('✅ Created discounts/promotions');
+    console.log('✅ Created/found discounts/promotions');
 
     // Create shift templates
     const [morningShift] = await db.insert(shiftTemplates).values({
@@ -544,11 +549,13 @@ async function seed() {
     // Create notifications
     for (const customer of customers.slice(0, 5)) {
       await db.insert(notifications).values({
-        userId: customer.id,
-        type: 'appointment_reminder',
+        type: 'in-app',
+        category: 'appointment',
+        status: 'sent',
+        recipientId: customer.id,
+        garageId,
         title: 'Appointment Reminder',
         message: 'Your vehicle service appointment is tomorrow at 10:00 AM',
-        isRead: Math.random() > 0.5,
         createdAt: new Date(Date.now() - Math.floor(Math.random() * 7) * 24 * 60 * 60 * 1000),
       });
     }
