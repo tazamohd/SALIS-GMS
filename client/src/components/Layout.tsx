@@ -1,4 +1,4 @@
-import { Home, ClipboardCheck, UserIcon, LogOut, Search, Calendar, Users, ShoppingCart, FileText, BarChart3, Wrench, ClipboardList, Hammer, Package, Building2, HardHat, UserCog, Zap, Car, Receipt, Warehouse, DollarSign, RotateCcw, DatabaseBackup, TrendingUp, UserCheck, Brain, Plug2, Shield, Settings as SettingsIcon } from "lucide-react";
+import { Home, ClipboardCheck, UserIcon, LogOut, Search, Calendar, Users, ShoppingCart, FileText, BarChart3, Wrench, ClipboardList, Hammer, Package, Building2, HardHat, UserCog, Zap, Car, Receipt, Warehouse, DollarSign, RotateCcw, DatabaseBackup, TrendingUp, UserCheck, Brain, Plug2, Shield, Settings as SettingsIcon, Menu, X } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,6 +18,7 @@ export function Layout({ children }: LayoutProps) {
   const [location] = useLocation();
   const { user } = useAuth();
   const [quickActionsOpen, setQuickActionsOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
   // Get user settings for keyboard shortcuts
   const { data: settings } = useQuery<UserSettings>({
@@ -26,6 +27,11 @@ export function Layout({ children }: LayoutProps) {
   
   // Enable global keyboard shortcuts
   useKeyboardShortcuts(settings?.enableKeyboardShortcuts ?? true);
+  
+  // Close mobile menu when route changes
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [location]);
 
   const handleLogout = () => {
     window.location.href = '/api/logout';
@@ -76,8 +82,22 @@ export function Layout({ children }: LayoutProps) {
 
   return (
     <div className="flex h-screen bg-white">
+      {/* Mobile Menu Overlay */}
+      {mobileMenuOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={() => setMobileMenuOpen(false)}
+          aria-label="Close mobile menu"
+        />
+      )}
+
       {/* Sidebar */}
-      <aside className="w-64 bg-white border-r border-[#e6e6e6] flex flex-col">
+      <aside className={`
+        fixed lg:static inset-y-0 left-0 z-50
+        w-64 bg-white border-r border-[#e6e6e6] flex flex-col
+        transition-transform duration-300 ease-in-out
+        ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+      `}>
         {/* Logo */}
         <div className="p-6 border-b border-[#e6e6e6]">
           <h1 className="font-['Poppins',Helvetica] font-bold text-xl text-[#222029]">Logo</h1>
@@ -126,10 +146,25 @@ export function Layout({ children }: LayoutProps) {
       </aside>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col lg:ml-0">
         {/* Header */}
-        <header className="h-16 border-b border-[#e6e6e6] px-8 flex items-center justify-end gap-4">
-          <div className="relative w-96">
+        <header className="h-16 border-b border-[#e6e6e6] px-4 sm:px-8 flex items-center gap-4">
+          {/* Mobile Menu Toggle */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="lg:hidden"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label="Toggle mobile menu"
+            data-testid="button-mobile-menu"
+          >
+            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </Button>
+          
+          <div className="flex-1" />
+          
+          {/* Search Bar - Hidden on small screens */}
+          <div className="hidden md:block relative w-full max-w-md">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[#999999]" />
             <Input
               type="text"
