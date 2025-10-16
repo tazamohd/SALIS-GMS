@@ -1,9 +1,11 @@
-import { Home, ClipboardCheck, UserIcon, LogOut, Search, Calendar, Users, ShoppingCart, FileText, BarChart3, Wrench, ClipboardList, Hammer, Package, Building2, HardHat, UserCog } from "lucide-react";
+import { Home, ClipboardCheck, UserIcon, LogOut, Search, Calendar, Users, ShoppingCart, FileText, BarChart3, Wrench, ClipboardList, Hammer, Package, Building2, HardHat, UserCog, Zap } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/hooks/useAuth";
 import { NotificationBell } from "@/components/NotificationBell";
+import { QuickActionsModal } from "@/components/QuickActionsModal";
+import { useState, useEffect } from "react";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -12,10 +14,23 @@ interface LayoutProps {
 export function Layout({ children }: LayoutProps) {
   const [location] = useLocation();
   const { user } = useAuth();
+  const [quickActionsOpen, setQuickActionsOpen] = useState(false);
 
   const handleLogout = () => {
     window.location.href = '/api/logout';
   };
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setQuickActionsOpen(true);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const navItems = [
     { path: "/dashboard", icon: Home, label: "Dashboard" },
@@ -99,6 +114,18 @@ export function Layout({ children }: LayoutProps) {
               data-testid="input-search"
             />
           </div>
+          <Button
+            variant="outline"
+            onClick={() => setQuickActionsOpen(true)}
+            className="gap-2"
+            data-testid="button-quick-actions"
+          >
+            <Zap className="w-4 h-4" />
+            <span className="hidden sm:inline">Quick Actions</span>
+            <kbd className="hidden sm:inline-flex px-1.5 py-0.5 bg-gray-100 border border-[#e6e6e6] rounded text-xs font-mono text-[#999999]">
+              {navigator.platform.includes("Mac") ? "⌘K" : "Ctrl+K"}
+            </kbd>
+          </Button>
           <NotificationBell />
         </header>
 
@@ -107,6 +134,9 @@ export function Layout({ children }: LayoutProps) {
           {children}
         </main>
       </div>
+
+      {/* Quick Actions Modal */}
+      <QuickActionsModal open={quickActionsOpen} onOpenChange={setQuickActionsOpen} />
     </div>
   );
 }
