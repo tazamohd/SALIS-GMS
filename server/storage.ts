@@ -190,6 +190,12 @@ import {
   type InsertUserConsent,
   type PermissionOverride,
   type InsertPermissionOverride,
+  userSettings,
+  type UserSettings,
+  type InsertUserSettings,
+  actionHistory,
+  type ActionHistory,
+  type InsertActionHistory,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, or, inArray, and, gte, lte, ilike, sql } from "drizzle-orm";
@@ -4584,6 +4590,62 @@ export class DatabaseStorage implements IStorage {
 
   async deletePermissionOverride(id: string): Promise<void> {
     await db.delete(permissionOverrides).where(eq(permissionOverrides.id, id));
+  }
+
+  // Module 35: System Improvements
+  async getUserSettings(userId: string): Promise<UserSettings | undefined> {
+    const [settings] = await db.select().from(userSettings).where(eq(userSettings.userId, userId));
+    return settings;
+  }
+
+  async createUserSettings(data: InsertUserSettings): Promise<UserSettings> {
+    const [settings] = await db.insert(userSettings).values(data).returning();
+    return settings;
+  }
+
+  async updateUserSettings(userId: string, data: Partial<UserSettings>): Promise<UserSettings> {
+    const [settings] = await db.update(userSettings)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(userSettings.userId, userId))
+      .returning();
+    return settings;
+  }
+
+  async getActionHistory(garageId: string, userId?: string, limit: number = 50): Promise<ActionHistory[]> {
+    const conditions = [
+      eq(actionHistory.garageId, garageId),
+      eq(actionHistory.canUndo, true),
+    ];
+    
+    if (userId) {
+      conditions.push(eq(actionHistory.userId, userId));
+    }
+    
+    return await db.select().from(actionHistory)
+      .where(and(...conditions))
+      .orderBy(desc(actionHistory.createdAt))
+      .limit(limit);
+  }
+
+  async createActionHistory(data: InsertActionHistory): Promise<ActionHistory> {
+    const [history] = await db.insert(actionHistory).values(data).returning();
+    return history;
+  }
+
+  async undoAction(id: string): Promise<ActionHistory> {
+    const [history] = await db.update(actionHistory)
+      .set({ undoneAt: new Date(), canUndo: false })
+      .where(eq(actionHistory.id, id))
+      .returning();
+    return history;
+  }
+
+  async redoAction(id: string): Promise<ActionHistory> {
+    const [history] = await db.update(actionHistory)
+      .set({ redoneAt: new Date(), undoneAt: null, canUndo: false })
+      .where(eq(actionHistory.id, id))
+      .returning();
+    return history;
   }
 }
 

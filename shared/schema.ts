@@ -1638,6 +1638,49 @@ export const permissionOverrides = pgTable("permission_overrides", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Module 35: System Improvements - User Settings
+export const userSettings = pgTable("user_settings", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id).notNull().unique(),
+  language: varchar("language", { length: 10 }).default("en").notNull(),
+  currency: varchar("currency", { length: 3 }).default("USD").notNull(),
+  timezone: varchar("timezone", { length: 50 }).default("UTC"),
+  dateFormat: varchar("date_format", { length: 20 }).default("MM/DD/YYYY"),
+  timeFormat: varchar("time_format", { length: 10 }).default("12h"),
+  theme: varchar("theme", { length: 20 }).default("light"),
+  fontSize: varchar("font_size", { length: 10 }).default("medium"),
+  compactMode: boolean("compact_mode").default(false),
+  enableNotifications: boolean("enable_notifications").default(true),
+  enableSounds: boolean("enable_sounds").default(true),
+  enableKeyboardShortcuts: boolean("enable_keyboard_shortcuts").default(true),
+  printSettings: jsonb("print_settings").default({
+    paperSize: "A4",
+    includeHeader: true,
+    includeFooter: true,
+    showLogo: true,
+  }),
+  preferences: jsonb("preferences").default({}),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Undo/Redo History
+export const actionHistory = pgTable("action_history", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  actionType: varchar("action_type", { length: 50 }).notNull(),
+  resourceType: varchar("resource_type", { length: 100 }).notNull(),
+  resourceId: varchar("resource_id", { length: 255 }),
+  previousState: jsonb("previous_state"),
+  newState: jsonb("new_state"),
+  canUndo: boolean("can_undo").default(true),
+  undoneAt: timestamp("undone_at"),
+  redoneAt: timestamp("redone_at"),
+  expiresAt: timestamp("expires_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 export type AuditLog = typeof auditLogs.$inferSelect;
 export type InsertAuditLog = typeof auditLogs.$inferInsert;
 export const insertAuditLogSchema = createInsertSchema(auditLogs).omit({ id: true, timestamp: true });
@@ -1661,3 +1704,11 @@ export const insertUserConsentSchema = createInsertSchema(userConsents).omit({ i
 export type PermissionOverride = typeof permissionOverrides.$inferSelect;
 export type InsertPermissionOverride = typeof permissionOverrides.$inferInsert;
 export const insertPermissionOverrideSchema = createInsertSchema(permissionOverrides).omit({ id: true, createdAt: true });
+
+export type UserSettings = typeof userSettings.$inferSelect;
+export type InsertUserSettings = typeof userSettings.$inferInsert;
+export const insertUserSettingsSchema = createInsertSchema(userSettings).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type ActionHistory = typeof actionHistory.$inferSelect;
+export type InsertActionHistory = typeof actionHistory.$inferInsert;
+export const insertActionHistorySchema = createInsertSchema(actionHistory).omit({ id: true, createdAt: true });
