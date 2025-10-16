@@ -745,3 +745,77 @@ export const insertEstimateSchema = createInsertSchema(estimates).omit({ id: tru
 export type EstimateItem = typeof estimateItems.$inferSelect;
 export type InsertEstimateItem = typeof estimateItems.$inferInsert;
 export const insertEstimateItemSchema = createInsertSchema(estimateItems).omit({ id: true, createdAt: true });
+
+// Technician Availability - Module 26: Scheduling & Calendar
+export const technicianAvailability = pgTable("technician_availability", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  technicianId: varchar("technician_id").notNull().references(() => users.id),
+  garageId: uuid("garage_id").notNull().references(() => garages.id),
+  dayOfWeek: integer("day_of_week"), // 0-6 (Sunday-Saturday), null for specific dates
+  startDate: timestamp("start_date"), // For specific date ranges
+  endDate: timestamp("end_date"),
+  startTime: varchar("start_time", { length: 5 }).notNull(), // "09:00"
+  endTime: varchar("end_time", { length: 5 }).notNull(), // "17:00"
+  isAvailable: boolean("is_available").default(true), // true = working, false = time off
+  availabilityType: varchar("availability_type", { length: 50 }).notNull(), // "working_hours", "time_off", "break", "meeting"
+  reason: text("reason"), // Reason for time off or special event
+  isRecurring: boolean("is_recurring").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Recurring Appointments - Module 26: Scheduling & Calendar
+export const recurringAppointments = pgTable("recurring_appointments", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").notNull().references(() => garages.id),
+  customerId: varchar("customer_id").references(() => users.id),
+  customerName: varchar("customer_name").notNull(),
+  customerPhone: varchar("customer_phone").notNull(),
+  customerEmail: varchar("customer_email"),
+  vehicleInfo: jsonb("vehicle_info").notNull(),
+  serviceType: varchar("service_type").notNull(),
+  description: text("description"),
+  duration: integer("duration").notNull().default(60),
+  assignedTo: varchar("assigned_to").references(() => users.id),
+  recurrencePattern: varchar("recurrence_pattern", { length: 50 }).notNull(), // "daily", "weekly", "biweekly", "monthly"
+  recurrenceInterval: integer("recurrence_interval").default(1), // Every X days/weeks/months
+  dayOfWeek: integer("day_of_week"), // For weekly patterns (0-6)
+  dayOfMonth: integer("day_of_month"), // For monthly patterns (1-31)
+  startTime: varchar("start_time", { length: 5 }).notNull(), // "14:00"
+  startDate: timestamp("start_date").notNull(), // When recurrence starts
+  endDate: timestamp("end_date"), // When recurrence ends (null = indefinite)
+  maxOccurrences: integer("max_occurrences"), // Alternative to endDate
+  isActive: boolean("is_active").default(true),
+  createdBy: varchar("created_by").notNull().references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Calendar Events - Module 26: Scheduling & Calendar
+export const calendarEvents = pgTable("calendar_events", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").notNull().references(() => garages.id),
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description"),
+  eventType: varchar("event_type", { length: 50 }).notNull(), // "blocked_time", "meeting", "holiday", "maintenance", "training"
+  startTime: timestamp("start_time").notNull(),
+  endTime: timestamp("end_time").notNull(),
+  affectedTechnicians: jsonb("affected_technicians"), // Array of technician IDs, null = all
+  isAllDay: boolean("is_all_day").default(false),
+  color: varchar("color", { length: 7 }).default("#000000"), // Hex color for calendar display
+  createdBy: varchar("created_by").notNull().references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type TechnicianAvailability = typeof technicianAvailability.$inferSelect;
+export type InsertTechnicianAvailability = typeof technicianAvailability.$inferInsert;
+export const insertTechnicianAvailabilitySchema = createInsertSchema(technicianAvailability).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type RecurringAppointment = typeof recurringAppointments.$inferSelect;
+export type InsertRecurringAppointment = typeof recurringAppointments.$inferInsert;
+export const insertRecurringAppointmentSchema = createInsertSchema(recurringAppointments).omit({ id: true, createdBy: true, createdAt: true, updatedAt: true });
+
+export type CalendarEvent = typeof calendarEvents.$inferSelect;
+export type InsertCalendarEvent = typeof calendarEvents.$inferInsert;
+export const insertCalendarEventSchema = createInsertSchema(calendarEvents).omit({ id: true, createdBy: true, createdAt: true, updatedAt: true });
