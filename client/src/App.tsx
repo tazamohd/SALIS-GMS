@@ -34,6 +34,7 @@ import RefundManagement from "@/pages/RefundManagement";
 import DataImportExport from "@/pages/DataImportExport";
 import BusinessIntelligence from "@/pages/BusinessIntelligence";
 import HRManagement from "@/pages/HRManagement";
+import AIAutomation from "@/pages/AIAutomation";
 import { CustomerDashboard } from "@/pages/customer/CustomerDashboard";
 import { CustomerAppointments } from "@/pages/customer/CustomerAppointments";
 import { CustomerInvoices } from "@/pages/customer/CustomerInvoices";
@@ -227,6 +228,11 @@ function Router() {
       <Route path="/hr-management">
         <Layout>
           <HRManagement />
+        </Layout>
+      </Route>
+      <Route path="/ai-automation">
+        <Layout>
+          <AIAutomation />
         </Layout>
       </Route>
       <Route component={NotFound} />
