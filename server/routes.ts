@@ -6053,6 +6053,78 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Module 35: System Improvements Routes
+  
+  // User Settings Routes
+  app.get('/api/settings', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      let settings = await storage.getUserSettings(userId);
+      
+      // Create default settings if none exist
+      if (!settings) {
+        settings = await storage.createUserSettings({ userId });
+      }
+      
+      res.json(settings);
+    } catch (error) {
+      console.error("Error fetching settings:", error);
+      res.status(500).json({ message: "Failed to fetch settings" });
+    }
+  });
+
+  app.patch('/api/settings', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const settings = await storage.updateUserSettings(userId, req.body);
+      res.json(settings);
+    } catch (error) {
+      console.error("Error updating settings:", error);
+      res.status(500).json({ message: "Failed to update settings" });
+    }
+  });
+
+  // Action History Routes (Undo/Redo)
+  app.get('/api/history', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.claims.garageId;
+      const userId = req.user.claims.sub;
+      const { limit } = req.query;
+      
+      const history = await storage.getActionHistory(
+        userGarageId,
+        userId,
+        limit ? parseInt(limit as string) : 50
+      );
+      res.json(history);
+    } catch (error) {
+      console.error("Error fetching action history:", error);
+      res.status(500).json({ message: "Failed to fetch action history" });
+    }
+  });
+
+  app.post('/api/history/undo/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const history = await storage.undoAction(id);
+      res.json(history);
+    } catch (error) {
+      console.error("Error undoing action:", error);
+      res.status(500).json({ message: "Failed to undo action" });
+    }
+  });
+
+  app.post('/api/history/redo/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const history = await storage.redoAction(id);
+      res.json(history);
+    } catch (error) {
+      console.error("Error redoing action:", error);
+      res.status(500).json({ message: "Failed to redo action" });
+    }
+  });
+
   // Protected route example
   app.get("/api/protected", isAuthenticated, async (req: any, res) => {
     const userId = req.user?.claims?.sub;

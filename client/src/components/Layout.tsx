@@ -1,4 +1,4 @@
-import { Home, ClipboardCheck, UserIcon, LogOut, Search, Calendar, Users, ShoppingCart, FileText, BarChart3, Wrench, ClipboardList, Hammer, Package, Building2, HardHat, UserCog, Zap, Car, Receipt, Warehouse, DollarSign, RotateCcw, DatabaseBackup, TrendingUp, UserCheck, Brain, Plug2, Shield } from "lucide-react";
+import { Home, ClipboardCheck, UserIcon, LogOut, Search, Calendar, Users, ShoppingCart, FileText, BarChart3, Wrench, ClipboardList, Hammer, Package, Building2, HardHat, UserCog, Zap, Car, Receipt, Warehouse, DollarSign, RotateCcw, DatabaseBackup, TrendingUp, UserCheck, Brain, Plug2, Shield, Settings as SettingsIcon } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -58,6 +58,7 @@ export function Layout({ children }: LayoutProps) {
     { path: "/ai-automation", icon: Brain, label: "AI Automation" },
     { path: "/integrations", icon: Plug2, label: "Integrations" },
     { path: "/security", icon: Shield, label: "Security & Compliance" },
+    { path: "/settings", icon: SettingsIcon, label: "Settings" },
     { path: "/reports", icon: BarChart3, label: "Reports" },
     { path: "/profile", icon: UserIcon, label: "My Profile" },
   ];

@@ -37,6 +37,7 @@ import HRManagement from "@/pages/HRManagement";
 import AIAutomation from "@/pages/AIAutomation";
 import Integrations from "@/pages/Integrations";
 import Security from "@/pages/Security";
+import Settings from "@/pages/Settings";
 import { CustomerDashboard } from "@/pages/customer/CustomerDashboard";
 import { CustomerAppointments } from "@/pages/customer/CustomerAppointments";
 import { CustomerInvoices } from "@/pages/customer/CustomerInvoices";
@@ -245,6 +246,11 @@ function Router() {
       <Route path="/security">
         <Layout>
           <Security />
+        </Layout>
+      </Route>
+      <Route path="/settings">
+        <Layout>
+          <Settings />
         </Layout>
       </Route>
       <Route component={NotFound} />
