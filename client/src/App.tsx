@@ -1,12 +1,13 @@
 import { Switch, Route, Redirect } from "wouter";
 import { queryClient } from "./lib/queryClient";
-import { QueryClientProvider } from "@tanstack/react-query";
+import { QueryClientProvider, useQuery } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 
 import { LoginDashboard } from "@/pages/LoginDashboard";
 import { Layout } from "@/components/Layout";
+import { CustomerPortalLayout } from "@/components/CustomerPortalLayout";
 import { Dashboard } from "@/pages/Dashboard";
 import { TasksManagement } from "@/pages/TasksManagement";
 import { Appointments } from "@/pages/Appointments";
@@ -26,10 +27,21 @@ import { TechnicianPortal } from "@/pages/TechnicianPortal";
 import TechnicianManagement from "@/pages/TechnicianManagement";
 import Notifications from "@/pages/Notifications";
 import Landing from "@/pages/Landing";
+import { CustomerDashboard } from "@/pages/customer/CustomerDashboard";
+import { CustomerAppointments } from "@/pages/customer/CustomerAppointments";
+import { CustomerInvoices } from "@/pages/customer/CustomerInvoices";
+import { CustomerVehicles } from "@/pages/customer/CustomerVehicles";
+import { CustomerCommunications } from "@/pages/customer/CustomerCommunications";
 import { useAuth } from "@/hooks/useAuth";
+import type { User } from "@shared/schema";
 
 function Router() {
   const { isAuthenticated, isLoading } = useAuth();
+  
+  const { data: user } = useQuery<User>({
+    queryKey: ['/api/auth/user'],
+    enabled: isAuthenticated,
+  });
 
   if (isLoading) {
     return (
@@ -46,9 +58,44 @@ function Router() {
     return <Landing />;
   }
 
+  // Check if user is a customer
+  const isCustomer = user?.userType === 'customer';
+
   return (
     <Switch>
-      <Route path="/" component={() => <Redirect to="/dashboard" />} />
+      {/* Root redirect based on user type */}
+      <Route path="/" component={() => (
+        <Redirect to={isCustomer ? "/portal/dashboard" : "/dashboard"} />
+      )} />
+
+      {/* Customer Portal Routes */}
+      <Route path="/portal/dashboard">
+        <CustomerPortalLayout>
+          <CustomerDashboard />
+        </CustomerPortalLayout>
+      </Route>
+      <Route path="/portal/appointments">
+        <CustomerPortalLayout>
+          <CustomerAppointments />
+        </CustomerPortalLayout>
+      </Route>
+      <Route path="/portal/invoices">
+        <CustomerPortalLayout>
+          <CustomerInvoices />
+        </CustomerPortalLayout>
+      </Route>
+      <Route path="/portal/vehicles">
+        <CustomerPortalLayout>
+          <CustomerVehicles />
+        </CustomerPortalLayout>
+      </Route>
+      <Route path="/portal/communications">
+        <CustomerPortalLayout>
+          <CustomerCommunications />
+        </CustomerPortalLayout>
+      </Route>
+
+      {/* Garage Management Routes */}
       <Route path="/old-dashboard" component={LoginDashboard} />
       <Route path="/dashboard">
         <Layout>
