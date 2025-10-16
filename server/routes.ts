@@ -7,6 +7,7 @@ import { smsService } from "./services/smsService";
 import { z } from "zod";
 import { insertNotificationSchema } from "@shared/schema";
 import Stripe from "stripe";
+import { createPaypalOrder, capturePaypalOrder, loadPaypalDefault } from "./paypal";
 
 // Initialize Stripe (Stripe integration - Module 25)
 const stripe = process.env.STRIPE_SECRET_KEY 
@@ -2986,6 +2987,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("Error creating payment intent:", error);
       res.status(500).json({ message: "Error creating payment intent: " + error.message });
     }
+  });
+
+  // PayPal Routes (PayPal integration blueprint - Module 28)
+  app.get("/paypal/setup", async (req, res) => {
+    await loadPaypalDefault(req, res);
+  });
+
+  app.post("/paypal/order", async (req, res) => {
+    await createPaypalOrder(req, res);
+  });
+
+  app.post("/paypal/order/:orderID/capture", async (req, res) => {
+    await capturePaypalOrder(req, res);
   });
 
   // Webhook to handle Stripe events
