@@ -599,7 +599,10 @@ export const estimateItems = pgTable("estimate_items", {
   description: text("description").notNull(),
   quantity: decimal("quantity", { precision: 10, scale: 2 }).notNull().default("1"),
   unitPrice: decimal("unit_price", { precision: 10, scale: 2 }).notNull(),
+  unitCost: decimal("unit_cost", { precision: 10, scale: 2 }), // For profit margin analysis
   lineTotal: decimal("line_total", { precision: 10, scale: 2 }).notNull(),
+  discountId: uuid("discount_id").references(() => discountsPromotions.id), // Applied discount
+  discountAmount: decimal("discount_amount", { precision: 10, scale: 2 }), // Calculated discount
   notes: text("notes"),
   createdAt: timestamp("created_at").defaultNow(),
 });
@@ -690,8 +693,11 @@ export const invoiceItems = pgTable("invoice_items", {
   description: text("description").notNull(),
   quantity: integer("quantity").notNull().default(1),
   unitPrice: decimal("unit_price", { precision: 10, scale: 2 }).notNull(),
+  unitCost: decimal("unit_cost", { precision: 10, scale: 2 }), // For profit margin analysis
   lineTotal: decimal("line_total", { precision: 10, scale: 2 }).notNull(),
   taxRate: decimal("tax_rate", { precision: 5, scale: 2 }).notNull().default("0"),
+  discountId: uuid("discount_id").references(() => discountsPromotions.id), // Applied discount
+  discountAmount: decimal("discount_amount", { precision: 10, scale: 2 }), // Calculated discount
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -1031,3 +1037,147 @@ export const insertInventoryTransferSchema = createInsertSchema(inventoryTransfe
 
 export type TecDocCache = typeof tecDocCache.$inferSelect;
 export type InsertTecDocCache = typeof tecDocCache.$inferInsert;
+
+// Module 28: Advanced Financial Features
+// Payment Plans - Installment payment tracking
+export const paymentPlans = pgTable("payment_plans", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  invoiceId: uuid("invoice_id").notNull().references(() => invoices.id, { onDelete: "cascade" }),
+  planName: varchar("plan_name", { length: 100 }).notNull(),
+  totalAmount: decimal("total_amount", { precision: 10, scale: 2 }).notNull(),
+  downPayment: decimal("down_payment", { precision: 10, scale: 2 }).notNull().default("0"),
+  numberOfInstallments: integer("number_of_installments").notNull(),
+  installmentAmount: decimal("installment_amount", { precision: 10, scale: 2 }).notNull(),
+  frequency: varchar("frequency", { length: 20 }).notNull().default("monthly"), // "weekly", "biweekly", "monthly"
+  startDate: timestamp("start_date").notNull(),
+  endDate: timestamp("end_date").notNull(),
+  status: varchar("status", { length: 20 }).notNull().default("active"), // "active", "completed", "defaulted", "cancelled"
+  interestRate: decimal("interest_rate", { precision: 5, scale: 2 }).notNull().default("0"),
+  notes: text("notes"),
+  createdBy: varchar("created_by").notNull().references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Installments - Individual payment schedule
+export const installments = pgTable("installments", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  paymentPlanId: uuid("payment_plan_id").notNull().references(() => paymentPlans.id, { onDelete: "cascade" }),
+  installmentNumber: integer("installment_number").notNull(),
+  dueDate: timestamp("due_date").notNull(),
+  amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+  paidAmount: decimal("paid_amount", { precision: 10, scale: 2 }).notNull().default("0"),
+  status: varchar("status", { length: 20 }).notNull().default("pending"), // "pending", "paid", "partial", "overdue"
+  paidAt: timestamp("paid_at"),
+  paymentId: uuid("payment_id").references(() => payments.id),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Refunds - Refund management
+export const refunds = pgTable("refunds", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  refundNumber: varchar("refund_number", { length: 50 }).notNull().unique(),
+  invoiceId: uuid("invoice_id").references(() => invoices.id),
+  paymentId: uuid("payment_id").references(() => payments.id),
+  garageId: uuid("garage_id").notNull().references(() => garages.id),
+  customerId: varchar("customer_id").notNull().references(() => users.id),
+  amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+  refundMethod: varchar("refund_method", { length: 50 }).notNull(), // "original_payment", "cash", "store_credit", "bank_transfer"
+  reason: varchar("reason", { length: 255 }).notNull(),
+  status: varchar("status", { length: 20 }).notNull().default("pending"), // "pending", "approved", "processed", "rejected", "cancelled"
+  requestedBy: varchar("requested_by").notNull().references(() => users.id),
+  approvedBy: varchar("approved_by").references(() => users.id),
+  processedBy: varchar("processed_by").references(() => users.id),
+  requestedAt: timestamp("requested_at").defaultNow(),
+  approvedAt: timestamp("approved_at"),
+  processedAt: timestamp("processed_at"),
+  referenceNumber: varchar("reference_number", { length: 100 }),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Tax Configurations - Automated tax calculation rules
+export const taxConfigurations = pgTable("tax_configurations", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").notNull().references(() => garages.id),
+  taxName: varchar("tax_name", { length: 100 }).notNull(),
+  taxType: varchar("tax_type", { length: 50 }).notNull(), // "percentage", "fixed", "tiered"
+  taxRate: decimal("tax_rate", { precision: 5, scale: 2 }).notNull(),
+  isDefault: boolean("is_default").notNull().default(false),
+  applicableCategories: text("applicable_categories").array(), // ["service", "parts", "labor"]
+  minAmount: decimal("min_amount", { precision: 10, scale: 2 }),
+  maxAmount: decimal("max_amount", { precision: 10, scale: 2 }),
+  region: varchar("region", { length: 100 }), // State/province for location-based tax
+  zipCodes: text("zip_codes").array(), // Specific zip codes for tax application
+  startDate: timestamp("start_date"),
+  endDate: timestamp("end_date"),
+  isActive: boolean("is_active").notNull().default(true),
+  description: text("description"),
+  createdBy: varchar("created_by").notNull().references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Discounts & Promotions - Promotional pricing rules
+export const discountsPromotions = pgTable("discounts_promotions", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").notNull().references(() => garages.id),
+  code: varchar("code", { length: 50 }).notNull().unique(),
+  name: varchar("name", { length: 100 }).notNull(),
+  description: text("description"),
+  discountType: varchar("discount_type", { length: 20 }).notNull(), // "percentage", "fixed_amount", "buy_x_get_y"
+  discountValue: decimal("discount_value", { precision: 10, scale: 2 }).notNull(),
+  minPurchaseAmount: decimal("min_purchase_amount", { precision: 10, scale: 2 }),
+  maxDiscountAmount: decimal("max_discount_amount", { precision: 10, scale: 2 }),
+  applicableCategories: text("applicable_categories").array(), // ["service", "parts", "labor"]
+  applicableServices: text("applicable_services").array(), // Specific service IDs
+  applicableParts: text("applicable_parts").array(), // Specific part IDs
+  usageLimit: integer("usage_limit"), // Total usage limit
+  usageCount: integer("usage_count").notNull().default(0),
+  perCustomerLimit: integer("per_customer_limit"),
+  startDate: timestamp("start_date").notNull(),
+  endDate: timestamp("end_date").notNull(),
+  isActive: boolean("is_active").notNull().default(true),
+  requiresApproval: boolean("requires_approval").notNull().default(false),
+  createdBy: varchar("created_by").notNull().references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Discount Usage Tracking
+export const discountUsage = pgTable("discount_usage", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  discountId: uuid("discount_id").notNull().references(() => discountsPromotions.id, { onDelete: "cascade" }),
+  invoiceId: uuid("invoice_id").references(() => invoices.id),
+  estimateId: uuid("estimate_id").references(() => estimates.id),
+  customerId: varchar("customer_id").notNull().references(() => users.id),
+  discountAmount: decimal("discount_amount", { precision: 10, scale: 2 }).notNull(),
+  appliedAt: timestamp("applied_at").defaultNow(),
+});
+
+export type PaymentPlan = typeof paymentPlans.$inferSelect;
+export type InsertPaymentPlan = typeof paymentPlans.$inferInsert;
+export const insertPaymentPlanSchema = createInsertSchema(paymentPlans).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type Installment = typeof installments.$inferSelect;
+export type InsertInstallment = typeof installments.$inferInsert;
+export const insertInstallmentSchema = createInsertSchema(installments).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type Refund = typeof refunds.$inferSelect;
+export type InsertRefund = typeof refunds.$inferInsert;
+export const insertRefundSchema = createInsertSchema(refunds).omit({ id: true, refundNumber: true, createdAt: true, updatedAt: true });
+
+export type TaxConfiguration = typeof taxConfigurations.$inferSelect;
+export type InsertTaxConfiguration = typeof taxConfigurations.$inferInsert;
+export const insertTaxConfigurationSchema = createInsertSchema(taxConfigurations).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type DiscountPromotion = typeof discountsPromotions.$inferSelect;
+export type InsertDiscountPromotion = typeof discountsPromotions.$inferInsert;
+export const insertDiscountPromotionSchema = createInsertSchema(discountsPromotions).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type DiscountUsage = typeof discountUsage.$inferSelect;
+export type InsertDiscountUsage = typeof discountUsage.$inferInsert;
+export const insertDiscountUsageSchema = createInsertSchema(discountUsage).omit({ id: true });
