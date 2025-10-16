@@ -89,6 +89,24 @@ import {
   type InsertRecurringAppointment,
   type CalendarEvent,
   type InsertCalendarEvent,
+  stockAlerts,
+  reorderSettings,
+  pricingHistory,
+  inventoryAuditTrail,
+  inventoryTransfers,
+  tecDocCache,
+  type StockAlert,
+  type InsertStockAlert,
+  type ReorderSetting,
+  type InsertReorderSetting,
+  type PricingHistory,
+  type InsertPricingHistory,
+  type InventoryAuditTrail,
+  type InsertInventoryAuditTrail,
+  type InventoryTransfer,
+  type InsertInventoryTransfer,
+  type TecDocCache,
+  type InsertTecDocCache,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, or, inArray, and, gte, lte, ilike } from "drizzle-orm";
@@ -344,6 +362,40 @@ export interface IStorage {
   checkAppointmentConflicts(appointmentData: any): Promise<any[]>;
   getAvailableTimeSlots(technicianId: string, date: Date, duration: number): Promise<any[]>;
   getTechnicianWorkload(technicianId: string, startDate: Date, endDate: Date): Promise<any>;
+  
+  // Module 27: Inventory & Parts Management
+  // Stock Alerts
+  getStockAlerts(garageId: string, status?: string): Promise<any[]>;
+  createStockAlert(data: any): Promise<any>;
+  updateStockAlert(id: string, data: any): Promise<any>;
+  acknowledgeStockAlert(id: string, userId: string): Promise<any>;
+  
+  // Reorder Settings
+  getReorderSettings(garageId: string, sparePartId?: string): Promise<any[]>;
+  createReorderSetting(data: any): Promise<any>;
+  updateReorderSetting(id: string, data: any): Promise<any>;
+  processAutoReorders(garageId: string): Promise<any[]>;
+  
+  // Pricing History
+  getPricingHistory(sparePartId: string): Promise<any[]>;
+  createPricingHistory(data: any): Promise<any>;
+  
+  // Inventory Audit Trail
+  getInventoryAuditTrail(garageId: string, sparePartId?: string, limit?: number): Promise<any[]>;
+  createAuditTrailEntry(data: any): Promise<any>;
+  
+  // Inventory Transfers
+  getInventoryTransfers(garageId: string, status?: string): Promise<any[]>;
+  getInventoryTransfer(id: string): Promise<any | undefined>;
+  createInventoryTransfer(data: any): Promise<any>;
+  updateInventoryTransfer(id: string, data: any): Promise<any>;
+  approveInventoryTransfer(id: string, userId: string): Promise<any>;
+  completeInventoryTransfer(id: string, userId: string): Promise<any>;
+  
+  // TecDoc Integration
+  searchTecDoc(query: string, searchType: string): Promise<any>;
+  getTecDocCache(query: string, searchType: string): Promise<any | undefined>;
+  cacheTecDocResponse(query: string, searchType: string, response: any): Promise<any>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -2393,6 +2445,395 @@ export class DatabaseStorage implements IStorage {
       averagePerDay: appointmentsList.length / totalDays,
       utilizationRate: (totalMinutes / (totalDays * 8 * 60)) * 100, // Assuming 8-hour workdays
     };
+  }
+
+  // Module 27: Inventory & Parts Management
+  // Stock Alerts
+  async getStockAlerts(garageId: string, status?: string) {
+    const conditions = [eq(stockAlerts.garageId, garageId)];
+    if (status) {
+      conditions.push(eq(stockAlerts.alertStatus, status));
+    }
+    return await db
+      .select()
+      .from(stockAlerts)
+      .where(and(...conditions))
+      .orderBy(desc(stockAlerts.createdAt));
+  }
+
+  async createStockAlert(data: InsertStockAlert) {
+    const [alert] = await db.insert(stockAlerts).values(data).returning();
+    return alert;
+  }
+
+  async updateStockAlert(id: string, data: Partial<StockAlert>) {
+    const [alert] = await db
+      .update(stockAlerts)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(stockAlerts.id, id))
+      .returning();
+    return alert;
+  }
+
+  async acknowledgeStockAlert(id: string, userId: string) {
+    const [alert] = await db
+      .update(stockAlerts)
+      .set({
+        alertStatus: "acknowledged",
+        acknowledgedBy: userId,
+        acknowledgedAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .where(eq(stockAlerts.id, id))
+      .returning();
+    return alert;
+  }
+
+  // Reorder Settings
+  async getReorderSettings(garageId: string, sparePartId?: string) {
+    if (sparePartId) {
+      return await db
+        .select()
+        .from(reorderSettings)
+        .where(
+          and(
+            eq(reorderSettings.garageId, garageId),
+            eq(reorderSettings.sparePartId, sparePartId)
+          )
+        );
+    }
+    return await db
+      .select()
+      .from(reorderSettings)
+      .where(eq(reorderSettings.garageId, garageId))
+      .orderBy(reorderSettings.sparePartId);
+  }
+
+  async createReorderSetting(data: InsertReorderSetting) {
+    const [setting] = await db.insert(reorderSettings).values(data).returning();
+    return setting;
+  }
+
+  async updateReorderSetting(id: string, data: Partial<ReorderSetting>) {
+    const [setting] = await db
+      .update(reorderSettings)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(reorderSettings.id, id))
+      .returning();
+    return setting;
+  }
+
+  async processAutoReorders(garageId: string) {
+    // Get all enabled reorder settings for garage
+    const settings = await db
+      .select()
+      .from(reorderSettings)
+      .where(
+        and(
+          eq(reorderSettings.garageId, garageId),
+          eq(reorderSettings.isAutoReorderEnabled, true)
+        )
+      );
+
+    const reordersToCreate = [];
+
+    for (const setting of settings) {
+      // Check current stock level
+      const [inventory] = await db
+        .select()
+        .from(sparePartInventories)
+        .where(
+          and(
+            eq(sparePartInventories.sparePartId, setting.sparePartId),
+            eq(sparePartInventories.garageId, garageId)
+          )
+        );
+
+      if (inventory && inventory.stockQuantity <= setting.reorderPoint) {
+        // Create purchase order (or add to reorders list)
+        reordersToCreate.push({
+          sparePartId: setting.sparePartId,
+          currentQuantity: inventory.stockQuantity,
+          reorderQuantity: setting.reorderQuantity,
+          supplierId: setting.supplierId,
+          reorderSettingId: setting.id,
+        });
+
+        // Update last reorder date
+        await db
+          .update(reorderSettings)
+          .set({
+            lastReorderDate: new Date(),
+            updatedAt: new Date(),
+          })
+          .where(eq(reorderSettings.id, setting.id));
+      }
+    }
+
+    return reordersToCreate;
+  }
+
+  // Pricing History
+  async getPricingHistory(sparePartId: string) {
+    return await db
+      .select()
+      .from(pricingHistory)
+      .where(eq(pricingHistory.sparePartId, sparePartId))
+      .orderBy(desc(pricingHistory.effectiveDate));
+  }
+
+  async createPricingHistory(data: InsertPricingHistory) {
+    const [history] = await db.insert(pricingHistory).values(data).returning();
+    return history;
+  }
+
+  // Inventory Audit Trail
+  async getInventoryAuditTrail(garageId: string, sparePartId?: string, limit: number = 100) {
+    const conditions = [eq(inventoryAuditTrail.garageId, garageId)];
+    if (sparePartId) {
+      conditions.push(eq(inventoryAuditTrail.sparePartId, sparePartId));
+    }
+
+    return await db
+      .select()
+      .from(inventoryAuditTrail)
+      .where(and(...conditions))
+      .orderBy(desc(inventoryAuditTrail.createdAt))
+      .limit(limit);
+  }
+
+  async createAuditTrailEntry(data: InsertInventoryAuditTrail) {
+    const [entry] = await db.insert(inventoryAuditTrail).values(data).returning();
+    return entry;
+  }
+
+  // Inventory Transfers
+  async getInventoryTransfers(garageId: string, status?: string) {
+    const conditions = [
+      or(
+        eq(inventoryTransfers.fromGarageId, garageId),
+        eq(inventoryTransfers.toGarageId, garageId)
+      ),
+    ];
+
+    if (status) {
+      conditions.push(eq(inventoryTransfers.transferStatus, status));
+    }
+
+    return await db
+      .select()
+      .from(inventoryTransfers)
+      .where(and(...conditions))
+      .orderBy(desc(inventoryTransfers.createdAt));
+  }
+
+  async getInventoryTransfer(id: string) {
+    const [transfer] = await db
+      .select()
+      .from(inventoryTransfers)
+      .where(eq(inventoryTransfers.id, id));
+    return transfer;
+  }
+
+  async createInventoryTransfer(data: InsertInventoryTransfer) {
+    // Generate transfer number
+    const transferCount = await db.select().from(inventoryTransfers);
+    const transferNumber = `TRN-${String(transferCount.length + 1).padStart(6, "0")}`;
+
+    const [transfer] = await db
+      .insert(inventoryTransfers)
+      .values({
+        ...data,
+        transferNumber,
+      })
+      .returning();
+    return transfer;
+  }
+
+  async updateInventoryTransfer(id: string, data: Partial<InventoryTransfer>) {
+    const [transfer] = await db
+      .update(inventoryTransfers)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(inventoryTransfers.id, id))
+      .returning();
+    return transfer;
+  }
+
+  async approveInventoryTransfer(id: string, userId: string) {
+    const [transfer] = await db
+      .update(inventoryTransfers)
+      .set({
+        transferStatus: "in_transit",
+        approvedBy: userId,
+        approvedAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .where(eq(inventoryTransfers.id, id))
+      .returning();
+    return transfer;
+  }
+
+  async completeInventoryTransfer(id: string, userId: string) {
+    const transfer = await this.getInventoryTransfer(id);
+    if (!transfer) throw new Error("Transfer not found");
+
+    // Update source inventory
+    const [sourceInventory] = await db
+      .select()
+      .from(sparePartInventories)
+      .where(
+        and(
+          eq(sparePartInventories.sparePartId, transfer.sparePartId),
+          eq(sparePartInventories.garageId, transfer.fromGarageId)
+        )
+      );
+
+    if (sourceInventory) {
+      await db
+        .update(sparePartInventories)
+        .set({
+          stockQuantity: sourceInventory.stockQuantity - transfer.quantity,
+          updatedAt: new Date(),
+        })
+        .where(eq(sparePartInventories.id, sourceInventory.id));
+
+      // Create audit trail for source
+      await this.createAuditTrailEntry({
+        sparePartId: transfer.sparePartId,
+        garageId: transfer.fromGarageId,
+        branchId: transfer.fromBranchId,
+        actionType: "transfer",
+        quantityBefore: sourceInventory.stockQuantity,
+        quantityChange: -transfer.quantity,
+        quantityAfter: sourceInventory.stockQuantity - transfer.quantity,
+        referenceType: "transfer",
+        referenceId: transfer.id,
+        reason: `Transfer to ${transfer.toGarageId}`,
+        performedBy: userId,
+      });
+    }
+
+    // Update destination inventory
+    const [destInventory] = await db
+      .select()
+      .from(sparePartInventories)
+      .where(
+        and(
+          eq(sparePartInventories.sparePartId, transfer.sparePartId),
+          eq(sparePartInventories.garageId, transfer.toGarageId)
+        )
+      );
+
+    if (destInventory) {
+      await db
+        .update(sparePartInventories)
+        .set({
+          stockQuantity: destInventory.stockQuantity + transfer.quantity,
+          updatedAt: new Date(),
+        })
+        .where(eq(sparePartInventories.id, destInventory.id));
+
+      // Create audit trail for destination
+      await this.createAuditTrailEntry({
+        sparePartId: transfer.sparePartId,
+        garageId: transfer.toGarageId,
+        branchId: transfer.toBranchId,
+        actionType: "transfer",
+        quantityBefore: destInventory.stockQuantity,
+        quantityChange: transfer.quantity,
+        quantityAfter: destInventory.stockQuantity + transfer.quantity,
+        referenceType: "transfer",
+        referenceId: transfer.id,
+        reason: `Transfer from ${transfer.fromGarageId}`,
+        performedBy: userId,
+      });
+    }
+
+    // Update transfer status
+    const [updatedTransfer] = await db
+      .update(inventoryTransfers)
+      .set({
+        transferStatus: "completed",
+        completedBy: userId,
+        completedAt: new Date(),
+        actualDeliveryDate: new Date(),
+        updatedAt: new Date(),
+      })
+      .where(eq(inventoryTransfers.id, id))
+      .returning();
+
+    return updatedTransfer;
+  }
+
+  // TecDoc Integration
+  async searchTecDoc(query: string, searchType: string) {
+    // Check cache first
+    const cached = await this.getTecDocCache(query, searchType);
+    if (cached && new Date(cached.expiresAt) > new Date()) {
+      return cached.response;
+    }
+
+    // Make TecDoc API request (requires TecDoc API credentials)
+    // Note: This is a placeholder - actual implementation requires TecDoc API setup
+    const tecDocApiUrl = process.env.TECDOC_API_URL || "";
+    const tecDocApiKey = process.env.TECDOC_API_KEY || "";
+
+    if (!tecDocApiUrl || !tecDocApiKey) {
+      throw new Error("TecDoc API credentials not configured");
+    }
+
+    try {
+      const response = await fetch(`${tecDocApiUrl}/search`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${tecDocApiKey}`,
+        },
+        body: JSON.stringify({
+          query,
+          searchType,
+        }),
+      });
+
+      const data = await response.json();
+
+      // Cache the response
+      await this.cacheTecDocResponse(query, searchType, data);
+
+      return data;
+    } catch (error) {
+      console.error("TecDoc API error:", error);
+      throw new Error("Failed to search TecDoc catalog");
+    }
+  }
+
+  async getTecDocCache(query: string, searchType: string) {
+    const [cached] = await db
+      .select()
+      .from(tecDocCache)
+      .where(
+        and(
+          eq(tecDocCache.searchQuery, query),
+          eq(tecDocCache.searchType, searchType)
+        )
+      );
+    return cached;
+  }
+
+  async cacheTecDocResponse(query: string, searchType: string, response: any) {
+    const expiresAt = new Date();
+    expiresAt.setHours(expiresAt.getHours() + 24); // Cache for 24 hours
+
+    const [cached] = await db
+      .insert(tecDocCache)
+      .values({
+        searchQuery: query,
+        searchType,
+        response,
+        expiresAt,
+      })
+      .returning();
+    return cached;
   }
 }
 
