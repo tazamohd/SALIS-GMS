@@ -10,6 +10,8 @@ This project is a full-stack SaaS application for garage management, offering a 
 - Responsive design
 - Continue developing and testing new features directly within the authenticated Figma interface
 - SALIS AUTO brand design system applied across entire UI (October 17, 2025)
+- Official SALIS AUTO logo integrated (October 17, 2025)
+- Dark theme enforced - avoid white backgrounds throughout the application
 
 ## Design System (SALIS AUTO Brand)
 ### Color Palette
@@ -41,6 +43,13 @@ This project is a full-stack SaaS application for garage management, offering a 
 - Gradient utility class: `text-gradient-salis` for logo and special text
 - Updated shadcn/ui theme colors to match brand palette
 - Applied across Layout (sidebar, header), Dashboard, and all major components
+- **Dark Theme Implementation**:
+  - Official SALIS AUTO logo displayed in sidebar
+  - Backgrounds: Midnight Blue (#0B1C2C) for cards, Dark Gray (#1F2937 / gray-800) for main content, Near-Black (#111827 / gray-900) for header
+  - Text: Chrome Silver (#C0C0C0) for primary text, with reduced opacity for secondary text
+  - Borders: Dark Steel Gray (#3C3C3C) for subtle separations
+  - No white backgrounds used - all surfaces use dark theme colors from the logo palette
+  - Cards feature gradients with brand colors (Electric Blue, Tech Orange, Deep Teal) at low opacity (20-30%) over dark backgrounds
 
 ## System Architecture
 The application utilizes a full-stack architecture with clear client-server separation.
