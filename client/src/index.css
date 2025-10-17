@@ -609,3 +609,52 @@
     display: block !important;
   }
 }
+
+/* SALIS AUTO Global Dark Theme Overrides */
+@layer base {
+  /* Default body and page backgrounds to dark */
+  body {
+    @apply bg-gray-900 text-chrome-silver;
+  }
+  
+  /* Override default card backgrounds */
+  [class*="card"],
+  [role="dialog"],
+  [role="alertdialog"] {
+    @apply bg-midnight-blue border-dark-steel;
+  }
+  
+  /* Override default text colors */
+  h1, h2, h3, h4, h5, h6 {
+    @apply text-chrome-silver;
+  }
+  
+  p {
+    @apply text-chrome-silver/90;
+  }
+  
+  /* Override default input backgrounds */
+  input:not([type="radio"]):not([type="checkbox"]),
+  textarea,
+  select {
+    @apply bg-dark-steel border-dark-steel text-chrome-silver placeholder:text-chrome-silver/50;
+  }
+  
+  /* Override default button styles */
+  button {
+    @apply text-chrome-silver;
+  }
+  
+  /* Override table backgrounds */
+  table {
+    @apply bg-midnight-blue;
+  }
+  
+  thead {
+    @apply border-dark-steel;
+  }
+  
+  tbody tr {
+    @apply border-dark-steel/50 hover:bg-dark-steel/30;
+  }
+}

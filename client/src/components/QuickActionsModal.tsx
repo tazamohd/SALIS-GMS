@@ -5,6 +5,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import {
@@ -135,6 +136,9 @@ export function QuickActionsModal({ open, onOpenChange }: QuickActionsModalProps
             <Command className="w-5 h-5 text-electric-blue" />
             Quick Actions
           </DialogTitle>
+          <DialogDescription className="sr-only">
+            Search and navigate to common actions and pages in the SALIS AUTO management system
+          </DialogDescription>
         </DialogHeader>
 
         <div className="px-6 pb-2">
