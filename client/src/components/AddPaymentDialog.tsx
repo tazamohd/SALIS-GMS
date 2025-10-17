@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -117,6 +118,9 @@ export function AddPaymentDialog({ invoice }: AddPaymentDialogProps) {
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>Record Payment</DialogTitle>
+          <DialogDescription className="sr-only">
+            Form to record a payment against an invoice
+          </DialogDescription>
         </DialogHeader>
         
         <div className="mb-4 p-3 bg-blue-50 rounded">

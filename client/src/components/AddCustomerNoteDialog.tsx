@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -86,6 +87,9 @@ export function AddCustomerNoteDialog({ customerId }: AddCustomerNoteDialogProps
       <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle>Add Customer Note</DialogTitle>
+          <DialogDescription className="sr-only">
+            Form to add a note about the customer
+          </DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">

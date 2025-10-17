@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -150,6 +150,9 @@ export function TaskDetailsDialog({ open, onOpenChange, task }: TaskDetailsDialo
                 <DialogTitle className="font-['Poppins',Helvetica] font-semibold text-xl text-[#222029]">
                   Task ID #{task.id}
                 </DialogTitle>
+                <DialogDescription className="sr-only">
+                  View and update task details including status, priority, and description
+                </DialogDescription>
               </div>
             </DialogHeader>
 

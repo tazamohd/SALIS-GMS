@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -153,6 +154,9 @@ export function InvoiceDetailsDialog({ invoice, customer }: InvoiceDetailsDialog
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Invoice Details - {invoice.invoiceNumber}</DialogTitle>
+            <DialogDescription className="sr-only">
+              View and manage invoice details, status, items, and payments
+            </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-6">

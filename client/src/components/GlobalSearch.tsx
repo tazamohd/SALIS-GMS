@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -146,6 +147,9 @@ export function GlobalSearch({ garageId, open, onOpenChange }: GlobalSearchProps
       <DialogContent className="max-w-2xl max-h-[80vh]">
         <DialogHeader>
           <DialogTitle>Search</DialogTitle>
+          <DialogDescription className="sr-only">
+            Global search across all modules including job cards, customers, vehicles, invoices, estimates, and spare parts
+          </DialogDescription>
         </DialogHeader>
         
         <div className="relative">

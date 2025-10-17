@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -200,6 +201,9 @@ export function EstimateDetailsDialog({ estimateId, children }: EstimateDetailsD
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Estimate Details - {estimate.estimateNumber}</DialogTitle>
+            <DialogDescription className="sr-only">
+              View estimate details, status, items, and convert to job card or invoice
+            </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-6">

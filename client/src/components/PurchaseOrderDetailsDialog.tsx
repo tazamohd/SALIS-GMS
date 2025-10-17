@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -131,6 +132,9 @@ export function PurchaseOrderDetailsDialog({ purchaseOrder, supplier }: Purchase
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Purchase Order Details - {purchaseOrder.poNumber}</DialogTitle>
+            <DialogDescription className="sr-only">
+              View and manage purchase order details, status, and items
+            </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-6">

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogFooter,
@@ -174,6 +175,9 @@ export function AdvancedFilters({ garageId, module, onApplyFilter, currentFilter
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Save Filter Preset</DialogTitle>
+            <DialogDescription className="sr-only">
+              Save current filter configuration as a reusable preset
+            </DialogDescription>
           </DialogHeader>
           
           <div className="space-y-4 py-4">

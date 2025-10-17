@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -190,6 +191,9 @@ export function CreateEstimateDialog() {
           <DialogTitle className="font-['Poppins',Helvetica] font-semibold text-xl text-[#222029]">
             Create New Estimate
           </DialogTitle>
+          <DialogDescription className="sr-only">
+            Form to create a new estimate with items and pricing for a customer
+          </DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
