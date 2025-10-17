@@ -269,8 +269,8 @@ export function CreateEstimateDialog() {
                   <FormItem>
                     <FormLabel>Vehicle (Optional)</FormLabel>
                     <Select 
-                      onValueChange={field.onChange} 
-                      value={field.value || ""}
+                      onValueChange={(value) => field.onChange(value === 'none' ? undefined : value)} 
+                      value={field.value || "none"}
                       disabled={!customerId}
                     >
                       <FormControl>
@@ -279,7 +279,7 @@ export function CreateEstimateDialog() {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="">No vehicle</SelectItem>
+                        <SelectItem value="none">No vehicle</SelectItem>
                         {customerVehicles.map((vehicle) => (
                           <SelectItem key={vehicle.id} value={vehicle.id}>
                             {vehicle.make} {vehicle.model} ({vehicle.licensePlate})

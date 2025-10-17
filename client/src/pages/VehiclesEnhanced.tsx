@@ -711,9 +711,11 @@ export default function VehiclesEnhanced() {
                               <div>
                                 <h4 className="font-semibold">{service.serviceType}</h4>
                                 <p className="text-sm text-gray-600">{service.description}</p>
-                                <p className="text-xs text-gray-500 mt-1">
-                                  {format(new Date(service.serviceDate), 'PPP')} • {service.mileageAtService?.toLocaleString()} miles
-                                </p>
+                                {service.serviceDate && (
+                                  <p className="text-xs text-gray-500 mt-1">
+                                    {format(new Date(service.serviceDate), 'PPP')} • {service.mileageAtService?.toLocaleString()} miles
+                                  </p>
+                                )}
                               </div>
                               {service.cost && (
                                 <Badge variant="outline">${service.cost}</Badge>

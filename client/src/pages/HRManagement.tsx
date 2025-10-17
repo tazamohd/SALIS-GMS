@@ -104,11 +104,11 @@ export default function HRManagement() {
 
 function AttendanceTab({ garageId }: { garageId: string }) {
   const { user } = useAuth();
-  const [selectedEmployee, setSelectedEmployee] = useState<string>("");
+  const [selectedEmployee, setSelectedEmployee] = useState<string>("all");
   
   const { data: attendance = [], isLoading } = useQuery({
     queryKey: ["/api/hr/attendance", garageId, selectedEmployee],
-    queryFn: () => apiRequest(`/api/hr/attendance?garageId=${garageId}${selectedEmployee ? `&employeeId=${selectedEmployee}` : ""}`),
+    queryFn: () => apiRequest(`/api/hr/attendance?garageId=${garageId}${selectedEmployee && selectedEmployee !== 'all' ? `&employeeId=${selectedEmployee}` : ""}`),
   });
 
   const { data: employees = [] } = useQuery({
@@ -230,7 +230,7 @@ function AttendanceTab({ garageId }: { garageId: string }) {
                 <SelectValue placeholder="All Employees" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Employees</SelectItem>
+                <SelectItem value="all">All Employees</SelectItem>
                 {employees.map((emp: any) => (
                   <SelectItem key={emp.id} value={emp.id}>{emp.fullName}</SelectItem>
                 ))}

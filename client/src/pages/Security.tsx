@@ -255,8 +255,8 @@ function TwoFactorAuthTab() {
 
 function AuditLogsTab() {
   const [filters, setFilters] = useState({
-    resourceType: '',
-    action: '',
+    resourceType: 'all',
+    action: 'all',
     startDate: '',
     endDate: '',
   });
@@ -283,12 +283,12 @@ function AuditLogsTab() {
         <div className="grid grid-cols-4 gap-4">
           <div className="space-y-2">
             <Label>Resource Type</Label>
-            <Select value={filters.resourceType} onValueChange={(value) => setFilters({...filters, resourceType: value})}>
+            <Select value={filters.resourceType} onValueChange={(value) => setFilters({...filters, resourceType: value === 'all' ? '' : value})}>
               <SelectTrigger data-testid="select-resource-type">
                 <SelectValue placeholder="All" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All</SelectItem>
+                <SelectItem value="all">All</SelectItem>
                 <SelectItem value="job_card">Job Cards</SelectItem>
                 <SelectItem value="customer">Customers</SelectItem>
                 <SelectItem value="invoice">Invoices</SelectItem>
@@ -299,12 +299,12 @@ function AuditLogsTab() {
 
           <div className="space-y-2">
             <Label>Action</Label>
-            <Select value={filters.action} onValueChange={(value) => setFilters({...filters, action: value})}>
+            <Select value={filters.action} onValueChange={(value) => setFilters({...filters, action: value === 'all' ? '' : value})}>
               <SelectTrigger data-testid="select-action">
                 <SelectValue placeholder="All" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All</SelectItem>
+                <SelectItem value="all">All</SelectItem>
                 <SelectItem value="create">Create</SelectItem>
                 <SelectItem value="update">Update</SelectItem>
                 <SelectItem value="delete">Delete</SelectItem>
