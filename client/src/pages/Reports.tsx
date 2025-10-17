@@ -21,7 +21,7 @@ const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'
 const CustomCurrencyTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
+      <div className="bg-midnight-blue p-3 border border-dark-steel rounded-lg shadow-lg">
         <p className="font-semibold text-gray-800 mb-1">{label}</p>
         {payload.map((entry: any, index: number) => (
           <p key={index} className="text-sm" style={{ color: entry.color }}>
@@ -37,7 +37,7 @@ const CustomCurrencyTooltip = ({ active, payload, label }: any) => {
 const CustomCountTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
+      <div className="bg-midnight-blue p-3 border border-dark-steel rounded-lg shadow-lg">
         <p className="font-semibold text-gray-800 mb-1">{label}</p>
         {payload.map((entry: any, index: number) => (
           <p key={index} className="text-sm" style={{ color: entry.color }}>
@@ -53,7 +53,7 @@ const CustomCountTooltip = ({ active, payload, label }: any) => {
 const CustomPercentTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
+      <div className="bg-midnight-blue p-3 border border-dark-steel rounded-lg shadow-lg">
         <p className="font-semibold text-gray-800 mb-1">{label}</p>
         {payload.map((entry: any, index: number) => (
           <p key={index} className="text-sm" style={{ color: entry.color }}>
@@ -180,10 +180,10 @@ export function Reports() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="font-['Poppins',Helvetica] font-bold text-3xl text-[#222029]">
+          <h1 className="font-['Poppins',Helvetica] font-bold text-3xl text-chrome-silver">
             Reports & Analytics
           </h1>
-          <p className="font-['Poppins',Helvetica] font-normal text-sm text-[#999999] mt-1">
+          <p className="font-['Poppins',Helvetica] font-normal text-sm text-chrome-silver/60 mt-1">
             Comprehensive business insights and metrics
           </p>
         </div>
@@ -244,46 +244,46 @@ export function Reports() {
           {overviewLoading ? (
             <div className="text-center py-12">
               <div className="animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-4"></div>
-              <p className="text-gray-500">Loading overview...</p>
+              <p className="text-chrome-silver/60">Loading overview...</p>
             </div>
           ) : (
             <>
               {/* Key Metrics */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <Card>
+                <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm font-medium text-gray-600">Total Revenue</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold">${overview?.totalRevenue || "0"}</div>
-                    <p className="text-xs text-gray-500 mt-1">All time</p>
+                    <p className="text-xs text-chrome-silver/60 mt-1">All time</p>
                   </CardContent>
                 </Card>
-                <Card>
+                <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm font-medium text-gray-600">Total Invoices</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold">{overview?.totalInvoices || 0}</div>
-                    <p className="text-xs text-gray-500 mt-1">{overview?.pendingInvoices || 0} pending</p>
+                    <p className="text-xs text-chrome-silver/60 mt-1">{overview?.pendingInvoices || 0} pending</p>
                   </CardContent>
                 </Card>
-                <Card>
+                <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm font-medium text-gray-600">Job Cards</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold">{overview?.totalJobCards || 0}</div>
-                    <p className="text-xs text-gray-500 mt-1">{overview?.activeJobCards || 0} active</p>
+                    <p className="text-xs text-chrome-silver/60 mt-1">{overview?.activeJobCards || 0} active</p>
                   </CardContent>
                 </Card>
-                <Card>
+                <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm font-medium text-gray-600">Customers</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold">{overview?.totalCustomers || 0}</div>
-                    <p className="text-xs text-gray-500 mt-1">Total registered</p>
+                    <p className="text-xs text-chrome-silver/60 mt-1">Total registered</p>
                   </CardContent>
                 </Card>
               </div>
@@ -296,13 +296,13 @@ export function Reports() {
           {revenueLoading ? (
             <div className="text-center py-12">
               <div className="animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-4"></div>
-              <p className="text-gray-500">Loading revenue data...</p>
+              <p className="text-chrome-silver/60">Loading revenue data...</p>
             </div>
           ) : (
             <>
               {/* Revenue Summary */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Card>
+                <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm font-medium text-gray-600">Total Revenue</CardTitle>
                   </CardHeader>
@@ -310,7 +310,7 @@ export function Reports() {
                     <div className="text-2xl font-bold text-blue-600">${revenueReport?.totalRevenue || "0"}</div>
                   </CardContent>
                 </Card>
-                <Card>
+                <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm font-medium text-gray-600">Paid Amount</CardTitle>
                   </CardHeader>
@@ -318,7 +318,7 @@ export function Reports() {
                     <div className="text-2xl font-bold text-green-600">${revenueReport?.paidAmount || "0"}</div>
                   </CardContent>
                 </Card>
-                <Card>
+                <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm font-medium text-gray-600">Pending Amount</CardTitle>
                   </CardHeader>
@@ -331,14 +331,14 @@ export function Reports() {
               {/* Comparison Metrics */}
               {revenueReport?.comparison && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Card>
+                  <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-sm font-medium text-gray-600">Month-over-Month</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-2">
                         <div className="flex items-center justify-between">
-                          <span className="text-xs text-gray-500">Previous Month</span>
+                          <span className="text-xs text-chrome-silver/60">Previous Month</span>
                           <span className="text-sm font-medium">${revenueReport.comparison.previousMonth.revenue.toFixed(2)}</span>
                         </div>
                         <div className="flex items-center gap-2">
@@ -358,14 +358,14 @@ export function Reports() {
                     </CardContent>
                   </Card>
                   
-                  <Card>
+                  <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-sm font-medium text-gray-600">Year-over-Year</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-2">
                         <div className="flex items-center justify-between">
-                          <span className="text-xs text-gray-500">Same Period Last Year</span>
+                          <span className="text-xs text-chrome-silver/60">Same Period Last Year</span>
                           <span className="text-sm font-medium">${revenueReport.comparison.previousYear.revenue.toFixed(2)}</span>
                         </div>
                         <div className="flex items-center gap-2">
@@ -389,9 +389,9 @@ export function Reports() {
 
               {/* Revenue by Month Chart */}
               {revenueReport?.revenueByMonth && revenueReport.revenueByMonth.length > 0 && (
-                <Card>
+                <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
                   <CardHeader>
-                    <CardTitle>Revenue Trend</CardTitle>
+                    <CardTitle className="text-chrome-silver">Revenue Trend</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <ResponsiveContainer width="100%" height={300}>
@@ -411,9 +411,9 @@ export function Reports() {
               {/* Invoices by Status */}
               {revenueReport?.invoicesByStatus && revenueReport.invoicesByStatus.length > 0 && (
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                  <Card>
+                  <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
                     <CardHeader>
-                      <CardTitle>Invoices by Status</CardTitle>
+                      <CardTitle className="text-chrome-silver">Invoices by Status</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <ResponsiveContainer width="100%" height={250}>
@@ -440,9 +440,9 @@ export function Reports() {
 
                   {/* Payments by Method */}
                   {revenueReport?.paymentsByMethod && revenueReport.paymentsByMethod.length > 0 && (
-                    <Card>
+                    <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
                       <CardHeader>
-                        <CardTitle>Payments by Method</CardTitle>
+                        <CardTitle className="text-chrome-silver">Payments by Method</CardTitle>
                       </CardHeader>
                       <CardContent>
                         <ResponsiveContainer width="100%" height={250}>
@@ -468,13 +468,13 @@ export function Reports() {
           {jobCardsLoading ? (
             <div className="text-center py-12">
               <div className="animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-4"></div>
-              <p className="text-gray-500">Loading job card analytics...</p>
+              <p className="text-chrome-silver/60">Loading job card analytics...</p>
             </div>
           ) : (
             <>
               {/* Job Card Summary */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Card>
+                <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm font-medium text-gray-600">Total Job Cards</CardTitle>
                   </CardHeader>
@@ -482,7 +482,7 @@ export function Reports() {
                     <div className="text-2xl font-bold">{jobCardAnalytics?.totalJobCards || 0}</div>
                   </CardContent>
                 </Card>
-                <Card>
+                <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm font-medium text-gray-600">Avg. Completion Time</CardTitle>
                   </CardHeader>
@@ -495,9 +495,9 @@ export function Reports() {
               {/* Charts */}
               {jobCardAnalytics?.byStatus && jobCardAnalytics.byStatus.length > 0 && (
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                  <Card>
+                  <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
                     <CardHeader>
-                      <CardTitle>Job Cards by Status</CardTitle>
+                      <CardTitle className="text-chrome-silver">Job Cards by Status</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <ResponsiveContainer width="100%" height={250}>
@@ -523,9 +523,9 @@ export function Reports() {
                   </Card>
 
                   {jobCardAnalytics?.byPriority && jobCardAnalytics.byPriority.length > 0 && (
-                    <Card>
+                    <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
                       <CardHeader>
-                        <CardTitle>Job Cards by Priority</CardTitle>
+                        <CardTitle className="text-chrome-silver">Job Cards by Priority</CardTitle>
                       </CardHeader>
                       <CardContent>
                         <ResponsiveContainer width="100%" height={250}>
@@ -551,7 +551,7 @@ export function Reports() {
           {technicianLoading ? (
             <div className="text-center py-12">
               <div className="animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-4"></div>
-              <p className="text-gray-500">Loading technician performance...</p>
+              <p className="text-chrome-silver/60">Loading technician performance...</p>
             </div>
           ) : (
             <>
@@ -599,7 +599,7 @@ export function Reports() {
                           </div>
                           {tech.jobsByStatus && tech.jobsByStatus.length > 0 && (
                             <div className="mt-3 pt-3 border-t">
-                              <div className="text-xs text-gray-500 mb-2">Job Status Breakdown</div>
+                              <div className="text-xs text-chrome-silver/60 mb-2">Job Status Breakdown</div>
                               <div className="grid grid-cols-2 gap-2">
                                 {tech.jobsByStatus.map((status) => (
                                   <div key={status.status} className="flex justify-between text-xs">
@@ -617,9 +617,9 @@ export function Reports() {
 
                   {/* Technician Comparison Charts */}
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-6">
-                    <Card>
+                    <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
                       <CardHeader>
-                        <CardTitle>Jobs Completed by Technician</CardTitle>
+                        <CardTitle className="text-chrome-silver">Jobs Completed by Technician</CardTitle>
                       </CardHeader>
                       <CardContent>
                         <ResponsiveContainer width="100%" height={300}>
@@ -635,9 +635,9 @@ export function Reports() {
                       </CardContent>
                     </Card>
 
-                    <Card>
+                    <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
                       <CardHeader>
-                        <CardTitle>Revenue Generated by Technician</CardTitle>
+                        <CardTitle className="text-chrome-silver">Revenue Generated by Technician</CardTitle>
                       </CardHeader>
                       <CardContent>
                         <ResponsiveContainer width="100%" height={300}>
@@ -653,9 +653,9 @@ export function Reports() {
                       </CardContent>
                     </Card>
 
-                    <Card>
+                    <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
                       <CardHeader>
-                        <CardTitle>Average Completion Time</CardTitle>
+                        <CardTitle className="text-chrome-silver">Average Completion Time</CardTitle>
                       </CardHeader>
                       <CardContent>
                         <ResponsiveContainer width="100%" height={300}>
@@ -671,9 +671,9 @@ export function Reports() {
                       </CardContent>
                     </Card>
 
-                    <Card>
+                    <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
                       <CardHeader>
-                        <CardTitle>Efficiency Rating</CardTitle>
+                        <CardTitle className="text-chrome-silver">Efficiency Rating</CardTitle>
                       </CardHeader>
                       <CardContent>
                         <ResponsiveContainer width="100%" height={300}>
@@ -692,9 +692,9 @@ export function Reports() {
                 </>
               ) : (
                 <div className="text-center py-12">
-                  <Users className="w-16 h-16 mx-auto text-gray-400 mb-4" />
-                  <p className="text-gray-500 text-lg">No technician performance data available</p>
-                  <p className="text-gray-400 text-sm mt-2">
+                  <Users className="w-16 h-16 mx-auto text-chrome-silver/50 mb-4" />
+                  <p className="text-chrome-silver/60 text-lg">No technician performance data available</p>
+                  <p className="text-chrome-silver/50 text-sm mt-2">
                     Technicians will appear here once they start completing jobs
                   </p>
                 </div>
@@ -708,7 +708,7 @@ export function Reports() {
           {customerLoading ? (
             <div className="text-center py-12">
               <div className="animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-4"></div>
-              <p className="text-gray-500">Loading customer analytics...</p>
+              <p className="text-chrome-silver/60">Loading customer analytics...</p>
             </div>
           ) : (
             <>
@@ -725,7 +725,7 @@ export function Reports() {
                               className={`text-xs px-2 py-1 rounded-full ${
                                 customer.status === 'active' ? 'bg-green-100 text-green-700' :
                                 customer.status === 'recent' ? 'bg-blue-100 text-blue-700' :
-                                'bg-gray-100 text-gray-700'
+                                'bg-dark-steel/30 text-gray-700'
                               }`}
                               data-testid={`status-${customer.id}`}
                             >
@@ -733,7 +733,7 @@ export function Reports() {
                             </span>
                           </div>
                           {customer.email && (
-                            <p className="text-xs text-gray-500 truncate">{customer.email}</p>
+                            <p className="text-xs text-chrome-silver/60 truncate">{customer.email}</p>
                           )}
                         </CardHeader>
                         <CardContent className="space-y-3">
@@ -763,7 +763,7 @@ export function Reports() {
                           </div>
                           {customer.lastVisit && (
                             <div className="flex justify-between items-center pt-2 border-t">
-                              <span className="text-xs text-gray-500">Last Visit</span>
+                              <span className="text-xs text-chrome-silver/60">Last Visit</span>
                               <span className="text-xs font-medium">
                                 {new Date(customer.lastVisit).toLocaleDateString()}
                               </span>
@@ -776,9 +776,9 @@ export function Reports() {
 
                   {/* Customer Comparison Charts */}
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-6">
-                    <Card>
+                    <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
                       <CardHeader>
-                        <CardTitle>Top 10 Customers by Lifetime Value</CardTitle>
+                        <CardTitle className="text-chrome-silver">Top 10 Customers by Lifetime Value</CardTitle>
                       </CardHeader>
                       <CardContent>
                         <ResponsiveContainer width="100%" height={300}>
@@ -794,9 +794,9 @@ export function Reports() {
                       </CardContent>
                     </Card>
 
-                    <Card>
+                    <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
                       <CardHeader>
-                        <CardTitle>Visit Frequency</CardTitle>
+                        <CardTitle className="text-chrome-silver">Visit Frequency</CardTitle>
                       </CardHeader>
                       <CardContent>
                         <ResponsiveContainer width="100%" height={300}>
@@ -812,9 +812,9 @@ export function Reports() {
                       </CardContent>
                     </Card>
 
-                    <Card>
+                    <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
                       <CardHeader>
-                        <CardTitle>Average Invoice Value</CardTitle>
+                        <CardTitle className="text-chrome-silver">Average Invoice Value</CardTitle>
                       </CardHeader>
                       <CardContent>
                         <ResponsiveContainer width="100%" height={300}>
@@ -830,9 +830,9 @@ export function Reports() {
                       </CardContent>
                     </Card>
 
-                    <Card>
+                    <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
                       <CardHeader>
-                        <CardTitle>Customer Status Distribution</CardTitle>
+                        <CardTitle className="text-chrome-silver">Customer Status Distribution</CardTitle>
                       </CardHeader>
                       <CardContent>
                         <ResponsiveContainer width="100%" height={300}>
@@ -868,9 +868,9 @@ export function Reports() {
                 </>
               ) : (
                 <div className="text-center py-12">
-                  <UserCheck className="w-16 h-16 mx-auto text-gray-400 mb-4" />
-                  <p className="text-gray-500 text-lg">No customer data available</p>
-                  <p className="text-gray-400 text-sm mt-2">
+                  <UserCheck className="w-16 h-16 mx-auto text-chrome-silver/50 mb-4" />
+                  <p className="text-chrome-silver/60 text-lg">No customer data available</p>
+                  <p className="text-chrome-silver/50 text-sm mt-2">
                     Customer analytics will appear here once you have invoices and appointments
                   </p>
                 </div>
@@ -884,13 +884,13 @@ export function Reports() {
           {inventoryLoading ? (
             <div className="text-center py-12">
               <div className="animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-4"></div>
-              <p className="text-gray-500">Loading inventory data...</p>
+              <p className="text-chrome-silver/60">Loading inventory data...</p>
             </div>
           ) : (
             <>
               {/* Inventory Summary */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Card>
+                <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm font-medium text-gray-600">Total Tools</CardTitle>
                   </CardHeader>
@@ -898,7 +898,7 @@ export function Reports() {
                     <div className="text-2xl font-bold">{inventoryReport?.totalTools || 0}</div>
                   </CardContent>
                 </Card>
-                <Card>
+                <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm font-medium text-gray-600">Available</CardTitle>
                   </CardHeader>
@@ -906,7 +906,7 @@ export function Reports() {
                     <div className="text-2xl font-bold text-green-600">{inventoryReport?.availableTools || 0}</div>
                   </CardContent>
                 </Card>
-                <Card>
+                <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm font-medium text-gray-600">In Use</CardTitle>
                   </CardHeader>
@@ -918,9 +918,9 @@ export function Reports() {
 
               {/* Tools by Category */}
               {inventoryReport?.toolsByCategory && inventoryReport.toolsByCategory.length > 0 && (
-                <Card>
+                <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
                   <CardHeader>
-                    <CardTitle>Tools by Category</CardTitle>
+                    <CardTitle className="text-chrome-silver">Tools by Category</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <ResponsiveContainer width="100%" height={300}>

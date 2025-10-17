@@ -137,8 +137,8 @@ export default function InventoryManagement() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Inventory & Parts Management</h1>
-          <p className="text-muted-foreground mt-2">
+          <h1 className="font-['Poppins',Helvetica] font-bold text-3xl text-chrome-silver">Inventory & Parts Management</h1>
+          <p className="text-chrome-silver/60 mt-2">
             Advanced inventory control with stock alerts, auto-reordering, and multi-location transfers
           </p>
         </div>
@@ -189,16 +189,16 @@ export default function InventoryManagement() {
         {/* Overview Tab */}
         <TabsContent value="overview" className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <Card>
+            <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium">Total Parts</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{spareParts.length}</div>
-                <p className="text-xs text-muted-foreground mt-1">Active items</p>
+                <p className="text-xs text-chrome-silver/60 mt-1">Active items</p>
               </CardContent>
             </Card>
-            <Card>
+            <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium">Low Stock Alerts</CardTitle>
               </CardHeader>
@@ -206,10 +206,10 @@ export default function InventoryManagement() {
                 <div className="text-2xl font-bold text-orange-600">
                   {stockAlerts.filter((a: any) => a.alertStatus === "active").length}
                 </div>
-                <p className="text-xs text-muted-foreground mt-1">Requires attention</p>
+                <p className="text-xs text-chrome-silver/60 mt-1">Requires attention</p>
               </CardContent>
             </Card>
-            <Card>
+            <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium">Pending Transfers</CardTitle>
               </CardHeader>
@@ -217,10 +217,10 @@ export default function InventoryManagement() {
                 <div className="text-2xl font-bold text-blue-600">
                   {inventoryTransfers.filter((t: any) => t.transferStatus === "pending").length}
                 </div>
-                <p className="text-xs text-muted-foreground mt-1">Awaiting approval</p>
+                <p className="text-xs text-chrome-silver/60 mt-1">Awaiting approval</p>
               </CardContent>
             </Card>
-            <Card>
+            <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium">Auto-Reorder Enabled</CardTitle>
               </CardHeader>
@@ -228,19 +228,19 @@ export default function InventoryManagement() {
                 <div className="text-2xl font-bold text-green-600">
                   {reorderSettings.filter((r: any) => r.isAutoReorderEnabled).length}
                 </div>
-                <p className="text-xs text-muted-foreground mt-1">Active rules</p>
+                <p className="text-xs text-chrome-silver/60 mt-1">Active rules</p>
               </CardContent>
             </Card>
           </div>
 
-          <Card>
+          <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
             <CardHeader>
-              <CardTitle>Inventory Summary</CardTitle>
-              <CardDescription>Quick overview of parts inventory</CardDescription>
+              <CardTitle className="text-chrome-silver">Inventory Summary</CardTitle>
+              <CardDescription className="text-chrome-silver/60">Quick overview of parts inventory</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="relative mb-4">
-                <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-chrome-silver/60 h-4 w-4" />
                 <Input
                   placeholder="Search parts..."
                   value={searchQuery}
@@ -250,12 +250,12 @@ export default function InventoryManagement() {
                 />
               </div>
               <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Part Name</TableHead>
-                    <TableHead>SKU</TableHead>
-                    <TableHead>Category</TableHead>
-                    <TableHead>Stock Status</TableHead>
+                <TableHeader className="bg-dark-steel/30">
+                  <TableRow className="border-b border-dark-steel/50 hover:bg-dark-steel/20">
+                    <TableHead className="text-chrome-silver">Part Name</TableHead>
+                    <TableHead className="text-chrome-silver">SKU</TableHead>
+                    <TableHead className="text-chrome-silver">Category</TableHead>
+                    <TableHead className="text-chrome-silver">Stock Status</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -269,11 +269,11 @@ export default function InventoryManagement() {
                     .map((part: any) => (
                       <TableRow key={part.id} data-testid={`row-part-${part.id}`}>
                         <TableCell className="font-medium">{part.name}</TableCell>
-                        <TableCell>{part.sku}</TableCell>
-                        <TableCell>
+                        <TableCell className="text-chrome-silver">{part.sku}</TableCell>
+                        <TableCell className="text-chrome-silver">
                           <Badge variant="outline">{part.category}</Badge>
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="text-chrome-silver">
                           <Badge variant="secondary">In Stock</Badge>
                         </TableCell>
                       </TableRow>
@@ -286,12 +286,12 @@ export default function InventoryManagement() {
 
         {/* Stock Alerts Tab */}
         <TabsContent value="alerts" className="space-y-4">
-          <Card>
+          <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle>Stock Alerts</CardTitle>
-                  <CardDescription>Low stock and out-of-stock notifications</CardDescription>
+                  <CardTitle className="text-chrome-silver">Stock Alerts</CardTitle>
+                  <CardDescription className="text-chrome-silver/60">Low stock and out-of-stock notifications</CardDescription>
                 </div>
                 <Button data-testid="button-create-alert">
                   <Plus className="mr-2 h-4 w-4" />
@@ -301,28 +301,28 @@ export default function InventoryManagement() {
             </CardHeader>
             <CardContent>
               <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Alert Type</TableHead>
-                    <TableHead>Part</TableHead>
-                    <TableHead>Current Stock</TableHead>
-                    <TableHead>Threshold</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Actions</TableHead>
+                <TableHeader className="bg-dark-steel/30">
+                  <TableRow className="border-b border-dark-steel/50 hover:bg-dark-steel/20">
+                    <TableHead className="text-chrome-silver">Alert Type</TableHead>
+                    <TableHead className="text-chrome-silver">Part</TableHead>
+                    <TableHead className="text-chrome-silver">Current Stock</TableHead>
+                    <TableHead className="text-chrome-silver">Threshold</TableHead>
+                    <TableHead className="text-chrome-silver">Status</TableHead>
+                    <TableHead className="text-chrome-silver">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {stockAlerts.map((alert: any) => (
                     <TableRow key={alert.id} data-testid={`row-alert-${alert.id}`}>
-                      <TableCell>
+                      <TableCell className="text-chrome-silver">
                         <Badge variant={alert.alertType === "out_of_stock" ? "destructive" : "outline"}>
                           {alert.alertType === "out_of_stock" ? "Out of Stock" : "Low Stock"}
                         </Badge>
                       </TableCell>
-                      <TableCell>{alert.sparePartId}</TableCell>
-                      <TableCell>{alert.currentQuantity}</TableCell>
-                      <TableCell>{alert.threshold}</TableCell>
-                      <TableCell>
+                      <TableCell className="text-chrome-silver">{alert.sparePartId}</TableCell>
+                      <TableCell className="text-chrome-silver">{alert.currentQuantity}</TableCell>
+                      <TableCell className="text-chrome-silver">{alert.threshold}</TableCell>
+                      <TableCell className="text-chrome-silver">
                         <Badge
                           variant={
                             alert.alertStatus === "active"
@@ -335,7 +335,7 @@ export default function InventoryManagement() {
                           {alert.alertStatus}
                         </Badge>
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="text-chrome-silver">
                         {alert.alertStatus === "active" && (
                           <Button
                             size="sm"
@@ -351,8 +351,8 @@ export default function InventoryManagement() {
                     </TableRow>
                   ))}
                   {stockAlerts.length === 0 && (
-                    <TableRow>
-                      <TableCell colSpan={6} className="text-center text-muted-foreground">
+                    <TableRow className="border-b border-dark-steel/50 hover:bg-dark-steel/20">
+                      <TableCell colSpan={6} className="text-center text-chrome-silver/60">
                         No stock alerts found
                       </TableCell>
                     </TableRow>
@@ -365,12 +365,12 @@ export default function InventoryManagement() {
 
         {/* Auto-Reorder Tab */}
         <TabsContent value="reorder" className="space-y-4">
-          <Card>
+          <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle>Automatic Reorder Settings</CardTitle>
-                  <CardDescription>Configure automatic reordering rules for parts</CardDescription>
+                  <CardTitle className="text-chrome-silver">Automatic Reorder Settings</CardTitle>
+                  <CardDescription className="text-chrome-silver/60">Configure automatic reordering rules for parts</CardDescription>
                 </div>
                 <Button data-testid="button-create-reorder-rule">
                   <Plus className="mr-2 h-4 w-4" />
@@ -380,29 +380,29 @@ export default function InventoryManagement() {
             </CardHeader>
             <CardContent>
               <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Part</TableHead>
-                    <TableHead>Reorder Point</TableHead>
-                    <TableHead>Reorder Quantity</TableHead>
-                    <TableHead>Supplier</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Last Reorder</TableHead>
+                <TableHeader className="bg-dark-steel/30">
+                  <TableRow className="border-b border-dark-steel/50 hover:bg-dark-steel/20">
+                    <TableHead className="text-chrome-silver">Part</TableHead>
+                    <TableHead className="text-chrome-silver">Reorder Point</TableHead>
+                    <TableHead className="text-chrome-silver">Reorder Quantity</TableHead>
+                    <TableHead className="text-chrome-silver">Supplier</TableHead>
+                    <TableHead className="text-chrome-silver">Status</TableHead>
+                    <TableHead className="text-chrome-silver">Last Reorder</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {reorderSettings.map((setting: any) => (
                     <TableRow key={setting.id} data-testid={`row-reorder-${setting.id}`}>
                       <TableCell className="font-medium">{setting.sparePartId}</TableCell>
-                      <TableCell>{setting.reorderPoint}</TableCell>
-                      <TableCell>{setting.reorderQuantity}</TableCell>
-                      <TableCell>{setting.supplierId}</TableCell>
-                      <TableCell>
+                      <TableCell className="text-chrome-silver">{setting.reorderPoint}</TableCell>
+                      <TableCell className="text-chrome-silver">{setting.reorderQuantity}</TableCell>
+                      <TableCell className="text-chrome-silver">{setting.supplierId}</TableCell>
+                      <TableCell className="text-chrome-silver">
                         <Badge variant={setting.isAutoReorderEnabled ? "default" : "secondary"}>
                           {setting.isAutoReorderEnabled ? "Enabled" : "Disabled"}
                         </Badge>
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="text-chrome-silver">
                         {setting.lastReorderDate
                           ? new Date(setting.lastReorderDate).toLocaleDateString()
                           : "Never"}
@@ -410,8 +410,8 @@ export default function InventoryManagement() {
                     </TableRow>
                   ))}
                   {reorderSettings.length === 0 && (
-                    <TableRow>
-                      <TableCell colSpan={6} className="text-center text-muted-foreground">
+                    <TableRow className="border-b border-dark-steel/50 hover:bg-dark-steel/20">
+                      <TableCell colSpan={6} className="text-center text-chrome-silver/60">
                         No reorder rules configured
                       </TableCell>
                     </TableRow>
@@ -424,12 +424,12 @@ export default function InventoryManagement() {
 
         {/* Transfers Tab */}
         <TabsContent value="transfers" className="space-y-4">
-          <Card>
+          <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle>Inventory Transfers</CardTitle>
-                  <CardDescription>Multi-location inventory movement tracking</CardDescription>
+                  <CardTitle className="text-chrome-silver">Inventory Transfers</CardTitle>
+                  <CardDescription className="text-chrome-silver/60">Multi-location inventory movement tracking</CardDescription>
                 </div>
                 <Button data-testid="button-create-transfer">
                   <Plus className="mr-2 h-4 w-4" />
@@ -439,26 +439,26 @@ export default function InventoryManagement() {
             </CardHeader>
             <CardContent>
               <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Transfer #</TableHead>
-                    <TableHead>Part</TableHead>
-                    <TableHead>From → To</TableHead>
-                    <TableHead>Quantity</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Date</TableHead>
+                <TableHeader className="bg-dark-steel/30">
+                  <TableRow className="border-b border-dark-steel/50 hover:bg-dark-steel/20">
+                    <TableHead className="text-chrome-silver">Transfer #</TableHead>
+                    <TableHead className="text-chrome-silver">Part</TableHead>
+                    <TableHead className="text-chrome-silver">From → To</TableHead>
+                    <TableHead className="text-chrome-silver">Quantity</TableHead>
+                    <TableHead className="text-chrome-silver">Status</TableHead>
+                    <TableHead className="text-chrome-silver">Date</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {inventoryTransfers.map((transfer: any) => (
                     <TableRow key={transfer.id} data-testid={`row-transfer-${transfer.id}`}>
                       <TableCell className="font-medium">{transfer.transferNumber}</TableCell>
-                      <TableCell>{transfer.sparePartId}</TableCell>
-                      <TableCell>
+                      <TableCell className="text-chrome-silver">{transfer.sparePartId}</TableCell>
+                      <TableCell className="text-chrome-silver">
                         {transfer.fromGarageId} → {transfer.toGarageId}
                       </TableCell>
-                      <TableCell>{transfer.quantity}</TableCell>
-                      <TableCell>
+                      <TableCell className="text-chrome-silver">{transfer.quantity}</TableCell>
+                      <TableCell className="text-chrome-silver">
                         <Badge
                           variant={
                             transfer.transferStatus === "completed"
@@ -471,14 +471,14 @@ export default function InventoryManagement() {
                           {transfer.transferStatus}
                         </Badge>
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="text-chrome-silver">
                         {new Date(transfer.createdAt).toLocaleDateString()}
                       </TableCell>
                     </TableRow>
                   ))}
                   {inventoryTransfers.length === 0 && (
-                    <TableRow>
-                      <TableCell colSpan={6} className="text-center text-muted-foreground">
+                    <TableRow className="border-b border-dark-steel/50 hover:bg-dark-steel/20">
+                      <TableCell colSpan={6} className="text-center text-chrome-silver/60">
                         No transfers found
                       </TableCell>
                     </TableRow>
@@ -491,13 +491,13 @@ export default function InventoryManagement() {
 
         {/* Pricing History Tab */}
         <TabsContent value="pricing" className="space-y-4">
-          <Card>
+          <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
             <CardHeader>
-              <CardTitle>Pricing History</CardTitle>
-              <CardDescription>Track price changes over time</CardDescription>
+              <CardTitle className="text-chrome-silver">Pricing History</CardTitle>
+              <CardDescription className="text-chrome-silver/60">Track price changes over time</CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-center text-muted-foreground py-8">
+              <p className="text-center text-chrome-silver/60 py-8">
                 Select a part to view pricing history
               </p>
             </CardContent>
@@ -506,13 +506,13 @@ export default function InventoryManagement() {
 
         {/* Audit Trail Tab */}
         <TabsContent value="audit" className="space-y-4">
-          <Card>
+          <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
             <CardHeader>
-              <CardTitle>Inventory Audit Trail</CardTitle>
-              <CardDescription>Complete history of inventory changes</CardDescription>
+              <CardTitle className="text-chrome-silver">Inventory Audit Trail</CardTitle>
+              <CardDescription className="text-chrome-silver/60">Complete history of inventory changes</CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-center text-muted-foreground py-8">
+              <p className="text-center text-chrome-silver/60 py-8">
                 Audit trail will display all inventory movements and changes
               </p>
             </CardContent>

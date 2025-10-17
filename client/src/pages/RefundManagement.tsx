@@ -150,13 +150,13 @@ export default function RefundManagement() {
   };
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-8 bg-gray-800 min-h-screen space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold" data-testid="text-page-title">
+          <h1 className="font-['Poppins',Helvetica] font-bold text-3xl text-chrome-silver" data-testid="text-page-title">
             Refund Management
           </h1>
-          <p className="text-muted-foreground" data-testid="text-page-description">
+          <p className="text-chrome-silver/60" data-testid="text-page-description">
             Manage customer refunds with approval workflow
           </p>
         </div>
@@ -300,29 +300,29 @@ export default function RefundManagement() {
         </Select>
       </div>
 
-      <Card>
+      <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
         <CardHeader>
-          <CardTitle>Refund Requests</CardTitle>
-          <CardDescription>Review and process customer refund requests</CardDescription>
+          <CardTitle className="text-chrome-silver">Refund Requests</CardTitle>
+          <CardDescription className="text-chrome-silver/60">Review and process customer refund requests</CardDescription>
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <div className="text-center py-8 text-muted-foreground">Loading...</div>
+            <div className="text-center py-8 text-chrome-silver/60">Loading...</div>
           ) : refunds.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground" data-testid="text-no-refunds">
+            <div className="text-center py-8 text-chrome-silver/60" data-testid="text-no-refunds">
               No refund requests found
             </div>
           ) : (
             <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Invoice</TableHead>
-                  <TableHead>Amount</TableHead>
-                  <TableHead>Reason</TableHead>
-                  <TableHead>Method</TableHead>
-                  <TableHead>Requested</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Actions</TableHead>
+              <TableHeader className="bg-dark-steel/30">
+                <TableRow className="border-b border-dark-steel/50 hover:bg-dark-steel/20">
+                  <TableHead className="text-chrome-silver">Invoice</TableHead>
+                  <TableHead className="text-chrome-silver">Amount</TableHead>
+                  <TableHead className="text-chrome-silver">Reason</TableHead>
+                  <TableHead className="text-chrome-silver">Method</TableHead>
+                  <TableHead className="text-chrome-silver">Requested</TableHead>
+                  <TableHead className="text-chrome-silver">Status</TableHead>
+                  <TableHead className="text-chrome-silver">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -347,7 +347,7 @@ export default function RefundManagement() {
                     <TableCell data-testid={`badge-refund-status-${refund.id}`}>
                       {getStatusBadge(refund.status)}
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="text-chrome-silver">
                       <div className="flex gap-2">
                         {refund.status === "pending" && (
                           <Button

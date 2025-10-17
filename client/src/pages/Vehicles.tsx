@@ -206,10 +206,10 @@ export default function Vehicles() {
     <div className="p-8">
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="font-['Poppins',Helvetica] font-bold text-2xl text-[#222029] mb-2">
+          <h1 className="font-['Poppins',Helvetica] font-bold text-2xl text-chrome-silver mb-2">
             Vehicles
           </h1>
-          <p className="font-['Poppins',Helvetica] text-sm text-[#999999]">
+          <p className="font-['Poppins',Helvetica] text-sm text-chrome-silver/60">
             Manage customer vehicles and service history
           </p>
         </div>
@@ -226,7 +226,7 @@ export default function Vehicles() {
           </DialogTrigger>
           <DialogContent className="sm:max-w-[600px]" data-testid="modal-vehicle-form">
             <DialogHeader>
-              <DialogTitle className="font-['Poppins',Helvetica] font-semibold text-xl text-[#222029]">
+              <DialogTitle className="font-['Poppins',Helvetica] font-semibold text-xl text-chrome-silver">
                 {editingVehicle ? "Edit Vehicle" : "Add New Vehicle"}
               </DialogTitle>
             </DialogHeader>
@@ -490,7 +490,7 @@ export default function Vehicles() {
 
       <div className="mb-6">
         <div className="relative w-96">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[#999999]" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-chrome-silver/60" />
           <Input
             type="text"
             placeholder="Search vehicles..."
@@ -504,8 +504,8 @@ export default function Vehicles() {
 
       {filteredVehicles.length === 0 ? (
         <div className="text-center py-12">
-          <Car className="w-12 h-12 mx-auto text-[#999999] mb-4" />
-          <p className="font-['Poppins',Helvetica] text-[#999999]">
+          <Car className="w-12 h-12 mx-auto text-chrome-silver/60 mb-4" />
+          <p className="font-['Poppins',Helvetica] text-chrome-silver/60">
             {searchQuery ? "No vehicles found matching your search" : "No vehicles added yet"}
           </p>
         </div>
@@ -517,7 +517,7 @@ export default function Vehicles() {
             return (
               <div
                 key={vehicle.id}
-                className="bg-white border border-[#e6e6e6] rounded-lg p-6 hover:shadow-md transition-shadow"
+                className="bg-midnight-blue border border-[#e6e6e6] rounded-lg p-6 hover:shadow-md transition-shadow"
                 data-testid={`card-vehicle-${vehicle.id}`}
               >
                 <div className="flex items-start justify-between mb-4">
@@ -526,10 +526,10 @@ export default function Vehicles() {
                       <Car className="w-6 h-6 text-blue-600" />
                     </div>
                     <div>
-                      <h3 className="font-['Poppins',Helvetica] font-semibold text-[#222029]">
+                      <h3 className="font-['Poppins',Helvetica] font-semibold text-chrome-silver">
                         {vehicle.make} {vehicle.model}
                       </h3>
-                      <p className="font-['Poppins',Helvetica] text-sm text-[#999999]">
+                      <p className="font-['Poppins',Helvetica] text-sm text-chrome-silver/60">
                         {vehicle.year}
                       </p>
                     </div>
@@ -541,37 +541,37 @@ export default function Vehicles() {
 
                 <div className="space-y-2 mb-4">
                   <div className="flex justify-between">
-                    <span className="font-['Poppins',Helvetica] text-sm text-[#999999]">Owner:</span>
-                    <span className="font-['Poppins',Helvetica] text-sm text-[#222029]">
+                    <span className="font-['Poppins',Helvetica] text-sm text-chrome-silver/60">Owner:</span>
+                    <span className="font-['Poppins',Helvetica] text-sm text-chrome-silver">
                       {customer?.fullName || "Unknown"}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="font-['Poppins',Helvetica] text-sm text-[#999999]">License:</span>
-                    <span className="font-['Poppins',Helvetica] text-sm text-[#222029] font-medium">
+                    <span className="font-['Poppins',Helvetica] text-sm text-chrome-silver/60">License:</span>
+                    <span className="font-['Poppins',Helvetica] text-sm text-chrome-silver font-medium">
                       {vehicle.licensePlate}
                     </span>
                   </div>
                   {vehicle.vin && (
                     <div className="flex justify-between">
-                      <span className="font-['Poppins',Helvetica] text-sm text-[#999999]">VIN:</span>
-                      <span className="font-['Poppins',Helvetica] text-sm text-[#222029] truncate max-w-[150px]">
+                      <span className="font-['Poppins',Helvetica] text-sm text-chrome-silver/60">VIN:</span>
+                      <span className="font-['Poppins',Helvetica] text-sm text-chrome-silver truncate max-w-[150px]">
                         {vehicle.vin}
                       </span>
                     </div>
                   )}
                   {vehicle.mileage && vehicle.mileage > 0 && (
                     <div className="flex justify-between">
-                      <span className="font-['Poppins',Helvetica] text-sm text-[#999999]">Mileage:</span>
-                      <span className="font-['Poppins',Helvetica] text-sm text-[#222029]">
+                      <span className="font-['Poppins',Helvetica] text-sm text-chrome-silver/60">Mileage:</span>
+                      <span className="font-['Poppins',Helvetica] text-sm text-chrome-silver">
                         {vehicle.mileage.toLocaleString()} km
                       </span>
                     </div>
                   )}
                   {vehicle.engineType && (
                     <div className="flex justify-between">
-                      <span className="font-['Poppins',Helvetica] text-sm text-[#999999]">Engine:</span>
-                      <span className="font-['Poppins',Helvetica] text-sm text-[#222029] capitalize">
+                      <span className="font-['Poppins',Helvetica] text-sm text-chrome-silver/60">Engine:</span>
+                      <span className="font-['Poppins',Helvetica] text-sm text-chrome-silver capitalize">
                         {vehicle.engineType}
                       </span>
                     </div>

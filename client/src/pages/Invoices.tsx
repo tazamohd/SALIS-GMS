@@ -42,13 +42,13 @@ export function Invoices() {
 
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
-      draft: "bg-gray-100 text-gray-800",
+      draft: "bg-dark-steel/30 text-gray-800",
       sent: "bg-blue-100 text-blue-800",
       paid: "bg-green-100 text-green-800",
       overdue: "bg-red-100 text-red-800",
-      cancelled: "bg-gray-100 text-gray-600",
+      cancelled: "bg-dark-steel/30 text-gray-600",
     };
-    return colors[status] || "bg-gray-100 text-gray-800";
+    return colors[status] || "bg-dark-steel/30 text-gray-800";
   };
 
   return (
@@ -56,10 +56,10 @@ export function Invoices() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="font-['Poppins',Helvetica] font-bold text-3xl text-[#222029]">
+          <h1 className="font-['Poppins',Helvetica] font-bold text-3xl text-chrome-silver">
             Invoices & Billing
           </h1>
-          <p className="font-['Poppins',Helvetica] font-normal text-sm text-[#999999] mt-1">
+          <p className="font-['Poppins',Helvetica] font-normal text-sm text-chrome-silver/60 mt-1">
             Manage invoices and payments
           </p>
         </div>
@@ -71,7 +71,7 @@ export function Invoices() {
       {/* Filters */}
       <div className="flex gap-4 mb-6">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-chrome-silver/50" />
           <Input
             placeholder="Search invoices..."
             className="pl-10"
@@ -108,12 +108,12 @@ export function Invoices() {
       </div>
 
       {/* Invoices List */}
-      <Card>
+      <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
         <CardContent className="p-6">
           {isLoading ? (
             <div className="text-center py-12">
               <div className="animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-4"></div>
-              <p className="text-gray-500">Loading invoices...</p>
+              <p className="text-chrome-silver/60">Loading invoices...</p>
             </div>
           ) : (invoices ?? []).length === 0 ? (
             <div className="text-center py-12">
@@ -121,7 +121,7 @@ export function Invoices() {
               <h3 className="font-['Poppins',Helvetica] font-semibold text-lg text-gray-600 mb-2">
                 No Invoices
               </h3>
-              <p className="text-sm text-gray-400 mb-4">
+              <p className="text-sm text-chrome-silver/50 mb-4">
                 Create your first invoice to start billing customers
               </p>
               <Button className="bg-blue-600 hover:bg-blue-700">
@@ -133,38 +133,38 @@ export function Invoices() {
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-gray-200">
-                    <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-semibold text-sm text-[#222029]">
+                  <tr className="border-b border-dark-steel">
+                    <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-semibold text-sm text-chrome-silver">
                       Invoice #
                     </th>
-                    <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-semibold text-sm text-[#222029]">
+                    <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-semibold text-sm text-chrome-silver">
                       Customer
                     </th>
-                    <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-semibold text-sm text-[#222029]">
+                    <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-semibold text-sm text-chrome-silver">
                       Invoice Date
                     </th>
-                    <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-semibold text-sm text-[#222029]">
+                    <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-semibold text-sm text-chrome-silver">
                       Due Date
                     </th>
-                    <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-semibold text-sm text-[#222029]">
+                    <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-semibold text-sm text-chrome-silver">
                       Total Amount
                     </th>
-                    <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-semibold text-sm text-[#222029]">
+                    <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-semibold text-sm text-chrome-silver">
                       Balance
                     </th>
-                    <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-semibold text-sm text-[#222029]">
+                    <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-semibold text-sm text-chrome-silver">
                       Status
                     </th>
-                    <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-semibold text-sm text-[#222029]">
+                    <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-semibold text-sm text-chrome-silver">
                       Actions
                     </th>
                   </tr>
                 </thead>
                 <tbody>
                   {invoices?.map((invoice) => (
-                    <tr key={invoice.id} className="border-b border-gray-100 hover:bg-gray-50" data-testid={`invoice-row-${invoice.id}`}>
+                    <tr key={invoice.id} className="border-b border-gray-100 hover:bg-dark-steel/20" data-testid={`invoice-row-${invoice.id}`}>
                       <td className="py-3 px-4">
-                        <span className="font-['Poppins',Helvetica] font-medium text-sm text-[#222029]">
+                        <span className="font-['Poppins',Helvetica] font-medium text-sm text-chrome-silver">
                           {invoice.invoiceNumber}
                         </span>
                       </td>
@@ -186,12 +186,12 @@ export function Invoices() {
                         </span>
                       </td>
                       <td className="py-3 px-4">
-                        <span className="font-['Poppins',Helvetica] font-semibold text-sm text-[#222029]">
+                        <span className="font-['Poppins',Helvetica] font-semibold text-sm text-chrome-silver">
                           ${parseFloat(invoice.totalAmount).toFixed(2)}
                         </span>
                       </td>
                       <td className="py-3 px-4">
-                        <span className="font-['Poppins',Helvetica] font-semibold text-sm text-[#222029]">
+                        <span className="font-['Poppins',Helvetica] font-semibold text-sm text-chrome-silver">
                           ${parseFloat(invoice.balanceAmount).toFixed(2)}
                         </span>
                       </td>

@@ -325,18 +325,18 @@ export default function Calendar() {
   };
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-8 bg-gray-800 min-h-screen space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold" data-testid="text-calendar-title">Scheduling & Calendar</h1>
-          <p className="text-gray-600 dark:text-gray-400">
+          <h1 className="font-['Poppins',Helvetica] font-bold text-3xl text-chrome-silver" data-testid="text-calendar-title">Scheduling & Calendar</h1>
+          <p className="text-chrome-silver/70">
             Visual calendar view with drag-and-drop scheduling
           </p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="p-4">
+        <Card className="bg-midnight-blue border-dark-steel p-4">
           <div className="flex items-center gap-2 mb-2">
             <CalendarIcon className="h-5 w-5 text-blue-600" />
             <h3 className="font-semibold">Filter by Garage</h3>
@@ -355,7 +355,7 @@ export default function Calendar() {
           </Select>
         </Card>
 
-        <Card className="p-4">
+        <Card className="bg-midnight-blue border-dark-steel p-4">
           <div className="flex items-center gap-2 mb-2">
             <Users className="h-5 w-5 text-green-600" />
             <h3 className="font-semibold">Filter by Technician</h3>
@@ -375,7 +375,7 @@ export default function Calendar() {
           </Select>
         </Card>
 
-        <Card className="p-4">
+        <Card className="bg-midnight-blue border-dark-steel p-4">
           <div className="flex items-center gap-2 mb-2">
             <Clock className="h-5 w-5 text-purple-600" />
             <h3 className="font-semibold">View Mode</h3>
@@ -395,17 +395,17 @@ export default function Calendar() {
       </div>
 
       {!selectedGarageId ? (
-        <Card className="p-12">
+        <Card className="bg-midnight-blue border-dark-steel p-12">
           <div className="text-center">
-            <AlertCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+            <AlertCircle className="h-12 w-12 text-chrome-silver/50 mx-auto mb-4" />
             <h3 className="text-lg font-semibold mb-2">Select a Garage</h3>
-            <p className="text-gray-600 dark:text-gray-400">
+            <p className="text-chrome-silver/70">
               Please select a garage from the dropdown above to view the calendar
             </p>
           </div>
         </Card>
       ) : (
-        <Card className="p-4">
+        <Card className="bg-midnight-blue border-dark-steel p-4">
           <div className="h-[700px]" data-testid="calendar-view">
             <DragAndDropCalendar
               localizer={localizer}

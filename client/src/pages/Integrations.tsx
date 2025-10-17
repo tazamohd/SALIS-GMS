@@ -166,11 +166,11 @@ export default function Integrations() {
   ];
 
   return (
-    <div className="min-h-screen bg-white dark:bg-black p-6">
+    <div className="min-h-screen bg-midnight-blue dark:bg-black p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         <div>
           <h1 className="text-3xl font-bold text-black dark:text-white">Integrations</h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">
+          <p className="text-chrome-silver/70 mt-1">
             Connect and manage third-party services
           </p>
         </div>
@@ -198,7 +198,7 @@ export default function Integrations() {
                           </div>
                           <div>
                             <CardTitle className="text-black dark:text-white">{integration.name}</CardTitle>
-                            <CardDescription>{integration.description}</CardDescription>
+                            <CardDescription className="text-chrome-silver/60">{integration.description}</CardDescription>
                           </div>
                         </div>
                         <Badge variant={isActive ? "default" : "secondary"} data-testid={`badge-status-${integration.id}`}>
@@ -212,9 +212,9 @@ export default function Integrations() {
                           {isActive ? (
                             <CheckCircle2 className="h-5 w-5 text-green-600" />
                           ) : (
-                            <XCircle className="h-5 w-5 text-gray-400" />
+                            <XCircle className="h-5 w-5 text-chrome-silver/50" />
                           )}
-                          <span className={`text-sm ${isActive ? 'text-green-600' : 'text-gray-500 dark:text-gray-400'}`}>
+                          <span className={`text-sm ${isActive ? 'text-green-600' : 'text-chrome-silver/60 dark:text-chrome-silver/50'}`}>
                             {isActive ? 'Active' : 'Not Configured'}
                           </span>
                         </div>
@@ -258,28 +258,28 @@ export default function Integrations() {
               })}
             </div>
 
-            <Card>
+            <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
               <CardHeader>
                 <CardTitle className="text-black dark:text-white">Integration Status</CardTitle>
-                <CardDescription>Recent sync activity and status</CardDescription>
+                <CardDescription className="text-chrome-silver/60">Recent sync activity and status</CardDescription>
               </CardHeader>
               <CardContent>
                 {logsLoading ? (
-                  <div className="text-center py-8 text-gray-500 dark:text-gray-400">Loading sync logs...</div>
+                  <div className="text-center py-8 text-chrome-silver/60 dark:text-chrome-silver/50">Loading sync logs...</div>
                 ) : syncLogs.length === 0 ? (
-                  <div className="text-center py-8 text-gray-500 dark:text-gray-400">No sync activity yet</div>
+                  <div className="text-center py-8 text-chrome-silver/60 dark:text-chrome-silver/50">No sync activity yet</div>
                 ) : (
                   <div className="space-y-3">
                     {syncLogs.slice(0, 5).map((log: any, index: number) => (
                       <div 
                         key={log.id || index} 
-                        className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900 rounded-lg"
+                        className="flex items-center justify-between p-3 bg-dark-steel/20 dark:bg-gray-900 rounded-lg"
                         data-testid={`log-entry-${index}`}
                       >
                         <div className="flex items-center gap-3">
                           <div className={`p-2 rounded-lg ${
                             log.status === 'success' ? 'bg-green-100' : 
-                            log.status === 'failed' ? 'bg-red-100' : 'bg-gray-100'
+                            log.status === 'failed' ? 'bg-red-100' : 'bg-dark-steel/30'
                           }`}>
                             {log.status === 'success' ? (
                               <CheckCircle2 className="h-4 w-4 text-green-600" />
@@ -293,7 +293,7 @@ export default function Integrations() {
                             <p className="text-sm font-medium text-black dark:text-white">
                               {log.syncType?.replace(/-/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
                             </p>
-                            <p className="text-xs text-gray-500 dark:text-gray-400">
+                            <p className="text-xs text-chrome-silver/60 dark:text-chrome-silver/50">
                               {log.recordsProcessed} record{log.recordsProcessed !== 1 ? 's' : ''} • {new Date(log.createdAt).toLocaleString()}
                             </p>
                           </div>
@@ -310,23 +310,23 @@ export default function Integrations() {
           </TabsContent>
 
           <TabsContent value="sync-logs" className="space-y-4">
-            <Card>
+            <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
               <CardHeader>
                 <CardTitle className="text-black dark:text-white">Sync History</CardTitle>
-                <CardDescription>Detailed history of all integration syncs</CardDescription>
+                <CardDescription className="text-chrome-silver/60">Detailed history of all integration syncs</CardDescription>
               </CardHeader>
               <CardContent>
                 <ScrollArea className="h-[600px]">
                   {logsLoading ? (
-                    <div className="text-center py-8 text-gray-500 dark:text-gray-400">Loading...</div>
+                    <div className="text-center py-8 text-chrome-silver/60 dark:text-chrome-silver/50">Loading...</div>
                   ) : syncLogs.length === 0 ? (
-                    <div className="text-center py-8 text-gray-500 dark:text-gray-400">No sync logs available</div>
+                    <div className="text-center py-8 text-chrome-silver/60 dark:text-chrome-silver/50">No sync logs available</div>
                   ) : (
                     <div className="space-y-3">
                       {syncLogs.map((log: any, index: number) => (
                         <div 
                           key={log.id || index} 
-                          className="p-4 border border-gray-200 dark:border-gray-800 rounded-lg"
+                          className="p-4 border border-dark-steel dark:border-gray-800 rounded-lg"
                           data-testid={`sync-log-${index}`}
                         >
                           <div className="flex items-start justify-between">
@@ -339,7 +339,7 @@ export default function Integrations() {
                                   {log.status}
                                 </Badge>
                               </div>
-                              <div className="space-y-1 text-sm text-gray-600 dark:text-gray-400">
+                              <div className="space-y-1 text-sm text-chrome-silver/70">
                                 <p>Records: {log.recordsProcessed}</p>
                                 <p>Time: {new Date(log.createdAt).toLocaleString()}</p>
                                 {log.errorMessage && (
@@ -358,12 +358,12 @@ export default function Integrations() {
           </TabsContent>
 
           <TabsContent value="accounting" className="space-y-4">
-            <Card>
+            <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
                     <CardTitle className="text-black dark:text-white">Accounting Transactions</CardTitle>
-                    <CardDescription>Transactions pending sync with accounting software</CardDescription>
+                    <CardDescription className="text-chrome-silver/60">Transactions pending sync with accounting software</CardDescription>
                   </div>
                   <Button
                     onClick={() => syncAccountingMutation.mutate()}
@@ -378,12 +378,12 @@ export default function Integrations() {
               <CardContent>
                 <ScrollArea className="h-[600px]">
                   {accountingLoading ? (
-                    <div className="text-center py-8 text-gray-500 dark:text-gray-400">Loading...</div>
+                    <div className="text-center py-8 text-chrome-silver/60 dark:text-chrome-silver/50">Loading...</div>
                   ) : accountingTransactions.length === 0 ? (
                     <div className="text-center py-8">
                       <DollarSign className="h-12 w-12 mx-auto text-gray-300 dark:text-gray-700 mb-3" />
-                      <p className="text-gray-500 dark:text-gray-400 mb-2">No accounting transactions</p>
-                      <p className="text-sm text-gray-400 dark:text-gray-500">
+                      <p className="text-chrome-silver/60 dark:text-chrome-silver/50 mb-2">No accounting transactions</p>
+                      <p className="text-sm text-chrome-silver/50 dark:text-chrome-silver/60">
                         Configure QuickBooks or Xero integration to sync transactions
                       </p>
                     </div>
@@ -392,13 +392,13 @@ export default function Integrations() {
                       {accountingTransactions.map((transaction: any, index: number) => (
                         <div 
                           key={transaction.id || index} 
-                          className="p-4 border border-gray-200 dark:border-gray-800 rounded-lg"
+                          className="p-4 border border-dark-steel dark:border-gray-800 rounded-lg"
                           data-testid={`transaction-${index}`}
                         >
                           <div className="flex items-center justify-between">
                             <div>
                               <h4 className="font-medium text-black dark:text-white">{transaction.transactionType}</h4>
-                              <p className="text-sm text-gray-600 dark:text-gray-400">
+                              <p className="text-sm text-chrome-silver/70">
                                 {new Date(transaction.transactionDate).toLocaleDateString()}
                               </p>
                             </div>

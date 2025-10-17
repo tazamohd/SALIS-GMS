@@ -73,7 +73,7 @@ export function TasksManagement() {
       'delivered': 'bg-purple-100 text-purple-700',
       'cancelled': 'bg-red-100 text-red-700',
     };
-    return statusColors[status] || 'bg-gray-100 text-gray-700';
+    return statusColors[status] || 'bg-dark-steel/30 text-gray-700';
   };
 
   const getPriorityBadge = (priority: string) => {
@@ -82,64 +82,64 @@ export function TasksManagement() {
       'medium': 'bg-yellow-100 text-yellow-700',
       'low': 'bg-green-100 text-green-700',
     };
-    return priorityColors[priority] || 'bg-gray-100 text-gray-700';
+    return priorityColors[priority] || 'bg-dark-steel/30 text-gray-700';
   };
 
   return (
-    <div className="flex-1 p-8 bg-white">
+    <div className="flex-1 p-8 bg-midnight-blue">
       <div className="mb-8">
-        <h1 className="font-['Poppins',Helvetica] font-semibold text-2xl text-[#222029]">Tasks Management</h1>
+        <h1 className="font-['Poppins',Helvetica] font-semibold text-2xl text-chrome-silver">Tasks Management</h1>
       </div>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <Card className="border border-[#e6e6e6]">
+        <Card className="bg-midnight-blue border-dark-steel border border-[#e6e6e6]">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="font-['Poppins',Helvetica] font-medium text-sm text-[#999999]">check-in</h3>
+              <h3 className="font-['Poppins',Helvetica] font-medium text-sm text-chrome-silver/60">check-in</h3>
               <Clock className="w-5 h-5 text-yellow-600" />
             </div>
-            <p className="font-['Poppins',Helvetica] font-bold text-3xl text-[#222029] mb-1">{checkInCount}</p>
-            <p className="font-['Poppins',Helvetica] font-normal text-xs text-[#999999]">in the last 2 hours</p>
+            <p className="font-['Poppins',Helvetica] font-bold text-3xl text-chrome-silver mb-1">{checkInCount}</p>
+            <p className="font-['Poppins',Helvetica] font-normal text-xs text-chrome-silver/60">in the last 2 hours</p>
           </CardContent>
         </Card>
 
-        <Card className="border border-[#e6e6e6]">
+        <Card className="bg-midnight-blue border-dark-steel border border-[#e6e6e6]">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="font-['Poppins',Helvetica] font-medium text-sm text-[#999999]">Repair</h3>
+              <h3 className="font-['Poppins',Helvetica] font-medium text-sm text-chrome-silver/60">Repair</h3>
               <Wrench className="w-5 h-5 text-blue-600" />
             </div>
-            <p className="font-['Poppins',Helvetica] font-bold text-3xl text-[#222029] mb-1">{repairCount}</p>
-            <p className="font-['Poppins',Helvetica] font-normal text-xs text-[#999999]">in the last 2 hours</p>
+            <p className="font-['Poppins',Helvetica] font-bold text-3xl text-chrome-silver mb-1">{repairCount}</p>
+            <p className="font-['Poppins',Helvetica] font-normal text-xs text-chrome-silver/60">in the last 2 hours</p>
           </CardContent>
         </Card>
 
-        <Card className="border border-[#e6e6e6]">
+        <Card className="bg-midnight-blue border-dark-steel border border-[#e6e6e6]">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="font-['Poppins',Helvetica] font-medium text-sm text-[#999999]">Quality Check</h3>
+              <h3 className="font-['Poppins',Helvetica] font-medium text-sm text-chrome-silver/60">Quality Check</h3>
               <AlertCircle className="w-5 h-5 text-orange-600" />
             </div>
-            <p className="font-['Poppins',Helvetica] font-bold text-3xl text-[#222029] mb-1">{qualityCheckCount}</p>
-            <p className="font-['Poppins',Helvetica] font-normal text-xs text-[#999999]">in the last 2 hours</p>
+            <p className="font-['Poppins',Helvetica] font-bold text-3xl text-chrome-silver mb-1">{qualityCheckCount}</p>
+            <p className="font-['Poppins',Helvetica] font-normal text-xs text-chrome-silver/60">in the last 2 hours</p>
           </CardContent>
         </Card>
 
-        <Card className="border border-[#e6e6e6]">
+        <Card className="bg-midnight-blue border-dark-steel border border-[#e6e6e6]">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="font-['Poppins',Helvetica] font-medium text-sm text-[#999999]">Completion</h3>
+              <h3 className="font-['Poppins',Helvetica] font-medium text-sm text-chrome-silver/60">Completion</h3>
               <CheckCircle className="w-5 h-5 text-green-600" />
             </div>
-            <p className="font-['Poppins',Helvetica] font-bold text-3xl text-[#222029] mb-1">{completionCount}</p>
-            <p className="font-['Poppins',Helvetica] font-normal text-xs text-[#999999]">in the last 2 hours</p>
+            <p className="font-['Poppins',Helvetica] font-bold text-3xl text-chrome-silver mb-1">{completionCount}</p>
+            <p className="font-['Poppins',Helvetica] font-normal text-xs text-chrome-silver/60">in the last 2 hours</p>
           </CardContent>
         </Card>
       </div>
 
       {/* Filters */}
-      <Card className="border border-[#e6e6e6] mb-6">
+      <Card className="bg-midnight-blue border-dark-steel border border-[#e6e6e6] mb-6">
         <CardContent className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <Select value={statusFilter} onValueChange={(value) => handleFilterChange('status', value)}>
@@ -169,7 +169,7 @@ export function TasksManagement() {
             </Select>
 
             <div className="md:col-span-2 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[#999999]" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-chrome-silver/60" />
               <Input
                 type="text"
                 placeholder="Search"
@@ -184,19 +184,19 @@ export function TasksManagement() {
       </Card>
 
       {/* Tasks Table */}
-      <Card className="border border-[#e6e6e6]">
+      <Card className="bg-midnight-blue border-dark-steel border border-[#e6e6e6]">
         <CardContent className="p-6">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-[#e6e6e6]">
-                  <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-medium text-sm text-[#999999]">Task ID</th>
-                  <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-medium text-sm text-[#999999]">Customer Name</th>
-                  <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-medium text-sm text-[#999999]">Service Type</th>
-                  <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-medium text-sm text-[#999999]">Status</th>
-                  <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-medium text-sm text-[#999999]">Due Date/Time</th>
-                  <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-medium text-sm text-[#999999]">Priority</th>
-                  <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-medium text-sm text-[#999999]">Action</th>
+                  <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-medium text-sm text-chrome-silver/60">Task ID</th>
+                  <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-medium text-sm text-chrome-silver/60">Customer Name</th>
+                  <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-medium text-sm text-chrome-silver/60">Service Type</th>
+                  <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-medium text-sm text-chrome-silver/60">Status</th>
+                  <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-medium text-sm text-chrome-silver/60">Due Date/Time</th>
+                  <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-medium text-sm text-chrome-silver/60">Priority</th>
+                  <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-medium text-sm text-chrome-silver/60">Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -208,18 +208,18 @@ export function TasksManagement() {
                   </tr>
                 ) : filteredTasks.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="py-8 text-center text-[#999999]">No tasks available</td>
+                    <td colSpan={7} className="py-8 text-center text-chrome-silver/60">No tasks available</td>
                   </tr>
                 ) : (
                   filteredTasks.map((task) => (
-                    <tr key={task.id} className="border-b border-[#e6e6e6] hover:bg-gray-50" data-testid={`row-task-${task.id}`}>
-                      <td className="py-4 px-4 font-['Poppins',Helvetica] font-medium text-sm text-[#222029]">
+                    <tr key={task.id} className="border-b border-[#e6e6e6] hover:bg-dark-steel/20" data-testid={`row-task-${task.id}`}>
+                      <td className="py-4 px-4 font-['Poppins',Helvetica] font-medium text-sm text-chrome-silver">
                         #{task.id}
                       </td>
-                      <td className="py-4 px-4 font-['Poppins',Helvetica] font-normal text-sm text-[#222029]">
+                      <td className="py-4 px-4 font-['Poppins',Helvetica] font-normal text-sm text-chrome-silver">
                         {(task.vehicleInfo as any)?.owner || 'N/A'}
                       </td>
-                      <td className="py-4 px-4 font-['Poppins',Helvetica] font-normal text-sm text-[#222029]">
+                      <td className="py-4 px-4 font-['Poppins',Helvetica] font-normal text-sm text-chrome-silver">
                         {task.serviceType}
                       </td>
                       <td className="py-4 px-4">
@@ -227,7 +227,7 @@ export function TasksManagement() {
                           {task.status}
                         </Badge>
                       </td>
-                      <td className="py-4 px-4 font-['Poppins',Helvetica] font-normal text-sm text-[#999999]">
+                      <td className="py-4 px-4 font-['Poppins',Helvetica] font-normal text-sm text-chrome-silver/60">
                         {task.createdAt ? new Date(task.createdAt).toLocaleString() : 'N/A'}
                       </td>
                       <td className="py-4 px-4">

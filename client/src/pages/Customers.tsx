@@ -112,10 +112,10 @@ export function Customers() {
     <div className="p-8">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="font-['Poppins',Helvetica] font-bold text-3xl text-[#222029]">
+          <h1 className="font-['Poppins',Helvetica] font-bold text-3xl text-chrome-silver">
             Customer Management
           </h1>
-          <p className="font-['Poppins',Helvetica] font-normal text-sm text-[#999999] mt-1">
+          <p className="font-['Poppins',Helvetica] font-normal text-sm text-chrome-silver/60 mt-1">
             Manage customer profiles and vehicle information
           </p>
         </div>
@@ -140,10 +140,10 @@ export function Customers() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Customers List */}
         <div className="lg:col-span-1">
-          <Card>
+          <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
             <CardContent className="p-4">
               <div className="relative mb-4">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-chrome-silver/50" />
                 <Input
                   type="text"
                   placeholder="Search customers..."
@@ -156,11 +156,11 @@ export function Customers() {
 
               <div className="space-y-2 max-h-[600px] overflow-y-auto">
                 {isLoading ? (
-                  <div className="text-center py-8 text-gray-500">Loading customers...</div>
+                  <div className="text-center py-8 text-chrome-silver/60">Loading customers...</div>
                 ) : filteredCustomers.length === 0 ? (
                   <div className="text-center py-8">
-                    <Users className="w-12 h-12 text-gray-400 mx-auto mb-2" />
-                    <p className="text-gray-500 text-sm">No customers found</p>
+                    <Users className="w-12 h-12 text-chrome-silver/50 mx-auto mb-2" />
+                    <p className="text-chrome-silver/60 text-sm">No customers found</p>
                   </div>
                 ) : (
                   filteredCustomers.map((customer) => (
@@ -170,7 +170,7 @@ export function Customers() {
                       className={`p-3 rounded-lg border cursor-pointer transition-all ${
                         selectedCustomerId === customer.id
                           ? 'bg-blue-50 border-blue-200'
-                          : 'hover:bg-gray-50 border-gray-200'
+                          : 'hover:bg-dark-steel/20 border-dark-steel'
                       }`}
                       data-testid={`customer-item-${customer.id}`}
                     >
@@ -179,14 +179,14 @@ export function Customers() {
                           <Users className="w-5 h-5 text-blue-600" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-['Poppins',Helvetica] font-semibold text-sm text-[#222029] truncate">
+                          <h3 className="font-['Poppins',Helvetica] font-semibold text-sm text-chrome-silver truncate">
                             {customer.fullName || 'Unnamed Customer'}
                           </h3>
                           {customer.email && (
-                            <p className="text-xs text-gray-500 truncate">{customer.email}</p>
+                            <p className="text-xs text-chrome-silver/60 truncate">{customer.email}</p>
                           )}
                           {customer.phone && (
-                            <p className="text-xs text-gray-500">{customer.phone}</p>
+                            <p className="text-xs text-chrome-silver/60">{customer.phone}</p>
                           )}
                         </div>
                       </div>
@@ -201,13 +201,13 @@ export function Customers() {
         {/* Customer Details */}
         <div className="lg:col-span-2">
           {!selectedCustomerId ? (
-            <Card>
+            <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
               <CardContent className="p-12 text-center">
                 <Users className="w-16 h-16 text-gray-300 mx-auto mb-4" />
                 <h3 className="font-['Poppins',Helvetica] font-semibold text-lg text-gray-600 mb-2">
                   No Customer Selected
                 </h3>
-                <p className="text-sm text-gray-400">
+                <p className="text-sm text-chrome-silver/50">
                   Select a customer from the list to view their details
                 </p>
               </CardContent>
@@ -215,7 +215,7 @@ export function Customers() {
           ) : (
             <div className="space-y-6">
               {/* Customer Info Card */}
-              <Card>
+              <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
                 <CardContent className="p-6">
                   <div className="flex items-start justify-between mb-6">
                     <div className="flex items-start gap-4">
@@ -223,13 +223,13 @@ export function Customers() {
                         <Users className="w-8 h-8 text-blue-600" />
                       </div>
                       <div>
-                        <h2 className="font-['Poppins',Helvetica] font-bold text-2xl text-[#222029]">
+                        <h2 className="font-['Poppins',Helvetica] font-bold text-2xl text-chrome-silver">
                           {selectedCustomer?.fullName || 'Unnamed Customer'}
                         </h2>
-                        <p className="text-sm text-gray-500 mt-1">Customer ID: {selectedCustomer?.id}</p>
+                        <p className="text-sm text-chrome-silver/60 mt-1">Customer ID: {selectedCustomer?.id}</p>
                       </div>
                     </div>
-                    <div className="text-xs text-gray-500">
+                    <div className="text-xs text-chrome-silver/60">
                       Customer managed via authentication
                     </div>
                   </div>
@@ -237,10 +237,10 @@ export function Customers() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {selectedCustomer?.email && (
                       <div className="flex items-center gap-3">
-                        <Mail className="w-5 h-5 text-gray-400" />
+                        <Mail className="w-5 h-5 text-chrome-silver/50" />
                         <div>
-                          <p className="text-xs text-gray-500">Email</p>
-                          <p className="font-['Poppins',Helvetica] font-medium text-sm text-[#222029]">
+                          <p className="text-xs text-chrome-silver/60">Email</p>
+                          <p className="font-['Poppins',Helvetica] font-medium text-sm text-chrome-silver">
                             {selectedCustomer.email}
                           </p>
                         </div>
@@ -248,10 +248,10 @@ export function Customers() {
                     )}
                     {selectedCustomer?.phone && (
                       <div className="flex items-center gap-3">
-                        <Phone className="w-5 h-5 text-gray-400" />
+                        <Phone className="w-5 h-5 text-chrome-silver/50" />
                         <div>
-                          <p className="text-xs text-gray-500">Phone</p>
-                          <p className="font-['Poppins',Helvetica] font-medium text-sm text-[#222029]">
+                          <p className="text-xs text-chrome-silver/60">Phone</p>
+                          <p className="font-['Poppins',Helvetica] font-medium text-sm text-chrome-silver">
                             {selectedCustomer.phone}
                           </p>
                         </div>
@@ -262,10 +262,10 @@ export function Customers() {
               </Card>
 
               {/* Vehicles Card */}
-              <Card>
+              <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="font-['Poppins',Helvetica] font-semibold text-lg text-[#222029]">
+                    <h3 className="font-['Poppins',Helvetica] font-semibold text-lg text-chrome-silver">
                       Vehicles
                     </h3>
                     {selectedCustomer?.garageId && (
@@ -279,35 +279,35 @@ export function Customers() {
                   {(customerVehicles ?? []).length === 0 ? (
                     <div className="text-center py-8">
                       <Car className="w-12 h-12 text-gray-300 mx-auto mb-2" />
-                      <p className="text-sm text-gray-500">No vehicles registered</p>
+                      <p className="text-sm text-chrome-silver/60">No vehicles registered</p>
                     </div>
                   ) : (
                     <div className="space-y-3">
                       {customerVehicles?.map((vehicle) => (
                         <div
                           key={vehicle.id}
-                          className="p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
+                          className="p-4 rounded-lg border border-dark-steel hover:bg-dark-steel/20 transition-colors"
                           data-testid={`vehicle-item-${vehicle.id}`}
                         >
                           <div className="flex items-start justify-between">
                             <div className="flex items-start gap-3 flex-1">
-                              <Car className="w-5 h-5 text-gray-400 mt-1" />
+                              <Car className="w-5 h-5 text-chrome-silver/50 mt-1" />
                               <div className="flex-1">
-                                <h4 className="font-['Poppins',Helvetica] font-semibold text-sm text-[#222029]">
+                                <h4 className="font-['Poppins',Helvetica] font-semibold text-sm text-chrome-silver">
                                   {vehicle.year} {vehicle.make} {vehicle.model}
                                 </h4>
-                                <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-xs text-gray-500">
+                                <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-xs text-chrome-silver/60">
                                   <span>License: {vehicle.licensePlate}</span>
                                   {vehicle.color && <span>Color: {vehicle.color}</span>}
                                   {vehicle.mileage && <span>Mileage: {vehicle.mileage.toLocaleString()} km</span>}
                                 </div>
                                 {vehicle.engineType && (
                                   <div className="mt-2 flex items-center gap-2">
-                                    <span className="px-2 py-1 bg-gray-100 rounded text-xs capitalize">
+                                    <span className="px-2 py-1 bg-dark-steel/30 rounded text-xs capitalize">
                                       {vehicle.engineType}
                                     </span>
                                     {vehicle.transmissionType && (
-                                      <span className="px-2 py-1 bg-gray-100 rounded text-xs capitalize">
+                                      <span className="px-2 py-1 bg-dark-steel/30 rounded text-xs capitalize">
                                         {vehicle.transmissionType}
                                       </span>
                                     )}
@@ -332,10 +332,10 @@ export function Customers() {
               </Card>
 
               {/* Notes Card */}
-              <Card>
+              <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="font-['Poppins',Helvetica] font-semibold text-lg text-[#222029]">
+                    <h3 className="font-['Poppins',Helvetica] font-semibold text-lg text-chrome-silver">
                       Notes & Communication
                     </h3>
                     <AddCustomerNoteDialog customerId={selectedCustomerId} />
@@ -344,20 +344,20 @@ export function Customers() {
                   {(customerNotes ?? []).length === 0 ? (
                     <div className="text-center py-8">
                       <MessageSquare className="w-12 h-12 text-gray-300 mx-auto mb-2" />
-                      <p className="text-sm text-gray-500">No notes available</p>
+                      <p className="text-sm text-chrome-silver/60">No notes available</p>
                     </div>
                   ) : (
                     <div className="space-y-3">
                       {customerNotes?.map((note) => (
                         <div
                           key={note.id}
-                          className="p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
+                          className="p-4 rounded-lg border border-dark-steel hover:bg-dark-steel/20 transition-colors"
                           data-testid={`note-item-${note.id}`}
                         >
                           <div className="flex items-start justify-between">
                             <div className="flex-1">
                               {note.subject && (
-                                <h4 className="font-['Poppins',Helvetica] font-semibold text-sm text-[#222029] mb-1">
+                                <h4 className="font-['Poppins',Helvetica] font-semibold text-sm text-chrome-silver mb-1">
                                   {note.subject}
                                 </h4>
                               )}
@@ -366,7 +366,7 @@ export function Customers() {
                                 <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs capitalize">
                                   {note.noteType}
                                 </span>
-                                <span className="text-xs text-gray-500">
+                                <span className="text-xs text-chrome-silver/60">
                                   {new Date(note.createdAt).toLocaleDateString()}
                                 </span>
                               </div>

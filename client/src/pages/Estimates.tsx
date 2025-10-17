@@ -43,13 +43,13 @@ export function Estimates() {
 
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
-      draft: "bg-gray-100 text-gray-800",
+      draft: "bg-dark-steel/30 text-gray-800",
       sent: "bg-blue-100 text-blue-800",
       accepted: "bg-green-100 text-green-800",
       declined: "bg-red-100 text-red-800",
-      expired: "bg-gray-100 text-gray-600",
+      expired: "bg-dark-steel/30 text-gray-600",
     };
-    return colors[status] || "bg-gray-100 text-gray-800";
+    return colors[status] || "bg-dark-steel/30 text-gray-800";
   };
 
   const filteredEstimates = (estimates ?? []).filter((estimate) => {
@@ -66,10 +66,10 @@ export function Estimates() {
     <div className="p-8">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="font-['Poppins',Helvetica] font-bold text-3xl text-[#222029]">
+          <h1 className="font-['Poppins',Helvetica] font-bold text-3xl text-chrome-silver">
             Estimates & Quotes
           </h1>
-          <p className="font-['Poppins',Helvetica] font-normal text-sm text-[#999999] mt-1">
+          <p className="font-['Poppins',Helvetica] font-normal text-sm text-chrome-silver/60 mt-1">
             Create and manage customer estimates
           </p>
         </div>
@@ -80,7 +80,7 @@ export function Estimates() {
 
       <div className="flex gap-4 mb-6">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-chrome-silver/50" />
           <Input
             placeholder="Search estimates..."
             className="pl-10"
@@ -118,12 +118,12 @@ export function Estimates() {
         </Select>
       </div>
 
-      <Card>
+      <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
         <CardContent className="p-6">
           {isLoading ? (
             <div className="text-center py-12">
               <div className="animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-4"></div>
-              <p className="text-gray-500">Loading estimates...</p>
+              <p className="text-chrome-silver/60">Loading estimates...</p>
             </div>
           ) : filteredEstimates.length === 0 ? (
             <div className="text-center py-12">
@@ -131,7 +131,7 @@ export function Estimates() {
               <h3 className="font-['Poppins',Helvetica] font-semibold text-lg text-gray-600 mb-2">
                 No Estimates
               </h3>
-              <p className="text-sm text-gray-400 mb-4">
+              <p className="text-sm text-chrome-silver/50 mb-4">
                 {searchTerm
                   ? "No estimates match your search"
                   : "Create your first estimate to start quoting customers"}
@@ -144,16 +144,16 @@ export function Estimates() {
                 const customer = customers?.find(c => c.id === estimate.customerId);
                 return (
                   <EstimateDetailsDialog key={estimate.id} estimateId={estimate.id}>
-                    <Card className="p-4 cursor-pointer hover:shadow-md transition-shadow" data-testid={`card-estimate-${estimate.id}`}>
+                    <Card className="bg-midnight-blue border-dark-steel p-4 cursor-pointer hover:shadow-md transition-shadow" data-testid={`card-estimate-${estimate.id}`}>
                       <div className="flex items-center justify-between">
                         <div className="flex-1">
                           <div className="flex items-center gap-3">
-                            <FileText className="w-5 h-5 text-gray-400" />
+                            <FileText className="w-5 h-5 text-chrome-silver/50" />
                             <div>
-                              <p className="font-['Poppins',Helvetica] font-semibold text-sm text-[#222029]" data-testid={`text-estimate-number-${estimate.id}`}>
+                              <p className="font-['Poppins',Helvetica] font-semibold text-sm text-chrome-silver" data-testid={`text-estimate-number-${estimate.id}`}>
                                 {estimate.estimateNumber}
                               </p>
-                              <p className="font-['Poppins',Helvetica] font-normal text-xs text-[#999999]" data-testid={`text-customer-${estimate.id}`}>
+                              <p className="font-['Poppins',Helvetica] font-normal text-xs text-chrome-silver/60" data-testid={`text-customer-${estimate.id}`}>
                                 {customer?.fullName || "Unknown Customer"}
                               </p>
                             </div>
@@ -161,11 +161,11 @@ export function Estimates() {
                         </div>
                         <div className="flex items-center gap-4">
                           <div className="text-right">
-                            <p className="font-['Poppins',Helvetica] font-bold text-sm text-[#222029]" data-testid={`text-amount-${estimate.id}`}>
+                            <p className="font-['Poppins',Helvetica] font-bold text-sm text-chrome-silver" data-testid={`text-amount-${estimate.id}`}>
                               ${estimate.totalAmount}
                             </p>
                             {estimate.validUntil && (
-                              <p className="font-['Poppins',Helvetica] font-normal text-xs text-[#999999]">
+                              <p className="font-['Poppins',Helvetica] font-normal text-xs text-chrome-silver/60">
                                 Valid until {new Date(estimate.validUntil).toLocaleDateString()}
                               </p>
                             )}

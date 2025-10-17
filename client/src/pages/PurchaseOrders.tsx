@@ -118,13 +118,13 @@ export function PurchaseOrders() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'draft': return 'bg-gray-100 text-gray-700';
+      case 'draft': return 'bg-dark-steel/30 text-gray-700';
       case 'sent': return 'bg-blue-100 text-blue-700';
       case 'confirmed': return 'bg-purple-100 text-purple-700';
       case 'partial': return 'bg-yellow-100 text-yellow-700';
       case 'received': return 'bg-green-100 text-green-700';
       case 'cancelled': return 'bg-red-100 text-red-700';
-      default: return 'bg-gray-100 text-gray-700';
+      default: return 'bg-dark-steel/30 text-gray-700';
     }
   };
 
@@ -146,10 +146,10 @@ export function PurchaseOrders() {
     <div className="p-8">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="font-['Poppins',Helvetica] font-bold text-3xl text-[#222029]">
+          <h1 className="font-['Poppins',Helvetica] font-bold text-3xl text-chrome-silver">
             Purchase Orders
           </h1>
-          <p className="font-['Poppins',Helvetica] font-normal text-sm text-[#999999] mt-1">
+          <p className="font-['Poppins',Helvetica] font-normal text-sm text-chrome-silver/60 mt-1">
             Manage purchase orders and track supplier deliveries
           </p>
         </div>
@@ -160,7 +160,7 @@ export function PurchaseOrders() {
       </div>
 
       {/* Filters */}
-      <Card className="mb-6">
+      <Card className="bg-midnight-blue border-dark-steel mb-6">
         <CardContent className="pt-6">
           <div className="flex gap-4">
             <div className="w-[250px]">
@@ -205,22 +205,22 @@ export function PurchaseOrders() {
       {/* Summary Cards */}
       {!isLoading && purchaseOrders && purchaseOrders.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <Card>
+          <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-500">Total Orders</p>
+                  <p className="text-sm text-chrome-silver/60">Total Orders</p>
                   <p className="text-2xl font-bold text-gray-900">{purchaseOrders.length}</p>
                 </div>
                 <ShoppingCart className="w-8 h-8 text-blue-600" />
               </div>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-500">Pending</p>
+                  <p className="text-sm text-chrome-silver/60">Pending</p>
                   <p className="text-2xl font-bold text-yellow-600">
                     {purchaseOrders.filter(po => ['draft', 'sent'].includes(po.status)).length}
                   </p>
@@ -229,11 +229,11 @@ export function PurchaseOrders() {
               </div>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-500">Confirmed</p>
+                  <p className="text-sm text-chrome-silver/60">Confirmed</p>
                   <p className="text-2xl font-bold text-purple-600">
                     {purchaseOrders.filter(po => po.status === 'confirmed').length}
                   </p>
@@ -242,11 +242,11 @@ export function PurchaseOrders() {
               </div>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-500">Total Value</p>
+                  <p className="text-sm text-chrome-silver/60">Total Value</p>
                   <p className="text-2xl font-bold text-green-600">
                     ${purchaseOrders.reduce((sum, po) => sum + parseFloat(po.totalAmount), 0).toFixed(2)}
                   </p>
@@ -259,7 +259,7 @@ export function PurchaseOrders() {
       )}
 
       {/* Purchase Orders List */}
-      <Card>
+      <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
         <CardContent className="p-6">
           {isLoading ? (
             <div className="space-y-4">
@@ -275,7 +275,7 @@ export function PurchaseOrders() {
               <h3 className="font-['Poppins',Helvetica] font-semibold text-lg text-gray-600 mb-2">
                 No Purchase Orders
               </h3>
-              <p className="text-sm text-gray-400 mb-4">
+              <p className="text-sm text-chrome-silver/50 mb-4">
                 Create your first purchase order to start managing inventory
               </p>
               <CreatePurchaseOrderDialog />
@@ -284,35 +284,35 @@ export function PurchaseOrders() {
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-gray-200">
-                    <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-semibold text-sm text-[#222029]">
+                  <tr className="border-b border-dark-steel">
+                    <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-semibold text-sm text-chrome-silver">
                       PO Number
                     </th>
-                    <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-semibold text-sm text-[#222029]">
+                    <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-semibold text-sm text-chrome-silver">
                       Supplier
                     </th>
-                    <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-semibold text-sm text-[#222029]">
+                    <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-semibold text-sm text-chrome-silver">
                       Order Date
                     </th>
-                    <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-semibold text-sm text-[#222029]">
+                    <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-semibold text-sm text-chrome-silver">
                       Expected Delivery
                     </th>
-                    <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-semibold text-sm text-[#222029]">
+                    <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-semibold text-sm text-chrome-silver">
                       Total Amount
                     </th>
-                    <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-semibold text-sm text-[#222029]">
+                    <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-semibold text-sm text-chrome-silver">
                       Status
                     </th>
-                    <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-semibold text-sm text-[#222029]">
+                    <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-semibold text-sm text-chrome-silver">
                       Actions
                     </th>
                   </tr>
                 </thead>
                 <tbody>
                   {purchaseOrders?.map((po) => (
-                    <tr key={po.id} className="border-b border-gray-100 hover:bg-gray-50" data-testid={`po-row-${po.id}`}>
+                    <tr key={po.id} className="border-b border-gray-100 hover:bg-dark-steel/20" data-testid={`po-row-${po.id}`}>
                       <td className="py-3 px-4">
-                        <span className="font-['Poppins',Helvetica] font-medium text-sm text-[#222029]">
+                        <span className="font-['Poppins',Helvetica] font-medium text-sm text-chrome-silver">
                           {po.poNumber}
                         </span>
                       </td>
@@ -332,7 +332,7 @@ export function PurchaseOrders() {
                         </span>
                       </td>
                       <td className="py-3 px-4">
-                        <span className="font-['Poppins',Helvetica] font-semibold text-sm text-[#222029]">
+                        <span className="font-['Poppins',Helvetica] font-semibold text-sm text-chrome-silver">
                           ${parseFloat(po.totalAmount).toFixed(2)}
                         </span>
                       </td>

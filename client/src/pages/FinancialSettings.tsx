@@ -236,11 +236,11 @@ export default function FinancialSettings() {
   };
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-8 bg-gray-800 min-h-screen space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold" data-testid="text-page-title">Financial Settings</h1>
-          <p className="text-muted-foreground" data-testid="text-page-description">
+          <h1 className="font-['Poppins',Helvetica] font-bold text-3xl text-chrome-silver" data-testid="text-page-title">Financial Settings</h1>
+          <p className="text-chrome-silver/60" data-testid="text-page-description">
             Manage tax configurations, discounts, and promotions
           </p>
         </div>
@@ -265,11 +265,11 @@ export default function FinancialSettings() {
         </TabsList>
 
         <TabsContent value="taxes" className="space-y-4">
-          <Card>
+          <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
-                <CardTitle>Tax Configurations</CardTitle>
-                <CardDescription>Configure automatic tax calculations for your garage</CardDescription>
+                <CardTitle className="text-chrome-silver">Tax Configurations</CardTitle>
+                <CardDescription className="text-chrome-silver/60">Configure automatic tax calculations for your garage</CardDescription>
               </div>
               <Dialog open={taxDialogOpen} onOpenChange={setTaxDialogOpen}>
                 <DialogTrigger asChild>
@@ -352,20 +352,20 @@ export default function FinancialSettings() {
             </CardHeader>
             <CardContent>
               {taxLoading ? (
-                <div className="text-center py-8 text-muted-foreground">Loading...</div>
+                <div className="text-center py-8 text-chrome-silver/60">Loading...</div>
               ) : taxConfigs.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground" data-testid="text-no-taxes">
+                <div className="text-center py-8 text-chrome-silver/60" data-testid="text-no-taxes">
                   No tax configurations found. Add one to get started.
                 </div>
               ) : (
                 <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Tax Name</TableHead>
-                      <TableHead>Rate</TableHead>
-                      <TableHead>Category</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Actions</TableHead>
+                  <TableHeader className="bg-dark-steel/30">
+                    <TableRow className="border-b border-dark-steel/50 hover:bg-dark-steel/20">
+                      <TableHead className="text-chrome-silver">Tax Name</TableHead>
+                      <TableHead className="text-chrome-silver">Rate</TableHead>
+                      <TableHead className="text-chrome-silver">Category</TableHead>
+                      <TableHead className="text-chrome-silver">Status</TableHead>
+                      <TableHead className="text-chrome-silver">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -374,12 +374,12 @@ export default function FinancialSettings() {
                         <TableCell className="font-medium" data-testid={`text-tax-name-${tax.id}`}>{tax.taxName}</TableCell>
                         <TableCell data-testid={`text-tax-rate-${tax.id}`}>{tax.taxRate}%</TableCell>
                         <TableCell data-testid={`text-tax-category-${tax.id}`}>{tax.category || "All"}</TableCell>
-                        <TableCell>
+                        <TableCell className="text-chrome-silver">
                           <Badge variant={tax.isActive ? "default" : "secondary"} data-testid={`badge-tax-status-${tax.id}`}>
                             {tax.isActive ? "Active" : "Inactive"}
                           </Badge>
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="text-chrome-silver">
                           <div className="flex gap-2">
                             <Button variant="ghost" size="sm" onClick={() => handleEditTax(tax)} data-testid={`button-edit-tax-${tax.id}`}>
                               <Edit className="h-4 w-4" />
@@ -399,11 +399,11 @@ export default function FinancialSettings() {
         </TabsContent>
 
         <TabsContent value="discounts" className="space-y-4">
-          <Card>
+          <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
-                <CardTitle>Discounts & Promotions</CardTitle>
-                <CardDescription>Create and manage discount codes and promotional campaigns</CardDescription>
+                <CardTitle className="text-chrome-silver">Discounts & Promotions</CardTitle>
+                <CardDescription className="text-chrome-silver/60">Create and manage discount codes and promotional campaigns</CardDescription>
               </div>
               <Dialog open={discountDialogOpen} onOpenChange={setDiscountDialogOpen}>
                 <DialogTrigger asChild>
@@ -516,7 +516,7 @@ export default function FinancialSettings() {
                               <Popover>
                                 <PopoverTrigger asChild>
                                   <FormControl>
-                                    <Button variant="outline" className={cn("pl-3 text-left font-normal", !field.value && "text-muted-foreground")} data-testid="button-discount-valid-from">
+                                    <Button variant="outline" className={cn("pl-3 text-left font-normal", !field.value && "text-chrome-silver/60")} data-testid="button-discount-valid-from">
                                       {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
                                       <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                                     </Button>
@@ -539,7 +539,7 @@ export default function FinancialSettings() {
                               <Popover>
                                 <PopoverTrigger asChild>
                                   <FormControl>
-                                    <Button variant="outline" className={cn("pl-3 text-left font-normal", !field.value && "text-muted-foreground")} data-testid="button-discount-valid-to">
+                                    <Button variant="outline" className={cn("pl-3 text-left font-normal", !field.value && "text-chrome-silver/60")} data-testid="button-discount-valid-to">
                                       {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
                                       <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                                     </Button>
@@ -639,22 +639,22 @@ export default function FinancialSettings() {
             </CardHeader>
             <CardContent>
               {discountsLoading ? (
-                <div className="text-center py-8 text-muted-foreground">Loading...</div>
+                <div className="text-center py-8 text-chrome-silver/60">Loading...</div>
               ) : discounts.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground" data-testid="text-no-discounts">
+                <div className="text-center py-8 text-chrome-silver/60" data-testid="text-no-discounts">
                   No discounts found. Create one to get started.
                 </div>
               ) : (
                 <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Code</TableHead>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Type</TableHead>
-                      <TableHead>Value</TableHead>
-                      <TableHead>Valid Period</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Actions</TableHead>
+                  <TableHeader className="bg-dark-steel/30">
+                    <TableRow className="border-b border-dark-steel/50 hover:bg-dark-steel/20">
+                      <TableHead className="text-chrome-silver">Code</TableHead>
+                      <TableHead className="text-chrome-silver">Name</TableHead>
+                      <TableHead className="text-chrome-silver">Type</TableHead>
+                      <TableHead className="text-chrome-silver">Value</TableHead>
+                      <TableHead className="text-chrome-silver">Valid Period</TableHead>
+                      <TableHead className="text-chrome-silver">Status</TableHead>
+                      <TableHead className="text-chrome-silver">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -664,7 +664,7 @@ export default function FinancialSettings() {
                           {discount.code}
                         </TableCell>
                         <TableCell data-testid={`text-discount-name-${discount.id}`}>{discount.name}</TableCell>
-                        <TableCell>
+                        <TableCell className="text-chrome-silver">
                           <Badge variant="outline" data-testid={`badge-discount-type-${discount.id}`}>
                             {discount.discountType === "percentage" ? <Percent className="h-3 w-3 mr-1" /> : <DollarSign className="h-3 w-3 mr-1" />}
                             {discount.discountType}
@@ -676,12 +676,12 @@ export default function FinancialSettings() {
                         <TableCell className="text-sm" data-testid={`text-discount-period-${discount.id}`}>
                           {format(new Date(discount.validFrom), "MMM dd")} - {format(new Date(discount.validTo), "MMM dd, yyyy")}
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="text-chrome-silver">
                           <Badge variant={discount.isActive ? "default" : "secondary"} data-testid={`badge-discount-status-${discount.id}`}>
                             {discount.isActive ? "Active" : "Inactive"}
                           </Badge>
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="text-chrome-silver">
                           <div className="flex gap-2">
                             <Button variant="ghost" size="sm" onClick={() => handleEditDiscount(discount)} data-testid={`button-edit-discount-${discount.id}`}>
                               <Edit className="h-4 w-4" />

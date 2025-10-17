@@ -68,7 +68,7 @@ export function TechnicianPortal() {
       case 'in_progress': return 'bg-purple-100 text-purple-800';
       case 'completed': return 'bg-green-100 text-green-800';
       case 'cancelled': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
+      default: return 'bg-dark-steel/30 text-gray-800';
     }
   };
 
@@ -78,7 +78,7 @@ export function TechnicianPortal() {
       case 'high': return 'bg-orange-100 text-orange-800';
       case 'medium': return 'bg-yellow-100 text-yellow-800';
       case 'low': return 'bg-green-100 text-green-800';
-      default: return 'bg-gray-100 text-gray-800';
+      default: return 'bg-dark-steel/30 text-gray-800';
     }
   };
 
@@ -119,7 +119,7 @@ export function TechnicianPortal() {
 
       {/* Profile Card */}
       {technicianProfile && (
-        <Card className="mb-8" data-testid="card-profile">
+        <Card className="bg-midnight-blue border-dark-steel mb-8" data-testid="card-profile">
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
@@ -213,11 +213,11 @@ export function TechnicianPortal() {
         <Card data-testid="stat-total-jobs">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Jobs</CardTitle>
-            <Wrench className="h-4 w-4 text-muted-foreground" />
+            <Wrench className="h-4 w-4 text-chrome-silver/60" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.total}</div>
-            <p className="text-xs text-muted-foreground">All assigned work</p>
+            <p className="text-xs text-chrome-silver/60">All assigned work</p>
           </CardContent>
         </Card>
 
@@ -228,7 +228,7 @@ export function TechnicianPortal() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.pending}</div>
-            <p className="text-xs text-muted-foreground">Waiting to start</p>
+            <p className="text-xs text-chrome-silver/60">Waiting to start</p>
           </CardContent>
         </Card>
 
@@ -239,7 +239,7 @@ export function TechnicianPortal() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.inProgress}</div>
-            <p className="text-xs text-muted-foreground">Currently working</p>
+            <p className="text-xs text-chrome-silver/60">Currently working</p>
           </CardContent>
         </Card>
 
@@ -250,7 +250,7 @@ export function TechnicianPortal() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.completed}</div>
-            <p className="text-xs text-muted-foreground">Finished jobs</p>
+            <p className="text-xs text-chrome-silver/60">Finished jobs</p>
           </CardContent>
         </Card>
       </div>
@@ -260,9 +260,9 @@ export function TechnicianPortal() {
         <h2 className="text-xl font-semibold text-gray-900">My Assigned Jobs</h2>
         
         {!jobCards || jobCards.length === 0 ? (
-          <Card>
+          <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
             <CardContent className="flex flex-col items-center justify-center py-12">
-              <Wrench className="h-12 w-12 text-gray-400 mb-4" />
+              <Wrench className="h-12 w-12 text-chrome-silver/50 mb-4" />
               <h3 className="text-lg font-semibold text-gray-900 mb-2">No Jobs Assigned</h3>
               <p className="text-gray-600 text-center">
                 You don't have any jobs assigned to you at the moment.
@@ -277,7 +277,7 @@ export function TechnicianPortal() {
                   <div className="flex items-start justify-between">
                     <div className="space-y-1">
                       <CardTitle className="text-lg">{job.jobNumber}</CardTitle>
-                      <CardDescription>{job.description}</CardDescription>
+                      <CardDescription className="text-chrome-silver/60">{job.description}</CardDescription>
                     </div>
                     <div className="flex gap-2">
                       <Badge className={getPriorityColor(job.priority)} data-testid={`badge-priority-${job.id}`}>
@@ -293,7 +293,7 @@ export function TechnicianPortal() {
                   <div className="space-y-4">
                     {/* Vehicle Info */}
                     <div className="flex items-center gap-2 text-sm">
-                      <UserIcon className="h-4 w-4 text-gray-500" />
+                      <UserIcon className="h-4 w-4 text-chrome-silver/60" />
                       <span className="font-medium">Vehicle:</span>
                       <span className="text-gray-600">
                         {(job.vehicleInfo as any)?.year} {(job.vehicleInfo as any)?.make} {(job.vehicleInfo as any)?.model} - {(job.vehicleInfo as any)?.licensePlate}
@@ -302,20 +302,20 @@ export function TechnicianPortal() {
 
                     {/* Service Type */}
                     <div className="flex items-center gap-2 text-sm">
-                      <Wrench className="h-4 w-4 text-gray-500" />
+                      <Wrench className="h-4 w-4 text-chrome-silver/60" />
                       <span className="font-medium">Service:</span>
                       <span className="text-gray-600 capitalize">{job.serviceType.replace('_', ' ')}</span>
                     </div>
 
                     {/* Time Info */}
                     <div className="flex items-center gap-2 text-sm">
-                      <Clock className="h-4 w-4 text-gray-500" />
+                      <Clock className="h-4 w-4 text-chrome-silver/60" />
                       <span className="font-medium">Est. Time:</span>
                       <span className="text-gray-600">{job.estimatedHours} hours</span>
                       {job.scheduledDate && (
                         <>
                           <span className="mx-2">•</span>
-                          <Calendar className="h-4 w-4 text-gray-500" />
+                          <Calendar className="h-4 w-4 text-chrome-silver/60" />
                           <span className="font-medium">Scheduled:</span>
                           <span className="text-gray-600">
                             {new Date(job.scheduledDate).toLocaleDateString()}

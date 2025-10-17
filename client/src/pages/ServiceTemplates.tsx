@@ -187,7 +187,7 @@ export default function ServiceTemplates() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Service Templates</h1>
+        <h1 className="font-['Poppins',Helvetica] font-bold text-3xl text-chrome-silver">Service Templates</h1>
         <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
           <DialogTrigger asChild>
             <Button data-testid="button-create-template">
@@ -407,7 +407,7 @@ export default function ServiceTemplates() {
       {/* Templates Grid */}
       {activeLoading ? (
         <div className="text-center py-12">
-          <p className="text-muted-foreground">Loading templates...</p>
+          <p className="text-chrome-silver/60">Loading templates...</p>
         </div>
       ) : filteredTemplates && filteredTemplates.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -422,9 +422,9 @@ export default function ServiceTemplates() {
                     </Badge>
                   </div>
                   {template.description && (
-                    <p className="text-sm text-muted-foreground line-clamp-2">{template.description}</p>
+                    <p className="text-sm text-chrome-silver/60 line-clamp-2">{template.description}</p>
                   )}
-                  <div className="flex gap-4 text-sm text-muted-foreground">
+                  <div className="flex gap-4 text-sm text-chrome-silver/60">
                     <div className="flex items-center gap-1">
                       <Clock className="h-4 w-4" />
                       <span>{template.estimatedHours || 0}h</span>
@@ -440,7 +440,7 @@ export default function ServiceTemplates() {
                         <CheckCircle className="h-3 w-3 mr-1" /> Active
                       </Badge>
                     ) : (
-                      <Badge variant="outline" className="bg-gray-50 text-gray-700 dark:bg-gray-950 dark:text-gray-300">
+                      <Badge variant="outline" className="bg-dark-steel/20 text-gray-700 dark:bg-gray-950 dark:text-gray-300">
                         <XCircle className="h-3 w-3 mr-1" /> Inactive
                       </Badge>
                     )}
@@ -452,8 +452,8 @@ export default function ServiceTemplates() {
         </div>
       ) : (
         <div className="text-center py-12">
-          <p className="text-muted-foreground">No service templates found</p>
-          <p className="text-sm text-muted-foreground mt-2">Create your first template to get started</p>
+          <p className="text-chrome-silver/60">No service templates found</p>
+          <p className="text-sm text-chrome-silver/60 mt-2">Create your first template to get started</p>
         </div>
       )}
 
@@ -473,7 +473,7 @@ export default function ServiceTemplates() {
               {selectedTemplate.description && (
                 <div>
                   <h4 className="font-semibold mb-2">Description</h4>
-                  <p className="text-sm text-muted-foreground">{selectedTemplate.description}</p>
+                  <p className="text-sm text-chrome-silver/60">{selectedTemplate.description}</p>
                 </div>
               )}
               <div className="grid grid-cols-2 gap-4">
@@ -493,12 +493,12 @@ export default function ServiceTemplates() {
                     (selectedTemplate.taskSteps as any[]).map((step: any, index: number) => (
                       <Card key={index} className="p-3">
                         <p className="font-medium">{index + 1}. {step.stepName}</p>
-                        {step.description && <p className="text-sm text-muted-foreground mt-1">{step.description}</p>}
-                        {step.estimatedMinutes && <p className="text-xs text-muted-foreground mt-1">~{step.estimatedMinutes} minutes</p>}
+                        {step.description && <p className="text-sm text-chrome-silver/60 mt-1">{step.description}</p>}
+                        {step.estimatedMinutes && <p className="text-xs text-chrome-silver/60 mt-1">~{step.estimatedMinutes} minutes</p>}
                       </Card>
                     ))
                   ) : (
-                    <p className="text-sm text-muted-foreground">No task steps defined</p>
+                    <p className="text-sm text-chrome-silver/60">No task steps defined</p>
                   )}
                 </div>
               </div>
