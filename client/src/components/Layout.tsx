@@ -155,7 +155,7 @@ export function Layout({ children }: LayoutProps) {
   return (
     <>
       <SkipLink />
-      <div className="flex h-screen bg-gray-900">
+      <div className="flex h-screen bg-dark-navy">
         {/* Mobile Menu Overlay */}
         {mobileMenuOpen && (
           <div 
@@ -168,15 +168,15 @@ export function Layout({ children }: LayoutProps) {
           />
         )}
 
-      {/* Sidebar - SALIS AUTO Midnight Blue */}
+      {/* Sidebar - SALIS AUTO Dark Navy */}
       <aside className={`
         fixed lg:static inset-y-0 left-0 z-50
-        w-64 bg-midnight-blue border-r border-dark-steel flex flex-col
+        w-64 bg-dark-navy border-r border-neon-blue/30 flex flex-col
         transition-transform duration-300 ease-in-out
         ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
         {/* Logo - SALIS AUTO Brand */}
-        <div className="p-6 border-b border-dark-steel">
+        <div className="p-6 border-b border-neon-blue/30">
           <Link href="/dashboard">
             <img 
               src="/attached_assets/Logo_blue_orange_1760743036292.png" 
@@ -204,14 +204,14 @@ export function Layout({ children }: LayoutProps) {
                     className="w-full"
                     data-testid={`nav-group-${group.label.toLowerCase().replace(/\s+/g, '-')}`}
                   >
-                    <div className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-dark-steel/50 transition-colors group">
-                      <span className="font-poppins font-semibold text-xs uppercase text-chrome-silver/70 tracking-wide">
+                    <div className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-neon-blue/10 transition-colors group">
+                      <span className="font-poppins font-semibold text-xs uppercase text-soft-white/70 tracking-wide">
                         {group.label}
                       </span>
                       {isExpanded ? (
-                        <ChevronDown className="w-4 h-4 text-chrome-silver/50 group-hover:text-chrome-silver" />
+                        <ChevronDown className="w-4 h-4 text-soft-white/50 group-hover:text-soft-white" />
                       ) : (
-                        <ChevronRight className="w-4 h-4 text-chrome-silver/50 group-hover:text-chrome-silver" />
+                        <ChevronRight className="w-4 h-4 text-soft-white/50 group-hover:text-soft-white" />
                       )}
                     </div>
                   </CollapsibleTrigger>
@@ -226,8 +226,8 @@ export function Layout({ children }: LayoutProps) {
                           <div
                             className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-200 cursor-pointer ml-2 ${
                               isActive
-                                ? 'bg-electric-blue text-white shadow-lg shadow-electric-blue/20'
-                                : 'text-chrome-silver hover:bg-dark-steel/50 hover:text-white'
+                                ? 'bg-electric-blue text-dark-navy shadow-lg shadow-electric-blue/30'
+                                : 'text-soft-white hover:bg-neon-blue/10 hover:text-electric-blue'
                             }`}
                             data-testid={`nav-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
                           >
@@ -247,11 +247,11 @@ export function Layout({ children }: LayoutProps) {
         </nav>
 
         {/* Logout */}
-        <div className="p-4 border-t border-dark-steel">
+        <div className="p-4 border-t border-neon-blue/30">
           <Button
             onClick={handleLogout}
             variant="ghost"
-            className="w-full justify-start text-tech-orange hover:text-tech-orange/80 hover:bg-dark-steel/50"
+            className="w-full justify-start text-brand-orange hover:text-brand-orange/80 hover:bg-neon-blue/10"
             data-testid="button-logout"
           >
             <LogOut className="w-5 h-5 mr-3" />
@@ -263,12 +263,12 @@ export function Layout({ children }: LayoutProps) {
       {/* Main Content */}
       <div className="flex-1 flex flex-col lg:ml-0">
         {/* Header - Dark with Electric Blue accents */}
-        <header className="h-16 bg-gray-900 border-b border-dark-steel px-4 sm:px-8 flex items-center gap-4 shadow-sm">
+        <header className="h-16 bg-dark-navy border-b border-neon-blue/30 px-4 sm:px-8 flex items-center gap-4 shadow-sm">
           {/* Mobile Menu Toggle */}
           <Button
             variant="ghost"
             size="icon"
-            className="lg:hidden text-chrome-silver hover:text-electric-blue"
+            className="lg:hidden text-soft-white hover:text-electric-blue"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label="Toggle mobile menu"
             data-testid="button-mobile-menu"
@@ -280,23 +280,23 @@ export function Layout({ children }: LayoutProps) {
           
           {/* Search Bar - Hidden on small screens */}
           <div className="hidden md:block relative w-full max-w-md">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-chrome-silver" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-soft-white/70" />
             <Input
               type="text"
               placeholder="Search..."
-              className="pl-10 bg-dark-steel border-dark-steel text-chrome-silver placeholder:text-chrome-silver/50 focus:border-electric-blue focus:ring-electric-blue font-poppins"
+              className="pl-10 bg-neon-blue/10 border-neon-blue/30 text-soft-white placeholder:text-soft-white/50 focus:border-electric-blue focus:ring-electric-blue font-poppins"
               data-testid="input-search"
             />
           </div>
           <Button
             variant="outline"
             onClick={() => setQuickActionsOpen(true)}
-            className="gap-2 border-electric-blue text-electric-blue hover:bg-electric-blue hover:text-midnight-blue transition-colors font-poppins"
+            className="gap-2 border-electric-blue text-electric-blue hover:bg-electric-blue hover:text-dark-navy transition-colors font-poppins"
             data-testid="button-quick-actions"
           >
             <Zap className="w-4 h-4" />
             <span className="hidden sm:inline">Quick Actions</span>
-            <kbd className="hidden sm:inline-flex px-1.5 py-0.5 bg-dark-steel border border-chrome-silver/20 rounded text-xs font-mono text-chrome-silver">
+            <kbd className="hidden sm:inline-flex px-1.5 py-0.5 bg-neon-blue/10 border border-neon-blue/30 rounded text-xs font-mono text-soft-white">
               {navigator.platform.includes("Mac") ? "⌘K" : "Ctrl+K"}
             </kbd>
           </Button>

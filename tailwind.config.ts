@@ -10,20 +10,18 @@ module.exports = {
         // SALIS AUTO New Brand Colors
         "brand-blue": "#0055b4",
         "brand-orange": "#ce5c17",
-        "navy-900": "#0A0F1C",
-        "navy-800": "#1F6FFF",
         "soft-white": "#eaf2ff",
         // New Tech Blue Palette
+        "dark-navy": "#0A0F1C",
         "electric-blue": "#00BFFF",
         "cyber-blue": "#008CFF",
         "neon-blue": "#1F6FFF",
-        "dark-navy": "#0A0F1C",
         "teal-glow": "#00E0FF",
+        "chrome-silver": "#C0C0C0",
+        "dark-steel": "#3C3C3C",
         // Legacy color aliases for backward compatibility
         "midnight-blue": "#0A0F1C",
         "sky-blue": "#00BFFF",
-        "chrome-silver": "#eaf2ff",
-        "dark-steel": "#1F6FFF",
         "tech-orange": "#ce5c17",
         "deep-teal": "#00E0FF",
         "accent-100": "var(--accent-100)",
