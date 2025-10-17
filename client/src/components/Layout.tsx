@@ -1,4 +1,4 @@
-import { Home, ClipboardCheck, UserIcon, LogOut, Search, Calendar, Users, ShoppingCart, FileText, BarChart3, Wrench, ClipboardList, Hammer, Package, Building2, HardHat, UserCog, Zap, Car, Receipt, Warehouse, DollarSign, RotateCcw, DatabaseBackup, TrendingUp, UserCheck, Brain, Plug2, Shield, Settings as SettingsIcon, Menu, X } from "lucide-react";
+import { Home, ClipboardCheck, UserIcon, LogOut, Search, Calendar, Users, ShoppingCart, FileText, BarChart3, Wrench, ClipboardList, Hammer, Package, Building2, HardHat, UserCog, Zap, Car, Receipt, Warehouse, DollarSign, RotateCcw, DatabaseBackup, TrendingUp, UserCheck, Brain, Plug2, Shield, Settings as SettingsIcon, Menu, X, ChevronDown, ChevronRight } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,6 +7,7 @@ import { NotificationBell } from "@/components/NotificationBell";
 import { QuickActionsModal } from "@/components/QuickActionsModal";
 import { SkipLink } from "@/components/SkipLink";
 import { OfflineIndicator } from "@/components/OfflineIndicator";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useState, useEffect } from "react";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { useQuery } from "@tanstack/react-query";
@@ -51,36 +52,105 @@ export function Layout({ children }: LayoutProps) {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  const navItems = [
-    { path: "/dashboard", icon: Home, label: "Dashboard" },
-    { path: "/calendar", icon: Calendar, label: "Scheduling & Calendar" },
-    { path: "/tasks", icon: ClipboardCheck, label: "Tasks Management" },
-    { path: "/job-cards", icon: Wrench, label: "Job Cards" },
-    { path: "/technician-portal", icon: HardHat, label: "Technician Portal" },
-    { path: "/technician-management", icon: UserCog, label: "Technician Management" },
-    { path: "/service-templates", icon: ClipboardList, label: "Service Templates" },
-    { path: "/tools", icon: Hammer, label: "Tools Management" },
-    { path: "/spare-parts", icon: Package, label: "Spare Parts" },
-    { path: "/inventory-management", icon: Warehouse, label: "Inventory & Parts" },
-    { path: "/suppliers", icon: Building2, label: "Suppliers" },
-    { path: "/appointments", icon: Calendar, label: "Appointments" },
-    { path: "/customers", icon: Users, label: "Customers" },
-    { path: "/vehicles", icon: Car, label: "Vehicles" },
-    { path: "/purchase-orders", icon: ShoppingCart, label: "Purchase Orders" },
-    { path: "/invoices", icon: FileText, label: "Invoices" },
-    { path: "/estimates", icon: Receipt, label: "Estimates" },
-    { path: "/financial-settings", icon: DollarSign, label: "Financial Settings" },
-    { path: "/refund-management", icon: RotateCcw, label: "Refund Management" },
-    { path: "/data-import-export", icon: DatabaseBackup, label: "Data Import/Export" },
-    { path: "/business-intelligence", icon: TrendingUp, label: "Business Intelligence" },
-    { path: "/hr-management", icon: UserCheck, label: "HR Management" },
-    { path: "/ai-automation", icon: Brain, label: "AI Automation" },
-    { path: "/integrations", icon: Plug2, label: "Integrations" },
-    { path: "/security", icon: Shield, label: "Security & Compliance" },
-    { path: "/settings", icon: SettingsIcon, label: "Settings" },
-    { path: "/reports", icon: BarChart3, label: "Reports" },
-    { path: "/profile", icon: UserIcon, label: "My Profile" },
+  // Organized navigation groups
+  const navGroups = [
+    {
+      label: "Dashboard & Overview",
+      items: [
+        { path: "/dashboard", icon: Home, label: "Dashboard" },
+      ]
+    },
+    {
+      label: "Operations & Scheduling",
+      items: [
+        { path: "/calendar", icon: Calendar, label: "Scheduling & Calendar" },
+        { path: "/appointments", icon: Calendar, label: "Appointments" },
+        { path: "/tasks", icon: ClipboardCheck, label: "Tasks Management" },
+      ]
+    },
+    {
+      label: "Job Management",
+      items: [
+        { path: "/job-cards", icon: Wrench, label: "Job Cards" },
+        { path: "/service-templates", icon: ClipboardList, label: "Service Templates" },
+        { path: "/technician-portal", icon: HardHat, label: "Technician Portal" },
+      ]
+    },
+    {
+      label: "Staff & Technicians",
+      items: [
+        { path: "/technician-management", icon: UserCog, label: "Technician Management" },
+        { path: "/hr-management", icon: UserCheck, label: "HR Management" },
+      ]
+    },
+    {
+      label: "Inventory & Parts",
+      items: [
+        { path: "/inventory-management", icon: Warehouse, label: "Inventory & Parts" },
+        { path: "/spare-parts", icon: Package, label: "Spare Parts" },
+        { path: "/tools", icon: Hammer, label: "Tools Management" },
+        { path: "/suppliers", icon: Building2, label: "Suppliers" },
+      ]
+    },
+    {
+      label: "Orders & Purchasing",
+      items: [
+        { path: "/purchase-orders", icon: ShoppingCart, label: "Purchase Orders" },
+        { path: "/estimates", icon: Receipt, label: "Estimates" },
+      ]
+    },
+    {
+      label: "Customers & Vehicles",
+      items: [
+        { path: "/customers", icon: Users, label: "Customers" },
+        { path: "/vehicles", icon: Car, label: "Vehicles" },
+      ]
+    },
+    {
+      label: "Financial Management",
+      items: [
+        { path: "/invoices", icon: FileText, label: "Invoices" },
+        { path: "/financial-settings", icon: DollarSign, label: "Financial Settings" },
+        { path: "/refund-management", icon: RotateCcw, label: "Refund Management" },
+      ]
+    },
+    {
+      label: "Analytics & Insights",
+      items: [
+        { path: "/reports", icon: BarChart3, label: "Reports" },
+        { path: "/business-intelligence", icon: TrendingUp, label: "Business Intelligence" },
+      ]
+    },
+    {
+      label: "Advanced Tools",
+      items: [
+        { path: "/ai-automation", icon: Brain, label: "AI Automation" },
+        { path: "/integrations", icon: Plug2, label: "Integrations" },
+        { path: "/data-import-export", icon: DatabaseBackup, label: "Data Import/Export" },
+      ]
+    },
+    {
+      label: "Settings & Security",
+      items: [
+        { path: "/settings", icon: SettingsIcon, label: "Settings" },
+        { path: "/security", icon: Shield, label: "Security & Compliance" },
+        { path: "/profile", icon: UserIcon, label: "My Profile" },
+      ]
+    },
   ];
+
+  // Track which groups are expanded
+  const [expandedGroups, setExpandedGroups] = useState<string[]>(
+    navGroups.map(group => group.label) // All groups expanded by default
+  );
+
+  const toggleGroup = (groupLabel: string) => {
+    setExpandedGroups(prev => 
+      prev.includes(groupLabel)
+        ? prev.filter(label => label !== groupLabel)
+        : [...prev, groupLabel]
+    );
+  };
 
   return (
     <>
@@ -111,28 +181,59 @@ export function Layout({ children }: LayoutProps) {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 p-4">
-          <div className="space-y-2">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = location === item.path;
+        <nav className="flex-1 p-4 overflow-y-auto">
+          <div className="space-y-1">
+            {navGroups.map((group) => {
+              const isExpanded = expandedGroups.includes(group.label);
+              const hasActiveItem = group.items.some(item => location === item.path);
               
               return (
-                <Link key={item.path} href={item.path}>
-                  <div
-                    className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors cursor-pointer ${
-                      isActive
-                        ? 'bg-blue-600 text-white'
-                        : 'text-[#999999] hover:bg-gray-100'
-                    }`}
-                    data-testid={`nav-${item.label.toLowerCase().replace(' ', '-')}`}
+                <Collapsible
+                  key={group.label}
+                  open={isExpanded}
+                  onOpenChange={() => toggleGroup(group.label)}
+                >
+                  <CollapsibleTrigger 
+                    className="w-full"
+                    data-testid={`nav-group-${group.label.toLowerCase().replace(/\s+/g, '-')}`}
                   >
-                    <Icon className="w-5 h-5" />
-                    <span className="font-['Poppins',Helvetica] font-medium text-sm">
-                      {item.label}
-                    </span>
-                  </div>
-                </Link>
+                    <div className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors group">
+                      <span className="font-['Poppins',Helvetica] font-semibold text-xs uppercase text-[#666666] tracking-wide">
+                        {group.label}
+                      </span>
+                      {isExpanded ? (
+                        <ChevronDown className="w-4 h-4 text-[#999999] group-hover:text-[#666666]" />
+                      ) : (
+                        <ChevronRight className="w-4 h-4 text-[#999999] group-hover:text-[#666666]" />
+                      )}
+                    </div>
+                  </CollapsibleTrigger>
+                  
+                  <CollapsibleContent className="mt-1 space-y-1">
+                    {group.items.map((item) => {
+                      const Icon = item.icon;
+                      const isActive = location === item.path;
+                      
+                      return (
+                        <Link key={item.path} href={item.path}>
+                          <div
+                            className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors cursor-pointer ml-2 ${
+                              isActive
+                                ? 'bg-blue-600 text-white'
+                                : 'text-[#999999] hover:bg-gray-100 hover:text-[#222029]'
+                            }`}
+                            data-testid={`nav-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
+                          >
+                            <Icon className="w-4 h-4" />
+                            <span className="font-['Poppins',Helvetica] font-medium text-sm">
+                              {item.label}
+                            </span>
+                          </div>
+                        </Link>
+                      );
+                    })}
+                  </CollapsibleContent>
+                </Collapsible>
               );
             })}
           </div>
