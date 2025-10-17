@@ -26,6 +26,7 @@ export default function Home() {
             variant="outline"
             onClick={() => window.location.href = '/api/logout'}
             className="flex items-center gap-2"
+            data-testid="button-sign-out"
           >
             <LogOut className="h-4 w-4" />
             Sign Out
@@ -120,15 +121,15 @@ export default function Home() {
           </CardHeader>
           <CardContent>
             <div className="grid md:grid-cols-3 gap-4">
-              <Button variant="outline" className="h-20 flex-col">
+              <Button variant="outline" className="h-20 flex-col" data-testid="button-edit-profile">
                 <UserIcon className="h-6 w-6 mb-2" />
                 Edit Profile
               </Button>
-              <Button variant="outline" className="h-20 flex-col">
+              <Button variant="outline" className="h-20 flex-col" data-testid="button-security-settings">
                 <Shield className="h-6 w-6 mb-2" />
                 Security Settings
               </Button>
-              <Button variant="outline" className="h-20 flex-col">
+              <Button variant="outline" className="h-20 flex-col" data-testid="button-sign-out-quick">
                 <LogOut className="h-6 w-6 mb-2" />
                 Sign Out
               </Button>

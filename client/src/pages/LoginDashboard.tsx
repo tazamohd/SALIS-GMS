@@ -497,7 +497,7 @@ export const LoginDashboard = (): JSX.Element => {
                 </p>
               </div>
               <div className="flex items-center gap-3">
-                <Button variant="outline" size="icon" className="h-10 w-10 rounded-full border-[#e6e6e6]">
+                <Button variant="outline" size="icon" className="h-10 w-10 rounded-full border-[#e6e6e6]" data-testid="button-notifications">
                   <Bell className="h-4 w-4 text-[#222029]" />
                 </Button>
                 <Button 
@@ -505,6 +505,7 @@ export const LoginDashboard = (): JSX.Element => {
                   variant="outline" 
                   size="sm"
                   className="flex items-center gap-2 h-10 px-4 border-[#e6e6e6] text-[#222029] hover:bg-accent-500 hover:text-white"
+                  data-testid="button-logout"
                 >
                   <LogOut className="w-4 h-4" />
                   Sign Out
@@ -636,19 +637,19 @@ export const LoginDashboard = (): JSX.Element => {
                   Quick Actions
                 </h3>
                 <div className="space-y-3">
-                  <Button className="w-full justify-start gap-3 h-12 bg-accent-500 hover:bg-accent-500/90 text-white rounded-lg">
+                  <Button className="w-full justify-start gap-3 h-12 bg-accent-500 hover:bg-accent-500/90 text-white rounded-lg" data-testid="button-manage-garages">
                     <Building2 className="w-4 h-4" />
                     Manage Garages
                   </Button>
-                  <Button variant="outline" className="w-full justify-start gap-3 h-12 border-[#e6e6e6] text-[#222029] hover:bg-gray-50 rounded-lg">
+                  <Button variant="outline" className="w-full justify-start gap-3 h-12 border-[#e6e6e6] text-[#222029] hover:bg-gray-50 rounded-lg" data-testid="button-add-user">
                     <UserPlus className="w-4 h-4" />
                     Add User
                   </Button>
-                  <Button variant="outline" className="w-full justify-start gap-3 h-12 border-[#e6e6e6] text-[#222029] hover:bg-gray-50 rounded-lg">
+                  <Button variant="outline" className="w-full justify-start gap-3 h-12 border-[#e6e6e6] text-[#222029] hover:bg-gray-50 rounded-lg" data-testid="button-user-roles">
                     <Shield className="w-4 h-4" />
                     User Roles
                   </Button>
-                  <Button variant="outline" className="w-full justify-start gap-3 h-12 border-[#e6e6e6] text-[#222029] hover:bg-gray-50 rounded-lg">
+                  <Button variant="outline" className="w-full justify-start gap-3 h-12 border-[#e6e6e6] text-[#222029] hover:bg-gray-50 rounded-lg" data-testid="button-settings">
                     <Settings className="w-4 h-4" />
                     Settings
                   </Button>
@@ -669,7 +670,7 @@ export const LoginDashboard = (): JSX.Element => {
                     <h4 className="font-['Poppins',Helvetica] font-semibold text-[#222029] text-lg">
                       Active Job Cards
                     </h4>
-                    <Button size="sm" className="bg-accent-500 hover:bg-accent-500/90 text-white">
+                    <Button size="sm" className="bg-accent-500 hover:bg-accent-500/90 text-white" data-testid="button-new-job-card">
                       <FileText className="w-4 h-4 mr-2" />
                       New Job Card
                     </Button>
