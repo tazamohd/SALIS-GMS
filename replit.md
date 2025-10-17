@@ -39,18 +39,22 @@ This project is a full-stack SaaS application for garage management, offering a 
 
 ### Implementation Details
 - Google Fonts imported in index.css
-- Custom Tailwind color classes: `dark-navy`, `electric-blue`, `cyber-blue`, `neon-blue`, `teal-glow`, `brand-blue`, `brand-orange`, `soft-white`
+- Custom Tailwind color classes: `dark-navy`, `electric-blue`, `cyber-blue`, `neon-blue`, `teal-glow`, `brand-blue`, `brand-orange`, `soft-white`, `chrome-silver`, `dark-steel`
 - Typography utilities: `font-montserrat`, `font-poppins`, `font-inter`
 - Gradient utility class: `text-gradient-salis` for logo and special text
 - Updated shadcn/ui theme colors to match brand palette
-- Applied across Layout (sidebar, header), Dashboard, and all major components
+- **All primary buttons use brand orange (#ce5c17)** - button.tsx primary variant updated
+- Applied across Layout (sidebar, header, search bar), Dashboard, and all major components
 - **Dark Theme Implementation**:
   - Official SALIS AUTO S logo displayed in sidebar and login screen
-  - Backgrounds: Dark Navy (#0A0F1C) for cards and main content, Neon Blue (#1F6FFF) for secondary surfaces
+  - Backgrounds: Dark Navy (#0A0F1C) for all backgrounds, cards, sidebar, and header
   - Text: Soft White (#eaf2ff) for primary text, with reduced opacity for secondary text
-  - Borders: Neon Blue (#1F6FFF) for subtle separations and glows
+  - Borders: Neon Blue (#1F6FFF) at 30% opacity for subtle separations and glows
+  - Search bar: Neon Blue background at 10% opacity with matching borders
   - No white backgrounds used - all surfaces use dark theme colors from the tech palette
   - Cards feature gradients with brand colors (Electric Blue, Cyber Blue, Teal Glow) at low opacity (20-30%) over dark backgrounds
+  - Status badges use Electric Blue, Cyber Blue, Neon Blue, Teal Glow, and Brand Orange with 10% background opacity
+  - Navigation: Active items use Electric Blue background with dark navy text, inactive items use soft white text with neon blue hover effect
 
 ## System Architecture
 The application utilizes a full-stack architecture with clear client-server separation.
