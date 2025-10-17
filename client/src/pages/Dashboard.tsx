@@ -62,64 +62,65 @@ export function Dashboard() {
   };
 
   return (
-    <div className="flex-1 p-8 bg-white">
+    <div className="flex-1 p-8 bg-gray-50">
       <div className="mb-8">
-        <h1 className="font-['Poppins',Helvetica] font-semibold text-2xl text-[#222029]">Dashboard</h1>
+        <h1 className="font-montserrat font-semibold text-3xl text-midnight-blue">Dashboard</h1>
+        <p className="font-poppins text-sm text-dark-steel mt-1">Welcome to SALIS AUTO Management System</p>
       </div>
 
-      {/* Stats Cards */}
+      {/* Stats Cards - SALIS AUTO Brand Colors */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <Card className="border border-[#e6e6e6]">
+        <Card className="border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="font-['Poppins',Helvetica] font-medium text-sm text-[#999999]">check-in</h3>
-              <Clock className="w-5 h-5 text-yellow-600" />
+              <h3 className="font-poppins font-medium text-sm text-dark-steel uppercase">Check-in</h3>
+              <Clock className="w-5 h-5 text-sky-blue" />
             </div>
-            <p className="font-['Poppins',Helvetica] font-bold text-3xl text-[#222029] mb-1">{checkInCount}</p>
-            <p className="font-['Poppins',Helvetica] font-normal text-xs text-[#999999]">in the last 2 hours</p>
+            <p className="font-montserrat font-bold text-3xl text-midnight-blue mb-1">{checkInCount}</p>
+            <p className="font-poppins font-normal text-xs text-dark-steel/70">in the last 2 hours</p>
           </CardContent>
         </Card>
 
-        <Card className="border border-[#e6e6e6]">
+        <Card className="border border-electric-blue shadow-sm hover:shadow-md transition-shadow bg-gradient-to-br from-electric-blue/5 to-sky-blue/5">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="font-['Poppins',Helvetica] font-medium text-sm text-[#999999]">Repair</h3>
-              <Wrench className="w-5 h-5 text-blue-600" />
+              <h3 className="font-poppins font-medium text-sm text-electric-blue uppercase">Repair</h3>
+              <Wrench className="w-5 h-5 text-electric-blue" />
             </div>
-            <p className="font-['Poppins',Helvetica] font-bold text-3xl text-[#222029] mb-1">{repairCount}</p>
-            <p className="font-['Poppins',Helvetica] font-normal text-xs text-[#999999]">in the last 2 hours</p>
+            <p className="font-montserrat font-bold text-3xl text-midnight-blue mb-1">{repairCount}</p>
+            <p className="font-poppins font-normal text-xs text-dark-steel/70">in the last 2 hours</p>
           </CardContent>
         </Card>
 
-        <Card className="border border-[#e6e6e6]">
+        <Card className="border border-tech-orange shadow-sm hover:shadow-md transition-shadow bg-gradient-to-br from-tech-orange/5 to-tech-orange/10">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="font-['Poppins',Helvetica] font-medium text-sm text-[#999999]">Quality Check</h3>
-              <AlertCircle className="w-5 h-5 text-orange-600" />
+              <h3 className="font-poppins font-medium text-sm text-tech-orange uppercase">Quality Check</h3>
+              <AlertCircle className="w-5 h-5 text-tech-orange" />
             </div>
-            <p className="font-['Poppins',Helvetica] font-bold text-3xl text-[#222029] mb-1">{qualityCheckCount}</p>
-            <p className="font-['Poppins',Helvetica] font-normal text-xs text-[#999999]">in the last 2 hours</p>
+            <p className="font-montserrat font-bold text-3xl text-midnight-blue mb-1">{qualityCheckCount}</p>
+            <p className="font-poppins font-normal text-xs text-dark-steel/70">in the last 2 hours</p>
           </CardContent>
         </Card>
 
-        <Card className="border border-[#e6e6e6]">
+        <Card className="border border-deep-teal shadow-sm hover:shadow-md transition-shadow bg-gradient-to-br from-deep-teal/5 to-deep-teal/10">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="font-['Poppins',Helvetica] font-medium text-sm text-[#999999]">Completion</h3>
-              <CheckCircle className="w-5 h-5 text-green-600" />
+              <h3 className="font-poppins font-medium text-sm text-deep-teal uppercase">Completion</h3>
+              <CheckCircle className="w-5 h-5 text-deep-teal" />
             </div>
-            <p className="font-['Poppins',Helvetica] font-bold text-3xl text-[#222029] mb-1">{completionCount}</p>
-            <p className="font-['Poppins',Helvetica] font-normal text-xs text-[#999999]">in the last 2 hours</p>
+            <p className="font-montserrat font-bold text-3xl text-midnight-blue mb-1">{completionCount}</p>
+            <p className="font-poppins font-normal text-xs text-dark-steel/70">in the last 2 hours</p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Chart Section */}
-      <Card className="border border-[#e6e6e6] mb-8">
+      {/* Chart Section - Electric Blue Gradient */}
+      <Card className="border border-gray-200 shadow-sm mb-8">
         <CardContent className="p-6">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="font-['Poppins',Helvetica] font-semibold text-lg text-[#222029]">Total Tasks</h2>
-            <span className="font-['Poppins',Helvetica] font-medium text-sm text-[#999999]">This Month</span>
+            <h2 className="font-montserrat font-semibold text-xl text-midnight-blue">Total Tasks</h2>
+            <span className="font-poppins font-medium text-sm text-dark-steel">This Month</span>
           </div>
           <div className="h-64 flex items-end justify-between gap-4">
             {['Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'].map((month, i) => {
@@ -127,10 +128,10 @@ export function Dashboard() {
               return (
                 <div key={month} className="flex-1 flex flex-col items-center gap-2">
                   <div 
-                    className="w-full bg-blue-600 rounded-t"
+                    className="w-full bg-gradient-to-t from-electric-blue to-sky-blue rounded-t shadow-lg hover:shadow-electric-blue/30 transition-shadow"
                     style={{ height: `${heights[i]}%` }}
                   ></div>
-                  <span className="font-['Poppins',Helvetica] font-normal text-xs text-[#999999]">{month}</span>
+                  <span className="font-poppins font-normal text-xs text-dark-steel">{month}</span>
                 </div>
               );
             })}
@@ -139,11 +140,11 @@ export function Dashboard() {
       </Card>
 
       {/* Latest Tasks Table */}
-      <Card className="border border-[#e6e6e6]">
+      <Card className="border border-gray-200 shadow-sm">
         <CardContent className="p-6">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="font-['Poppins',Helvetica] font-semibold text-lg text-[#222029]">Latest Tasks</h2>
-            <Button variant="ghost" className="text-blue-600 hover:text-blue-700" data-testid="button-view-all">
+            <h2 className="font-montserrat font-semibold text-xl text-midnight-blue">Latest Tasks</h2>
+            <Button variant="ghost" className="text-electric-blue hover:text-sky-blue font-poppins" data-testid="button-view-all">
               View all
             </Button>
           </div>
@@ -151,14 +152,14 @@ export function Dashboard() {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-[#e6e6e6]">
-                  <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-medium text-sm text-[#999999]">Task ID</th>
-                  <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-medium text-sm text-[#999999]">Service Type</th>
-                  <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-medium text-sm text-[#999999]">Customer Name</th>
-                  <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-medium text-sm text-[#999999]">Status</th>
-                  <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-medium text-sm text-[#999999]">Date</th>
-                  <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-medium text-sm text-[#999999]">Priority</th>
-                  <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-medium text-sm text-[#999999]">Action</th>
+                <tr className="border-b border-gray-200">
+                  <th className="text-left py-3 px-4 font-poppins font-medium text-sm text-dark-steel uppercase">Task ID</th>
+                  <th className="text-left py-3 px-4 font-poppins font-medium text-sm text-dark-steel uppercase">Service Type</th>
+                  <th className="text-left py-3 px-4 font-poppins font-medium text-sm text-dark-steel uppercase">Customer Name</th>
+                  <th className="text-left py-3 px-4 font-poppins font-medium text-sm text-dark-steel uppercase">Status</th>
+                  <th className="text-left py-3 px-4 font-poppins font-medium text-sm text-dark-steel uppercase">Date</th>
+                  <th className="text-left py-3 px-4 font-poppins font-medium text-sm text-dark-steel uppercase">Priority</th>
+                  <th className="text-left py-3 px-4 font-poppins font-medium text-sm text-dark-steel uppercase">Action</th>
                 </tr>
               </thead>
               <tbody>
