@@ -286,7 +286,7 @@
     --card: 0 0% 100%;
     --card-foreground: 207 60% 11%;
 
-    --primary: 197 100% 50%;  /* Electric Blue #00A9FF */
+    --primary: 20 80% 45%;  /* Brand Orange #ce5c17 */
     --primary-foreground: 0 0% 100%;
 
     --secondary: 200 100% 59%;  /* Sky Blue #36B1FF */
@@ -332,7 +332,7 @@
     --card: 207 55% 15%;
     --card-foreground: 0 0% 95%;
 
-    --primary: 197 100% 50%;  /* Electric Blue */
+    --primary: 20 80% 45%;  /* Brand Orange #ce5c17 */
     --primary-foreground: 0 0% 100%;
 
     --secondary: 200 100% 59%;  /* Sky Blue */

@@ -29,7 +29,7 @@ export default function Landing() {
         
         <div className="space-y-4 pt-4">
           <Button 
-            className="bg-brand-blue hover:bg-brand-blue/90 text-white px-10 py-6 text-lg font-poppins font-semibold rounded-lg shadow-lg shadow-brand-blue/30 transition-all duration-200 w-full"
+            className="bg-brand-orange hover:bg-brand-orange/90 text-white px-10 py-6 text-lg font-poppins font-semibold rounded-lg shadow-lg shadow-brand-orange/30 transition-all duration-200 w-full"
             onClick={() => window.location.href = '/api/login'}
             data-testid="button-sign-in"
           >
