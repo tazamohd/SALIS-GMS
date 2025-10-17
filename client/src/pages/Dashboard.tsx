@@ -43,22 +43,22 @@ export function Dashboard() {
 
   const getStatusBadge = (status: string) => {
     const statusColors: { [key: string]: string } = {
-      'pending': 'bg-yellow-100 text-yellow-700',
-      'in_progress': 'bg-blue-100 text-blue-700',
-      'completed': 'bg-green-100 text-green-700',
-      'delivered': 'bg-purple-100 text-purple-700',
-      'cancelled': 'bg-red-100 text-red-700',
+      'pending': 'bg-sky-blue/10 text-sky-blue border border-sky-blue/20',
+      'in_progress': 'bg-electric-blue/10 text-electric-blue border border-electric-blue/20',
+      'completed': 'bg-deep-teal/10 text-deep-teal border border-deep-teal/20',
+      'delivered': 'bg-midnight-blue/10 text-midnight-blue border border-midnight-blue/20',
+      'cancelled': 'bg-tech-orange/10 text-tech-orange border border-tech-orange/20',
     };
-    return statusColors[status] || 'bg-gray-100 text-gray-700';
+    return statusColors[status] || 'bg-gray-100 text-dark-steel border border-gray-200';
   };
 
   const getPriorityBadge = (priority: string) => {
     const priorityColors: { [key: string]: string } = {
-      'high': 'bg-red-100 text-red-700',
-      'medium': 'bg-yellow-100 text-yellow-700',
-      'low': 'bg-green-100 text-green-700',
+      'high': 'bg-tech-orange/10 text-tech-orange border border-tech-orange/20',
+      'medium': 'bg-electric-blue/10 text-electric-blue border border-electric-blue/20',
+      'low': 'bg-deep-teal/10 text-deep-teal border border-deep-teal/20',
     };
-    return priorityColors[priority] || 'bg-gray-100 text-gray-700';
+    return priorityColors[priority] || 'bg-gray-100 text-dark-steel border border-gray-200';
   };
 
   return (
