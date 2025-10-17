@@ -10,18 +10,6 @@ deploymentTarget = "autoscale"
 build = ["npm", "run", "build"]
 run = ["npm", "run", "start"]
 
-[[ports]]
-localPort = 5000
-externalPort = 80
-
-[[ports]]
-localPort = 38501
-externalPort = 3001
-
-[[ports]]
-localPort = 39361
-externalPort = 3000
-
 [workflows]
 runButton = "Project"
 
@@ -45,3 +33,11 @@ waitForPort = 5000
 
 [agent]
 integrations = ["javascript_database:1.0.0", "javascript_log_in_with_replit:1.0.0", "twilio:1.0.0", "javascript_openai_ai_integrations:1.0.0", "google-calendar:1.0.0", "google-mail:1.0.0"]
+
+[[ports]]
+localPort = 5000
+externalPort = 80
+
+[[ports]]
+localPort = 33409
+externalPort = 3000

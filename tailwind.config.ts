@@ -7,6 +7,14 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        // SALIS AUTO Brand Colors
+        "midnight-blue": "#0B1C2C",
+        "electric-blue": "#00A9FF",
+        "sky-blue": "#36B1FF",
+        "chrome-silver": "#C0C0C0",
+        "dark-steel": "#3C3C3C",
+        "tech-orange": "#FF6A00",
+        "deep-teal": "#008080",
         "accent-100": "var(--accent-100)",
         "accent-50": "var(--accent-50)",
         "accent-500": "var(--accent-500)",
@@ -112,6 +120,10 @@ module.exports = {
         },
       },
       fontFamily: {
+        // SALIS AUTO Typography
+        montserrat: ["Montserrat", "sans-serif"],
+        poppins: ["Poppins", "sans-serif"],
+        inter: ["Inter", "sans-serif"],
         "14-regular": "var(--14-regular-font-family)",
         "body-base": "var(--body-base-font-family)",
         "body-bold-small": "var(--body-bold-small-font-family)",

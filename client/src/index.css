@@ -1,3 +1,6 @@
+/* SALIS AUTO Typography - Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
 @tailwind components;
 @tailwind utilities;
 
@@ -249,67 +252,78 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 47.4% 11.2%;
+    /* SALIS AUTO Color Palette - Light Mode */
+    --background: 0 0% 98%;
+    --foreground: 207 60% 11%;  /* Midnight Blue #0B1C2C */
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 210 14% 89%;  /* Light gray */
+    --muted-foreground: 0 0% 40%;  /* Dark Steel Gray */
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 47.4% 11.2%;
+    --popover-foreground: 207 60% 11%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
+    --border: 0 0% 76%;  /* Chrome Silver */
+    --input: 0 0% 90%;
 
-    --card: transparent;
-    --card-foreground: 222.2 47.4% 11.2%;
+    --card: 0 0% 100%;
+    --card-foreground: 207 60% 11%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 197 100% 50%;  /* Electric Blue #00A9FF */
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 200 100% 59%;  /* Sky Blue #36B1FF */
+    --secondary-foreground: 0 0% 100%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 197 100% 50%;  /* Electric Blue */
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 100% 50%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 100%;
 
-    --ring: 215 20.2% 65.1%;
+    --ring: 197 100% 50%;  /* Electric Blue */
 
     --radius: 0.5rem;
+    
+    /* SALIS AUTO Brand Colors */
+    --salis-midnight-blue: #0B1C2C;
+    --salis-electric-blue: #00A9FF;
+    --salis-sky-blue: #36B1FF;
+    --salis-chrome-silver: #C0C0C0;
+    --salis-dark-steel: #3C3C3C;
+    --salis-tech-orange: #FF6A00;
+    --salis-deep-teal: #008080;
   }
 
   .dark {
-    --background: 224 71% 4%;
-    --foreground: 213 31% 91%;
+    /* SALIS AUTO Color Palette - Dark Mode */
+    --background: 207 60% 11%;  /* Midnight Blue #0B1C2C */
+    --foreground: 0 0% 95%;  /* Chrome Silver */
 
-    --muted: 223 47% 11%;
-    --muted-foreground: 215.4 16.3% 56.9%;
+    --muted: 207 45% 18%;  /* Slightly lighter Midnight Blue */
+    --muted-foreground: 0 0% 76%;  /* Chrome Silver */
 
-    --accent: 216 34% 17%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 197 100% 50%;  /* Electric Blue */
+    --accent-foreground: 0 0% 100%;
 
-    --popover: 224 71% 4%;
-    --popover-foreground: 215 20.2% 65.1%;
+    --popover: 207 55% 15%;
+    --popover-foreground: 0 0% 95%;
 
-    --border: 216 34% 17%;
-    --input: 216 34% 17%;
+    --border: 0 0% 24%;  /* Dark Steel Gray */
+    --input: 207 45% 18%;
 
-    --card: transparent;
-    --card-foreground: 213 31% 91%;
+    --card: 207 55% 15%;
+    --card-foreground: 0 0% 95%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 1.2%;
+    --primary: 197 100% 50%;  /* Electric Blue */
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 222.2 47.4% 11.2%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 200 100% 59%;  /* Sky Blue */
+    --secondary-foreground: 0 0% 100%;
 
     --destructive: 0 63% 31%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 100%;
 
-    --ring: 216 34% 17%;
+    --ring: 197 100% 50%;  /* Electric Blue */
 
     --radius: 0.5rem;
   }
@@ -322,7 +336,42 @@
 
   body {
     @apply bg-background text-foreground;
+    font-family: 'Poppins', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  
+  /* SALIS AUTO Typography Hierarchy */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+  }
+  
+  h1 {
+    font-size: 2.5rem;
+    font-weight: 600;
+    letter-spacing: -0.05em;
+  }
+  
+  h2 {
+    font-size: 2rem;
+    font-weight: 600;
+  }
+  
+  h3 {
+    font-size: 1.5rem;
+    font-weight: 500;
+  }
+  
+  .font-logo {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+  }
+  
+  .text-gradient-salis {
+    background: linear-gradient(90deg, #00A9FF 0%, #36B1FF 50%, #FF6A00 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
 }
 
