@@ -129,23 +129,23 @@ export function QuickActionsModal({ open, onOpenChange }: QuickActionsModalProps
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px] p-0" data-testid="modal-quick-actions">
+      <DialogContent className="sm:max-w-[600px] p-0 bg-midnight-blue border-dark-steel" data-testid="modal-quick-actions">
         <DialogHeader className="px-6 pt-6 pb-4">
-          <DialogTitle className="font-['Poppins',Helvetica] font-semibold text-xl text-[#222029] flex items-center gap-2">
-            <Command className="w-5 h-5" />
+          <DialogTitle className="font-['Poppins',Helvetica] font-semibold text-xl text-chrome-silver flex items-center gap-2">
+            <Command className="w-5 h-5 text-electric-blue" />
             Quick Actions
           </DialogTitle>
         </DialogHeader>
 
         <div className="px-6 pb-2">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[#999999]" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-chrome-silver/70" />
             <Input
               type="text"
               placeholder="Search actions..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 border-[#e6e6e6]"
+              className="pl-10 border-dark-steel bg-dark-steel text-chrome-silver placeholder:text-chrome-silver/50"
               data-testid="input-quick-actions-search"
               autoFocus
             />
@@ -155,7 +155,7 @@ export function QuickActionsModal({ open, onOpenChange }: QuickActionsModalProps
         <div className="max-h-[400px] overflow-y-auto">
           {filteredActions.length === 0 ? (
             <div className="px-6 py-8 text-center">
-              <p className="text-[#999999] font-['Poppins',Helvetica]">
+              <p className="text-chrome-silver/60 font-['Poppins',Helvetica]">
                 No actions found for "{searchQuery}"
               </p>
             </div>
@@ -167,17 +167,17 @@ export function QuickActionsModal({ open, onOpenChange }: QuickActionsModalProps
                   <button
                     key={action.id}
                     onClick={() => handleActionClick(action.path)}
-                    className="w-full flex items-start gap-4 px-4 py-3 rounded-lg hover:bg-gray-50 transition-colors text-left"
+                    className="w-full flex items-start gap-4 px-4 py-3 rounded-lg hover:bg-dark-steel/50 transition-colors text-left"
                     data-testid={`button-${action.id}`}
                   >
-                    <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
-                      <Icon className="w-5 h-5 text-blue-600" />
+                    <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-electric-blue/20 flex items-center justify-center">
+                      <Icon className="w-5 h-5 text-electric-blue" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-['Poppins',Helvetica] font-medium text-sm text-[#222029] mb-1">
+                      <h3 className="font-['Poppins',Helvetica] font-medium text-sm text-chrome-silver mb-1">
                         {action.label}
                       </h3>
-                      <p className="font-['Poppins',Helvetica] text-xs text-[#999999]">
+                      <p className="font-['Poppins',Helvetica] text-xs text-chrome-silver/70">
                         {action.description}
                       </p>
                     </div>
@@ -188,12 +188,12 @@ export function QuickActionsModal({ open, onOpenChange }: QuickActionsModalProps
           )}
         </div>
 
-        <div className="border-t border-[#e6e6e6] px-6 py-3 bg-gray-50">
-          <p className="text-xs text-[#999999] font-['Poppins',Helvetica] flex items-center gap-2">
-            <kbd className="px-2 py-1 bg-white border border-[#e6e6e6] rounded text-[#222029] font-mono">
+        <div className="border-t border-dark-steel px-6 py-3 bg-dark-steel/30">
+          <p className="text-xs text-chrome-silver/70 font-['Poppins',Helvetica] flex items-center gap-2">
+            <kbd className="px-2 py-1 bg-dark-steel border border-chrome-silver/20 rounded text-chrome-silver font-mono">
               {navigator.platform.includes("Mac") ? "⌘" : "Ctrl"}
             </kbd>
-            <kbd className="px-2 py-1 bg-white border border-[#e6e6e6] rounded text-[#222029] font-mono">
+            <kbd className="px-2 py-1 bg-dark-steel border border-chrome-silver/20 rounded text-chrome-silver font-mono">
               K
             </kbd>
             <span>to open quick actions</span>
