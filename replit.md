@@ -9,7 +9,38 @@ This project is a full-stack SaaS application for garage management, offering a 
 - Component-based architecture
 - Responsive design
 - Continue developing and testing new features directly within the authenticated Figma interface
-- Preserve original Figma design while adding functionality
+- SALIS AUTO brand design system applied across entire UI (October 17, 2025)
+
+## Design System (SALIS AUTO Brand)
+### Color Palette
+- **Midnight Blue (#0B1C2C)**: Primary background color for sidebar and dark sections
+- **Electric Blue (#00A9FF)**: Primary accent color for interactive elements, active states, and CTAs
+- **Sky Blue (#36B1FF)**: Secondary accent for gradients and hover states
+- **Chrome Silver (#C0C0C0)**: Typography and highlights in dark backgrounds
+- **Dark Steel Gray (#3C3C3C)**: Secondary text and borders
+- **Tech Orange (#FF6A00)**: Energy/growth accent used sparingly for alerts and special actions
+- **Deep Teal (#008080)**: Tertiary accent for success states and completion indicators
+- **Gradient**: Linear gradient from Electric Blue (#00A9FF) → Sky Blue (#36B1FF) → Tech Orange (#FF6A00)
+
+### Typography
+- **Primary Font (Headers/Logo)**: Montserrat (Medium/SemiBold/Bold)
+  - Logo: Montserrat Bold, with gradient text effect
+  - H1: Montserrat SemiBold, 2.5rem
+  - H2: Montserrat SemiBold, 2rem
+  - H3: Montserrat Medium, 1.5rem
+- **Secondary Font (Body/UI)**: Poppins and Inter
+  - Body text: Poppins Regular, 14-16px
+  - Subheadings: Poppins Medium, 18-24px
+  - Captions/Labels: Inter Light/Regular, 12-14px
+  - UI elements: Poppins Medium/SemiBold
+
+### Implementation Details
+- Google Fonts imported in index.css
+- Custom Tailwind color classes: `midnight-blue`, `electric-blue`, `sky-blue`, `chrome-silver`, `dark-steel`, `tech-orange`, `deep-teal`
+- Typography utilities: `font-montserrat`, `font-poppins`, `font-inter`
+- Gradient utility class: `text-gradient-salis` for logo and special text
+- Updated shadcn/ui theme colors to match brand palette
+- Applied across Layout (sidebar, header), Dashboard, and all major components
 
 ## System Architecture
 The application utilizes a full-stack architecture with clear client-server separation.
