@@ -155,7 +155,7 @@ export function Layout({ children }: LayoutProps) {
   return (
     <>
       <SkipLink />
-      <div className="flex h-screen bg-gray-50">
+      <div className="flex h-screen bg-gray-900">
         {/* Mobile Menu Overlay */}
         {mobileMenuOpen && (
           <div 
@@ -177,10 +177,14 @@ export function Layout({ children }: LayoutProps) {
       `}>
         {/* Logo - SALIS AUTO Brand */}
         <div className="p-6 border-b border-dark-steel">
-          <h1 className="font-montserrat font-bold text-xl text-gradient-salis">
-            SALIS AUTO
-          </h1>
-          <p className="font-poppins text-xs text-chrome-silver mt-1">Garage Management</p>
+          <Link href="/dashboard">
+            <img 
+              src="/attached_assets/ChatGPT Image Oct 17, 2025, 04_10_17 PM_1760705161242.png" 
+              alt="SALIS AUTO"
+              className="w-full h-auto"
+              data-testid="logo-salis-auto"
+            />
+          </Link>
         </div>
 
         {/* Navigation */}
@@ -258,13 +262,13 @@ export function Layout({ children }: LayoutProps) {
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col lg:ml-0">
-        {/* Header - White with Electric Blue accents */}
-        <header className="h-16 bg-white border-b border-gray-200 px-4 sm:px-8 flex items-center gap-4 shadow-sm">
+        {/* Header - Dark with Electric Blue accents */}
+        <header className="h-16 bg-gray-900 border-b border-dark-steel px-4 sm:px-8 flex items-center gap-4 shadow-sm">
           {/* Mobile Menu Toggle */}
           <Button
             variant="ghost"
             size="icon"
-            className="lg:hidden"
+            className="lg:hidden text-chrome-silver hover:text-electric-blue"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label="Toggle mobile menu"
             data-testid="button-mobile-menu"
@@ -276,23 +280,23 @@ export function Layout({ children }: LayoutProps) {
           
           {/* Search Bar - Hidden on small screens */}
           <div className="hidden md:block relative w-full max-w-md">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-chrome-silver" />
             <Input
               type="text"
               placeholder="Search..."
-              className="pl-10 border-gray-200 focus:border-electric-blue focus:ring-electric-blue font-poppins"
+              className="pl-10 bg-dark-steel border-dark-steel text-chrome-silver placeholder:text-chrome-silver/50 focus:border-electric-blue focus:ring-electric-blue font-poppins"
               data-testid="input-search"
             />
           </div>
           <Button
             variant="outline"
             onClick={() => setQuickActionsOpen(true)}
-            className="gap-2 border-electric-blue text-electric-blue hover:bg-electric-blue hover:text-white transition-colors font-poppins"
+            className="gap-2 border-electric-blue text-electric-blue hover:bg-electric-blue hover:text-midnight-blue transition-colors font-poppins"
             data-testid="button-quick-actions"
           >
             <Zap className="w-4 h-4" />
             <span className="hidden sm:inline">Quick Actions</span>
-            <kbd className="hidden sm:inline-flex px-1.5 py-0.5 bg-gray-100 border border-gray-200 rounded text-xs font-mono text-dark-steel">
+            <kbd className="hidden sm:inline-flex px-1.5 py-0.5 bg-dark-steel border border-chrome-silver/20 rounded text-xs font-mono text-chrome-silver">
               {navigator.platform.includes("Mac") ? "⌘K" : "Ctrl+K"}
             </kbd>
           </Button>

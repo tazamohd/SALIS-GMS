@@ -62,65 +62,65 @@ export function Dashboard() {
   };
 
   return (
-    <div className="flex-1 p-8 bg-gray-50">
+    <div className="flex-1 p-8 bg-gray-800">
       <div className="mb-8">
-        <h1 className="font-montserrat font-semibold text-3xl text-midnight-blue">Dashboard</h1>
-        <p className="font-poppins text-sm text-dark-steel mt-1">Welcome to SALIS AUTO Management System</p>
+        <h1 className="font-montserrat font-semibold text-3xl text-chrome-silver">Dashboard</h1>
+        <p className="font-poppins text-sm text-chrome-silver/70 mt-1">Welcome to SALIS AUTO Management System</p>
       </div>
 
       {/* Stats Cards - SALIS AUTO Brand Colors */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <Card className="border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+        <Card className="border border-dark-steel shadow-sm hover:shadow-md transition-shadow bg-midnight-blue">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="font-poppins font-medium text-sm text-dark-steel uppercase">Check-in</h3>
+              <h3 className="font-poppins font-medium text-sm text-chrome-silver uppercase">Check-in</h3>
               <Clock className="w-5 h-5 text-sky-blue" />
             </div>
-            <p className="font-montserrat font-bold text-3xl text-midnight-blue mb-1">{checkInCount}</p>
-            <p className="font-poppins font-normal text-xs text-dark-steel/70">in the last 2 hours</p>
+            <p className="font-montserrat font-bold text-3xl text-chrome-silver mb-1">{checkInCount}</p>
+            <p className="font-poppins font-normal text-xs text-chrome-silver/60">in the last 2 hours</p>
           </CardContent>
         </Card>
 
-        <Card className="border border-electric-blue shadow-sm hover:shadow-md transition-shadow bg-gradient-to-br from-electric-blue/5 to-sky-blue/5">
+        <Card className="border border-electric-blue shadow-sm hover:shadow-md transition-shadow bg-gradient-to-br from-electric-blue/20 to-sky-blue/20 bg-midnight-blue">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-2">
               <h3 className="font-poppins font-medium text-sm text-electric-blue uppercase">Repair</h3>
               <Wrench className="w-5 h-5 text-electric-blue" />
             </div>
-            <p className="font-montserrat font-bold text-3xl text-midnight-blue mb-1">{repairCount}</p>
-            <p className="font-poppins font-normal text-xs text-dark-steel/70">in the last 2 hours</p>
+            <p className="font-montserrat font-bold text-3xl text-chrome-silver mb-1">{repairCount}</p>
+            <p className="font-poppins font-normal text-xs text-chrome-silver/60">in the last 2 hours</p>
           </CardContent>
         </Card>
 
-        <Card className="border border-tech-orange shadow-sm hover:shadow-md transition-shadow bg-gradient-to-br from-tech-orange/5 to-tech-orange/10">
+        <Card className="border border-tech-orange shadow-sm hover:shadow-md transition-shadow bg-gradient-to-br from-tech-orange/20 to-tech-orange/30 bg-midnight-blue">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-2">
               <h3 className="font-poppins font-medium text-sm text-tech-orange uppercase">Quality Check</h3>
               <AlertCircle className="w-5 h-5 text-tech-orange" />
             </div>
-            <p className="font-montserrat font-bold text-3xl text-midnight-blue mb-1">{qualityCheckCount}</p>
-            <p className="font-poppins font-normal text-xs text-dark-steel/70">in the last 2 hours</p>
+            <p className="font-montserrat font-bold text-3xl text-chrome-silver mb-1">{qualityCheckCount}</p>
+            <p className="font-poppins font-normal text-xs text-chrome-silver/60">in the last 2 hours</p>
           </CardContent>
         </Card>
 
-        <Card className="border border-deep-teal shadow-sm hover:shadow-md transition-shadow bg-gradient-to-br from-deep-teal/5 to-deep-teal/10">
+        <Card className="border border-deep-teal shadow-sm hover:shadow-md transition-shadow bg-gradient-to-br from-deep-teal/20 to-deep-teal/30 bg-midnight-blue">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-2">
               <h3 className="font-poppins font-medium text-sm text-deep-teal uppercase">Completion</h3>
               <CheckCircle className="w-5 h-5 text-deep-teal" />
             </div>
-            <p className="font-montserrat font-bold text-3xl text-midnight-blue mb-1">{completionCount}</p>
-            <p className="font-poppins font-normal text-xs text-dark-steel/70">in the last 2 hours</p>
+            <p className="font-montserrat font-bold text-3xl text-chrome-silver mb-1">{completionCount}</p>
+            <p className="font-poppins font-normal text-xs text-chrome-silver/60">in the last 2 hours</p>
           </CardContent>
         </Card>
       </div>
 
       {/* Chart Section - Electric Blue Gradient */}
-      <Card className="border border-gray-200 shadow-sm mb-8">
+      <Card className="border border-dark-steel shadow-sm mb-8 bg-midnight-blue">
         <CardContent className="p-6">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="font-montserrat font-semibold text-xl text-midnight-blue">Total Tasks</h2>
-            <span className="font-poppins font-medium text-sm text-dark-steel">This Month</span>
+            <h2 className="font-montserrat font-semibold text-xl text-chrome-silver">Total Tasks</h2>
+            <span className="font-poppins font-medium text-sm text-chrome-silver/70">This Month</span>
           </div>
           <div className="h-64 flex items-end justify-between gap-4">
             {['Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'].map((month, i) => {
@@ -131,7 +131,7 @@ export function Dashboard() {
                     className="w-full bg-gradient-to-t from-electric-blue to-sky-blue rounded-t shadow-lg hover:shadow-electric-blue/30 transition-shadow"
                     style={{ height: `${heights[i]}%` }}
                   ></div>
-                  <span className="font-poppins font-normal text-xs text-dark-steel">{month}</span>
+                  <span className="font-poppins font-normal text-xs text-chrome-silver">{month}</span>
                 </div>
               );
             })}
@@ -140,10 +140,10 @@ export function Dashboard() {
       </Card>
 
       {/* Latest Tasks Table */}
-      <Card className="border border-gray-200 shadow-sm">
+      <Card className="border border-dark-steel shadow-sm bg-midnight-blue">
         <CardContent className="p-6">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="font-montserrat font-semibold text-xl text-midnight-blue">Latest Tasks</h2>
+            <h2 className="font-montserrat font-semibold text-xl text-chrome-silver">Latest Tasks</h2>
             <Button variant="ghost" className="text-electric-blue hover:text-sky-blue font-poppins" data-testid="button-view-all">
               View all
             </Button>
@@ -152,37 +152,37 @@ export function Dashboard() {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-gray-200">
-                  <th className="text-left py-3 px-4 font-poppins font-medium text-sm text-dark-steel uppercase">Task ID</th>
-                  <th className="text-left py-3 px-4 font-poppins font-medium text-sm text-dark-steel uppercase">Service Type</th>
-                  <th className="text-left py-3 px-4 font-poppins font-medium text-sm text-dark-steel uppercase">Customer Name</th>
-                  <th className="text-left py-3 px-4 font-poppins font-medium text-sm text-dark-steel uppercase">Status</th>
-                  <th className="text-left py-3 px-4 font-poppins font-medium text-sm text-dark-steel uppercase">Date</th>
-                  <th className="text-left py-3 px-4 font-poppins font-medium text-sm text-dark-steel uppercase">Priority</th>
-                  <th className="text-left py-3 px-4 font-poppins font-medium text-sm text-dark-steel uppercase">Action</th>
+                <tr className="border-b border-dark-steel">
+                  <th className="text-left py-3 px-4 font-poppins font-medium text-sm text-chrome-silver uppercase">Task ID</th>
+                  <th className="text-left py-3 px-4 font-poppins font-medium text-sm text-chrome-silver uppercase">Service Type</th>
+                  <th className="text-left py-3 px-4 font-poppins font-medium text-sm text-chrome-silver uppercase">Customer Name</th>
+                  <th className="text-left py-3 px-4 font-poppins font-medium text-sm text-chrome-silver uppercase">Status</th>
+                  <th className="text-left py-3 px-4 font-poppins font-medium text-sm text-chrome-silver uppercase">Date</th>
+                  <th className="text-left py-3 px-4 font-poppins font-medium text-sm text-chrome-silver uppercase">Priority</th>
+                  <th className="text-left py-3 px-4 font-poppins font-medium text-sm text-chrome-silver uppercase">Action</th>
                 </tr>
               </thead>
               <tbody>
                 {isLoading ? (
                   <tr>
                     <td colSpan={7} className="py-8 text-center">
-                      <div className="animate-pulse">Loading...</div>
+                      <div className="animate-pulse text-chrome-silver">Loading...</div>
                     </td>
                   </tr>
                 ) : latestTasks.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="py-8 text-center text-[#999999]">No tasks available</td>
+                    <td colSpan={7} className="py-8 text-center text-chrome-silver/60">No tasks available</td>
                   </tr>
                 ) : (
                   latestTasks.map((task) => (
-                    <tr key={task.id} className="border-b border-[#e6e6e6] hover:bg-gray-50" data-testid={`row-task-${task.id}`}>
-                      <td className="py-4 px-4 font-['Poppins',Helvetica] font-medium text-sm text-[#222029]">
+                    <tr key={task.id} className="border-b border-dark-steel/50 hover:bg-dark-steel/30" data-testid={`row-task-${task.id}`}>
+                      <td className="py-4 px-4 font-['Poppins',Helvetica] font-medium text-sm text-chrome-silver">
                         #{task.id}
                       </td>
-                      <td className="py-4 px-4 font-['Poppins',Helvetica] font-normal text-sm text-[#222029]">
+                      <td className="py-4 px-4 font-['Poppins',Helvetica] font-normal text-sm text-chrome-silver">
                         {task.serviceType}
                       </td>
-                      <td className="py-4 px-4 font-['Poppins',Helvetica] font-normal text-sm text-[#222029]">
+                      <td className="py-4 px-4 font-['Poppins',Helvetica] font-normal text-sm text-chrome-silver">
                         {(task.vehicleInfo as any)?.owner || 'N/A'}
                       </td>
                       <td className="py-4 px-4">
@@ -190,7 +190,7 @@ export function Dashboard() {
                           {task.status}
                         </Badge>
                       </td>
-                      <td className="py-4 px-4 font-['Poppins',Helvetica] font-normal text-sm text-[#999999]">
+                      <td className="py-4 px-4 font-['Poppins',Helvetica] font-normal text-sm text-chrome-silver/70">
                         {task.createdAt ? new Date(task.createdAt).toLocaleDateString() : 'N/A'}
                       </td>
                       <td className="py-4 px-4">
@@ -203,6 +203,7 @@ export function Dashboard() {
                           size="sm" 
                           variant="outline" 
                           onClick={() => handleViewTask(task)}
+                          className="border-electric-blue text-electric-blue hover:bg-electric-blue hover:text-midnight-blue"
                           data-testid={`button-view-${task.id}`}
                         >
                           View
