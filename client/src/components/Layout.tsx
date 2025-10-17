@@ -155,7 +155,7 @@ export function Layout({ children }: LayoutProps) {
   return (
     <>
       <SkipLink />
-      <div className="flex h-screen bg-white">
+      <div className="flex h-screen bg-gray-50">
         {/* Mobile Menu Overlay */}
         {mobileMenuOpen && (
           <div 
@@ -168,16 +168,19 @@ export function Layout({ children }: LayoutProps) {
           />
         )}
 
-      {/* Sidebar */}
+      {/* Sidebar - SALIS AUTO Midnight Blue */}
       <aside className={`
         fixed lg:static inset-y-0 left-0 z-50
-        w-64 bg-white border-r border-[#e6e6e6] flex flex-col
+        w-64 bg-midnight-blue border-r border-dark-steel flex flex-col
         transition-transform duration-300 ease-in-out
         ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
-        {/* Logo */}
-        <div className="p-6 border-b border-[#e6e6e6]">
-          <h1 className="font-['Poppins',Helvetica] font-bold text-xl text-[#222029]">Logo</h1>
+        {/* Logo - SALIS AUTO Brand */}
+        <div className="p-6 border-b border-dark-steel">
+          <h1 className="font-montserrat font-bold text-xl text-gradient-salis">
+            SALIS AUTO
+          </h1>
+          <p className="font-poppins text-xs text-chrome-silver mt-1">Garage Management</p>
         </div>
 
         {/* Navigation */}
@@ -197,14 +200,14 @@ export function Layout({ children }: LayoutProps) {
                     className="w-full"
                     data-testid={`nav-group-${group.label.toLowerCase().replace(/\s+/g, '-')}`}
                   >
-                    <div className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors group">
-                      <span className="font-['Poppins',Helvetica] font-semibold text-xs uppercase text-[#666666] tracking-wide">
+                    <div className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-dark-steel/50 transition-colors group">
+                      <span className="font-poppins font-semibold text-xs uppercase text-chrome-silver/70 tracking-wide">
                         {group.label}
                       </span>
                       {isExpanded ? (
-                        <ChevronDown className="w-4 h-4 text-[#999999] group-hover:text-[#666666]" />
+                        <ChevronDown className="w-4 h-4 text-chrome-silver/50 group-hover:text-chrome-silver" />
                       ) : (
-                        <ChevronRight className="w-4 h-4 text-[#999999] group-hover:text-[#666666]" />
+                        <ChevronRight className="w-4 h-4 text-chrome-silver/50 group-hover:text-chrome-silver" />
                       )}
                     </div>
                   </CollapsibleTrigger>
@@ -217,15 +220,15 @@ export function Layout({ children }: LayoutProps) {
                       return (
                         <Link key={item.path} href={item.path}>
                           <div
-                            className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors cursor-pointer ml-2 ${
+                            className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-200 cursor-pointer ml-2 ${
                               isActive
-                                ? 'bg-blue-600 text-white'
-                                : 'text-[#999999] hover:bg-gray-100 hover:text-[#222029]'
+                                ? 'bg-electric-blue text-white shadow-lg shadow-electric-blue/20'
+                                : 'text-chrome-silver hover:bg-dark-steel/50 hover:text-white'
                             }`}
                             data-testid={`nav-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
                           >
                             <Icon className="w-4 h-4" />
-                            <span className="font-['Poppins',Helvetica] font-medium text-sm">
+                            <span className="font-poppins font-medium text-sm">
                               {item.label}
                             </span>
                           </div>
@@ -240,23 +243,23 @@ export function Layout({ children }: LayoutProps) {
         </nav>
 
         {/* Logout */}
-        <div className="p-4 border-t border-[#e6e6e6]">
+        <div className="p-4 border-t border-dark-steel">
           <Button
             onClick={handleLogout}
             variant="ghost"
-            className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
+            className="w-full justify-start text-tech-orange hover:text-tech-orange/80 hover:bg-dark-steel/50"
             data-testid="button-logout"
           >
             <LogOut className="w-5 h-5 mr-3" />
-            <span className="font-['Poppins',Helvetica] font-medium text-sm">Logout</span>
+            <span className="font-poppins font-medium text-sm">Logout</span>
           </Button>
         </div>
       </aside>
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col lg:ml-0">
-        {/* Header */}
-        <header className="h-16 border-b border-[#e6e6e6] px-4 sm:px-8 flex items-center gap-4">
+        {/* Header - White with Electric Blue accents */}
+        <header className="h-16 bg-white border-b border-gray-200 px-4 sm:px-8 flex items-center gap-4 shadow-sm">
           {/* Mobile Menu Toggle */}
           <Button
             variant="ghost"
@@ -273,23 +276,23 @@ export function Layout({ children }: LayoutProps) {
           
           {/* Search Bar - Hidden on small screens */}
           <div className="hidden md:block relative w-full max-w-md">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[#999999]" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
             <Input
               type="text"
-              placeholder="Search"
-              className="pl-10 border-[#e6e6e6]"
+              placeholder="Search..."
+              className="pl-10 border-gray-200 focus:border-electric-blue focus:ring-electric-blue font-poppins"
               data-testid="input-search"
             />
           </div>
           <Button
             variant="outline"
             onClick={() => setQuickActionsOpen(true)}
-            className="gap-2"
+            className="gap-2 border-electric-blue text-electric-blue hover:bg-electric-blue hover:text-white transition-colors font-poppins"
             data-testid="button-quick-actions"
           >
             <Zap className="w-4 h-4" />
             <span className="hidden sm:inline">Quick Actions</span>
-            <kbd className="hidden sm:inline-flex px-1.5 py-0.5 bg-gray-100 border border-[#e6e6e6] rounded text-xs font-mono text-[#999999]">
+            <kbd className="hidden sm:inline-flex px-1.5 py-0.5 bg-gray-100 border border-gray-200 rounded text-xs font-mono text-dark-steel">
               {navigator.platform.includes("Mac") ? "⌘K" : "Ctrl+K"}
             </kbd>
           </Button>
