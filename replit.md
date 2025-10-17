@@ -14,15 +14,16 @@ This project is a full-stack SaaS application for garage management, offering a 
 - Dark theme enforced - avoid white backgrounds throughout the application
 
 ## Design System (SALIS AUTO Brand)
-### Color Palette
-- **Midnight Blue (#0B1C2C)**: Primary background color for sidebar and dark sections
-- **Electric Blue (#00A9FF)**: Primary accent color for interactive elements, active states, and CTAs
-- **Sky Blue (#36B1FF)**: Secondary accent for gradients and hover states
-- **Chrome Silver (#C0C0C0)**: Typography and highlights in dark backgrounds
-- **Dark Steel Gray (#3C3C3C)**: Secondary text and borders
-- **Tech Orange (#FF6A00)**: Energy/growth accent used sparingly for alerts and special actions
-- **Deep Teal (#008080)**: Tertiary accent for success states and completion indicators
-- **Gradient**: Linear gradient from Electric Blue (#00A9FF) → Sky Blue (#36B1FF) → Tech Orange (#FF6A00)
+### Color Palette (Updated October 17, 2025)
+- **Dark Navy (#0A0F1C)**: Primary background color for sidebar, cards, and dark sections
+- **Electric Blue (#00BFFF)**: Main wireframe lines, primary accent for interactive elements
+- **Cyber Blue (#008CFF)**: Highlighted lines, active states, and CTAs
+- **Neon Blue (#1F6FFF)**: Secondary glow, icon outlines, and hover states
+- **Teal Glow (#00E0FF)**: Subtle digital aura and highlight effects
+- **Brand Blue (#0055b4)**: Primary brand accent for buttons and key actions
+- **Brand Orange (#ce5c17)**: Energy/growth accent used for alerts and special actions
+- **Soft White (#eaf2ff)**: Typography and highlights in dark backgrounds
+- **Gradient**: Linear gradient from Electric Blue (#00BFFF) → Cyber Blue (#008CFF) → Teal Glow (#00E0FF)
 
 ### Typography
 - **Primary Font (Headers/Logo)**: Montserrat (Medium/SemiBold/Bold)
@@ -38,18 +39,18 @@ This project is a full-stack SaaS application for garage management, offering a 
 
 ### Implementation Details
 - Google Fonts imported in index.css
-- Custom Tailwind color classes: `midnight-blue`, `electric-blue`, `sky-blue`, `chrome-silver`, `dark-steel`, `tech-orange`, `deep-teal`
+- Custom Tailwind color classes: `dark-navy`, `electric-blue`, `cyber-blue`, `neon-blue`, `teal-glow`, `brand-blue`, `brand-orange`, `soft-white`
 - Typography utilities: `font-montserrat`, `font-poppins`, `font-inter`
 - Gradient utility class: `text-gradient-salis` for logo and special text
 - Updated shadcn/ui theme colors to match brand palette
 - Applied across Layout (sidebar, header), Dashboard, and all major components
 - **Dark Theme Implementation**:
-  - Official SALIS AUTO logo displayed in sidebar
-  - Backgrounds: Midnight Blue (#0B1C2C) for cards, Dark Gray (#1F2937 / gray-800) for main content, Near-Black (#111827 / gray-900) for header
-  - Text: Chrome Silver (#C0C0C0) for primary text, with reduced opacity for secondary text
-  - Borders: Dark Steel Gray (#3C3C3C) for subtle separations
-  - No white backgrounds used - all surfaces use dark theme colors from the logo palette
-  - Cards feature gradients with brand colors (Electric Blue, Tech Orange, Deep Teal) at low opacity (20-30%) over dark backgrounds
+  - Official SALIS AUTO S logo displayed in sidebar and login screen
+  - Backgrounds: Dark Navy (#0A0F1C) for cards and main content, Neon Blue (#1F6FFF) for secondary surfaces
+  - Text: Soft White (#eaf2ff) for primary text, with reduced opacity for secondary text
+  - Borders: Neon Blue (#1F6FFF) for subtle separations and glows
+  - No white backgrounds used - all surfaces use dark theme colors from the tech palette
+  - Cards feature gradients with brand colors (Electric Blue, Cyber Blue, Teal Glow) at low opacity (20-30%) over dark backgrounds
 
 ## System Architecture
 The application utilizes a full-stack architecture with clear client-server separation.

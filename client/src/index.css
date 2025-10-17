@@ -20,10 +20,10 @@
   --14-regular-line-height: 140%;
   
   /* SALIS AUTO Accent Colors - New Brand Palette */
-  --accent-100: #0055b4;
-  --accent-50: #0055b4;
-  --accent-500: #0055b4;
-  --accent-950: #0b1220;
+  --accent-100: #00BFFF;
+  --accent-50: #008CFF;
+  --accent-500: #008CFF;
+  --accent-950: #0A0F1C;
   --basewhite: #eaf2ff;
   
   /* SALIS AUTO Body Typography */
@@ -111,8 +111,8 @@
   --gray-500: rgba(100, 100, 100, 1);
   --gray-600: rgba(60, 60, 60, 1);
   --gray-700: rgba(40, 40, 40, 1);
-  --gray-800: #0f192b;  /* Navy 800 */
-  --gray-900: #0b1220;  /* Navy 900 */
+  --gray-800: #1F6FFF;  /* Neon Blue */
+  --gray-900: #0A0F1C;  /* Dark Navy */
   --graysblack: rgba(0, 0, 0, 1);
   --grayswhite: #eaf2ff;
   /* SALIS AUTO Headlines - Montserrat */
