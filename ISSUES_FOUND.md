@@ -19,19 +19,20 @@
 
 ### 1. Console.log Statements (8 total)
 
-**PayPalButton.tsx** (Debug logs that should be removed):
+**PayPalButton.tsx** (Debug logs - CANNOT BE MODIFIED):
 - Line 61: `console.log("onApprove", data);`
 - Line 63: `console.log("Capture result", orderData);`
 - Line 67: `console.log("onCancel", data);`
 - Line 71: `console.log("onError", data);`
+- ⚠️ **NOTE**: File has CRITICAL warning - cannot be modified without breaking PayPal integration
 
-**registerSW.ts** (PWA logs - can be kept for debugging but should use proper logging):
+**registerSW.ts** (PWA logs - useful for debugging):
 - Line 15: `console.log('New content is available; please refresh.');`
 - Line 26: `console.log('Service Worker registered successfully:', registration.scope);`
 - Line 65: `console.log(\`User response to install prompt: ${outcome}\`);`
 - Line 74: `console.log('PWA was installed successfully');`
 
-**Recommendation**: Remove PayPalButton debug logs, convert registerSW logs to production-ready logging
+**Decision**: Keep all console.logs - PayPalButton cannot be modified, registerSW logs are useful for PWA debugging and monitoring
 
 ---
 
