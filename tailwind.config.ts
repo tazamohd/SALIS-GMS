@@ -7,14 +7,20 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // SALIS AUTO Brand Colors
-        "midnight-blue": "#0B1C2C",
-        "electric-blue": "#00A9FF",
-        "sky-blue": "#36B1FF",
-        "chrome-silver": "#C0C0C0",
-        "dark-steel": "#3C3C3C",
-        "tech-orange": "#FF6A00",
-        "deep-teal": "#008080",
+        // SALIS AUTO New Brand Colors
+        "brand-blue": "#0055b4",
+        "brand-orange": "#ce5c17",
+        "navy-900": "#0b1220",
+        "navy-800": "#0f192b",
+        "soft-white": "#eaf2ff",
+        // Legacy color aliases for backward compatibility
+        "midnight-blue": "#0b1220",
+        "electric-blue": "#0055b4",
+        "sky-blue": "#0055b4",
+        "chrome-silver": "#eaf2ff",
+        "dark-steel": "#0f192b",
+        "tech-orange": "#ce5c17",
+        "deep-teal": "#0055b4",
         "accent-100": "var(--accent-100)",
         "accent-50": "var(--accent-50)",
         "accent-500": "var(--accent-500)",

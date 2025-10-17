@@ -179,9 +179,9 @@ export function Layout({ children }: LayoutProps) {
         <div className="p-6 border-b border-dark-steel">
           <Link href="/dashboard">
             <img 
-              src="/attached_assets/ChatGPT Image Oct 17, 2025, 04_10_17 PM_1760705161242.png" 
+              src="/attached_assets/Logo_blue_orange_1760743036292.png" 
               alt="SALIS AUTO"
-              className="w-full h-auto"
+              className="w-32 h-auto mx-auto"
               data-testid="logo-salis-auto"
             />
           </Link>
