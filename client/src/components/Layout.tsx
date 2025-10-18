@@ -145,7 +145,7 @@ export function Layout({ children }: LayoutProps) {
   return (
     <>
       <SkipLink />
-      <div className="flex h-screen bg-dark-navy">
+      <div className="flex h-screen bg-white dark:bg-salis-black">
         {/* Mobile Menu Overlay */}
         {mobileMenuOpen && (
           <div 
@@ -161,12 +161,12 @@ export function Layout({ children }: LayoutProps) {
       {/* Sidebar - Compact Design */}
       <aside className={`
         fixed lg:static inset-y-0 left-0 z-50
-        w-56 bg-dark-navy border-r border-neon-blue/30 flex flex-col
+        w-56 bg-white dark:bg-salis-black border-r border-gray-200 dark:border-salis-gray-dark flex flex-col
         transition-transform duration-300 ease-in-out
         ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
         {/* Logo - Compact */}
-        <div className="p-4 border-b border-neon-blue/30">
+        <div className="p-4 border-b border-gray-200 dark:border-salis-gray-dark">
           <Link href="/dashboard">
             <img 
               src="/attached_assets/Logo_blue_orange_1760743036292.png" 
@@ -194,14 +194,14 @@ export function Layout({ children }: LayoutProps) {
                     className="w-full"
                     data-testid={`nav-group-${group.label.toLowerCase().replace(/\s+/g, '-')}`}
                   >
-                    <div className="flex items-center justify-between px-2 py-1.5 rounded-md hover:bg-neon-blue/10 transition-colors group">
-                      <span className="font-poppins font-semibold text-[10px] uppercase text-soft-white/60 tracking-wider">
+                    <div className="flex items-center justify-between px-2 py-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-salis-gray-dark transition-colors group">
+                      <span className="font-poppins font-semibold text-[10px] uppercase text-gray-500 dark:text-gray-400 tracking-wider">
                         {group.label}
                       </span>
                       {isExpanded ? (
-                        <ChevronDown className="w-3 h-3 text-soft-white/40 group-hover:text-soft-white" />
+                        <ChevronDown className="w-3 h-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-300" />
                       ) : (
-                        <ChevronRight className="w-3 h-3 text-soft-white/40 group-hover:text-soft-white" />
+                        <ChevronRight className="w-3 h-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-300" />
                       )}
                     </div>
                   </CollapsibleTrigger>
@@ -216,8 +216,8 @@ export function Layout({ children }: LayoutProps) {
                           <div
                             className={`flex items-center gap-2 px-3 py-1.5 rounded-md transition-all duration-200 cursor-pointer ml-1 ${
                               isActive
-                                ? 'bg-electric-blue text-dark-navy shadow-md shadow-electric-blue/20'
-                                : 'text-soft-white hover:bg-neon-blue/10 hover:text-electric-blue'
+                                ? 'bg-salis-black dark:bg-white text-white dark:text-salis-black shadow-md'
+                                : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-salis-gray-dark hover:text-salis-black dark:hover:text-white'
                             }`}
                             data-testid={`nav-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
                           >
@@ -237,12 +237,12 @@ export function Layout({ children }: LayoutProps) {
         </nav>
 
         {/* Logout - Compact */}
-        <div className="p-3 border-t border-neon-blue/30">
+        <div className="p-3 border-t border-gray-200 dark:border-salis-gray-dark">
           <Button
             onClick={handleLogout}
             variant="ghost"
             size="sm"
-            className="w-full justify-start text-brand-orange hover:text-brand-orange/80 hover:bg-neon-blue/10 h-8"
+            className="w-full justify-start text-gray-700 dark:text-gray-300 hover:text-salis-black dark:hover:text-white hover:bg-gray-100 dark:hover:bg-salis-gray-dark h-8"
             data-testid="button-logout"
           >
             <LogOut className="w-4 h-4 mr-2" />
@@ -253,13 +253,13 @@ export function Layout({ children }: LayoutProps) {
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col lg:ml-0">
-        {/* Header - Dark with Electric Blue accents */}
-        <header className="h-14 bg-dark-navy border-b border-neon-blue/30 px-4 sm:px-6 flex items-center gap-3 shadow-sm">
+        {/* Header - Monochrome */}
+        <header className="h-14 bg-white dark:bg-salis-black border-b border-gray-200 dark:border-salis-gray-dark px-4 sm:px-6 flex items-center gap-3 shadow-sm">
           {/* Mobile Menu Toggle */}
           <Button
             variant="ghost"
             size="icon"
-            className="lg:hidden text-soft-white hover:text-electric-blue h-8 w-8"
+            className="lg:hidden text-gray-700 dark:text-gray-300 hover:text-salis-black dark:hover:text-white h-8 w-8"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label="Toggle mobile menu"
             data-testid="button-mobile-menu"
@@ -271,11 +271,11 @@ export function Layout({ children }: LayoutProps) {
           
           {/* Search Bar - Compact */}
           <div className="hidden md:block relative w-full max-w-md">
-            <Search className="absolute left-2.5 top-1/2 transform -translate-y-1/2 w-3.5 h-3.5 text-soft-white/70" />
+            <Search className="absolute left-2.5 top-1/2 transform -translate-y-1/2 w-3.5 h-3.5 text-gray-400 dark:text-gray-500" />
             <Input
               type="text"
               placeholder="Search..."
-              className="pl-9 h-9 bg-neon-blue/10 border-neon-blue/30 text-soft-white text-sm placeholder:text-soft-white/50 focus:border-electric-blue focus:ring-electric-blue font-poppins"
+              className="pl-9 h-9 bg-gray-50 dark:bg-salis-gray-dark border-gray-200 dark:border-salis-gray text-gray-900 dark:text-white text-sm placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-salis-black dark:focus:border-white focus:ring-salis-black dark:focus:ring-white font-poppins"
               data-testid="input-search"
             />
           </div>
@@ -283,12 +283,12 @@ export function Layout({ children }: LayoutProps) {
             variant="outline"
             size="sm"
             onClick={() => setQuickActionsOpen(true)}
-            className="gap-2 h-9 border-electric-blue text-electric-blue hover:bg-electric-blue hover:text-dark-navy transition-colors font-poppins"
+            className="gap-2 h-9 border-gray-300 dark:border-salis-gray text-gray-700 dark:text-gray-300 hover:bg-salis-black dark:hover:bg-white hover:text-white dark:hover:text-salis-black transition-colors font-poppins"
             data-testid="button-quick-actions"
           >
             <Zap className="w-3.5 h-3.5" />
             <span className="hidden sm:inline text-xs">Quick Actions</span>
-            <kbd className="hidden sm:inline-flex px-1 py-0.5 bg-neon-blue/10 border border-neon-blue/30 rounded text-[10px] font-mono text-soft-white">
+            <kbd className="hidden sm:inline-flex px-1 py-0.5 bg-gray-100 dark:bg-salis-gray-dark border border-gray-300 dark:border-salis-gray rounded text-[10px] font-mono text-gray-600 dark:text-gray-400">
               {navigator.platform.includes("Mac") ? "⌘K" : "Ctrl+K"}
             </kbd>
           </Button>

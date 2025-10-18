@@ -14,19 +14,20 @@ This project is a full-stack SaaS application for garage management, offering a 
 - Dark theme enforced - avoid white backgrounds throughout the application
 
 ## Design System (SALIS AUTO Brand)
-### Color Palette (Simplified - Updated October 18, 2025)
-**Restricted 6-Color Palette:**
-- **Neon Blue (#1F6FFF)**: Borders, secondary accents, icon outlines, and hover states
-- **Cyber Blue (#008CFF)**: Highlighted elements, active states, and secondary CTAs
-- **Electric Blue (#00BFFF)**: Primary interactive elements, links, and main accents
-- **Brand Blue (#0055b4)**: Special brand accent for key actions
-- **Brand Orange (#ce5c17)**: Primary buttons, alerts, and energy/growth indicators
-- **Soft White (#eaf2ff)**: All typography and text highlights on dark backgrounds
+### Color Palette (Monochrome - Updated October 18, 2025)
+**Simple Monochrome Palette:**
+- **Black (#010101)**: Primary text, active states, primary buttons, dark backgrounds
+- **White (#FFFFFF)**: Backgrounds (light mode), text on dark backgrounds, light elements
+- **Gray (#6B7280)**: Secondary text, muted elements, borders
+- **Gray Light (#D1D5DB)**: Subtle borders, disabled states, light backgrounds
+- **Gray Dark (#374151)**: Hover states, dark mode borders, tertiary elements
+- **50% Black (#808080)**: Secondary buttons, muted accents
 
 **Additional:**
-- **Dark Navy (#0A0F1C)**: Background color only (very dark, almost black)
+- No colored accents - pure grayscale design
+- Supports both light and dark modes with proper contrast
 
-**Gradient**: Linear gradient from Electric Blue (#00BFFF) → Cyber Blue (#008CFF) → Neon Blue (#1F6FFF)
+**Gradient**: Linear gradient from Black (#000000) → Gray (#505050) → 50% Black (#808080)
 
 ### Typography
 - **Primary Font (Headers/Logo)**: Montserrat (Medium/SemiBold/Bold)
@@ -42,22 +43,25 @@ This project is a full-stack SaaS application for garage management, offering a 
 
 ### Implementation Details
 - Google Fonts imported in index.css
-- **Restricted Tailwind color palette**: `neon-blue`, `cyber-blue`, `electric-blue`, `brand-blue`, `brand-orange`, `soft-white`, `dark-navy`
-- **NO other colors used throughout the entire application**
+- **Monochrome Tailwind color palette**: `salis-black`, `salis-white`, `salis-gray`, `salis-gray-light`, `salis-gray-dark`, `salis-50-black`
+- **NO colored accents - pure grayscale design throughout the entire application**
 - Typography utilities: `font-montserrat`, `font-poppins`, `font-inter`
-- Gradient utility class: `text-gradient-salis` for logo and special text
-- Updated shadcn/ui theme colors to match brand palette
-- **All primary buttons use brand orange (#ce5c17)** - button.tsx primary variant updated
-- Applied across Layout (sidebar, header, search bar), Dashboard, and all major components
-- **Dark Theme Implementation**:
+- Gradient utility class: `text-gradient-salis` for logo (grayscale gradient)
+- Updated shadcn/ui theme colors to match monochrome palette
+- **All primary buttons use black (#010101)** with white text
+- Applied across Layout (sidebar, header, search bar), Dashboard, Security, and all major components
+- **Light/Dark Theme Implementation**:
   - Official SALIS AUTO S logo displayed in sidebar and login screen
-  - Backgrounds: Dark Navy (#0A0F1C) for all backgrounds, cards, sidebar, and header
-  - Text: Soft White (#eaf2ff) for all text, with reduced opacity for secondary text
-  - Borders: Neon Blue (#1F6FFF) at 30% opacity for subtle separations and glows
-  - Search bar: Neon Blue background at 10% opacity with matching borders
-  - Cards feature gradients with brand colors (Electric Blue, Cyber Blue, Neon Blue) at low opacity (10-20%) over dark backgrounds
-  - Status badges use Electric Blue, Cyber Blue, Neon Blue, Brand Blue, and Brand Orange with 10% background opacity
-  - Navigation: Active items use Electric Blue background with dark navy text, inactive items use soft white text with neon blue hover effect
+  - Light Mode:
+    - Backgrounds: White (#FFFFFF) for main backgrounds, light gray for cards
+    - Text: Black (#010101) for primary text, grays for secondary
+    - Borders: Light gray (#D1D5DB) for subtle separations
+  - Dark Mode:
+    - Backgrounds: Near-black (#010101) for main backgrounds, dark gray for cards
+    - Text: White (#FFFFFF) for primary text, light grays for secondary
+    - Borders: Dark gray (#374151) for subtle separations
+  - Navigation: Active items use black background with white text (light mode) or white background with black text (dark mode)
+  - Status badges use grayscale variations
 
 ## System Architecture
 The application utilizes a full-stack architecture with clear client-server separation.

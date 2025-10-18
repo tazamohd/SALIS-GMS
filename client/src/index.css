@@ -12,14 +12,13 @@
 }
 
 :root {
-  /* SALIS AUTO Brand Colors - RESTRICTED PALETTE ONLY */
-  --salis-dark-navy: #0A0F1C;
-  --salis-electric-blue: #00BFFF;
-  --salis-cyber-blue: #008CFF;
-  --salis-neon-blue: #1F6FFF;
-  --salis-brand-blue: #0055b4;
-  --salis-brand-orange: #ce5c17;
-  --salis-soft-white: #eaf2ff;
+  /* SALIS AUTO Brand Colors - Monochrome Palette */
+  --salis-black: #010101;
+  --salis-white: #FFFFFF;
+  --salis-gray: #6B7280;
+  --salis-gray-light: #D1D5DB;
+  --salis-gray-dark: #374151;
+  --salis-50-black: #808080;
 
   /* SALIS AUTO Typography Variables */
   --14-regular-font-family: "Poppins", "Inter", Helvetica;
@@ -106,7 +105,7 @@
   --display-small-semibold-letter-spacing: 0px;
   --display-small-semibold-line-height: normal;
   
-  --drop-shadow-100: 0px 1px 4px 0px rgba(12, 12, 13, 0.05);
+  --drop-shadow-100: 0px 1px 4px 0px rgba(1, 1, 1, 0.1);
   
   --headline-bold-font-family: "Montserrat", Helvetica;
   --headline-bold-font-size: 20px;
@@ -157,9 +156,9 @@
   --m3-title-small-letter-spacing: 0.10000000149011612px;
   --m3-title-small-line-height: 20px;
   
-  --shadow: 0px 1px 3px 1px rgba(16, 24, 40, 0.15), 0px 1px 2px 0px rgba(0, 0, 0, 0.3);
-  --shadow-black-lg: 0px 4px 6px -2px rgba(15, 23, 42, 0.05), 0px 12px 16px -4px rgba(15, 23, 42, 0.1);
-  --shadow-black-sm: 0px 1px 2px 0px rgba(15, 23, 42, 0.06), 0px 1px 3px 0px rgba(15, 23, 42, 0.1);
+  --shadow: 0px 1px 3px 1px rgba(1, 1, 1, 0.1), 0px 1px 2px 0px rgba(0, 0, 0, 0.15);
+  --shadow-black-lg: 0px 4px 6px -2px rgba(1, 1, 1, 0.05), 0px 12px 16px -4px rgba(1, 1, 1, 0.1);
+  --shadow-black-sm: 0px 1px 2px 0px rgba(1, 1, 1, 0.06), 0px 1px 3px 0px rgba(1, 1, 1, 0.1);
   
   --single-line-body-base-font-family: "Inter", Helvetica;
   --single-line-body-base-font-size: 16px;
@@ -213,69 +212,69 @@
 
 @layer base {
   :root {
-    /* SALIS AUTO shadcn Theme Colors - Light Mode */
-    --background: 212 100% 50%;  /* Lighter Brand Blue */
-    --foreground: 217 100% 96%;  /* Soft White #eaf2ff */
+    /* SALIS AUTO shadcn Theme Colors - Light Mode (Monochrome) */
+    --background: 0 0% 100%;  /* White */
+    --foreground: 0 0% 0%;  /* Black */
 
-    --muted: 212 100% 55%;
-    --muted-foreground: 219 100% 20%;
+    --muted: 0 0% 96%;  /* Very light gray */
+    --muted-foreground: 0 0% 45%;  /* Medium gray */
 
-    --accent: 195 100% 50%;  /* Electric Blue #00BFFF */
-    --accent-foreground: 212 100% 50%;
+    --accent: 0 0% 96%;  /* Very light gray */
+    --accent-foreground: 0 0% 0%;  /* Black */
 
-    --popover: 212 100% 45%;
-    --popover-foreground: 217 100% 96%;
+    --popover: 0 0% 100%;  /* White */
+    --popover-foreground: 0 0% 0%;  /* Black */
 
-    --border: 219 100% 56%;  /* Neon Blue #1F6FFF */
-    --input: 212 100% 55%;
+    --border: 0 0% 90%;  /* Light gray border */
+    --input: 0 0% 90%;  /* Light gray */
 
-    --card: 212 100% 45%;
-    --card-foreground: 217 100% 96%;
+    --card: 0 0% 100%;  /* White */
+    --card-foreground: 0 0% 0%;  /* Black */
 
-    --primary: 23 80% 45%;  /* Brand Orange #ce5c17 */
-    --primary-foreground: 217 100% 96%;
+    --primary: 0 0% 0%;  /* Black */
+    --primary-foreground: 0 0% 100%;  /* White */
 
-    --secondary: 207 100% 50%;  /* Cyber Blue #008CFF */
-    --secondary-foreground: 217 100% 96%;
+    --secondary: 0 0% 50%;  /* 50% Black */
+    --secondary-foreground: 0 0% 100%;  /* White */
 
-    --destructive: 0 100% 50%;
-    --destructive-foreground: 217 100% 96%;
+    --destructive: 0 84% 60%;  /* Red for errors */
+    --destructive-foreground: 0 0% 100%;  /* White */
 
-    --ring: 195 100% 50%;  /* Electric Blue #00BFFF */
+    --ring: 0 0% 50%;  /* 50% Black */
 
     --radius: 0.5rem;
   }
 
   .dark {
-    /* SALIS AUTO shadcn Theme Colors - Dark Mode */
-    --background: 212 100% 50%;  /* Lighter Brand Blue */
-    --foreground: 217 100% 96%;  /* Soft White #eaf2ff */
+    /* SALIS AUTO shadcn Theme Colors - Dark Mode (Monochrome) */
+    --background: 0 0% 5%;  /* Near black */
+    --foreground: 0 0% 100%;  /* White */
 
-    --muted: 212 100% 55%;
-    --muted-foreground: 217 100% 80%;
+    --muted: 0 0% 15%;  /* Dark gray */
+    --muted-foreground: 0 0% 65%;  /* Light gray */
 
-    --accent: 195 100% 50%;  /* Electric Blue #00BFFF */
-    --accent-foreground: 212 100% 50%;
+    --accent: 0 0% 15%;  /* Dark gray */
+    --accent-foreground: 0 0% 100%;  /* White */
 
-    --popover: 212 100% 45%;
-    --popover-foreground: 217 100% 96%;
+    --popover: 0 0% 5%;  /* Near black */
+    --popover-foreground: 0 0% 100%;  /* White */
 
-    --border: 219 100% 56%;  /* Neon Blue #1F6FFF */
-    --input: 212 100% 55%;
+    --border: 0 0% 20%;  /* Dark gray border */
+    --input: 0 0% 20%;  /* Dark gray */
 
-    --card: 212 100% 45%;
-    --card-foreground: 217 100% 96%;
+    --card: 0 0% 5%;  /* Near black */
+    --card-foreground: 0 0% 100%;  /* White */
 
-    --primary: 23 80% 45%;  /* Brand Orange #ce5c17 */
-    --primary-foreground: 217 100% 96%;
+    --primary: 0 0% 100%;  /* White */
+    --primary-foreground: 0 0% 0%;  /* Black */
 
-    --secondary: 207 100% 50%;  /* Cyber Blue #008CFF */
-    --secondary-foreground: 217 100% 96%;
+    --secondary: 0 0% 50%;  /* 50% Black/Gray */
+    --secondary-foreground: 0 0% 100%;  /* White */
 
-    --destructive: 0 63% 31%;
-    --destructive-foreground: 217 100% 96%;
+    --destructive: 0 63% 50%;  /* Red for errors */
+    --destructive-foreground: 0 0% 100%;  /* White */
 
-    --ring: 195 100% 50%;  /* Electric Blue #00BFFF */
+    --ring: 0 0% 50%;  /* 50% Black/Gray */
 
     --radius: 0.5rem;
   }
@@ -316,9 +315,9 @@
 }
 
 @layer components {
-  /* SALIS AUTO Gradient Text Utility */
+  /* SALIS AUTO Gradient Text Utility (Grayscale gradient) */
   .text-gradient-salis {
-    background: linear-gradient(90deg, #00BFFF 0%, #008CFF 50%, #1F6FFF 100%);
+    background: linear-gradient(90deg, #000000 0%, #505050 50%, #808080 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -326,20 +325,20 @@
   
   /* SALIS AUTO Button Variants */
   .btn-primary {
-    background-color: #ce5c17;
-    color: #eaf2ff;
+    background-color: #010101;
+    color: #FFFFFF;
   }
   
   .btn-primary:hover {
-    background-color: #b04f14;
+    background-color: #1a1a1a;
   }
   
   .btn-secondary {
-    background-color: #008CFF;
-    color: #eaf2ff;
+    background-color: #808080;
+    color: #FFFFFF;
   }
   
   .btn-secondary:hover {
-    background-color: #0077dd;
+    background-color: #6a6a6a;
   }
 }

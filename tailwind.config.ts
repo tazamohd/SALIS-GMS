@@ -7,14 +7,16 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // SALIS AUTO Brand Colors - RESTRICTED PALETTE ONLY
-        "neon-blue": "#1F6FFF",
-        "cyber-blue": "#008CFF",
-        "electric-blue": "#00BFFF",
-        "brand-blue": "#0055b4",
-        "brand-orange": "#ce5c17",
-        "soft-white": "#eaf2ff",
-        "dark-navy": "#0A0F1C",
+        // SALIS AUTO Brand Colors - Monochrome Palette
+        "salis-black": "#010101",
+        "salis-white": "#FFFFFF",
+        "salis-gray": "#6B7280",
+        "salis-gray-light": "#D1D5DB",
+        "salis-gray-dark": "#374151",
+        "salis-50-black": "#808080",
+        
+        // Legacy compatibility (map to monochrome)
+        "dark-navy": "#010101",
         
         // shadcn/ui theme colors (using HSL vars)
         border: "hsl(var(--border))",

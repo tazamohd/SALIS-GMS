@@ -43,84 +43,84 @@ export function Dashboard() {
 
   const getStatusBadge = (status: string) => {
     const statusColors: { [key: string]: string } = {
-      'pending': 'bg-electric-blue/10 text-electric-blue border border-electric-blue/30',
-      'in_progress': 'bg-cyber-blue/10 text-cyber-blue border border-cyber-blue/30',
-      'completed': 'bg-neon-blue/10 text-neon-blue border border-neon-blue/30',
-      'delivered': 'bg-brand-blue/10 text-brand-blue border border-brand-blue/30',
-      'cancelled': 'bg-brand-orange/10 text-brand-orange border border-brand-orange/30',
+      'pending': 'bg-gray-100 dark:bg-salis-gray-dark text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-salis-gray',
+      'in_progress': 'bg-gray-200 dark:bg-salis-gray text-gray-800 dark:text-gray-200 border border-gray-400 dark:border-salis-gray-light',
+      'completed': 'bg-salis-black/10 dark:bg-white/10 text-salis-black dark:text-white border border-salis-black/30 dark:border-white/30',
+      'delivered': 'bg-salis-50-black/10 dark:bg-salis-50-black/20 text-salis-50-black dark:text-gray-300 border border-salis-50-black/30',
+      'cancelled': 'bg-gray-300 dark:bg-salis-gray-dark text-gray-600 dark:text-gray-400 border border-gray-400 dark:border-salis-gray',
     };
-    return statusColors[status] || 'bg-neon-blue/10 text-soft-white border border-neon-blue/30';
+    return statusColors[status] || 'bg-gray-100 dark:bg-salis-gray-dark text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-salis-gray';
   };
 
   const getPriorityBadge = (priority: string) => {
     const priorityColors: { [key: string]: string } = {
-      'high': 'bg-brand-orange/10 text-brand-orange border border-brand-orange/30',
-      'medium': 'bg-cyber-blue/10 text-cyber-blue border border-cyber-blue/30',
-      'low': 'bg-neon-blue/10 text-neon-blue border border-neon-blue/30',
+      'high': 'bg-salis-black dark:bg-white text-white dark:text-salis-black border border-salis-black dark:border-white',
+      'medium': 'bg-salis-50-black dark:bg-salis-50-black text-white dark:text-white border border-salis-50-black',
+      'low': 'bg-gray-300 dark:bg-salis-gray text-gray-700 dark:text-gray-300 border border-gray-400 dark:border-salis-gray-light',
     };
-    return priorityColors[priority] || 'bg-neon-blue/10 text-soft-white border border-neon-blue/30';
+    return priorityColors[priority] || 'bg-gray-100 dark:bg-salis-gray-dark text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-salis-gray';
   };
 
   return (
-    <div className="flex-1 p-8 bg-dark-navy">
+    <div className="flex-1 p-8 bg-gray-50 dark:bg-salis-black">
       <div className="mb-8">
-        <h1 className="font-montserrat font-semibold text-3xl text-soft-white">Dashboard</h1>
-        <p className="font-poppins text-sm text-soft-white/70 mt-1">Welcome to SALIS AUTO Management System</p>
+        <h1 className="font-montserrat font-semibold text-3xl text-gray-900 dark:text-white">Dashboard</h1>
+        <p className="font-poppins text-sm text-gray-600 dark:text-gray-400 mt-1">Welcome to SALIS AUTO Management System</p>
       </div>
 
-      {/* Stats Cards - SALIS AUTO Brand Colors */}
+      {/* Stats Cards - Monochrome */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <Card className="border border-neon-blue/30 shadow-sm hover:shadow-lg hover:shadow-electric-blue/20 transition-all bg-dark-navy">
+        <Card className="border border-gray-200 dark:border-salis-gray-dark shadow-sm hover:shadow-lg transition-all bg-white dark:bg-salis-black">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="font-poppins font-medium text-sm text-soft-white/80 uppercase">Check-in</h3>
-              <Clock className="w-5 h-5 text-electric-blue" />
+              <h3 className="font-poppins font-medium text-sm text-gray-600 dark:text-gray-400 uppercase">Check-in</h3>
+              <Clock className="w-5 h-5 text-gray-700 dark:text-gray-300" />
             </div>
-            <p className="font-montserrat font-bold text-3xl text-soft-white mb-1">{checkInCount}</p>
-            <p className="font-poppins font-normal text-xs text-soft-white/60">in the last 2 hours</p>
+            <p className="font-montserrat font-bold text-3xl text-gray-900 dark:text-white mb-1">{checkInCount}</p>
+            <p className="font-poppins font-normal text-xs text-gray-500 dark:text-gray-500">in the last 2 hours</p>
           </CardContent>
         </Card>
 
-        <Card className="border border-electric-blue/50 shadow-sm hover:shadow-lg hover:shadow-electric-blue/30 transition-all bg-gradient-to-br from-electric-blue/20 to-cyber-blue/20">
+        <Card className="border border-gray-300 dark:border-salis-gray shadow-sm hover:shadow-lg transition-all bg-gray-100 dark:bg-salis-gray-dark">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="font-poppins font-medium text-sm text-electric-blue uppercase">Repair</h3>
-              <Wrench className="w-5 h-5 text-electric-blue" />
+              <h3 className="font-poppins font-medium text-sm text-gray-700 dark:text-gray-300 uppercase">Repair</h3>
+              <Wrench className="w-5 h-5 text-gray-800 dark:text-gray-200" />
             </div>
-            <p className="font-montserrat font-bold text-3xl text-soft-white mb-1">{repairCount}</p>
-            <p className="font-poppins font-normal text-xs text-soft-white/60">in the last 2 hours</p>
+            <p className="font-montserrat font-bold text-3xl text-gray-900 dark:text-white mb-1">{repairCount}</p>
+            <p className="font-poppins font-normal text-xs text-gray-600 dark:text-gray-400">in the last 2 hours</p>
           </CardContent>
         </Card>
 
-        <Card className="border border-brand-orange/50 shadow-sm hover:shadow-lg hover:shadow-brand-orange/30 transition-all bg-gradient-to-br from-brand-orange/20 to-brand-orange/10">
+        <Card className="border border-salis-black dark:border-white shadow-sm hover:shadow-lg transition-all bg-salis-black dark:bg-white">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="font-poppins font-medium text-sm text-brand-orange uppercase">Quality Check</h3>
-              <AlertCircle className="w-5 h-5 text-brand-orange" />
+              <h3 className="font-poppins font-medium text-sm text-white dark:text-salis-black uppercase">Quality Check</h3>
+              <AlertCircle className="w-5 h-5 text-white dark:text-salis-black" />
             </div>
-            <p className="font-montserrat font-bold text-3xl text-soft-white mb-1">{qualityCheckCount}</p>
-            <p className="font-poppins font-normal text-xs text-soft-white/60">in the last 2 hours</p>
+            <p className="font-montserrat font-bold text-3xl text-white dark:text-salis-black mb-1">{qualityCheckCount}</p>
+            <p className="font-poppins font-normal text-xs text-gray-300 dark:text-gray-600">in the last 2 hours</p>
           </CardContent>
         </Card>
 
-        <Card className="border border-cyber-blue/50 shadow-sm hover:shadow-lg hover:shadow-cyber-blue/30 transition-all bg-gradient-to-br from-cyber-blue/20 to-neon-blue/10">
+        <Card className="border border-salis-50-black shadow-sm hover:shadow-lg transition-all bg-salis-50-black dark:bg-salis-50-black">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="font-poppins font-medium text-sm text-cyber-blue uppercase">Completion</h3>
-              <CheckCircle className="w-5 h-5 text-cyber-blue" />
+              <h3 className="font-poppins font-medium text-sm text-white uppercase">Completion</h3>
+              <CheckCircle className="w-5 h-5 text-white" />
             </div>
-            <p className="font-montserrat font-bold text-3xl text-soft-white mb-1">{completionCount}</p>
-            <p className="font-poppins font-normal text-xs text-soft-white/60">in the last 2 hours</p>
+            <p className="font-montserrat font-bold text-3xl text-white mb-1">{completionCount}</p>
+            <p className="font-poppins font-normal text-xs text-gray-200">in the last 2 hours</p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Chart Section - Electric Blue Gradient */}
-      <Card className="border border-neon-blue/30 shadow-sm mb-8 bg-dark-navy">
+      {/* Chart Section - Grayscale Gradient */}
+      <Card className="border border-gray-200 dark:border-salis-gray-dark shadow-sm mb-8 bg-white dark:bg-salis-black">
         <CardContent className="p-6">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="font-montserrat font-semibold text-xl text-soft-white">Total Tasks</h2>
-            <span className="font-poppins font-medium text-sm text-soft-white/70">This Month</span>
+            <h2 className="font-montserrat font-semibold text-xl text-gray-900 dark:text-white">Total Tasks</h2>
+            <span className="font-poppins font-medium text-sm text-gray-600 dark:text-gray-400">This Month</span>
           </div>
           <div className="h-64 flex items-end justify-between gap-4">
             {['Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'].map((month, i) => {
@@ -128,10 +128,10 @@ export function Dashboard() {
               return (
                 <div key={month} className="flex-1 flex flex-col items-center gap-2">
                   <div 
-                    className="w-full bg-gradient-to-t from-electric-blue via-cyber-blue to-neon-blue rounded-t shadow-lg hover:shadow-electric-blue/50 transition-shadow"
+                    className="w-full bg-gradient-to-t from-salis-black via-salis-gray to-salis-50-black dark:from-white dark:via-salis-gray-light dark:to-salis-50-black rounded-t shadow-lg hover:shadow-lg transition-shadow"
                     style={{ height: `${heights[i]}%` }}
                   ></div>
-                  <span className="font-poppins font-normal text-xs text-soft-white">{month}</span>
+                  <span className="font-poppins font-normal text-xs text-gray-700 dark:text-gray-300">{month}</span>
                 </div>
               );
             })}
@@ -140,11 +140,11 @@ export function Dashboard() {
       </Card>
 
       {/* Latest Tasks Table */}
-      <Card className="border border-neon-blue/30 shadow-sm bg-dark-navy">
+      <Card className="border border-gray-200 dark:border-salis-gray-dark shadow-sm bg-white dark:bg-salis-black">
         <CardContent className="p-6">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="font-montserrat font-semibold text-xl text-soft-white">Latest Tasks</h2>
-            <Button variant="ghost" className="text-electric-blue hover:text-cyber-blue font-poppins" data-testid="button-view-all">
+            <h2 className="font-montserrat font-semibold text-xl text-gray-900 dark:text-white">Latest Tasks</h2>
+            <Button variant="ghost" className="text-gray-700 dark:text-gray-300 hover:text-salis-black dark:hover:text-white font-poppins" data-testid="button-view-all">
               View all
             </Button>
           </div>
@@ -152,37 +152,37 @@ export function Dashboard() {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-neon-blue/30">
-                  <th className="text-left py-3 px-4 font-poppins font-medium text-sm text-soft-white/80 uppercase">Task ID</th>
-                  <th className="text-left py-3 px-4 font-poppins font-medium text-sm text-soft-white/80 uppercase">Service Type</th>
-                  <th className="text-left py-3 px-4 font-poppins font-medium text-sm text-soft-white/80 uppercase">Customer Name</th>
-                  <th className="text-left py-3 px-4 font-poppins font-medium text-sm text-soft-white/80 uppercase">Status</th>
-                  <th className="text-left py-3 px-4 font-poppins font-medium text-sm text-soft-white/80 uppercase">Date</th>
-                  <th className="text-left py-3 px-4 font-poppins font-medium text-sm text-soft-white/80 uppercase">Priority</th>
-                  <th className="text-left py-3 px-4 font-poppins font-medium text-sm text-soft-white/80 uppercase">Action</th>
+                <tr className="border-b border-gray-200 dark:border-salis-gray-dark">
+                  <th className="text-left py-3 px-4 font-poppins font-medium text-sm text-gray-600 dark:text-gray-400 uppercase">Task ID</th>
+                  <th className="text-left py-3 px-4 font-poppins font-medium text-sm text-gray-600 dark:text-gray-400 uppercase">Service Type</th>
+                  <th className="text-left py-3 px-4 font-poppins font-medium text-sm text-gray-600 dark:text-gray-400 uppercase">Customer Name</th>
+                  <th className="text-left py-3 px-4 font-poppins font-medium text-sm text-gray-600 dark:text-gray-400 uppercase">Status</th>
+                  <th className="text-left py-3 px-4 font-poppins font-medium text-sm text-gray-600 dark:text-gray-400 uppercase">Date</th>
+                  <th className="text-left py-3 px-4 font-poppins font-medium text-sm text-gray-600 dark:text-gray-400 uppercase">Priority</th>
+                  <th className="text-left py-3 px-4 font-poppins font-medium text-sm text-gray-600 dark:text-gray-400 uppercase">Action</th>
                 </tr>
               </thead>
               <tbody>
                 {isLoading ? (
                   <tr>
                     <td colSpan={7} className="py-8 text-center">
-                      <div className="animate-pulse text-soft-white">Loading...</div>
+                      <div className="animate-pulse text-gray-700 dark:text-gray-300">Loading...</div>
                     </td>
                   </tr>
                 ) : latestTasks.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="py-8 text-center text-soft-white/60">No tasks available</td>
+                    <td colSpan={7} className="py-8 text-center text-gray-500 dark:text-gray-500">No tasks available</td>
                   </tr>
                 ) : (
                   latestTasks.map((task) => (
-                    <tr key={task.id} className="border-b border-neon-blue/20 hover:bg-neon-blue/10 transition-colors" data-testid={`row-task-${task.id}`}>
-                      <td className="py-4 px-4 font-['Poppins',Helvetica] font-medium text-sm text-soft-white">
+                    <tr key={task.id} className="border-b border-gray-100 dark:border-salis-gray-dark hover:bg-gray-50 dark:hover:bg-salis-gray-dark transition-colors" data-testid={`row-task-${task.id}`}>
+                      <td className="py-4 px-4 font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white">
                         #{task.id}
                       </td>
-                      <td className="py-4 px-4 font-['Poppins',Helvetica] font-normal text-sm text-soft-white">
+                      <td className="py-4 px-4 font-['Poppins',Helvetica] font-normal text-sm text-gray-700 dark:text-gray-300">
                         {task.serviceType}
                       </td>
-                      <td className="py-4 px-4 font-['Poppins',Helvetica] font-normal text-sm text-soft-white">
+                      <td className="py-4 px-4 font-['Poppins',Helvetica] font-normal text-sm text-gray-700 dark:text-gray-300">
                         {(task.vehicleInfo as any)?.owner || 'N/A'}
                       </td>
                       <td className="py-4 px-4">
@@ -190,7 +190,7 @@ export function Dashboard() {
                           {task.status}
                         </Badge>
                       </td>
-                      <td className="py-4 px-4 font-['Poppins',Helvetica] font-normal text-sm text-soft-white/70">
+                      <td className="py-4 px-4 font-['Poppins',Helvetica] font-normal text-sm text-gray-600 dark:text-gray-400">
                         {task.createdAt ? new Date(task.createdAt).toLocaleDateString() : 'N/A'}
                       </td>
                       <td className="py-4 px-4">
@@ -203,7 +203,7 @@ export function Dashboard() {
                           size="sm" 
                           variant="outline" 
                           onClick={() => handleViewTask(task)}
-                          className="border-electric-blue text-electric-blue hover:bg-electric-blue hover:text-dark-navy transition-colors"
+                          className="border-gray-300 dark:border-salis-gray text-gray-700 dark:text-gray-300 hover:bg-salis-black dark:hover:bg-white hover:text-white dark:hover:text-salis-black transition-colors"
                           data-testid={`button-view-${task.id}`}
                         >
                           View

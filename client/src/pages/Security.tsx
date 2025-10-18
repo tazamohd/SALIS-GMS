@@ -136,12 +136,12 @@ function TwoFactorAuthTab() {
   };
 
   return (
-    <Card data-testid="card-2fa" className="bg-white dark:bg-white">
+    <Card data-testid="card-2fa">
       <CardHeader>
-        <CardTitle className="text-dark-navy">Two-Factor Authentication (2FA)</CardTitle>
-        <CardDescription className="text-dark-navy/70">Add an extra layer of security to your account</CardDescription>
+        <CardTitle>Two-Factor Authentication (2FA)</CardTitle>
+        <CardDescription>Add an extra layer of security to your account</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4 text-dark-navy">
+      <CardContent className="space-y-4">
         {status?.enabled ? (
           <div className="space-y-4">
             <div className="flex items-center justify-between p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
@@ -274,12 +274,12 @@ function AuditLogsTab() {
   });
 
   return (
-    <Card data-testid="card-audit-logs" className="bg-white dark:bg-white">
+    <Card data-testid="card-audit-logs">
       <CardHeader>
-        <CardTitle className="text-dark-navy">Audit Logs</CardTitle>
-        <CardDescription className="text-dark-navy/70">Track all system activities and changes</CardDescription>
+        <CardTitle>Audit Logs</CardTitle>
+        <CardDescription>Track all system activities and changes</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4 text-dark-navy">
+      <CardContent className="space-y-4">
         <div className="grid grid-cols-4 gap-4">
           <div className="space-y-2">
             <Label>Resource Type</Label>
@@ -403,12 +403,12 @@ function BackupRestoreTab() {
   });
 
   return (
-    <Card data-testid="card-backup" className="bg-white dark:bg-white">
+    <Card data-testid="card-backup">
       <CardHeader>
-        <CardTitle className="text-dark-navy">Backup & Restore</CardTitle>
-        <CardDescription className="text-dark-navy/70">Create and manage data backups</CardDescription>
+        <CardTitle>Backup & Restore</CardTitle>
+        <CardDescription>Create and manage data backups</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4 text-dark-navy">
+      <CardContent className="space-y-4">
         <div className="flex gap-4 items-end">
           <div className="flex-1 space-y-2">
             <Label>Backup Type</Label>
@@ -527,12 +527,12 @@ function GDPRTab() {
   });
 
   return (
-    <Card data-testid="card-gdpr" className="bg-white dark:bg-white">
+    <Card data-testid="card-gdpr">
       <CardHeader>
-        <CardTitle className="text-dark-navy">GDPR Compliance</CardTitle>
-        <CardDescription className="text-dark-navy/70">Manage data subject rights requests</CardDescription>
+        <CardTitle>GDPR Compliance</CardTitle>
+        <CardDescription>Manage data subject rights requests</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4 text-dark-navy">
+      <CardContent className="space-y-4">
         <div className="grid gap-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
@@ -649,12 +649,12 @@ function ConsentsTab() {
   });
 
   return (
-    <Card data-testid="card-consents" className="bg-white dark:bg-white">
+    <Card data-testid="card-consents">
       <CardHeader>
-        <CardTitle className="text-dark-navy">User Consents</CardTitle>
-        <CardDescription className="text-dark-navy/70">Manage user consent preferences</CardDescription>
+        <CardTitle>User Consents</CardTitle>
+        <CardDescription>Manage user consent preferences</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4 text-dark-navy">
+      <CardContent className="space-y-4">
         <div className="flex gap-4 items-end">
           <div className="flex-1 space-y-2">
             <Label>Consent Type</Label>
@@ -766,12 +766,12 @@ function PermissionsTab() {
   });
 
   return (
-    <Card data-testid="card-permissions" className="bg-white dark:bg-white">
+    <Card data-testid="card-permissions">
       <CardHeader>
-        <CardTitle className="text-dark-navy">Permission Overrides</CardTitle>
-        <CardDescription className="text-dark-navy/70">Grant or restrict specific permissions for users</CardDescription>
+        <CardTitle>Permission Overrides</CardTitle>
+        <CardDescription>Grant or restrict specific permissions for users</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4 text-dark-navy">
+      <CardContent className="space-y-4">
         <div className="grid gap-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
