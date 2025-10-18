@@ -303,13 +303,13 @@
     --radius: 0.5rem;
     
     /* SALIS AUTO Brand Colors */
-    --salis-midnight-blue: #0B1C2C;
-    --salis-electric-blue: #00A9FF;
-    --salis-sky-blue: #36B1FF;
-    --salis-soft-white: #C0C0C0;
-    --salis-dark-steel: #3C3C3C;
-    --salis-tech-orange: #FF6A00;
-    --salis-deep-teal: #008080;
+    --salis-dark-navy: #0A0F1C;
+    --salis-electric-blue: #00BFFF;
+    --salis-cyber-blue: #008CFF;
+    --salis-neon-blue: #1F6FFF;
+    --salis-brand-blue: #0055b4;
+    --salis-brand-orange: #ce5c17;
+    --salis-soft-white: #eaf2ff;
   }
 
   .dark {
@@ -622,7 +622,7 @@
   [class*="card"],
   [role="dialog"],
   [role="alertdialog"] {
-    @apply bg-midnight-blue border-dark-steel;
+    @apply bg-dark-navy border-neon-blue/30;
   }
   
   /* Override default text colors */
@@ -638,7 +638,7 @@
   input:not([type="radio"]):not([type="checkbox"]),
   textarea,
   select {
-    @apply bg-dark-steel border-dark-steel text-soft-white placeholder:text-soft-white/50;
+    @apply bg-neon-blue/10 border-neon-blue/30 text-soft-white placeholder:text-soft-white/50;
   }
   
   /* Override default button styles */
@@ -648,14 +648,14 @@
   
   /* Override table backgrounds */
   table {
-    @apply bg-midnight-blue;
+    @apply bg-dark-navy;
   }
   
   thead {
-    @apply border-dark-steel;
+    @apply border-neon-blue/30;
   }
   
   tbody tr {
-    @apply border-dark-steel/50 hover:bg-dark-steel/30;
+    @apply border-neon-blue/30 hover:bg-neon-blue/10;
   }
 }
