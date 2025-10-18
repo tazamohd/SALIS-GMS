@@ -45,20 +45,20 @@ export function Dashboard() {
     const statusColors: { [key: string]: string } = {
       'pending': 'bg-electric-blue/10 text-electric-blue border border-electric-blue/30',
       'in_progress': 'bg-cyber-blue/10 text-cyber-blue border border-cyber-blue/30',
-      'completed': 'bg-teal-glow/10 text-teal-glow border border-teal-glow/30',
-      'delivered': 'bg-neon-blue/10 text-neon-blue border border-neon-blue/30',
+      'completed': 'bg-neon-blue/10 text-neon-blue border border-neon-blue/30',
+      'delivered': 'bg-brand-blue/10 text-brand-blue border border-brand-blue/30',
       'cancelled': 'bg-brand-orange/10 text-brand-orange border border-brand-orange/30',
     };
-    return statusColors[status] || 'bg-gray-100 text-soft-white border border-gray-200';
+    return statusColors[status] || 'bg-neon-blue/10 text-soft-white border border-neon-blue/30';
   };
 
   const getPriorityBadge = (priority: string) => {
     const priorityColors: { [key: string]: string } = {
       'high': 'bg-brand-orange/10 text-brand-orange border border-brand-orange/30',
       'medium': 'bg-cyber-blue/10 text-cyber-blue border border-cyber-blue/30',
-      'low': 'bg-teal-glow/10 text-teal-glow border border-teal-glow/30',
+      'low': 'bg-neon-blue/10 text-neon-blue border border-neon-blue/30',
     };
-    return priorityColors[priority] || 'bg-gray-100 text-soft-white border border-gray-200';
+    return priorityColors[priority] || 'bg-neon-blue/10 text-soft-white border border-neon-blue/30';
   };
 
   return (
@@ -103,11 +103,11 @@ export function Dashboard() {
           </CardContent>
         </Card>
 
-        <Card className="border border-teal-glow/50 shadow-sm hover:shadow-lg hover:shadow-teal-glow/30 transition-all bg-gradient-to-br from-teal-glow/20 to-cyber-blue/10">
+        <Card className="border border-cyber-blue/50 shadow-sm hover:shadow-lg hover:shadow-cyber-blue/30 transition-all bg-gradient-to-br from-cyber-blue/20 to-neon-blue/10">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="font-poppins font-medium text-sm text-teal-glow uppercase">Completion</h3>
-              <CheckCircle className="w-5 h-5 text-teal-glow" />
+              <h3 className="font-poppins font-medium text-sm text-cyber-blue uppercase">Completion</h3>
+              <CheckCircle className="w-5 h-5 text-cyber-blue" />
             </div>
             <p className="font-montserrat font-bold text-3xl text-soft-white mb-1">{completionCount}</p>
             <p className="font-poppins font-normal text-xs text-soft-white/60">in the last 2 hours</p>
@@ -128,7 +128,7 @@ export function Dashboard() {
               return (
                 <div key={month} className="flex-1 flex flex-col items-center gap-2">
                   <div 
-                    className="w-full bg-gradient-to-t from-electric-blue via-cyber-blue to-teal-glow rounded-t shadow-lg hover:shadow-electric-blue/50 transition-shadow"
+                    className="w-full bg-gradient-to-t from-electric-blue via-cyber-blue to-neon-blue rounded-t shadow-lg hover:shadow-electric-blue/50 transition-shadow"
                     style={{ height: `${heights[i]}%` }}
                   ></div>
                   <span className="font-poppins font-normal text-xs text-soft-white">{month}</span>
