@@ -52,77 +52,67 @@ export function Layout({ children }: LayoutProps) {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  // Organized navigation groups
+  // Streamlined and reorganized navigation groups
   const navGroups = [
     {
-      label: "Dashboard & Overview",
+      label: "Dashboard",
       items: [
         { path: "/dashboard", icon: Home, label: "Dashboard" },
       ]
     },
     {
-      label: "Operations & Scheduling",
-      items: [
-        { path: "/calendar", icon: Calendar, label: "Scheduling & Calendar" },
-        { path: "/appointments", icon: Calendar, label: "Appointments" },
-        { path: "/tasks", icon: ClipboardCheck, label: "Tasks Management" },
-      ]
-    },
-    {
-      label: "Job Management",
+      label: "Operations",
       items: [
         { path: "/job-cards", icon: Wrench, label: "Job Cards" },
+        { path: "/calendar", icon: Calendar, label: "Calendar & Scheduling" },
+        { path: "/appointments", icon: Calendar, label: "Appointments" },
+        { path: "/tasks", icon: ClipboardCheck, label: "Tasks" },
         { path: "/service-templates", icon: ClipboardList, label: "Service Templates" },
         { path: "/technician-portal", icon: HardHat, label: "Technician Portal" },
       ]
     },
     {
-      label: "Staff & Technicians",
-      items: [
-        { path: "/technician-management", icon: UserCog, label: "Technician Management" },
-        { path: "/hr-management", icon: UserCheck, label: "HR Management" },
-      ]
-    },
-    {
-      label: "Inventory & Parts",
-      items: [
-        { path: "/inventory-management", icon: Warehouse, label: "Inventory & Parts" },
-        { path: "/spare-parts", icon: Package, label: "Spare Parts" },
-        { path: "/tools", icon: Hammer, label: "Tools Management" },
-        { path: "/suppliers", icon: Building2, label: "Suppliers" },
-      ]
-    },
-    {
-      label: "Orders & Purchasing",
-      items: [
-        { path: "/purchase-orders", icon: ShoppingCart, label: "Purchase Orders" },
-        { path: "/estimates", icon: Receipt, label: "Estimates" },
-      ]
-    },
-    {
-      label: "Customers & Vehicles",
+      label: "Customers & Fleet",
       items: [
         { path: "/customers", icon: Users, label: "Customers" },
         { path: "/vehicles", icon: Car, label: "Vehicles" },
       ]
     },
     {
-      label: "Financial Management",
+      label: "Inventory & Orders",
       items: [
-        { path: "/invoices", icon: FileText, label: "Invoices" },
-        { path: "/financial-settings", icon: DollarSign, label: "Financial Settings" },
-        { path: "/refund-management", icon: RotateCcw, label: "Refund Management" },
+        { path: "/inventory-management", icon: Warehouse, label: "Inventory & Parts" },
+        { path: "/spare-parts", icon: Package, label: "Spare Parts" },
+        { path: "/tools", icon: Hammer, label: "Tools" },
+        { path: "/suppliers", icon: Building2, label: "Suppliers" },
+        { path: "/purchase-orders", icon: ShoppingCart, label: "Purchase Orders" },
+        { path: "/estimates", icon: Receipt, label: "Estimates & Quotes" },
       ]
     },
     {
-      label: "Analytics & Insights",
+      label: "Team & Staff",
+      items: [
+        { path: "/technician-management", icon: UserCog, label: "Technician Management" },
+        { path: "/hr-management", icon: UserCheck, label: "HR & Payroll" },
+      ]
+    },
+    {
+      label: "Finance",
+      items: [
+        { path: "/invoices", icon: FileText, label: "Invoices" },
+        { path: "/financial-settings", icon: DollarSign, label: "Financial Settings" },
+        { path: "/refund-management", icon: RotateCcw, label: "Refunds" },
+      ]
+    },
+    {
+      label: "Analytics",
       items: [
         { path: "/reports", icon: BarChart3, label: "Reports" },
         { path: "/business-intelligence", icon: TrendingUp, label: "Business Intelligence" },
       ]
     },
     {
-      label: "Advanced Tools",
+      label: "Automation & Tools",
       items: [
         { path: "/ai-automation", icon: Brain, label: "AI Automation" },
         { path: "/integrations", icon: Plug2, label: "Integrations" },
@@ -130,11 +120,11 @@ export function Layout({ children }: LayoutProps) {
       ]
     },
     {
-      label: "Settings & Security",
+      label: "Settings",
       items: [
         { path: "/settings", icon: SettingsIcon, label: "Settings" },
-        { path: "/security", icon: Shield, label: "Security & Compliance" },
-        { path: "/profile", icon: UserIcon, label: "My Profile" },
+        { path: "/security", icon: Shield, label: "Security" },
+        { path: "/profile", icon: UserIcon, label: "Profile" },
       ]
     },
   ];
@@ -168,28 +158,28 @@ export function Layout({ children }: LayoutProps) {
           />
         )}
 
-      {/* Sidebar - SALIS AUTO Dark Navy */}
+      {/* Sidebar - Compact Design */}
       <aside className={`
         fixed lg:static inset-y-0 left-0 z-50
-        w-64 bg-dark-navy border-r border-neon-blue/30 flex flex-col
+        w-56 bg-dark-navy border-r border-neon-blue/30 flex flex-col
         transition-transform duration-300 ease-in-out
         ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
-        {/* Logo - SALIS AUTO Brand */}
-        <div className="p-6 border-b border-neon-blue/30">
+        {/* Logo - Compact */}
+        <div className="p-4 border-b border-neon-blue/30">
           <Link href="/dashboard">
             <img 
               src="/attached_assets/Logo_blue_orange_1760743036292.png" 
               alt="SALIS AUTO"
-              className="w-32 h-auto mx-auto"
+              className="w-24 h-auto mx-auto"
               data-testid="logo-salis-auto"
             />
           </Link>
         </div>
 
-        {/* Navigation */}
-        <nav className="flex-1 p-4 overflow-y-auto">
-          <div className="space-y-1">
+        {/* Navigation - Compact */}
+        <nav className="flex-1 p-3 overflow-y-auto">
+          <div className="space-y-0.5">
             {navGroups.map((group) => {
               const isExpanded = expandedGroups.includes(group.label);
               const hasActiveItem = group.items.some(item => location === item.path);
@@ -204,19 +194,19 @@ export function Layout({ children }: LayoutProps) {
                     className="w-full"
                     data-testid={`nav-group-${group.label.toLowerCase().replace(/\s+/g, '-')}`}
                   >
-                    <div className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-neon-blue/10 transition-colors group">
-                      <span className="font-poppins font-semibold text-xs uppercase text-soft-white/70 tracking-wide">
+                    <div className="flex items-center justify-between px-2 py-1.5 rounded-md hover:bg-neon-blue/10 transition-colors group">
+                      <span className="font-poppins font-semibold text-[10px] uppercase text-soft-white/60 tracking-wider">
                         {group.label}
                       </span>
                       {isExpanded ? (
-                        <ChevronDown className="w-4 h-4 text-soft-white/50 group-hover:text-soft-white" />
+                        <ChevronDown className="w-3 h-3 text-soft-white/40 group-hover:text-soft-white" />
                       ) : (
-                        <ChevronRight className="w-4 h-4 text-soft-white/50 group-hover:text-soft-white" />
+                        <ChevronRight className="w-3 h-3 text-soft-white/40 group-hover:text-soft-white" />
                       )}
                     </div>
                   </CollapsibleTrigger>
                   
-                  <CollapsibleContent className="mt-1 space-y-1">
+                  <CollapsibleContent className="mt-0.5 space-y-0.5">
                     {group.items.map((item) => {
                       const Icon = item.icon;
                       const isActive = location === item.path;
@@ -224,15 +214,15 @@ export function Layout({ children }: LayoutProps) {
                       return (
                         <Link key={item.path} href={item.path}>
                           <div
-                            className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-200 cursor-pointer ml-2 ${
+                            className={`flex items-center gap-2 px-3 py-1.5 rounded-md transition-all duration-200 cursor-pointer ml-1 ${
                               isActive
-                                ? 'bg-electric-blue text-dark-navy shadow-lg shadow-electric-blue/30'
+                                ? 'bg-electric-blue text-dark-navy shadow-md shadow-electric-blue/20'
                                 : 'text-soft-white hover:bg-neon-blue/10 hover:text-electric-blue'
                             }`}
                             data-testid={`nav-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
                           >
-                            <Icon className="w-4 h-4" />
-                            <span className="font-poppins font-medium text-sm">
+                            <Icon className="w-3.5 h-3.5 flex-shrink-0" />
+                            <span className="font-poppins font-medium text-xs truncate">
                               {item.label}
                             </span>
                           </div>
@@ -246,16 +236,17 @@ export function Layout({ children }: LayoutProps) {
           </div>
         </nav>
 
-        {/* Logout */}
-        <div className="p-4 border-t border-neon-blue/30">
+        {/* Logout - Compact */}
+        <div className="p-3 border-t border-neon-blue/30">
           <Button
             onClick={handleLogout}
             variant="ghost"
-            className="w-full justify-start text-brand-orange hover:text-brand-orange/80 hover:bg-neon-blue/10"
+            size="sm"
+            className="w-full justify-start text-brand-orange hover:text-brand-orange/80 hover:bg-neon-blue/10 h-8"
             data-testid="button-logout"
           >
-            <LogOut className="w-5 h-5 mr-3" />
-            <span className="font-poppins font-medium text-sm">Logout</span>
+            <LogOut className="w-4 h-4 mr-2" />
+            <span className="font-poppins font-medium text-xs">Logout</span>
           </Button>
         </div>
       </aside>
@@ -263,40 +254,41 @@ export function Layout({ children }: LayoutProps) {
       {/* Main Content */}
       <div className="flex-1 flex flex-col lg:ml-0">
         {/* Header - Dark with Electric Blue accents */}
-        <header className="h-16 bg-dark-navy border-b border-neon-blue/30 px-4 sm:px-8 flex items-center gap-4 shadow-sm">
+        <header className="h-14 bg-dark-navy border-b border-neon-blue/30 px-4 sm:px-6 flex items-center gap-3 shadow-sm">
           {/* Mobile Menu Toggle */}
           <Button
             variant="ghost"
             size="icon"
-            className="lg:hidden text-soft-white hover:text-electric-blue"
+            className="lg:hidden text-soft-white hover:text-electric-blue h-8 w-8"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label="Toggle mobile menu"
             data-testid="button-mobile-menu"
           >
-            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
           </Button>
           
           <div className="flex-1" />
           
-          {/* Search Bar - Hidden on small screens */}
+          {/* Search Bar - Compact */}
           <div className="hidden md:block relative w-full max-w-md">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-soft-white/70" />
+            <Search className="absolute left-2.5 top-1/2 transform -translate-y-1/2 w-3.5 h-3.5 text-soft-white/70" />
             <Input
               type="text"
               placeholder="Search..."
-              className="pl-10 bg-neon-blue/10 border-neon-blue/30 text-soft-white placeholder:text-soft-white/50 focus:border-electric-blue focus:ring-electric-blue font-poppins"
+              className="pl-9 h-9 bg-neon-blue/10 border-neon-blue/30 text-soft-white text-sm placeholder:text-soft-white/50 focus:border-electric-blue focus:ring-electric-blue font-poppins"
               data-testid="input-search"
             />
           </div>
           <Button
             variant="outline"
+            size="sm"
             onClick={() => setQuickActionsOpen(true)}
-            className="gap-2 border-electric-blue text-electric-blue hover:bg-electric-blue hover:text-dark-navy transition-colors font-poppins"
+            className="gap-2 h-9 border-electric-blue text-electric-blue hover:bg-electric-blue hover:text-dark-navy transition-colors font-poppins"
             data-testid="button-quick-actions"
           >
-            <Zap className="w-4 h-4" />
-            <span className="hidden sm:inline">Quick Actions</span>
-            <kbd className="hidden sm:inline-flex px-1.5 py-0.5 bg-neon-blue/10 border border-neon-blue/30 rounded text-xs font-mono text-soft-white">
+            <Zap className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline text-xs">Quick Actions</span>
+            <kbd className="hidden sm:inline-flex px-1 py-0.5 bg-neon-blue/10 border border-neon-blue/30 rounded text-[10px] font-mono text-soft-white">
               {navigator.platform.includes("Mac") ? "⌘K" : "Ctrl+K"}
             </kbd>
           </Button>
