@@ -1,6 +1,7 @@
 /* SALIS AUTO Typography - Google Fonts */
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
 
+@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
@@ -11,7 +12,16 @@
 }
 
 :root {
-  /* SALIS AUTO Typography Overrides */
+  /* SALIS AUTO Brand Colors - RESTRICTED PALETTE ONLY */
+  --salis-dark-navy: #0A0F1C;
+  --salis-electric-blue: #00BFFF;
+  --salis-cyber-blue: #008CFF;
+  --salis-neon-blue: #1F6FFF;
+  --salis-brand-blue: #0055b4;
+  --salis-brand-orange: #ce5c17;
+  --salis-soft-white: #eaf2ff;
+
+  /* SALIS AUTO Typography Variables */
   --14-regular-font-family: "Poppins", "Inter", Helvetica;
   --14-regular-font-size: 14px;
   --14-regular-font-style: normal;
@@ -19,329 +29,253 @@
   --14-regular-letter-spacing: 0px;
   --14-regular-line-height: 140%;
   
-  /* SALIS AUTO Accent Colors - New Brand Palette */
-  --accent-100: #00BFFF;
-  --accent-50: #008CFF;
-  --accent-500: #008CFF;
-  --accent-950: #0A0F1C;
-  --basewhite: #eaf2ff;
-  
-  /* SALIS AUTO Body Typography */
   --body-base-font-family: "Poppins", "Inter", Helvetica;
   --body-base-font-size: 16px;
   --body-base-font-style: normal;
   --body-base-font-weight: 400;
   --body-base-letter-spacing: 0px;
   --body-base-line-height: 140%;
+  
   --body-bold-small-font-family: "Poppins", Helvetica;
   --body-bold-small-font-size: 12px;
   --body-bold-small-font-style: normal;
   --body-bold-small-font-weight: 500;
   --body-bold-small-letter-spacing: -0.30000001192092896px;
   --body-bold-small-line-height: 140%;
+  
   --body-emphasized-font-family: "Poppins", Helvetica;
   --body-emphasized-font-size: 17px;
   --body-emphasized-font-style: normal;
   --body-emphasized-font-weight: 400;
   --body-emphasized-letter-spacing: -0.4300000071525574px;
   --body-emphasized-line-height: 22px;
+  
   --body-medium-font-family: "Poppins", Helvetica;
   --body-medium-font-size: 14px;
   --body-medium-font-style: normal;
   --body-medium-font-weight: 500;
   --body-medium-letter-spacing: 0px;
   --body-medium-line-height: 140%;
+  
   --body-regular-font-family: "Poppins", Helvetica;
   --body-regular-font-size: 14px;
   --body-regular-font-style: normal;
   --body-regular-font-weight: 400;
   --body-regular-letter-spacing: 0px;
   --body-regular-line-height: 140%;
+  
   --body-regular-medium-font-family: "Poppins", Helvetica;
   --body-regular-medium-font-size: 14px;
   --body-regular-medium-font-style: normal;
   --body-regular-medium-font-weight: 400;
   --body-regular-medium-letter-spacing: -0.5px;
   --body-regular-medium-line-height: 140%;
+  
   --body-semibold-font-family: "Poppins", Helvetica;
   --body-semibold-font-size: 14px;
   --body-semibold-font-style: normal;
   --body-semibold-font-weight: 600;
   --body-semibold-letter-spacing: 0px;
   --body-semibold-line-height: 140%;
+  
   --caps-md-font-family: "Poppins", Helvetica;
   --caps-md-font-size: 12px;
   --caps-md-font-style: normal;
   --caps-md-font-weight: 500;
   --caps-md-letter-spacing: 0.30000001192092896px;
   --caps-md-line-height: 140%;
-  --cyan-50: rgba(236, 254, 255, 1);
-  --cyan-700: rgba(14, 116, 144, 1);
-  /* SALIS AUTO Display Typography - Montserrat */
+  
   --display-large-semibold-font-family: "Montserrat", Helvetica;
   --display-large-semibold-font-size: 54px;
   --display-large-semibold-font-style: normal;
   --display-large-semibold-font-weight: 600;
   --display-large-semibold-letter-spacing: -2.7px;
   --display-large-semibold-line-height: normal;
+  
   --display-medium-semibold-font-family: "Montserrat", Helvetica;
   --display-medium-semibold-font-size: 32px;
   --display-medium-semibold-font-style: normal;
   --display-medium-semibold-font-weight: 600;
   --display-medium-semibold-letter-spacing: -1.6px;
   --display-medium-semibold-line-height: 100%;
+  
   --display-small-semibold-font-family: "Montserrat", Helvetica;
   --display-small-semibold-font-size: 24px;
   --display-small-semibold-font-style: normal;
   --display-small-semibold-font-weight: 600;
   --display-small-semibold-letter-spacing: 0px;
   --display-small-semibold-line-height: normal;
-  --drop-shadow-100: 0px 1px 4px 0px rgba(12, 12, 13, 0.05);
-  /* SALIS AUTO Error/Alert Colors - Brand Orange */
-  --error-50: rgba(255, 240, 229, 1);
-  --error-500: #ce5c17;
-  --error-700: rgba(180, 80, 20, 1);
   
-  /* SALIS AUTO Gray Scale - New Brand Palette */
-  --gray-50: #eaf2ff;  /* Soft White */
-  --gray-100: rgba(245, 245, 245, 1);
-  --gray-200: #eaf2ff;  /* Soft White */
-  --gray-300: rgba(170, 170, 170, 1);
-  --gray-400: rgba(130, 130, 130, 1);
-  --gray-500: rgba(100, 100, 100, 1);
-  --gray-600: rgba(60, 60, 60, 1);
-  --gray-700: rgba(40, 40, 40, 1);
-  --gray-800: #1F6FFF;  /* Neon Blue */
-  --gray-900: #0A0F1C;  /* Dark Navy */
-  --graysblack: rgba(0, 0, 0, 1);
-  --grayswhite: #eaf2ff;
-  /* SALIS AUTO Headlines - Montserrat */
+  --drop-shadow-100: 0px 1px 4px 0px rgba(12, 12, 13, 0.05);
+  
   --headline-bold-font-family: "Montserrat", Helvetica;
   --headline-bold-font-size: 20px;
   --headline-bold-font-style: normal;
   --headline-bold-font-weight: 700;
   --headline-bold-letter-spacing: 0px;
   --headline-bold-line-height: normal;
+  
   --headline-medium-font-family: "Montserrat", Helvetica;
   --headline-medium-font-size: 20px;
   --headline-medium-font-style: normal;
   --headline-medium-font-weight: 500;
   --headline-medium-letter-spacing: 0px;
   --headline-medium-line-height: normal;
+  
   --headline-semibold-font-family: "Montserrat", Helvetica;
   --headline-semibold-font-size: 20px;
   --headline-semibold-font-style: normal;
   --headline-semibold-font-weight: 600;
   --headline-semibold-letter-spacing: 0px;
   --headline-semibold-line-height: normal;
-  --indigo-50: rgba(238, 244, 255, 1);
-  --indigo-700: rgba(53, 56, 205, 1);
-  --info-50: rgba(239, 248, 255, 1);
-  --info-700: rgba(23, 92, 211, 1);
+  
   --label-medium-font-family: "Poppins", Helvetica;
   --label-medium-font-size: 12px;
   --label-medium-font-style: normal;
   --label-medium-font-weight: 500;
   --label-medium-letter-spacing: 0px;
   --label-medium-line-height: 140%;
+  
   --label-regular-font-family: "Poppins", Helvetica;
   --label-regular-font-size: 12px;
   --label-regular-font-style: normal;
   --label-regular-font-weight: 400;
   --label-regular-letter-spacing: 0px;
   --label-regular-line-height: 140%;
+  
   --label-small-font-family: "Poppins", Helvetica;
   --label-small-font-size: 11px;
   --label-small-font-style: normal;
   --label-small-font-weight: 400;
   --label-small-letter-spacing: 0.04400000065565109px;
   --label-small-line-height: normal;
-  --m-3syslighterror: rgba(179, 38, 30, 1);
-  --m-3syslightsurface: rgba(254, 247, 255, 1);
+  
   --m3-title-small-font-family: "Poppins", Helvetica;
   --m3-title-small-font-size: 14px;
   --m3-title-small-font-style: normal;
   --m3-title-small-font-weight: 500;
   --m3-title-small-letter-spacing: 0.10000000149011612px;
   --m3-title-small-line-height: 20px;
-  --m3syslighton-surface: rgba(29, 27, 32, 1);
-  --m3syslighton-surface-variant: rgba(73, 69, 79, 1);
-  --m3syslightoutline-variant: rgba(202, 196, 208, 1);
-  /* SALIS AUTO Neutral Scale */
-  --neutral-50: rgba(250, 250, 250, 1);
-  --neutral-100: rgba(245, 245, 245, 1);
-  --neutral-200: #C0C0C0;  /* Chrome Silver */
-  --neutral-300: rgba(170, 170, 170, 1);
-  --neutral-400: rgba(130, 130, 130, 1);
-  --neutral-500: rgba(100, 100, 100, 1);
-  --neutral-600: #3C3C3C;  /* Dark Steel Gray */
-  --neutral-700: rgba(40, 40, 40, 1);
-  --neutral-800: rgba(30, 30, 30, 1);
-  --neutral-900: rgba(20, 20, 20, 1);
-  --neutral-950: #0B1C2C;  /* Midnight Blue */
-  --neutral500-base: rgba(100, 100, 100, 1);
-  --neutralwhite: rgba(255, 255, 255, 1);
-  --on-surface-dark-low-emphasis: rgba(60, 60, 60, 0.42);
   
-  /* SALIS AUTO Primary - Electric Blue */
-  --primary-0: rgba(255, 255, 255, 1);
-  --primary-100: #36B1FF;  /* Sky Blue */
-  --primary-400: #00A9FF;  /* Electric Blue */
-  --primary-900: #0B1C2C;  /* Midnight Blue */
+  --shadow: 0px 1px 3px 1px rgba(16, 24, 40, 0.15), 0px 1px 2px 0px rgba(0, 0, 0, 0.3);
+  --shadow-black-lg: 0px 4px 6px -2px rgba(15, 23, 42, 0.05), 0px 12px 16px -4px rgba(15, 23, 42, 0.1);
+  --shadow-black-sm: 0px 1px 2px 0px rgba(15, 23, 42, 0.06), 0px 1px 3px 0px rgba(15, 23, 42, 0.1);
   
-  /* SALIS AUTO Secondary - Deep Teal */
-  --secondarysecondary-base: #008080;  /* Deep Teal */
-  --secondery-200: rgba(128, 224, 224, 1);
-  --secondery-300: rgba(96, 208, 208, 1);
-  --secondery-400: rgba(64, 192, 192, 1);
-  --secondery-500: #008080;  /* Deep Teal */
-  --secondery-800: rgba(0, 96, 96, 1);
-  --secondery-950: rgba(0, 64, 64, 1);
-  --shadow: 0px 1px 3px 1px rgba(16, 24, 40, 0.15), 0px 1px 2px 0px
-    rgba(0, 0, 0, 0.3);
-  --shadow-black-lg: 0px 4px 6px -2px rgba(15, 23, 42, 0.05), 0px 12px 16px -4px
-    rgba(15, 23, 42, 0.1);
-  --shadow-black-sm: 0px 1px 2px 0px rgba(15, 23, 42, 0.06), 0px 1px 3px 0px
-    rgba(15, 23, 42, 0.1);
   --single-line-body-base-font-family: "Inter", Helvetica;
   --single-line-body-base-font-size: 16px;
   --single-line-body-base-font-style: normal;
   --single-line-body-base-font-weight: 400;
   --single-line-body-base-letter-spacing: 0px;
   --single-line-body-base-line-height: 100%;
-  /* SALIS AUTO Success Colors - Deep Teal */
-  --success-50: rgba(230, 250, 250, 1);
-  --success-600: #008080;  /* Deep Teal */
-  --success-700: rgba(0, 112, 112, 1);
-  --text: rgba(16, 23, 32, 1);
+  
   --text-sm-medium-font-family: "Inter", Helvetica;
   --text-sm-medium-font-size: 14px;
   --text-sm-medium-font-style: normal;
   --text-sm-medium-font-weight: 500;
   --text-sm-medium-letter-spacing: 0px;
   --text-sm-medium-line-height: 20px;
+  
   --text-sm-normal-font-family: "Inter", Helvetica;
   --text-sm-normal-font-size: 14px;
   --text-sm-normal-font-style: normal;
   --text-sm-normal-font-weight: 400;
   --text-sm-normal-letter-spacing: 0px;
   --text-sm-normal-line-height: 20px;
+  
   --text-xs-medium-font-family: "Inter", Helvetica;
   --text-xs-medium-font-size: 12px;
   --text-xs-medium-font-style: normal;
   --text-xs-medium-font-weight: 500;
   --text-xs-medium-letter-spacing: 0px;
   --text-xs-medium-line-height: 18px;
-  --textprimary-black: rgba(51, 51, 51, 1);
-  /* SALIS AUTO Titles - Montserrat */
+  
   --title-medium-font-family: "Montserrat", Helvetica;
   --title-medium-font-size: 16px;
   --title-medium-font-style: normal;
   --title-medium-font-weight: 500;
   --title-medium-letter-spacing: 0px;
   --title-medium-line-height: normal;
+  
   --title-regular-font-family: "Montserrat", Helvetica;
   --title-regular-font-size: 16px;
   --title-regular-font-style: normal;
   --title-regular-font-weight: 400;
   --title-regular-letter-spacing: 0px;
   --title-regular-line-height: 140%;
+  
   --title-semibold-font-family: "Montserrat", Helvetica;
   --title-semibold-font-size: 16px;
   --title-semibold-font-style: normal;
   --title-semibold-font-weight: 600;
   --title-semibold-letter-spacing: 0px;
   --title-semibold-line-height: 140%;
-  --ui-base-200: rgba(240, 241, 242, 1);
-  --ui-base-300: rgba(230, 231, 233, 1);
-  --ui-base-50: rgba(255, 255, 255, 1);
-  --ui-base-ui-base-500: rgba(145, 146, 148, 1);
-  --violet-50: rgba(245, 243, 255, 1);
-  --violet-600: rgba(124, 58, 237, 1);
-  --violet-700: rgba(109, 40, 217, 1);
-  --white: rgba(255, 255, 255, 1);
-  --yellow-50: rgba(254, 252, 232, 1);
-  --yellow-700: rgba(161, 98, 7, 1);
 }
-
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
 
 @layer base {
   :root {
-    /* SALIS AUTO Color Palette - Light Mode */
-    --background: 0 0% 98%;
-    --foreground: 207 60% 11%;  /* Midnight Blue #0B1C2C */
+    /* SALIS AUTO shadcn Theme Colors - Light Mode */
+    --background: 217 100% 96%;  /* Soft White #eaf2ff */
+    --foreground: 213 47% 7%;  /* Dark Navy #0A0F1C */
 
-    --muted: 210 14% 89%;  /* Light gray */
-    --muted-foreground: 0 0% 40%;  /* Dark Steel Gray */
+    --muted: 217 100% 90%;
+    --muted-foreground: 219 100% 40%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 207 60% 11%;
+    --accent: 195 100% 50%;  /* Electric Blue #00BFFF */
+    --accent-foreground: 217 100% 96%;  /* Soft White */
 
-    --border: 0 0% 76%;  /* Chrome Silver */
-    --input: 0 0% 90%;
+    --popover: 217 100% 96%;
+    --popover-foreground: 213 47% 7%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 207 60% 11%;
+    --border: 219 100% 56%;  /* Neon Blue #1F6FFF */
+    --input: 217 100% 90%;
 
-    --primary: 20 80% 45%;  /* Brand Orange #ce5c17 */
-    --primary-foreground: 0 0% 100%;
+    --card: 213 47% 10%;
+    --card-foreground: 217 100% 96%;
 
-    --secondary: 200 100% 59%;  /* Sky Blue #36B1FF */
-    --secondary-foreground: 0 0% 100%;
+    --primary: 23 80% 45%;  /* Brand Orange #ce5c17 */
+    --primary-foreground: 217 100% 96%;
 
-    --accent: 197 100% 50%;  /* Electric Blue */
-    --accent-foreground: 0 0% 100%;
+    --secondary: 207 100% 50%;  /* Cyber Blue #008CFF */
+    --secondary-foreground: 217 100% 96%;
 
     --destructive: 0 100% 50%;
-    --destructive-foreground: 0 0% 100%;
+    --destructive-foreground: 217 100% 96%;
 
-    --ring: 197 100% 50%;  /* Electric Blue */
+    --ring: 195 100% 50%;  /* Electric Blue #00BFFF */
 
     --radius: 0.5rem;
-    
-    /* SALIS AUTO Brand Colors */
-    --salis-dark-navy: #0A0F1C;
-    --salis-electric-blue: #00BFFF;
-    --salis-cyber-blue: #008CFF;
-    --salis-neon-blue: #1F6FFF;
-    --salis-brand-blue: #0055b4;
-    --salis-brand-orange: #ce5c17;
-    --salis-soft-white: #eaf2ff;
   }
 
   .dark {
-    /* SALIS AUTO Color Palette - Dark Mode */
-    --background: 207 60% 11%;  /* Midnight Blue #0B1C2C */
-    --foreground: 0 0% 95%;  /* Chrome Silver */
+    /* SALIS AUTO shadcn Theme Colors - Dark Mode */
+    --background: 213 47% 7%;  /* Dark Navy #0A0F1C */
+    --foreground: 217 100% 96%;  /* Soft White #eaf2ff */
 
-    --muted: 207 45% 18%;  /* Slightly lighter Midnight Blue */
-    --muted-foreground: 0 0% 76%;  /* Chrome Silver */
+    --muted: 213 47% 12%;
+    --muted-foreground: 217 100% 80%;
 
-    --accent: 197 100% 50%;  /* Electric Blue */
-    --accent-foreground: 0 0% 100%;
+    --accent: 195 100% 50%;  /* Electric Blue #00BFFF */
+    --accent-foreground: 213 47% 7%;
 
-    --popover: 207 55% 15%;
-    --popover-foreground: 0 0% 95%;
+    --popover: 213 47% 10%;
+    --popover-foreground: 217 100% 96%;
 
-    --border: 0 0% 24%;  /* Dark Steel Gray */
-    --input: 207 45% 18%;
+    --border: 219 100% 56%;  /* Neon Blue #1F6FFF */
+    --input: 213 47% 12%;
 
-    --card: 207 55% 15%;
-    --card-foreground: 0 0% 95%;
+    --card: 213 47% 10%;
+    --card-foreground: 217 100% 96%;
 
-    --primary: 20 80% 45%;  /* Brand Orange #ce5c17 */
-    --primary-foreground: 0 0% 100%;
+    --primary: 23 80% 45%;  /* Brand Orange #ce5c17 */
+    --primary-foreground: 217 100% 96%;
 
-    --secondary: 200 100% 59%;  /* Sky Blue */
-    --secondary-foreground: 0 0% 100%;
+    --secondary: 207 100% 50%;  /* Cyber Blue #008CFF */
+    --secondary-foreground: 217 100% 96%;
 
     --destructive: 0 63% 31%;
-    --destructive-foreground: 0 0% 100%;
+    --destructive-foreground: 217 100% 96%;
 
-    --ring: 197 100% 50%;  /* Electric Blue */
+    --ring: 195 100% 50%;  /* Electric Blue #00BFFF */
 
     --radius: 0.5rem;
   }
@@ -379,283 +313,33 @@
     font-size: 1.5rem;
     font-weight: 500;
   }
-  
-  .font-logo {
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 700;
-  }
-  
+}
+
+@layer components {
+  /* SALIS AUTO Gradient Text Utility */
   .text-gradient-salis {
-    background: linear-gradient(90deg, #00A9FF 0%, #36B1FF 50%, #FF6A00 100%);
+    background: linear-gradient(90deg, #00BFFF 0%, #008CFF 50%, #1F6FFF 100%);
     -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
     background-clip: text;
-  }
-}
-
-/* Print Styles */
-@media print {
-  /* Hide navigation and non-essential elements */
-  nav,
-  aside,
-  .no-print,
-  button:not(.print-visible),
-  [data-print-hide="true"] {
-    display: none !important;
-  }
-
-  /* Reset page styles for printing */
-  body {
-    background: white !important;
-    color: black !important;
-    margin: 0;
-    padding: 0;
-  }
-
-  /* Ensure proper page breaks */
-  .page-break {
-    page-break-after: always;
-  }
-
-  .page-break-before {
-    page-break-before: always;
-  }
-
-  .avoid-break {
-    page-break-inside: avoid;
-  }
-
-  /* Invoice and document styles */
-  .print-document {
-    width: 100%;
-    max-width: 100%;
-    margin: 0;
-    padding: 20mm;
-    background: white;
-    color: black;
-  }
-
-  /* Table styles for print */
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    page-break-inside: auto;
-  }
-
-  tr {
-    page-break-inside: avoid;
-    page-break-after: auto;
-  }
-
-  thead {
-    display: table-header-group;
-  }
-
-  tfoot {
-    display: table-footer-group;
-  }
-
-  /* Headers and footers */
-  .print-header {
-    position: running(header);
-    padding-bottom: 10mm;
-    border-bottom: 1px solid #ddd;
-  }
-
-  .print-footer {
-    position: running(footer);
-    padding-top: 10mm;
-    border-top: 1px solid #ddd;
-  }
-
-  /* Typography adjustments */
-  h1 {
-    font-size: 24pt;
-    margin-bottom: 12pt;
-  }
-
-  h2 {
-    font-size: 18pt;
-    margin-bottom: 10pt;
-  }
-
-  h3 {
-    font-size: 14pt;
-    margin-bottom: 8pt;
-  }
-
-  p, li {
-    font-size: 11pt;
-    line-height: 1.5;
-  }
-
-  /* Links */
-  a {
-    color: black !important;
-    text-decoration: none;
-  }
-
-  a[href]:after {
-    content: " (" attr(href) ")";
-    font-size: 9pt;
-    color: #666;
-  }
-
-  /* Remove shadows and effects */
-  * {
-    box-shadow: none !important;
-    text-shadow: none !important;
-  }
-
-  /* Card and container styles */
-  .card,
-  [class*="Card"] {
-    border: 1px solid #ddd !important;
-    box-shadow: none !important;
-    page-break-inside: avoid;
-  }
-
-  /* Ensure images fit properly */
-  img {
-    max-width: 100% !important;
-    height: auto !important;
-    page-break-inside: avoid;
-  }
-
-  /* QR codes and barcodes */
-  .qr-code,
-  .barcode {
-    page-break-inside: avoid;
-    margin: 10px 0;
-  }
-
-  /* Invoice specific styles */
-  .invoice-header {
-    margin-bottom: 20mm;
-  }
-
-  .invoice-details {
-    margin-bottom: 15mm;
-  }
-
-  .invoice-items {
-    margin-bottom: 15mm;
-  }
-
-  .invoice-total {
-    margin-top: 10mm;
-    font-weight: bold;
-  }
-
-  /* Job card styles */
-  .job-card {
-    border: 2px solid black;
-    padding: 15mm;
-    margin: 0;
-  }
-
-  .job-card-header {
-    border-bottom: 2px solid black;
-    padding-bottom: 10mm;
-    margin-bottom: 10mm;
-  }
-
-  /* Report styles */
-  .report-chart {
-    page-break-inside: avoid;
-    margin: 15mm 0;
-  }
-
-  /* Signature lines */
-  .signature-line {
-    border-top: 1px solid black;
-    margin-top: 15mm;
-    padding-top: 5mm;
-    width: 60%;
-  }
-
-  /* Terms and conditions */
-  .terms {
-    font-size: 9pt;
-    margin-top: 20mm;
-    border-top: 1px solid #ddd;
-    padding-top: 10mm;
-  }
-
-  /* Color adjustments for better print quality */
-  .bg-primary,
-  .bg-secondary,
-  .bg-accent {
-    background: transparent !important;
-    color: black !important;
-    border: 1px solid black;
-  }
-
-  /* Status badges */
-  .badge,
-  [class*="badge"] {
-    border: 1px solid black !important;
-    background: white !important;
-    color: black !important;
-  }
-}
-
-/* Print-specific classes that can be added to elements */
-.print-only {
-  display: none;
-}
-
-@media print {
-  .print-only {
-    display: block !important;
-  }
-}
-
-/* SALIS AUTO Global Dark Theme Overrides */
-@layer base {
-  /* Default body and page backgrounds to dark */
-  body {
-    @apply bg-gray-900 text-soft-white;
+    -webkit-text-fill-color: transparent;
   }
   
-  /* Override default card backgrounds */
-  [class*="card"],
-  [role="dialog"],
-  [role="alertdialog"] {
-    @apply bg-dark-navy border-neon-blue/30;
+  /* SALIS AUTO Button Variants */
+  .btn-primary {
+    background-color: #ce5c17;
+    color: #eaf2ff;
   }
   
-  /* Override default text colors */
-  h1, h2, h3, h4, h5, h6 {
-    @apply text-soft-white;
+  .btn-primary:hover {
+    background-color: #b04f14;
   }
   
-  p {
-    @apply text-soft-white/90;
+  .btn-secondary {
+    background-color: #008CFF;
+    color: #eaf2ff;
   }
   
-  /* Override default input backgrounds */
-  input:not([type="radio"]):not([type="checkbox"]),
-  textarea,
-  select {
-    @apply bg-neon-blue/10 border-neon-blue/30 text-soft-white placeholder:text-soft-white/50;
-  }
-  
-  /* Override default button styles */
-  button {
-    @apply text-soft-white;
-  }
-  
-  /* Override table backgrounds */
-  table {
-    @apply bg-dark-navy;
-  }
-  
-  thead {
-    @apply border-neon-blue/30;
-  }
-  
-  tbody tr {
-    @apply border-neon-blue/30 hover:bg-neon-blue/10;
+  .btn-secondary:hover {
+    background-color: #0077dd;
   }
 }
