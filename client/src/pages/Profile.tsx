@@ -36,7 +36,7 @@ export function Profile() {
 
   if (isLoading) {
     return (
-      <div className="flex-1 p-8 bg-midnight-blue">
+      <div className="flex-1 p-8 bg-dark-navy">
         <div className="animate-pulse space-y-4">
           <div className="h-8 bg-gray-200 rounded w-48"></div>
           <div className="h-64 bg-gray-200 rounded"></div>
@@ -46,19 +46,19 @@ export function Profile() {
   }
 
   return (
-    <div className="flex-1 p-8 bg-midnight-blue">
+    <div className="flex-1 p-8 bg-dark-navy">
       <div className="mb-8">
-        <h1 className="font-['Poppins',Helvetica] font-semibold text-2xl text-chrome-silver">My Profile</h1>
+        <h1 className="font-['Poppins',Helvetica] font-semibold text-2xl text-soft-white">My Profile</h1>
       </div>
 
       {/* Personal Details */}
-      <Card className="bg-midnight-blue border-dark-steel border border-[#e6e6e6] mb-6">
+      <Card className="bg-dark-navy border-neon-blue/30 border border-[#e6e6e6] mb-6">
         <CardContent className="p-6">
-          <h2 className="font-['Poppins',Helvetica] font-semibold text-lg text-chrome-silver mb-6">Personal Details</h2>
+          <h2 className="font-['Poppins',Helvetica] font-semibold text-lg text-soft-white mb-6">Personal Details</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div>
-              <Label className="font-['Poppins',Helvetica] font-medium text-sm text-chrome-silver mb-2 block">
+              <Label className="font-['Poppins',Helvetica] font-medium text-sm text-soft-white mb-2 block">
                 Full Name
               </Label>
               <Input
@@ -70,7 +70,7 @@ export function Profile() {
             </div>
 
             <div>
-              <Label className="font-['Poppins',Helvetica] font-medium text-sm text-chrome-silver mb-2 block">
+              <Label className="font-['Poppins',Helvetica] font-medium text-sm text-soft-white mb-2 block">
                 Email
               </Label>
               <Input
@@ -83,7 +83,7 @@ export function Profile() {
           </div>
 
           <div className="mb-4">
-            <Label className="font-['Poppins',Helvetica] font-medium text-sm text-chrome-silver mb-2 block">
+            <Label className="font-['Poppins',Helvetica] font-medium text-sm text-soft-white mb-2 block">
               Mobile Number
             </Label>
             <Input
@@ -101,13 +101,13 @@ export function Profile() {
       </Card>
 
       {/* Role and Specialization */}
-      <Card className="bg-midnight-blue border-dark-steel border border-[#e6e6e6] mb-6">
+      <Card className="bg-dark-navy border-neon-blue/30 border border-[#e6e6e6] mb-6">
         <CardContent className="p-6">
-          <h2 className="font-['Poppins',Helvetica] font-semibold text-lg text-chrome-silver mb-6">Role and Specialization</h2>
+          <h2 className="font-['Poppins',Helvetica] font-semibold text-lg text-soft-white mb-6">Role and Specialization</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div>
-              <Label className="font-['Poppins',Helvetica] font-medium text-sm text-chrome-silver mb-2 block">
+              <Label className="font-['Poppins',Helvetica] font-medium text-sm text-soft-white mb-2 block">
                 Job Title
               </Label>
               <Input
@@ -119,7 +119,7 @@ export function Profile() {
             </div>
 
             <div>
-              <Label className="font-['Poppins',Helvetica] font-medium text-sm text-chrome-silver mb-2 block">
+              <Label className="font-['Poppins',Helvetica] font-medium text-sm text-soft-white mb-2 block">
                 Specialization
               </Label>
               <Input
@@ -132,7 +132,7 @@ export function Profile() {
           </div>
 
           <div>
-            <Label className="font-['Poppins',Helvetica] font-medium text-sm text-chrome-silver mb-2 block">
+            <Label className="font-['Poppins',Helvetica] font-medium text-sm text-soft-white mb-2 block">
               Certifications
             </Label>
             <Input
@@ -146,13 +146,13 @@ export function Profile() {
       </Card>
 
       {/* Availability */}
-      <Card className="bg-midnight-blue border-dark-steel border border-[#e6e6e6] mb-6">
+      <Card className="bg-dark-navy border-neon-blue/30 border border-[#e6e6e6] mb-6">
         <CardContent className="p-6">
-          <h2 className="font-['Poppins',Helvetica] font-semibold text-lg text-chrome-silver mb-6">Availability</h2>
+          <h2 className="font-['Poppins',Helvetica] font-semibold text-lg text-soft-white mb-6">Availability</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div>
-              <Label className="font-['Poppins',Helvetica] font-medium text-sm text-chrome-silver mb-2 block">
+              <Label className="font-['Poppins',Helvetica] font-medium text-sm text-soft-white mb-2 block">
                 From
               </Label>
               <Select disabled={!isEditing} defaultValue="sunday">
@@ -172,7 +172,7 @@ export function Profile() {
             </div>
 
             <div>
-              <Label className="font-['Poppins',Helvetica] font-medium text-sm text-chrome-silver mb-2 block">
+              <Label className="font-['Poppins',Helvetica] font-medium text-sm text-soft-white mb-2 block">
                 To
               </Label>
               <Select disabled={!isEditing} defaultValue="tuesday">
@@ -194,7 +194,7 @@ export function Profile() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <Label className="font-['Poppins',Helvetica] font-medium text-sm text-chrome-silver mb-2 block">
+              <Label className="font-['Poppins',Helvetica] font-medium text-sm text-soft-white mb-2 block">
                 Work hours
               </Label>
               <Input
@@ -206,7 +206,7 @@ export function Profile() {
             </div>
 
             <div>
-              <Label className="font-['Poppins',Helvetica] font-medium text-sm text-chrome-silver mb-2 block">
+              <Label className="font-['Poppins',Helvetica] font-medium text-sm text-soft-white mb-2 block">
                 Current Status
               </Label>
               <Select disabled={!isEditing} defaultValue="available">
@@ -225,10 +225,10 @@ export function Profile() {
       </Card>
 
       {/* Change Password */}
-      <Card className="bg-midnight-blue border-dark-steel border border-[#e6e6e6] mb-6">
+      <Card className="bg-dark-navy border-neon-blue/30 border border-[#e6e6e6] mb-6">
         <CardContent className="p-6">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="font-['Poppins',Helvetica] font-semibold text-lg text-chrome-silver">Change Password</h2>
+            <h2 className="font-['Poppins',Helvetica] font-semibold text-lg text-soft-white">Change Password</h2>
             <Button
               variant="outline"
               onClick={() => setIsChangingPassword(!isChangingPassword)}
@@ -241,7 +241,7 @@ export function Profile() {
           {isChangingPassword && (
             <div className="space-y-4">
               <div>
-                <Label className="font-['Poppins',Helvetica] font-medium text-sm text-chrome-silver mb-2 block">
+                <Label className="font-['Poppins',Helvetica] font-medium text-sm text-soft-white mb-2 block">
                   Current Password
                 </Label>
                 <Input
@@ -253,7 +253,7 @@ export function Profile() {
               </div>
 
               <div>
-                <Label className="font-['Poppins',Helvetica] font-medium text-sm text-chrome-silver mb-2 block">
+                <Label className="font-['Poppins',Helvetica] font-medium text-sm text-soft-white mb-2 block">
                   New Password
                 </Label>
                 <Input
@@ -265,7 +265,7 @@ export function Profile() {
               </div>
 
               <div>
-                <Label className="font-['Poppins',Helvetica] font-medium text-sm text-chrome-silver mb-2 block">
+                <Label className="font-['Poppins',Helvetica] font-medium text-sm text-soft-white mb-2 block">
                   Confirm Password
                 </Label>
                 <Input

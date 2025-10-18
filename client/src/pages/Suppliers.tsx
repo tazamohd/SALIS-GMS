@@ -146,8 +146,8 @@ export default function Suppliers() {
     <div className="p-8 bg-gray-800 min-h-screen space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="font-['Poppins',Helvetica] font-bold text-3xl text-chrome-silver" data-testid="page-title">Suppliers</h1>
-          <p className="text-chrome-silver/60">Manage your supplier network</p>
+          <h1 className="font-['Poppins',Helvetica] font-bold text-3xl text-soft-white" data-testid="page-title">Suppliers</h1>
+          <p className="text-soft-white/60">Manage your supplier network</p>
         </div>
         <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
           <DialogTrigger asChild>
@@ -501,7 +501,7 @@ export default function Suppliers() {
 
       <div className="flex items-center gap-4">
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-chrome-silver/60" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-soft-white/60" />
           <Input
             placeholder="Search by name, contact person, or email..."
             value={searchQuery}
@@ -513,11 +513,11 @@ export default function Suppliers() {
       </div>
 
       {error ? (
-        <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
+        <Card className="bg-dark-navy border-neon-blue/30 bg-dark-navy border-neon-blue/30">
           <CardContent className="flex flex-col items-center justify-center py-12">
             <Building2 className="h-12 w-12 text-destructive mb-4" />
             <p className="text-lg font-medium mb-2">Failed to load suppliers</p>
-            <p className="text-chrome-silver/60 mb-4">
+            <p className="text-soft-white/60 mb-4">
               {error instanceof Error ? error.message : "An error occurred"}
             </p>
             <Button onClick={() => queryClient.invalidateQueries({ queryKey: ["/api/suppliers"] })} data-testid="button-retry">
@@ -544,11 +544,11 @@ export default function Suppliers() {
           ))}
         </div>
       ) : filteredSuppliers.length === 0 ? (
-        <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
+        <Card className="bg-dark-navy border-neon-blue/30 bg-dark-navy border-neon-blue/30">
           <CardContent className="flex flex-col items-center justify-center py-12">
-            <Building2 className="h-12 w-12 text-chrome-silver/60 mb-4" />
+            <Building2 className="h-12 w-12 text-soft-white/60 mb-4" />
             <p className="text-lg font-medium mb-2">No suppliers found</p>
-            <p className="text-chrome-silver/60 mb-4">
+            <p className="text-soft-white/60 mb-4">
               {searchQuery ? "Try adjusting your search" : "Get started by creating your first supplier"}
             </p>
             {!searchQuery && (
@@ -586,19 +586,19 @@ export default function Suppliers() {
               </CardHeader>
               <CardContent className="space-y-2">
                 {supplier.email && (
-                  <div className="flex items-center text-sm text-chrome-silver/60" data-testid={`text-email-${supplier.id}`}>
+                  <div className="flex items-center text-sm text-soft-white/60" data-testid={`text-email-${supplier.id}`}>
                     <Mail className="mr-2 h-4 w-4" />
                     {supplier.email}
                   </div>
                 )}
                 {supplier.phone && (
-                  <div className="flex items-center text-sm text-chrome-silver/60" data-testid={`text-phone-${supplier.id}`}>
+                  <div className="flex items-center text-sm text-soft-white/60" data-testid={`text-phone-${supplier.id}`}>
                     <Phone className="mr-2 h-4 w-4" />
                     {supplier.phone}
                   </div>
                 )}
                 {(supplier.city || supplier.country) && (
-                  <div className="flex items-center text-sm text-chrome-silver/60" data-testid={`text-location-${supplier.id}`}>
+                  <div className="flex items-center text-sm text-soft-white/60" data-testid={`text-location-${supplier.id}`}>
                     <MapPin className="mr-2 h-4 w-4" />
                     {[supplier.city, supplier.country].filter(Boolean).join(", ")}
                   </div>
@@ -626,60 +626,60 @@ export default function Suppliers() {
             <div className="space-y-6">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-sm font-medium text-chrome-silver/60">Supplier Name</p>
+                  <p className="text-sm font-medium text-soft-white/60">Supplier Name</p>
                   <p className="text-base" data-testid="detail-name">{selectedSupplier.name}</p>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-chrome-silver/60">Status</p>
+                  <p className="text-sm font-medium text-soft-white/60">Status</p>
                   <Badge variant={selectedSupplier.isActive ? "default" : "secondary"} data-testid="detail-status">
                     {selectedSupplier.isActive ? "Active" : "Inactive"}
                   </Badge>
                 </div>
                 {selectedSupplier.contactPerson && (
                   <div>
-                    <p className="text-sm font-medium text-chrome-silver/60">Contact Person</p>
+                    <p className="text-sm font-medium text-soft-white/60">Contact Person</p>
                     <p className="text-base" data-testid="detail-contact-person">{selectedSupplier.contactPerson}</p>
                   </div>
                 )}
                 {selectedSupplier.email && (
                   <div>
-                    <p className="text-sm font-medium text-chrome-silver/60">Email</p>
+                    <p className="text-sm font-medium text-soft-white/60">Email</p>
                     <p className="text-base" data-testid="detail-email">{selectedSupplier.email}</p>
                   </div>
                 )}
                 {selectedSupplier.phone && (
                   <div>
-                    <p className="text-sm font-medium text-chrome-silver/60">Phone</p>
+                    <p className="text-sm font-medium text-soft-white/60">Phone</p>
                     <p className="text-base" data-testid="detail-phone">{selectedSupplier.phone}</p>
                   </div>
                 )}
                 {selectedSupplier.taxId && (
                   <div>
-                    <p className="text-sm font-medium text-chrome-silver/60">Tax ID</p>
+                    <p className="text-sm font-medium text-soft-white/60">Tax ID</p>
                     <p className="text-base" data-testid="detail-tax-id">{selectedSupplier.taxId}</p>
                   </div>
                 )}
                 {selectedSupplier.address && (
                   <div className="col-span-2">
-                    <p className="text-sm font-medium text-chrome-silver/60">Address</p>
+                    <p className="text-sm font-medium text-soft-white/60">Address</p>
                     <p className="text-base" data-testid="detail-address">{selectedSupplier.address}</p>
                   </div>
                 )}
                 {selectedSupplier.city && (
                   <div>
-                    <p className="text-sm font-medium text-chrome-silver/60">City</p>
+                    <p className="text-sm font-medium text-soft-white/60">City</p>
                     <p className="text-base" data-testid="detail-city">{selectedSupplier.city}</p>
                   </div>
                 )}
                 {selectedSupplier.country && (
                   <div>
-                    <p className="text-sm font-medium text-chrome-silver/60">Country</p>
+                    <p className="text-sm font-medium text-soft-white/60">Country</p>
                     <p className="text-base" data-testid="detail-country">{selectedSupplier.country}</p>
                   </div>
                 )}
                 {selectedSupplier.paymentTerms && (
                   <div>
-                    <p className="text-sm font-medium text-chrome-silver/60">Payment Terms</p>
+                    <p className="text-sm font-medium text-soft-white/60">Payment Terms</p>
                     <p className="text-base" data-testid="detail-payment-terms">
                       {selectedSupplier.paymentTerms.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
                     </p>
@@ -688,7 +688,7 @@ export default function Suppliers() {
               </div>
               {selectedSupplier.notes && (
                 <div>
-                  <p className="text-sm font-medium text-chrome-silver/60">Notes</p>
+                  <p className="text-sm font-medium text-soft-white/60">Notes</p>
                   <p className="text-base whitespace-pre-wrap" data-testid="detail-notes">{selectedSupplier.notes}</p>
                 </div>
               )}

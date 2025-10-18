@@ -172,14 +172,14 @@ export default function DataImportExport() {
   return (
     <div className="container mx-auto p-8 bg-gray-800 min-h-screen space-y-6">
       <div>
-        <h1 className="font-['Poppins',Helvetica] font-bold text-3xl text-chrome-silver">Data Import/Export</h1>
-        <p className="text-chrome-silver/60">Import and export data across modules</p>
+        <h1 className="font-['Poppins',Helvetica] font-bold text-3xl text-soft-white">Data Import/Export</h1>
+        <p className="text-soft-white/60">Import and export data across modules</p>
       </div>
 
       {garages && garages.length > 0 && (
-        <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
+        <Card className="bg-dark-navy border-neon-blue/30 bg-dark-navy border-neon-blue/30">
           <CardHeader>
-            <CardTitle className="text-chrome-silver">Select Garage</CardTitle>
+            <CardTitle className="text-soft-white">Select Garage</CardTitle>
           </CardHeader>
           <CardContent>
             <Select value={garageId} onValueChange={setGarageId}>
@@ -200,13 +200,13 @@ export default function DataImportExport() {
 
       <div className="grid md:grid-cols-2 gap-6">
         {/* Export Section */}
-        <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
+        <Card className="bg-dark-navy border-neon-blue/30 bg-dark-navy border-neon-blue/30">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Download className="h-5 w-5" />
               Export Data
             </CardTitle>
-            <CardDescription className="text-chrome-silver/60">Export data from selected module</CardDescription>
+            <CardDescription className="text-soft-white/60">Export data from selected module</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
@@ -259,13 +259,13 @@ export default function DataImportExport() {
         </Card>
 
         {/* Import Section */}
-        <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
+        <Card className="bg-dark-navy border-neon-blue/30 bg-dark-navy border-neon-blue/30">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Upload className="h-5 w-5" />
               Import Data
             </CardTitle>
-            <CardDescription className="text-chrome-silver/60">Import data from CSV or JSON file</CardDescription>
+            <CardDescription className="text-soft-white/60">Import data from CSV or JSON file</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
@@ -291,7 +291,7 @@ export default function DataImportExport() {
                 data-testid="input-import-file"
               />
               {importFile && (
-                <p className="text-sm text-chrome-silver/60">
+                <p className="text-sm text-soft-white/60">
                   Selected: {importFile.name}
                 </p>
               )}
@@ -311,14 +311,14 @@ export default function DataImportExport() {
       </div>
 
       {/* Export Jobs History */}
-      <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
+      <Card className="bg-dark-navy border-neon-blue/30 bg-dark-navy border-neon-blue/30">
         <CardHeader>
-          <CardTitle className="text-chrome-silver">Export History</CardTitle>
-          <CardDescription className="text-chrome-silver/60">Recent export jobs</CardDescription>
+          <CardTitle className="text-soft-white">Export History</CardTitle>
+          <CardDescription className="text-soft-white/60">Recent export jobs</CardDescription>
         </CardHeader>
         <CardContent>
           {!exportJobs || exportJobs.length === 0 ? (
-            <div className="text-center text-chrome-silver/60 py-8">
+            <div className="text-center text-soft-white/60 py-8">
               No export history
             </div>
           ) : (
@@ -326,15 +326,15 @@ export default function DataImportExport() {
               {exportJobs.map((job) => (
                 <div
                   key={job.id}
-                  className="flex items-center justify-between p-4 border border-dark-steel rounded-lg"
+                  className="flex items-center justify-between p-4 border border-neon-blue/30 rounded-lg"
                   data-testid={`export-job-${job.id}`}
                 >
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
                       <span className="font-medium">{modules.find(m => m.value === job.module)?.label}</span>
-                      <span className="text-sm text-chrome-silver/60">({job.format.toUpperCase()})</span>
+                      <span className="text-sm text-soft-white/60">({job.format.toUpperCase()})</span>
                     </div>
-                    <div className="text-sm text-chrome-silver/60">
+                    <div className="text-sm text-soft-white/60">
                       {job.createdAt && new Date(job.createdAt).toLocaleString()}
                       {job.recordCount && ` • ${job.recordCount} records`}
                     </div>

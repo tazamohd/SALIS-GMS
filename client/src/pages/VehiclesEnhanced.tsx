@@ -222,8 +222,8 @@ export default function VehiclesEnhanced() {
     <div className="p-8 bg-gray-800 min-h-screen space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="font-['Poppins',Helvetica] font-bold text-3xl text-chrome-silver" data-testid="text-vehicles-title">Vehicle Management</h1>
-          <p className="text-chrome-silver/70">
+          <h1 className="font-['Poppins',Helvetica] font-bold text-3xl text-soft-white" data-testid="text-vehicles-title">Vehicle Management</h1>
+          <p className="text-soft-white/70">
             Track vehicles, service history, maintenance schedules, and more
           </p>
         </div>
@@ -588,7 +588,7 @@ export default function VehiclesEnhanced() {
         {/* Vehicle List */}
         <div className="col-span-4 space-y-4">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-chrome-silver/50" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-soft-white/50" />
             <Input
               type="text"
               placeholder="Search vehicles..."
@@ -603,7 +603,7 @@ export default function VehiclesEnhanced() {
             {filteredVehicles.map((vehicle) => (
               <Card
                 key={vehicle.id}
-                className={`cursor-pointer transition-colors ${selectedVehicle?.id === vehicle.id ? 'border-blue-500 bg-blue-50 dark:bg-blue-950' : 'hover:bg-dark-steel/20 dark:hover:bg-gray-800'}`}
+                className={`cursor-pointer transition-colors ${selectedVehicle?.id === vehicle.id ? 'border-blue-500 bg-blue-50 dark:bg-blue-950' : 'hover:bg-neon-blue/20/20 dark:hover:bg-gray-800'}`}
                 onClick={() => handleSelectVehicle(vehicle)}
                 data-testid={`card-vehicle-${vehicle.id}`}
               >
@@ -660,10 +660,10 @@ export default function VehiclesEnhanced() {
               </TabsList>
 
               <TabsContent value="overview" className="mt-4">
-                <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
+                <Card className="bg-dark-navy border-neon-blue/30 bg-dark-navy border-neon-blue/30">
                   <CardHeader>
-                    <CardTitle className="text-chrome-silver">{selectedVehicle.year} {selectedVehicle.make} {selectedVehicle.model}</CardTitle>
-                    <CardDescription className="text-chrome-silver/60">Vehicle Information</CardDescription>
+                    <CardTitle className="text-soft-white">{selectedVehicle.year} {selectedVehicle.make} {selectedVehicle.model}</CardTitle>
+                    <CardDescription className="text-soft-white/60">Vehicle Information</CardDescription>
                   </CardHeader>
                   <CardContent className="grid grid-cols-2 gap-4">
                     <div>
@@ -695,14 +695,14 @@ export default function VehiclesEnhanced() {
               </TabsContent>
 
               <TabsContent value="history" className="mt-4">
-                <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
+                <Card className="bg-dark-navy border-neon-blue/30 bg-dark-navy border-neon-blue/30">
                   <CardHeader>
-                    <CardTitle className="text-chrome-silver">Service History Timeline</CardTitle>
-                    <CardDescription className="text-chrome-silver/60">Complete service history for this vehicle</CardDescription>
+                    <CardTitle className="text-soft-white">Service History Timeline</CardTitle>
+                    <CardDescription className="text-soft-white/60">Complete service history for this vehicle</CardDescription>
                   </CardHeader>
                   <CardContent>
                     {serviceHistory.length === 0 ? (
-                      <p className="text-center text-chrome-silver/60 py-8">No service history recorded yet</p>
+                      <p className="text-center text-soft-white/60 py-8">No service history recorded yet</p>
                     ) : (
                       <div className="space-y-4">
                         {serviceHistory.map((service) => (
@@ -712,7 +712,7 @@ export default function VehiclesEnhanced() {
                                 <h4 className="font-semibold">{service.serviceType}</h4>
                                 <p className="text-sm text-gray-600">{service.description}</p>
                                 {service.serviceDate && (
-                                  <p className="text-xs text-chrome-silver/60 mt-1">
+                                  <p className="text-xs text-soft-white/60 mt-1">
                                     {format(new Date(service.serviceDate), 'PPP')} • {service.mileageAtService?.toLocaleString()} miles
                                   </p>
                                 )}
@@ -730,23 +730,23 @@ export default function VehiclesEnhanced() {
               </TabsContent>
 
               <TabsContent value="maintenance" className="mt-4">
-                <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
+                <Card className="bg-dark-navy border-neon-blue/30 bg-dark-navy border-neon-blue/30">
                   <CardHeader>
-                    <CardTitle className="text-chrome-silver">Maintenance Schedule</CardTitle>
-                    <CardDescription className="text-chrome-silver/60">Upcoming and scheduled maintenance items</CardDescription>
+                    <CardTitle className="text-soft-white">Maintenance Schedule</CardTitle>
+                    <CardDescription className="text-soft-white/60">Upcoming and scheduled maintenance items</CardDescription>
                   </CardHeader>
                   <CardContent>
                     {maintenanceSchedules.length === 0 ? (
-                      <p className="text-center text-chrome-silver/60 py-8">No maintenance schedules configured</p>
+                      <p className="text-center text-soft-white/60 py-8">No maintenance schedules configured</p>
                     ) : (
                       <div className="space-y-3">
                         {maintenanceSchedules.map((schedule) => (
-                          <div key={schedule.id} className="border border-dark-steel rounded-lg p-4">
+                          <div key={schedule.id} className="border border-neon-blue/30 rounded-lg p-4">
                             <div className="flex justify-between items-start">
                               <div>
                                 <h4 className="font-semibold">{schedule.serviceName}</h4>
                                 <p className="text-sm text-gray-600">{schedule.description}</p>
-                                <div className="flex gap-4 mt-2 text-xs text-chrome-silver/60">
+                                <div className="flex gap-4 mt-2 text-xs text-soft-white/60">
                                   {schedule.nextDueDate && (
                                     <span>Due: {format(new Date(schedule.nextDueDate), 'PP')}</span>
                                   )}
@@ -768,23 +768,23 @@ export default function VehiclesEnhanced() {
               </TabsContent>
 
               <TabsContent value="reminders" className="mt-4">
-                <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
+                <Card className="bg-dark-navy border-neon-blue/30 bg-dark-navy border-neon-blue/30">
                   <CardHeader>
-                    <CardTitle className="text-chrome-silver">Service Reminders</CardTitle>
-                    <CardDescription className="text-chrome-silver/60">Automated reminders for upcoming services</CardDescription>
+                    <CardTitle className="text-soft-white">Service Reminders</CardTitle>
+                    <CardDescription className="text-soft-white/60">Automated reminders for upcoming services</CardDescription>
                   </CardHeader>
                   <CardContent>
                     {serviceReminders.length === 0 ? (
-                      <p className="text-center text-chrome-silver/60 py-8">No service reminders set</p>
+                      <p className="text-center text-soft-white/60 py-8">No service reminders set</p>
                     ) : (
                       <div className="space-y-3">
                         {serviceReminders.map((reminder) => (
-                          <div key={reminder.id} className="border border-dark-steel rounded-lg p-4">
+                          <div key={reminder.id} className="border border-neon-blue/30 rounded-lg p-4">
                             <div className="flex justify-between items-start">
                               <div>
                                 <h4 className="font-semibold">{reminder.reminderTitle}</h4>
                                 <p className="text-sm text-gray-600">{reminder.reminderMessage}</p>
-                                <div className="flex gap-4 mt-2 text-xs text-chrome-silver/60">
+                                <div className="flex gap-4 mt-2 text-xs text-soft-white/60">
                                   {reminder.triggerDate && (
                                     <span>Trigger: {format(new Date(reminder.triggerDate), 'PP')}</span>
                                   )}
@@ -806,10 +806,10 @@ export default function VehiclesEnhanced() {
               </TabsContent>
 
               <TabsContent value="warranty" className="mt-4">
-                <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
+                <Card className="bg-dark-navy border-neon-blue/30 bg-dark-navy border-neon-blue/30">
                   <CardHeader>
-                    <CardTitle className="text-chrome-silver">Warranty Information</CardTitle>
-                    <CardDescription className="text-chrome-silver/60">Vehicle warranty details and coverage</CardDescription>
+                    <CardTitle className="text-soft-white">Warranty Information</CardTitle>
+                    <CardDescription className="text-soft-white/60">Vehicle warranty details and coverage</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     {selectedVehicle.warrantyProvider ? (
@@ -846,17 +846,17 @@ export default function VehiclesEnhanced() {
                         )}
                       </div>
                     ) : (
-                      <p className="text-center text-chrome-silver/60 py-8">No warranty information available</p>
+                      <p className="text-center text-soft-white/60 py-8">No warranty information available</p>
                     )}
                   </CardContent>
                 </Card>
               </TabsContent>
 
               <TabsContent value="photos" className="mt-4">
-                <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
+                <Card className="bg-dark-navy border-neon-blue/30 bg-dark-navy border-neon-blue/30">
                   <CardHeader>
-                    <CardTitle className="text-chrome-silver">Vehicle Photos</CardTitle>
-                    <CardDescription className="text-chrome-silver/60">Photo gallery for this vehicle</CardDescription>
+                    <CardTitle className="text-soft-white">Vehicle Photos</CardTitle>
+                    <CardDescription className="text-soft-white/60">Photo gallery for this vehicle</CardDescription>
                   </CardHeader>
                   <CardContent>
                     {selectedVehicle.photos && selectedVehicle.photos.length > 0 ? (
@@ -871,16 +871,16 @@ export default function VehiclesEnhanced() {
                         ))}
                       </div>
                     ) : (
-                      <p className="text-center text-chrome-silver/60 py-8">No photos uploaded yet</p>
+                      <p className="text-center text-soft-white/60 py-8">No photos uploaded yet</p>
                     )}
                   </CardContent>
                 </Card>
               </TabsContent>
             </Tabs>
           ) : (
-            <Card className="bg-midnight-blue border-dark-steel h-full flex items-center justify-center">
+            <Card className="bg-dark-navy border-neon-blue/30 h-full flex items-center justify-center">
               <CardContent className="text-center py-16">
-                <Car className="w-16 h-16 text-chrome-silver/50 mx-auto mb-4" />
+                <Car className="w-16 h-16 text-soft-white/50 mx-auto mb-4" />
                 <h3 className="text-lg font-semibold mb-2">No Vehicle Selected</h3>
                 <p className="text-gray-600">Select a vehicle from the list to view details</p>
               </CardContent>

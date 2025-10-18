@@ -38,13 +38,13 @@ export function Appointments() {
   const getStatusBadge = (status: string) => {
     const statusMap: Record<string, string> = {
       scheduled: "bg-electric-blue/20 text-electric-blue border border-electric-blue/30",
-      confirmed: "bg-deep-teal/20 text-deep-teal border border-deep-teal/30",
-      in_progress: "bg-sky-blue/20 text-sky-blue border border-sky-blue/30",
-      completed: "bg-chrome-silver/20 text-chrome-silver border border-chrome-silver/30",
+      confirmed: "bg-cyber-blue/20 text-cyber-blue border border-cyber-blue/30",
+      in_progress: "bg-electric-blue/20 text-electric-blue border border-electric-blue/30",
+      completed: "bg-soft-white/20 text-soft-white border border-soft-white/30",
       cancelled: "bg-red-500/20 text-red-400 border border-red-500/30",
-      no_show: "bg-tech-orange/20 text-tech-orange border border-tech-orange/30",
+      no_show: "bg-brand-orange/20 text-brand-orange border border-brand-orange/30",
     };
-    return statusMap[status] || "bg-chrome-silver/20 text-chrome-silver border border-chrome-silver/30";
+    return statusMap[status] || "bg-soft-white/20 text-soft-white border border-soft-white/30";
   };
 
   const getStatusLabel = (status: string) => {
@@ -63,15 +63,15 @@ export function Appointments() {
     <div className="p-8 bg-gray-800 min-h-screen">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="font-['Poppins',Helvetica] font-bold text-3xl text-chrome-silver">
+          <h1 className="font-['Poppins',Helvetica] font-bold text-3xl text-soft-white">
             Appointments
           </h1>
-          <p className="font-['Poppins',Helvetica] font-normal text-sm text-chrome-silver/70 mt-1">
+          <p className="font-['Poppins',Helvetica] font-normal text-sm text-soft-white/70 mt-1">
             Manage and schedule customer appointments
           </p>
         </div>
         <Button 
-          className="bg-electric-blue hover:bg-sky-blue text-white"
+          className="bg-electric-blue hover:bg-electric-blue text-white"
           data-testid="button-create-appointment"
         >
           <Plus className="w-4 h-4 mr-2" />
@@ -80,12 +80,12 @@ export function Appointments() {
       </div>
 
       {/* Filters */}
-      <Card className="mb-6 bg-midnight-blue border-dark-steel">
+      <Card className="mb-6 bg-dark-navy border-neon-blue/30">
         <CardContent className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Search */}
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-chrome-silver/50" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-soft-white/50" />
               <Input
                 type="text"
                 placeholder="Search by customer name, phone, or appointment #"
@@ -94,7 +94,7 @@ export function Appointments() {
                   setSearchQuery(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="pl-10 bg-dark-steel border-dark-steel text-chrome-silver placeholder:text-chrome-silver/50"
+                className="pl-10 bg-neon-blue/20 border-neon-blue/30 text-soft-white placeholder:text-soft-white/50"
                 data-testid="input-search-appointments"
               />
             </div>
@@ -104,10 +104,10 @@ export function Appointments() {
               setStatusFilter(value);
               setCurrentPage(1);
             }}>
-              <SelectTrigger className="bg-dark-steel border-dark-steel text-chrome-silver" data-testid="select-status-filter">
+              <SelectTrigger className="bg-neon-blue/20 border-neon-blue/30 text-soft-white" data-testid="select-status-filter">
                 <SelectValue placeholder="Filter by status" />
               </SelectTrigger>
-              <SelectContent className="bg-midnight-blue border-dark-steel">
+              <SelectContent className="bg-dark-navy border-neon-blue/30">
                 <SelectItem value="all">All Statuses</SelectItem>
                 <SelectItem value="scheduled">Scheduled</SelectItem>
                 <SelectItem value="confirmed">Confirmed</SelectItem>
@@ -120,10 +120,10 @@ export function Appointments() {
 
             {/* Stats Summary */}
             <div className="flex items-center gap-4 text-sm">
-              <span className="text-chrome-silver/70">
+              <span className="text-soft-white/70">
                 Total: <span className="font-semibold text-electric-blue">{filteredAppointments.length}</span>
               </span>
-              <span className="text-chrome-silver/70">
+              <span className="text-soft-white/70">
                 Today: <span className="font-semibold text-electric-blue">
                   {(appointments ?? []).filter(apt => {
                     const today = new Date().toDateString();
@@ -137,15 +137,15 @@ export function Appointments() {
       </Card>
 
       {/* Appointments Table */}
-      <Card className="bg-midnight-blue border-dark-steel">
+      <Card className="bg-dark-navy border-neon-blue/30">
         <CardContent className="p-0">
           {isLoading ? (
-            <div className="p-12 text-center text-chrome-silver/50">Loading appointments...</div>
+            <div className="p-12 text-center text-soft-white/50">Loading appointments...</div>
           ) : filteredAppointments.length === 0 ? (
             <div className="p-12 text-center">
-              <Calendar className="w-12 h-12 text-chrome-silver/40 mx-auto mb-4" />
-              <p className="text-chrome-silver/70">No appointments found</p>
-              <p className="text-sm text-chrome-silver/50 mt-1">
+              <Calendar className="w-12 h-12 text-soft-white/40 mx-auto mb-4" />
+              <p className="text-soft-white/70">No appointments found</p>
+              <p className="text-sm text-soft-white/50 mt-1">
                 {searchQuery || statusFilter !== "all" 
                   ? "Try adjusting your filters" 
                   : "Create your first appointment to get started"}
@@ -156,26 +156,26 @@ export function Appointments() {
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
-                    <tr className="border-b border-dark-steel bg-dark-steel/30">
-                      <th className="py-4 px-4 text-left font-['Poppins',Helvetica] font-semibold text-sm text-chrome-silver">
+                    <tr className="border-b border-neon-blue/30 bg-neon-blue/20/30">
+                      <th className="py-4 px-4 text-left font-['Poppins',Helvetica] font-semibold text-sm text-soft-white">
                         Appointment #
                       </th>
-                      <th className="py-4 px-4 text-left font-['Poppins',Helvetica] font-semibold text-sm text-chrome-silver">
+                      <th className="py-4 px-4 text-left font-['Poppins',Helvetica] font-semibold text-sm text-soft-white">
                         Customer
                       </th>
-                      <th className="py-4 px-4 text-left font-['Poppins',Helvetica] font-semibold text-sm text-chrome-silver">
+                      <th className="py-4 px-4 text-left font-['Poppins',Helvetica] font-semibold text-sm text-soft-white">
                         Vehicle
                       </th>
-                      <th className="py-4 px-4 text-left font-['Poppins',Helvetica] font-semibold text-sm text-chrome-silver">
+                      <th className="py-4 px-4 text-left font-['Poppins',Helvetica] font-semibold text-sm text-soft-white">
                         Service Type
                       </th>
-                      <th className="py-4 px-4 text-left font-['Poppins',Helvetica] font-semibold text-sm text-chrome-silver">
+                      <th className="py-4 px-4 text-left font-['Poppins',Helvetica] font-semibold text-sm text-soft-white">
                         Date & Time
                       </th>
-                      <th className="py-4 px-4 text-left font-['Poppins',Helvetica] font-semibold text-sm text-chrome-silver">
+                      <th className="py-4 px-4 text-left font-['Poppins',Helvetica] font-semibold text-sm text-soft-white">
                         Status
                       </th>
-                      <th className="py-4 px-4 text-left font-['Poppins',Helvetica] font-semibold text-sm text-chrome-silver">
+                      <th className="py-4 px-4 text-left font-['Poppins',Helvetica] font-semibold text-sm text-soft-white">
                         Actions
                       </th>
                     </tr>
@@ -184,7 +184,7 @@ export function Appointments() {
                     {paginatedAppointments.map((apt) => {
                       const vehicleInfo = apt.vehicleInfo as any;
                       return (
-                        <tr key={apt.id} className="border-b border-dark-steel/50 hover:bg-dark-steel/20">
+                        <tr key={apt.id} className="border-b border-neon-blue/30/50 hover:bg-neon-blue/20/20">
                           <td className="py-4 px-4">
                             <span className="font-['Poppins',Helvetica] font-medium text-sm text-electric-blue" data-testid={`text-apt-number-${apt.id}`}>
                               {apt.appointmentNumber}
@@ -192,12 +192,12 @@ export function Appointments() {
                           </td>
                           <td className="py-4 px-4">
                             <div className="flex items-start gap-2">
-                              <User className="w-4 h-4 text-chrome-silver/50 mt-0.5" />
+                              <User className="w-4 h-4 text-soft-white/50 mt-0.5" />
                               <div>
-                                <div className="font-['Poppins',Helvetica] font-medium text-sm text-chrome-silver" data-testid={`text-customer-name-${apt.id}`}>
+                                <div className="font-['Poppins',Helvetica] font-medium text-sm text-soft-white" data-testid={`text-customer-name-${apt.id}`}>
                                   {apt.customerName}
                                 </div>
-                                <div className="flex items-center gap-1 text-xs text-chrome-silver/60">
+                                <div className="flex items-center gap-1 text-xs text-soft-white/60">
                                   <Phone className="w-3 h-3" />
                                   {apt.customerPhone}
                                 </div>
@@ -206,25 +206,25 @@ export function Appointments() {
                           </td>
                           <td className="py-4 px-4">
                             <div className="flex items-center gap-2">
-                              <Car className="w-4 h-4 text-chrome-silver/50" />
-                              <span className="font-['Poppins',Helvetica] font-normal text-sm text-chrome-silver" data-testid={`text-vehicle-${apt.id}`}>
+                              <Car className="w-4 h-4 text-soft-white/50" />
+                              <span className="font-['Poppins',Helvetica] font-normal text-sm text-soft-white" data-testid={`text-vehicle-${apt.id}`}>
                                 {vehicleInfo?.make} {vehicleInfo?.model} ({vehicleInfo?.year})
                               </span>
                             </div>
                           </td>
                           <td className="py-4 px-4">
-                            <span className="font-['Poppins',Helvetica] font-normal text-sm text-chrome-silver capitalize" data-testid={`text-service-type-${apt.id}`}>
+                            <span className="font-['Poppins',Helvetica] font-normal text-sm text-soft-white capitalize" data-testid={`text-service-type-${apt.id}`}>
                               {apt.serviceType}
                             </span>
                           </td>
                           <td className="py-4 px-4">
                             <div className="flex items-start gap-2">
-                              <Clock className="w-4 h-4 text-chrome-silver/50 mt-0.5" />
+                              <Clock className="w-4 h-4 text-soft-white/50 mt-0.5" />
                               <div>
-                                <div className="font-['Poppins',Helvetica] font-medium text-sm text-chrome-silver" data-testid={`text-date-${apt.id}`}>
+                                <div className="font-['Poppins',Helvetica] font-medium text-sm text-soft-white" data-testid={`text-date-${apt.id}`}>
                                   {format(new Date(apt.appointmentDate), 'MMM dd, yyyy')}
                                 </div>
-                                <div className="text-xs text-chrome-silver/60">
+                                <div className="text-xs text-soft-white/60">
                                   {format(new Date(apt.appointmentDate), 'hh:mm a')} ({apt.duration} min)
                                 </div>
                               </div>
@@ -253,13 +253,13 @@ export function Appointments() {
 
               {/* Pagination */}
               {totalPages > 1 && (
-                <div className="flex items-center justify-between p-4 border-t border-dark-steel">
-                  <div className="text-sm text-chrome-silver/70">
+                <div className="flex items-center justify-between p-4 border-t border-neon-blue/30">
+                  <div className="text-sm text-soft-white/70">
                     Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, filteredAppointments.length)} of {filteredAppointments.length} appointments
                   </div>
                   <div className="flex items-center gap-2">
                     <Button
-                      className="bg-dark-steel/50 hover:bg-dark-steel text-chrome-silver border border-dark-steel"
+                      className="bg-neon-blue/20/50 hover:bg-neon-blue/20 text-soft-white border border-neon-blue/30"
                       size="sm"
                       onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                       disabled={currentPage === 1}
@@ -267,11 +267,11 @@ export function Appointments() {
                     >
                       Previous
                     </Button>
-                    <span className="text-sm text-chrome-silver/70">
+                    <span className="text-sm text-soft-white/70">
                       Page {currentPage} of {totalPages}
                     </span>
                     <Button
-                      className="bg-dark-steel/50 hover:bg-dark-steel text-chrome-silver border border-dark-steel"
+                      className="bg-neon-blue/20/50 hover:bg-neon-blue/20 text-soft-white border border-neon-blue/30"
                       size="sm"
                       onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                       disabled={currentPage === totalPages}

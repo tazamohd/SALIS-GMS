@@ -207,17 +207,17 @@ export function EstimateDetailsDialog({ estimateId, children }: EstimateDetailsD
           </DialogHeader>
 
           <div className="space-y-6">
-            <div className="grid grid-cols-2 gap-4 p-4 bg-dark-steel/30 rounded">
+            <div className="grid grid-cols-2 gap-4 p-4 bg-neon-blue/20/30 rounded">
               <div>
-                <label className="text-sm font-medium text-chrome-silver/70">Title</label>
-                <p className="font-medium text-chrome-silver" data-testid="text-estimate-title">{estimate.title}</p>
+                <label className="text-sm font-medium text-soft-white/70">Title</label>
+                <p className="font-medium text-soft-white" data-testid="text-estimate-title">{estimate.title}</p>
               </div>
               <div>
-                <label className="text-sm font-medium text-chrome-silver/70">Customer</label>
-                <p className="font-medium text-chrome-silver" data-testid="text-customer-name">{customer?.fullName || customer?.email || "Unknown"}</p>
+                <label className="text-sm font-medium text-soft-white/70">Customer</label>
+                <p className="font-medium text-soft-white" data-testid="text-customer-name">{customer?.fullName || customer?.email || "Unknown"}</p>
               </div>
               <div>
-                <label className="text-sm font-medium text-chrome-silver/70">Status</label>
+                <label className="text-sm font-medium text-soft-white/70">Status</label>
                 <Select value={currentStatus} onValueChange={handleStatusChange}>
                   <SelectTrigger className="mt-1" data-testid="select-estimate-status">
                     <SelectValue />
@@ -232,8 +232,8 @@ export function EstimateDetailsDialog({ estimateId, children }: EstimateDetailsD
                 </Select>
               </div>
               <div>
-                <label className="text-sm font-medium text-chrome-silver/70">Valid Until</label>
-                <p className="font-medium text-chrome-silver" data-testid="text-valid-until">
+                <label className="text-sm font-medium text-soft-white/70">Valid Until</label>
+                <p className="font-medium text-soft-white" data-testid="text-valid-until">
                   {estimate.validUntil ? new Date(estimate.validUntil).toLocaleDateString() : "N/A"}
                 </p>
               </div>
@@ -241,46 +241,46 @@ export function EstimateDetailsDialog({ estimateId, children }: EstimateDetailsD
 
             {estimate.description && (
               <div>
-                <label className="text-sm font-medium text-chrome-silver/70">Description</label>
-                <p className="mt-1 text-chrome-silver" data-testid="text-description">{estimate.description}</p>
+                <label className="text-sm font-medium text-soft-white/70">Description</label>
+                <p className="mt-1 text-soft-white" data-testid="text-description">{estimate.description}</p>
               </div>
             )}
 
             <div>
-              <h3 className="font-semibold text-lg mb-3 text-chrome-silver">Items</h3>
+              <h3 className="font-semibold text-lg mb-3 text-soft-white">Items</h3>
               <div className="space-y-2">
                 {(items ?? []).map((item) => (
-                  <div key={item.id} className="flex items-center justify-between p-3 bg-dark-steel/30 rounded" data-testid={`estimate-item-${item.id}`}>
+                  <div key={item.id} className="flex items-center justify-between p-3 bg-neon-blue/20/30 rounded" data-testid={`estimate-item-${item.id}`}>
                     <div className="flex-1">
-                      <p className="font-medium text-chrome-silver" data-testid={`item-description-${item.id}`}>{item.description}</p>
-                      <p className="text-sm text-chrome-silver/60">
+                      <p className="font-medium text-soft-white" data-testid={`item-description-${item.id}`}>{item.description}</p>
+                      <p className="text-sm text-soft-white/60">
                         {item.itemType} • Qty: {item.quantity} • ${parseFloat(item.unitPrice).toFixed(2)} each
                       </p>
                     </div>
-                    <p className="font-semibold text-chrome-silver" data-testid={`item-total-${item.id}`}>${parseFloat(item.lineTotal).toFixed(2)}</p>
+                    <p className="font-semibold text-soft-white" data-testid={`item-total-${item.id}`}>${parseFloat(item.lineTotal).toFixed(2)}</p>
                   </div>
                 ))}
                 {(items ?? []).length === 0 && (
-                  <p className="text-chrome-silver/50 text-center py-4">No items</p>
+                  <p className="text-soft-white/50 text-center py-4">No items</p>
                 )}
               </div>
             </div>
 
-            <div className="border-t border-dark-steel pt-4">
+            <div className="border-t border-neon-blue/30 pt-4">
               <div className="space-y-2">
                 <div className="flex justify-between">
-                  <span className="text-chrome-silver/70">Subtotal:</span>
-                  <span className="font-semibold text-chrome-silver" data-testid="text-estimate-subtotal">${parseFloat(estimate.subtotal).toFixed(2)}</span>
+                  <span className="text-soft-white/70">Subtotal:</span>
+                  <span className="font-semibold text-soft-white" data-testid="text-estimate-subtotal">${parseFloat(estimate.subtotal).toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-chrome-silver/70">Tax ({parseFloat(estimate.taxRate).toFixed(0)}%):</span>
-                  <span className="font-semibold text-chrome-silver" data-testid="text-estimate-tax">${parseFloat(estimate.taxAmount).toFixed(2)}</span>
+                  <span className="text-soft-white/70">Tax ({parseFloat(estimate.taxRate).toFixed(0)}%):</span>
+                  <span className="font-semibold text-soft-white" data-testid="text-estimate-tax">${parseFloat(estimate.taxAmount).toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-chrome-silver/70">Discount:</span>
-                  <span className="font-semibold text-chrome-silver" data-testid="text-estimate-discount">${parseFloat(estimate.discountAmount).toFixed(2)}</span>
+                  <span className="text-soft-white/70">Discount:</span>
+                  <span className="font-semibold text-soft-white" data-testid="text-estimate-discount">${parseFloat(estimate.discountAmount).toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-lg font-bold border-t border-dark-steel pt-2 text-chrome-silver">
+                <div className="flex justify-between text-lg font-bold border-t border-neon-blue/30 pt-2 text-soft-white">
                   <span>Total:</span>
                   <span data-testid="text-estimate-total">${parseFloat(estimate.totalAmount).toFixed(2)}</span>
                 </div>
@@ -289,8 +289,8 @@ export function EstimateDetailsDialog({ estimateId, children }: EstimateDetailsD
 
             {estimate.notes && (
               <div>
-                <label className="text-sm font-medium text-chrome-silver/70">Notes</label>
-                <p className="mt-1 text-chrome-silver" data-testid="text-estimate-notes">{estimate.notes}</p>
+                <label className="text-sm font-medium text-soft-white/70">Notes</label>
+                <p className="mt-1 text-soft-white" data-testid="text-estimate-notes">{estimate.notes}</p>
               </div>
             )}
 

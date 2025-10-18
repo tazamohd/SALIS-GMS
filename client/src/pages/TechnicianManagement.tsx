@@ -179,8 +179,8 @@ export default function TechnicianManagement() {
     <div className="p-6 space-y-6" data-testid="page-technician-management">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-['Poppins',Helvetica] font-bold text-3xl text-chrome-silver" data-testid="text-title">Technician Management</h1>
-          <p className="text-chrome-silver/60" data-testid="text-subtitle">
+          <h1 className="font-['Poppins',Helvetica] font-bold text-3xl text-soft-white" data-testid="text-title">Technician Management</h1>
+          <p className="text-soft-white/60" data-testid="text-subtitle">
             Manage technician profiles, skills, and assignments
           </p>
         </div>
@@ -283,50 +283,50 @@ export default function TechnicianManagement() {
                 <CardContent className="space-y-3">
                   {profile?.speciality && (
                     <div className="flex items-start gap-2" data-testid={`text-speciality-${technician.id}`}>
-                      <Briefcase className="h-4 w-4 mt-0.5 text-chrome-silver/60" />
+                      <Briefcase className="h-4 w-4 mt-0.5 text-soft-white/60" />
                       <div className="text-sm">
                         <div className="font-medium">Speciality</div>
-                        <div className="text-chrome-silver/60">{profile.speciality}</div>
+                        <div className="text-soft-white/60">{profile.speciality}</div>
                       </div>
                     </div>
                   )}
 
                   {profile?.yearsOfExperience !== undefined && (
                     <div className="flex items-start gap-2" data-testid={`text-experience-${technician.id}`}>
-                      <Clock className="h-4 w-4 mt-0.5 text-chrome-silver/60" />
+                      <Clock className="h-4 w-4 mt-0.5 text-soft-white/60" />
                       <div className="text-sm">
                         <div className="font-medium">Experience</div>
-                        <div className="text-chrome-silver/60">{profile.yearsOfExperience} years</div>
+                        <div className="text-soft-white/60">{profile.yearsOfExperience} years</div>
                       </div>
                     </div>
                   )}
 
                   {profile?.hourlyRate && (
                     <div className="flex items-start gap-2" data-testid={`text-rate-${technician.id}`}>
-                      <DollarSign className="h-4 w-4 mt-0.5 text-chrome-silver/60" />
+                      <DollarSign className="h-4 w-4 mt-0.5 text-soft-white/60" />
                       <div className="text-sm">
                         <div className="font-medium">Hourly Rate</div>
-                        <div className="text-chrome-silver/60">${profile.hourlyRate}/hr</div>
+                        <div className="text-soft-white/60">${profile.hourlyRate}/hr</div>
                       </div>
                     </div>
                   )}
 
                   {profile?.qualifications && (
                     <div className="flex items-start gap-2" data-testid={`text-qualifications-${technician.id}`}>
-                      <GraduationCap className="h-4 w-4 mt-0.5 text-chrome-silver/60" />
+                      <GraduationCap className="h-4 w-4 mt-0.5 text-soft-white/60" />
                       <div className="text-sm">
                         <div className="font-medium">Qualifications</div>
-                        <div className="text-chrome-silver/60 text-xs line-clamp-2">{profile.qualifications}</div>
+                        <div className="text-soft-white/60 text-xs line-clamp-2">{profile.qualifications}</div>
                       </div>
                     </div>
                   )}
 
                   {profile?.certifications && (
                     <div className="flex items-start gap-2" data-testid={`text-certifications-${technician.id}`}>
-                      <Award className="h-4 w-4 mt-0.5 text-chrome-silver/60" />
+                      <Award className="h-4 w-4 mt-0.5 text-soft-white/60" />
                       <div className="text-sm">
                         <div className="font-medium">Certifications</div>
-                        <div className="text-chrome-silver/60 text-xs line-clamp-2">{profile.certifications}</div>
+                        <div className="text-soft-white/60 text-xs line-clamp-2">{profile.certifications}</div>
                       </div>
                     </div>
                   )}
@@ -338,9 +338,9 @@ export default function TechnicianManagement() {
       ) : (
         <Card data-testid="card-empty">
           <CardContent className="flex flex-col items-center justify-center py-12">
-            <Users className="h-12 w-12 text-chrome-silver/60 mb-4" />
+            <Users className="h-12 w-12 text-soft-white/60 mb-4" />
             <p className="text-lg font-medium" data-testid="text-empty">No technicians found</p>
-            <p className="text-sm text-chrome-silver/60" data-testid="text-empty-subtitle">
+            <p className="text-sm text-soft-white/60" data-testid="text-empty-subtitle">
               Try adjusting your filters
             </p>
           </CardContent>

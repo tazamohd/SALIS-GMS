@@ -125,7 +125,7 @@ export default function Tools() {
   return (
     <div className="space-y-6 p-8">
       <div className="flex justify-between items-center">
-        <h1 className="font-['Poppins',Helvetica] font-bold text-3xl text-chrome-silver">Tools Management</h1>
+        <h1 className="font-['Poppins',Helvetica] font-bold text-3xl text-soft-white">Tools Management</h1>
         <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
           <DialogTrigger asChild>
             <Button data-testid="button-create-tool">
@@ -282,12 +282,12 @@ export default function Tools() {
       {/* Tools Grid */}
       {isLoading ? (
         <div className="text-center py-12" data-testid="loading-state">
-          <p className="text-chrome-silver/60">Loading tools...</p>
+          <p className="text-soft-white/60">Loading tools...</p>
         </div>
       ) : isError ? (
         <div className="text-center py-12" data-testid="error-state">
           <p className="text-red-600 font-semibold">Error loading tools</p>
-          <p className="text-sm text-chrome-silver/60 mt-2">{error instanceof Error ? error.message : "Please try again later"}</p>
+          <p className="text-sm text-soft-white/60 mt-2">{error instanceof Error ? error.message : "Please try again later"}</p>
         </div>
       ) : filteredTools && filteredTools.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -305,9 +305,9 @@ export default function Tools() {
                     </Badge>
                   </div>
                   {tool.description && (
-                    <p className="text-sm text-chrome-silver/60 line-clamp-2" data-testid={`text-description-${tool.id}`}>{tool.description}</p>
+                    <p className="text-sm text-soft-white/60 line-clamp-2" data-testid={`text-description-${tool.id}`}>{tool.description}</p>
                   )}
-                  <div className="flex flex-col gap-2 text-sm text-chrome-silver/60">
+                  <div className="flex flex-col gap-2 text-sm text-soft-white/60">
                     {tool.brand && (
                       <div className="flex justify-between" data-testid={`text-brand-${tool.id}`}>
                         <span className="font-medium">Brand:</span>
@@ -327,7 +327,7 @@ export default function Tools() {
                         <CheckCircle className="h-3 w-3 mr-1" /> Active
                       </Badge>
                     ) : (
-                      <Badge variant="outline" className="bg-dark-steel/20 text-gray-700 dark:bg-gray-950 dark:text-gray-300">
+                      <Badge variant="outline" className="bg-neon-blue/20/20 text-gray-700 dark:bg-gray-950 dark:text-gray-300">
                         <XCircle className="h-3 w-3 mr-1" /> Inactive
                       </Badge>
                     )}
@@ -344,8 +344,8 @@ export default function Tools() {
         </div>
       ) : (
         <div className="text-center py-12" data-testid="empty-state">
-          <p className="text-chrome-silver/60">No tools found</p>
-          <p className="text-sm text-chrome-silver/60 mt-2">Add your first tool to get started</p>
+          <p className="text-soft-white/60">No tools found</p>
+          <p className="text-sm text-soft-white/60 mt-2">Add your first tool to get started</p>
         </div>
       )}
 
@@ -365,7 +365,7 @@ export default function Tools() {
               {selectedTool.description && (
                 <div>
                   <h4 className="font-semibold mb-2">Description</h4>
-                  <p className="text-sm text-chrome-silver/60">{selectedTool.description}</p>
+                  <p className="text-sm text-soft-white/60">{selectedTool.description}</p>
                 </div>
               )}
               <div className="grid grid-cols-2 gap-4">
@@ -390,7 +390,7 @@ export default function Tools() {
                       <CheckCircle className="h-3 w-3 mr-1" /> Active
                     </Badge>
                   ) : (
-                    <Badge variant="outline" className="bg-dark-steel/20 text-gray-700">
+                    <Badge variant="outline" className="bg-neon-blue/20/20 text-gray-700">
                       <XCircle className="h-3 w-3 mr-1" /> Inactive
                     </Badge>
                   )}

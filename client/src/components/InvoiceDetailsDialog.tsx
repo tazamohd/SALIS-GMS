@@ -161,13 +161,13 @@ export function InvoiceDetailsDialog({ invoice, customer }: InvoiceDetailsDialog
 
           <div className="space-y-6">
             {/* Header Information */}
-            <div className="grid grid-cols-2 gap-4 p-4 bg-dark-steel/30 rounded">
+            <div className="grid grid-cols-2 gap-4 p-4 bg-neon-blue/20/30 rounded">
               <div>
-                <label className="text-sm font-medium text-chrome-silver/70">Customer</label>
-                <p className="font-medium text-chrome-silver">{customer?.fullName || customer?.email || "Unknown"}</p>
+                <label className="text-sm font-medium text-soft-white/70">Customer</label>
+                <p className="font-medium text-soft-white">{customer?.fullName || customer?.email || "Unknown"}</p>
               </div>
               <div>
-                <label className="text-sm font-medium text-chrome-silver/70">Status</label>
+                <label className="text-sm font-medium text-soft-white/70">Status</label>
                 <Select value={currentStatus} onValueChange={handleStatusChange}>
                   <SelectTrigger className="mt-1" data-testid="select-invoice-status">
                     <SelectValue />
@@ -182,45 +182,45 @@ export function InvoiceDetailsDialog({ invoice, customer }: InvoiceDetailsDialog
                 </Select>
               </div>
               <div>
-                <label className="text-sm font-medium text-chrome-silver/70">Invoice Date</label>
-                <p className="text-chrome-silver">{new Date(invoice.invoiceDate).toLocaleDateString()}</p>
+                <label className="text-sm font-medium text-soft-white/70">Invoice Date</label>
+                <p className="text-soft-white">{new Date(invoice.invoiceDate).toLocaleDateString()}</p>
               </div>
               <div>
-                <label className="text-sm font-medium text-chrome-silver/70">Due Date</label>
-                <p className="text-chrome-silver">{new Date(invoice.dueDate).toLocaleDateString()}</p>
+                <label className="text-sm font-medium text-soft-white/70">Due Date</label>
+                <p className="text-soft-white">{new Date(invoice.dueDate).toLocaleDateString()}</p>
               </div>
             </div>
 
             {/* Notes */}
             {invoice.notes && (
               <div>
-                <label className="text-sm font-medium text-chrome-silver/70">Notes</label>
-                <p className="mt-1 p-3 bg-dark-steel/30 rounded text-chrome-silver">{invoice.notes}</p>
+                <label className="text-sm font-medium text-soft-white/70">Notes</label>
+                <p className="mt-1 p-3 bg-neon-blue/20/30 rounded text-soft-white">{invoice.notes}</p>
               </div>
             )}
 
             {/* Items Table */}
             <div>
-              <h3 className="font-semibold mb-3 text-chrome-silver">Invoice Items</h3>
-              <div className="border border-dark-steel rounded overflow-hidden">
+              <h3 className="font-semibold mb-3 text-soft-white">Invoice Items</h3>
+              <div className="border border-neon-blue/30 rounded overflow-hidden">
                 <table className="w-full">
-                  <thead className="bg-dark-steel/30">
+                  <thead className="bg-neon-blue/20/30">
                     <tr>
-                      <th className="text-left p-3 text-sm font-medium text-chrome-silver/70">Type</th>
-                      <th className="text-left p-3 text-sm font-medium text-chrome-silver/70">Description</th>
-                      <th className="text-right p-3 text-sm font-medium text-chrome-silver/70">Quantity</th>
-                      <th className="text-right p-3 text-sm font-medium text-chrome-silver/70">Unit Price</th>
-                      <th className="text-right p-3 text-sm font-medium text-chrome-silver/70">Total</th>
+                      <th className="text-left p-3 text-sm font-medium text-soft-white/70">Type</th>
+                      <th className="text-left p-3 text-sm font-medium text-soft-white/70">Description</th>
+                      <th className="text-right p-3 text-sm font-medium text-soft-white/70">Quantity</th>
+                      <th className="text-right p-3 text-sm font-medium text-soft-white/70">Unit Price</th>
+                      <th className="text-right p-3 text-sm font-medium text-soft-white/70">Total</th>
                     </tr>
                   </thead>
                   <tbody>
                     {(items ?? []).map((item) => (
-                      <tr key={item.id} className="border-t border-dark-steel" data-testid={`invoice-item-${item.id}`}>
-                        <td className="p-3 capitalize text-chrome-silver">{item.itemType}</td>
-                        <td className="p-3 text-chrome-silver">{item.description}</td>
-                        <td className="p-3 text-right text-chrome-silver">{item.quantity}</td>
-                        <td className="p-3 text-right text-chrome-silver">${parseFloat(item.unitPrice).toFixed(2)}</td>
-                        <td className="p-3 text-right font-medium text-chrome-silver">
+                      <tr key={item.id} className="border-t border-neon-blue/30" data-testid={`invoice-item-${item.id}`}>
+                        <td className="p-3 capitalize text-soft-white">{item.itemType}</td>
+                        <td className="p-3 text-soft-white">{item.description}</td>
+                        <td className="p-3 text-right text-soft-white">{item.quantity}</td>
+                        <td className="p-3 text-right text-soft-white">${parseFloat(item.unitPrice).toFixed(2)}</td>
+                        <td className="p-3 text-right font-medium text-soft-white">
                           ${parseFloat(item.lineTotal).toFixed(2)}
                         </td>
                       </tr>
@@ -231,32 +231,32 @@ export function InvoiceDetailsDialog({ invoice, customer }: InvoiceDetailsDialog
             </div>
 
             {/* Totals */}
-            <div className="border-t border-dark-steel pt-4">
+            <div className="border-t border-neon-blue/30 pt-4">
               <div className="flex justify-end">
                 <div className="space-y-2 min-w-[300px]">
                   <div className="flex justify-between">
-                    <span className="text-chrome-silver/70">Subtotal:</span>
-                    <span className="font-medium text-chrome-silver">${parseFloat(invoice.subtotal).toFixed(2)}</span>
+                    <span className="text-soft-white/70">Subtotal:</span>
+                    <span className="font-medium text-soft-white">${parseFloat(invoice.subtotal).toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-chrome-silver/70">Tax:</span>
-                    <span className="font-medium text-chrome-silver">${parseFloat(invoice.taxAmount).toFixed(2)}</span>
+                    <span className="text-soft-white/70">Tax:</span>
+                    <span className="font-medium text-soft-white">${parseFloat(invoice.taxAmount).toFixed(2)}</span>
                   </div>
                   {parseFloat(invoice.discountAmount) > 0 && (
                     <div className="flex justify-between">
-                      <span className="text-chrome-silver/70">Discount:</span>
-                      <span className="font-medium text-chrome-silver">-${parseFloat(invoice.discountAmount).toFixed(2)}</span>
+                      <span className="text-soft-white/70">Discount:</span>
+                      <span className="font-medium text-soft-white">-${parseFloat(invoice.discountAmount).toFixed(2)}</span>
                     </div>
                   )}
-                  <div className="flex justify-between text-lg font-bold border-t border-dark-steel pt-2 text-chrome-silver">
+                  <div className="flex justify-between text-lg font-bold border-t border-neon-blue/30 pt-2 text-soft-white">
                     <span>Total:</span>
                     <span>${parseFloat(invoice.totalAmount).toFixed(2)}</span>
                   </div>
-                  <div className="flex justify-between text-deep-teal font-semibold">
+                  <div className="flex justify-between text-cyber-blue font-semibold">
                     <span>Paid:</span>
                     <span>${parseFloat(invoice.paidAmount).toFixed(2)}</span>
                   </div>
-                  <div className="flex justify-between text-tech-orange font-semibold border-t border-dark-steel pt-2">
+                  <div className="flex justify-between text-brand-orange font-semibold border-t border-neon-blue/30 pt-2">
                     <span>Balance Due:</span>
                     <span>${parseFloat(invoice.balanceAmount).toFixed(2)}</span>
                   </div>

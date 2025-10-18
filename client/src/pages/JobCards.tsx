@@ -34,11 +34,11 @@ const statusColors = {
   assigned: "bg-blue-100 text-blue-800",
   in_progress: "bg-purple-100 text-purple-800",
   completed: "bg-green-100 text-green-800",
-  cancelled: "bg-dark-steel/30 text-gray-800",
+  cancelled: "bg-neon-blue/20/30 text-gray-800",
 };
 
 const priorityColors = {
-  low: "bg-dark-steel/30 text-gray-800",
+  low: "bg-neon-blue/20/30 text-gray-800",
   medium: "bg-blue-100 text-blue-800",
   high: "bg-orange-100 text-orange-800",
   urgent: "bg-red-100 text-red-800",
@@ -217,10 +217,10 @@ export function JobCards() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="font-['Poppins',Helvetica] font-bold text-3xl text-chrome-silver">
+          <h1 className="font-['Poppins',Helvetica] font-bold text-3xl text-soft-white">
             Job Cards
           </h1>
-          <p className="font-['Poppins',Helvetica] font-normal text-sm text-chrome-silver/60 mt-1">
+          <p className="font-['Poppins',Helvetica] font-normal text-sm text-soft-white/60 mt-1">
             Manage service job cards and track progress
           </p>
         </div>
@@ -235,7 +235,7 @@ export function JobCards() {
       </div>
 
       {/* Filters */}
-      <Card className="bg-midnight-blue border-dark-steel mb-6">
+      <Card className="bg-dark-navy border-neon-blue/30 mb-6">
         <CardContent className="pt-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
@@ -296,14 +296,14 @@ export function JobCards() {
       {isLoading ? (
         <div className="text-center py-12">
           <div className="animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-4"></div>
-          <p className="text-chrome-silver/60">Loading job cards...</p>
+          <p className="text-soft-white/60">Loading job cards...</p>
         </div>
       ) : filteredJobCards.length === 0 ? (
-        <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
+        <Card className="bg-dark-navy border-neon-blue/30 bg-dark-navy border-neon-blue/30">
           <CardContent className="text-center py-12">
-            <Wrench className="w-12 h-12 text-chrome-silver/50 mx-auto mb-4" />
-            <p className="text-chrome-silver/60">No job cards found</p>
-            <p className="text-sm text-chrome-silver/50 mt-1">Create your first job card to get started</p>
+            <Wrench className="w-12 h-12 text-soft-white/50 mx-auto mb-4" />
+            <p className="text-soft-white/60">No job cards found</p>
+            <p className="text-sm text-soft-white/50 mt-1">Create your first job card to get started</p>
           </CardContent>
         </Card>
       ) : (
@@ -321,10 +321,10 @@ export function JobCards() {
                       <CardTitle className="text-lg font-semibold">
                         {jobCard.jobNumber}
                       </CardTitle>
-                      <p className="text-sm text-chrome-silver/60 mt-1">
+                      <p className="text-sm text-soft-white/60 mt-1">
                         {vehicle?.make} {vehicle?.model} ({vehicle?.year})
                       </p>
-                      <p className="text-xs text-chrome-silver/50">{vehicle?.licensePlate}</p>
+                      <p className="text-xs text-soft-white/50">{vehicle?.licensePlate}</p>
                     </div>
                     <div className="flex flex-col gap-1">
                       <Badge className={statusColors[jobCard.status as keyof typeof statusColors]}>
@@ -560,7 +560,7 @@ export function JobCards() {
                               <div className="flex items-center gap-2">
                                 <span>{tech.fullName || tech.email}</span>
                                 {profile?.level && (
-                                  <span className="text-xs text-chrome-silver/60">
+                                  <span className="text-xs text-soft-white/60">
                                     ({profile.level}
                                     {profile.speciality ? ` - ${profile.speciality}` : ""})
                                   </span>

@@ -189,7 +189,7 @@ export default function SpareParts() {
       fluids: "bg-purple-100 text-purple-800",
       filters: "bg-green-100 text-green-800",
     };
-    return colors[category] || "bg-dark-steel/30 text-gray-800";
+    return colors[category] || "bg-neon-blue/20/30 text-gray-800";
   };
 
   const getPartTypeBadgeColor = (partType: string) => {
@@ -198,15 +198,15 @@ export default function SpareParts() {
       generic: "bg-slate-100 text-slate-800",
       consumable: "bg-orange-100 text-orange-800",
     };
-    return colors[partType] || "bg-dark-steel/30 text-gray-800";
+    return colors[partType] || "bg-neon-blue/20/30 text-gray-800";
   };
 
   return (
     <div className="container mx-auto py-6 space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="font-['Poppins',Helvetica] font-bold text-3xl text-chrome-silver" data-testid="page-title">Spare Parts & Inventory</h1>
-          <p className="text-chrome-silver/60">Manage spare parts and inventory levels</p>
+          <h1 className="font-['Poppins',Helvetica] font-bold text-3xl text-soft-white" data-testid="page-title">Spare Parts & Inventory</h1>
+          <p className="text-soft-white/60">Manage spare parts and inventory levels</p>
         </div>
         <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
           <DialogTrigger asChild>
@@ -469,7 +469,7 @@ export default function SpareParts() {
 
       <div className="flex gap-4 items-center">
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-3 h-4 w-4 text-chrome-silver/60" />
+          <Search className="absolute left-3 top-3 h-4 w-4 text-soft-white/60" />
           <Input
             placeholder="Search by name, SKU, or brand..."
             value={searchQuery}
@@ -494,11 +494,11 @@ export default function SpareParts() {
       </div>
 
       {error ? (
-        <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
+        <Card className="bg-dark-navy border-neon-blue/30 bg-dark-navy border-neon-blue/30">
           <CardContent className="flex flex-col items-center justify-center py-12">
             <Package className="h-12 w-12 text-destructive mb-4" />
             <p className="text-lg font-medium mb-2">Failed to load spare parts</p>
-            <p className="text-chrome-silver/60 mb-4">
+            <p className="text-soft-white/60 mb-4">
               {error instanceof Error ? error.message : "An error occurred"}
             </p>
             <Button onClick={() => queryClient.invalidateQueries({ queryKey: ["/api/spare-parts"] })} data-testid="button-retry">
@@ -525,11 +525,11 @@ export default function SpareParts() {
           ))}
         </div>
       ) : filteredParts.length === 0 ? (
-        <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
+        <Card className="bg-dark-navy border-neon-blue/30 bg-dark-navy border-neon-blue/30">
           <CardContent className="flex flex-col items-center justify-center py-12">
-            <Package className="h-12 w-12 text-chrome-silver/60 mb-4" />
+            <Package className="h-12 w-12 text-soft-white/60 mb-4" />
             <p className="text-lg font-medium mb-2">No spare parts found</p>
-            <p className="text-chrome-silver/60 mb-4">
+            <p className="text-soft-white/60 mb-4">
               {searchQuery || categoryFilter !== "all" 
                 ? "Try adjusting your filters" 
                 : "Get started by adding your first spare part"}
@@ -604,11 +604,11 @@ export default function SpareParts() {
                   </Badge>
                 </div>
                 {part.description && (
-                  <p className="text-sm text-chrome-silver/60 line-clamp-2">
+                  <p className="text-sm text-soft-white/60 line-clamp-2">
                     {part.description}
                   </p>
                 )}
-                <div className="flex items-center gap-4 text-sm text-chrome-silver/60">
+                <div className="flex items-center gap-4 text-sm text-soft-white/60">
                   {part.brand && (
                     <div className="flex items-center gap-1">
                       <Package className="h-3 w-3" />
@@ -636,21 +636,21 @@ export default function SpareParts() {
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-sm font-medium text-chrome-silver/60">Name</p>
+                  <p className="text-sm font-medium text-soft-white/60">Name</p>
                   <p className="text-sm" data-testid="detail-name">{selectedPart.name}</p>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-chrome-silver/60">SKU</p>
+                  <p className="text-sm font-medium text-soft-white/60">SKU</p>
                   <p className="text-sm" data-testid="detail-sku">{selectedPart.sku}</p>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-chrome-silver/60">Category</p>
+                  <p className="text-sm font-medium text-soft-white/60">Category</p>
                   <Badge className={getCategoryBadgeColor(selectedPart.category)}>
                     {selectedPart.category}
                   </Badge>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-chrome-silver/60">Part Type</p>
+                  <p className="text-sm font-medium text-soft-white/60">Part Type</p>
                   <Badge className={getPartTypeBadgeColor(selectedPart.partType)}>
                     {selectedPart.partType}
                   </Badge>
@@ -659,7 +659,7 @@ export default function SpareParts() {
 
               {selectedPart.description && (
                 <div>
-                  <p className="text-sm font-medium text-chrome-silver/60">Description</p>
+                  <p className="text-sm font-medium text-soft-white/60">Description</p>
                   <p className="text-sm" data-testid="detail-description">{selectedPart.description}</p>
                 </div>
               )}
@@ -667,31 +667,31 @@ export default function SpareParts() {
               <div className="grid grid-cols-2 gap-4">
                 {selectedPart.brand && (
                   <div>
-                    <p className="text-sm font-medium text-chrome-silver/60">Brand</p>
+                    <p className="text-sm font-medium text-soft-white/60">Brand</p>
                     <p className="text-sm">{selectedPart.brand}</p>
                   </div>
                 )}
                 {selectedPart.manufacturer && (
                   <div>
-                    <p className="text-sm font-medium text-chrome-silver/60">Manufacturer</p>
+                    <p className="text-sm font-medium text-soft-white/60">Manufacturer</p>
                     <p className="text-sm">{selectedPart.manufacturer}</p>
                   </div>
                 )}
                 {selectedPart.barcode && (
                   <div>
-                    <p className="text-sm font-medium text-chrome-silver/60">Barcode</p>
+                    <p className="text-sm font-medium text-soft-white/60">Barcode</p>
                     <p className="text-sm">{selectedPart.barcode}</p>
                   </div>
                 )}
                 <div>
-                  <p className="text-sm font-medium text-chrome-silver/60">Unit of Measure</p>
+                  <p className="text-sm font-medium text-soft-white/60">Unit of Measure</p>
                   <p className="text-sm">{selectedPart.unitOfMeasure}</p>
                 </div>
               </div>
 
               {selectedPart.notes && (
                 <div>
-                  <p className="text-sm font-medium text-chrome-silver/60">Notes</p>
+                  <p className="text-sm font-medium text-soft-white/60">Notes</p>
                   <p className="text-sm">{selectedPart.notes}</p>
                 </div>
               )}

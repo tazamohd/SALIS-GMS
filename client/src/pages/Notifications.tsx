@@ -72,7 +72,7 @@ export default function Notifications() {
       case 'in-app':
         return <Bell className="h-5 w-5 text-purple-500" />;
       default:
-        return <Bell className="h-5 w-5 text-chrome-silver/60" />;
+        return <Bell className="h-5 w-5 text-soft-white/60" />;
     }
   };
 
@@ -88,7 +88,7 @@ export default function Notifications() {
       invoice: 'bg-green-100 text-green-700',
       job_completed: 'bg-cyan-100 text-cyan-700',
       feedback_request: 'bg-purple-100 text-purple-700',
-      general: 'bg-dark-steel/30 text-gray-700',
+      general: 'bg-neon-blue/20/30 text-gray-700',
     };
 
     return (
@@ -118,8 +118,8 @@ export default function Notifications() {
     <div className="p-8 bg-gray-800 min-h-screen space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-chrome-silver">Notifications</h1>
-          <p className="text-chrome-silver/60 mt-2">Manage your notifications and alerts</p>
+          <h1 className="text-3xl font-bold text-soft-white">Notifications</h1>
+          <p className="text-soft-white/60 mt-2">Manage your notifications and alerts</p>
         </div>
         <Button
           variant="outline"
@@ -153,10 +153,10 @@ export default function Notifications() {
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
             </div>
           ) : filteredNotifications.length === 0 ? (
-            <Card className="bg-midnight-blue border-dark-steel bg-midnight-blue border-dark-steel">
+            <Card className="bg-dark-navy border-neon-blue/30 bg-dark-navy border-neon-blue/30">
               <CardContent className="flex flex-col items-center justify-center py-12">
                 <Bell className="h-12 w-12 text-gray-300 mb-4" />
-                <p className="text-chrome-silver/60">No notifications to display</p>
+                <p className="text-soft-white/60">No notifications to display</p>
               </CardContent>
             </Card>
           ) : (
@@ -214,7 +214,7 @@ export default function Notifications() {
                     <CardDescription className="text-sm whitespace-pre-wrap">
                       {notification.message}
                     </CardDescription>
-                    <div className="mt-3 flex items-center gap-4 text-xs text-chrome-silver/60">
+                    <div className="mt-3 flex items-center gap-4 text-xs text-soft-white/60">
                       <span>
                         {notification.createdAt &&
                           formatDistanceToNow(new Date(notification.createdAt), {
