@@ -214,8 +214,8 @@
 @layer base {
   :root {
     /* SALIS AUTO shadcn Theme Colors - Light Mode */
-    --background: 217 100% 96%;  /* Soft White #eaf2ff */
-    --foreground: 213 47% 7%;  /* Dark Navy #0A0F1C */
+    --background: 212 100% 35%;  /* Brand Blue #0055b4 */
+    --foreground: 217 100% 96%;  /* Soft White #eaf2ff */
 
     --muted: 217 100% 90%;
     --muted-foreground: 219 100% 40%;
@@ -229,7 +229,7 @@
     --border: 219 100% 56%;  /* Neon Blue #1F6FFF */
     --input: 217 100% 90%;
 
-    --card: 213 47% 10%;
+    --card: 212 100% 30%;
     --card-foreground: 217 100% 96%;
 
     --primary: 23 80% 45%;  /* Brand Orange #ce5c17 */
@@ -248,22 +248,22 @@
 
   .dark {
     /* SALIS AUTO shadcn Theme Colors - Dark Mode */
-    --background: 213 47% 7%;  /* Dark Navy #0A0F1C */
+    --background: 212 100% 35%;  /* Brand Blue #0055b4 */
     --foreground: 217 100% 96%;  /* Soft White #eaf2ff */
 
-    --muted: 213 47% 12%;
+    --muted: 212 100% 40%;
     --muted-foreground: 217 100% 80%;
 
     --accent: 195 100% 50%;  /* Electric Blue #00BFFF */
-    --accent-foreground: 213 47% 7%;
+    --accent-foreground: 212 100% 35%;
 
-    --popover: 213 47% 10%;
+    --popover: 212 100% 30%;
     --popover-foreground: 217 100% 96%;
 
     --border: 219 100% 56%;  /* Neon Blue #1F6FFF */
-    --input: 213 47% 12%;
+    --input: 212 100% 40%;
 
-    --card: 213 47% 10%;
+    --card: 212 100% 30%;
     --card-foreground: 217 100% 96%;
 
     --primary: 23 80% 45%;  /* Brand Orange #ce5c17 */
