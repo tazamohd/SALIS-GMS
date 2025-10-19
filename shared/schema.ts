@@ -78,13 +78,13 @@ export const roles = pgTable("roles", {
 });
 
 // User storage table.
-// (IMPORTANT) This table is mandatory for Replit Auth, don't drop it.
 export const users = pgTable("users", {
   id: varchar("id")
     .primaryKey()
     .default(sql`gen_random_uuid()`),
   fullName: varchar("full_name", { length: 255 }),
-  email: varchar("email", { length: 255 }).unique(),
+  email: varchar("email", { length: 255 }).unique().notNull(),
+  password: varchar("password", { length: 255 }).notNull(),
   phone: varchar("phone", { length: 20 }),
   profileImageUrl: varchar("profile_image_url", { length: 500 }),
   nationalId: varchar("national_id", { length: 50 }),
@@ -93,7 +93,6 @@ export const users = pgTable("users", {
   accessEndDate: timestamp("access_end_date"),
   garageId: uuid("garage_id").references(() => garages.id),
   userType: varchar("user_type", { length: 50 }),
-  // Keep these for Replit Auth compatibility
   firstName: varchar("first_name"),
   lastName: varchar("last_name"),
   updatedAt: timestamp("updated_at").defaultNow(),
