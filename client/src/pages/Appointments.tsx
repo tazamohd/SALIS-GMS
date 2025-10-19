@@ -37,14 +37,14 @@ export function Appointments() {
 
   const getStatusBadge = (status: string) => {
     const statusMap: Record<string, string> = {
-      scheduled: "bg-electric-blue/20 text-electric-blue border border-electric-blue/30",
-      confirmed: "bg-cyber-blue/20 text-cyber-blue border border-cyber-blue/30",
-      in_progress: "bg-electric-blue/20 text-electric-blue border border-electric-blue/30",
-      completed: "bg-soft-white/20 text-soft-white border border-soft-white/30",
-      cancelled: "bg-red-500/20 text-red-400 border border-red-500/30",
-      no_show: "bg-brand-orange/20 text-brand-orange border border-brand-orange/30",
+      scheduled: "bg-gray-100 dark:bg-salis-gray-dark text-gray-900 dark:text-white border border-gray-300 dark:border-salis-gray",
+      confirmed: "bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 border border-gray-400 dark:border-gray-600",
+      in_progress: "bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-300 dark:border-salis-gray",
+      completed: "bg-gray-100 text-gray-800 dark:bg-salis-gray-dark dark:text-gray-300 border border-gray-200 dark:border-gray-600",
+      cancelled: "bg-salis-black dark:bg-white text-white dark:text-salis-black border border-salis-black dark:border-white",
+      no_show: "bg-gray-400 dark:bg-gray-500 text-gray-900 dark:text-white border border-gray-400 dark:border-gray-600",
     };
-    return statusMap[status] || "bg-soft-white/20 text-soft-white border border-soft-white/30";
+    return statusMap[status] || "bg-gray-100 text-gray-800 dark:bg-salis-gray-dark dark:text-gray-300 border border-gray-200 dark:border-gray-600";
   };
 
   const getStatusLabel = (status: string) => {
@@ -60,18 +60,18 @@ export function Appointments() {
   };
 
   return (
-    <div className="p-8 bg-gray-800 min-h-screen">
+    <div className="p-8 bg-gray-50 dark:bg-salis-black min-h-screen">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="font-['Poppins',Helvetica] font-bold text-3xl text-soft-white">
+          <h1 className="font-['Poppins',Helvetica] font-bold text-3xl text-gray-900 dark:text-white">
             Appointments
           </h1>
-          <p className="font-['Poppins',Helvetica] font-normal text-sm text-soft-white/70 mt-1">
+          <p className="font-['Poppins',Helvetica] font-normal text-sm text-gray-700 dark:text-gray-300 mt-1">
             Manage and schedule customer appointments
           </p>
         </div>
         <Button 
-          className="bg-electric-blue hover:bg-electric-blue text-white"
+          className="bg-white dark:bg-salis-black hover:bg-gray-100 dark:hover:bg-salis-gray-dark text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700"
           data-testid="button-create-appointment"
         >
           <Plus className="w-4 h-4 mr-2" />
@@ -80,12 +80,12 @@ export function Appointments() {
       </div>
 
       {/* Filters */}
-      <Card className="mb-6 bg-dark-navy border-neon-blue/30">
+      <Card className="mb-6 bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
         <CardContent className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Search */}
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-soft-white/50" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 dark:text-gray-500" />
               <Input
                 type="text"
                 placeholder="Search by customer name, phone, or appointment #"
@@ -94,7 +94,7 @@ export function Appointments() {
                   setSearchQuery(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="pl-10 bg-neon-blue/20 border-neon-blue/30 text-soft-white placeholder:text-soft-white/50"
+                className="pl-10"
                 data-testid="input-search-appointments"
               />
             </div>
@@ -104,10 +104,10 @@ export function Appointments() {
               setStatusFilter(value);
               setCurrentPage(1);
             }}>
-              <SelectTrigger className="bg-neon-blue/20 border-neon-blue/30 text-soft-white" data-testid="select-status-filter">
+              <SelectTrigger data-testid="select-status-filter">
                 <SelectValue placeholder="Filter by status" />
               </SelectTrigger>
-              <SelectContent className="bg-dark-navy border-neon-blue/30">
+              <SelectContent>
                 <SelectItem value="all">All Statuses</SelectItem>
                 <SelectItem value="scheduled">Scheduled</SelectItem>
                 <SelectItem value="confirmed">Confirmed</SelectItem>
@@ -120,11 +120,11 @@ export function Appointments() {
 
             {/* Stats Summary */}
             <div className="flex items-center gap-4 text-sm">
-              <span className="text-soft-white/70">
-                Total: <span className="font-semibold text-electric-blue">{filteredAppointments.length}</span>
+              <span className="text-gray-700 dark:text-gray-300">
+                Total: <span className="font-semibold text-gray-900 dark:text-white">{filteredAppointments.length}</span>
               </span>
-              <span className="text-soft-white/70">
-                Today: <span className="font-semibold text-electric-blue">
+              <span className="text-gray-700 dark:text-gray-300">
+                Today: <span className="font-semibold text-gray-900 dark:text-white">
                   {(appointments ?? []).filter(apt => {
                     const today = new Date().toDateString();
                     return new Date(apt.appointmentDate).toDateString() === today;
@@ -137,15 +137,15 @@ export function Appointments() {
       </Card>
 
       {/* Appointments Table */}
-      <Card className="bg-dark-navy border-neon-blue/30">
+      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
         <CardContent className="p-0">
           {isLoading ? (
-            <div className="p-12 text-center text-soft-white/50">Loading appointments...</div>
+            <div className="p-12 text-center text-gray-500 dark:text-gray-500">Loading appointments...</div>
           ) : filteredAppointments.length === 0 ? (
             <div className="p-12 text-center">
-              <Calendar className="w-12 h-12 text-soft-white/40 mx-auto mb-4" />
-              <p className="text-soft-white/70">No appointments found</p>
-              <p className="text-sm text-soft-white/50 mt-1">
+              <Calendar className="w-12 h-12 text-gray-400 dark:text-gray-600 mx-auto mb-4" />
+              <p className="text-gray-700 dark:text-gray-300">No appointments found</p>
+              <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">
                 {searchQuery || statusFilter !== "all" 
                   ? "Try adjusting your filters" 
                   : "Create your first appointment to get started"}
@@ -156,26 +156,26 @@ export function Appointments() {
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
-                    <tr className="border-b border-neon-blue/30 bg-neon-blue/20/30">
-                      <th className="py-4 px-4 text-left font-['Poppins',Helvetica] font-semibold text-sm text-soft-white">
+                    <tr className="border-b border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-salis-gray-dark">
+                      <th className="py-4 px-4 text-left font-['Poppins',Helvetica] font-semibold text-sm text-gray-900 dark:text-white">
                         Appointment #
                       </th>
-                      <th className="py-4 px-4 text-left font-['Poppins',Helvetica] font-semibold text-sm text-soft-white">
+                      <th className="py-4 px-4 text-left font-['Poppins',Helvetica] font-semibold text-sm text-gray-900 dark:text-white">
                         Customer
                       </th>
-                      <th className="py-4 px-4 text-left font-['Poppins',Helvetica] font-semibold text-sm text-soft-white">
+                      <th className="py-4 px-4 text-left font-['Poppins',Helvetica] font-semibold text-sm text-gray-900 dark:text-white">
                         Vehicle
                       </th>
-                      <th className="py-4 px-4 text-left font-['Poppins',Helvetica] font-semibold text-sm text-soft-white">
+                      <th className="py-4 px-4 text-left font-['Poppins',Helvetica] font-semibold text-sm text-gray-900 dark:text-white">
                         Service Type
                       </th>
-                      <th className="py-4 px-4 text-left font-['Poppins',Helvetica] font-semibold text-sm text-soft-white">
+                      <th className="py-4 px-4 text-left font-['Poppins',Helvetica] font-semibold text-sm text-gray-900 dark:text-white">
                         Date & Time
                       </th>
-                      <th className="py-4 px-4 text-left font-['Poppins',Helvetica] font-semibold text-sm text-soft-white">
+                      <th className="py-4 px-4 text-left font-['Poppins',Helvetica] font-semibold text-sm text-gray-900 dark:text-white">
                         Status
                       </th>
-                      <th className="py-4 px-4 text-left font-['Poppins',Helvetica] font-semibold text-sm text-soft-white">
+                      <th className="py-4 px-4 text-left font-['Poppins',Helvetica] font-semibold text-sm text-gray-900 dark:text-white">
                         Actions
                       </th>
                     </tr>
@@ -184,20 +184,20 @@ export function Appointments() {
                     {paginatedAppointments.map((apt) => {
                       const vehicleInfo = apt.vehicleInfo as any;
                       return (
-                        <tr key={apt.id} className="border-b border-neon-blue/30/50 hover:bg-neon-blue/20/20">
+                        <tr key={apt.id} className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-salis-gray-dark">
                           <td className="py-4 px-4">
-                            <span className="font-['Poppins',Helvetica] font-medium text-sm text-electric-blue" data-testid={`text-apt-number-${apt.id}`}>
+                            <span className="font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white" data-testid={`text-apt-number-${apt.id}`}>
                               {apt.appointmentNumber}
                             </span>
                           </td>
                           <td className="py-4 px-4">
                             <div className="flex items-start gap-2">
-                              <User className="w-4 h-4 text-soft-white/50 mt-0.5" />
+                              <User className="w-4 h-4 text-gray-500 dark:text-gray-500 mt-0.5" />
                               <div>
-                                <div className="font-['Poppins',Helvetica] font-medium text-sm text-soft-white" data-testid={`text-customer-name-${apt.id}`}>
+                                <div className="font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white" data-testid={`text-customer-name-${apt.id}`}>
                                   {apt.customerName}
                                 </div>
-                                <div className="flex items-center gap-1 text-xs text-soft-white/60">
+                                <div className="flex items-center gap-1 text-xs text-gray-600 dark:text-gray-400">
                                   <Phone className="w-3 h-3" />
                                   {apt.customerPhone}
                                 </div>
@@ -206,25 +206,25 @@ export function Appointments() {
                           </td>
                           <td className="py-4 px-4">
                             <div className="flex items-center gap-2">
-                              <Car className="w-4 h-4 text-soft-white/50" />
-                              <span className="font-['Poppins',Helvetica] font-normal text-sm text-soft-white" data-testid={`text-vehicle-${apt.id}`}>
+                              <Car className="w-4 h-4 text-gray-500 dark:text-gray-500" />
+                              <span className="font-['Poppins',Helvetica] font-normal text-sm text-gray-900 dark:text-white" data-testid={`text-vehicle-${apt.id}`}>
                                 {vehicleInfo?.make} {vehicleInfo?.model} ({vehicleInfo?.year})
                               </span>
                             </div>
                           </td>
                           <td className="py-4 px-4">
-                            <span className="font-['Poppins',Helvetica] font-normal text-sm text-soft-white capitalize" data-testid={`text-service-type-${apt.id}`}>
+                            <span className="font-['Poppins',Helvetica] font-normal text-sm text-gray-900 dark:text-white capitalize" data-testid={`text-service-type-${apt.id}`}>
                               {apt.serviceType}
                             </span>
                           </td>
                           <td className="py-4 px-4">
                             <div className="flex items-start gap-2">
-                              <Clock className="w-4 h-4 text-soft-white/50 mt-0.5" />
+                              <Clock className="w-4 h-4 text-gray-500 dark:text-gray-500 mt-0.5" />
                               <div>
-                                <div className="font-['Poppins',Helvetica] font-medium text-sm text-soft-white" data-testid={`text-date-${apt.id}`}>
+                                <div className="font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white" data-testid={`text-date-${apt.id}`}>
                                   {format(new Date(apt.appointmentDate), 'MMM dd, yyyy')}
                                 </div>
-                                <div className="text-xs text-soft-white/60">
+                                <div className="text-xs text-gray-600 dark:text-gray-400">
                                   {format(new Date(apt.appointmentDate), 'hh:mm a')} ({apt.duration} min)
                                 </div>
                               </div>
@@ -238,7 +238,7 @@ export function Appointments() {
                           <td className="py-4 px-4">
                             <Button 
                               size="sm" 
-                              className="bg-electric-blue/20 hover:bg-electric-blue/30 text-electric-blue border border-electric-blue/30"
+                              className="bg-gray-100 hover:bg-gray-200 dark:bg-salis-gray-dark dark:hover:bg-salis-gray text-gray-900 dark:text-gray-100 border border-gray-200 dark:border-gray-700"
                               data-testid={`button-view-${apt.id}`}
                             >
                               View
@@ -253,13 +253,13 @@ export function Appointments() {
 
               {/* Pagination */}
               {totalPages > 1 && (
-                <div className="flex items-center justify-between p-4 border-t border-neon-blue/30">
-                  <div className="text-sm text-soft-white/70">
+                <div className="flex items-center justify-between p-4 border-t border-gray-200 dark:border-salis-gray-dark">
+                  <div className="text-sm text-gray-700 dark:text-gray-300">
                     Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, filteredAppointments.length)} of {filteredAppointments.length} appointments
                   </div>
                   <div className="flex items-center gap-2">
                     <Button
-                      className="bg-neon-blue/20/50 hover:bg-neon-blue/20 text-soft-white border border-neon-blue/30"
+                      className="bg-gray-100 hover:bg-gray-200 dark:bg-salis-gray-dark dark:hover:bg-salis-gray text-gray-900 dark:text-gray-100 border border-gray-200 dark:border-gray-700"
                       size="sm"
                       onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                       disabled={currentPage === 1}
@@ -267,11 +267,11 @@ export function Appointments() {
                     >
                       Previous
                     </Button>
-                    <span className="text-sm text-soft-white/70">
+                    <span className="text-sm text-gray-700 dark:text-gray-300">
                       Page {currentPage} of {totalPages}
                     </span>
                     <Button
-                      className="bg-neon-blue/20/50 hover:bg-neon-blue/20 text-soft-white border border-neon-blue/30"
+                      className="bg-gray-100 hover:bg-gray-200 dark:bg-salis-gray-dark dark:hover:bg-salis-gray text-gray-900 dark:text-gray-100 border border-gray-200 dark:border-gray-700"
                       size="sm"
                       onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                       disabled={currentPage === totalPages}

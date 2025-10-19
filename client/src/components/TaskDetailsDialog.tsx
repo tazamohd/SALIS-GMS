@@ -126,13 +126,13 @@ export function TaskDetailsDialog({ open, onOpenChange, task }: TaskDetailsDialo
       <DialogContent className="max-w-2xl" data-testid="dialog-task-details">
         {showSuccess ? (
           <div className="flex flex-col items-center justify-center py-12">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
-              <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-16 h-16 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4">
+              <svg className="w-8 h-8 text-gray-900 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
             </div>
-            <h3 className="font-['Poppins',Helvetica] font-bold text-2xl text-[#222029] mb-2">Done!</h3>
-            <p className="font-['Poppins',Helvetica] font-normal text-sm text-[#999999]">
+            <h3 className="font-['Poppins',Helvetica] font-bold text-2xl text-gray-900 dark:text-white mb-2">Done!</h3>
+            <p className="font-['Poppins',Helvetica] font-normal text-sm text-gray-500 dark:text-gray-500">
               The task status is updated successfully
             </p>
             <Button 
@@ -147,7 +147,7 @@ export function TaskDetailsDialog({ open, onOpenChange, task }: TaskDetailsDialo
           <>
             <DialogHeader>
               <div className="flex items-center justify-between">
-                <DialogTitle className="font-['Poppins',Helvetica] font-semibold text-xl text-[#222029]">
+                <DialogTitle className="font-['Poppins',Helvetica] font-semibold text-xl text-gray-900 dark:text-white">
                   Task ID #{task.id}
                 </DialogTitle>
                 <DialogDescription className="sr-only">
@@ -159,7 +159,7 @@ export function TaskDetailsDialog({ open, onOpenChange, task }: TaskDetailsDialo
             <div className="space-y-6 py-4">
               {/* Status */}
               <div>
-                <Label className="font-['Poppins',Helvetica] font-medium text-sm text-[#222029] mb-2 block">
+                <Label className="font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white mb-2 block">
                   Status
                 </Label>
                 <Select value={status} onValueChange={setStatus}>
@@ -178,10 +178,10 @@ export function TaskDetailsDialog({ open, onOpenChange, task }: TaskDetailsDialo
 
               {/* Service Type */}
               <div>
-                <h3 className="font-['Poppins',Helvetica] font-semibold text-lg text-[#222029] mb-2">
+                <h3 className="font-['Poppins',Helvetica] font-semibold text-lg text-gray-900 dark:text-white mb-2">
                   {task.serviceType}
                 </h3>
-                <p className="font-['Poppins',Helvetica] font-medium text-sm text-[#222029]">
+                <p className="font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white">
                   Task description
                 </p>
               </div>
@@ -191,14 +191,14 @@ export function TaskDetailsDialog({ open, onOpenChange, task }: TaskDetailsDialo
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 rows={5}
-                className="border-[#e6e6e6] resize-none"
+                className="border-gray-200 dark:border-salis-gray-dark resize-none"
                 placeholder="Enter task description..."
                 data-testid="textarea-task-description"
               />
 
               {/* Priority */}
               <div>
-                <Label className="font-['Poppins',Helvetica] font-medium text-sm text-[#222029] mb-2 block">
+                <Label className="font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white mb-2 block">
                   Priority
                 </Label>
                 <Select value={priority} onValueChange={setPriority}>
@@ -215,7 +215,7 @@ export function TaskDetailsDialog({ open, onOpenChange, task }: TaskDetailsDialo
 
               {/* Estimated Time */}
               <div>
-                <Label className="font-['Poppins',Helvetica] font-medium text-sm text-[#222029] mb-2 block">
+                <Label className="font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white mb-2 block">
                   Estimated time required
                 </Label>
                 <Input
@@ -223,7 +223,7 @@ export function TaskDetailsDialog({ open, onOpenChange, task }: TaskDetailsDialo
                   value={estimatedTime}
                   onChange={(e) => setEstimatedTime(e.target.value)}
                   placeholder="2 - 3 hours"
-                  className="border-[#e6e6e6]"
+                  className="border-gray-200 dark:border-salis-gray-dark"
                   data-testid="input-estimated-time"
                 />
               </div>
@@ -232,7 +232,7 @@ export function TaskDetailsDialog({ open, onOpenChange, task }: TaskDetailsDialo
               {/* Update Button */}
               <Button
                 onClick={handleUpdate}
-                className="w-full bg-blue-600 hover:bg-blue-700"
+                className="w-full bg-gray-800 dark:bg-gray-200 hover:bg-gray-900 dark:hover:bg-gray-300 text-white dark:text-black"
                 disabled={updateTaskMutation.isPending}
                 data-testid="button-update-task"
               >

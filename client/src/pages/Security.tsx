@@ -144,9 +144,9 @@ function TwoFactorAuthTab() {
       <CardContent className="space-y-4">
         {status?.enabled ? (
           <div className="space-y-4">
-            <div className="flex items-center justify-between p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
+            <div className="flex items-center justify-between p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">
               <div className="flex items-center gap-3">
-                <CheckCircle className="h-5 w-5 text-green-600" />
+                <CheckCircle className="h-5 w-5 text-gray-700" />
                 <div>
                   <p className="font-medium">2FA is Active</p>
                   <p className="text-sm text-muted-foreground">
@@ -166,7 +166,7 @@ function TwoFactorAuthTab() {
           </div>
         ) : setupData ? (
           <div className="space-y-4">
-            <div className="flex justify-center p-4 bg-white dark:bg-gray-800 rounded-lg">
+            <div className="flex justify-center p-4 bg-white dark:bg-salis-black rounded-lg">
               <img src={setupData.qrCodeUrl} alt="2FA QR Code" className="w-64 h-64" data-testid="img-qr-code" />
             </div>
             

@@ -216,7 +216,7 @@ export default function Calendar() {
           end,
           resource: apt,
           type: 'appointment',
-          color: apt.status === 'completed' ? '#10b981' : apt.status === 'cancelled' ? '#ef4444' : '#3b82f6',
+          color: apt.status === 'completed' ? '#6b7280' : apt.status === 'cancelled' ? '#4b5563' : '#9ca3af',
         });
       });
 
@@ -325,20 +325,20 @@ export default function Calendar() {
   };
 
   return (
-    <div className="p-8 bg-gray-800 min-h-screen space-y-6">
+    <div className="p-8 bg-gray-50 dark:bg-salis-black min-h-screen space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="font-['Poppins',Helvetica] font-bold text-3xl text-soft-white" data-testid="text-calendar-title">Scheduling & Calendar</h1>
-          <p className="text-soft-white/70">
+          <h1 className="font-['Poppins',Helvetica] font-bold text-3xl text-gray-900 dark:text-white" data-testid="text-calendar-title">Scheduling & Calendar</h1>
+          <p className="text-gray-900 dark:text-white/70">
             Visual calendar view with drag-and-drop scheduling
           </p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="bg-dark-navy border-neon-blue/30 p-4">
+        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark p-4">
           <div className="flex items-center gap-2 mb-2">
-            <CalendarIcon className="h-5 w-5 text-blue-600" />
+            <CalendarIcon className="h-5 w-5 text-gray-700 dark:text-gray-300" />
             <h3 className="font-semibold">Filter by Garage</h3>
           </div>
           <Select value={selectedGarageId} onValueChange={setSelectedGarageId}>
@@ -355,9 +355,9 @@ export default function Calendar() {
           </Select>
         </Card>
 
-        <Card className="bg-dark-navy border-neon-blue/30 p-4">
+        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark p-4">
           <div className="flex items-center gap-2 mb-2">
-            <Users className="h-5 w-5 text-green-600" />
+            <Users className="h-5 w-5 text-gray-700 dark:text-gray-300" />
             <h3 className="font-semibold">Filter by Technician</h3>
           </div>
           <Select value={selectedTechnicianId} onValueChange={setSelectedTechnicianId}>
@@ -375,9 +375,9 @@ export default function Calendar() {
           </Select>
         </Card>
 
-        <Card className="bg-dark-navy border-neon-blue/30 p-4">
+        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark p-4">
           <div className="flex items-center gap-2 mb-2">
-            <Clock className="h-5 w-5 text-purple-600" />
+            <Clock className="h-5 w-5 text-gray-700 dark:text-gray-300" />
             <h3 className="font-semibold">View Mode</h3>
           </div>
           <Select value={view} onValueChange={(v) => handleViewChange(v as View)}>
@@ -395,17 +395,17 @@ export default function Calendar() {
       </div>
 
       {!selectedGarageId ? (
-        <Card className="bg-dark-navy border-neon-blue/30 p-12">
+        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark p-12">
           <div className="text-center">
-            <AlertCircle className="h-12 w-12 text-soft-white/50 mx-auto mb-4" />
+            <AlertCircle className="h-12 w-12 text-gray-900 dark:text-white/50 mx-auto mb-4" />
             <h3 className="text-lg font-semibold mb-2">Select a Garage</h3>
-            <p className="text-soft-white/70">
+            <p className="text-gray-900 dark:text-white/70">
               Please select a garage from the dropdown above to view the calendar
             </p>
           </div>
         </Card>
       ) : (
-        <Card className="bg-dark-navy border-neon-blue/30 p-4">
+        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark p-4">
           <div className="h-[700px]" data-testid="calendar-view">
             <DragAndDropCalendar
               localizer={localizer}
@@ -468,9 +468,9 @@ export default function Calendar() {
                       <div>
                         <span className="font-semibold">Status:</span>{' '}
                         <span className={`px-2 py-1 rounded text-xs ${
-                          selectedEvent.resource.status === 'completed' ? 'bg-green-100 text-green-800' :
-                          selectedEvent.resource.status === 'cancelled' ? 'bg-red-100 text-red-800' :
-                          'bg-blue-100 text-blue-800'
+                          selectedEvent.resource.status === 'completed' ? 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100' :
+                          selectedEvent.resource.status === 'cancelled' ? 'bg-gray-300 dark:bg-gray-600 text-gray-900 dark:text-gray-100' :
+                          'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100'
                         }`}>
                           {selectedEvent.resource.status}
                         </span>

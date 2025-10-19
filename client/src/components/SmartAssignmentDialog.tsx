@@ -108,11 +108,11 @@ export function SmartAssignmentDialog({ open, onOpenChange }: SmartAssignmentDia
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="font-['Poppins',Helvetica] font-semibold text-xl text-[#222029] flex items-center gap-2">
-            <Sparkles className="w-6 h-6 text-purple-600" />
+          <DialogTitle className="font-['Poppins',Helvetica] font-semibold text-xl text-gray-900 dark:text-white flex items-center gap-2">
+            <Sparkles className="w-6 h-6 text-gray-700 dark:text-gray-300" />
             Smart Tool Assignment
           </DialogTitle>
-          <DialogDescription className="font-['Poppins',Helvetica] text-sm text-[#999999]">
+          <DialogDescription className="font-['Poppins',Helvetica] text-sm text-gray-500 dark:text-gray-500">
             AI-powered tool recommendations based on job requirements and availability
           </DialogDescription>
         </DialogHeader>

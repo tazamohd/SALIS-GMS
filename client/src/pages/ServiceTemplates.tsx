@@ -177,9 +177,9 @@ export default function ServiceTemplates() {
 
   const getCategoryBadge = (category: string) => {
     const variants: Record<string, string> = {
-      maintenance: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300",
-      repair: "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300",
-      diagnostic: "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300",
+      maintenance: "bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200",
+      repair: "bg-gray-300 text-gray-900 dark:bg-gray-600 dark:text-gray-100",
+      diagnostic: "bg-gray-400 text-gray-950 dark:bg-gray-500 dark:text-gray-50",
     };
     return variants[category] || variants.maintenance;
   };
@@ -187,7 +187,7 @@ export default function ServiceTemplates() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="font-['Poppins',Helvetica] font-bold text-3xl text-soft-white">Service Templates</h1>
+        <h1 className="font-['Poppins',Helvetica] font-bold text-3xl text-gray-900 dark:text-white">Service Templates</h1>
         <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
           <DialogTrigger asChild>
             <Button data-testid="button-create-template">
@@ -407,7 +407,7 @@ export default function ServiceTemplates() {
       {/* Templates Grid */}
       {activeLoading ? (
         <div className="text-center py-12">
-          <p className="text-soft-white/60">Loading templates...</p>
+          <p className="text-gray-900 dark:text-white/60">Loading templates...</p>
         </div>
       ) : filteredTemplates && filteredTemplates.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -422,9 +422,9 @@ export default function ServiceTemplates() {
                     </Badge>
                   </div>
                   {template.description && (
-                    <p className="text-sm text-soft-white/60 line-clamp-2">{template.description}</p>
+                    <p className="text-sm text-gray-900 dark:text-white/60 line-clamp-2">{template.description}</p>
                   )}
-                  <div className="flex gap-4 text-sm text-soft-white/60">
+                  <div className="flex gap-4 text-sm text-gray-900 dark:text-white/60">
                     <div className="flex items-center gap-1">
                       <Clock className="h-4 w-4" />
                       <span>{template.estimatedHours || 0}h</span>
@@ -436,11 +436,11 @@ export default function ServiceTemplates() {
                   </div>
                   <div className="flex items-center gap-2">
                     {template.isActive ? (
-                      <Badge variant="outline" className="bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-300">
+                      <Badge variant="outline" className="bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200">
                         <CheckCircle className="h-3 w-3 mr-1" /> Active
                       </Badge>
                     ) : (
-                      <Badge variant="outline" className="bg-neon-blue/20/20 text-gray-700 dark:bg-gray-950 dark:text-gray-300">
+                      <Badge variant="outline" className="bg-gray-100 text-gray-700 dark:bg-gray-950 dark:text-gray-300">
                         <XCircle className="h-3 w-3 mr-1" /> Inactive
                       </Badge>
                     )}
@@ -452,8 +452,8 @@ export default function ServiceTemplates() {
         </div>
       ) : (
         <div className="text-center py-12">
-          <p className="text-soft-white/60">No service templates found</p>
-          <p className="text-sm text-soft-white/60 mt-2">Create your first template to get started</p>
+          <p className="text-gray-900 dark:text-white/60">No service templates found</p>
+          <p className="text-sm text-gray-900 dark:text-white/60 mt-2">Create your first template to get started</p>
         </div>
       )}
 
@@ -473,7 +473,7 @@ export default function ServiceTemplates() {
               {selectedTemplate.description && (
                 <div>
                   <h4 className="font-semibold mb-2">Description</h4>
-                  <p className="text-sm text-soft-white/60">{selectedTemplate.description}</p>
+                  <p className="text-sm text-gray-900 dark:text-white/60">{selectedTemplate.description}</p>
                 </div>
               )}
               <div className="grid grid-cols-2 gap-4">
@@ -493,12 +493,12 @@ export default function ServiceTemplates() {
                     (selectedTemplate.taskSteps as any[]).map((step: any, index: number) => (
                       <Card key={index} className="p-3">
                         <p className="font-medium">{index + 1}. {step.stepName}</p>
-                        {step.description && <p className="text-sm text-soft-white/60 mt-1">{step.description}</p>}
-                        {step.estimatedMinutes && <p className="text-xs text-soft-white/60 mt-1">~{step.estimatedMinutes} minutes</p>}
+                        {step.description && <p className="text-sm text-gray-900 dark:text-white/60 mt-1">{step.description}</p>}
+                        {step.estimatedMinutes && <p className="text-xs text-gray-900 dark:text-white/60 mt-1">~{step.estimatedMinutes} minutes</p>}
                       </Card>
                     ))
                   ) : (
-                    <p className="text-sm text-soft-white/60">No task steps defined</p>
+                    <p className="text-sm text-gray-900 dark:text-white/60">No task steps defined</p>
                   )}
                 </div>
               </div>

@@ -183,30 +183,30 @@ export default function SpareParts() {
 
   const getCategoryBadgeColor = (category: string) => {
     const colors: Record<string, string> = {
-      engine: "bg-red-100 text-red-800",
-      brakes: "bg-yellow-100 text-yellow-800",
-      electrical: "bg-blue-100 text-blue-800",
-      fluids: "bg-purple-100 text-purple-800",
-      filters: "bg-green-100 text-green-800",
+      engine: "bg-gray-300 text-gray-800",
+      brakes: "bg-gray-200 text-gray-700",
+      electrical: "bg-gray-300 text-gray-800",
+      fluids: "bg-gray-400 text-gray-900",
+      filters: "bg-gray-200 text-gray-700",
     };
-    return colors[category] || "bg-neon-blue/20/30 text-gray-800";
+    return colors[category] || "bg-gray-100 dark:bg-salis-gray-dark text-gray-800 dark:text-gray-200";
   };
 
   const getPartTypeBadgeColor = (partType: string) => {
     const colors: Record<string, string> = {
-      oem: "bg-indigo-100 text-indigo-800",
-      generic: "bg-slate-100 text-slate-800",
-      consumable: "bg-orange-100 text-orange-800",
+      oem: "bg-gray-300 text-gray-800",
+      generic: "bg-gray-200 text-gray-700",
+      consumable: "bg-gray-400 text-gray-900",
     };
-    return colors[partType] || "bg-neon-blue/20/30 text-gray-800";
+    return colors[partType] || "bg-gray-100 dark:bg-salis-gray-dark text-gray-800 dark:text-gray-200";
   };
 
   return (
     <div className="container mx-auto py-6 space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="font-['Poppins',Helvetica] font-bold text-3xl text-soft-white" data-testid="page-title">Spare Parts & Inventory</h1>
-          <p className="text-soft-white/60">Manage spare parts and inventory levels</p>
+          <h1 className="font-['Poppins',Helvetica] font-bold text-3xl text-gray-900 dark:text-white" data-testid="page-title">Spare Parts & Inventory</h1>
+          <p className="text-gray-900 dark:text-white/60">Manage spare parts and inventory levels</p>
         </div>
         <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
           <DialogTrigger asChild>
@@ -469,7 +469,7 @@ export default function SpareParts() {
 
       <div className="flex gap-4 items-center">
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-3 h-4 w-4 text-soft-white/60" />
+          <Search className="absolute left-3 top-3 h-4 w-4 text-gray-900 dark:text-white/60" />
           <Input
             placeholder="Search by name, SKU, or brand..."
             value={searchQuery}
@@ -494,11 +494,11 @@ export default function SpareParts() {
       </div>
 
       {error ? (
-        <Card className="bg-dark-navy border-neon-blue/30 bg-dark-navy border-neon-blue/30">
+        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
           <CardContent className="flex flex-col items-center justify-center py-12">
             <Package className="h-12 w-12 text-destructive mb-4" />
             <p className="text-lg font-medium mb-2">Failed to load spare parts</p>
-            <p className="text-soft-white/60 mb-4">
+            <p className="text-gray-900 dark:text-white/60 mb-4">
               {error instanceof Error ? error.message : "An error occurred"}
             </p>
             <Button onClick={() => queryClient.invalidateQueries({ queryKey: ["/api/spare-parts"] })} data-testid="button-retry">
@@ -525,11 +525,11 @@ export default function SpareParts() {
           ))}
         </div>
       ) : filteredParts.length === 0 ? (
-        <Card className="bg-dark-navy border-neon-blue/30 bg-dark-navy border-neon-blue/30">
+        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
           <CardContent className="flex flex-col items-center justify-center py-12">
-            <Package className="h-12 w-12 text-soft-white/60 mb-4" />
+            <Package className="h-12 w-12 text-gray-900 dark:text-white/60 mb-4" />
             <p className="text-lg font-medium mb-2">No spare parts found</p>
-            <p className="text-soft-white/60 mb-4">
+            <p className="text-gray-900 dark:text-white/60 mb-4">
               {searchQuery || categoryFilter !== "all" 
                 ? "Try adjusting your filters" 
                 : "Get started by adding your first spare part"}
@@ -580,7 +580,7 @@ export default function SpareParts() {
                         View Details
                       </DropdownMenuItem>
                       <DropdownMenuItem 
-                        className="text-red-600"
+                        className="text-gray-800 dark:text-gray-200"
                         onClick={(e) => {
                           e.stopPropagation();
                           handleDelete(part.id);
@@ -604,11 +604,11 @@ export default function SpareParts() {
                   </Badge>
                 </div>
                 {part.description && (
-                  <p className="text-sm text-soft-white/60 line-clamp-2">
+                  <p className="text-sm text-gray-900 dark:text-white/60 line-clamp-2">
                     {part.description}
                   </p>
                 )}
-                <div className="flex items-center gap-4 text-sm text-soft-white/60">
+                <div className="flex items-center gap-4 text-sm text-gray-900 dark:text-white/60">
                   {part.brand && (
                     <div className="flex items-center gap-1">
                       <Package className="h-3 w-3" />
@@ -636,21 +636,21 @@ export default function SpareParts() {
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-sm font-medium text-soft-white/60">Name</p>
+                  <p className="text-sm font-medium text-gray-900 dark:text-white/60">Name</p>
                   <p className="text-sm" data-testid="detail-name">{selectedPart.name}</p>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-soft-white/60">SKU</p>
+                  <p className="text-sm font-medium text-gray-900 dark:text-white/60">SKU</p>
                   <p className="text-sm" data-testid="detail-sku">{selectedPart.sku}</p>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-soft-white/60">Category</p>
+                  <p className="text-sm font-medium text-gray-900 dark:text-white/60">Category</p>
                   <Badge className={getCategoryBadgeColor(selectedPart.category)}>
                     {selectedPart.category}
                   </Badge>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-soft-white/60">Part Type</p>
+                  <p className="text-sm font-medium text-gray-900 dark:text-white/60">Part Type</p>
                   <Badge className={getPartTypeBadgeColor(selectedPart.partType)}>
                     {selectedPart.partType}
                   </Badge>
@@ -659,7 +659,7 @@ export default function SpareParts() {
 
               {selectedPart.description && (
                 <div>
-                  <p className="text-sm font-medium text-soft-white/60">Description</p>
+                  <p className="text-sm font-medium text-gray-900 dark:text-white/60">Description</p>
                   <p className="text-sm" data-testid="detail-description">{selectedPart.description}</p>
                 </div>
               )}
@@ -667,31 +667,31 @@ export default function SpareParts() {
               <div className="grid grid-cols-2 gap-4">
                 {selectedPart.brand && (
                   <div>
-                    <p className="text-sm font-medium text-soft-white/60">Brand</p>
+                    <p className="text-sm font-medium text-gray-900 dark:text-white/60">Brand</p>
                     <p className="text-sm">{selectedPart.brand}</p>
                   </div>
                 )}
                 {selectedPart.manufacturer && (
                   <div>
-                    <p className="text-sm font-medium text-soft-white/60">Manufacturer</p>
+                    <p className="text-sm font-medium text-gray-900 dark:text-white/60">Manufacturer</p>
                     <p className="text-sm">{selectedPart.manufacturer}</p>
                   </div>
                 )}
                 {selectedPart.barcode && (
                   <div>
-                    <p className="text-sm font-medium text-soft-white/60">Barcode</p>
+                    <p className="text-sm font-medium text-gray-900 dark:text-white/60">Barcode</p>
                     <p className="text-sm">{selectedPart.barcode}</p>
                   </div>
                 )}
                 <div>
-                  <p className="text-sm font-medium text-soft-white/60">Unit of Measure</p>
+                  <p className="text-sm font-medium text-gray-900 dark:text-white/60">Unit of Measure</p>
                   <p className="text-sm">{selectedPart.unitOfMeasure}</p>
                 </div>
               </div>
 
               {selectedPart.notes && (
                 <div>
-                  <p className="text-sm font-medium text-soft-white/60">Notes</p>
+                  <p className="text-sm font-medium text-gray-900 dark:text-white/60">Notes</p>
                   <p className="text-sm">{selectedPart.notes}</p>
                 </div>
               )}

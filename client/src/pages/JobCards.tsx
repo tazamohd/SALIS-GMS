@@ -30,18 +30,18 @@ import type { JobCard, Garage, User as UserType, InsertJobCard, TechnicianProfil
 import { insertJobCardSchema } from "@shared/schema";
 
 const statusColors = {
-  pending: "bg-yellow-100 text-yellow-800",
-  assigned: "bg-blue-100 text-blue-800",
-  in_progress: "bg-purple-100 text-purple-800",
-  completed: "bg-green-100 text-green-800",
-  cancelled: "bg-neon-blue/20/30 text-gray-800",
+  pending: "bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300",
+  assigned: "bg-gray-100 dark:bg-salis-gray-dark text-gray-900 dark:text-white",
+  in_progress: "bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white",
+  completed: "bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200",
+  cancelled: "bg-gray-100 text-gray-800 dark:bg-salis-gray-dark dark:text-gray-300",
 };
 
 const priorityColors = {
-  low: "bg-neon-blue/20/30 text-gray-800",
-  medium: "bg-blue-100 text-blue-800",
-  high: "bg-orange-100 text-orange-800",
-  urgent: "bg-red-100 text-red-800",
+  low: "bg-gray-100 text-gray-800 dark:bg-salis-gray-dark dark:text-gray-300",
+  medium: "bg-gray-100 dark:bg-salis-gray-dark text-gray-900 dark:text-white",
+  high: "bg-gray-400 dark:bg-gray-500 text-gray-900 dark:text-white",
+  urgent: "bg-salis-black dark:bg-white text-white dark:text-salis-black",
 };
 
 // Extend the insertJobCardSchema for the form (with string types for numbers and dates)
@@ -217,16 +217,16 @@ export function JobCards() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="font-['Poppins',Helvetica] font-bold text-3xl text-soft-white">
+          <h1 className="font-['Poppins',Helvetica] font-bold text-3xl text-gray-900 dark:text-white">
             Job Cards
           </h1>
-          <p className="font-['Poppins',Helvetica] font-normal text-sm text-soft-white/60 mt-1">
+          <p className="font-['Poppins',Helvetica] font-normal text-sm text-gray-900 dark:text-white/60 mt-1">
             Manage service job cards and track progress
           </p>
         </div>
         <Button
           onClick={() => setIsCreateOpen(true)}
-          className="bg-blue-600 hover:bg-blue-700"
+          className="bg-white dark:bg-salis-black hover:bg-gray-100 dark:hover:bg-salis-gray-dark text-gray-900 dark:text-white"
           data-testid="button-create-job-card"
         >
           <Plus className="w-4 h-4 mr-2" />
@@ -235,7 +235,7 @@ export function JobCards() {
       </div>
 
       {/* Filters */}
-      <Card className="bg-dark-navy border-neon-blue/30 mb-6">
+      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark mb-6">
         <CardContent className="pt-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
@@ -295,15 +295,15 @@ export function JobCards() {
       {/* Job Cards Grid */}
       {isLoading ? (
         <div className="text-center py-12">
-          <div className="animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-4"></div>
-          <p className="text-soft-white/60">Loading job cards...</p>
+          <div className="animate-spin w-8 h-8 border-4 border-gray-900 dark:border-white border-t-transparent rounded-full mx-auto mb-4"></div>
+          <p className="text-gray-900 dark:text-white/60">Loading job cards...</p>
         </div>
       ) : filteredJobCards.length === 0 ? (
-        <Card className="bg-dark-navy border-neon-blue/30 bg-dark-navy border-neon-blue/30">
+        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
           <CardContent className="text-center py-12">
-            <Wrench className="w-12 h-12 text-soft-white/50 mx-auto mb-4" />
-            <p className="text-soft-white/60">No job cards found</p>
-            <p className="text-sm text-soft-white/50 mt-1">Create your first job card to get started</p>
+            <Wrench className="w-12 h-12 text-gray-400 dark:text-gray-600 mx-auto mb-4" />
+            <p className="text-gray-600 dark:text-gray-400">No job cards found</p>
+            <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">Create your first job card to get started</p>
           </CardContent>
         </Card>
       ) : (
@@ -321,10 +321,10 @@ export function JobCards() {
                       <CardTitle className="text-lg font-semibold">
                         {jobCard.jobNumber}
                       </CardTitle>
-                      <p className="text-sm text-soft-white/60 mt-1">
+                      <p className="text-sm text-gray-900 dark:text-white/60 mt-1">
                         {vehicle?.make} {vehicle?.model} ({vehicle?.year})
                       </p>
-                      <p className="text-xs text-soft-white/50">{vehicle?.licensePlate}</p>
+                      <p className="text-xs text-gray-900 dark:text-white/50">{vehicle?.licensePlate}</p>
                     </div>
                     <div className="flex flex-col gap-1">
                       <Badge className={statusColors[jobCard.status as keyof typeof statusColors]}>
@@ -338,28 +338,28 @@ export function JobCards() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2 text-sm">
-                    <div className="flex items-center gap-2 text-gray-600">
+                    <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
                       <Building2 className="w-4 h-4" />
                       <span>{garage?.name || 'Unknown Garage'}</span>
                     </div>
-                    <div className="flex items-center gap-2 text-gray-600">
+                    <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
                       <Wrench className="w-4 h-4" />
                       <span>{jobCard.serviceType}</span>
                     </div>
                     {assignedTech && (
-                      <div className="flex items-center gap-2 text-gray-600">
+                      <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
                         <User className="w-4 h-4" />
                         <span>{assignedTech.fullName || assignedTech.email}</span>
                       </div>
                     )}
                     {jobCard.scheduledDate && (
-                      <div className="flex items-center gap-2 text-gray-600">
+                      <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
                         <Calendar className="w-4 h-4" />
                         <span>{new Date(jobCard.scheduledDate).toLocaleDateString()}</span>
                       </div>
                     )}
                   </div>
-                  <p className="text-sm text-gray-700 mt-3 line-clamp-2">
+                  <p className="text-sm text-gray-700 dark:text-gray-300 mt-3 line-clamp-2">
                     {jobCard.description}
                   </p>
                   <div className="flex gap-2 mt-4">
@@ -415,7 +415,7 @@ export function JobCards() {
                   data-testid="input-job-number"
                 />
                 {createForm.formState.errors.jobNumber && (
-                  <p className="text-sm text-red-600 mt-1">{createForm.formState.errors.jobNumber.message}</p>
+                  <p className="text-sm text-gray-800 dark:text-gray-200 mt-1">{createForm.formState.errors.jobNumber.message}</p>
                 )}
               </div>
               <div>
@@ -436,7 +436,7 @@ export function JobCards() {
                   </SelectContent>
                 </Select>
                 {createForm.formState.errors.garageId && (
-                  <p className="text-sm text-red-600 mt-1">{createForm.formState.errors.garageId.message}</p>
+                  <p className="text-sm text-gray-800 dark:text-gray-200 mt-1">{createForm.formState.errors.garageId.message}</p>
                 )}
               </div>
             </div>
@@ -560,7 +560,7 @@ export function JobCards() {
                               <div className="flex items-center gap-2">
                                 <span>{tech.fullName || tech.email}</span>
                                 {profile?.level && (
-                                  <span className="text-xs text-soft-white/60">
+                                  <span className="text-xs text-gray-900 dark:text-white/60">
                                     ({profile.level}
                                     {profile.speciality ? ` - ${profile.speciality}` : ""})
                                   </span>
@@ -630,7 +630,7 @@ export function JobCards() {
               </Button>
               <Button
                 type="submit"
-                className="bg-blue-600 hover:bg-blue-700"
+                className="bg-salis-black hover:bg-gray-800 dark:bg-white dark:hover:bg-gray-200"
                 disabled={createMutation.isPending}
                 data-testid="button-submit-create"
               >

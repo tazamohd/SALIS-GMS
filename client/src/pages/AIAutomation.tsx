@@ -220,16 +220,16 @@ export default function AIAutomation() {
   });
 
   return (
-    <div className="p-8 bg-gray-800 min-h-screen space-y-6">
+    <div className="p-8 bg-gray-50 dark:bg-salis-black min-h-screen space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-['Poppins',Helvetica] font-bold text-3xl text-soft-white flex items-center gap-2" data-testid="text-page-title">
-            <Brain className="h-8 w-8 text-electric-blue" />
+          <h1 className="font-['Poppins',Helvetica] font-bold text-3xl text-gray-900 dark:text-white flex items-center gap-2" data-testid="text-page-title">
+            <Brain className="h-8 w-8 text-gray-700 dark:text-gray-300" />
             AI Automation & Insights
           </h1>
-          <p className="text-soft-white/70 mt-1">Powered by AI to optimize garage operations</p>
+          <p className="text-gray-900 dark:text-white/70 mt-1">Powered by AI to optimize garage operations</p>
         </div>
-        <Badge variant="outline" className="text-sm bg-electric-blue/20 border-electric-blue/30 text-soft-white">
+        <Badge variant="outline" className="text-sm bg-gray-100 dark:bg-salis-gray-dark border-gray-200 dark:border-salis-gray-dark text-gray-900 dark:text-white">
           <Sparkles className="h-3 w-3 mr-1" />
           AI Powered
         </Badge>
@@ -261,26 +261,26 @@ export default function AIAutomation() {
 
         {/* Job Estimation Tab */}
         <TabsContent value="estimation" className="space-y-4">
-          <Card className="bg-dark-navy border-neon-blue/30 bg-dark-navy border-neon-blue/30">
+          <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
             <CardHeader>
-              <CardTitle className="text-soft-white">AI Job Time & Cost Estimation</CardTitle>
-              <CardDescription className="text-soft-white/60">Get AI-powered estimates for job duration and costs based on historical data</CardDescription>
+              <CardTitle className="text-gray-900 dark:text-white">AI Job Time & Cost Estimation</CardTitle>
+              <CardDescription className="text-gray-900 dark:text-white/60">Get AI-powered estimates for job duration and costs based on historical data</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="service-type" className="text-soft-white">Service Type</Label>
+                  <Label htmlFor="service-type" className="text-gray-900 dark:text-white">Service Type</Label>
                   <Input
                     id="service-type"
                     data-testid="input-service-type"
                     placeholder="e.g., Oil Change, Brake Repair"
                     value={estimationForm.serviceType}
                     onChange={(e) => setEstimationForm({ ...estimationForm, serviceType: e.target.value })}
-                    className="bg-neon-blue/20 border-neon-blue/30 text-soft-white placeholder:text-soft-white/50"
+                    className="bg-gray-100 dark:bg-salis-gray-dark border-gray-200 dark:border-salis-gray-dark text-gray-900 dark:text-white placeholder:text-gray-900 dark:text-white/50"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="estimation-vehicle" className="text-soft-white">Vehicle</Label>
+                  <Label htmlFor="estimation-vehicle" className="text-gray-900 dark:text-white">Vehicle</Label>
                   <Select value={estimationForm.vehicleId} onValueChange={(value) => {
                     const vehicle = vehicles.find((v: any) => v.id === value);
                     setEstimationForm({
@@ -291,12 +291,12 @@ export default function AIAutomation() {
                       vehicleYear: vehicle?.year || "",
                     });
                   }}>
-                    <SelectTrigger id="estimation-vehicle" data-testid="select-estimation-vehicle" className="bg-neon-blue/20 border-neon-blue/30 text-soft-white">
+                    <SelectTrigger id="estimation-vehicle" data-testid="select-estimation-vehicle" className="bg-gray-100 dark:bg-salis-gray-dark border-gray-200 dark:border-salis-gray-dark text-gray-900 dark:text-white">
                       <SelectValue placeholder="Select vehicle" />
                     </SelectTrigger>
-                    <SelectContent className="bg-dark-navy border-neon-blue/30">
+                    <SelectContent className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
                       {vehicles.map((vehicle: any) => (
-                        <SelectItem key={vehicle.id} value={vehicle.id} className="text-soft-white">
+                        <SelectItem key={vehicle.id} value={vehicle.id} className="text-gray-900 dark:text-white">
                           {vehicle.year} {vehicle.make} {vehicle.model}
                         </SelectItem>
                       ))}
@@ -314,21 +314,21 @@ export default function AIAutomation() {
             </CardContent>
           </Card>
 
-          <Card className="bg-dark-navy border-neon-blue/30 bg-dark-navy border-neon-blue/30">
+          <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
             <CardHeader>
-              <CardTitle className="text-soft-white">Recent Estimations</CardTitle>
+              <CardTitle className="text-gray-900 dark:text-white">Recent Estimations</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
                 {estimations.length === 0 ? (
-                  <p className="text-soft-white/50 text-sm" data-testid="text-no-estimations">No estimations yet</p>
+                  <p className="text-gray-900 dark:text-white/50 text-sm" data-testid="text-no-estimations">No estimations yet</p>
                 ) : (
                   estimations.map((est: any) => (
-                    <div key={est.id} className="p-4 border border-neon-blue/30 rounded-lg space-y-2" data-testid={`card-estimation-${est.id}`}>
+                    <div key={est.id} className="p-4 border border-gray-200 dark:border-salis-gray-dark rounded-lg space-y-2" data-testid={`card-estimation-${est.id}`}>
                       <div className="flex justify-between items-start">
                         <div>
-                          <h4 className="font-semibold text-soft-white">{est.serviceType}</h4>
-                          <p className="text-sm text-soft-white/60">
+                          <h4 className="font-semibold text-gray-900 dark:text-white">{est.serviceType}</h4>
+                          <p className="text-sm text-gray-900 dark:text-white/60">
                             {est.createdAt && format(new Date(est.createdAt), 'MMM dd, yyyy')}
                           </p>
                         </div>
@@ -338,16 +338,16 @@ export default function AIAutomation() {
                       </div>
                       <div className="grid grid-cols-2 gap-4 text-sm">
                         <div>
-                          <span className="text-soft-white/60">Estimated Hours:</span>
+                          <span className="text-gray-900 dark:text-white/60">Estimated Hours:</span>
                           <span className="ml-2 font-medium">{est.estimatedHours || "N/A"}</span>
                         </div>
                         <div>
-                          <span className="text-soft-white/60">Estimated Cost:</span>
+                          <span className="text-gray-900 dark:text-white/60">Estimated Cost:</span>
                           <span className="ml-2 font-medium">${est.estimatedCost || "N/A"}</span>
                         </div>
                       </div>
                       {est.reasoning && (
-                        <p className="text-sm text-soft-white/60 mt-2">{est.reasoning}</p>
+                        <p className="text-sm text-gray-900 dark:text-white/60 mt-2">{est.reasoning}</p>
                       )}
                     </div>
                   ))
@@ -359,15 +359,15 @@ export default function AIAutomation() {
 
         {/* Maintenance Prediction Tab */}
         <TabsContent value="maintenance" className="space-y-4">
-          <Card className="bg-dark-navy border-neon-blue/30 bg-dark-navy border-neon-blue/30">
+          <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
             <CardHeader>
-              <CardTitle className="text-soft-white">Predictive Maintenance Analysis</CardTitle>
-              <CardDescription className="text-soft-white/60">AI analyzes vehicle history to predict potential issues before they occur</CardDescription>
+              <CardTitle className="text-gray-900 dark:text-white">Predictive Maintenance Analysis</CardTitle>
+              <CardDescription className="text-gray-900 dark:text-white/60">AI analyzes vehicle history to predict potential issues before they occur</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="prediction-vehicle" className="text-soft-white">Vehicle</Label>
+                  <Label htmlFor="prediction-vehicle" className="text-gray-900 dark:text-white">Vehicle</Label>
                   <Select value={predictionForm.vehicleId} onValueChange={(value) => {
                     const vehicle = vehicles.find((v: any) => v.id === value);
                     setPredictionForm({
@@ -378,12 +378,12 @@ export default function AIAutomation() {
                       vehicleYear: vehicle?.year || "",
                     });
                   }}>
-                    <SelectTrigger id="prediction-vehicle" data-testid="select-prediction-vehicle" className="bg-neon-blue/20 border-neon-blue/30 text-soft-white">
+                    <SelectTrigger id="prediction-vehicle" data-testid="select-prediction-vehicle" className="bg-gray-100 dark:bg-salis-gray-dark border-gray-200 dark:border-salis-gray-dark text-gray-900 dark:text-white">
                       <SelectValue placeholder="Select vehicle" />
                     </SelectTrigger>
-                    <SelectContent className="bg-dark-navy border-neon-blue/30">
+                    <SelectContent className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
                       {vehicles.map((vehicle: any) => (
-                        <SelectItem key={vehicle.id} value={vehicle.id} className="text-soft-white">
+                        <SelectItem key={vehicle.id} value={vehicle.id} className="text-gray-900 dark:text-white">
                           {vehicle.year} {vehicle.make} {vehicle.model}
                         </SelectItem>
                       ))}
@@ -391,7 +391,7 @@ export default function AIAutomation() {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="mileage" className="text-soft-white">Current Mileage</Label>
+                  <Label htmlFor="mileage" className="text-gray-900 dark:text-white">Current Mileage</Label>
                   <Input
                     id="mileage"
                     data-testid="input-mileage"
@@ -399,7 +399,7 @@ export default function AIAutomation() {
                     placeholder="e.g., 50000"
                     value={predictionForm.mileage}
                     onChange={(e) => setPredictionForm({ ...predictionForm, mileage: e.target.value })}
-                    className="bg-neon-blue/20 border-neon-blue/30 text-soft-white placeholder:text-soft-white/50"
+                    className="bg-gray-100 dark:bg-salis-gray-dark border-gray-200 dark:border-salis-gray-dark text-gray-900 dark:text-white placeholder:text-gray-900 dark:text-white/50"
                   />
                 </div>
               </div>
@@ -413,23 +413,23 @@ export default function AIAutomation() {
             </CardContent>
           </Card>
 
-          <Card className="bg-dark-navy border-neon-blue/30 bg-dark-navy border-neon-blue/30">
+          <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
             <CardHeader>
-              <CardTitle className="text-soft-white">Maintenance Predictions</CardTitle>
+              <CardTitle className="text-gray-900 dark:text-white">Maintenance Predictions</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
                 {predictions.length === 0 ? (
-                  <p className="text-soft-white/60 text-sm" data-testid="text-no-predictions">No predictions yet</p>
+                  <p className="text-gray-900 dark:text-white/60 text-sm" data-testid="text-no-predictions">No predictions yet</p>
                 ) : (
                   predictions.map((pred: any) => (
-                    <div key={pred.id} className="p-4 border border-neon-blue/30 rounded-lg space-y-2" data-testid={`card-prediction-${pred.id}`}>
+                    <div key={pred.id} className="p-4 border border-gray-200 dark:border-salis-gray-dark rounded-lg space-y-2" data-testid={`card-prediction-${pred.id}`}>
                       <div className="flex justify-between items-start">
                         <div className="flex items-start gap-2">
-                          <AlertCircle className="h-5 w-5 text-orange-500 mt-0.5" />
+                          <AlertCircle className="h-5 w-5 text-gray-700 dark:text-gray-300 mt-0.5" />
                           <div>
                             <h4 className="font-semibold">{pred.predictedIssue}</h4>
-                            <p className="text-sm text-soft-white/60">
+                            <p className="text-sm text-gray-900 dark:text-white/60">
                               {pred.createdAt && format(new Date(pred.createdAt), 'MMM dd, yyyy')}
                             </p>
                           </div>
@@ -454,7 +454,7 @@ export default function AIAutomation() {
                         <p className="text-sm"><span className="font-medium">Recommended:</span> {pred.recommendedAction}</p>
                       )}
                       {pred.estimatedTimeframe && (
-                        <p className="text-sm text-soft-white/60">Timeframe: {pred.estimatedTimeframe}</p>
+                        <p className="text-sm text-gray-900 dark:text-white/60">Timeframe: {pred.estimatedTimeframe}</p>
                       )}
                     </div>
                   ))
@@ -466,10 +466,10 @@ export default function AIAutomation() {
 
         {/* Parts Recommendations Tab */}
         <TabsContent value="parts" className="space-y-4">
-          <Card className="bg-dark-navy border-neon-blue/30 bg-dark-navy border-neon-blue/30">
+          <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
             <CardHeader>
-              <CardTitle className="text-soft-white">AI Parts Recommendations</CardTitle>
-              <CardDescription className="text-soft-white/60">Get intelligent parts suggestions based on service type and vehicle</CardDescription>
+              <CardTitle className="text-gray-900 dark:text-white">AI Parts Recommendations</CardTitle>
+              <CardDescription className="text-gray-900 dark:text-white/60">Get intelligent parts suggestions based on service type and vehicle</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
@@ -528,21 +528,21 @@ export default function AIAutomation() {
             </CardContent>
           </Card>
 
-          <Card className="bg-dark-navy border-neon-blue/30 bg-dark-navy border-neon-blue/30">
+          <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
             <CardHeader>
-              <CardTitle className="text-soft-white">Parts Recommendations</CardTitle>
+              <CardTitle className="text-gray-900 dark:text-white">Parts Recommendations</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
                 {recommendations.length === 0 ? (
-                  <p className="text-soft-white/60 text-sm" data-testid="text-no-recommendations">No recommendations yet</p>
+                  <p className="text-gray-900 dark:text-white/60 text-sm" data-testid="text-no-recommendations">No recommendations yet</p>
                 ) : (
                   recommendations.map((rec: any) => (
-                    <div key={rec.id} className="p-4 border border-neon-blue/30 rounded-lg space-y-2" data-testid={`card-recommendation-${rec.id}`}>
+                    <div key={rec.id} className="p-4 border border-gray-200 dark:border-salis-gray-dark rounded-lg space-y-2" data-testid={`card-recommendation-${rec.id}`}>
                       <div className="flex justify-between items-start">
                         <div>
                           <h4 className="font-semibold">Parts for Job #{rec.jobCardId || "N/A"}</h4>
-                          <p className="text-sm text-soft-white/60">
+                          <p className="text-sm text-gray-900 dark:text-white/60">
                             {rec.createdAt && format(new Date(rec.createdAt), 'MMM dd, yyyy')}
                           </p>
                         </div>
@@ -571,13 +571,13 @@ export default function AIAutomation() {
 
         {/* Schedule Optimization Tab */}
         <TabsContent value="schedule" className="space-y-4">
-          <Card className="bg-dark-navy border-neon-blue/30 bg-dark-navy border-neon-blue/30">
+          <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
             <CardHeader>
-              <CardTitle className="text-soft-white">Smart Schedule Optimization</CardTitle>
-              <CardDescription className="text-soft-white/60">AI analyzes appointments and technician availability to optimize scheduling</CardDescription>
+              <CardTitle className="text-gray-900 dark:text-white">Smart Schedule Optimization</CardTitle>
+              <CardDescription className="text-gray-900 dark:text-white/60">AI analyzes appointments and technician availability to optimize scheduling</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <p className="text-sm text-soft-white/60">
+              <p className="text-sm text-gray-900 dark:text-white/60">
                 Click to analyze current schedule and get optimization suggestions based on technician skills, appointment urgency, and efficiency.
               </p>
               <Button
@@ -590,23 +590,23 @@ export default function AIAutomation() {
             </CardContent>
           </Card>
 
-          <Card className="bg-dark-navy border-neon-blue/30 bg-dark-navy border-neon-blue/30">
+          <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
             <CardHeader>
-              <CardTitle className="text-soft-white">Optimization Results</CardTitle>
+              <CardTitle className="text-gray-900 dark:text-white">Optimization Results</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
                 {scheduleOpts.length === 0 ? (
-                  <p className="text-soft-white/60 text-sm" data-testid="text-no-optimizations">No optimizations yet</p>
+                  <p className="text-gray-900 dark:text-white/60 text-sm" data-testid="text-no-optimizations">No optimizations yet</p>
                 ) : (
                   scheduleOpts.map((opt: any) => (
-                    <div key={opt.id} className="p-4 border border-neon-blue/30 rounded-lg space-y-2" data-testid={`card-optimization-${opt.id}`}>
+                    <div key={opt.id} className="p-4 border border-gray-200 dark:border-salis-gray-dark rounded-lg space-y-2" data-testid={`card-optimization-${opt.id}`}>
                       <div className="flex justify-between items-start">
                         <div className="flex items-start gap-2">
-                          <TrendingUp className="h-5 w-5 text-green-500 mt-0.5" />
+                          <TrendingUp className="h-5 w-5 text-gray-700 dark:text-gray-300 mt-0.5" />
                           <div>
                             <h4 className="font-semibold">{opt.optimizationType || "Schedule Optimization"}</h4>
-                            <p className="text-sm text-soft-white/60">
+                            <p className="text-sm text-gray-900 dark:text-white/60">
                               {opt.createdAt && format(new Date(opt.createdAt), 'MMM dd, yyyy')}
                             </p>
                           </div>
@@ -638,10 +638,10 @@ export default function AIAutomation() {
 
         {/* AI Chatbot Tab */}
         <TabsContent value="chat" className="space-y-4">
-          <Card className="bg-dark-navy border-neon-blue/30 bg-dark-navy border-neon-blue/30">
+          <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
             <CardHeader>
-              <CardTitle className="text-soft-white">AI Customer Support Chatbot</CardTitle>
-              <CardDescription className="text-soft-white/60">Intelligent assistant for customer inquiries and support</CardDescription>
+              <CardTitle className="text-gray-900 dark:text-white">AI Customer Support Chatbot</CardTitle>
+              <CardDescription className="text-gray-900 dark:text-white/60">Intelligent assistant for customer inquiries and support</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
@@ -665,19 +665,19 @@ export default function AIAutomation() {
             </CardContent>
           </Card>
 
-          <Card className="bg-dark-navy border-neon-blue/30 bg-dark-navy border-neon-blue/30">
+          <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
             <CardHeader>
-              <CardTitle className="text-soft-white">Chat Conversations</CardTitle>
+              <CardTitle className="text-gray-900 dark:text-white">Chat Conversations</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
                 {conversations.length === 0 ? (
-                  <p className="text-soft-white/60 text-sm" data-testid="text-no-conversations">No conversations yet</p>
+                  <p className="text-gray-900 dark:text-white/60 text-sm" data-testid="text-no-conversations">No conversations yet</p>
                 ) : (
                   conversations.map((conv: any) => (
                     <div
                       key={conv.id}
-                      className={`p-4 border border-neon-blue/30 rounded-lg space-y-2 cursor-pointer transition-colors ${
+                      className={`p-4 border border-gray-200 dark:border-salis-gray-dark rounded-lg space-y-2 cursor-pointer transition-colors ${
                         selectedConversation === conv.id ? 'border-primary bg-primary/5' : ''
                       }`}
                       onClick={() => setSelectedConversation(conv.id)}
@@ -686,7 +686,7 @@ export default function AIAutomation() {
                       <div className="flex justify-between items-start">
                         <div>
                           <h4 className="font-semibold">Conversation #{conv.id.slice(0, 8)}</h4>
-                          <p className="text-sm text-soft-white/60">
+                          <p className="text-sm text-gray-900 dark:text-white/60">
                             {conv.createdAt && format(new Date(conv.createdAt), 'MMM dd, yyyy HH:mm')}
                           </p>
                         </div>

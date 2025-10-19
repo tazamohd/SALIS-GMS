@@ -61,8 +61,8 @@ export function CustomerVehicles() {
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-4">
-                      <div className="bg-blue-100 dark:bg-blue-900 p-3 rounded-lg">
-                        <Car className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                      <div className="bg-gray-100 dark:bg-salis-gray-dark p-3 rounded-lg">
+                        <Car className="h-6 w-6 text-gray-900 dark:text-white" />
                       </div>
                       <div>
                         <CardTitle className="text-2xl" data-testid={`text-vehicle-name-${vehicle.id}`}>
@@ -127,8 +127,8 @@ export function CustomerVehicles() {
                               data-testid={`card-job-${job.id}`}
                             >
                               <div className="flex items-center gap-4">
-                                <div className="bg-green-100 dark:bg-green-900 p-2 rounded">
-                                  <Calendar className="h-4 w-4 text-green-600 dark:text-green-400" />
+                                <div className="bg-gray-200 dark:bg-gray-700 p-2 rounded">
+                                  <Calendar className="h-4 w-4 text-gray-800 dark:text-gray-200" />
                                 </div>
                                 <div>
                                   <p className="font-medium" data-testid={`text-job-service-${job.id}`}>

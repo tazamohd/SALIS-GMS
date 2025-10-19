@@ -137,8 +137,8 @@ export default function InventoryManagement() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-['Poppins',Helvetica] font-bold text-3xl text-soft-white">Inventory & Parts Management</h1>
-          <p className="text-soft-white/60 mt-2">
+          <h1 className="font-['Poppins',Helvetica] font-bold text-3xl text-gray-900 dark:text-white">Inventory & Parts Management</h1>
+          <p className="text-gray-900 dark:text-white/60 mt-2">
             Advanced inventory control with stock alerts, auto-reordering, and multi-location transfers
           </p>
         </div>
@@ -189,58 +189,58 @@ export default function InventoryManagement() {
         {/* Overview Tab */}
         <TabsContent value="overview" className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <Card className="bg-dark-navy border-neon-blue/30 bg-dark-navy border-neon-blue/30">
+            <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium">Total Parts</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{spareParts.length}</div>
-                <p className="text-xs text-soft-white/60 mt-1">Active items</p>
+                <p className="text-xs text-gray-900 dark:text-white/60 mt-1">Active items</p>
               </CardContent>
             </Card>
-            <Card className="bg-dark-navy border-neon-blue/30 bg-dark-navy border-neon-blue/30">
+            <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium">Low Stock Alerts</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-orange-600">
+                <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                   {stockAlerts.filter((a: any) => a.alertStatus === "active").length}
                 </div>
-                <p className="text-xs text-soft-white/60 mt-1">Requires attention</p>
+                <p className="text-xs text-gray-900 dark:text-white/60 mt-1">Requires attention</p>
               </CardContent>
             </Card>
-            <Card className="bg-dark-navy border-neon-blue/30 bg-dark-navy border-neon-blue/30">
+            <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium">Pending Transfers</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-blue-600">
+                <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                   {inventoryTransfers.filter((t: any) => t.transferStatus === "pending").length}
                 </div>
-                <p className="text-xs text-soft-white/60 mt-1">Awaiting approval</p>
+                <p className="text-xs text-gray-900 dark:text-white/60 mt-1">Awaiting approval</p>
               </CardContent>
             </Card>
-            <Card className="bg-dark-navy border-neon-blue/30 bg-dark-navy border-neon-blue/30">
+            <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium">Auto-Reorder Enabled</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-green-600">
+                <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                   {reorderSettings.filter((r: any) => r.isAutoReorderEnabled).length}
                 </div>
-                <p className="text-xs text-soft-white/60 mt-1">Active rules</p>
+                <p className="text-xs text-gray-900 dark:text-white/60 mt-1">Active rules</p>
               </CardContent>
             </Card>
           </div>
 
-          <Card className="bg-dark-navy border-neon-blue/30 bg-dark-navy border-neon-blue/30">
+          <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
             <CardHeader>
-              <CardTitle className="text-soft-white">Inventory Summary</CardTitle>
-              <CardDescription className="text-soft-white/60">Quick overview of parts inventory</CardDescription>
+              <CardTitle className="text-gray-900 dark:text-white">Inventory Summary</CardTitle>
+              <CardDescription className="text-gray-900 dark:text-white/60">Quick overview of parts inventory</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="relative mb-4">
-                <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-soft-white/60 h-4 w-4" />
+                <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-900 dark:text-white/60 h-4 w-4" />
                 <Input
                   placeholder="Search parts..."
                   value={searchQuery}
@@ -250,12 +250,12 @@ export default function InventoryManagement() {
                 />
               </div>
               <Table>
-                <TableHeader className="bg-neon-blue/20/30">
-                  <TableRow className="border-b border-neon-blue/30/50 hover:bg-neon-blue/20/20">
-                    <TableHead className="text-soft-white">Part Name</TableHead>
-                    <TableHead className="text-soft-white">SKU</TableHead>
-                    <TableHead className="text-soft-white">Category</TableHead>
-                    <TableHead className="text-soft-white">Stock Status</TableHead>
+                <TableHeader className="bg-gray-100 dark:bg-salis-gray-dark">
+                  <TableRow className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-salis-gray-dark">
+                    <TableHead className="text-gray-900 dark:text-white">Part Name</TableHead>
+                    <TableHead className="text-gray-900 dark:text-white">SKU</TableHead>
+                    <TableHead className="text-gray-900 dark:text-white">Category</TableHead>
+                    <TableHead className="text-gray-900 dark:text-white">Stock Status</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -269,11 +269,11 @@ export default function InventoryManagement() {
                     .map((part: any) => (
                       <TableRow key={part.id} data-testid={`row-part-${part.id}`}>
                         <TableCell className="font-medium">{part.name}</TableCell>
-                        <TableCell className="text-soft-white">{part.sku}</TableCell>
-                        <TableCell className="text-soft-white">
+                        <TableCell className="text-gray-900 dark:text-white">{part.sku}</TableCell>
+                        <TableCell className="text-gray-900 dark:text-white">
                           <Badge variant="outline">{part.category}</Badge>
                         </TableCell>
-                        <TableCell className="text-soft-white">
+                        <TableCell className="text-gray-900 dark:text-white">
                           <Badge variant="secondary">In Stock</Badge>
                         </TableCell>
                       </TableRow>
@@ -286,12 +286,12 @@ export default function InventoryManagement() {
 
         {/* Stock Alerts Tab */}
         <TabsContent value="alerts" className="space-y-4">
-          <Card className="bg-dark-navy border-neon-blue/30 bg-dark-navy border-neon-blue/30">
+          <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle className="text-soft-white">Stock Alerts</CardTitle>
-                  <CardDescription className="text-soft-white/60">Low stock and out-of-stock notifications</CardDescription>
+                  <CardTitle className="text-gray-900 dark:text-white">Stock Alerts</CardTitle>
+                  <CardDescription className="text-gray-900 dark:text-white/60">Low stock and out-of-stock notifications</CardDescription>
                 </div>
                 <Button data-testid="button-create-alert">
                   <Plus className="mr-2 h-4 w-4" />
@@ -301,28 +301,28 @@ export default function InventoryManagement() {
             </CardHeader>
             <CardContent>
               <Table>
-                <TableHeader className="bg-neon-blue/20/30">
-                  <TableRow className="border-b border-neon-blue/30/50 hover:bg-neon-blue/20/20">
-                    <TableHead className="text-soft-white">Alert Type</TableHead>
-                    <TableHead className="text-soft-white">Part</TableHead>
-                    <TableHead className="text-soft-white">Current Stock</TableHead>
-                    <TableHead className="text-soft-white">Threshold</TableHead>
-                    <TableHead className="text-soft-white">Status</TableHead>
-                    <TableHead className="text-soft-white">Actions</TableHead>
+                <TableHeader className="bg-gray-100 dark:bg-salis-gray-dark">
+                  <TableRow className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-salis-gray-dark">
+                    <TableHead className="text-gray-900 dark:text-white">Alert Type</TableHead>
+                    <TableHead className="text-gray-900 dark:text-white">Part</TableHead>
+                    <TableHead className="text-gray-900 dark:text-white">Current Stock</TableHead>
+                    <TableHead className="text-gray-900 dark:text-white">Threshold</TableHead>
+                    <TableHead className="text-gray-900 dark:text-white">Status</TableHead>
+                    <TableHead className="text-gray-900 dark:text-white">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {stockAlerts.map((alert: any) => (
                     <TableRow key={alert.id} data-testid={`row-alert-${alert.id}`}>
-                      <TableCell className="text-soft-white">
+                      <TableCell className="text-gray-900 dark:text-white">
                         <Badge variant={alert.alertType === "out_of_stock" ? "destructive" : "outline"}>
                           {alert.alertType === "out_of_stock" ? "Out of Stock" : "Low Stock"}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-soft-white">{alert.sparePartId}</TableCell>
-                      <TableCell className="text-soft-white">{alert.currentQuantity}</TableCell>
-                      <TableCell className="text-soft-white">{alert.threshold}</TableCell>
-                      <TableCell className="text-soft-white">
+                      <TableCell className="text-gray-900 dark:text-white">{alert.sparePartId}</TableCell>
+                      <TableCell className="text-gray-900 dark:text-white">{alert.currentQuantity}</TableCell>
+                      <TableCell className="text-gray-900 dark:text-white">{alert.threshold}</TableCell>
+                      <TableCell className="text-gray-900 dark:text-white">
                         <Badge
                           variant={
                             alert.alertStatus === "active"
@@ -335,7 +335,7 @@ export default function InventoryManagement() {
                           {alert.alertStatus}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-soft-white">
+                      <TableCell className="text-gray-900 dark:text-white">
                         {alert.alertStatus === "active" && (
                           <Button
                             size="sm"
@@ -351,8 +351,8 @@ export default function InventoryManagement() {
                     </TableRow>
                   ))}
                   {stockAlerts.length === 0 && (
-                    <TableRow className="border-b border-neon-blue/30/50 hover:bg-neon-blue/20/20">
-                      <TableCell colSpan={6} className="text-center text-soft-white/60">
+                    <TableRow className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-salis-gray-dark">
+                      <TableCell colSpan={6} className="text-center text-gray-900 dark:text-white/60">
                         No stock alerts found
                       </TableCell>
                     </TableRow>
@@ -365,12 +365,12 @@ export default function InventoryManagement() {
 
         {/* Auto-Reorder Tab */}
         <TabsContent value="reorder" className="space-y-4">
-          <Card className="bg-dark-navy border-neon-blue/30 bg-dark-navy border-neon-blue/30">
+          <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle className="text-soft-white">Automatic Reorder Settings</CardTitle>
-                  <CardDescription className="text-soft-white/60">Configure automatic reordering rules for parts</CardDescription>
+                  <CardTitle className="text-gray-900 dark:text-white">Automatic Reorder Settings</CardTitle>
+                  <CardDescription className="text-gray-900 dark:text-white/60">Configure automatic reordering rules for parts</CardDescription>
                 </div>
                 <Button data-testid="button-create-reorder-rule">
                   <Plus className="mr-2 h-4 w-4" />
@@ -380,29 +380,29 @@ export default function InventoryManagement() {
             </CardHeader>
             <CardContent>
               <Table>
-                <TableHeader className="bg-neon-blue/20/30">
-                  <TableRow className="border-b border-neon-blue/30/50 hover:bg-neon-blue/20/20">
-                    <TableHead className="text-soft-white">Part</TableHead>
-                    <TableHead className="text-soft-white">Reorder Point</TableHead>
-                    <TableHead className="text-soft-white">Reorder Quantity</TableHead>
-                    <TableHead className="text-soft-white">Supplier</TableHead>
-                    <TableHead className="text-soft-white">Status</TableHead>
-                    <TableHead className="text-soft-white">Last Reorder</TableHead>
+                <TableHeader className="bg-gray-100 dark:bg-salis-gray-dark">
+                  <TableRow className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-salis-gray-dark">
+                    <TableHead className="text-gray-900 dark:text-white">Part</TableHead>
+                    <TableHead className="text-gray-900 dark:text-white">Reorder Point</TableHead>
+                    <TableHead className="text-gray-900 dark:text-white">Reorder Quantity</TableHead>
+                    <TableHead className="text-gray-900 dark:text-white">Supplier</TableHead>
+                    <TableHead className="text-gray-900 dark:text-white">Status</TableHead>
+                    <TableHead className="text-gray-900 dark:text-white">Last Reorder</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {reorderSettings.map((setting: any) => (
                     <TableRow key={setting.id} data-testid={`row-reorder-${setting.id}`}>
                       <TableCell className="font-medium">{setting.sparePartId}</TableCell>
-                      <TableCell className="text-soft-white">{setting.reorderPoint}</TableCell>
-                      <TableCell className="text-soft-white">{setting.reorderQuantity}</TableCell>
-                      <TableCell className="text-soft-white">{setting.supplierId}</TableCell>
-                      <TableCell className="text-soft-white">
+                      <TableCell className="text-gray-900 dark:text-white">{setting.reorderPoint}</TableCell>
+                      <TableCell className="text-gray-900 dark:text-white">{setting.reorderQuantity}</TableCell>
+                      <TableCell className="text-gray-900 dark:text-white">{setting.supplierId}</TableCell>
+                      <TableCell className="text-gray-900 dark:text-white">
                         <Badge variant={setting.isAutoReorderEnabled ? "default" : "secondary"}>
                           {setting.isAutoReorderEnabled ? "Enabled" : "Disabled"}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-soft-white">
+                      <TableCell className="text-gray-900 dark:text-white">
                         {setting.lastReorderDate
                           ? new Date(setting.lastReorderDate).toLocaleDateString()
                           : "Never"}
@@ -410,8 +410,8 @@ export default function InventoryManagement() {
                     </TableRow>
                   ))}
                   {reorderSettings.length === 0 && (
-                    <TableRow className="border-b border-neon-blue/30/50 hover:bg-neon-blue/20/20">
-                      <TableCell colSpan={6} className="text-center text-soft-white/60">
+                    <TableRow className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-salis-gray-dark">
+                      <TableCell colSpan={6} className="text-center text-gray-900 dark:text-white/60">
                         No reorder rules configured
                       </TableCell>
                     </TableRow>
@@ -424,12 +424,12 @@ export default function InventoryManagement() {
 
         {/* Transfers Tab */}
         <TabsContent value="transfers" className="space-y-4">
-          <Card className="bg-dark-navy border-neon-blue/30 bg-dark-navy border-neon-blue/30">
+          <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle className="text-soft-white">Inventory Transfers</CardTitle>
-                  <CardDescription className="text-soft-white/60">Multi-location inventory movement tracking</CardDescription>
+                  <CardTitle className="text-gray-900 dark:text-white">Inventory Transfers</CardTitle>
+                  <CardDescription className="text-gray-900 dark:text-white/60">Multi-location inventory movement tracking</CardDescription>
                 </div>
                 <Button data-testid="button-create-transfer">
                   <Plus className="mr-2 h-4 w-4" />
@@ -439,26 +439,26 @@ export default function InventoryManagement() {
             </CardHeader>
             <CardContent>
               <Table>
-                <TableHeader className="bg-neon-blue/20/30">
-                  <TableRow className="border-b border-neon-blue/30/50 hover:bg-neon-blue/20/20">
-                    <TableHead className="text-soft-white">Transfer #</TableHead>
-                    <TableHead className="text-soft-white">Part</TableHead>
-                    <TableHead className="text-soft-white">From → To</TableHead>
-                    <TableHead className="text-soft-white">Quantity</TableHead>
-                    <TableHead className="text-soft-white">Status</TableHead>
-                    <TableHead className="text-soft-white">Date</TableHead>
+                <TableHeader className="bg-gray-100 dark:bg-salis-gray-dark">
+                  <TableRow className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-salis-gray-dark">
+                    <TableHead className="text-gray-900 dark:text-white">Transfer #</TableHead>
+                    <TableHead className="text-gray-900 dark:text-white">Part</TableHead>
+                    <TableHead className="text-gray-900 dark:text-white">From → To</TableHead>
+                    <TableHead className="text-gray-900 dark:text-white">Quantity</TableHead>
+                    <TableHead className="text-gray-900 dark:text-white">Status</TableHead>
+                    <TableHead className="text-gray-900 dark:text-white">Date</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {inventoryTransfers.map((transfer: any) => (
                     <TableRow key={transfer.id} data-testid={`row-transfer-${transfer.id}`}>
                       <TableCell className="font-medium">{transfer.transferNumber}</TableCell>
-                      <TableCell className="text-soft-white">{transfer.sparePartId}</TableCell>
-                      <TableCell className="text-soft-white">
+                      <TableCell className="text-gray-900 dark:text-white">{transfer.sparePartId}</TableCell>
+                      <TableCell className="text-gray-900 dark:text-white">
                         {transfer.fromGarageId} → {transfer.toGarageId}
                       </TableCell>
-                      <TableCell className="text-soft-white">{transfer.quantity}</TableCell>
-                      <TableCell className="text-soft-white">
+                      <TableCell className="text-gray-900 dark:text-white">{transfer.quantity}</TableCell>
+                      <TableCell className="text-gray-900 dark:text-white">
                         <Badge
                           variant={
                             transfer.transferStatus === "completed"
@@ -471,14 +471,14 @@ export default function InventoryManagement() {
                           {transfer.transferStatus}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-soft-white">
+                      <TableCell className="text-gray-900 dark:text-white">
                         {new Date(transfer.createdAt).toLocaleDateString()}
                       </TableCell>
                     </TableRow>
                   ))}
                   {inventoryTransfers.length === 0 && (
-                    <TableRow className="border-b border-neon-blue/30/50 hover:bg-neon-blue/20/20">
-                      <TableCell colSpan={6} className="text-center text-soft-white/60">
+                    <TableRow className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-salis-gray-dark">
+                      <TableCell colSpan={6} className="text-center text-gray-900 dark:text-white/60">
                         No transfers found
                       </TableCell>
                     </TableRow>
@@ -491,13 +491,13 @@ export default function InventoryManagement() {
 
         {/* Pricing History Tab */}
         <TabsContent value="pricing" className="space-y-4">
-          <Card className="bg-dark-navy border-neon-blue/30 bg-dark-navy border-neon-blue/30">
+          <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
             <CardHeader>
-              <CardTitle className="text-soft-white">Pricing History</CardTitle>
-              <CardDescription className="text-soft-white/60">Track price changes over time</CardDescription>
+              <CardTitle className="text-gray-900 dark:text-white">Pricing History</CardTitle>
+              <CardDescription className="text-gray-900 dark:text-white/60">Track price changes over time</CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-center text-soft-white/60 py-8">
+              <p className="text-center text-gray-900 dark:text-white/60 py-8">
                 Select a part to view pricing history
               </p>
             </CardContent>
@@ -506,13 +506,13 @@ export default function InventoryManagement() {
 
         {/* Audit Trail Tab */}
         <TabsContent value="audit" className="space-y-4">
-          <Card className="bg-dark-navy border-neon-blue/30 bg-dark-navy border-neon-blue/30">
+          <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
             <CardHeader>
-              <CardTitle className="text-soft-white">Inventory Audit Trail</CardTitle>
-              <CardDescription className="text-soft-white/60">Complete history of inventory changes</CardDescription>
+              <CardTitle className="text-gray-900 dark:text-white">Inventory Audit Trail</CardTitle>
+              <CardDescription className="text-gray-900 dark:text-white/60">Complete history of inventory changes</CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-center text-soft-white/60 py-8">
+              <p className="text-center text-gray-900 dark:text-white/60 py-8">
                 Audit trail will display all inventory movements and changes
               </p>
             </CardContent>

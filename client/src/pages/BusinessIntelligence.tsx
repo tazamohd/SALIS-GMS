@@ -27,7 +27,7 @@ import {
   Cell,
 } from "recharts";
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'];
+const COLORS = ['#1a1a1a', '#404040', '#5a5a5a', '#737373', '#8c8c8c', '#a6a6a6'];
 
 export default function BusinessIntelligence() {
   const [garageId, setGarageId] = useState("");
@@ -89,21 +89,21 @@ export default function BusinessIntelligence() {
     : 0;
 
   return (
-    <div className="p-8 bg-gray-800 min-h-screen space-y-6">
+    <div className="p-8 bg-gray-50 dark:bg-salis-black min-h-screen space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-soft-white">Business Intelligence</h1>
-          <p className="text-sm text-soft-white/60 mt-1">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Business Intelligence</h1>
+          <p className="text-sm text-gray-900 dark:text-white/60 mt-1">
             Track key metrics and insights for your garage business
           </p>
         </div>
       </div>
 
       {/* Filters */}
-      <Card className="bg-dark-navy border-neon-blue/30 bg-dark-navy border-neon-blue/30">
+      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
         <CardHeader>
-          <CardTitle className="text-soft-white">Filters</CardTitle>
-          <CardDescription className="text-soft-white/60">Select garage and date range for analysis</CardDescription>
+          <CardTitle className="text-gray-900 dark:text-white">Filters</CardTitle>
+          <CardDescription className="text-gray-900 dark:text-white/60">Select garage and date range for analysis</CardDescription>
         </CardHeader>
         <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-2">
@@ -148,61 +148,61 @@ export default function BusinessIntelligence() {
 
       {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="bg-dark-navy border-neon-blue/30 bg-dark-navy border-neon-blue/30">
+        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Avg. Customer Lifetime Value</CardTitle>
-            <DollarSign className="h-4 w-4 text-soft-white/60" />
+            <DollarSign className="h-4 w-4 text-gray-900 dark:text-white/60" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold" data-testid="text-avg-clv">
               ${avgLifetimeValue.toFixed(2)}
             </div>
-            <p className="text-xs text-soft-white/60">
+            <p className="text-xs text-gray-900 dark:text-white/60">
               Total customers: {customerLifetime?.customers?.length || 0}
             </p>
           </CardContent>
         </Card>
 
-        <Card className="bg-dark-navy border-neon-blue/30 bg-dark-navy border-neon-blue/30">
+        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Customer Acquisition Cost</CardTitle>
-            <Users className="h-4 w-4 text-soft-white/60" />
+            <Users className="h-4 w-4 text-gray-900 dark:text-white/60" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold" data-testid="text-cac">
               ${(acquisitionCost?.acquisitionCost || 0).toFixed(2)}
             </div>
-            <p className="text-xs text-soft-white/60">
+            <p className="text-xs text-gray-900 dark:text-white/60">
               New customers: {acquisitionCost?.newCustomers || 0}
             </p>
           </CardContent>
         </Card>
 
-        <Card className="bg-dark-navy border-neon-blue/30 bg-dark-navy border-neon-blue/30">
+        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Peak Hour</CardTitle>
-            <Clock className="h-4 w-4 text-soft-white/60" />
+            <Clock className="h-4 w-4 text-gray-900 dark:text-white/60" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold" data-testid="text-peak-hour">
               {peakHours?.peakHour || 0}:00
             </div>
-            <p className="text-xs text-soft-white/60">
+            <p className="text-xs text-gray-900 dark:text-white/60">
               Most busy time
             </p>
           </CardContent>
         </Card>
 
-        <Card className="bg-dark-navy border-neon-blue/30 bg-dark-navy border-neon-blue/30">
+        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Peak Day</CardTitle>
-            <TrendingUp className="h-4 w-4 text-soft-white/60" />
+            <TrendingUp className="h-4 w-4 text-gray-900 dark:text-white/60" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold" data-testid="text-peak-day">
               {peakHours?.peakDay || 'N/A'}
             </div>
-            <p className="text-xs text-soft-white/60">
+            <p className="text-xs text-gray-900 dark:text-white/60">
               Most busy day
             </p>
           </CardContent>
@@ -212,10 +212,10 @@ export default function BusinessIntelligence() {
       {/* Charts Row 1 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Most Profitable Services */}
-        <Card className="bg-dark-navy border-neon-blue/30 bg-dark-navy border-neon-blue/30">
+        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
           <CardHeader>
-            <CardTitle className="text-soft-white">Most Profitable Services</CardTitle>
-            <CardDescription className="text-soft-white/60">Revenue, cost, and profit by service type</CardDescription>
+            <CardTitle className="text-gray-900 dark:text-white">Most Profitable Services</CardTitle>
+            <CardDescription className="text-gray-900 dark:text-white/60">Revenue, cost, and profit by service type</CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -225,19 +225,19 @@ export default function BusinessIntelligence() {
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                <Bar dataKey="revenue" fill="#0088FE" name="Revenue" />
-                <Bar dataKey="cost" fill="#FF8042" name="Cost" />
-                <Bar dataKey="profit" fill="#00C49F" name="Profit" />
+                <Bar dataKey="revenue" fill="#404040" name="Revenue" />
+                <Bar dataKey="cost" fill="#8c8c8c" name="Cost" />
+                <Bar dataKey="profit" fill="#5a5a5a" name="Profit" />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
 
         {/* Profit Margin by Service */}
-        <Card className="bg-dark-navy border-neon-blue/30 bg-dark-navy border-neon-blue/30">
+        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
           <CardHeader>
-            <CardTitle className="text-soft-white">Profit Margin by Service</CardTitle>
-            <CardDescription className="text-soft-white/60">Percentage profit margin for each service type</CardDescription>
+            <CardTitle className="text-gray-900 dark:text-white">Profit Margin by Service</CardTitle>
+            <CardDescription className="text-gray-900 dark:text-white/60">Percentage profit margin for each service type</CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -249,7 +249,7 @@ export default function BusinessIntelligence() {
                   labelLine={false}
                   label={(entry) => `${entry.serviceType}: ${entry.profitMargin.toFixed(1)}%`}
                   outerRadius={80}
-                  fill="#8884d8"
+                  fill="#737373"
                   dataKey="profitMargin"
                 >
                   {profitableServices?.services?.map((entry: any, index: number) => (
@@ -266,10 +266,10 @@ export default function BusinessIntelligence() {
       {/* Charts Row 2 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Peak Hours Analysis */}
-        <Card className="bg-dark-navy border-neon-blue/30 bg-dark-navy border-neon-blue/30">
+        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
           <CardHeader>
-            <CardTitle className="text-soft-white">Hourly Distribution</CardTitle>
-            <CardDescription className="text-soft-white/60">Appointments and revenue by hour of day</CardDescription>
+            <CardTitle className="text-gray-900 dark:text-white">Hourly Distribution</CardTitle>
+            <CardDescription className="text-gray-900 dark:text-white/60">Appointments and revenue by hour of day</CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -280,18 +280,18 @@ export default function BusinessIntelligence() {
                 <YAxis yAxisId="right" orientation="right" />
                 <Tooltip />
                 <Legend />
-                <Line yAxisId="left" type="monotone" dataKey="count" stroke="#8884d8" name="Appointments" />
-                <Line yAxisId="right" type="monotone" dataKey="revenue" stroke="#82ca9d" name="Revenue ($)" />
+                <Line yAxisId="left" type="monotone" dataKey="count" stroke="#737373" name="Appointments" />
+                <Line yAxisId="right" type="monotone" dataKey="revenue" stroke="#a6a6a6" name="Revenue ($)" />
               </LineChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
 
         {/* Daily Distribution */}
-        <Card className="bg-dark-navy border-neon-blue/30 bg-dark-navy border-neon-blue/30">
+        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
           <CardHeader>
-            <CardTitle className="text-soft-white">Daily Distribution</CardTitle>
-            <CardDescription className="text-soft-white/60">Appointments and revenue by day of week</CardDescription>
+            <CardTitle className="text-gray-900 dark:text-white">Daily Distribution</CardTitle>
+            <CardDescription className="text-gray-900 dark:text-white/60">Appointments and revenue by day of week</CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -302,7 +302,7 @@ export default function BusinessIntelligence() {
                 <YAxis yAxisId="right" orientation="right" />
                 <Tooltip />
                 <Legend />
-                <Bar yAxisId="left" dataKey="count" fill="#8884d8" name="Appointments" />
+                <Bar yAxisId="left" dataKey="count" fill="#737373" name="Appointments" />
                 <Bar yAxisId="right" dataKey="revenue" fill="#82ca9d" name="Revenue ($)" />
               </BarChart>
             </ResponsiveContainer>
@@ -313,10 +313,10 @@ export default function BusinessIntelligence() {
       {/* Charts Row 3 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Technician Utilization */}
-        <Card className="bg-dark-navy border-neon-blue/30 bg-dark-navy border-neon-blue/30">
+        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
           <CardHeader>
-            <CardTitle className="text-soft-white">Technician Utilization Rates</CardTitle>
-            <CardDescription className="text-soft-white/60">Hours worked vs available by technician</CardDescription>
+            <CardTitle className="text-gray-900 dark:text-white">Technician Utilization Rates</CardTitle>
+            <CardDescription className="text-gray-900 dark:text-white/60">Hours worked vs available by technician</CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -334,10 +334,10 @@ export default function BusinessIntelligence() {
         </Card>
 
         {/* Customer Acquisition Sources */}
-        <Card className="bg-dark-navy border-neon-blue/30 bg-dark-navy border-neon-blue/30">
+        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
           <CardHeader>
-            <CardTitle className="text-soft-white">Customer Acquisition Sources</CardTitle>
-            <CardDescription className="text-soft-white/60">New customers by acquisition channel</CardDescription>
+            <CardTitle className="text-gray-900 dark:text-white">Customer Acquisition Sources</CardTitle>
+            <CardDescription className="text-gray-900 dark:text-white/60">New customers by acquisition channel</CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -349,7 +349,7 @@ export default function BusinessIntelligence() {
                   labelLine={false}
                   label={(entry) => `${entry.source}: ${entry.count}`}
                   outerRadius={80}
-                  fill="#8884d8"
+                  fill="#737373"
                   dataKey="count"
                 >
                   {acquisitionCost?.customersBySource?.map((entry: any, index: number) => (
@@ -364,35 +364,35 @@ export default function BusinessIntelligence() {
       </div>
 
       {/* Top Customers by Lifetime Value */}
-      <Card className="bg-dark-navy border-neon-blue/30 bg-dark-navy border-neon-blue/30">
+      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
         <CardHeader>
-          <CardTitle className="text-soft-white">Top Customers by Lifetime Value</CardTitle>
-          <CardDescription className="text-soft-white/60">Top 5 customers ranked by total revenue</CardDescription>
+          <CardTitle className="text-gray-900 dark:text-white">Top Customers by Lifetime Value</CardTitle>
+          <CardDescription className="text-gray-900 dark:text-white/60">Top 5 customers ranked by total revenue</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             {topCustomers.map((customer: any, index: number) => (
               <div
                 key={customer.id}
-                className="flex items-center justify-between p-3 border border-neon-blue/30 rounded-lg"
+                className="flex items-center justify-between p-3 border border-gray-200 dark:border-salis-gray-dark rounded-lg"
                 data-testid={`customer-${index}`}
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-semibold">
+                  <div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-900 dark:text-white font-semibold">
                     {index + 1}
                   </div>
                   <div>
                     <p className="font-medium">{customer.name || 'Unknown'}</p>
-                    <p className="text-sm text-soft-white/60">
+                    <p className="text-sm text-gray-900 dark:text-white/60">
                       {customer.totalInvoices} invoices • {customer.totalVisits} visits
                     </p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-lg font-bold text-green-600">
+                  <p className="text-lg font-bold text-gray-900 dark:text-white">
                     ${customer.lifetimeValue.toFixed(2)}
                   </p>
-                  <p className="text-sm text-soft-white/60">
+                  <p className="text-sm text-gray-900 dark:text-white/60">
                     Avg: ${customer.avgInvoiceValue.toFixed(2)}
                   </p>
                 </div>
@@ -403,40 +403,40 @@ export default function BusinessIntelligence() {
       </Card>
 
       {/* Technician Performance Details */}
-      <Card className="bg-dark-navy border-neon-blue/30 bg-dark-navy border-neon-blue/30">
+      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
         <CardHeader>
-          <CardTitle className="text-soft-white">Technician Performance Details</CardTitle>
-          <CardDescription className="text-soft-white/60">Detailed metrics for each technician</CardDescription>
+          <CardTitle className="text-gray-900 dark:text-white">Technician Performance Details</CardTitle>
+          <CardDescription className="text-gray-900 dark:text-white/60">Detailed metrics for each technician</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             {technicianUtilization?.technicians?.map((tech: any) => (
               <div
                 key={tech.id}
-                className="flex items-center justify-between p-3 border border-neon-blue/30 rounded-lg"
+                className="flex items-center justify-between p-3 border border-gray-200 dark:border-salis-gray-dark rounded-lg"
                 data-testid={`technician-${tech.id}`}
               >
                 <div className="flex items-center gap-3">
-                  <Wrench className="w-8 h-8 text-blue-600" />
+                  <Wrench className="w-8 h-8 text-gray-700 dark:text-gray-300" />
                   <div>
                     <p className="font-medium">{tech.name}</p>
-                    <p className="text-sm text-soft-white/60">
+                    <p className="text-sm text-gray-900 dark:text-white/60">
                       {tech.jobsCompleted} jobs completed
                     </p>
                   </div>
                 </div>
                 <div className="flex gap-8 text-right">
                   <div>
-                    <p className="text-sm text-soft-white/60">Utilization</p>
+                    <p className="text-sm text-gray-900 dark:text-white/60">Utilization</p>
                     <p className="text-lg font-bold">{tech.utilizationRate.toFixed(1)}%</p>
                   </div>
                   <div>
-                    <p className="text-sm text-soft-white/60">Hours Worked</p>
+                    <p className="text-sm text-gray-900 dark:text-white/60">Hours Worked</p>
                     <p className="text-lg font-bold">{tech.totalHoursWorked.toFixed(1)}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-soft-white/60">Revenue</p>
-                    <p className="text-lg font-bold text-green-600">
+                    <p className="text-sm text-gray-900 dark:text-white/60">Revenue</p>
+                    <p className="text-lg font-bold text-gray-900 dark:text-white">
                       ${tech.revenueGenerated.toFixed(2)}
                     </p>
                   </div>

@@ -77,11 +77,11 @@ export function AddToolDialog({ open, onOpenChange }: AddToolDialogProps) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="font-['Poppins',Helvetica] font-semibold text-xl text-[#222029] flex items-center gap-2">
+          <DialogTitle className="font-['Poppins',Helvetica] font-semibold text-xl text-gray-900 dark:text-white flex items-center gap-2">
             <Wrench className="w-6 h-6" />
             Add New Tool
           </DialogTitle>
-          <DialogDescription className="font-['Poppins',Helvetica] text-sm text-[#999999]">
+          <DialogDescription className="font-['Poppins',Helvetica] text-sm text-gray-500 dark:text-gray-500">
             Add a new tool to your garage inventory
           </DialogDescription>
         </DialogHeader>
@@ -212,7 +212,7 @@ export function AddToolDialog({ open, onOpenChange }: AddToolDialogProps) {
                 type="submit"
                 disabled={createToolMutation.isPending}
                 data-testid="button-add-tool"
-                className="bg-[#4f46e5] hover:bg-[#4338ca]"
+                className="bg-gray-800 dark:bg-gray-200 hover:bg-gray-900 dark:hover:bg-gray-300 text-white dark:text-black"
               >
                 {createToolMutation.isPending ? (
                   <>

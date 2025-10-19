@@ -66,29 +66,29 @@ export default function Notifications() {
   const getNotificationIcon = (type: string) => {
     switch (type) {
       case 'email':
-        return <Mail className="h-5 w-5 text-blue-500" />;
+        return <Mail className="h-5 w-5 text-gray-700 dark:text-gray-300" />;
       case 'sms':
-        return <MessageSquare className="h-5 w-5 text-green-500" />;
+        return <MessageSquare className="h-5 w-5 text-gray-600 dark:text-gray-400" />;
       case 'in-app':
-        return <Bell className="h-5 w-5 text-purple-500" />;
+        return <Bell className="h-5 w-5 text-gray-800 dark:text-gray-200" />;
       default:
-        return <Bell className="h-5 w-5 text-soft-white/60" />;
+        return <Bell className="h-5 w-5 text-gray-900 dark:text-white/60" />;
     }
   };
 
   const getStatusIcon = (status: string) => {
-    if (status === 'read') return <CheckCircle className="h-4 w-4 text-green-500" />;
-    if (status === 'failed') return <XCircle className="h-4 w-4 text-red-500" />;
+    if (status === 'read') return <CheckCircle className="h-4 w-4 text-gray-700 dark:text-gray-300" />;
+    if (status === 'failed') return <XCircle className="h-4 w-4 text-gray-600 dark:text-gray-400" />;
     return null;
   };
 
   const getCategoryBadge = (category: string) => {
     const colors: Record<string, string> = {
-      appointment: 'bg-blue-100 text-blue-700',
-      invoice: 'bg-green-100 text-green-700',
-      job_completed: 'bg-cyan-100 text-cyan-700',
-      feedback_request: 'bg-purple-100 text-purple-700',
-      general: 'bg-neon-blue/20/30 text-gray-700',
+      appointment: 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100',
+      invoice: 'bg-gray-300 dark:bg-gray-600 text-gray-900 dark:text-gray-100',
+      job_completed: 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100',
+      feedback_request: 'bg-gray-300 dark:bg-gray-600 text-gray-900 dark:text-gray-100',
+      general: 'bg-gray-100 dark:bg-salis-gray-dark text-gray-700 dark:text-gray-300',
     };
 
     return (
@@ -100,7 +100,7 @@ export default function Notifications() {
 
   if (showPreferences) {
     return (
-      <div className="p-8 bg-gray-800 min-h-screen">
+      <div className="p-8 bg-gray-50 dark:bg-salis-black min-h-screen">
         <Button
           variant="ghost"
           onClick={() => setShowPreferences(false)}
@@ -115,11 +115,11 @@ export default function Notifications() {
   }
 
   return (
-    <div className="p-8 bg-gray-800 min-h-screen space-y-6">
+    <div className="p-8 bg-gray-50 dark:bg-salis-black min-h-screen space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-soft-white">Notifications</h1>
-          <p className="text-soft-white/60 mt-2">Manage your notifications and alerts</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Notifications</h1>
+          <p className="text-gray-900 dark:text-white/60 mt-2">Manage your notifications and alerts</p>
         </div>
         <Button
           variant="outline"
@@ -150,13 +150,13 @@ export default function Notifications() {
         <TabsContent value={selectedTab} className="mt-6">
           {isLoading ? (
             <div className="flex justify-center py-12">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-gray-100"></div>
             </div>
           ) : filteredNotifications.length === 0 ? (
-            <Card className="bg-dark-navy border-neon-blue/30 bg-dark-navy border-neon-blue/30">
+            <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
               <CardContent className="flex flex-col items-center justify-center py-12">
                 <Bell className="h-12 w-12 text-gray-300 mb-4" />
-                <p className="text-soft-white/60">No notifications to display</p>
+                <p className="text-gray-900 dark:text-white/60">No notifications to display</p>
               </CardContent>
             </Card>
           ) : (
@@ -165,7 +165,7 @@ export default function Notifications() {
                 <Card
                   key={notification.id}
                   className={`${
-                    notification.status !== 'read' ? 'bg-blue-50 border-blue-200' : ''
+                    notification.status !== 'read' ? 'bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-600' : ''
                   }`}
                   data-testid={`notification-card-${notification.id}`}
                 >
@@ -205,7 +205,7 @@ export default function Notifications() {
                           onClick={() => handleDelete(notification.id)}
                           data-testid={`button-delete-${notification.id}`}
                         >
-                          <Trash2 className="h-4 w-4 text-red-500" />
+                          <Trash2 className="h-4 w-4 text-gray-700 dark:text-gray-300" />
                         </Button>
                       </div>
                     </div>
@@ -214,7 +214,7 @@ export default function Notifications() {
                     <CardDescription className="text-sm whitespace-pre-wrap">
                       {notification.message}
                     </CardDescription>
-                    <div className="mt-3 flex items-center gap-4 text-xs text-soft-white/60">
+                    <div className="mt-3 flex items-center gap-4 text-xs text-gray-900 dark:text-white/60">
                       <span>
                         {notification.createdAt &&
                           formatDistanceToNow(new Date(notification.createdAt), {
@@ -227,7 +227,7 @@ export default function Notifications() {
                         </span>
                       )}
                       {notification.status === 'failed' && notification.failureReason && (
-                        <span className="text-red-500">Failed: {notification.failureReason}</span>
+                        <span className="text-gray-700 dark:text-gray-300">Failed: {notification.failureReason}</span>
                       )}
                     </div>
                   </CardContent>

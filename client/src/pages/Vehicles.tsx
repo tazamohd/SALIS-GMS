@@ -196,7 +196,7 @@ export default function Vehicles() {
     return (
       <div className="p-8">
         <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-gray-100"></div>
         </div>
       </div>
     );
@@ -206,10 +206,10 @@ export default function Vehicles() {
     <div className="p-8">
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="font-['Poppins',Helvetica] font-bold text-2xl text-soft-white mb-2">
+          <h1 className="font-['Poppins',Helvetica] font-bold text-2xl text-gray-900 dark:text-white mb-2">
             Vehicles
           </h1>
-          <p className="font-['Poppins',Helvetica] text-sm text-soft-white/60">
+          <p className="font-['Poppins',Helvetica] text-sm text-gray-600 dark:text-gray-400">
             Manage customer vehicles and service history
           </p>
         </div>
@@ -217,7 +217,7 @@ export default function Vehicles() {
         <Dialog open={isDialogOpen} onOpenChange={handleDialogClose}>
           <DialogTrigger asChild>
             <Button
-              className="bg-blue-600 hover:bg-blue-700 text-white"
+              className="bg-gray-800 dark:bg-gray-200 hover:bg-gray-900 dark:hover:bg-gray-300 text-white dark:text-black"
               data-testid="button-add-vehicle"
             >
               <Plus className="w-4 h-4 mr-2" />
@@ -226,7 +226,7 @@ export default function Vehicles() {
           </DialogTrigger>
           <DialogContent className="sm:max-w-[600px]" data-testid="modal-vehicle-form">
             <DialogHeader>
-              <DialogTitle className="font-['Poppins',Helvetica] font-semibold text-xl text-soft-white">
+              <DialogTitle className="font-['Poppins',Helvetica] font-semibold text-xl text-gray-900 dark:text-white">
                 {editingVehicle ? "Edit Vehicle" : "Add New Vehicle"}
               </DialogTitle>
             </DialogHeader>
@@ -475,7 +475,7 @@ export default function Vehicles() {
                   </Button>
                   <Button
                     type="submit"
-                    className="bg-blue-600 hover:bg-blue-700"
+                    className="bg-gray-800 dark:bg-gray-200 hover:bg-gray-900 dark:hover:bg-gray-300 text-white dark:text-black"
                     disabled={createMutation.isPending || updateMutation.isPending}
                     data-testid="button-save-vehicle"
                   >
@@ -490,13 +490,13 @@ export default function Vehicles() {
 
       <div className="mb-6">
         <div className="relative w-96">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-soft-white/60" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-600 dark:text-gray-400" />
           <Input
             type="text"
             placeholder="Search vehicles..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 border-[#e6e6e6]"
+            className="pl-10 border-gray-200 dark:border-salis-gray-dark"
             data-testid="input-search-vehicles"
           />
         </div>
@@ -504,8 +504,8 @@ export default function Vehicles() {
 
       {filteredVehicles.length === 0 ? (
         <div className="text-center py-12">
-          <Car className="w-12 h-12 mx-auto text-soft-white/60 mb-4" />
-          <p className="font-['Poppins',Helvetica] text-soft-white/60">
+          <Car className="w-12 h-12 mx-auto text-gray-600 dark:text-gray-400 mb-4" />
+          <p className="font-['Poppins',Helvetica] text-gray-600 dark:text-gray-400">
             {searchQuery ? "No vehicles found matching your search" : "No vehicles added yet"}
           </p>
         </div>
@@ -517,68 +517,68 @@ export default function Vehicles() {
             return (
               <div
                 key={vehicle.id}
-                className="bg-dark-navy border border-[#e6e6e6] rounded-lg p-6 hover:shadow-md transition-shadow"
+                className="bg-white dark:bg-salis-black border border-gray-200 dark:border-salis-gray-dark rounded-lg p-6 hover:shadow-md transition-shadow"
                 data-testid={`card-vehicle-${vehicle.id}`}
               >
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center">
-                      <Car className="w-6 h-6 text-blue-600" />
+                    <div className="w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center">
+                      <Car className="w-6 h-6 text-gray-700 dark:text-gray-300" />
                     </div>
                     <div>
-                      <h3 className="font-['Poppins',Helvetica] font-semibold text-soft-white">
+                      <h3 className="font-['Poppins',Helvetica] font-semibold text-gray-900 dark:text-white">
                         {vehicle.make} {vehicle.model}
                       </h3>
-                      <p className="font-['Poppins',Helvetica] text-sm text-soft-white/60">
+                      <p className="font-['Poppins',Helvetica] text-sm text-gray-600 dark:text-gray-400">
                         {vehicle.year}
                       </p>
                     </div>
                   </div>
                   {vehicle.isActive && (
-                    <Badge className="bg-green-100 text-green-800">Active</Badge>
+                    <Badge className="bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100">Active</Badge>
                   )}
                 </div>
 
                 <div className="space-y-2 mb-4">
                   <div className="flex justify-between">
-                    <span className="font-['Poppins',Helvetica] text-sm text-soft-white/60">Owner:</span>
-                    <span className="font-['Poppins',Helvetica] text-sm text-soft-white">
+                    <span className="font-['Poppins',Helvetica] text-sm text-gray-600 dark:text-gray-400">Owner:</span>
+                    <span className="font-['Poppins',Helvetica] text-sm text-gray-900 dark:text-white">
                       {customer?.fullName || "Unknown"}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="font-['Poppins',Helvetica] text-sm text-soft-white/60">License:</span>
-                    <span className="font-['Poppins',Helvetica] text-sm text-soft-white font-medium">
+                    <span className="font-['Poppins',Helvetica] text-sm text-gray-600 dark:text-gray-400">License:</span>
+                    <span className="font-['Poppins',Helvetica] text-sm text-gray-900 dark:text-white font-medium">
                       {vehicle.licensePlate}
                     </span>
                   </div>
                   {vehicle.vin && (
                     <div className="flex justify-between">
-                      <span className="font-['Poppins',Helvetica] text-sm text-soft-white/60">VIN:</span>
-                      <span className="font-['Poppins',Helvetica] text-sm text-soft-white truncate max-w-[150px]">
+                      <span className="font-['Poppins',Helvetica] text-sm text-gray-600 dark:text-gray-400">VIN:</span>
+                      <span className="font-['Poppins',Helvetica] text-sm text-gray-900 dark:text-white truncate max-w-[150px]">
                         {vehicle.vin}
                       </span>
                     </div>
                   )}
                   {vehicle.mileage && vehicle.mileage > 0 && (
                     <div className="flex justify-between">
-                      <span className="font-['Poppins',Helvetica] text-sm text-soft-white/60">Mileage:</span>
-                      <span className="font-['Poppins',Helvetica] text-sm text-soft-white">
+                      <span className="font-['Poppins',Helvetica] text-sm text-gray-600 dark:text-gray-400">Mileage:</span>
+                      <span className="font-['Poppins',Helvetica] text-sm text-gray-900 dark:text-white">
                         {vehicle.mileage.toLocaleString()} km
                       </span>
                     </div>
                   )}
                   {vehicle.engineType && (
                     <div className="flex justify-between">
-                      <span className="font-['Poppins',Helvetica] text-sm text-soft-white/60">Engine:</span>
-                      <span className="font-['Poppins',Helvetica] text-sm text-soft-white capitalize">
+                      <span className="font-['Poppins',Helvetica] text-sm text-gray-600 dark:text-gray-400">Engine:</span>
+                      <span className="font-['Poppins',Helvetica] text-sm text-gray-900 dark:text-white capitalize">
                         {vehicle.engineType}
                       </span>
                     </div>
                   )}
                 </div>
 
-                <div className="flex gap-2 pt-4 border-t border-[#e6e6e6]">
+                <div className="flex gap-2 pt-4 border-t border-gray-200 dark:border-salis-gray-dark">
                   <Button
                     variant="outline"
                     size="sm"
@@ -593,7 +593,7 @@ export default function Vehicles() {
                     variant="outline"
                     size="sm"
                     onClick={() => handleDelete(vehicle.id)}
-                    className="flex-1 text-red-600 hover:text-red-700 hover:bg-red-50"
+                    className="flex-1 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800"
                     data-testid={`button-delete-${vehicle.id}`}
                   >
                     <Trash2 className="w-4 h-4 mr-2" />

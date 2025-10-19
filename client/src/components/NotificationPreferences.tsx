@@ -97,8 +97,8 @@ export function NotificationPreferences() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-[#222029]">Notification Preferences</h2>
-        <p className="text-[#999999] mt-1">Choose how you want to receive notifications</p>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Notification Preferences</h2>
+        <p className="text-gray-500 dark:text-gray-500 mt-1">Choose how you want to receive notifications</p>
       </div>
 
       <Card>

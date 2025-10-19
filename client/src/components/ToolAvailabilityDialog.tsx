@@ -20,18 +20,18 @@ export function ToolAvailabilityDialog({ open, onOpenChange }: ToolAvailabilityD
 
   const getToolIcon = (toolType: string) => {
     switch (toolType) {
-      case 'diagnostic': return <Zap className="w-5 h-5 text-red-600" />;
-      case 'electrical': return <Zap className="w-5 h-5 text-yellow-600" />;
-      case 'mechanical': return <Wrench className="w-5 h-5 text-blue-600" />;
+      case 'diagnostic': return <Zap className="w-5 h-5 text-gray-800 dark:text-gray-200" />;
+      case 'electrical': return <Zap className="w-5 h-5 text-gray-700 dark:text-gray-300" />;
+      case 'mechanical': return <Wrench className="w-5 h-5 text-gray-600 dark:text-gray-400" />;
       default: return <Wrench className="w-5 h-5 text-gray-600" />;
     }
   };
 
   const getStatusIcon = (isActive: boolean) => {
     if (isActive) {
-      return <CheckCircle className="w-5 h-5 text-green-500" />;
+      return <CheckCircle className="w-5 h-5 text-gray-800 dark:text-gray-200" />;
     }
-    return <XCircle className="w-5 h-5 text-red-500" />;
+    return <XCircle className="w-5 h-5 text-gray-500 dark:text-gray-500" />;
   };
 
   const isLoading = toolsLoading || garagesLoading;
@@ -40,11 +40,11 @@ export function ToolAvailabilityDialog({ open, onOpenChange }: ToolAvailabilityD
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="font-['Poppins',Helvetica] font-semibold text-xl text-[#222029] flex items-center gap-2">
+          <DialogTitle className="font-['Poppins',Helvetica] font-semibold text-xl text-gray-900 dark:text-white flex items-center gap-2">
             <Wrench className="w-6 h-6" />
             Tool Availability Status
           </DialogTitle>
-          <DialogDescription className="font-['Poppins',Helvetica] text-sm text-[#999999]">
+          <DialogDescription className="font-['Poppins',Helvetica] text-sm text-gray-500 dark:text-gray-500">
             Real-time availability of tools across all garages
           </DialogDescription>
         </DialogHeader>
@@ -100,7 +100,7 @@ export function ToolAvailabilityDialog({ open, onOpenChange }: ToolAvailabilityD
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className={`text-sm font-semibold ${tool.isActive ? 'text-green-600' : 'text-red-600'}`}>
+                      <div className={`text-sm font-semibold ${tool.isActive ? 'text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-500'}`}>
                         {tool.isActive ? 'Available' : 'Unavailable'}
                       </div>
                       <div className="text-xs text-gray-500 mt-1">
@@ -114,12 +114,12 @@ export function ToolAvailabilityDialog({ open, onOpenChange }: ToolAvailabilityD
           </div>
         )}
 
-        <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+        <div className="mt-4 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600">
           <div className="flex items-start gap-2">
-            <AlertCircle className="w-5 h-5 text-blue-600 mt-0.5" />
+            <AlertCircle className="w-5 h-5 text-gray-700 dark:text-gray-300 mt-0.5" />
             <div>
-              <p className="text-sm font-medium text-blue-900">Availability Summary</p>
-              <p className="text-sm text-blue-700 mt-1">
+              <p className="text-sm font-medium text-gray-900 dark:text-white">Availability Summary</p>
+              <p className="text-sm text-gray-700 dark:text-gray-300 mt-1">
                 Total Tools: {tools.length} | 
                 Available: {tools.filter(t => t.isActive).length} | 
                 In Use: {tools.filter(t => !t.isActive).length}

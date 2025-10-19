@@ -36,7 +36,7 @@ export function Profile() {
 
   if (isLoading) {
     return (
-      <div className="flex-1 p-8 bg-dark-navy">
+      <div className="flex-1 p-8 bg-white dark:bg-salis-black">
         <div className="animate-pulse space-y-4">
           <div className="h-8 bg-gray-200 rounded w-48"></div>
           <div className="h-64 bg-gray-200 rounded"></div>
@@ -46,99 +46,99 @@ export function Profile() {
   }
 
   return (
-    <div className="flex-1 p-8 bg-dark-navy">
+    <div className="flex-1 p-8 bg-white dark:bg-salis-black">
       <div className="mb-8">
-        <h1 className="font-['Poppins',Helvetica] font-semibold text-2xl text-soft-white">My Profile</h1>
+        <h1 className="font-['Poppins',Helvetica] font-semibold text-2xl text-gray-900 dark:text-white">My Profile</h1>
       </div>
 
       {/* Personal Details */}
-      <Card className="bg-dark-navy border-neon-blue/30 border border-[#e6e6e6] mb-6">
+      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark border border-gray-200 dark:border-salis-gray-dark mb-6">
         <CardContent className="p-6">
-          <h2 className="font-['Poppins',Helvetica] font-semibold text-lg text-soft-white mb-6">Personal Details</h2>
+          <h2 className="font-['Poppins',Helvetica] font-semibold text-lg text-gray-900 dark:text-white mb-6">Personal Details</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div>
-              <Label className="font-['Poppins',Helvetica] font-medium text-sm text-soft-white mb-2 block">
+              <Label className="font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white mb-2 block">
                 Full Name
               </Label>
               <Input
                 defaultValue={user?.fullName || "John Doe"}
                 disabled={!isEditing}
-                className="border-[#e6e6e6]"
+                className="border-gray-200 dark:border-salis-gray-dark"
                 data-testid="input-full-name"
               />
             </div>
 
             <div>
-              <Label className="font-['Poppins',Helvetica] font-medium text-sm text-soft-white mb-2 block">
+              <Label className="font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white mb-2 block">
                 Email
               </Label>
               <Input
                 defaultValue={user?.email || "example@email.com"}
                 disabled={!isEditing}
-                className="border-[#e6e6e6]"
+                className="border-gray-200 dark:border-salis-gray-dark"
                 data-testid="input-email"
               />
             </div>
           </div>
 
           <div className="mb-4">
-            <Label className="font-['Poppins',Helvetica] font-medium text-sm text-soft-white mb-2 block">
+            <Label className="font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white mb-2 block">
               Mobile Number
             </Label>
             <Input
               defaultValue="+971 51 234 5678"
               disabled={!isEditing}
-              className="border-[#e6e6e6]"
+              className="border-gray-200 dark:border-salis-gray-dark"
               data-testid="input-mobile"
             />
           </div>
 
-          <Button variant="ghost" className="text-blue-600 hover:text-blue-700" data-testid="button-add-phone">
+          <Button variant="ghost" className="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100" data-testid="button-add-phone">
             + Add an additional phone number
           </Button>
         </CardContent>
       </Card>
 
       {/* Role and Specialization */}
-      <Card className="bg-dark-navy border-neon-blue/30 border border-[#e6e6e6] mb-6">
+      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark border border-gray-200 dark:border-salis-gray-dark mb-6">
         <CardContent className="p-6">
-          <h2 className="font-['Poppins',Helvetica] font-semibold text-lg text-soft-white mb-6">Role and Specialization</h2>
+          <h2 className="font-['Poppins',Helvetica] font-semibold text-lg text-gray-900 dark:text-white mb-6">Role and Specialization</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div>
-              <Label className="font-['Poppins',Helvetica] font-medium text-sm text-soft-white mb-2 block">
+              <Label className="font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white mb-2 block">
                 Job Title
               </Label>
               <Input
                 defaultValue="Senior Mechanic"
                 disabled={!isEditing}
-                className="border-[#e6e6e6]"
+                className="border-gray-200 dark:border-salis-gray-dark"
                 data-testid="input-job-title"
               />
             </div>
 
             <div>
-              <Label className="font-['Poppins',Helvetica] font-medium text-sm text-soft-white mb-2 block">
+              <Label className="font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white mb-2 block">
                 Specialization
               </Label>
               <Input
                 defaultValue="Engine Repair, Electrical Systems, Diagnostics"
                 disabled={!isEditing}
-                className="border-[#e6e6e6]"
+                className="border-gray-200 dark:border-salis-gray-dark"
                 data-testid="input-specialization"
               />
             </div>
           </div>
 
           <div>
-            <Label className="font-['Poppins',Helvetica] font-medium text-sm text-soft-white mb-2 block">
+            <Label className="font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white mb-2 block">
               Certifications
             </Label>
             <Input
               defaultValue="ASE, EV Technician"
               disabled={!isEditing}
-              className="border-[#e6e6e6]"
+              className="border-gray-200 dark:border-salis-gray-dark"
               data-testid="input-certifications"
             />
           </div>
@@ -146,13 +146,13 @@ export function Profile() {
       </Card>
 
       {/* Availability */}
-      <Card className="bg-dark-navy border-neon-blue/30 border border-[#e6e6e6] mb-6">
+      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark border border-gray-200 dark:border-salis-gray-dark mb-6">
         <CardContent className="p-6">
-          <h2 className="font-['Poppins',Helvetica] font-semibold text-lg text-soft-white mb-6">Availability</h2>
+          <h2 className="font-['Poppins',Helvetica] font-semibold text-lg text-gray-900 dark:text-white mb-6">Availability</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div>
-              <Label className="font-['Poppins',Helvetica] font-medium text-sm text-soft-white mb-2 block">
+              <Label className="font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white mb-2 block">
                 From
               </Label>
               <Select disabled={!isEditing} defaultValue="sunday">
@@ -172,7 +172,7 @@ export function Profile() {
             </div>
 
             <div>
-              <Label className="font-['Poppins',Helvetica] font-medium text-sm text-soft-white mb-2 block">
+              <Label className="font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white mb-2 block">
                 To
               </Label>
               <Select disabled={!isEditing} defaultValue="tuesday">
@@ -194,19 +194,19 @@ export function Profile() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <Label className="font-['Poppins',Helvetica] font-medium text-sm text-soft-white mb-2 block">
+              <Label className="font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white mb-2 block">
                 Work hours
               </Label>
               <Input
                 defaultValue="ASE, EV Technician"
                 disabled={!isEditing}
-                className="border-[#e6e6e6]"
+                className="border-gray-200 dark:border-salis-gray-dark"
                 data-testid="input-work-hours"
               />
             </div>
 
             <div>
-              <Label className="font-['Poppins',Helvetica] font-medium text-sm text-soft-white mb-2 block">
+              <Label className="font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white mb-2 block">
                 Current Status
               </Label>
               <Select disabled={!isEditing} defaultValue="available">
@@ -225,10 +225,10 @@ export function Profile() {
       </Card>
 
       {/* Change Password */}
-      <Card className="bg-dark-navy border-neon-blue/30 border border-[#e6e6e6] mb-6">
+      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark border border-gray-200 dark:border-salis-gray-dark mb-6">
         <CardContent className="p-6">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="font-['Poppins',Helvetica] font-semibold text-lg text-soft-white">Change Password</h2>
+            <h2 className="font-['Poppins',Helvetica] font-semibold text-lg text-gray-900 dark:text-white">Change Password</h2>
             <Button
               variant="outline"
               onClick={() => setIsChangingPassword(!isChangingPassword)}
@@ -241,37 +241,37 @@ export function Profile() {
           {isChangingPassword && (
             <div className="space-y-4">
               <div>
-                <Label className="font-['Poppins',Helvetica] font-medium text-sm text-soft-white mb-2 block">
+                <Label className="font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white mb-2 block">
                   Current Password
                 </Label>
                 <Input
                   type="password"
                   placeholder="Enter Current password"
-                  className="border-[#e6e6e6]"
+                  className="border-gray-200 dark:border-salis-gray-dark"
                   data-testid="input-current-password"
                 />
               </div>
 
               <div>
-                <Label className="font-['Poppins',Helvetica] font-medium text-sm text-soft-white mb-2 block">
+                <Label className="font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white mb-2 block">
                   New Password
                 </Label>
                 <Input
                   type="password"
                   placeholder="********"
-                  className="border-[#e6e6e6]"
+                  className="border-gray-200 dark:border-salis-gray-dark"
                   data-testid="input-new-password"
                 />
               </div>
 
               <div>
-                <Label className="font-['Poppins',Helvetica] font-medium text-sm text-soft-white mb-2 block">
+                <Label className="font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white mb-2 block">
                   Confirm Password
                 </Label>
                 <Input
                   type="password"
                   placeholder="********"
-                  className="border-[#e6e6e6]"
+                  className="border-gray-200 dark:border-salis-gray-dark"
                   data-testid="input-confirm-password"
                 />
               </div>

@@ -17,10 +17,10 @@ export function ServiceTemplatesDialog({ open, onOpenChange }: ServiceTemplatesD
 
   const getCategoryColor = (category: string) => {
     switch (category) {
-      case "maintenance": return "bg-blue-100 text-blue-700";
-      case "repair": return "bg-orange-100 text-orange-700";
-      case "diagnostic": return "bg-purple-100 text-purple-700";
-      default: return "bg-gray-100 text-gray-700";
+      case "maintenance": return "bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200";
+      case "repair": return "bg-gray-300 dark:bg-gray-600 text-gray-900 dark:text-white";
+      case "diagnostic": return "bg-gray-400 dark:bg-gray-500 text-gray-900 dark:text-white";
+      default: return "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300";
     }
   };
 
@@ -28,11 +28,11 @@ export function ServiceTemplatesDialog({ open, onOpenChange }: ServiceTemplatesD
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="font-['Poppins',Helvetica] font-semibold text-xl text-[#222029] flex items-center gap-2">
+          <DialogTitle className="font-['Poppins',Helvetica] font-semibold text-xl text-gray-900 dark:text-white flex items-center gap-2">
             <FileText className="w-6 h-6" />
             Service Templates
           </DialogTitle>
-          <DialogDescription className="font-['Poppins',Helvetica] text-sm text-[#999999]">
+          <DialogDescription className="font-['Poppins',Helvetica] text-sm text-gray-500 dark:text-gray-500">
             Pre-configured service workflows with steps and requirements
           </DialogDescription>
         </DialogHeader>
@@ -63,7 +63,7 @@ export function ServiceTemplatesDialog({ open, onOpenChange }: ServiceTemplatesD
                           {template.category}
                         </Badge>
                         {template.isActive && (
-                          <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                          <Badge variant="outline" className="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 border-gray-300 dark:border-gray-600">
                             Active
                           </Badge>
                         )}
@@ -100,7 +100,7 @@ export function ServiceTemplatesDialog({ open, onOpenChange }: ServiceTemplatesD
                       <ul className="space-y-1">
                         {(template.taskSteps as any[]).slice(0, 3).map((step: any, index: number) => (
                           <li key={index} className="text-sm text-gray-600 flex items-start gap-2">
-                            <span className="text-blue-600 font-medium">{index + 1}.</span>
+                            <span className="text-gray-800 dark:text-gray-200 font-medium">{index + 1}.</span>
                             <span>{typeof step === 'string' ? step : step.description || step.name || 'Step'}</span>
                           </li>
                         ))}
@@ -130,8 +130,8 @@ export function ServiceTemplatesDialog({ open, onOpenChange }: ServiceTemplatesD
           </div>
         )}
 
-        <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
-          <p className="text-sm text-blue-700">
+        <div className="mt-4 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600">
+          <p className="text-sm text-gray-700 dark:text-gray-300">
             <strong>Total Templates:</strong> {templates.length} | 
             <strong className="ml-2">Active:</strong> {templates.filter(t => t.isActive).length}
           </p>

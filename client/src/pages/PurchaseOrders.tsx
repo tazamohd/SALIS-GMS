@@ -118,13 +118,13 @@ export function PurchaseOrders() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'draft': return 'bg-neon-blue/20/30 text-gray-700';
-      case 'sent': return 'bg-blue-100 text-blue-700';
-      case 'confirmed': return 'bg-purple-100 text-purple-700';
-      case 'partial': return 'bg-yellow-100 text-yellow-700';
-      case 'received': return 'bg-green-100 text-green-700';
-      case 'cancelled': return 'bg-red-100 text-red-700';
-      default: return 'bg-neon-blue/20/30 text-gray-700';
+      case 'draft': return 'bg-gray-100 dark:bg-salis-gray-dark text-gray-700 dark:text-gray-300';
+      case 'sent': return 'bg-gray-200 text-gray-700';
+      case 'confirmed': return 'bg-gray-300 text-gray-800';
+      case 'partial': return 'bg-gray-400 text-gray-900';
+      case 'received': return 'bg-gray-500 text-white';
+      case 'cancelled': return 'bg-gray-300 text-gray-700';
+      default: return 'bg-gray-100 dark:bg-salis-gray-dark text-gray-700 dark:text-gray-300';
     }
   };
 
@@ -146,10 +146,10 @@ export function PurchaseOrders() {
     <div className="p-8">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="font-['Poppins',Helvetica] font-bold text-3xl text-soft-white">
+          <h1 className="font-['Poppins',Helvetica] font-bold text-3xl text-gray-900 dark:text-white">
             Purchase Orders
           </h1>
-          <p className="font-['Poppins',Helvetica] font-normal text-sm text-soft-white/60 mt-1">
+          <p className="font-['Poppins',Helvetica] font-normal text-sm text-gray-900 dark:text-white/60 mt-1">
             Manage purchase orders and track supplier deliveries
           </p>
         </div>
@@ -160,7 +160,7 @@ export function PurchaseOrders() {
       </div>
 
       {/* Filters */}
-      <Card className="bg-dark-navy border-neon-blue/30 mb-6">
+      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark mb-6">
         <CardContent className="pt-6">
           <div className="flex gap-4">
             <div className="w-[250px]">
@@ -205,53 +205,53 @@ export function PurchaseOrders() {
       {/* Summary Cards */}
       {!isLoading && purchaseOrders && purchaseOrders.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <Card className="bg-dark-navy border-neon-blue/30 bg-dark-navy border-neon-blue/30">
+          <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-soft-white/60">Total Orders</p>
+                  <p className="text-sm text-gray-900 dark:text-white/60">Total Orders</p>
                   <p className="text-2xl font-bold text-gray-900">{purchaseOrders.length}</p>
                 </div>
-                <ShoppingCart className="w-8 h-8 text-blue-600" />
+                <ShoppingCart className="w-8 h-8 text-gray-700" />
               </div>
             </CardContent>
           </Card>
-          <Card className="bg-dark-navy border-neon-blue/30 bg-dark-navy border-neon-blue/30">
+          <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-soft-white/60">Pending</p>
-                  <p className="text-2xl font-bold text-yellow-600">
+                  <p className="text-sm text-gray-900 dark:text-white/60">Pending</p>
+                  <p className="text-2xl font-bold text-gray-700">
                     {purchaseOrders.filter(po => ['draft', 'sent'].includes(po.status)).length}
                   </p>
                 </div>
-                <PackageIcon className="w-8 h-8 text-yellow-600" />
+                <PackageIcon className="w-8 h-8 text-gray-700" />
               </div>
             </CardContent>
           </Card>
-          <Card className="bg-dark-navy border-neon-blue/30 bg-dark-navy border-neon-blue/30">
+          <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-soft-white/60">Confirmed</p>
-                  <p className="text-2xl font-bold text-purple-600">
+                  <p className="text-sm text-gray-900 dark:text-white/60">Confirmed</p>
+                  <p className="text-2xl font-bold text-gray-800">
                     {purchaseOrders.filter(po => po.status === 'confirmed').length}
                   </p>
                 </div>
-                <CheckCircle className="w-8 h-8 text-purple-600" />
+                <CheckCircle className="w-8 h-8 text-gray-800" />
               </div>
             </CardContent>
           </Card>
-          <Card className="bg-dark-navy border-neon-blue/30 bg-dark-navy border-neon-blue/30">
+          <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-soft-white/60">Total Value</p>
-                  <p className="text-2xl font-bold text-green-600">
+                  <p className="text-sm text-gray-900 dark:text-white/60">Total Value</p>
+                  <p className="text-2xl font-bold text-gray-900">
                     ${purchaseOrders.reduce((sum, po) => sum + parseFloat(po.totalAmount), 0).toFixed(2)}
                   </p>
                 </div>
-                <Building2 className="w-8 h-8 text-green-600" />
+                <Building2 className="w-8 h-8 text-gray-900" />
               </div>
             </CardContent>
           </Card>
@@ -259,7 +259,7 @@ export function PurchaseOrders() {
       )}
 
       {/* Purchase Orders List */}
-      <Card className="bg-dark-navy border-neon-blue/30 bg-dark-navy border-neon-blue/30">
+      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
         <CardContent className="p-6">
           {isLoading ? (
             <div className="space-y-4">
@@ -275,7 +275,7 @@ export function PurchaseOrders() {
               <h3 className="font-['Poppins',Helvetica] font-semibold text-lg text-gray-600 mb-2">
                 No Purchase Orders
               </h3>
-              <p className="text-sm text-soft-white/50 mb-4">
+              <p className="text-sm text-gray-900 dark:text-white/50 mb-4">
                 Create your first purchase order to start managing inventory
               </p>
               <CreatePurchaseOrderDialog />
@@ -284,35 +284,35 @@ export function PurchaseOrders() {
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-neon-blue/30">
-                    <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-semibold text-sm text-soft-white">
+                  <tr className="border-b border-gray-200 dark:border-salis-gray-dark">
+                    <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-semibold text-sm text-gray-900 dark:text-white">
                       PO Number
                     </th>
-                    <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-semibold text-sm text-soft-white">
+                    <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-semibold text-sm text-gray-900 dark:text-white">
                       Supplier
                     </th>
-                    <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-semibold text-sm text-soft-white">
+                    <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-semibold text-sm text-gray-900 dark:text-white">
                       Order Date
                     </th>
-                    <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-semibold text-sm text-soft-white">
+                    <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-semibold text-sm text-gray-900 dark:text-white">
                       Expected Delivery
                     </th>
-                    <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-semibold text-sm text-soft-white">
+                    <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-semibold text-sm text-gray-900 dark:text-white">
                       Total Amount
                     </th>
-                    <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-semibold text-sm text-soft-white">
+                    <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-semibold text-sm text-gray-900 dark:text-white">
                       Status
                     </th>
-                    <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-semibold text-sm text-soft-white">
+                    <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-semibold text-sm text-gray-900 dark:text-white">
                       Actions
                     </th>
                   </tr>
                 </thead>
                 <tbody>
                   {purchaseOrders?.map((po) => (
-                    <tr key={po.id} className="border-b border-gray-100 hover:bg-neon-blue/20/20" data-testid={`po-row-${po.id}`}>
+                    <tr key={po.id} className="border-b border-gray-100 hover:bg-gray-100 dark:hover:bg-salis-gray-dark" data-testid={`po-row-${po.id}`}>
                       <td className="py-3 px-4">
-                        <span className="font-['Poppins',Helvetica] font-medium text-sm text-soft-white">
+                        <span className="font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white">
                           {po.poNumber}
                         </span>
                       </td>
@@ -332,7 +332,7 @@ export function PurchaseOrders() {
                         </span>
                       </td>
                       <td className="py-3 px-4">
-                        <span className="font-['Poppins',Helvetica] font-semibold text-sm text-soft-white">
+                        <span className="font-['Poppins',Helvetica] font-semibold text-sm text-gray-900 dark:text-white">
                           ${parseFloat(po.totalAmount).toFixed(2)}
                         </span>
                       </td>
@@ -410,7 +410,7 @@ export function PurchaseOrders() {
                               {po.status === 'draft' && (
                                 <DropdownMenuItem 
                                   onClick={() => handleDelete(po)}
-                                  className="text-red-600"
+                                  className="text-gray-800 dark:text-gray-200"
                                 >
                                   <Trash2 className="w-4 h-4 mr-2" />
                                   Delete
@@ -442,7 +442,7 @@ export function PurchaseOrders() {
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => poToDelete && deleteMutation.mutate(poToDelete.id)}
-              className="bg-red-600 hover:bg-red-700"
+              className="bg-salis-black hover:bg-gray-800 dark:bg-white dark:hover:bg-gray-200"
             >
               {deleteMutation.isPending ? "Deleting..." : "Delete"}
             </AlertDialogAction>

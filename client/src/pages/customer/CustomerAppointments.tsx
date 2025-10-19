@@ -31,17 +31,17 @@ export function CustomerAppointments() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'confirmed':
-        return 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300';
+        return 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200';
       case 'scheduled':
-        return 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300';
+        return 'bg-gray-100 dark:bg-salis-gray-dark text-gray-900 dark:text-white';
       case 'in_progress':
-        return 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300';
+        return 'bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300';
       case 'completed':
-        return 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300';
+        return 'bg-gray-100 text-gray-700 dark:bg-salis-gray-dark dark:text-gray-300';
       case 'cancelled':
-        return 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300';
+        return 'bg-salis-black dark:bg-white text-white dark:text-salis-black';
       default:
-        return 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300';
+        return 'bg-gray-100 text-gray-700 dark:bg-salis-gray-dark dark:text-gray-300';
     }
   };
 

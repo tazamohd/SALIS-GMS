@@ -236,11 +236,11 @@ export default function FinancialSettings() {
   };
 
   return (
-    <div className="p-8 bg-gray-800 min-h-screen space-y-6">
+    <div className="p-8 bg-gray-50 dark:bg-salis-black min-h-screen space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-['Poppins',Helvetica] font-bold text-3xl text-soft-white" data-testid="text-page-title">Financial Settings</h1>
-          <p className="text-soft-white/60" data-testid="text-page-description">
+          <h1 className="font-['Poppins',Helvetica] font-bold text-3xl text-gray-900 dark:text-white" data-testid="text-page-title">Financial Settings</h1>
+          <p className="text-gray-900 dark:text-white/60" data-testid="text-page-description">
             Manage tax configurations, discounts, and promotions
           </p>
         </div>
@@ -265,11 +265,11 @@ export default function FinancialSettings() {
         </TabsList>
 
         <TabsContent value="taxes" className="space-y-4">
-          <Card className="bg-dark-navy border-neon-blue/30 bg-dark-navy border-neon-blue/30">
+          <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
-                <CardTitle className="text-soft-white">Tax Configurations</CardTitle>
-                <CardDescription className="text-soft-white/60">Configure automatic tax calculations for your garage</CardDescription>
+                <CardTitle className="text-gray-900 dark:text-white">Tax Configurations</CardTitle>
+                <CardDescription className="text-gray-900 dark:text-white/60">Configure automatic tax calculations for your garage</CardDescription>
               </div>
               <Dialog open={taxDialogOpen} onOpenChange={setTaxDialogOpen}>
                 <DialogTrigger asChild>
@@ -352,20 +352,20 @@ export default function FinancialSettings() {
             </CardHeader>
             <CardContent>
               {taxLoading ? (
-                <div className="text-center py-8 text-soft-white/60">Loading...</div>
+                <div className="text-center py-8 text-gray-900 dark:text-white/60">Loading...</div>
               ) : taxConfigs.length === 0 ? (
-                <div className="text-center py-8 text-soft-white/60" data-testid="text-no-taxes">
+                <div className="text-center py-8 text-gray-900 dark:text-white/60" data-testid="text-no-taxes">
                   No tax configurations found. Add one to get started.
                 </div>
               ) : (
                 <Table>
-                  <TableHeader className="bg-neon-blue/20/30">
-                    <TableRow className="border-b border-neon-blue/30/50 hover:bg-neon-blue/20/20">
-                      <TableHead className="text-soft-white">Tax Name</TableHead>
-                      <TableHead className="text-soft-white">Rate</TableHead>
-                      <TableHead className="text-soft-white">Category</TableHead>
-                      <TableHead className="text-soft-white">Status</TableHead>
-                      <TableHead className="text-soft-white">Actions</TableHead>
+                  <TableHeader className="bg-gray-100 dark:bg-salis-gray-dark">
+                    <TableRow className="border-b border-gray-200 dark:border-salis-gray-dark hover:bg-gray-100 dark:hover:bg-salis-gray-dark">
+                      <TableHead className="text-gray-900 dark:text-white">Tax Name</TableHead>
+                      <TableHead className="text-gray-900 dark:text-white">Rate</TableHead>
+                      <TableHead className="text-gray-900 dark:text-white">Category</TableHead>
+                      <TableHead className="text-gray-900 dark:text-white">Status</TableHead>
+                      <TableHead className="text-gray-900 dark:text-white">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -374,12 +374,12 @@ export default function FinancialSettings() {
                         <TableCell className="font-medium" data-testid={`text-tax-name-${tax.id}`}>{tax.taxName}</TableCell>
                         <TableCell data-testid={`text-tax-rate-${tax.id}`}>{tax.taxRate}%</TableCell>
                         <TableCell data-testid={`text-tax-category-${tax.id}`}>{tax.category || "All"}</TableCell>
-                        <TableCell className="text-soft-white">
+                        <TableCell className="text-gray-900 dark:text-white">
                           <Badge variant={tax.isActive ? "default" : "secondary"} data-testid={`badge-tax-status-${tax.id}`}>
                             {tax.isActive ? "Active" : "Inactive"}
                           </Badge>
                         </TableCell>
-                        <TableCell className="text-soft-white">
+                        <TableCell className="text-gray-900 dark:text-white">
                           <div className="flex gap-2">
                             <Button variant="ghost" size="sm" onClick={() => handleEditTax(tax)} data-testid={`button-edit-tax-${tax.id}`}>
                               <Edit className="h-4 w-4" />
@@ -399,11 +399,11 @@ export default function FinancialSettings() {
         </TabsContent>
 
         <TabsContent value="discounts" className="space-y-4">
-          <Card className="bg-dark-navy border-neon-blue/30 bg-dark-navy border-neon-blue/30">
+          <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
-                <CardTitle className="text-soft-white">Discounts & Promotions</CardTitle>
-                <CardDescription className="text-soft-white/60">Create and manage discount codes and promotional campaigns</CardDescription>
+                <CardTitle className="text-gray-900 dark:text-white">Discounts & Promotions</CardTitle>
+                <CardDescription className="text-gray-900 dark:text-white/60">Create and manage discount codes and promotional campaigns</CardDescription>
               </div>
               <Dialog open={discountDialogOpen} onOpenChange={setDiscountDialogOpen}>
                 <DialogTrigger asChild>
@@ -516,7 +516,7 @@ export default function FinancialSettings() {
                               <Popover>
                                 <PopoverTrigger asChild>
                                   <FormControl>
-                                    <Button variant="outline" className={cn("pl-3 text-left font-normal", !field.value && "text-soft-white/60")} data-testid="button-discount-valid-from">
+                                    <Button variant="outline" className={cn("pl-3 text-left font-normal", !field.value && "text-gray-900 dark:text-white/60")} data-testid="button-discount-valid-from">
                                       {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
                                       <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                                     </Button>
@@ -539,7 +539,7 @@ export default function FinancialSettings() {
                               <Popover>
                                 <PopoverTrigger asChild>
                                   <FormControl>
-                                    <Button variant="outline" className={cn("pl-3 text-left font-normal", !field.value && "text-soft-white/60")} data-testid="button-discount-valid-to">
+                                    <Button variant="outline" className={cn("pl-3 text-left font-normal", !field.value && "text-gray-900 dark:text-white/60")} data-testid="button-discount-valid-to">
                                       {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
                                       <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                                     </Button>
@@ -639,22 +639,22 @@ export default function FinancialSettings() {
             </CardHeader>
             <CardContent>
               {discountsLoading ? (
-                <div className="text-center py-8 text-soft-white/60">Loading...</div>
+                <div className="text-center py-8 text-gray-900 dark:text-white/60">Loading...</div>
               ) : discounts.length === 0 ? (
-                <div className="text-center py-8 text-soft-white/60" data-testid="text-no-discounts">
+                <div className="text-center py-8 text-gray-900 dark:text-white/60" data-testid="text-no-discounts">
                   No discounts found. Create one to get started.
                 </div>
               ) : (
                 <Table>
-                  <TableHeader className="bg-neon-blue/20/30">
-                    <TableRow className="border-b border-neon-blue/30/50 hover:bg-neon-blue/20/20">
-                      <TableHead className="text-soft-white">Code</TableHead>
-                      <TableHead className="text-soft-white">Name</TableHead>
-                      <TableHead className="text-soft-white">Type</TableHead>
-                      <TableHead className="text-soft-white">Value</TableHead>
-                      <TableHead className="text-soft-white">Valid Period</TableHead>
-                      <TableHead className="text-soft-white">Status</TableHead>
-                      <TableHead className="text-soft-white">Actions</TableHead>
+                  <TableHeader className="bg-gray-100 dark:bg-salis-gray-dark">
+                    <TableRow className="border-b border-gray-200 dark:border-salis-gray-dark hover:bg-gray-100 dark:hover:bg-salis-gray-dark">
+                      <TableHead className="text-gray-900 dark:text-white">Code</TableHead>
+                      <TableHead className="text-gray-900 dark:text-white">Name</TableHead>
+                      <TableHead className="text-gray-900 dark:text-white">Type</TableHead>
+                      <TableHead className="text-gray-900 dark:text-white">Value</TableHead>
+                      <TableHead className="text-gray-900 dark:text-white">Valid Period</TableHead>
+                      <TableHead className="text-gray-900 dark:text-white">Status</TableHead>
+                      <TableHead className="text-gray-900 dark:text-white">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -664,7 +664,7 @@ export default function FinancialSettings() {
                           {discount.code}
                         </TableCell>
                         <TableCell data-testid={`text-discount-name-${discount.id}`}>{discount.name}</TableCell>
-                        <TableCell className="text-soft-white">
+                        <TableCell className="text-gray-900 dark:text-white">
                           <Badge variant="outline" data-testid={`badge-discount-type-${discount.id}`}>
                             {discount.discountType === "percentage" ? <Percent className="h-3 w-3 mr-1" /> : <DollarSign className="h-3 w-3 mr-1" />}
                             {discount.discountType}
@@ -676,12 +676,12 @@ export default function FinancialSettings() {
                         <TableCell className="text-sm" data-testid={`text-discount-period-${discount.id}`}>
                           {format(new Date(discount.validFrom), "MMM dd")} - {format(new Date(discount.validTo), "MMM dd, yyyy")}
                         </TableCell>
-                        <TableCell className="text-soft-white">
+                        <TableCell className="text-gray-900 dark:text-white">
                           <Badge variant={discount.isActive ? "default" : "secondary"} data-testid={`badge-discount-status-${discount.id}`}>
                             {discount.isActive ? "Active" : "Inactive"}
                           </Badge>
                         </TableCell>
-                        <TableCell className="text-soft-white">
+                        <TableCell className="text-gray-900 dark:text-white">
                           <div className="flex gap-2">
                             <Button variant="ghost" size="sm" onClick={() => handleEditDiscount(discount)} data-testid={`button-edit-discount-${discount.id}`}>
                               <Edit className="h-4 w-4" />

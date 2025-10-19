@@ -63,22 +63,22 @@ export function TechnicianPortal() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'pending': return 'bg-yellow-100 text-yellow-800';
-      case 'assigned': return 'bg-blue-100 text-blue-800';
-      case 'in_progress': return 'bg-purple-100 text-purple-800';
-      case 'completed': return 'bg-green-100 text-green-800';
-      case 'cancelled': return 'bg-red-100 text-red-800';
-      default: return 'bg-neon-blue/20/30 text-gray-800';
+      case 'pending': return 'bg-gray-200 text-gray-700';
+      case 'assigned': return 'bg-gray-300 text-gray-800';
+      case 'in_progress': return 'bg-gray-400 text-gray-900';
+      case 'completed': return 'bg-gray-500 text-white';
+      case 'cancelled': return 'bg-gray-300 text-gray-700';
+      default: return 'bg-gray-100 dark:bg-salis-gray-dark text-gray-800 dark:text-gray-200';
     }
   };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'urgent': return 'bg-red-100 text-red-800';
-      case 'high': return 'bg-orange-100 text-orange-800';
-      case 'medium': return 'bg-yellow-100 text-yellow-800';
-      case 'low': return 'bg-green-100 text-green-800';
-      default: return 'bg-neon-blue/20/30 text-gray-800';
+      case 'urgent': return 'bg-gray-500 text-white';
+      case 'high': return 'bg-gray-400 text-gray-900';
+      case 'medium': return 'bg-gray-300 text-gray-800';
+      case 'low': return 'bg-gray-200 text-gray-700';
+      default: return 'bg-gray-100 dark:bg-salis-gray-dark text-gray-800 dark:text-gray-200';
     }
   };
 
@@ -119,7 +119,7 @@ export function TechnicianPortal() {
 
       {/* Profile Card */}
       {technicianProfile && (
-        <Card className="bg-dark-navy border-neon-blue/30 mb-8" data-testid="card-profile">
+        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark mb-8" data-testid="card-profile">
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
@@ -142,7 +142,7 @@ export function TechnicianPortal() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {technicianProfile.speciality && (
                 <div className="flex items-start gap-3" data-testid="text-speciality">
-                  <Briefcase className="h-5 w-5 mt-0.5 text-blue-600" />
+                  <Briefcase className="h-5 w-5 mt-0.5 text-gray-700" />
                   <div>
                     <div className="font-medium text-sm text-gray-700">Speciality</div>
                     <div className="text-sm text-gray-900">{technicianProfile.speciality}</div>
@@ -152,7 +152,7 @@ export function TechnicianPortal() {
 
               {technicianProfile.yearsOfExperience !== undefined && (
                 <div className="flex items-start gap-3" data-testid="text-experience">
-                  <Clock className="h-5 w-5 mt-0.5 text-blue-600" />
+                  <Clock className="h-5 w-5 mt-0.5 text-gray-700" />
                   <div>
                     <div className="font-medium text-sm text-gray-700">Experience</div>
                     <div className="text-sm text-gray-900">{technicianProfile.yearsOfExperience} years</div>
@@ -162,7 +162,7 @@ export function TechnicianPortal() {
 
               {technicianProfile.maxConcurrentJobs !== undefined && (
                 <div className="flex items-start gap-3" data-testid="text-capacity">
-                  <Wrench className="h-5 w-5 mt-0.5 text-blue-600" />
+                  <Wrench className="h-5 w-5 mt-0.5 text-gray-700" />
                   <div>
                     <div className="font-medium text-sm text-gray-700">Job Capacity</div>
                     <div className="text-sm text-gray-900">Up to {technicianProfile.maxConcurrentJobs} jobs</div>
@@ -175,7 +175,7 @@ export function TechnicianPortal() {
               <div className="mt-6 pt-6 border-t grid grid-cols-1 md:grid-cols-3 gap-6">
                 {technicianProfile.qualifications && (
                   <div className="flex items-start gap-3" data-testid="text-qualifications">
-                    <GraduationCap className="h-5 w-5 mt-0.5 text-green-600" />
+                    <GraduationCap className="h-5 w-5 mt-0.5 text-gray-700" />
                     <div>
                       <div className="font-medium text-sm text-gray-700">Qualifications</div>
                       <div className="text-sm text-gray-600">{technicianProfile.qualifications}</div>
@@ -185,7 +185,7 @@ export function TechnicianPortal() {
 
                 {technicianProfile.certifications && (
                   <div className="flex items-start gap-3" data-testid="text-certifications">
-                    <Award className="h-5 w-5 mt-0.5 text-yellow-600" />
+                    <Award className="h-5 w-5 mt-0.5 text-gray-700" />
                     <div>
                       <div className="font-medium text-sm text-gray-700">Certifications</div>
                       <div className="text-sm text-gray-600">{technicianProfile.certifications}</div>
@@ -195,7 +195,7 @@ export function TechnicianPortal() {
 
                 {technicianProfile.skills && (
                   <div className="flex items-start gap-3" data-testid="text-skills">
-                    <Wrench className="h-5 w-5 mt-0.5 text-purple-600" />
+                    <Wrench className="h-5 w-5 mt-0.5 text-gray-700" />
                     <div>
                       <div className="font-medium text-sm text-gray-700">Skills</div>
                       <div className="text-sm text-gray-600">{technicianProfile.skills}</div>
@@ -213,44 +213,44 @@ export function TechnicianPortal() {
         <Card data-testid="stat-total-jobs">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Jobs</CardTitle>
-            <Wrench className="h-4 w-4 text-soft-white/60" />
+            <Wrench className="h-4 w-4 text-gray-600 dark:text-gray-400" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.total}</div>
-            <p className="text-xs text-soft-white/60">All assigned work</p>
+            <p className="text-xs text-gray-600 dark:text-gray-400">All assigned work</p>
           </CardContent>
         </Card>
 
         <Card data-testid="stat-pending-jobs">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Pending</CardTitle>
-            <Clock className="h-4 w-4 text-yellow-600" />
+            <Clock className="h-4 w-4 text-gray-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.pending}</div>
-            <p className="text-xs text-soft-white/60">Waiting to start</p>
+            <p className="text-xs text-gray-600 dark:text-gray-400">Waiting to start</p>
           </CardContent>
         </Card>
 
         <Card data-testid="stat-in-progress-jobs">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">In Progress</CardTitle>
-            <AlertCircle className="h-4 w-4 text-purple-600" />
+            <AlertCircle className="h-4 w-4 text-gray-700" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.inProgress}</div>
-            <p className="text-xs text-soft-white/60">Currently working</p>
+            <p className="text-xs text-gray-600 dark:text-gray-400">Currently working</p>
           </CardContent>
         </Card>
 
         <Card data-testid="stat-completed-jobs">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Completed</CardTitle>
-            <CheckCircle className="h-4 w-4 text-green-600" />
+            <CheckCircle className="h-4 w-4 text-gray-800" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.completed}</div>
-            <p className="text-xs text-soft-white/60">Finished jobs</p>
+            <p className="text-xs text-gray-600 dark:text-gray-400">Finished jobs</p>
           </CardContent>
         </Card>
       </div>
@@ -260,9 +260,9 @@ export function TechnicianPortal() {
         <h2 className="text-xl font-semibold text-gray-900">My Assigned Jobs</h2>
         
         {!jobCards || jobCards.length === 0 ? (
-          <Card className="bg-dark-navy border-neon-blue/30 bg-dark-navy border-neon-blue/30">
+          <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
             <CardContent className="flex flex-col items-center justify-center py-12">
-              <Wrench className="h-12 w-12 text-soft-white/50 mb-4" />
+              <Wrench className="h-12 w-12 text-gray-500 dark:text-gray-500 mb-4" />
               <h3 className="text-lg font-semibold text-gray-900 mb-2">No Jobs Assigned</h3>
               <p className="text-gray-600 text-center">
                 You don't have any jobs assigned to you at the moment.
@@ -277,7 +277,7 @@ export function TechnicianPortal() {
                   <div className="flex items-start justify-between">
                     <div className="space-y-1">
                       <CardTitle className="text-lg">{job.jobNumber}</CardTitle>
-                      <CardDescription className="text-soft-white/60">{job.description}</CardDescription>
+                      <CardDescription className="text-gray-600 dark:text-gray-400">{job.description}</CardDescription>
                     </div>
                     <div className="flex gap-2">
                       <Badge className={getPriorityColor(job.priority)} data-testid={`badge-priority-${job.id}`}>
@@ -293,7 +293,7 @@ export function TechnicianPortal() {
                   <div className="space-y-4">
                     {/* Vehicle Info */}
                     <div className="flex items-center gap-2 text-sm">
-                      <UserIcon className="h-4 w-4 text-soft-white/60" />
+                      <UserIcon className="h-4 w-4 text-gray-600 dark:text-gray-400" />
                       <span className="font-medium">Vehicle:</span>
                       <span className="text-gray-600">
                         {(job.vehicleInfo as any)?.year} {(job.vehicleInfo as any)?.make} {(job.vehicleInfo as any)?.model} - {(job.vehicleInfo as any)?.licensePlate}
@@ -302,20 +302,20 @@ export function TechnicianPortal() {
 
                     {/* Service Type */}
                     <div className="flex items-center gap-2 text-sm">
-                      <Wrench className="h-4 w-4 text-soft-white/60" />
+                      <Wrench className="h-4 w-4 text-gray-600 dark:text-gray-400" />
                       <span className="font-medium">Service:</span>
                       <span className="text-gray-600 capitalize">{job.serviceType.replace('_', ' ')}</span>
                     </div>
 
                     {/* Time Info */}
                     <div className="flex items-center gap-2 text-sm">
-                      <Clock className="h-4 w-4 text-soft-white/60" />
+                      <Clock className="h-4 w-4 text-gray-600 dark:text-gray-400" />
                       <span className="font-medium">Est. Time:</span>
                       <span className="text-gray-600">{job.estimatedHours} hours</span>
                       {job.scheduledDate && (
                         <>
                           <span className="mx-2">•</span>
-                          <Calendar className="h-4 w-4 text-soft-white/60" />
+                          <Calendar className="h-4 w-4 text-gray-600 dark:text-gray-400" />
                           <span className="font-medium">Scheduled:</span>
                           <span className="text-gray-600">
                             {new Date(job.scheduledDate).toLocaleDateString()}

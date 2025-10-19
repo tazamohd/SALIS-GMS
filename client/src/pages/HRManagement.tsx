@@ -577,7 +577,7 @@ function ReviewsTab({ garageId }: { garageId: string }) {
                 </CardHeader>
                 <CardContent className="space-y-2">
                   <div className="flex items-center gap-2">
-                    <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
+                    <Star className="h-5 w-5 fill-gray-700 dark:fill-gray-300 text-gray-700 dark:text-gray-300" />
                     <span className="text-2xl font-bold">{review.overallRating}</span>
                     <span className="text-muted-foreground">/5.00</span>
                   </div>

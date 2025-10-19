@@ -42,13 +42,13 @@ export function Invoices() {
 
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
-      draft: "bg-neon-blue/20/30 text-gray-800",
-      sent: "bg-blue-100 text-blue-800",
-      paid: "bg-green-100 text-green-800",
-      overdue: "bg-red-100 text-red-800",
-      cancelled: "bg-neon-blue/20/30 text-gray-600",
+      draft: "bg-gray-100 dark:bg-salis-gray-dark text-gray-800 dark:text-gray-300",
+      sent: "bg-gray-100 dark:bg-salis-gray-dark text-gray-900 dark:text-white",
+      paid: "bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200",
+      overdue: "bg-salis-black dark:bg-white text-white dark:text-salis-black",
+      cancelled: "bg-gray-100 dark:bg-salis-gray-dark text-gray-600 dark:text-gray-400",
     };
-    return colors[status] || "bg-neon-blue/20/30 text-gray-800";
+    return colors[status] || "bg-gray-100 dark:bg-salis-gray-dark text-gray-800 dark:text-gray-300";
   };
 
   return (
@@ -56,10 +56,10 @@ export function Invoices() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="font-['Poppins',Helvetica] font-bold text-3xl text-soft-white">
+          <h1 className="font-['Poppins',Helvetica] font-bold text-3xl text-gray-900 dark:text-white">
             Invoices & Billing
           </h1>
-          <p className="font-['Poppins',Helvetica] font-normal text-sm text-soft-white/60 mt-1">
+          <p className="font-['Poppins',Helvetica] font-normal text-sm text-gray-900 dark:text-white/60 mt-1">
             Manage invoices and payments
           </p>
         </div>
@@ -71,7 +71,7 @@ export function Invoices() {
       {/* Filters */}
       <div className="flex gap-4 mb-6">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-soft-white/50" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-900 dark:text-white/50" />
           <Input
             placeholder="Search invoices..."
             className="pl-10"
@@ -108,12 +108,12 @@ export function Invoices() {
       </div>
 
       {/* Invoices List */}
-      <Card className="bg-dark-navy border-neon-blue/30 bg-dark-navy border-neon-blue/30">
+      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
         <CardContent className="p-6">
           {isLoading ? (
             <div className="text-center py-12">
-              <div className="animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-4"></div>
-              <p className="text-soft-white/60">Loading invoices...</p>
+              <div className="animate-spin w-8 h-8 border-4 border-gray-900 dark:border-white border-t-transparent rounded-full mx-auto mb-4"></div>
+              <p className="text-gray-900 dark:text-white/60">Loading invoices...</p>
             </div>
           ) : (invoices ?? []).length === 0 ? (
             <div className="text-center py-12">
@@ -121,10 +121,10 @@ export function Invoices() {
               <h3 className="font-['Poppins',Helvetica] font-semibold text-lg text-gray-600 mb-2">
                 No Invoices
               </h3>
-              <p className="text-sm text-soft-white/50 mb-4">
+              <p className="text-sm text-gray-900 dark:text-white/50 mb-4">
                 Create your first invoice to start billing customers
               </p>
-              <Button className="bg-blue-600 hover:bg-blue-700">
+              <Button className="bg-gray-900 dark:bg-white hover:bg-salis-black dark:hover:bg-gray-200 text-white dark:text-salis-black">
                 <Plus className="w-4 h-4 mr-2" />
                 Create Invoice
               </Button>
@@ -133,38 +133,38 @@ export function Invoices() {
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-neon-blue/30">
-                    <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-semibold text-sm text-soft-white">
+                  <tr className="border-b border-gray-200 dark:border-gray-700">
+                    <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-semibold text-sm text-gray-900 dark:text-white">
                       Invoice #
                     </th>
-                    <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-semibold text-sm text-soft-white">
+                    <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-semibold text-sm text-gray-900 dark:text-white">
                       Customer
                     </th>
-                    <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-semibold text-sm text-soft-white">
+                    <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-semibold text-sm text-gray-900 dark:text-white">
                       Invoice Date
                     </th>
-                    <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-semibold text-sm text-soft-white">
+                    <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-semibold text-sm text-gray-900 dark:text-white">
                       Due Date
                     </th>
-                    <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-semibold text-sm text-soft-white">
+                    <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-semibold text-sm text-gray-900 dark:text-white">
                       Total Amount
                     </th>
-                    <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-semibold text-sm text-soft-white">
+                    <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-semibold text-sm text-gray-900 dark:text-white">
                       Balance
                     </th>
-                    <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-semibold text-sm text-soft-white">
+                    <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-semibold text-sm text-gray-900 dark:text-white">
                       Status
                     </th>
-                    <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-semibold text-sm text-soft-white">
+                    <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-semibold text-sm text-gray-900 dark:text-white">
                       Actions
                     </th>
                   </tr>
                 </thead>
                 <tbody>
                   {invoices?.map((invoice) => (
-                    <tr key={invoice.id} className="border-b border-gray-100 hover:bg-neon-blue/20/20" data-testid={`invoice-row-${invoice.id}`}>
+                    <tr key={invoice.id} className="border-b border-gray-100 hover:bg-gray-50 dark:hover:bg-salis-gray-dark" data-testid={`invoice-row-${invoice.id}`}>
                       <td className="py-3 px-4">
-                        <span className="font-['Poppins',Helvetica] font-medium text-sm text-soft-white">
+                        <span className="font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white">
                           {invoice.invoiceNumber}
                         </span>
                       </td>
@@ -186,12 +186,12 @@ export function Invoices() {
                         </span>
                       </td>
                       <td className="py-3 px-4">
-                        <span className="font-['Poppins',Helvetica] font-semibold text-sm text-soft-white">
+                        <span className="font-['Poppins',Helvetica] font-semibold text-sm text-gray-900 dark:text-white">
                           ${parseFloat(invoice.totalAmount).toFixed(2)}
                         </span>
                       </td>
                       <td className="py-3 px-4">
-                        <span className="font-['Poppins',Helvetica] font-semibold text-sm text-soft-white">
+                        <span className="font-['Poppins',Helvetica] font-semibold text-sm text-gray-900 dark:text-white">
                           ${parseFloat(invoice.balanceAmount).toFixed(2)}
                         </span>
                       </td>

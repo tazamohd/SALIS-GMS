@@ -125,8 +125,8 @@ export function CustomerDashboard() {
               {upcomingAppointments.map(apt => (
                 <div key={apt.id} className="flex items-center justify-between p-4 border rounded-lg" data-testid={`card-appointment-${apt.id}`}>
                   <div className="flex items-center gap-4">
-                    <div className="bg-blue-100 dark:bg-blue-900 p-3 rounded-lg">
-                      <Calendar className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                    <div className="bg-gray-100 dark:bg-salis-gray-dark p-3 rounded-lg">
+                      <Calendar className="h-5 w-5 text-gray-900 dark:text-white" />
                     </div>
                     <div>
                       <p className="font-medium" data-testid={`text-appointment-service-${apt.id}`}>{apt.serviceType}</p>
@@ -137,8 +137,8 @@ export function CustomerDashboard() {
                   </div>
                   <span className={`px-3 py-1 rounded-full text-xs font-medium ${
                     apt.status === 'confirmed' 
-                      ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300'
-                      : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300'
+                      ? 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200'
+                      : 'bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300'
                   }`} data-testid={`status-appointment-${apt.id}`}>
                     {apt.status}
                   </span>
@@ -156,7 +156,7 @@ export function CustomerDashboard() {
             <div className="flex items-center justify-between">
               <div>
                 <CardTitle className="text-xl flex items-center gap-2">
-                  <AlertCircle className="h-5 w-5 text-orange-500" />
+                  <AlertCircle className="h-5 w-5 text-gray-900 dark:text-white" />
                   Pending Payments
                 </CardTitle>
                 <CardDescription>Invoices requiring payment</CardDescription>
@@ -173,8 +173,8 @@ export function CustomerDashboard() {
               {unpaidInvoices.map(inv => (
                 <div key={inv.id} className="flex items-center justify-between p-4 border rounded-lg" data-testid={`card-invoice-${inv.id}`}>
                   <div className="flex items-center gap-4">
-                    <div className="bg-orange-100 dark:bg-orange-900 p-3 rounded-lg">
-                      <FileText className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+                    <div className="bg-gray-400 dark:bg-gray-500 p-3 rounded-lg">
+                      <FileText className="h-5 w-5 text-gray-900 dark:text-white" />
                     </div>
                     <div>
                       <p className="font-medium" data-testid={`text-invoice-number-${inv.id}`}>{inv.invoiceNumber}</p>

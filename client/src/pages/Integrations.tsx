@@ -128,8 +128,8 @@ export default function Integrations() {
       name: 'Google Calendar',
       description: 'Sync appointments to Google Calendar automatically',
       icon: Calendar,
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-50',
+      color: 'text-gray-700 dark:text-gray-300',
+      bgColor: 'bg-gray-100 dark:bg-gray-800',
       status: 'active',
       type: 'Connected'
     },
@@ -138,8 +138,8 @@ export default function Integrations() {
       name: 'Gmail',
       description: 'Send automated email notifications via Gmail',
       icon: Mail,
-      color: 'text-red-600',
-      bgColor: 'bg-red-50',
+      color: 'text-gray-800 dark:text-gray-200',
+      bgColor: 'bg-gray-200 dark:bg-gray-700',
       status: 'active',
       type: 'Connected'
     },
@@ -148,8 +148,8 @@ export default function Integrations() {
       name: 'Accounting Software',
       description: 'Sync invoices and transactions with QuickBooks or Xero',
       icon: DollarSign,
-      color: 'text-green-600',
-      bgColor: 'bg-green-50',
+      color: 'text-gray-600 dark:text-gray-400',
+      bgColor: 'bg-gray-100 dark:bg-gray-800',
       status: 'inactive',
       type: 'Available'
     },
@@ -158,19 +158,19 @@ export default function Integrations() {
       name: 'OBD-II Diagnostics',
       description: 'Connect OBD-II adapters for vehicle diagnostics',
       icon: Activity,
-      color: 'text-purple-600',
-      bgColor: 'bg-purple-50',
+      color: 'text-gray-700 dark:text-gray-300',
+      bgColor: 'bg-gray-200 dark:bg-gray-700',
       status: 'inactive',
       type: 'Available'
     },
   ];
 
   return (
-    <div className="min-h-screen bg-dark-navy dark:bg-black p-6">
+    <div className="min-h-screen bg-white dark:bg-salis-black p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         <div>
           <h1 className="text-3xl font-bold text-black dark:text-white">Integrations</h1>
-          <p className="text-soft-white/70 mt-1">
+          <p className="text-gray-900 dark:text-white/70 mt-1">
             Connect and manage third-party services
           </p>
         </div>
@@ -198,7 +198,7 @@ export default function Integrations() {
                           </div>
                           <div>
                             <CardTitle className="text-black dark:text-white">{integration.name}</CardTitle>
-                            <CardDescription className="text-soft-white/60">{integration.description}</CardDescription>
+                            <CardDescription className="text-gray-900 dark:text-white/60">{integration.description}</CardDescription>
                           </div>
                         </div>
                         <Badge variant={isActive ? "default" : "secondary"} data-testid={`badge-status-${integration.id}`}>
@@ -210,11 +210,11 @@ export default function Integrations() {
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           {isActive ? (
-                            <CheckCircle2 className="h-5 w-5 text-green-600" />
+                            <CheckCircle2 className="h-5 w-5 text-gray-700 dark:text-gray-300" />
                           ) : (
-                            <XCircle className="h-5 w-5 text-soft-white/50" />
+                            <XCircle className="h-5 w-5 text-gray-900 dark:text-white/50" />
                           )}
-                          <span className={`text-sm ${isActive ? 'text-green-600' : 'text-soft-white/60 dark:text-soft-white/50'}`}>
+                          <span className={`text-sm ${isActive ? 'text-gray-700 dark:text-gray-300' : 'text-gray-900 dark:text-white/60 dark:text-gray-900 dark:text-white/50'}`}>
                             {isActive ? 'Active' : 'Not Configured'}
                           </span>
                         </div>
@@ -258,33 +258,33 @@ export default function Integrations() {
               })}
             </div>
 
-            <Card className="bg-dark-navy border-neon-blue/30 bg-dark-navy border-neon-blue/30">
+            <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
               <CardHeader>
                 <CardTitle className="text-black dark:text-white">Integration Status</CardTitle>
-                <CardDescription className="text-soft-white/60">Recent sync activity and status</CardDescription>
+                <CardDescription className="text-gray-900 dark:text-white/60">Recent sync activity and status</CardDescription>
               </CardHeader>
               <CardContent>
                 {logsLoading ? (
-                  <div className="text-center py-8 text-soft-white/60 dark:text-soft-white/50">Loading sync logs...</div>
+                  <div className="text-center py-8 text-gray-900 dark:text-white/60 dark:text-gray-900 dark:text-white/50">Loading sync logs...</div>
                 ) : syncLogs.length === 0 ? (
-                  <div className="text-center py-8 text-soft-white/60 dark:text-soft-white/50">No sync activity yet</div>
+                  <div className="text-center py-8 text-gray-900 dark:text-white/60 dark:text-gray-900 dark:text-white/50">No sync activity yet</div>
                 ) : (
                   <div className="space-y-3">
                     {syncLogs.slice(0, 5).map((log: any, index: number) => (
                       <div 
                         key={log.id || index} 
-                        className="flex items-center justify-between p-3 bg-neon-blue/20/20 dark:bg-gray-900 rounded-lg"
+                        className="flex items-center justify-between p-3 bg-gray-100 dark:bg-salis-black rounded-lg"
                         data-testid={`log-entry-${index}`}
                       >
                         <div className="flex items-center gap-3">
                           <div className={`p-2 rounded-lg ${
-                            log.status === 'success' ? 'bg-green-100' : 
-                            log.status === 'failed' ? 'bg-red-100' : 'bg-neon-blue/20/30'
+                            log.status === 'success' ? 'bg-gray-200 dark:bg-gray-700' : 
+                            log.status === 'failed' ? 'bg-gray-300 dark:bg-gray-600' : 'bg-gray-100 dark:bg-salis-gray-dark'
                           }`}>
                             {log.status === 'success' ? (
-                              <CheckCircle2 className="h-4 w-4 text-green-600" />
+                              <CheckCircle2 className="h-4 w-4 text-gray-700 dark:text-gray-300" />
                             ) : log.status === 'failed' ? (
-                              <AlertCircle className="h-4 w-4 text-red-600" />
+                              <AlertCircle className="h-4 w-4 text-gray-700 dark:text-gray-300" />
                             ) : (
                               <Clock className="h-4 w-4 text-gray-600" />
                             )}
@@ -293,7 +293,7 @@ export default function Integrations() {
                             <p className="text-sm font-medium text-black dark:text-white">
                               {log.syncType?.replace(/-/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
                             </p>
-                            <p className="text-xs text-soft-white/60 dark:text-soft-white/50">
+                            <p className="text-xs text-gray-900 dark:text-white/60 dark:text-gray-900 dark:text-white/50">
                               {log.recordsProcessed} record{log.recordsProcessed !== 1 ? 's' : ''} • {new Date(log.createdAt).toLocaleString()}
                             </p>
                           </div>
@@ -310,23 +310,23 @@ export default function Integrations() {
           </TabsContent>
 
           <TabsContent value="sync-logs" className="space-y-4">
-            <Card className="bg-dark-navy border-neon-blue/30 bg-dark-navy border-neon-blue/30">
+            <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
               <CardHeader>
                 <CardTitle className="text-black dark:text-white">Sync History</CardTitle>
-                <CardDescription className="text-soft-white/60">Detailed history of all integration syncs</CardDescription>
+                <CardDescription className="text-gray-900 dark:text-white/60">Detailed history of all integration syncs</CardDescription>
               </CardHeader>
               <CardContent>
                 <ScrollArea className="h-[600px]">
                   {logsLoading ? (
-                    <div className="text-center py-8 text-soft-white/60 dark:text-soft-white/50">Loading...</div>
+                    <div className="text-center py-8 text-gray-900 dark:text-white/60 dark:text-gray-900 dark:text-white/50">Loading...</div>
                   ) : syncLogs.length === 0 ? (
-                    <div className="text-center py-8 text-soft-white/60 dark:text-soft-white/50">No sync logs available</div>
+                    <div className="text-center py-8 text-gray-900 dark:text-white/60 dark:text-gray-900 dark:text-white/50">No sync logs available</div>
                   ) : (
                     <div className="space-y-3">
                       {syncLogs.map((log: any, index: number) => (
                         <div 
                           key={log.id || index} 
-                          className="p-4 border border-neon-blue/30 dark:border-gray-800 rounded-lg"
+                          className="p-4 border border-gray-200 dark:border-salis-gray-dark dark:border-gray-800 rounded-lg"
                           data-testid={`sync-log-${index}`}
                         >
                           <div className="flex items-start justify-between">
@@ -339,11 +339,11 @@ export default function Integrations() {
                                   {log.status}
                                 </Badge>
                               </div>
-                              <div className="space-y-1 text-sm text-soft-white/70">
+                              <div className="space-y-1 text-sm text-gray-900 dark:text-white/70">
                                 <p>Records: {log.recordsProcessed}</p>
                                 <p>Time: {new Date(log.createdAt).toLocaleString()}</p>
                                 {log.errorMessage && (
-                                  <p className="text-red-600">Error: {log.errorMessage}</p>
+                                  <p className="text-gray-700 dark:text-gray-300">Error: {log.errorMessage}</p>
                                 )}
                               </div>
                             </div>
@@ -358,12 +358,12 @@ export default function Integrations() {
           </TabsContent>
 
           <TabsContent value="accounting" className="space-y-4">
-            <Card className="bg-dark-navy border-neon-blue/30 bg-dark-navy border-neon-blue/30">
+            <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
                     <CardTitle className="text-black dark:text-white">Accounting Transactions</CardTitle>
-                    <CardDescription className="text-soft-white/60">Transactions pending sync with accounting software</CardDescription>
+                    <CardDescription className="text-gray-900 dark:text-white/60">Transactions pending sync with accounting software</CardDescription>
                   </div>
                   <Button
                     onClick={() => syncAccountingMutation.mutate()}
@@ -378,12 +378,12 @@ export default function Integrations() {
               <CardContent>
                 <ScrollArea className="h-[600px]">
                   {accountingLoading ? (
-                    <div className="text-center py-8 text-soft-white/60 dark:text-soft-white/50">Loading...</div>
+                    <div className="text-center py-8 text-gray-900 dark:text-white/60 dark:text-gray-900 dark:text-white/50">Loading...</div>
                   ) : accountingTransactions.length === 0 ? (
                     <div className="text-center py-8">
                       <DollarSign className="h-12 w-12 mx-auto text-gray-300 dark:text-gray-700 mb-3" />
-                      <p className="text-soft-white/60 dark:text-soft-white/50 mb-2">No accounting transactions</p>
-                      <p className="text-sm text-soft-white/50 dark:text-soft-white/60">
+                      <p className="text-gray-900 dark:text-white/60 dark:text-gray-900 dark:text-white/50 mb-2">No accounting transactions</p>
+                      <p className="text-sm text-gray-900 dark:text-white/50 dark:text-gray-900 dark:text-white/60">
                         Configure QuickBooks or Xero integration to sync transactions
                       </p>
                     </div>
@@ -392,13 +392,13 @@ export default function Integrations() {
                       {accountingTransactions.map((transaction: any, index: number) => (
                         <div 
                           key={transaction.id || index} 
-                          className="p-4 border border-neon-blue/30 dark:border-gray-800 rounded-lg"
+                          className="p-4 border border-gray-200 dark:border-salis-gray-dark dark:border-gray-800 rounded-lg"
                           data-testid={`transaction-${index}`}
                         >
                           <div className="flex items-center justify-between">
                             <div>
                               <h4 className="font-medium text-black dark:text-white">{transaction.transactionType}</h4>
-                              <p className="text-sm text-soft-white/70">
+                              <p className="text-sm text-gray-900 dark:text-white/70">
                                 {new Date(transaction.transactionDate).toLocaleDateString()}
                               </p>
                             </div>

@@ -42,8 +42,8 @@ export default function Settings() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading settings...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 dark:border-gray-100 mx-auto"></div>
+          <p className="mt-4 text-gray-900 dark:text-white/60">Loading settings...</p>
         </div>
       </div>
     );
@@ -53,9 +53,9 @@ export default function Settings() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <div className="text-red-500 text-5xl mb-4">⚠️</div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Failed to Load Settings</h2>
-          <p className="text-gray-600 mb-4">
+          <div className="text-gray-700 dark:text-gray-300 text-5xl mb-4">⚠️</div>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Failed to Load Settings</h2>
+          <p className="text-gray-900 dark:text-white/60 mb-4">
             {error instanceof Error ? error.message : 'Unable to connect to server'}
           </p>
           <Button onClick={() => window.location.reload()} data-testid="button-retry">
@@ -75,8 +75,8 @@ export default function Settings() {
       <div className="flex items-center gap-3">
         <SettingsIcon className="h-8 w-8 text-primary" />
         <div>
-          <h1 className="font-['Poppins',Helvetica] font-bold text-3xl text-soft-white" data-testid="text-page-title">Settings & Preferences</h1>
-          <p className="text-soft-white/60">Customize your experience</p>
+          <h1 className="font-['Poppins',Helvetica] font-bold text-3xl text-gray-900 dark:text-white" data-testid="text-page-title">Settings & Preferences</h1>
+          <p className="text-gray-900 dark:text-white/60">Customize your experience</p>
         </div>
       </div>
 
@@ -140,8 +140,8 @@ function GeneralSettingsTab({ settings, onUpdate }: { settings: UserSettings; on
   return (
     <Card data-testid="card-general">
       <CardHeader>
-        <CardTitle className="text-soft-white">General Settings</CardTitle>
-        <CardDescription className="text-soft-white/60">Configure your basic preferences</CardDescription>
+        <CardTitle className="text-gray-900 dark:text-white">General Settings</CardTitle>
+        <CardDescription className="text-gray-900 dark:text-white/60">Configure your basic preferences</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="space-y-4">
@@ -203,7 +203,7 @@ function GeneralSettingsTab({ settings, onUpdate }: { settings: UserSettings; on
           <div className="flex items-center justify-between">
             <div>
               <Label>Notifications</Label>
-              <p className="text-sm text-soft-white/60">Receive system notifications</p>
+              <p className="text-sm text-gray-900 dark:text-white/60">Receive system notifications</p>
             </div>
             <Switch 
               checked={settings.enableNotifications ?? true}
@@ -215,7 +215,7 @@ function GeneralSettingsTab({ settings, onUpdate }: { settings: UserSettings; on
           <div className="flex items-center justify-between">
             <div>
               <Label>Sound Effects</Label>
-              <p className="text-sm text-soft-white/60">Play sounds for notifications</p>
+              <p className="text-sm text-gray-900 dark:text-white/60">Play sounds for notifications</p>
             </div>
             <Switch 
               checked={settings.enableSounds ?? true}
@@ -233,8 +233,8 @@ function LanguageSettingsTab({ settings, onUpdate }: { settings: UserSettings; o
   return (
     <Card data-testid="card-language">
       <CardHeader>
-        <CardTitle className="text-soft-white">Language & Region</CardTitle>
-        <CardDescription className="text-soft-white/60">Choose your preferred language</CardDescription>
+        <CardTitle className="text-gray-900 dark:text-white">Language & Region</CardTitle>
+        <CardDescription className="text-gray-900 dark:text-white/60">Choose your preferred language</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">
@@ -257,7 +257,7 @@ function LanguageSettingsTab({ settings, onUpdate }: { settings: UserSettings; o
               <SelectItem value="ja">日本語</SelectItem>
             </SelectContent>
           </Select>
-          <p className="text-sm text-soft-white/60">
+          <p className="text-sm text-gray-900 dark:text-white/60">
             Language support is coming soon. Currently only English is available.
           </p>
         </div>
@@ -270,8 +270,8 @@ function CurrencySettingsTab({ settings, onUpdate }: { settings: UserSettings; o
   return (
     <Card data-testid="card-currency">
       <CardHeader>
-        <CardTitle className="text-soft-white">Currency Settings</CardTitle>
-        <CardDescription className="text-soft-white/60">Set your preferred currency</CardDescription>
+        <CardTitle className="text-gray-900 dark:text-white">Currency Settings</CardTitle>
+        <CardDescription className="text-gray-900 dark:text-white/60">Set your preferred currency</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">
@@ -305,8 +305,8 @@ function AppearanceSettingsTab({ settings, onUpdate }: { settings: UserSettings;
   return (
     <Card data-testid="card-appearance">
       <CardHeader>
-        <CardTitle className="text-soft-white">Appearance</CardTitle>
-        <CardDescription className="text-soft-white/60">Customize the look and feel</CardDescription>
+        <CardTitle className="text-gray-900 dark:text-white">Appearance</CardTitle>
+        <CardDescription className="text-gray-900 dark:text-white/60">Customize the look and feel</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="space-y-4">
@@ -355,7 +355,7 @@ function AppearanceSettingsTab({ settings, onUpdate }: { settings: UserSettings;
           <div className="flex items-center justify-between">
             <div>
               <Label>Compact Mode</Label>
-              <p className="text-sm text-soft-white/60">Reduce spacing and padding</p>
+              <p className="text-sm text-gray-900 dark:text-white/60">Reduce spacing and padding</p>
             </div>
             <Switch 
               checked={settings.compactMode ?? false}
@@ -386,8 +386,8 @@ function PrintSettingsTab({ settings, onUpdate }: { settings: UserSettings; onUp
   return (
     <Card data-testid="card-print">
       <CardHeader>
-        <CardTitle className="text-soft-white">Print Settings</CardTitle>
-        <CardDescription className="text-soft-white/60">Configure print layout and options</CardDescription>
+        <CardTitle className="text-gray-900 dark:text-white">Print Settings</CardTitle>
+        <CardDescription className="text-gray-900 dark:text-white/60">Configure print layout and options</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="space-y-4">
@@ -411,7 +411,7 @@ function PrintSettingsTab({ settings, onUpdate }: { settings: UserSettings; onUp
           <div className="flex items-center justify-between">
             <div>
               <Label>Include Header</Label>
-              <p className="text-sm text-soft-white/60">Show header on printed pages</p>
+              <p className="text-sm text-gray-900 dark:text-white/60">Show header on printed pages</p>
             </div>
             <Switch 
               checked={printSettings.includeHeader}
@@ -423,7 +423,7 @@ function PrintSettingsTab({ settings, onUpdate }: { settings: UserSettings; onUp
           <div className="flex items-center justify-between">
             <div>
               <Label>Include Footer</Label>
-              <p className="text-sm text-soft-white/60">Show footer on printed pages</p>
+              <p className="text-sm text-gray-900 dark:text-white/60">Show footer on printed pages</p>
             </div>
             <Switch 
               checked={printSettings.includeFooter}
@@ -435,7 +435,7 @@ function PrintSettingsTab({ settings, onUpdate }: { settings: UserSettings; onUp
           <div className="flex items-center justify-between">
             <div>
               <Label>Show Logo</Label>
-              <p className="text-sm text-soft-white/60">Display company logo on prints</p>
+              <p className="text-sm text-gray-900 dark:text-white/60">Display company logo on prints</p>
             </div>
             <Switch 
               checked={printSettings.showLogo}
@@ -463,14 +463,14 @@ function KeyboardShortcutsTab({ settings, onUpdate }: { settings: UserSettings; 
   return (
     <Card data-testid="card-shortcuts">
       <CardHeader>
-        <CardTitle className="text-soft-white">Keyboard Shortcuts</CardTitle>
-        <CardDescription className="text-soft-white/60">Available keyboard shortcuts</CardDescription>
+        <CardTitle className="text-gray-900 dark:text-white">Keyboard Shortcuts</CardTitle>
+        <CardDescription className="text-gray-900 dark:text-white/60">Available keyboard shortcuts</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="flex items-center justify-between mb-4">
           <div>
             <Label>Enable Keyboard Shortcuts</Label>
-            <p className="text-sm text-soft-white/60">Use keyboard shortcuts for quick actions</p>
+            <p className="text-sm text-gray-900 dark:text-white/60">Use keyboard shortcuts for quick actions</p>
           </div>
           <Switch 
             checked={settings.enableKeyboardShortcuts ?? true}
@@ -486,8 +486,8 @@ function KeyboardShortcutsTab({ settings, onUpdate }: { settings: UserSettings; 
               className="flex items-center justify-between p-3 bg-muted rounded-lg"
               data-testid={`shortcut-${index}`}
             >
-              <span className="text-sm text-soft-white/60">{shortcut.description}</span>
-              <kbd className="px-2 py-1 text-xs font-semibold text-gray-800 bg-neon-blue/20/30 border border-neon-blue/30 rounded-lg dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500">
+              <span className="text-sm text-gray-900 dark:text-white/60">{shortcut.description}</span>
+              <kbd className="px-2 py-1 text-xs font-semibold text-gray-800 bg-gray-100 dark:bg-gray-600 border border-gray-300 dark:border-gray-500 rounded-lg dark:text-gray-100">
                 {shortcut.key}
               </kbd>
             </div>

@@ -134,10 +134,10 @@ export default function RefundManagement() {
 
   const getStatusBadge = (status: string) => {
     const variants: Record<string, any> = {
-      pending: { variant: "outline", icon: AlertTriangle, color: "text-yellow-600" },
-      approved: { variant: "default", icon: CheckCircle, color: "text-blue-600" },
-      processed: { variant: "default", icon: CheckCircle, color: "text-green-600" },
-      rejected: { variant: "destructive", icon: XCircle, color: "text-red-600" },
+      pending: { variant: "outline", icon: AlertTriangle, color: "text-gray-700 dark:text-gray-300" },
+      approved: { variant: "default", icon: CheckCircle, color: "text-gray-900 dark:text-gray-100" },
+      processed: { variant: "default", icon: CheckCircle, color: "text-gray-950 dark:text-gray-50" },
+      rejected: { variant: "destructive", icon: XCircle, color: "text-gray-800 dark:text-gray-200" },
     };
     const config = variants[status] || variants.pending;
     const Icon = config.icon;
@@ -150,13 +150,13 @@ export default function RefundManagement() {
   };
 
   return (
-    <div className="p-8 bg-gray-800 min-h-screen space-y-6">
+    <div className="p-8 bg-gray-50 dark:bg-salis-black min-h-screen space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-['Poppins',Helvetica] font-bold text-3xl text-soft-white" data-testid="text-page-title">
+          <h1 className="font-['Poppins',Helvetica] font-bold text-3xl text-gray-900 dark:text-white" data-testid="text-page-title">
             Refund Management
           </h1>
-          <p className="text-soft-white/60" data-testid="text-page-description">
+          <p className="text-gray-900 dark:text-white/60" data-testid="text-page-description">
             Manage customer refunds with approval workflow
           </p>
         </div>
@@ -300,29 +300,29 @@ export default function RefundManagement() {
         </Select>
       </div>
 
-      <Card className="bg-dark-navy border-neon-blue/30 bg-dark-navy border-neon-blue/30">
+      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
         <CardHeader>
-          <CardTitle className="text-soft-white">Refund Requests</CardTitle>
-          <CardDescription className="text-soft-white/60">Review and process customer refund requests</CardDescription>
+          <CardTitle className="text-gray-900 dark:text-white">Refund Requests</CardTitle>
+          <CardDescription className="text-gray-900 dark:text-white/60">Review and process customer refund requests</CardDescription>
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <div className="text-center py-8 text-soft-white/60">Loading...</div>
+            <div className="text-center py-8 text-gray-900 dark:text-white/60">Loading...</div>
           ) : refunds.length === 0 ? (
-            <div className="text-center py-8 text-soft-white/60" data-testid="text-no-refunds">
+            <div className="text-center py-8 text-gray-900 dark:text-white/60" data-testid="text-no-refunds">
               No refund requests found
             </div>
           ) : (
             <Table>
-              <TableHeader className="bg-neon-blue/20/30">
-                <TableRow className="border-b border-neon-blue/30/50 hover:bg-neon-blue/20/20">
-                  <TableHead className="text-soft-white">Invoice</TableHead>
-                  <TableHead className="text-soft-white">Amount</TableHead>
-                  <TableHead className="text-soft-white">Reason</TableHead>
-                  <TableHead className="text-soft-white">Method</TableHead>
-                  <TableHead className="text-soft-white">Requested</TableHead>
-                  <TableHead className="text-soft-white">Status</TableHead>
-                  <TableHead className="text-soft-white">Actions</TableHead>
+              <TableHeader className="bg-gray-100 dark:bg-salis-gray-dark">
+                <TableRow className="border-b border-gray-200 dark:border-salis-gray-dark hover:bg-gray-100 dark:hover:bg-salis-gray-dark">
+                  <TableHead className="text-gray-900 dark:text-white">Invoice</TableHead>
+                  <TableHead className="text-gray-900 dark:text-white">Amount</TableHead>
+                  <TableHead className="text-gray-900 dark:text-white">Reason</TableHead>
+                  <TableHead className="text-gray-900 dark:text-white">Method</TableHead>
+                  <TableHead className="text-gray-900 dark:text-white">Requested</TableHead>
+                  <TableHead className="text-gray-900 dark:text-white">Status</TableHead>
+                  <TableHead className="text-gray-900 dark:text-white">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -347,7 +347,7 @@ export default function RefundManagement() {
                     <TableCell data-testid={`badge-refund-status-${refund.id}`}>
                       {getStatusBadge(refund.status)}
                     </TableCell>
-                    <TableCell className="text-soft-white">
+                    <TableCell className="text-gray-900 dark:text-white">
                       <div className="flex gap-2">
                         {refund.status === "pending" && (
                           <Button

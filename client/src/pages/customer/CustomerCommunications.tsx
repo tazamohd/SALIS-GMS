@@ -12,15 +12,15 @@ export function CustomerCommunications() {
   const getNoteTypeColor = (type: string) => {
     switch (type) {
       case 'general':
-        return 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300';
+        return 'bg-gray-100 dark:bg-salis-gray-dark text-gray-900 dark:text-white';
       case 'complaint':
-        return 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300';
+        return 'bg-salis-black dark:bg-white text-white dark:text-salis-black';
       case 'feedback':
-        return 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300';
+        return 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200';
       case 'reminder':
-        return 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300';
+        return 'bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300';
       default:
-        return 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300';
+        return 'bg-gray-100 text-gray-700 dark:bg-salis-gray-dark dark:text-gray-300';
     }
   };
 
@@ -71,7 +71,7 @@ export function CustomerCommunications() {
                       {comm.noteType}
                     </span>
                     {comm.isImportant && (
-                      <span className="px-3 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300">
+                      <span className="px-3 py-1 rounded-full text-xs font-medium bg-gray-400 dark:bg-gray-500 text-gray-900 dark:text-white">
                         Important
                       </span>
                     )}
