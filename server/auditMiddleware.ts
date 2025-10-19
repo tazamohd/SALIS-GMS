@@ -142,7 +142,7 @@ export const auditLog = async (req: Request, res: Response, next: NextFunction) 
     try {
       // Only log successful operations (2xx status codes)
       if (statusCode >= 200 && statusCode < 300) {
-        const garageId = user.claims?.garageId;
+        const garageId = user.garageId;
         if (!garageId) return;
 
         const auditLogData: InsertAuditLog = {
