@@ -46,6 +46,8 @@ import { CustomerCommunications } from "@/pages/customer/CustomerCommunications"
 import { useAuth } from "@/hooks/useAuth";
 import { UndoRedoProvider } from "@/contexts/UndoRedoContext";
 import type { User } from "@shared/schema";
+import Login from "@/pages/Login";
+import Register from "@/pages/Register";
 
 function Router() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -67,7 +69,13 @@ function Router() {
   }
 
   if (!isAuthenticated) {
-    return <Landing />;
+    return (
+      <Switch>
+        <Route path="/login" component={Login} />
+        <Route path="/register" component={Register} />
+        <Route component={Landing} />
+      </Switch>
+    );
   }
 
   // Check if user is a customer

@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import logoImage from "@assets/Logo_blue_orange_1760743036292.png";
+import { Link } from "wouter";
 
 export default function Landing() {
   return (
@@ -28,16 +29,22 @@ export default function Landing() {
         </div>
         
         <div className="space-y-4 pt-4">
-          <Button 
-            className="bg-salis-black hover:bg-gray-100 dark:hover:bg-salis-gray-dark text-white px-10 py-6 text-lg font-poppins font-semibold rounded-lg shadow-lg shadow-black/30 transition-all duration-200 w-full border border-white"
-            onClick={() => window.location.href = '/api/login'}
-            data-testid="button-sign-in"
-          >
-            Sign In with Replit
-          </Button>
-          <p className="text-xs font-poppins text-gray-500">
-            Secure authentication powered by Replit
-          </p>
+          <Link href="/login">
+            <Button 
+              className="bg-salis-orange hover:bg-salis-orange-dark text-white px-10 py-6 text-lg font-poppins font-semibold rounded-lg shadow-lg shadow-black/30 transition-all duration-200 w-full"
+              data-testid="button-sign-in"
+            >
+              Sign In
+            </Button>
+          </Link>
+          <Link href="/register">
+            <Button 
+              className="bg-transparent hover:bg-white/10 text-white px-10 py-6 text-lg font-poppins font-semibold rounded-lg shadow-lg shadow-black/30 transition-all duration-200 w-full border border-white"
+              data-testid="button-register"
+            >
+              Create Account
+            </Button>
+          </Link>
         </div>
       </div>
     </div>
