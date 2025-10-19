@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { BarChart3, Clock, AlertCircle, CheckCircle, Wrench } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -8,6 +9,7 @@ import { TaskDetailsDialog } from "@/components/TaskDetailsDialog";
 import type { JobCard } from "@shared/schema";
 
 export function Dashboard() {
+  const { t } = useTranslation();
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
   const [selectedTask, setSelectedTask] = useState<JobCard | null>(null);
@@ -64,8 +66,8 @@ export function Dashboard() {
   return (
     <div className="flex-1 p-8 bg-gray-50 dark:bg-salis-black">
       <div className="mb-8">
-        <h1 className="font-montserrat font-semibold text-3xl text-gray-900 dark:text-white">Dashboard</h1>
-        <p className="font-poppins text-sm text-gray-600 dark:text-gray-400 mt-1">Welcome to SALIS AUTO Management System</p>
+        <h1 className="font-montserrat font-semibold text-3xl text-gray-900 dark:text-white">{t('dashboard.title')}</h1>
+        <p className="font-poppins text-sm text-gray-600 dark:text-gray-400 mt-1">{t('common.welcome')}</p>
       </div>
 
       {/* Stats Cards - Monochrome */}
@@ -73,44 +75,44 @@ export function Dashboard() {
         <Card className="border border-gray-200 dark:border-salis-gray-dark shadow-sm hover:shadow-lg transition-all bg-white dark:bg-salis-black">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="font-poppins font-medium text-sm text-gray-600 dark:text-gray-400 uppercase">Check-in</h3>
+              <h3 className="font-poppins font-medium text-sm text-gray-600 dark:text-gray-400 uppercase">{t('dashboard.checkIn')}</h3>
               <Clock className="w-5 h-5 text-gray-700 dark:text-gray-300" />
             </div>
             <p className="font-montserrat font-bold text-3xl text-gray-900 dark:text-white mb-1">{checkInCount}</p>
-            <p className="font-poppins font-normal text-xs text-gray-500 dark:text-gray-500">in the last 2 hours</p>
+            <p className="font-poppins font-normal text-xs text-gray-500 dark:text-gray-500">{t('dashboard.inLastHours')}</p>
           </CardContent>
         </Card>
 
         <Card className="border border-gray-300 dark:border-salis-gray shadow-sm hover:shadow-lg transition-all bg-gray-100 dark:bg-salis-gray-dark">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="font-poppins font-medium text-sm text-gray-700 dark:text-gray-300 uppercase">Repair</h3>
+              <h3 className="font-poppins font-medium text-sm text-gray-700 dark:text-gray-300 uppercase">{t('dashboard.repair')}</h3>
               <Wrench className="w-5 h-5 text-gray-800 dark:text-gray-200" />
             </div>
             <p className="font-montserrat font-bold text-3xl text-gray-900 dark:text-white mb-1">{repairCount}</p>
-            <p className="font-poppins font-normal text-xs text-gray-600 dark:text-gray-400">in the last 2 hours</p>
+            <p className="font-poppins font-normal text-xs text-gray-600 dark:text-gray-400">{t('dashboard.inLastHours')}</p>
           </CardContent>
         </Card>
 
         <Card className="border border-salis-black dark:border-white shadow-sm hover:shadow-lg transition-all bg-salis-black dark:bg-white">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="font-poppins font-medium text-sm text-white dark:text-salis-black uppercase">Quality Check</h3>
+              <h3 className="font-poppins font-medium text-sm text-white dark:text-salis-black uppercase">{t('dashboard.qualityCheck')}</h3>
               <AlertCircle className="w-5 h-5 text-white dark:text-salis-black" />
             </div>
             <p className="font-montserrat font-bold text-3xl text-white dark:text-salis-black mb-1">{qualityCheckCount}</p>
-            <p className="font-poppins font-normal text-xs text-gray-300 dark:text-gray-600">in the last 2 hours</p>
+            <p className="font-poppins font-normal text-xs text-gray-300 dark:text-gray-600">{t('dashboard.inLastHours')}</p>
           </CardContent>
         </Card>
 
         <Card className="border border-salis-50-black shadow-sm hover:shadow-lg transition-all bg-salis-50-black dark:bg-salis-50-black">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="font-poppins font-medium text-sm text-white uppercase">Completion</h3>
+              <h3 className="font-poppins font-medium text-sm text-white uppercase">{t('dashboard.completion')}</h3>
               <CheckCircle className="w-5 h-5 text-white" />
             </div>
             <p className="font-montserrat font-bold text-3xl text-white mb-1">{completionCount}</p>
-            <p className="font-poppins font-normal text-xs text-gray-200">in the last 2 hours</p>
+            <p className="font-poppins font-normal text-xs text-gray-200">{t('dashboard.inLastHours')}</p>
           </CardContent>
         </Card>
       </div>
@@ -119,8 +121,8 @@ export function Dashboard() {
       <Card className="border border-gray-200 dark:border-salis-gray-dark shadow-sm mb-8 bg-white dark:bg-salis-black">
         <CardContent className="p-6">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="font-montserrat font-semibold text-xl text-gray-900 dark:text-white">Total Tasks</h2>
-            <span className="font-poppins font-medium text-sm text-gray-600 dark:text-gray-400">This Month</span>
+            <h2 className="font-montserrat font-semibold text-xl text-gray-900 dark:text-white">{t('dashboard.totalTasks')}</h2>
+            <span className="font-poppins font-medium text-sm text-gray-600 dark:text-gray-400">{t('dashboard.thisMonth')}</span>
           </div>
           <div className="h-64 flex items-end justify-between gap-4">
             {['Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'].map((month, i) => {
@@ -143,9 +145,9 @@ export function Dashboard() {
       <Card className="border border-gray-200 dark:border-salis-gray-dark shadow-sm bg-white dark:bg-salis-black">
         <CardContent className="p-6">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="font-montserrat font-semibold text-xl text-gray-900 dark:text-white">Latest Tasks</h2>
+            <h2 className="font-montserrat font-semibold text-xl text-gray-900 dark:text-white">{t('dashboard.latestTasks')}</h2>
             <Button variant="ghost" className="text-gray-700 dark:text-gray-300 hover:text-salis-black dark:hover:text-white font-poppins" data-testid="button-view-all">
-              View all
+              {t('common.viewAll')}
             </Button>
           </div>
 
@@ -153,25 +155,25 @@ export function Dashboard() {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-200 dark:border-salis-gray-dark">
-                  <th className="text-left py-3 px-4 font-poppins font-medium text-sm text-gray-600 dark:text-gray-400 uppercase">Task ID</th>
-                  <th className="text-left py-3 px-4 font-poppins font-medium text-sm text-gray-600 dark:text-gray-400 uppercase">Service Type</th>
-                  <th className="text-left py-3 px-4 font-poppins font-medium text-sm text-gray-600 dark:text-gray-400 uppercase">Customer Name</th>
-                  <th className="text-left py-3 px-4 font-poppins font-medium text-sm text-gray-600 dark:text-gray-400 uppercase">Status</th>
-                  <th className="text-left py-3 px-4 font-poppins font-medium text-sm text-gray-600 dark:text-gray-400 uppercase">Date</th>
-                  <th className="text-left py-3 px-4 font-poppins font-medium text-sm text-gray-600 dark:text-gray-400 uppercase">Priority</th>
-                  <th className="text-left py-3 px-4 font-poppins font-medium text-sm text-gray-600 dark:text-gray-400 uppercase">Action</th>
+                  <th className="text-left py-3 px-4 font-poppins font-medium text-sm text-gray-600 dark:text-gray-400 uppercase">{t('dashboard.taskId')}</th>
+                  <th className="text-left py-3 px-4 font-poppins font-medium text-sm text-gray-600 dark:text-gray-400 uppercase">{t('dashboard.serviceType')}</th>
+                  <th className="text-left py-3 px-4 font-poppins font-medium text-sm text-gray-600 dark:text-gray-400 uppercase">{t('dashboard.customerName')}</th>
+                  <th className="text-left py-3 px-4 font-poppins font-medium text-sm text-gray-600 dark:text-gray-400 uppercase">{t('dashboard.status')}</th>
+                  <th className="text-left py-3 px-4 font-poppins font-medium text-sm text-gray-600 dark:text-gray-400 uppercase">{t('dashboard.date')}</th>
+                  <th className="text-left py-3 px-4 font-poppins font-medium text-sm text-gray-600 dark:text-gray-400 uppercase">{t('dashboard.priority')}</th>
+                  <th className="text-left py-3 px-4 font-poppins font-medium text-sm text-gray-600 dark:text-gray-400 uppercase">{t('dashboard.action')}</th>
                 </tr>
               </thead>
               <tbody>
                 {isLoading ? (
                   <tr>
                     <td colSpan={7} className="py-8 text-center">
-                      <div className="animate-pulse text-gray-700 dark:text-gray-300">Loading...</div>
+                      <div className="animate-pulse text-gray-700 dark:text-gray-300">{t('common.loading')}</div>
                     </td>
                   </tr>
                 ) : latestTasks.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="py-8 text-center text-gray-500 dark:text-gray-500">No tasks available</td>
+                    <td colSpan={7} className="py-8 text-center text-gray-500 dark:text-gray-500">{t('dashboard.noTasksAvailable')}</td>
                   </tr>
                 ) : (
                   latestTasks.map((task) => (
@@ -206,7 +208,7 @@ export function Dashboard() {
                           className="border-gray-300 dark:border-salis-gray text-gray-700 dark:text-gray-300 hover:bg-salis-black dark:hover:bg-white hover:text-white dark:hover:text-salis-black transition-colors"
                           data-testid={`button-view-${task.id}`}
                         >
-                          View
+                          {t('common.view')}
                         </Button>
                       </td>
                     </tr>
@@ -226,7 +228,7 @@ export function Dashboard() {
                 disabled={currentPage === 1}
                 data-testid="button-previous"
               >
-                Previous
+                {t('common.previous')}
               </Button>
               <div className="flex gap-2">
                 {Array.from({ length: Math.min(totalPages, 10) }, (_, i) => i + 1).map((page) => (
@@ -249,7 +251,7 @@ export function Dashboard() {
                 disabled={currentPage === totalPages}
                 data-testid="button-next"
               >
-                Next
+                {t('common.next')}
               </Button>
             </div>
           )}

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/hooks/useAuth";
 import { NotificationBell } from "@/components/NotificationBell";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { QuickActionsModal } from "@/components/QuickActionsModal";
 import { SkipLink } from "@/components/SkipLink";
 import { OfflineIndicator } from "@/components/OfflineIndicator";
@@ -11,6 +12,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { useState, useEffect } from "react";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import type { UserSettings } from "@shared/schema";
 
 interface LayoutProps {
@@ -22,6 +24,7 @@ export function Layout({ children }: LayoutProps) {
   const { user } = useAuth();
   const [quickActionsOpen, setQuickActionsOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { t } = useTranslation();
   
   // Get user settings for keyboard shortcuts
   const { data: settings } = useQuery<UserSettings>({
@@ -52,79 +55,79 @@ export function Layout({ children }: LayoutProps) {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  // Streamlined and reorganized navigation groups
+  // Streamlined and reorganized navigation groups with translations
   const navGroups = [
     {
-      label: "Dashboard",
+      label: t('nav.dashboard'),
       items: [
-        { path: "/dashboard", icon: Home, label: "Dashboard" },
+        { path: "/dashboard", icon: Home, label: t('nav.dashboard') },
       ]
     },
     {
-      label: "Operations",
+      label: t('nav.operations'),
       items: [
-        { path: "/job-cards", icon: Wrench, label: "Job Cards" },
-        { path: "/calendar", icon: Calendar, label: "Calendar & Scheduling" },
-        { path: "/appointments", icon: Calendar, label: "Appointments" },
-        { path: "/tasks", icon: ClipboardCheck, label: "Tasks" },
-        { path: "/service-templates", icon: ClipboardList, label: "Service Templates" },
-        { path: "/technician-portal", icon: HardHat, label: "Technician Portal" },
+        { path: "/job-cards", icon: Wrench, label: t('nav.jobCards') },
+        { path: "/calendar", icon: Calendar, label: t('nav.calendar') },
+        { path: "/appointments", icon: Calendar, label: t('nav.appointments') },
+        { path: "/tasks", icon: ClipboardCheck, label: t('nav.tasks') },
+        { path: "/service-templates", icon: ClipboardList, label: t('nav.serviceTemplates') },
+        { path: "/technician-portal", icon: HardHat, label: t('nav.technicianPortal') },
       ]
     },
     {
-      label: "Customers & Fleet",
+      label: t('nav.customersFleet'),
       items: [
-        { path: "/customers", icon: Users, label: "Customers" },
-        { path: "/vehicles", icon: Car, label: "Vehicles" },
+        { path: "/customers", icon: Users, label: t('nav.customers') },
+        { path: "/vehicles", icon: Car, label: t('nav.vehicles') },
       ]
     },
     {
-      label: "Inventory & Orders",
+      label: t('nav.inventoryOrders'),
       items: [
-        { path: "/inventory-management", icon: Warehouse, label: "Inventory & Parts" },
-        { path: "/spare-parts", icon: Package, label: "Spare Parts" },
-        { path: "/tools", icon: Hammer, label: "Tools" },
-        { path: "/suppliers", icon: Building2, label: "Suppliers" },
-        { path: "/purchase-orders", icon: ShoppingCart, label: "Purchase Orders" },
-        { path: "/estimates", icon: Receipt, label: "Estimates & Quotes" },
+        { path: "/inventory-management", icon: Warehouse, label: t('nav.inventory') },
+        { path: "/spare-parts", icon: Package, label: t('nav.spareParts') },
+        { path: "/tools", icon: Hammer, label: t('nav.tools') },
+        { path: "/suppliers", icon: Building2, label: t('nav.suppliers') },
+        { path: "/purchase-orders", icon: ShoppingCart, label: t('nav.purchaseOrders') },
+        { path: "/estimates", icon: Receipt, label: t('nav.estimates') },
       ]
     },
     {
-      label: "Team & Staff",
+      label: t('nav.teamStaff'),
       items: [
-        { path: "/technician-management", icon: UserCog, label: "Technician Management" },
-        { path: "/hr-management", icon: UserCheck, label: "HR & Payroll" },
+        { path: "/technician-management", icon: UserCog, label: t('nav.technicianManagement') },
+        { path: "/hr-management", icon: UserCheck, label: t('nav.hrManagement') },
       ]
     },
     {
-      label: "Finance",
+      label: t('nav.finance'),
       items: [
-        { path: "/invoices", icon: FileText, label: "Invoices" },
-        { path: "/financial-settings", icon: DollarSign, label: "Financial Settings" },
-        { path: "/refund-management", icon: RotateCcw, label: "Refunds" },
+        { path: "/invoices", icon: FileText, label: t('nav.invoices') },
+        { path: "/financial-settings", icon: DollarSign, label: t('nav.financialSettings') },
+        { path: "/refund-management", icon: RotateCcw, label: t('nav.refunds') },
       ]
     },
     {
-      label: "Analytics",
+      label: t('nav.analytics'),
       items: [
-        { path: "/reports", icon: BarChart3, label: "Reports" },
-        { path: "/business-intelligence", icon: TrendingUp, label: "Business Intelligence" },
+        { path: "/reports", icon: BarChart3, label: t('nav.reports') },
+        { path: "/business-intelligence", icon: TrendingUp, label: t('nav.businessIntelligence') },
       ]
     },
     {
-      label: "Automation & Tools",
+      label: t('nav.automationTools'),
       items: [
-        { path: "/ai-automation", icon: Brain, label: "AI Automation" },
-        { path: "/integrations", icon: Plug2, label: "Integrations" },
-        { path: "/data-import-export", icon: DatabaseBackup, label: "Data Import/Export" },
+        { path: "/ai-automation", icon: Brain, label: t('nav.aiAutomation') },
+        { path: "/integrations", icon: Plug2, label: t('nav.integrations') },
+        { path: "/data-import-export", icon: DatabaseBackup, label: t('nav.dataImportExport') },
       ]
     },
     {
-      label: "Settings",
+      label: t('nav.settings'),
       items: [
-        { path: "/settings", icon: SettingsIcon, label: "Settings" },
-        { path: "/security", icon: Shield, label: "Security" },
-        { path: "/profile", icon: UserIcon, label: "Profile" },
+        { path: "/settings", icon: SettingsIcon, label: t('nav.settings') },
+        { path: "/security", icon: Shield, label: t('nav.security') },
+        { path: "/profile", icon: UserIcon, label: t('nav.profile') },
       ]
     },
   ];
@@ -246,7 +249,7 @@ export function Layout({ children }: LayoutProps) {
             data-testid="button-logout"
           >
             <LogOut className="w-4 h-4 mr-2" />
-            <span className="font-poppins font-medium text-xs">Logout</span>
+            <span className="font-poppins font-medium text-xs">{t('common.logout')}</span>
           </Button>
         </div>
       </aside>
@@ -274,7 +277,7 @@ export function Layout({ children }: LayoutProps) {
             <Search className="absolute left-2.5 top-1/2 transform -translate-y-1/2 w-3.5 h-3.5 text-gray-400 dark:text-gray-500" />
             <Input
               type="text"
-              placeholder="Search..."
+              placeholder={t('common.search')}
               className="pl-9 h-9 bg-gray-50 dark:bg-salis-gray-dark border-gray-200 dark:border-salis-gray text-gray-900 dark:text-white text-sm placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-salis-black dark:focus:border-white focus:ring-salis-black dark:focus:ring-white font-poppins"
               data-testid="input-search"
             />
@@ -292,6 +295,7 @@ export function Layout({ children }: LayoutProps) {
               {navigator.platform.includes("Mac") ? "⌘K" : "Ctrl+K"}
             </kbd>
           </Button>
+          <LanguageSwitcher />
           <NotificationBell />
         </header>
 

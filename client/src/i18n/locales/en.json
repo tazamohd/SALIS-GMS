@@ -1,0 +1,112 @@
+{
+  "common": {
+    "welcome": "Welcome to SALIS AUTO Management System",
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "view": "View",
+    "search": "Search...",
+    "logout": "Logout",
+    "viewAll": "View all",
+    "previous": "Previous",
+    "next": "Next"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "operations": "Operations",
+    "jobCards": "Job Cards",
+    "calendar": "Calendar & Scheduling",
+    "appointments": "Appointments",
+    "tasks": "Tasks",
+    "serviceTemplates": "Service Templates",
+    "technicianPortal": "Technician Portal",
+    "customersFleet": "Customers & Fleet",
+    "customers": "Customers",
+    "vehicles": "Vehicles",
+    "inventoryOrders": "Inventory & Orders",
+    "inventory": "Inventory & Parts",
+    "spareParts": "Spare Parts",
+    "tools": "Tools",
+    "suppliers": "Suppliers",
+    "purchaseOrders": "Purchase Orders",
+    "estimates": "Estimates & Quotes",
+    "teamStaff": "Team & Staff",
+    "technicianManagement": "Technician Management",
+    "hrManagement": "HR & Payroll",
+    "finance": "Finance",
+    "invoices": "Invoices",
+    "financialSettings": "Financial Settings",
+    "refunds": "Refunds",
+    "analytics": "Analytics",
+    "reports": "Reports",
+    "businessIntelligence": "Business Intelligence",
+    "automationTools": "Automation & Tools",
+    "aiAutomation": "AI Automation",
+    "integrations": "Integrations",
+    "dataImportExport": "Data Import/Export",
+    "settings": "Settings",
+    "security": "Security",
+    "profile": "Profile"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "checkIn": "Check-in",
+    "repair": "Repair",
+    "qualityCheck": "Quality Check",
+    "completion": "Completion",
+    "inLastHours": "in the last 2 hours",
+    "totalTasks": "Total Tasks",
+    "thisMonth": "This Month",
+    "latestTasks": "Latest Tasks",
+    "taskId": "Task ID",
+    "serviceType": "Service Type",
+    "customerName": "Customer Name",
+    "status": "Status",
+    "date": "Date",
+    "priority": "Priority",
+    "action": "Action",
+    "noTasksAvailable": "No tasks available"
+  },
+  "security": {
+    "title": "Security & Compliance",
+    "subtitle": "Manage security settings and compliance features",
+    "twoFactor": {
+      "title": "Two-Factor Authentication (2FA)",
+      "description": "Add an extra layer of security to your account",
+      "setup": "Setup 2FA",
+      "disable": "Disable 2FA",
+      "active": "2FA is Active",
+      "backupCodes": "Backup codes remaining"
+    },
+    "auditLogs": {
+      "title": "Audit Logs",
+      "description": "Track all system activities and changes",
+      "resourceType": "Resource Type",
+      "action": "Action",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "noLogsFound": "No audit logs found"
+    },
+    "backup": {
+      "title": "Backup & Restore",
+      "description": "Create and manage data backups",
+      "backupType": "Backup Type",
+      "createBackup": "Create Backup",
+      "noBackupsFound": "No backups found"
+    },
+    "gdpr": {
+      "title": "GDPR Compliance",
+      "description": "Manage data subject rights requests"
+    },
+    "consents": {
+      "title": "User Consents",
+      "description": "Manage user consent preferences"
+    },
+    "permissions": {
+      "title": "Permission Overrides",
+      "description": "Grant or restrict specific permissions for users"
+    }
+  }
+}

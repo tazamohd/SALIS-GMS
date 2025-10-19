@@ -1,0 +1,112 @@
+{
+  "common": {
+    "welcome": "مرحباً بك في نظام إدارة ساليس أوتو",
+    "loading": "جاري التحميل...",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "view": "عرض",
+    "search": "بحث...",
+    "logout": "تسجيل الخروج",
+    "viewAll": "عرض الكل",
+    "previous": "السابق",
+    "next": "التالي"
+  },
+  "nav": {
+    "dashboard": "لوحة التحكم",
+    "operations": "العمليات",
+    "jobCards": "بطاقات العمل",
+    "calendar": "التقويم والجدولة",
+    "appointments": "المواعيد",
+    "tasks": "المهام",
+    "serviceTemplates": "قوالب الخدمة",
+    "technicianPortal": "بوابة الفني",
+    "customersFleet": "العملاء والأسطول",
+    "customers": "العملاء",
+    "vehicles": "المركبات",
+    "inventoryOrders": "المخزون والطلبات",
+    "inventory": "المخزون والقطع",
+    "spareParts": "قطع الغيار",
+    "tools": "الأدوات",
+    "suppliers": "الموردون",
+    "purchaseOrders": "أوامر الشراء",
+    "estimates": "التقديرات والعروض",
+    "teamStaff": "الفريق والموظفين",
+    "technicianManagement": "إدارة الفنيين",
+    "hrManagement": "الموارد البشرية والرواتب",
+    "finance": "المالية",
+    "invoices": "الفواتير",
+    "financialSettings": "الإعدادات المالية",
+    "refunds": "المبالغ المستردة",
+    "analytics": "التحليلات",
+    "reports": "التقارير",
+    "businessIntelligence": "ذكاء الأعمال",
+    "automationTools": "الأتمتة والأدوات",
+    "aiAutomation": "الأتمتة بالذكاء الاصطناعي",
+    "integrations": "التكاملات",
+    "dataImportExport": "استيراد/تصدير البيانات",
+    "settings": "الإعدادات",
+    "security": "الأمان",
+    "profile": "الملف الشخصي"
+  },
+  "dashboard": {
+    "title": "لوحة التحكم",
+    "checkIn": "الاستقبال",
+    "repair": "الإصلاح",
+    "qualityCheck": "فحص الجودة",
+    "completion": "الإنجاز",
+    "inLastHours": "في آخر ساعتين",
+    "totalTasks": "إجمالي المهام",
+    "thisMonth": "هذا الشهر",
+    "latestTasks": "أحدث المهام",
+    "taskId": "رقم المهمة",
+    "serviceType": "نوع الخدمة",
+    "customerName": "اسم العميل",
+    "status": "الحالة",
+    "date": "التاريخ",
+    "priority": "الأولوية",
+    "action": "الإجراء",
+    "noTasksAvailable": "لا توجد مهام متاحة"
+  },
+  "security": {
+    "title": "الأمان والامتثال",
+    "subtitle": "إدارة إعدادات الأمان وميزات الامتثال",
+    "twoFactor": {
+      "title": "المصادقة الثنائية (2FA)",
+      "description": "أضف طبقة إضافية من الأمان لحسابك",
+      "setup": "إعداد المصادقة الثنائية",
+      "disable": "تعطيل المصادقة الثنائية",
+      "active": "المصادقة الثنائية نشطة",
+      "backupCodes": "رموز النسخ الاحتياطي المتبقية"
+    },
+    "auditLogs": {
+      "title": "سجلات التدقيق",
+      "description": "تتبع جميع أنشطة النظام والتغييرات",
+      "resourceType": "نوع المورد",
+      "action": "الإجراء",
+      "startDate": "تاريخ البدء",
+      "endDate": "تاريخ الانتهاء",
+      "noLogsFound": "لم يتم العثور على سجلات تدقيق"
+    },
+    "backup": {
+      "title": "النسخ الاحتياطي والاستعادة",
+      "description": "إنشاء وإدارة النسخ الاحتياطية للبيانات",
+      "backupType": "نوع النسخ الاحتياطي",
+      "createBackup": "إنشاء نسخة احتياطية",
+      "noBackupsFound": "لم يتم العثور على نسخ احتياطية"
+    },
+    "gdpr": {
+      "title": "الامتثال للقانون العام لحماية البيانات",
+      "description": "إدارة طلبات حقوق موضوعات البيانات"
+    },
+    "consents": {
+      "title": "موافقات المستخدم",
+      "description": "إدارة تفضيلات موافقة المستخدم"
+    },
+    "permissions": {
+      "title": "تجاوزات الصلاحيات",
+      "description": "منح أو تقييد صلاحيات محددة للمستخدمين"
+    }
+  }
+}
