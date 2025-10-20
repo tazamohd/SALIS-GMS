@@ -38,6 +38,7 @@ import AIAutomation from "@/pages/AIAutomation";
 import Integrations from "@/pages/Integrations";
 import Security from "@/pages/Security";
 import Settings from "@/pages/Settings";
+import Chat from "@/pages/Chat";
 import { CustomerDashboard } from "@/pages/customer/CustomerDashboard";
 import { CustomerAppointments } from "@/pages/customer/CustomerAppointments";
 import { CustomerInvoices } from "@/pages/customer/CustomerInvoices";
@@ -260,6 +261,11 @@ function Router() {
       <Route path="/settings">
         <Layout>
           <Settings />
+        </Layout>
+      </Route>
+      <Route path="/chat">
+        <Layout>
+          <Chat />
         </Layout>
       </Route>
       <Route component={NotFound} />
