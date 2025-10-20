@@ -2401,3 +2401,105 @@ export type InsertActionHistory = typeof actionHistory.$inferInsert;
 export const insertActionHistorySchema = createInsertSchema(actionHistory).omit(
   { id: true, createdAt: true },
 );
+
+// Module 36: In-App Chat Support
+export const chatConversations = pgTable("chat_conversations", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id")
+    .references(() => garages.id)
+    .notNull(),
+  title: varchar("title", { length: 255 }),
+  type: varchar("type", { length: 50 }).notNull().default("direct"), // "direct", "group", "support"
+  createdBy: varchar("created_by")
+    .references(() => users.id)
+    .notNull(),
+  lastMessageAt: timestamp("last_message_at"),
+  isActive: boolean("is_active").default(true),
+  metadata: jsonb("metadata").default({}),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const chatParticipants = pgTable("chat_participants", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  conversationId: uuid("conversation_id")
+    .references(() => chatConversations.id)
+    .notNull(),
+  userId: varchar("user_id")
+    .references(() => users.id)
+    .notNull(),
+  role: varchar("role", { length: 50 }).default("member"), // "admin", "member"
+  lastReadAt: timestamp("last_read_at"),
+  joinedAt: timestamp("joined_at").defaultNow(),
+  leftAt: timestamp("left_at"),
+  isActive: boolean("is_active").default(true),
+  notificationsEnabled: boolean("notifications_enabled").default(true),
+});
+
+export const chatMessages = pgTable("chat_messages", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  conversationId: uuid("conversation_id")
+    .references(() => chatConversations.id)
+    .notNull(),
+  senderId: varchar("sender_id")
+    .references(() => users.id)
+    .notNull(),
+  messageType: varchar("message_type", { length: 50 }).default("text"), // "text", "file", "image", "system"
+  content: text("content").notNull(),
+  attachments: jsonb("attachments").default([]), // Array of file metadata
+  metadata: jsonb("metadata").default({}),
+  replyToId: uuid("reply_to_id").references((): any => chatMessages.id),
+  isEdited: boolean("is_edited").default(false),
+  editedAt: timestamp("edited_at"),
+  deletedAt: timestamp("deleted_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const chatMessageReactions = pgTable("chat_message_reactions", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  messageId: uuid("message_id")
+    .references(() => chatMessages.id)
+    .notNull(),
+  userId: varchar("user_id")
+    .references(() => users.id)
+    .notNull(),
+  reaction: varchar("reaction", { length: 10 }).notNull(), // emoji
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export type ChatConversation = typeof chatConversations.$inferSelect;
+export type InsertChatConversation = typeof chatConversations.$inferInsert;
+export const insertChatConversationSchema = createInsertSchema(chatConversations).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type ChatParticipant = typeof chatParticipants.$inferSelect;
+export type InsertChatParticipant = typeof chatParticipants.$inferInsert;
+export const insertChatParticipantSchema = createInsertSchema(chatParticipants).omit({
+  id: true,
+  joinedAt: true,
+});
+
+export type ChatMessage = typeof chatMessages.$inferSelect;
+export type InsertChatMessage = typeof chatMessages.$inferInsert;
+export const insertChatMessageSchema = createInsertSchema(chatMessages).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type ChatMessageReaction = typeof chatMessageReactions.$inferSelect;
+export type InsertChatMessageReaction = typeof chatMessageReactions.$inferInsert;
+export const insertChatMessageReactionSchema = createInsertSchema(chatMessageReactions).omit({
+  id: true,
+  createdAt: true,
+});
