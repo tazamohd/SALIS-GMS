@@ -1048,7 +1048,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { insertVehicleServiceHistorySchema } = await import("@shared/schema");
       const { id } = req.params;
-      const userId = req.user?.claims?.sub;
+      const userId = req.user.id;
 
       const validationResult = insertVehicleServiceHistorySchema.safeParse({
         ...req.body,
@@ -6208,7 +6208,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Protected route example
   app.get("/api/protected", isAuthenticated, async (req: any, res) => {
-    const userId = req.user?.claims?.sub;
+    const userId = req.user.id;
     res.json({ message: "This is a protected route", userId });
   });
 

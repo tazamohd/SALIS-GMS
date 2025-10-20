@@ -198,7 +198,7 @@ import {
   type InsertActionHistory,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, or, inArray, and, gte, lte, ilike, sql } from "drizzle-orm";
+import { eq, desc, or, inArray, and, gte, lte, ilike, sql, isNull } from "drizzle-orm";
 
 // Interface for storage operations
 export interface IStorage {
@@ -2825,11 +2825,11 @@ export class DatabaseStorage implements IStorage {
           )
         );
 
-      if (inventory && inventory.stockQuantity <= setting.reorderPoint) {
+      if (inventory && (inventory.stockQuantity ?? 0) <= setting.reorderPoint) {
         // Create purchase order (or add to reorders list)
         reordersToCreate.push({
           sparePartId: setting.sparePartId,
-          currentQuantity: inventory.stockQuantity,
+          currentQuantity: inventory.stockQuantity ?? 0,
           reorderQuantity: setting.reorderQuantity,
           supplierId: setting.supplierId,
           reorderSettingId: setting.id,
@@ -2965,10 +2965,11 @@ export class DatabaseStorage implements IStorage {
       );
 
     if (sourceInventory) {
+      const currentStock = sourceInventory.stockQuantity ?? 0;
       await db
         .update(sparePartInventories)
         .set({
-          stockQuantity: sourceInventory.stockQuantity - transfer.quantity,
+          stockQuantity: currentStock - transfer.quantity,
           updatedAt: new Date(),
         })
         .where(eq(sparePartInventories.id, sourceInventory.id));
@@ -2979,9 +2980,9 @@ export class DatabaseStorage implements IStorage {
         garageId: transfer.fromGarageId,
         branchId: transfer.fromBranchId,
         actionType: "transfer",
-        quantityBefore: sourceInventory.stockQuantity,
+        quantityBefore: currentStock,
         quantityChange: -transfer.quantity,
-        quantityAfter: sourceInventory.stockQuantity - transfer.quantity,
+        quantityAfter: currentStock - transfer.quantity,
         referenceType: "transfer",
         referenceId: transfer.id,
         reason: `Transfer to ${transfer.toGarageId}`,
@@ -3001,10 +3002,11 @@ export class DatabaseStorage implements IStorage {
       );
 
     if (destInventory) {
+      const currentStock = destInventory.stockQuantity ?? 0;
       await db
         .update(sparePartInventories)
         .set({
-          stockQuantity: destInventory.stockQuantity + transfer.quantity,
+          stockQuantity: currentStock + transfer.quantity,
           updatedAt: new Date(),
         })
         .where(eq(sparePartInventories.id, destInventory.id));
@@ -3015,9 +3017,9 @@ export class DatabaseStorage implements IStorage {
         garageId: transfer.toGarageId,
         branchId: transfer.toBranchId,
         actionType: "transfer",
-        quantityBefore: destInventory.stockQuantity,
+        quantityBefore: currentStock,
         quantityChange: transfer.quantity,
-        quantityAfter: destInventory.stockQuantity + transfer.quantity,
+        quantityAfter: currentStock + transfer.quantity,
         referenceType: "transfer",
         referenceId: transfer.id,
         reason: `Transfer from ${transfer.fromGarageId}`,
@@ -4058,7 +4060,7 @@ export class DatabaseStorage implements IStorage {
 
   async calculateCommission(jobCardId: string, garageId: string): Promise<Commission | null> {
     const [jobCard] = await db.select().from(jobCards).where(eq(jobCards.id, jobCardId));
-    if (!jobCard) return null;
+    if (!jobCard || !jobCard.assignedTo) return null;
     
     const [invoice] = await db.select().from(invoices).where(eq(invoices.jobCardId, jobCardId));
     if (!invoice) return null;
@@ -4578,9 +4580,9 @@ export class DatabaseStorage implements IStorage {
     // Filter out expired overrides
     conditions.push(
       or(
-        eq(permissionOverrides.expiresAt, null),
+        isNull(permissionOverrides.expiresAt),
         gte(permissionOverrides.expiresAt, new Date())
-      ) as any
+      )
     );
     
     return await db.select().from(permissionOverrides)
