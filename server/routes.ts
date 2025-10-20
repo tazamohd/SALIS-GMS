@@ -6211,6 +6211,201 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ message: "This is a protected route", userId });
   });
 
+  // Module 36: In-App Chat Support Routes
+  
+  // Chat Conversations
+  app.get('/api/chat/conversations', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.garageId;
+      const userId = req.user.id;
+      const conversations = await storage.getChatConversations(userGarageId, userId);
+      res.json(conversations);
+    } catch (error) {
+      console.error("Error fetching conversations:", error);
+      res.status(500).json({ message: "Failed to fetch conversations" });
+    }
+  });
+
+  app.get('/api/chat/conversations/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const conversation = await storage.getChatConversation(id);
+      
+      if (!conversation) {
+        return res.status(404).json({ message: "Conversation not found" });
+      }
+      
+      res.json(conversation);
+    } catch (error) {
+      console.error("Error fetching conversation:", error);
+      res.status(500).json({ message: "Failed to fetch conversation" });
+    }
+  });
+
+  app.post('/api/chat/conversations', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.garageId;
+      const userId = req.user.id;
+      const { title, type, participantIds } = req.body;
+      
+      const conversation = await storage.createChatConversation({
+        garageId: userGarageId,
+        title,
+        type: type || 'direct',
+        createdBy: userId,
+      });
+      
+      // Add creator as participant
+      await storage.addChatParticipant({
+        conversationId: conversation.id,
+        userId,
+        role: 'admin',
+      });
+      
+      // Add other participants
+      if (participantIds && Array.isArray(participantIds)) {
+        for (const participantId of participantIds) {
+          if (participantId !== userId) {
+            await storage.addChatParticipant({
+              conversationId: conversation.id,
+              userId: participantId,
+              role: 'member',
+            });
+          }
+        }
+      }
+      
+      res.json(conversation);
+    } catch (error) {
+      console.error("Error creating conversation:", error);
+      res.status(500).json({ message: "Failed to create conversation" });
+    }
+  });
+
+  // Chat Messages
+  app.get('/api/chat/conversations/:id/messages', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const { limit } = req.query;
+      
+      const messages = await storage.getChatMessages(
+        id,
+        limit ? parseInt(limit as string) : 100
+      );
+      
+      res.json(messages);
+    } catch (error) {
+      console.error("Error fetching messages:", error);
+      res.status(500).json({ message: "Failed to fetch messages" });
+    }
+  });
+
+  app.post('/api/chat/conversations/:id/messages', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const userId = req.user.id;
+      const { content, messageType, replyToId, attachments } = req.body;
+      
+      const message = await storage.createChatMessage({
+        conversationId: id,
+        senderId: userId,
+        content,
+        messageType: messageType || 'text',
+        replyToId,
+        attachments,
+      });
+      
+      res.json(message);
+    } catch (error) {
+      console.error("Error sending message:", error);
+      res.status(500).json({ message: "Failed to send message" });
+    }
+  });
+
+  app.patch('/api/chat/messages/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const { content } = req.body;
+      
+      const message = await storage.updateChatMessage(id, { content });
+      res.json(message);
+    } catch (error) {
+      console.error("Error updating message:", error);
+      res.status(500).json({ message: "Failed to update message" });
+    }
+  });
+
+  app.delete('/api/chat/messages/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteChatMessage(id);
+      res.json({ message: "Message deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting message:", error);
+      res.status(500).json({ message: "Failed to delete message" });
+    }
+  });
+
+  // Chat Participants
+  app.get('/api/chat/conversations/:id/participants', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const participants = await storage.getChatParticipants(id);
+      res.json(participants);
+    } catch (error) {
+      console.error("Error fetching participants:", error);
+      res.status(500).json({ message: "Failed to fetch participants" });
+    }
+  });
+
+  app.post('/api/chat/conversations/:id/participants', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const { userId, role } = req.body;
+      
+      const participant = await storage.addChatParticipant({
+        conversationId: id,
+        userId,
+        role: role || 'member',
+      });
+      
+      res.json(participant);
+    } catch (error) {
+      console.error("Error adding participant:", error);
+      res.status(500).json({ message: "Failed to add participant" });
+    }
+  });
+
+  app.post('/api/chat/conversations/:id/read', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const userId = req.user.id;
+      
+      await storage.markMessagesAsRead(id, userId);
+      res.json({ message: "Messages marked as read" });
+    } catch (error) {
+      console.error("Error marking messages as read:", error);
+      res.status(500).json({ message: "Failed to mark messages as read" });
+    }
+  });
+
+  app.get('/api/chat/unread-count', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const { conversationId } = req.query;
+      
+      const count = await storage.getUnreadMessageCount(
+        userId,
+        conversationId as string | undefined
+      );
+      
+      res.json({ count });
+    } catch (error) {
+      console.error("Error fetching unread count:", error);
+      res.status(500).json({ message: "Failed to fetch unread count" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
