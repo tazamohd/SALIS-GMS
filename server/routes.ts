@@ -5808,7 +5808,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let remainingCodes: string[] | undefined;
       
       if (isBackupCode) {
-        const result = verifyBackupCode(twoFactorAuth.backupCodes, token);
+        const result = verifyBackupCode(twoFactorAuth.backupCodes as string[], token);
         isValid = result.valid;
         remainingCodes = result.remainingCodes;
         
@@ -5821,7 +5821,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json({ 
         valid: isValid,
-        remainingBackupCodes: remainingCodes?.length || twoFactorAuth.backupCodes.length
+        remainingBackupCodes: remainingCodes?.length || (twoFactorAuth.backupCodes as string[])?.length || 0
       });
     } catch (error: any) {
       console.error("Error verifying 2FA:", error);
@@ -5847,7 +5847,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json({
         enabled: twoFactorAuth?.isEnabled || false,
-        backupCodesCount: twoFactorAuth?.backupCodes?.length || 0,
+        backupCodesCount: (twoFactorAuth?.backupCodes as string[])?.length || 0,
       });
     } catch (error: any) {
       console.error("Error getting 2FA status:", error);
@@ -5899,10 +5899,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Create backup job
       const backupJob = await storage.createBackupJob({
         garageId: userGarageId,
-        type: type || 'full',
+        jobType: type || 'full',
         status: 'pending',
-        initiatedBy: userId,
-        includeAttachments: includeAttachments || false,
+        createdBy: userId,
       });
       
       // In production, this would trigger a background job
@@ -5912,8 +5911,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           await storage.updateBackupJob(backupJob.id, {
             status: 'completed',
             completedAt: new Date(),
-            size: Math.floor(Math.random() * 1000000) + 500000, // Mock size
-            location: `/backups/${backupJob.id}.zip`,
+            fileSize: Math.floor(Math.random() * 1000000) + 500000, // Mock size
+            fileName: `backup_${backupJob.id}.zip`,
           });
         } catch (error) {
           console.error("Error completing backup:", error);
@@ -5982,8 +5981,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         userId: dataSubjectId,
         requestType,
         status: 'pending',
-        requestedBy: userId,
-        reason,
+        requestData: { reason, requestedBy: userId },
       });
       
       res.json(request);
@@ -6000,9 +5998,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const updated = await storage.updateGdprDataRequest(id, {
         status,
-        processedBy,
         completedAt: completedAt ? new Date(completedAt) : undefined,
-        exportUrl,
+        responseData: { processedBy, exportUrl },
       });
       
       res.json(updated);
@@ -6036,7 +6033,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const consent = await storage.createUserConsent({
         userId,
         consentType,
-        granted,
+        consentGiven: granted,
         ipAddress: (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || 
                    req.socket.remoteAddress || 
                    null,
@@ -6054,7 +6051,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { id } = req.params;
       const { granted } = req.body;
       
-      const updated = await storage.updateUserConsent(id, { granted });
+      const updated = await storage.updateUserConsent(id, { consentGiven: granted });
       res.json(updated);
     } catch (error) {
       console.error("Error updating consent:", error);
@@ -6089,9 +6086,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const override = await storage.createPermissionOverride({
         garageId: userGarageId,
         userId,
-        permission,
-        granted,
-        grantedBy,
+        resource: permission.split(':')[0] || 'resource',
+        action: permission.split(':')[1] || permission,
+        allowed: granted,
+        createdBy: grantedBy,
         reason,
         expiresAt: expiresAt ? new Date(expiresAt) : null,
       });
@@ -6156,8 +6154,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         garageId: userGarageId,
         userId,
         actionType,
-        actionDescription,
-        metadata: metadata || {},
+        resourceType: actionDescription || 'general',
+        previousState: metadata?.previousState,
+        newState: metadata?.newState,
       });
       res.json(history);
     } catch (error) {
