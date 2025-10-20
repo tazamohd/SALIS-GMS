@@ -123,6 +123,16 @@ import {
   type InsertTaxConfiguration,
   type DiscountPromotion,
   type InsertDiscountPromotion,
+  chatConversations,
+  chatParticipants,
+  chatMessages,
+  chatMessageReactions,
+  type ChatConversation,
+  type InsertChatConversation,
+  type ChatParticipant,
+  type InsertChatParticipant,
+  type ChatMessage,
+  type InsertChatMessage,
   type DiscountUsage,
   type InsertDiscountUsage,
   savedFilterPresets,
@@ -667,6 +677,25 @@ export interface IStorage {
   getAIChatConversation(id: string): Promise<any | undefined>;
   createAIChatConversation(data: any): Promise<any>;
   updateAIChatConversation(id: string, data: any): Promise<any>;
+  
+  // Module 36: In-App Chat Support
+  getChatConversations(garageId: string, userId?: string): Promise<any[]>;
+  getChatConversation(id: string): Promise<any | undefined>;
+  createChatConversation(data: any): Promise<any>;
+  updateChatConversation(id: string, data: any): Promise<any>;
+  
+  getChatMessages(conversationId: string, limit?: number): Promise<any[]>;
+  getChatMessage(id: string): Promise<any | undefined>;
+  createChatMessage(data: any): Promise<any>;
+  updateChatMessage(id: string, data: any): Promise<any>;
+  deleteChatMessage(id: string): Promise<void>;
+  
+  getChatParticipants(conversationId: string): Promise<any[]>;
+  addChatParticipant(data: any): Promise<any>;
+  updateChatParticipant(id: string, data: any): Promise<any>;
+  removeChatParticipant(id: string): Promise<void>;
+  markMessagesAsRead(conversationId: string, userId: string): Promise<void>;
+  getUnreadMessageCount(userId: string, conversationId?: string): Promise<number>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -4572,22 +4601,22 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getPermissionOverrides(garageId: string, userId?: string): Promise<PermissionOverride[]> {
-    const conditions = [eq(permissionOverrides.garageId, garageId)];
+    let query = db.select().from(permissionOverrides)
+      .where(
+        and(
+          eq(permissionOverrides.garageId, garageId),
+          or(
+            isNull(permissionOverrides.expiresAt),
+            gte(permissionOverrides.expiresAt, new Date())
+          ) ?? sql`true`
+        )
+      );
+    
     if (userId) {
-      conditions.push(eq(permissionOverrides.userId, userId));
+      query = query.where(eq(permissionOverrides.userId, userId));
     }
     
-    // Filter out expired overrides
-    conditions.push(
-      or(
-        isNull(permissionOverrides.expiresAt),
-        gte(permissionOverrides.expiresAt, new Date())
-      )
-    );
-    
-    return await db.select().from(permissionOverrides)
-      .where(and(...conditions))
-      .orderBy(desc(permissionOverrides.createdAt));
+    return await query.orderBy(desc(permissionOverrides.createdAt));
   }
 
   async createPermissionOverride(data: InsertPermissionOverride): Promise<PermissionOverride> {
@@ -4653,6 +4682,174 @@ export class DatabaseStorage implements IStorage {
       .where(eq(actionHistory.id, id))
       .returning();
     return history;
+  }
+
+  // Module 36: In-App Chat Support
+  async getChatConversations(garageId: string, userId?: string): Promise<ChatConversation[]> {
+    if (userId) {
+      const conversations = await db
+        .select({
+          conversation: chatConversations,
+        })
+        .from(chatConversations)
+        .innerJoin(chatParticipants, eq(chatParticipants.conversationId, chatConversations.id))
+        .where(
+          and(
+            eq(chatConversations.garageId, garageId),
+            eq(chatParticipants.userId, userId),
+            eq(chatParticipants.isActive, true)
+          )
+        )
+        .orderBy(desc(chatConversations.lastMessageAt));
+      
+      return conversations.map(c => c.conversation);
+    }
+    
+    return await db.select().from(chatConversations)
+      .where(eq(chatConversations.garageId, garageId))
+      .orderBy(desc(chatConversations.lastMessageAt));
+  }
+
+  async getChatConversation(id: string): Promise<ChatConversation | undefined> {
+    const [conversation] = await db.select().from(chatConversations).where(eq(chatConversations.id, id));
+    return conversation;
+  }
+
+  async createChatConversation(data: InsertChatConversation): Promise<ChatConversation> {
+    const [conversation] = await db.insert(chatConversations).values(data).returning();
+    return conversation;
+  }
+
+  async updateChatConversation(id: string, data: Partial<ChatConversation>): Promise<ChatConversation> {
+    const [conversation] = await db.update(chatConversations)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(chatConversations.id, id))
+      .returning();
+    return conversation;
+  }
+
+  async getChatMessages(conversationId: string, limit: number = 100): Promise<ChatMessage[]> {
+    return await db.select().from(chatMessages)
+      .where(
+        and(
+          eq(chatMessages.conversationId, conversationId),
+          isNull(chatMessages.deletedAt)
+        )
+      )
+      .orderBy(desc(chatMessages.createdAt))
+      .limit(limit);
+  }
+
+  async getChatMessage(id: string): Promise<ChatMessage | undefined> {
+    const [message] = await db.select().from(chatMessages).where(eq(chatMessages.id, id));
+    return message;
+  }
+
+  async createChatMessage(data: InsertChatMessage): Promise<ChatMessage> {
+    const [message] = await db.insert(chatMessages).values(data).returning();
+    
+    await db.update(chatConversations)
+      .set({ lastMessageAt: new Date() })
+      .where(eq(chatConversations.id, data.conversationId));
+    
+    return message;
+  }
+
+  async updateChatMessage(id: string, data: Partial<ChatMessage>): Promise<ChatMessage> {
+    const [message] = await db.update(chatMessages)
+      .set({ ...data, isEdited: true, editedAt: new Date() })
+      .where(eq(chatMessages.id, id))
+      .returning();
+    return message;
+  }
+
+  async deleteChatMessage(id: string): Promise<void> {
+    await db.update(chatMessages)
+      .set({ deletedAt: new Date() })
+      .where(eq(chatMessages.id, id));
+  }
+
+  async getChatParticipants(conversationId: string): Promise<ChatParticipant[]> {
+    return await db.select().from(chatParticipants)
+      .where(
+        and(
+          eq(chatParticipants.conversationId, conversationId),
+          eq(chatParticipants.isActive, true)
+        )
+      );
+  }
+
+  async addChatParticipant(data: InsertChatParticipant): Promise<ChatParticipant> {
+    const [participant] = await db.insert(chatParticipants).values(data).returning();
+    return participant;
+  }
+
+  async updateChatParticipant(id: string, data: Partial<ChatParticipant>): Promise<ChatParticipant> {
+    const [participant] = await db.update(chatParticipants)
+      .set(data)
+      .where(eq(chatParticipants.id, id))
+      .returning();
+    return participant;
+  }
+
+  async removeChatParticipant(id: string): Promise<void> {
+    await db.update(chatParticipants)
+      .set({ isActive: false, leftAt: new Date() })
+      .where(eq(chatParticipants.id, id));
+  }
+
+  async markMessagesAsRead(conversationId: string, userId: string): Promise<void> {
+    await db.update(chatParticipants)
+      .set({ lastReadAt: new Date() })
+      .where(
+        and(
+          eq(chatParticipants.conversationId, conversationId),
+          eq(chatParticipants.userId, userId)
+        )
+      );
+  }
+
+  async getUnreadMessageCount(userId: string, conversationId?: string): Promise<number> {
+    if (conversationId) {
+      const [participant] = await db.select().from(chatParticipants)
+        .where(
+          and(
+            eq(chatParticipants.conversationId, conversationId),
+            eq(chatParticipants.userId, userId)
+          )
+        );
+      
+      if (!participant || !participant.lastReadAt) {
+        const [result] = await db.select({ count: sql<number>`count(*)` }).from(chatMessages)
+          .where(eq(chatMessages.conversationId, conversationId));
+        return Number(result.count);
+      }
+      
+      const [result] = await db.select({ count: sql<number>`count(*)` }).from(chatMessages)
+        .where(
+          and(
+            eq(chatMessages.conversationId, conversationId),
+            gt(chatMessages.createdAt, participant.lastReadAt)
+          )
+        );
+      return Number(result.count);
+    }
+    
+    const userConversations = await db.select().from(chatParticipants)
+      .where(
+        and(
+          eq(chatParticipants.userId, userId),
+          eq(chatParticipants.isActive, true)
+        )
+      );
+    
+    let totalUnread = 0;
+    for (const participant of userConversations) {
+      const count = await this.getUnreadMessageCount(userId, participant.conversationId);
+      totalUnread += count;
+    }
+    
+    return totalUnread;
   }
 }
 
