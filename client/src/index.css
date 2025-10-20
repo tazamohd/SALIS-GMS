@@ -341,4 +341,78 @@
   .btn-secondary:hover {
     background-color: #6a6a6a;
   }
+  
+  /* Enhanced Typography Utilities */
+  .text-display-lg {
+    font-family: var(--display-large-semibold-font-family);
+    font-size: var(--display-large-semibold-font-size);
+    font-weight: var(--display-large-semibold-font-weight);
+    letter-spacing: var(--display-large-semibold-letter-spacing);
+    line-height: var(--display-large-semibold-line-height);
+  }
+  
+  .text-display-md {
+    font-family: var(--display-medium-semibold-font-family);
+    font-size: var(--display-medium-semibold-font-size);
+    font-weight: var(--display-medium-semibold-font-weight);
+    letter-spacing: var(--display-medium-semibold-letter-spacing);
+    line-height: var(--display-medium-semibold-line-height);
+  }
+  
+  .text-display-sm {
+    font-family: var(--display-small-semibold-font-family);
+    font-size: var(--display-small-semibold-font-size);
+    font-weight: var(--display-small-semibold-font-weight);
+    letter-spacing: var(--display-small-semibold-letter-spacing);
+    line-height: var(--display-small-semibold-line-height);
+  }
+  
+  .text-headline {
+    font-family: var(--headline-semibold-font-family);
+    font-size: var(--headline-semibold-font-size);
+    font-weight: var(--headline-semibold-font-weight);
+    letter-spacing: var(--headline-semibold-letter-spacing);
+    line-height: var(--headline-semibold-line-height);
+  }
+  
+  /* Enhanced Card Styles */
+  .card-elevated {
+    box-shadow: var(--shadow-black-lg);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .card-elevated:hover {
+    transform: translateY(-4px);
+    box-shadow: 0px 8px 16px -4px rgba(1, 1, 1, 0.1), 0px 16px 24px -6px rgba(1, 1, 1, 0.15);
+  }
+  
+  /* Stat Card Styles */
+  .stat-card {
+    @apply rounded-xl p-8 border-2 transition-all duration-300;
+  }
+  
+  .stat-card-number {
+    @apply font-montserrat font-bold text-5xl tracking-tight;
+  }
+  
+  .stat-card-label {
+    @apply font-poppins font-medium text-sm uppercase tracking-wider;
+  }
+  
+  .stat-card-subtitle {
+    @apply font-poppins font-normal text-xs;
+  }
+  
+  /* Improved Spacing Utilities */
+  .section-spacing {
+    @apply space-y-8;
+  }
+  
+  .content-spacing {
+    @apply space-y-6;
+  }
+  
+  .item-spacing {
+    @apply space-y-4;
+  }
 }
