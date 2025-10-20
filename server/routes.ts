@@ -5,6 +5,7 @@ import { setupAuth, isAuthenticated, hashPassword } from "./auth";
 import passport from "passport";
 import { emailService } from "./services/emailService";
 import { smsService } from "./services/smsService";
+import { initializeChatWebSocket, getChatWebSocketServer } from "./websocket";
 import { z } from "zod";
 import { 
   insertNotificationSchema, 
@@ -6315,6 +6316,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         attachments,
       });
       
+      // Broadcast message to all participants via WebSocket
+      const participants = await storage.getChatParticipants(id);
+      const participantIds = participants.map(p => p.userId);
+      
+      const wsServer = getChatWebSocketServer();
+      if (wsServer) {
+        wsServer.broadcastNewMessage(id, message, participantIds);
+      }
+      
       res.json(message);
     } catch (error) {
       console.error("Error sending message:", error);
@@ -6407,5 +6417,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   const httpServer = createServer(app);
+  
+  // Initialize WebSocket server for chat
+  initializeChatWebSocket(httpServer);
+  
   return httpServer;
 }
