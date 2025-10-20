@@ -1,17 +1,19 @@
 import { useState } from "react";
-import { BarChart3, Clock, AlertCircle, CheckCircle, Wrench, TrendingUp } from "lucide-react";
+import { BarChart3, Clock, AlertCircle, CheckCircle, Wrench, TrendingUp, Users, DollarSign, Package } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { TaskDetailsDialog } from "@/components/TaskDetailsDialog";
+import { useAuth } from "@/hooks/useAuth";
 import type { JobCard } from "@shared/schema";
 
 export function Dashboard() {
   const { t } = useTranslation();
+  const { user } = useAuth();
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 6;
+  const itemsPerPage = 5;
   const [selectedTask, setSelectedTask] = useState<JobCard | null>(null);
   const [taskDetailsOpen, setTaskDetailsOpen] = useState(false);
 
@@ -43,132 +45,155 @@ export function Dashboard() {
     }
   };
 
-  const getStatusBadge = (status: string) => {
-    const statusColors: { [key: string]: string } = {
-      'pending': 'bg-gray-100 dark:bg-salis-gray-dark text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-salis-gray',
-      'in_progress': 'bg-gray-200 dark:bg-salis-gray text-gray-800 dark:text-gray-200 border border-gray-400 dark:border-salis-gray-light',
-      'completed': 'bg-salis-black/10 dark:bg-white/10 text-salis-black dark:text-white border border-salis-black/30 dark:border-white/30',
-      'delivered': 'bg-salis-50-black/10 dark:bg-salis-50-black/20 text-salis-50-black dark:text-gray-300 border border-salis-50-black/30',
-      'cancelled': 'bg-gray-300 dark:bg-salis-gray-dark text-gray-600 dark:text-gray-400 border border-gray-400 dark:border-salis-gray',
+  // Enhanced colorful service type badges
+  const getServiceTypeBadge = (serviceType: string) => {
+    const types: { [key: string]: { bg: string; text: string; icon: string } } = {
+      'maintenance': { bg: 'bg-blue-100 dark:bg-blue-900/30', text: 'text-blue-700 dark:text-blue-300', icon: '🔧' },
+      'repair': { bg: 'bg-orange-100 dark:bg-orange-900/30', text: 'text-orange-700 dark:text-orange-300', icon: '⚙️' },
+      'diagnostic': { bg: 'bg-purple-100 dark:bg-purple-900/30', text: 'text-purple-700 dark:text-purple-300', icon: '🔍' },
+      'inspection': { bg: 'bg-green-100 dark:bg-green-900/30', text: 'text-green-700 dark:text-green-300', icon: '✓' },
+      'body_work': { bg: 'bg-pink-100 dark:bg-pink-900/30', text: 'text-pink-700 dark:text-pink-300', icon: '🎨' },
+      'tire_service': { bg: 'bg-indigo-100 dark:bg-indigo-900/30', text: 'text-indigo-700 dark:text-indigo-300', icon: '⭕' },
     };
-    return statusColors[status] || 'bg-gray-100 dark:bg-salis-gray-dark text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-salis-gray';
+    const config = types[serviceType.toLowerCase().replace(/\s+/g, '_')] || { bg: 'bg-gray-100 dark:bg-gray-800', text: 'text-gray-700 dark:text-gray-300', icon: '📋' };
+    return { ...config, label: serviceType };
   };
 
-  const getPriorityBadge = (priority: string) => {
-    const priorityColors: { [key: string]: string } = {
-      'high': 'bg-salis-black dark:bg-white text-white dark:text-salis-black border border-salis-black dark:border-white',
-      'medium': 'bg-salis-50-black dark:bg-salis-50-black text-white dark:text-white border border-salis-50-black',
-      'low': 'bg-gray-300 dark:bg-salis-gray text-gray-700 dark:text-gray-300 border border-gray-400 dark:border-salis-gray-light',
+  // Enhanced colorful status badges
+  const getStatusBadge = (status: string) => {
+    const statusColors: { [key: string]: { bg: string; text: string; icon: string } } = {
+      'pending': { bg: 'bg-yellow-100 dark:bg-yellow-900/30', text: 'text-yellow-700 dark:text-yellow-300', icon: '⏳' },
+      'assigned': { bg: 'bg-cyan-100 dark:bg-cyan-900/30', text: 'text-cyan-700 dark:text-cyan-300', icon: '👤' },
+      'in_progress': { bg: 'bg-blue-100 dark:bg-blue-900/30', text: 'text-blue-700 dark:text-blue-300', icon: '🔄' },
+      'completed': { bg: 'bg-green-100 dark:bg-green-900/30', text: 'text-green-700 dark:text-green-300', icon: '✅' },
+      'delivered': { bg: 'bg-teal-100 dark:bg-teal-900/30', text: 'text-teal-700 dark:text-teal-300', icon: '🚗' },
+      'cancelled': { bg: 'bg-red-100 dark:bg-red-900/30', text: 'text-red-700 dark:text-red-300', icon: '❌' },
     };
-    return priorityColors[priority] || 'bg-gray-100 dark:bg-salis-gray-dark text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-salis-gray';
+    const config = statusColors[status] || { bg: 'bg-gray-100 dark:bg-gray-800', text: 'text-gray-700 dark:text-gray-300', icon: '○' };
+    return { ...config, label: status };
+  };
+
+  // Enhanced colorful priority badges
+  const getPriorityBadge = (priority: string) => {
+    const priorityColors: { [key: string]: { bg: string; text: string; icon: string } } = {
+      'urgent': { bg: 'bg-red-500 dark:bg-red-600', text: 'text-white', icon: '🔥' },
+      'high': { bg: 'bg-orange-500 dark:bg-orange-600', text: 'text-white', icon: '⚡' },
+      'medium': { bg: 'bg-yellow-500 dark:bg-yellow-600', text: 'text-white', icon: '⭐' },
+      'low': { bg: 'bg-green-500 dark:bg-green-600', text: 'text-white', icon: '💚' },
+    };
+    const config = priorityColors[priority] || { bg: 'bg-gray-500', text: 'text-white', icon: '○' };
+    return { ...config, label: priority };
+  };
+
+  // Shorten task ID
+  const shortenId = (id: string) => {
+    return id.substring(0, 8).toUpperCase();
+  };
+
+  // Role-based metrics
+  const roleBasedMetrics = () => {
+    const role = user?.role || 'technician';
+    
+    if (role === 'admin' || role === 'manager') {
+      return [
+        { label: 'Total Revenue', value: '$12,450', icon: DollarSign, color: 'text-green-600 dark:text-green-400' },
+        { label: 'Active Customers', value: '156', icon: Users, color: 'text-blue-600 dark:text-blue-400' },
+        { label: 'Parts Inventory', value: '89%', icon: Package, color: 'text-purple-600 dark:text-purple-400' },
+      ];
+    } else {
+      return [
+        { label: 'My Tasks', value: repairCount.toString(), icon: Wrench, color: 'text-orange-600 dark:text-orange-400' },
+        { label: 'Completed Today', value: qualityCheckCount.toString(), icon: CheckCircle, color: 'text-green-600 dark:text-green-400' },
+        { label: 'Pending', value: checkInCount.toString(), icon: Clock, color: 'text-yellow-600 dark:text-yellow-400' },
+      ];
+    }
   };
 
   return (
-    <div className="flex-1 p-10 bg-gray-50 dark:bg-salis-black min-h-screen">
-      {/* Enhanced Header */}
-      <div className="mb-12">
-        <h1 className="text-display-md text-gray-900 dark:text-white mb-3">{t('dashboard.title')}</h1>
-        <p className="font-poppins text-base text-gray-600 dark:text-gray-400">{t('common.welcome')}</p>
+    <div className="flex-1 p-6 bg-gray-50 dark:bg-salis-black min-h-screen">
+      {/* Compact Header */}
+      <div className="mb-6">
+        <h1 className="font-montserrat font-semibold text-2xl text-gray-900 dark:text-white">{t('dashboard.title')}</h1>
+        <p className="font-poppins text-sm text-gray-600 dark:text-gray-400 mt-1">{t('common.welcome')} {user?.name}</p>
       </div>
 
-      {/* Enhanced Stats Cards - Larger with better spacing */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8 mb-12">
-        <Card className="stat-card card-elevated border-gray-200 dark:border-salis-gray-dark bg-white dark:bg-salis-black" data-testid="card-check-in">
-          <CardContent className="p-8">
-            <div className="flex items-start justify-between mb-6">
-              <div className="flex-1">
-                <h3 className="stat-card-label text-gray-600 dark:text-gray-400 mb-3">{t('dashboard.checkIn')}</h3>
-                <p className="stat-card-number text-gray-900 dark:text-white">{checkInCount}</p>
-              </div>
-              <div className="p-4 rounded-xl bg-gray-100 dark:bg-salis-gray-dark">
-                <Clock className="w-7 h-7 text-gray-700 dark:text-gray-300" />
-              </div>
-            </div>
-            <p className="stat-card-subtitle text-gray-500 dark:text-gray-500">{t('dashboard.inLastHours')}</p>
-          </CardContent>
-        </Card>
-
-        <Card className="stat-card card-elevated border-gray-300 dark:border-salis-gray bg-gray-100 dark:bg-salis-gray-dark" data-testid="card-repair">
-          <CardContent className="p-8">
-            <div className="flex items-start justify-between mb-6">
-              <div className="flex-1">
-                <h3 className="stat-card-label text-gray-700 dark:text-gray-300 mb-3">{t('dashboard.repair')}</h3>
-                <p className="stat-card-number text-gray-900 dark:text-white">{repairCount}</p>
-              </div>
-              <div className="p-4 rounded-xl bg-gray-200 dark:bg-salis-gray">
-                <Wrench className="w-7 h-7 text-gray-800 dark:text-gray-200" />
-              </div>
-            </div>
-            <p className="stat-card-subtitle text-gray-600 dark:text-gray-400">{t('dashboard.inLastHours')}</p>
-          </CardContent>
-        </Card>
-
-        <Card className="stat-card card-elevated border-salis-black dark:border-white bg-salis-black dark:bg-white" data-testid="card-quality">
-          <CardContent className="p-8">
-            <div className="flex items-start justify-between mb-6">
-              <div className="flex-1">
-                <h3 className="stat-card-label text-white dark:text-salis-black mb-3">{t('dashboard.qualityCheck')}</h3>
-                <p className="stat-card-number text-white dark:text-salis-black">{qualityCheckCount}</p>
-              </div>
-              <div className="p-4 rounded-xl bg-white/20 dark:bg-salis-black/20">
-                <AlertCircle className="w-7 h-7 text-white dark:text-salis-black" />
-              </div>
-            </div>
-            <p className="stat-card-subtitle text-gray-300 dark:text-gray-600">{t('dashboard.inLastHours')}</p>
-          </CardContent>
-        </Card>
-
-        <Card className="stat-card card-elevated border-salis-50-black bg-salis-50-black dark:bg-salis-50-black" data-testid="card-completion">
-          <CardContent className="p-8">
-            <div className="flex items-start justify-between mb-6">
-              <div className="flex-1">
-                <h3 className="stat-card-label text-white mb-3">{t('dashboard.completion')}</h3>
-                <p className="stat-card-number text-white">{completionCount}</p>
-              </div>
-              <div className="p-4 rounded-xl bg-white/20">
-                <CheckCircle className="w-7 h-7 text-white" />
-              </div>
-            </div>
-            <p className="stat-card-subtitle text-gray-200">{t('dashboard.inLastHours')}</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Enhanced Chart Section */}
-      <Card className="card-elevated border-gray-200 dark:border-salis-gray-dark mb-12 bg-white dark:bg-salis-black" data-testid="card-chart">
-        <CardContent className="p-10">
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center gap-3">
-              <div className="p-3 rounded-lg bg-gray-100 dark:bg-salis-gray-dark">
-                <TrendingUp className="w-6 h-6 text-gray-700 dark:text-gray-300" />
-              </div>
+      {/* Role-based Quick Metrics */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        {roleBasedMetrics().map((metric, idx) => (
+          <Card key={idx} className="border border-gray-200 dark:border-salis-gray-dark bg-white dark:bg-salis-black/50">
+            <CardContent className="p-4 flex items-center justify-between">
               <div>
-                <h2 className="text-headline text-gray-900 dark:text-white">{t('dashboard.totalTasks')}</h2>
-                <p className="font-poppins text-sm text-gray-600 dark:text-gray-400 mt-1">{t('dashboard.thisMonth')}</p>
+                <p className="text-xs font-poppins text-gray-600 dark:text-gray-400 uppercase tracking-wide mb-1">{metric.label}</p>
+                <p className="text-2xl font-montserrat font-bold text-gray-900 dark:text-white">{metric.value}</p>
               </div>
+              <metric.icon className={`w-8 h-8 ${metric.color}`} />
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* Compact Stats Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <Card className="border border-gray-200 dark:border-salis-gray-dark bg-white dark:bg-salis-black" data-testid="card-check-in">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between mb-2">
+              <Clock className="w-5 h-5 text-yellow-600 dark:text-yellow-400" />
+              <span className="text-3xl font-montserrat font-bold text-gray-900 dark:text-white">{checkInCount}</span>
             </div>
-            <Badge variant="outline" className="px-4 py-2 text-sm font-medium border-gray-300 dark:border-salis-gray">
-              7 Days
-            </Badge>
+            <p className="text-xs font-poppins text-gray-600 dark:text-gray-400">{t('dashboard.checkIn')}</p>
+          </CardContent>
+        </Card>
+
+        <Card className="border border-gray-200 dark:border-salis-gray-dark bg-white dark:bg-salis-black" data-testid="card-repair">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between mb-2">
+              <Wrench className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              <span className="text-3xl font-montserrat font-bold text-gray-900 dark:text-white">{repairCount}</span>
+            </div>
+            <p className="text-xs font-poppins text-gray-600 dark:text-gray-400">{t('dashboard.repair')}</p>
+          </CardContent>
+        </Card>
+
+        <Card className="border border-gray-200 dark:border-salis-gray-dark bg-white dark:bg-salis-black" data-testid="card-quality">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between mb-2">
+              <AlertCircle className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+              <span className="text-3xl font-montserrat font-bold text-gray-900 dark:text-white">{qualityCheckCount}</span>
+            </div>
+            <p className="text-xs font-poppins text-gray-600 dark:text-gray-400">{t('dashboard.qualityCheck')}</p>
+          </CardContent>
+        </Card>
+
+        <Card className="border border-gray-200 dark:border-salis-gray-dark bg-white dark:bg-salis-black" data-testid="card-completion">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between mb-2">
+              <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400" />
+              <span className="text-3xl font-montserrat font-bold text-gray-900 dark:text-white">{completionCount}</span>
+            </div>
+            <p className="text-xs font-poppins text-gray-600 dark:text-gray-400">{t('dashboard.completion')}</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Compact Chart Section */}
+      <Card className="border border-gray-200 dark:border-salis-gray-dark mb-6 bg-white dark:bg-salis-black" data-testid="card-chart">
+        <CardContent className="p-5">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">{t('dashboard.totalTasks')}</h2>
+            <Badge variant="outline" className="text-xs">Last 7 days</Badge>
           </div>
           
-          {/* Improved Chart with Better Spacing */}
-          <div className="h-80 flex items-end justify-between gap-6 px-4">
-            {['Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'].map((month, i) => {
+          <div className="h-40 flex items-end justify-between gap-3">
+            {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((day, i) => {
               const heights = [60, 40, 80, 70, 50, 65, 75];
-              const values = [12, 8, 16, 14, 10, 13, 15];
+              const colors = ['bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-orange-500', 'bg-pink-500', 'bg-indigo-500', 'bg-teal-500'];
               return (
-                <div key={month} className="flex-1 flex flex-col items-center gap-4 group">
-                  <div className="relative w-full flex flex-col items-center">
-                    <span className="font-montserrat font-semibold text-sm text-gray-900 dark:text-white mb-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      {values[i]}
-                    </span>
-                    <div 
-                      className="w-full bg-gradient-to-t from-salis-black via-salis-gray to-salis-50-black dark:from-white dark:via-salis-gray-light dark:to-salis-50-black rounded-t-lg shadow-md hover:shadow-xl transition-all duration-300 hover:scale-105 cursor-pointer"
-                      style={{ height: `${heights[i]}%` }}
-                    ></div>
-                  </div>
-                  <span className="font-poppins font-medium text-sm text-gray-700 dark:text-gray-300">{month}</span>
+                <div key={i} className="flex-1 flex flex-col items-center gap-2 group">
+                  <div 
+                    className={`w-full ${colors[i]} rounded-t hover:opacity-80 transition-all cursor-pointer`}
+                    style={{ height: `${heights[i]}%` }}
+                  ></div>
+                  <span className="text-xs font-poppins text-gray-600 dark:text-gray-400">{day}</span>
                 </div>
               );
             })}
@@ -176,106 +201,116 @@ export function Dashboard() {
         </CardContent>
       </Card>
 
-      {/* Enhanced Tasks Table */}
-      <Card className="card-elevated border-gray-200 dark:border-salis-gray-dark bg-white dark:bg-salis-black" data-testid="card-tasks">
-        <CardContent className="p-10">
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h2 className="text-headline text-gray-900 dark:text-white mb-2">{t('dashboard.latestTasks')}</h2>
-              <p className="font-poppins text-sm text-gray-600 dark:text-gray-400">Overview of recent job cards</p>
-            </div>
-            <Button variant="ghost" className="text-gray-700 dark:text-gray-300 hover:text-salis-black dark:hover:text-white font-poppins text-base px-6" data-testid="button-view-all">
+      {/* Minimized Tasks Table */}
+      <Card className="border border-gray-200 dark:border-salis-gray-dark bg-white dark:bg-salis-black" data-testid="card-tasks">
+        <CardContent className="p-5">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">{t('dashboard.latestTasks')}</h2>
+            <Button variant="ghost" size="sm" className="text-gray-700 dark:text-gray-300" data-testid="button-view-all">
               {t('common.viewAll')} →
             </Button>
           </div>
 
           <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-salis-gray-dark">
-            <table className="w-full">
+            <table className="w-full text-sm">
               <thead className="bg-gray-50 dark:bg-salis-gray-dark/50">
                 <tr className="border-b border-gray-200 dark:border-salis-gray-dark">
-                  <th className="text-left py-5 px-6 font-poppins font-semibold text-sm text-gray-700 dark:text-gray-300 uppercase tracking-wide">{t('dashboard.taskId')}</th>
-                  <th className="text-left py-5 px-6 font-poppins font-semibold text-sm text-gray-700 dark:text-gray-300 uppercase tracking-wide">{t('dashboard.serviceType')}</th>
-                  <th className="text-left py-5 px-6 font-poppins font-semibold text-sm text-gray-700 dark:text-gray-300 uppercase tracking-wide">{t('dashboard.customerName')}</th>
-                  <th className="text-left py-5 px-6 font-poppins font-semibold text-sm text-gray-700 dark:text-gray-300 uppercase tracking-wide">{t('dashboard.status')}</th>
-                  <th className="text-left py-5 px-6 font-poppins font-semibold text-sm text-gray-700 dark:text-gray-300 uppercase tracking-wide">{t('dashboard.date')}</th>
-                  <th className="text-left py-5 px-6 font-poppins font-semibold text-sm text-gray-700 dark:text-gray-300 uppercase tracking-wide">{t('dashboard.priority')}</th>
-                  <th className="text-left py-5 px-6 font-poppins font-semibold text-sm text-gray-700 dark:text-gray-300 uppercase tracking-wide">{t('dashboard.action')}</th>
+                  <th className="text-left py-3 px-4 font-poppins font-semibold text-xs text-gray-700 dark:text-gray-300">ID</th>
+                  <th className="text-left py-3 px-4 font-poppins font-semibold text-xs text-gray-700 dark:text-gray-300">Service</th>
+                  <th className="text-left py-3 px-4 font-poppins font-semibold text-xs text-gray-700 dark:text-gray-300">Customer</th>
+                  <th className="text-left py-3 px-4 font-poppins font-semibold text-xs text-gray-700 dark:text-gray-300">Vehicle</th>
+                  <th className="text-left py-3 px-4 font-poppins font-semibold text-xs text-gray-700 dark:text-gray-300">Status</th>
+                  <th className="text-left py-3 px-4 font-poppins font-semibold text-xs text-gray-700 dark:text-gray-300">Priority</th>
+                  <th className="text-left py-3 px-4 font-poppins font-semibold text-xs text-gray-700 dark:text-gray-300">Date</th>
+                  <th className="text-left py-3 px-4 font-poppins font-semibold text-xs text-gray-700 dark:text-gray-300">Action</th>
                 </tr>
               </thead>
               <tbody>
                 {isLoading ? (
                   <tr>
-                    <td colSpan={7} className="py-16 text-center">
-                      <div className="animate-pulse text-lg text-gray-700 dark:text-gray-300">{t('common.loading')}</div>
+                    <td colSpan={8} className="py-8 text-center">
+                      <div className="animate-pulse text-gray-700 dark:text-gray-300">{t('common.loading')}</div>
                     </td>
                   </tr>
                 ) : latestTasks.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="py-16 text-center text-gray-500 dark:text-gray-500 text-base">{t('dashboard.noTasksAvailable')}</td>
+                    <td colSpan={8} className="py-8 text-center text-gray-500 dark:text-gray-500">{t('dashboard.noTasksAvailable')}</td>
                   </tr>
                 ) : (
-                  latestTasks.map((task) => (
-                    <tr key={task.id} className="border-b border-gray-100 dark:border-salis-gray-dark hover:bg-gray-50 dark:hover:bg-salis-gray-dark/30 transition-colors" data-testid={`row-task-${task.id}`}>
-                      <td className="py-5 px-6 font-poppins font-semibold text-base text-gray-900 dark:text-white">
-                        #{task.id}
-                      </td>
-                      <td className="py-5 px-6 font-poppins font-normal text-base text-gray-700 dark:text-gray-300">
-                        {task.serviceType}
-                      </td>
-                      <td className="py-5 px-6 font-poppins font-normal text-base text-gray-700 dark:text-gray-300">
-                        {(task.vehicleInfo as any)?.owner || 'N/A'}
-                      </td>
-                      <td className="py-5 px-6">
-                        <Badge className={`${getStatusBadge(task.status)} px-4 py-1.5 text-sm font-medium`} data-testid={`badge-status-${task.id}`}>
-                          {task.status}
-                        </Badge>
-                      </td>
-                      <td className="py-5 px-6 font-poppins font-normal text-base text-gray-600 dark:text-gray-400">
-                        {task.createdAt ? new Date(task.createdAt).toLocaleDateString() : 'N/A'}
-                      </td>
-                      <td className="py-5 px-6">
-                        <Badge className={`${getPriorityBadge(task.priority)} px-4 py-1.5 text-sm font-medium`} data-testid={`badge-priority-${task.id}`}>
-                          {task.priority}
-                        </Badge>
-                      </td>
-                      <td className="py-5 px-6">
-                        <Button 
-                          size="default" 
-                          variant="outline" 
-                          onClick={() => handleViewTask(task)}
-                          className="border-gray-300 dark:border-salis-gray text-gray-700 dark:text-gray-300 hover:bg-salis-black dark:hover:bg-white hover:text-white dark:hover:text-salis-black transition-colors px-6"
-                          data-testid={`button-view-${task.id}`}
-                        >
-                          {t('common.view')}
-                        </Button>
-                      </td>
-                    </tr>
-                  ))
+                  latestTasks.map((task) => {
+                    const serviceConfig = getServiceTypeBadge(task.serviceType);
+                    const statusConfig = getStatusBadge(task.status);
+                    const priorityConfig = getPriorityBadge(task.priority);
+                    const vehicleInfo = task.vehicleInfo as any;
+                    
+                    return (
+                      <tr key={task.id} className="border-b border-gray-100 dark:border-salis-gray-dark hover:bg-gray-50 dark:hover:bg-salis-gray-dark/30 transition-colors" data-testid={`row-task-${task.id}`}>
+                        <td className="py-3 px-4 font-mono text-xs font-semibold text-gray-900 dark:text-white">
+                          #{shortenId(task.id)}
+                        </td>
+                        <td className="py-3 px-4">
+                          <Badge className={`${serviceConfig.bg} ${serviceConfig.text} border-0 text-xs font-medium`}>
+                            {serviceConfig.icon} {serviceConfig.label}
+                          </Badge>
+                        </td>
+                        <td className="py-3 px-4 font-poppins text-sm text-gray-700 dark:text-gray-300">
+                          {vehicleInfo?.customerName || vehicleInfo?.owner || 'N/A'}
+                        </td>
+                        <td className="py-3 px-4 font-poppins text-sm text-gray-700 dark:text-gray-300">
+                          {vehicleInfo?.make} {vehicleInfo?.model}
+                        </td>
+                        <td className="py-3 px-4">
+                          <Badge className={`${statusConfig.bg} ${statusConfig.text} border-0 text-xs font-medium`} data-testid={`badge-status-${task.id}`}>
+                            {statusConfig.icon} {statusConfig.label}
+                          </Badge>
+                        </td>
+                        <td className="py-3 px-4">
+                          <Badge className={`${priorityConfig.bg} ${priorityConfig.text} border-0 text-xs font-medium shadow-sm`} data-testid={`badge-priority-${task.id}`}>
+                            {priorityConfig.icon} {priorityConfig.label.toUpperCase()}
+                          </Badge>
+                        </td>
+                        <td className="py-3 px-4 font-poppins text-xs text-gray-600 dark:text-gray-400">
+                          {task.createdAt ? new Date(task.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'N/A'}
+                        </td>
+                        <td className="py-3 px-4">
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            onClick={() => handleViewTask(task)}
+                            className="h-7 px-3 text-xs"
+                            data-testid={`button-view-${task.id}`}
+                          >
+                            View
+                          </Button>
+                        </td>
+                      </tr>
+                    );
+                  })
                 )}
               </tbody>
             </table>
           </div>
 
-          {/* Enhanced Pagination */}
-          {totalPages > 0 && (
-            <div className="flex items-center justify-between mt-8">
+          {/* Compact Pagination */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between mt-4">
               <Button 
                 variant="outline" 
-                size="default"
+                size="sm"
                 onClick={() => goToPage(currentPage - 1)}
                 disabled={currentPage === 1}
-                className="px-6 py-2.5"
+                className="h-8 px-3 text-xs"
                 data-testid="button-previous"
               >
-                ← {t('common.previous')}
+                ← Prev
               </Button>
-              <div className="flex gap-2">
-                {Array.from({ length: Math.min(totalPages, 10) }, (_, i) => i + 1).map((page) => (
+              <div className="flex gap-1">
+                {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => i + 1).map((page) => (
                   <Button 
                     key={page} 
                     variant={page === currentPage ? 'default' : 'outline'} 
-                    size="default"
-                    className="min-w-[48px] h-11"
+                    size="sm"
+                    className="h-8 w-8 p-0 text-xs"
                     onClick={() => goToPage(page)}
                     data-testid={`button-page-${page}`}
                   >
@@ -285,13 +320,13 @@ export function Dashboard() {
               </div>
               <Button 
                 variant="outline" 
-                size="default"
+                size="sm"
                 onClick={() => goToPage(currentPage + 1)}
                 disabled={currentPage === totalPages}
-                className="px-6 py-2.5"
+                className="h-8 px-3 text-xs"
                 data-testid="button-next"
               >
-                {t('common.next')} →
+                Next →
               </Button>
             </div>
           )}
