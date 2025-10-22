@@ -581,6 +581,58 @@ async function seed() {
 
     console.log('✅ Created stock alerts');
 
+    // Create task assignments
+    const taskStatuses = ['assigned', 'accepted', 'in_progress', 'completed'];
+    const taskTypes = ['diagnostic', 'repair', 'assembly', 'disassembly', 'cleaning', 'inspection'];
+    const taskPriorities = ['low', 'medium', 'high', 'urgent'];
+    const taskNames = [
+      'Replace engine oil and filter',
+      'Inspect brake system',
+      'Test battery and charging system',
+      'Rotate tires and check alignment',
+      'Check and top up all fluids',
+      'Inspect suspension components',
+      'Test drive and verify repairs',
+      'Clean and organize work area',
+      'Order replacement parts',
+      'Update customer on progress',
+      'Perform diagnostic scan',
+      'Replace air filter',
+      'Inspect exhaust system',
+      'Check tire pressure and condition',
+      'Lubricate door hinges and locks'
+    ];
+
+    const createdTasks = [];
+    for (let i = 0; i < 25; i++) {
+      const jobCard = createdJobCards[i % createdJobCards.length];
+      const tech = technicians[i % technicians.length];
+      const status = taskStatuses[Math.floor(Math.random() * taskStatuses.length)];
+      const taskType = taskTypes[Math.floor(Math.random() * taskTypes.length)];
+      const dueDate = new Date(Date.now() + (i - 12) * 24 * 60 * 60 * 1000);
+      
+      const [task] = await db.insert(taskAssignments).values({
+        jobCardId: jobCard.id,
+        taskName: taskNames[i % taskNames.length],
+        taskType,
+        description: `Complete ${taskNames[i % taskNames.length].toLowerCase()} for ${jobCard.vehicleInfo.make} ${jobCard.vehicleInfo.model}`,
+        assignedTo: tech.id,
+        assignedBy: userId,
+        userType: 'technician',
+        status,
+        priority: taskPriorities[Math.floor(Math.random() * taskPriorities.length)],
+        estimatedMinutes: Math.floor(Math.random() * 180 + 30),
+        actualMinutes: status === 'completed' ? Math.floor(Math.random() * 180 + 30) : null,
+        dueDate,
+        startedAt: status !== 'assigned' ? new Date(Date.now() - (13 - i) * 24 * 60 * 60 * 1000) : null,
+        completedAt: status === 'completed' ? new Date(Date.now() - (12 - i) * 24 * 60 * 60 * 1000) : null,
+        notes: i % 3 === 0 ? 'Customer waiting - high priority' : null,
+      }).returning();
+      createdTasks.push(task);
+    }
+
+    console.log(`✅ Created ${createdTasks.length} task assignments`);
+
     console.log('\n🎉 Database seeding completed successfully!');
     console.log('\n📊 Summary:');
     console.log(`   - ${customers.length} customers`);
@@ -588,6 +640,7 @@ async function seed() {
     console.log(`   - ${createdVehicles.length} vehicles`);
     console.log(`   - ${createdParts.length} spare parts`);
     console.log(`   - ${createdJobCards.length} job cards`);
+    console.log(`   - ${createdTasks.length} task assignments`);
     console.log(`   - 20 appointments`);
     console.log(`   - ${createdInvoices.length} invoices`);
     console.log(`   - 10 estimates`);
