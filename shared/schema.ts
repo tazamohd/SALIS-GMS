@@ -2503,3 +2503,905 @@ export const insertChatMessageReactionSchema = createInsertSchema(chatMessageRea
   id: true,
   createdAt: true,
 });
+
+// Module 37: Customer Self-Service Portal
+export const customerPortalSessions = pgTable("customer_portal_sessions", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  customerId: varchar("customer_id")
+    .references(() => users.id)
+    .notNull(),
+  token: varchar("token", { length: 500 }).notNull().unique(),
+  expiresAt: timestamp("expires_at").notNull(),
+  lastAccessedAt: timestamp("last_accessed_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const customerPortalSettings = pgTable("customer_portal_settings", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id")
+    .references(() => garages.id)
+    .notNull(),
+  allowOnlineBooking: boolean("allow_online_booking").default(true),
+  allowEstimateApproval: boolean("allow_estimate_approval").default(true),
+  allowOnlinePayment: boolean("allow_online_payment").default(true),
+  allowServiceHistoryView: boolean("allow_service_history_view").default(true),
+  requireEmailVerification: boolean("require_email_verification").default(true),
+  customBranding: jsonb("custom_branding").default({}),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Module 38: Digital Signatures & Media Documentation
+export const digitalSignatures = pgTable("digital_signatures", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id")
+    .references(() => garages.id)
+    .notNull(),
+  relatedType: varchar("related_type", { length: 50 }).notNull(), // "job_card", "estimate", "invoice", "vehicle_inspection"
+  relatedId: uuid("related_id").notNull(),
+  signedBy: varchar("signed_by")
+    .references(() => users.id)
+    .notNull(),
+  signatureData: text("signature_data").notNull(), // Base64 encoded signature image
+  signatureType: varchar("signature_type", { length: 50 }).default("customer"), // "customer", "technician", "manager"
+  ipAddress: varchar("ip_address", { length: 50 }),
+  deviceInfo: varchar("device_info", { length: 255 }),
+  consentText: text("consent_text"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const mediaAttachments = pgTable("media_attachments", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id")
+    .references(() => garages.id)
+    .notNull(),
+  relatedType: varchar("related_type", { length: 50 }).notNull(), // "job_card", "vehicle", "inspection", "estimate"
+  relatedId: uuid("related_id").notNull(),
+  mediaType: varchar("media_type", { length: 50 }).notNull(), // "photo", "video", "audio", "document"
+  fileUrl: varchar("file_url", { length: 500 }).notNull(),
+  fileName: varchar("file_name", { length: 255 }).notNull(),
+  fileSize: integer("file_size"), // in bytes
+  mimeType: varchar("mime_type", { length: 100 }),
+  category: varchar("category", { length: 100 }), // "before", "after", "damage", "walkaround", "invoice", "estimate"
+  description: text("description"),
+  uploadedBy: varchar("uploaded_by").references(() => users.id),
+  thumbnailUrl: varchar("thumbnail_url", { length: 500 }),
+  metadata: jsonb("metadata").default({}),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Module 39: QR Code Check-In System
+export const qrCodeTokens = pgTable("qr_code_tokens", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id")
+    .references(() => garages.id)
+    .notNull(),
+  appointmentId: uuid("appointment_id").references(() => appointments.id),
+  customerId: varchar("customer_id")
+    .references(() => users.id)
+    .notNull(),
+  vehicleId: uuid("vehicle_id").references(() => vehicles.id),
+  qrCodeData: varchar("qr_code_data", { length: 500 }).notNull().unique(),
+  qrCodeImageUrl: varchar("qr_code_image_url", { length: 500 }),
+  tokenType: varchar("token_type", { length: 50 }).default("appointment"), // "appointment", "vehicle_dropoff", "loyalty_card"
+  isUsed: boolean("is_used").default(false),
+  usedAt: timestamp("used_at"),
+  expiresAt: timestamp("expires_at").notNull(),
+  metadata: jsonb("metadata").default({}),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const qrScanLogs = pgTable("qr_scan_logs", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  qrCodeId: uuid("qr_code_id")
+    .references(() => qrCodeTokens.id)
+    .notNull(),
+  scannedBy: varchar("scanned_by").references(() => users.id),
+  scanLocation: varchar("scan_location", { length: 255 }),
+  deviceInfo: varchar("device_info", { length: 255 }),
+  ipAddress: varchar("ip_address", { length: 50 }),
+  scanResult: varchar("scan_result", { length: 50 }).default("success"), // "success", "expired", "invalid", "already_used"
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Module 40: Fleet Management
+export const fleetGroups = pgTable("fleet_groups", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id")
+    .references(() => garages.id)
+    .notNull(),
+  customerId: varchar("customer_id")
+    .references(() => users.id)
+    .notNull(),
+  fleetName: varchar("fleet_name", { length: 255 }).notNull(),
+  companyName: varchar("company_name", { length: 255 }),
+  contactPerson: varchar("contact_person", { length: 255 }),
+  contactEmail: varchar("contact_email", { length: 255 }),
+  contactPhone: varchar("contact_phone", { length: 20 }),
+  billingAddress: text("billing_address"),
+  taxId: varchar("tax_id", { length: 100 }),
+  discountPercentage: decimal("discount_percentage", { precision: 5, scale: 2 }).default("0.00"),
+  paymentTerms: varchar("payment_terms", { length: 100 }), // "net_30", "net_60", "prepaid"
+  preferredPaymentMethod: varchar("preferred_payment_method", { length: 50 }),
+  isActive: boolean("is_active").default(true),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const fleetVehicles = pgTable("fleet_vehicles", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  fleetGroupId: uuid("fleet_group_id")
+    .references(() => fleetGroups.id)
+    .notNull(),
+  vehicleId: uuid("vehicle_id")
+    .references(() => vehicles.id)
+    .notNull(),
+  fleetNumber: varchar("fleet_number", { length: 100 }),
+  department: varchar("department", { length: 100 }),
+  assignedDriver: varchar("assigned_driver", { length: 255 }),
+  driverPhone: varchar("driver_phone", { length: 20 }),
+  averageMonthlyMileage: integer("average_monthly_mileage"),
+  customMaintenanceSchedule: jsonb("custom_maintenance_schedule").default([]),
+  isActive: boolean("is_active").default(true),
+  notes: text("notes"),
+  assignedAt: timestamp("assigned_at").defaultNow(),
+});
+
+export const fleetContracts = pgTable("fleet_contracts", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  fleetGroupId: uuid("fleet_group_id")
+    .references(() => fleetGroups.id)
+    .notNull(),
+  contractNumber: varchar("contract_number", { length: 100 }).notNull().unique(),
+  contractType: varchar("contract_type", { length: 50 }).notNull(), // "maintenance", "full_service", "parts_only"
+  startDate: timestamp("start_date").notNull(),
+  endDate: timestamp("end_date").notNull(),
+  monthlyFee: decimal("monthly_fee", { precision: 10, scale: 2 }),
+  discountPercentage: decimal("discount_percentage", { precision: 5, scale: 2 }).default("0.00"),
+  includedServices: jsonb("included_services").default([]),
+  excludedServices: jsonb("excluded_services").default([]),
+  maxVehicles: integer("max_vehicles"),
+  billingCycle: varchar("billing_cycle", { length: 50 }).default("monthly"), // "monthly", "quarterly", "annual"
+  autoRenew: boolean("auto_renew").default(false),
+  status: varchar("status", { length: 50 }).default("active"), // "draft", "active", "expired", "cancelled"
+  terms: text("terms"),
+  createdBy: varchar("created_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Module 41: Warranty Tracking
+export const warranties = pgTable("warranties", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id")
+    .references(() => garages.id)
+    .notNull(),
+  warrantyType: varchar("warranty_type", { length: 50 }).notNull(), // "parts", "labor", "combined"
+  relatedType: varchar("related_type", { length: 50 }).notNull(), // "job_card", "spare_part", "service"
+  relatedId: uuid("related_id").notNull(),
+  vehicleId: uuid("vehicle_id").references(() => vehicles.id),
+  customerId: varchar("customer_id").references(() => users.id),
+  warrantyNumber: varchar("warranty_number", { length: 100 }).unique(),
+  provider: varchar("provider", { length: 255 }), // "manufacturer", "garage", "third_party"
+  providerName: varchar("provider_name", { length: 255 }),
+  coverageDescription: text("coverage_description").notNull(),
+  startDate: timestamp("start_date").notNull(),
+  endDate: timestamp("end_date").notNull(),
+  mileageLimit: integer("mileage_limit"),
+  currentMileage: integer("current_mileage"),
+  terms: text("terms"),
+  exclusions: text("exclusions"),
+  status: varchar("status", { length: 50 }).default("active"), // "active", "expired", "claimed", "voided"
+  isTransferable: boolean("is_transferable").default(false),
+  documentUrl: varchar("document_url", { length: 500 }),
+  createdBy: varchar("created_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const warrantyClaims = pgTable("warranty_claims", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  warrantyId: uuid("warranty_id")
+    .references(() => warranties.id)
+    .notNull(),
+  claimNumber: varchar("claim_number", { length: 100 }).unique(),
+  jobCardId: uuid("job_card_id").references(() => jobCards.id),
+  claimDate: timestamp("claim_date").notNull(),
+  issueDescription: text("issue_description").notNull(),
+  claimAmount: decimal("claim_amount", { precision: 10, scale: 2 }),
+  approvedAmount: decimal("approved_amount", { precision: 10, scale: 2 }),
+  status: varchar("status", { length: 50 }).default("submitted"), // "submitted", "under_review", "approved", "rejected", "paid"
+  submittedBy: varchar("submitted_by").references(() => users.id),
+  reviewedBy: varchar("reviewed_by").references(() => users.id),
+  rejectionReason: text("rejection_reason"),
+  approvalNotes: text("approval_notes"),
+  paymentDate: timestamp("payment_date"),
+  supportingDocuments: jsonb("supporting_documents").default([]),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Module 42: Marketing Automation
+export const marketingCampaigns = pgTable("marketing_campaigns", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id")
+    .references(() => garages.id)
+    .notNull(),
+  campaignName: varchar("campaign_name", { length: 255 }).notNull(),
+  campaignType: varchar("campaign_type", { length: 50 }).notNull(), // "email", "sms", "both"
+  category: varchar("category", { length: 100 }), // "service_reminder", "promotion", "birthday", "retention", "review_request"
+  targetAudience: varchar("target_audience", { length: 50 }).default("all"), // "all", "active", "inactive", "high_value", "custom"
+  targetFilters: jsonb("target_filters").default({}),
+  subject: varchar("subject", { length: 500 }),
+  emailContent: text("email_content"),
+  smsContent: text("sms_content"),
+  scheduledDate: timestamp("scheduled_date"),
+  sendImmediately: boolean("send_immediately").default(false),
+  status: varchar("status", { length: 50 }).default("draft"), // "draft", "scheduled", "sending", "sent", "cancelled"
+  totalRecipients: integer("total_recipients").default(0),
+  sentCount: integer("sent_count").default(0),
+  deliveredCount: integer("delivered_count").default(0),
+  openedCount: integer("opened_count").default(0),
+  clickedCount: integer("clicked_count").default(0),
+  unsubscribedCount: integer("unsubscribed_count").default(0),
+  createdBy: varchar("created_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const campaignRecipients = pgTable("campaign_recipients", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  campaignId: uuid("campaign_id")
+    .references(() => marketingCampaigns.id)
+    .notNull(),
+  customerId: varchar("customer_id")
+    .references(() => users.id)
+    .notNull(),
+  status: varchar("status", { length: 50 }).default("pending"), // "pending", "sent", "delivered", "bounced", "opened", "clicked", "unsubscribed"
+  sentAt: timestamp("sent_at"),
+  deliveredAt: timestamp("delivered_at"),
+  openedAt: timestamp("opened_at"),
+  clickedAt: timestamp("clicked_at"),
+  unsubscribedAt: timestamp("unsubscribed_at"),
+  errorMessage: text("error_message"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Module 43: Vendor/Supplier Portal (extends existing suppliers table from Module 11)
+export const supplierPriceList = pgTable("supplier_price_list", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  supplierId: uuid("supplier_id")
+    .references(() => suppliers.id)
+    .notNull(),
+  sparePartId: uuid("spare_part_id").references(() => spareParts.id),
+  partName: varchar("part_name", { length: 255 }).notNull(),
+  partNumber: varchar("part_number", { length: 100 }),
+  unitPrice: decimal("unit_price", { precision: 10, scale: 2 }).notNull(),
+  currency: varchar("currency", { length: 10 }).default("USD"),
+  minimumOrderQuantity: integer("minimum_order_quantity").default(1),
+  leadTimeDays: integer("lead_time_days"),
+  availability: varchar("availability", { length: 50 }).default("in_stock"), // "in_stock", "limited", "out_of_stock", "discontinued"
+  validFrom: timestamp("valid_from").defaultNow(),
+  validUntil: timestamp("valid_until"),
+  isActive: boolean("is_active").default(true),
+  lastUpdated: timestamp("last_updated").defaultNow(),
+});
+
+export const supplierPerformance = pgTable("supplier_performance", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  supplierId: uuid("supplier_id")
+    .references(() => suppliers.id)
+    .notNull(),
+  period: varchar("period", { length: 50 }).notNull(), // "2025-01", "2025-Q1"
+  totalOrders: integer("total_orders").default(0),
+  totalValue: decimal("total_value", { precision: 12, scale: 2 }).default("0.00"),
+  onTimeDeliveryRate: decimal("on_time_delivery_rate", { precision: 5, scale: 2 }), // Percentage
+  qualityScore: decimal("quality_score", { precision: 5, scale: 2 }), // 0-100
+  defectRate: decimal("defect_rate", { precision: 5, scale: 2 }), // Percentage
+  averageLeadTime: decimal("average_lead_time", { precision: 5, scale: 2 }), // Days
+  priceCompetitiveness: decimal("price_competitiveness", { precision: 5, scale: 2 }), // 0-100
+  overallRating: decimal("overall_rating", { precision: 3, scale: 2 }), // 0.00 to 5.00
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Module 44: Customer Loyalty Program
+export const loyaltyProgram = pgTable("loyalty_program", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id")
+    .references(() => garages.id)
+    .notNull(),
+  programName: varchar("program_name", { length: 255 }).notNull(),
+  description: text("description"),
+  pointsPerDollar: decimal("points_per_dollar", { precision: 5, scale: 2 }).default("1.00"),
+  pointsExpireDays: integer("points_expire_days"), // null = never expire
+  referralBonusPoints: integer("referral_bonus_points").default(0),
+  birthdayBonusPoints: integer("birthday_bonus_points").default(0),
+  tierSystem: jsonb("tier_system").default([]), // Array of {name, minPoints, benefits, discount}
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const customerLoyaltyAccounts = pgTable("customer_loyalty_accounts", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  customerId: varchar("customer_id")
+    .references(() => users.id)
+    .notNull(),
+  programId: uuid("program_id")
+    .references(() => loyaltyProgram.id)
+    .notNull(),
+  totalPointsEarned: integer("total_points_earned").default(0),
+  currentPoints: integer("current_points").default(0),
+  lifetimeSpent: decimal("lifetime_spent", { precision: 12, scale: 2 }).default("0.00"),
+  currentTier: varchar("current_tier", { length: 50 }).default("bronze"), // "bronze", "silver", "gold", "platinum"
+  tierSince: timestamp("tier_since").defaultNow(),
+  referralCode: varchar("referral_code", { length: 50 }).unique(),
+  successfulReferrals: integer("successful_referrals").default(0),
+  enrolledAt: timestamp("enrolled_at").defaultNow(),
+});
+
+export const loyaltyTransactions = pgTable("loyalty_transactions", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  accountId: uuid("account_id")
+    .references(() => customerLoyaltyAccounts.id)
+    .notNull(),
+  transactionType: varchar("transaction_type", { length: 50 }).notNull(), // "earn", "redeem", "expire", "adjust", "referral", "birthday"
+  points: integer("points").notNull(), // Positive for earn, negative for redeem
+  relatedType: varchar("related_type", { length: 50 }), // "invoice", "referral", "manual", "birthday"
+  relatedId: uuid("related_id"),
+  description: text("description"),
+  expiresAt: timestamp("expires_at"),
+  createdBy: varchar("created_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const loyaltyRewards = pgTable("loyalty_rewards", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  programId: uuid("program_id")
+    .references(() => loyaltyProgram.id)
+    .notNull(),
+  rewardName: varchar("reward_name", { length: 255 }).notNull(),
+  description: text("description"),
+  pointsCost: integer("points_cost").notNull(),
+  rewardType: varchar("reward_type", { length: 50 }).notNull(), // "discount", "free_service", "gift", "upgrade"
+  rewardValue: decimal("reward_value", { precision: 10, scale: 2 }),
+  availability: integer("availability"), // null = unlimited
+  redeemed: integer("redeemed").default(0),
+  validFrom: timestamp("valid_from").defaultNow(),
+  validUntil: timestamp("valid_until"),
+  terms: text("terms"),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const loyaltyRedemptions = pgTable("loyalty_redemptions", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  accountId: uuid("account_id")
+    .references(() => customerLoyaltyAccounts.id)
+    .notNull(),
+  rewardId: uuid("reward_id")
+    .references(() => loyaltyRewards.id)
+    .notNull(),
+  pointsRedeemed: integer("points_redeemed").notNull(),
+  redemptionCode: varchar("redemption_code", { length: 100 }).unique(),
+  status: varchar("status", { length: 50 }).default("pending"), // "pending", "approved", "used", "expired", "cancelled"
+  usedAt: timestamp("used_at"),
+  expiresAt: timestamp("expires_at"),
+  relatedInvoiceId: uuid("related_invoice_id").references(() => invoices.id),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Module 45: Vehicle Inspection Checklists
+export const inspectionTemplates = pgTable("inspection_templates", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id")
+    .references(() => garages.id)
+    .notNull(),
+  templateName: varchar("template_name", { length: 255 }).notNull(),
+  description: text("description"),
+  category: varchar("category", { length: 100 }), // "general", "pre_purchase", "seasonal", "safety", "state_inspection"
+  vehicleTypes: jsonb("vehicle_types").default([]), // ["car", "truck", "motorcycle"]
+  checklistItems: jsonb("checklist_items").notNull(), // Array of {section, item, type, required, passCriteria}
+  estimateRules: jsonb("estimate_rules").default([]), // Auto-generate estimates based on findings
+  isDefault: boolean("is_default").default(false),
+  isActive: boolean("is_active").default(true),
+  createdBy: varchar("created_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const vehicleInspections = pgTable("vehicle_inspections", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id")
+    .references(() => garages.id)
+    .notNull(),
+  inspectionNumber: varchar("inspection_number", { length: 100 }).unique(),
+  templateId: uuid("template_id").references(() => inspectionTemplates.id),
+  vehicleId: uuid("vehicle_id")
+    .references(() => vehicles.id)
+    .notNull(),
+  customerId: varchar("customer_id")
+    .references(() => users.id)
+    .notNull(),
+  jobCardId: uuid("job_card_id").references(() => jobCards.id),
+  inspectorId: varchar("inspector_id")
+    .references(() => users.id)
+    .notNull(),
+  currentMileage: integer("current_mileage"),
+  inspectionType: varchar("inspection_type", { length: 50 }).notNull(),
+  overallStatus: varchar("overall_status", { length: 50 }).default("in_progress"), // "in_progress", "completed", "failed", "passed"
+  findings: jsonb("findings").notNull(), // Array of {item, status, severity, notes, photoUrls}
+  recommendations: jsonb("recommendations").default([]),
+  estimatedCost: decimal("estimated_cost", { precision: 10, scale: 2 }),
+  estimateGenerated: boolean("estimate_generated").default(false),
+  estimateId: uuid("estimate_id").references(() => estimates.id),
+  customerNotified: boolean("customer_notified").default(false),
+  customerSignatureId: uuid("customer_signature_id").references(() => digitalSignatures.id),
+  inspectionDate: timestamp("inspection_date").defaultNow(),
+  completedAt: timestamp("completed_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Module 46: Towing & Roadside Assistance
+export const towingRequests = pgTable("towing_requests", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id")
+    .references(() => garages.id)
+    .notNull(),
+  requestNumber: varchar("request_number", { length: 100 }).unique(),
+  customerId: varchar("customer_id")
+    .references(() => users.id)
+    .notNull(),
+  vehicleId: uuid("vehicle_id").references(() => vehicles.id),
+  serviceType: varchar("service_type", { length: 50 }).notNull(), // "towing", "jumpstart", "tire_change", "fuel_delivery", "lockout"
+  pickupLocation: text("pickup_location").notNull(),
+  pickupLatitude: decimal("pickup_latitude", { precision: 10, scale: 7 }),
+  pickupLongitude: decimal("pickup_longitude", { precision: 10, scale: 7 }),
+  dropoffLocation: text("dropoff_location"),
+  dropoffLatitude: decimal("dropoff_latitude", { precision: 10, scale: 7 }),
+  dropoffLongitude: decimal("dropoff_longitude", { precision: 10, scale: 7 }),
+  urgency: varchar("urgency", { length: 50 }).default("normal"), // "normal", "urgent", "emergency"
+  status: varchar("status", { length: 50 }).default("requested"), // "requested", "assigned", "en_route", "arrived", "in_progress", "completed", "cancelled"
+  assignedDriverId: varchar("assigned_driver_id").references(() => users.id),
+  estimatedArrival: timestamp("estimated_arrival"),
+  actualArrival: timestamp("actual_arrival"),
+  serviceCost: decimal("service_cost", { precision: 10, scale: 2 }),
+  distance: decimal("distance", { precision: 8, scale: 2 }), // in miles/km
+  notes: text("notes"),
+  customerNotes: text("customer_notes"),
+  requestedAt: timestamp("requested_at").defaultNow(),
+  completedAt: timestamp("completed_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const towTrucks = pgTable("tow_trucks", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id")
+    .references(() => garages.id)
+    .notNull(),
+  truckName: varchar("truck_name", { length: 255 }).notNull(),
+  truckNumber: varchar("truck_number", { length: 100 }),
+  licensePlate: varchar("license_plate", { length: 50 }),
+  capacity: varchar("capacity", { length: 100 }), // "light_duty", "medium_duty", "heavy_duty"
+  currentDriverId: varchar("current_driver_id").references(() => users.id),
+  status: varchar("status", { length: 50 }).default("available"), // "available", "on_job", "maintenance", "offline"
+  currentLocation: text("current_location"),
+  gpsEnabled: boolean("gps_enabled").default(false),
+  lastKnownLatitude: decimal("last_known_latitude", { precision: 10, scale: 7 }),
+  lastKnownLongitude: decimal("last_known_longitude", { precision: 10, scale: 7 }),
+  lastLocationUpdate: timestamp("last_location_update"),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Module 47: Document Management
+export const documentCategories = pgTable("document_categories", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id")
+    .references(() => garages.id)
+    .notNull(),
+  categoryName: varchar("category_name", { length: 255 }).notNull(),
+  description: text("description"),
+  requiresExpiration: boolean("requires_expiration").default(false),
+  expirationWarningDays: integer("expiration_warning_days").default(30),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const documents = pgTable("documents", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id")
+    .references(() => garages.id)
+    .notNull(),
+  categoryId: uuid("category_id").references(() => documentCategories.id),
+  documentName: varchar("document_name", { length: 255 }).notNull(),
+  description: text("description"),
+  relatedType: varchar("related_type", { length: 50 }), // "vehicle", "customer", "employee", "garage", "supplier"
+  relatedId: varchar("related_id"),
+  fileUrl: varchar("file_url", { length: 500 }).notNull(),
+  fileName: varchar("file_name", { length: 255 }).notNull(),
+  fileSize: integer("file_size"),
+  mimeType: varchar("mime_type", { length: 100 }),
+  documentNumber: varchar("document_number", { length: 100 }),
+  issueDate: timestamp("issue_date"),
+  expirationDate: timestamp("expiration_date"),
+  reminderSent: boolean("reminder_sent").default(false),
+  status: varchar("status", { length: 50 }).default("active"), // "active", "expired", "archived"
+  tags: jsonb("tags").default([]),
+  uploadedBy: varchar("uploaded_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const documentAccessLog = pgTable("document_access_log", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  documentId: uuid("document_id")
+    .references(() => documents.id)
+    .notNull(),
+  accessedBy: varchar("accessed_by")
+    .references(() => users.id)
+    .notNull(),
+  action: varchar("action", { length: 50 }).notNull(), // "view", "download", "update", "delete"
+  ipAddress: varchar("ip_address", { length: 50 }),
+  deviceInfo: varchar("device_info", { length: 255 }),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Module 48: Loaner Vehicle Management
+export const loanerVehicles = pgTable("loaner_vehicles", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id")
+    .references(() => garages.id)
+    .notNull(),
+  vehicleId: uuid("vehicle_id").references(() => vehicles.id),
+  loanerNumber: varchar("loaner_number", { length: 100 }).unique(),
+  make: varchar("make", { length: 100 }).notNull(),
+  model: varchar("model", { length: 100 }).notNull(),
+  year: integer("year").notNull(),
+  licensePlate: varchar("license_plate", { length: 50 }),
+  vin: varchar("vin", { length: 17 }),
+  color: varchar("color", { length: 50 }),
+  currentMileage: integer("current_mileage"),
+  dailyRate: decimal("daily_rate", { precision: 8, scale: 2 }).default("0.00"),
+  depositAmount: decimal("deposit_amount", { precision: 10, scale: 2 }).default("0.00"),
+  insuranceCoverage: text("insurance_coverage"),
+  status: varchar("status", { length: 50 }).default("available"), // "available", "reserved", "on_loan", "maintenance", "retired"
+  condition: varchar("condition", { length: 50 }).default("good"), // "excellent", "good", "fair", "poor"
+  lastServiceDate: timestamp("last_service_date"),
+  nextServiceDue: integer("next_service_due"),
+  features: jsonb("features").default([]),
+  restrictions: text("restrictions"),
+  isActive: boolean("is_active").default(true),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const loanerReservations = pgTable("loaner_reservations", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  loanerVehicleId: uuid("loaner_vehicle_id")
+    .references(() => loanerVehicles.id)
+    .notNull(),
+  customerId: varchar("customer_id")
+    .references(() => users.id)
+    .notNull(),
+  jobCardId: uuid("job_card_id").references(() => jobCards.id),
+  reservationNumber: varchar("reservation_number", { length: 100 }).unique(),
+  startDate: timestamp("start_date").notNull(),
+  endDate: timestamp("end_date").notNull(),
+  actualReturnDate: timestamp("actual_return_date"),
+  startMileage: integer("start_mileage"),
+  endMileage: integer("end_mileage"),
+  startFuelLevel: varchar("start_fuel_level", { length: 20 }), // "empty", "quarter", "half", "three_quarters", "full"
+  endFuelLevel: varchar("end_fuel_level", { length: 20 }),
+  depositPaid: decimal("deposit_paid", { precision: 10, scale: 2 }),
+  depositRefunded: decimal("deposit_refunded", { precision: 10, scale: 2 }),
+  totalCost: decimal("total_cost", { precision: 10, scale: 2 }),
+  damageReported: boolean("damage_reported").default(false),
+  damageDescription: text("damage_description"),
+  damagePhotos: jsonb("damage_photos").default([]),
+  damageCharge: decimal("damage_charge", { precision: 10, scale: 2 }),
+  status: varchar("status", { length: 50 }).default("reserved"), // "reserved", "active", "returned", "late", "cancelled"
+  agreementSignatureId: uuid("agreement_signature_id").references(() => digitalSignatures.id),
+  returnSignatureId: uuid("return_signature_id").references(() => digitalSignatures.id),
+  notes: text("notes"),
+  createdBy: varchar("created_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Type exports for new modules (37-48)
+
+// Module 37: Customer Portal
+export type CustomerPortalSession = typeof customerPortalSessions.$inferSelect;
+export type InsertCustomerPortalSession = typeof customerPortalSessions.$inferInsert;
+export const insertCustomerPortalSessionSchema = createInsertSchema(customerPortalSessions).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type CustomerPortalSettings = typeof customerPortalSettings.$inferSelect;
+export type InsertCustomerPortalSettings = typeof customerPortalSettings.$inferInsert;
+export const insertCustomerPortalSettingsSchema = createInsertSchema(customerPortalSettings).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+// Module 38: Digital Signatures & Media
+export type DigitalSignature = typeof digitalSignatures.$inferSelect;
+export type InsertDigitalSignature = typeof digitalSignatures.$inferInsert;
+export const insertDigitalSignatureSchema = createInsertSchema(digitalSignatures).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type MediaAttachment = typeof mediaAttachments.$inferSelect;
+export type InsertMediaAttachment = typeof mediaAttachments.$inferInsert;
+export const insertMediaAttachmentSchema = createInsertSchema(mediaAttachments).omit({
+  id: true,
+  createdAt: true,
+});
+
+// Module 39: QR Code System
+export type QrCodeToken = typeof qrCodeTokens.$inferSelect;
+export type InsertQrCodeToken = typeof qrCodeTokens.$inferInsert;
+export const insertQrCodeTokenSchema = createInsertSchema(qrCodeTokens).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type QrScanLog = typeof qrScanLogs.$inferSelect;
+export type InsertQrScanLog = typeof qrScanLogs.$inferInsert;
+export const insertQrScanLogSchema = createInsertSchema(qrScanLogs).omit({
+  id: true,
+  createdAt: true,
+});
+
+// Module 40: Fleet Management
+export type FleetGroup = typeof fleetGroups.$inferSelect;
+export type InsertFleetGroup = typeof fleetGroups.$inferInsert;
+export const insertFleetGroupSchema = createInsertSchema(fleetGroups).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type FleetVehicle = typeof fleetVehicles.$inferSelect;
+export type InsertFleetVehicle = typeof fleetVehicles.$inferInsert;
+export const insertFleetVehicleSchema = createInsertSchema(fleetVehicles).omit({
+  id: true,
+  assignedAt: true,
+});
+
+export type FleetContract = typeof fleetContracts.$inferSelect;
+export type InsertFleetContract = typeof fleetContracts.$inferInsert;
+export const insertFleetContractSchema = createInsertSchema(fleetContracts).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+// Module 41: Warranty Tracking
+export type Warranty = typeof warranties.$inferSelect;
+export type InsertWarranty = typeof warranties.$inferInsert;
+export const insertWarrantySchema = createInsertSchema(warranties).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type WarrantyClaim = typeof warrantyClaims.$inferSelect;
+export type InsertWarrantyClaim = typeof warrantyClaims.$inferInsert;
+export const insertWarrantyClaimSchema = createInsertSchema(warrantyClaims).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+// Module 42: Marketing Automation
+export type MarketingCampaign = typeof marketingCampaigns.$inferSelect;
+export type InsertMarketingCampaign = typeof marketingCampaigns.$inferInsert;
+export const insertMarketingCampaignSchema = createInsertSchema(marketingCampaigns).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type CampaignRecipient = typeof campaignRecipients.$inferSelect;
+export type InsertCampaignRecipient = typeof campaignRecipients.$inferInsert;
+export const insertCampaignRecipientSchema = createInsertSchema(campaignRecipients).omit({
+  id: true,
+  createdAt: true,
+});
+
+// Module 43: Vendor/Supplier Portal (Supplier types already exported in Module 11)
+export type SupplierPriceList = typeof supplierPriceList.$inferSelect;
+export type InsertSupplierPriceList = typeof supplierPriceList.$inferInsert;
+export const insertSupplierPriceListSchema = createInsertSchema(supplierPriceList).omit({
+  id: true,
+  lastUpdated: true,
+});
+
+export type SupplierPerformance = typeof supplierPerformance.$inferSelect;
+export type InsertSupplierPerformance = typeof supplierPerformance.$inferInsert;
+export const insertSupplierPerformanceSchema = createInsertSchema(supplierPerformance).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+// Module 44: Customer Loyalty Program
+export type LoyaltyProgram = typeof loyaltyProgram.$inferSelect;
+export type InsertLoyaltyProgram = typeof loyaltyProgram.$inferInsert;
+export const insertLoyaltyProgramSchema = createInsertSchema(loyaltyProgram).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type CustomerLoyaltyAccount = typeof customerLoyaltyAccounts.$inferSelect;
+export type InsertCustomerLoyaltyAccount = typeof customerLoyaltyAccounts.$inferInsert;
+export const insertCustomerLoyaltyAccountSchema = createInsertSchema(customerLoyaltyAccounts).omit({
+  id: true,
+  enrolledAt: true,
+  tierSince: true,
+});
+
+export type LoyaltyTransaction = typeof loyaltyTransactions.$inferSelect;
+export type InsertLoyaltyTransaction = typeof loyaltyTransactions.$inferInsert;
+export const insertLoyaltyTransactionSchema = createInsertSchema(loyaltyTransactions).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type LoyaltyReward = typeof loyaltyRewards.$inferSelect;
+export type InsertLoyaltyReward = typeof loyaltyRewards.$inferInsert;
+export const insertLoyaltyRewardSchema = createInsertSchema(loyaltyRewards).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type LoyaltyRedemption = typeof loyaltyRedemptions.$inferSelect;
+export type InsertLoyaltyRedemption = typeof loyaltyRedemptions.$inferInsert;
+export const insertLoyaltyRedemptionSchema = createInsertSchema(loyaltyRedemptions).omit({
+  id: true,
+  createdAt: true,
+});
+
+// Module 45: Vehicle Inspection Checklists
+export type InspectionTemplate = typeof inspectionTemplates.$inferSelect;
+export type InsertInspectionTemplate = typeof inspectionTemplates.$inferInsert;
+export const insertInspectionTemplateSchema = createInsertSchema(inspectionTemplates).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type VehicleInspection = typeof vehicleInspections.$inferSelect;
+export type InsertVehicleInspection = typeof vehicleInspections.$inferInsert;
+export const insertVehicleInspectionSchema = createInsertSchema(vehicleInspections).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+// Module 46: Towing & Roadside Assistance
+export type TowingRequest = typeof towingRequests.$inferSelect;
+export type InsertTowingRequest = typeof towingRequests.$inferInsert;
+export const insertTowingRequestSchema = createInsertSchema(towingRequests).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type TowTruck = typeof towTrucks.$inferSelect;
+export type InsertTowTruck = typeof towTrucks.$inferInsert;
+export const insertTowTruckSchema = createInsertSchema(towTrucks).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+// Module 47: Document Management
+export type DocumentCategory = typeof documentCategories.$inferSelect;
+export type InsertDocumentCategory = typeof documentCategories.$inferInsert;
+export const insertDocumentCategorySchema = createInsertSchema(documentCategories).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type Document = typeof documents.$inferSelect;
+export type InsertDocument = typeof documents.$inferInsert;
+export const insertDocumentSchema = createInsertSchema(documents).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type DocumentAccessLog = typeof documentAccessLog.$inferSelect;
+export type InsertDocumentAccessLog = typeof documentAccessLog.$inferInsert;
+export const insertDocumentAccessLogSchema = createInsertSchema(documentAccessLog).omit({
+  id: true,
+  createdAt: true,
+});
+
+// Module 48: Loaner Vehicle Management
+export type LoanerVehicle = typeof loanerVehicles.$inferSelect;
+export type InsertLoanerVehicle = typeof loanerVehicles.$inferInsert;
+export const insertLoanerVehicleSchema = createInsertSchema(loanerVehicles).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type LoanerReservation = typeof loanerReservations.$inferSelect;
+export type InsertLoanerReservation = typeof loanerReservations.$inferInsert;
+export const insertLoanerReservationSchema = createInsertSchema(loanerReservations).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
