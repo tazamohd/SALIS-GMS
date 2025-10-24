@@ -206,9 +206,10 @@ import {
   actionHistory,
   type ActionHistory,
   type InsertActionHistory,
+  customerPortalSessions,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, or, inArray, and, gte, lte, ilike, sql, isNull } from "drizzle-orm";
+import { eq, desc, or, inArray, and, gte, lte, ilike, sql, isNull, gt } from "drizzle-orm";
 
 // Interface for storage operations
 export interface IStorage {
@@ -696,6 +697,17 @@ export interface IStorage {
   removeChatParticipant(id: string): Promise<void>;
   markMessagesAsRead(conversationId: string, userId: string): Promise<void>;
   getUnreadMessageCount(userId: string, conversationId?: string): Promise<number>;
+  
+  // Module 37: Customer Self-Service Portal
+  createPortalSession(customerId: string): Promise<any>;
+  validatePortalSession(token: string): Promise<any | null>;
+  getCustomerAppointments(customerId: string, status?: string): Promise<any[]>;
+  getCustomerVehicles(customerId: string): Promise<any[]>;
+  getCustomerServiceHistory(customerId: string, vehicleId?: string): Promise<any[]>;
+  getCustomerEstimates(customerId: string, status?: string): Promise<any[]>;
+  approveEstimate(estimateId: string, customerId: string): Promise<any>;
+  getCustomerInvoices(customerId: string, status?: string): Promise<any[]>;
+  getCustomerPayments(customerId: string): Promise<any[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -4850,6 +4862,209 @@ export class DatabaseStorage implements IStorage {
     }
     
     return totalUnread;
+  }
+
+  // Module 37: Customer Self-Service Portal
+  async createPortalSession(customerId: string): Promise<any> {
+    const token = `portal_${crypto.randomUUID()}_${Date.now()}`;
+    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+    
+    const [session] = await db.insert(customerPortalSessions)
+      .values({
+        customerId,
+        token,
+        expiresAt,
+      })
+      .returning();
+    
+    return session;
+  }
+
+  async validatePortalSession(token: string): Promise<any | null> {
+    const [session] = await db.select()
+      .from(customerPortalSessions)
+      .where(eq(customerPortalSessions.token, token));
+    
+    if (!session || new Date() > session.expiresAt) {
+      return null;
+    }
+    
+    // Update last accessed time
+    await db.update(customerPortalSessions)
+      .set({ lastAccessedAt: new Date() })
+      .where(eq(customerPortalSessions.id, session.id));
+    
+    return session;
+  }
+
+  async getCustomerAppointments(customerId: string, status?: string): Promise<any[]> {
+    if (status) {
+      return await db.select({
+        appointment: appointments,
+        vehicle: vehicles,
+      })
+      .from(appointments)
+      .leftJoin(vehicles, eq(appointments.vehicleId, vehicles.id))
+      .where(
+        and(
+          eq(appointments.customerId, customerId),
+          eq(appointments.status, status)
+        )
+      )
+      .orderBy(desc(appointments.appointmentDate));
+    }
+    
+    return await db.select({
+      appointment: appointments,
+      vehicle: vehicles,
+    })
+    .from(appointments)
+    .leftJoin(vehicles, eq(appointments.vehicleId, vehicles.id))
+    .where(eq(appointments.customerId, customerId))
+    .orderBy(desc(appointments.appointmentDate));
+  }
+
+  async getCustomerVehicles(customerId: string): Promise<any[]> {
+    return await db.select()
+      .from(vehicles)
+      .where(eq(vehicles.customerId, customerId))
+      .orderBy(desc(vehicles.createdAt));
+  }
+
+  async getCustomerServiceHistory(customerId: string, vehicleId?: string): Promise<any[]> {
+    if (vehicleId) {
+      return await db.select({
+        history: vehicleServiceHistory,
+        vehicle: vehicles,
+        jobCard: jobCards,
+      })
+      .from(vehicleServiceHistory)
+      .leftJoin(vehicles, eq(vehicleServiceHistory.vehicleId, vehicles.id))
+      .leftJoin(jobCards, eq(vehicleServiceHistory.jobCardId, jobCards.id))
+      .where(
+        and(
+          eq(vehicleServiceHistory.vehicleId, vehicleId),
+          eq(vehicles.customerId, customerId)
+        )
+      )
+      .orderBy(desc(vehicleServiceHistory.serviceDate));
+    }
+    
+    const customerVehicles = await this.getCustomerVehicles(customerId);
+    const vehicleIds = customerVehicles.map((v: any) => v.id);
+    
+    if (vehicleIds.length === 0) return [];
+    
+    return await db.select({
+      history: vehicleServiceHistory,
+      vehicle: vehicles,
+      jobCard: jobCards,
+    })
+    .from(vehicleServiceHistory)
+    .leftJoin(vehicles, eq(vehicleServiceHistory.vehicleId, vehicles.id))
+    .leftJoin(jobCards, eq(vehicleServiceHistory.jobCardId, jobCards.id))
+    .where(inArray(vehicleServiceHistory.vehicleId, vehicleIds))
+    .orderBy(desc(vehicleServiceHistory.serviceDate));
+  }
+
+  async getCustomerEstimates(customerId: string, status?: string): Promise<any[]> {
+    if (status) {
+      return await db.select({
+        estimate: estimates,
+        vehicle: vehicles,
+      })
+      .from(estimates)
+      .leftJoin(vehicles, eq(estimates.vehicleId, vehicles.id))
+      .where(
+        and(
+          eq(estimates.customerId, customerId),
+          eq(estimates.status, status)
+        )
+      )
+      .orderBy(desc(estimates.createdAt));
+    }
+    
+    return await db.select({
+      estimate: estimates,
+      vehicle: vehicles,
+    })
+    .from(estimates)
+    .leftJoin(vehicles, eq(estimates.vehicleId, vehicles.id))
+    .where(eq(estimates.customerId, customerId))
+    .orderBy(desc(estimates.createdAt));
+  }
+
+  async approveEstimate(estimateId: string, customerId: string): Promise<any> {
+    // Verify customer owns this estimate
+    const [estimate] = await db.select()
+      .from(estimates)
+      .where(
+        and(
+          eq(estimates.id, estimateId),
+          eq(estimates.customerId, customerId)
+        )
+      );
+    
+    if (!estimate) {
+      throw new Error('Estimate not found or unauthorized');
+    }
+    
+    const [updated] = await db.update(estimates)
+      .set({
+        status: 'approved',
+        approvedAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .where(eq(estimates.id, estimateId))
+      .returning();
+    
+    return updated;
+  }
+
+  async getCustomerInvoices(customerId: string, status?: string): Promise<any[]> {
+    if (status) {
+      return await db.select({
+        invoice: invoices,
+        vehicle: vehicles,
+      })
+      .from(invoices)
+      .leftJoin(vehicles, eq(invoices.vehicleId, vehicles.id))
+      .where(
+        and(
+          eq(invoices.customerId, customerId),
+          eq(invoices.status, status)
+        )
+      )
+      .orderBy(desc(invoices.issueDate));
+    }
+    
+    return await db.select({
+      invoice: invoices,
+      vehicle: vehicles,
+    })
+    .from(invoices)
+    .leftJoin(vehicles, eq(invoices.vehicleId, vehicles.id))
+    .where(eq(invoices.customerId, customerId))
+    .orderBy(desc(invoices.issueDate));
+  }
+
+  async getCustomerPayments(customerId: string): Promise<any[]> {
+    const customerInvoices = await db.select()
+      .from(invoices)
+      .where(eq(invoices.customerId, customerId));
+    
+    const invoiceIds = customerInvoices.map((inv: any) => inv.id);
+    
+    if (invoiceIds.length === 0) return [];
+    
+    return await db.select({
+      payment: payments,
+      invoice: invoices,
+    })
+    .from(payments)
+    .leftJoin(invoices, eq(payments.invoiceId, invoices.id))
+    .where(inArray(payments.invoiceId, invoiceIds))
+    .orderBy(desc(payments.paymentDate));
   }
 }
 
