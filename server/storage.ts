@@ -211,6 +211,21 @@ import {
   mediaAttachments,
   qrCodeTokens,
   qrScanLogs,
+  fleetGroups,
+  fleetVehicles,
+  fleetContracts,
+  fleetPricingTiers,
+  fleetMaintenanceSchedules,
+  type FleetGroup,
+  type InsertFleetGroup,
+  type FleetVehicle,
+  type InsertFleetVehicle,
+  type FleetContract,
+  type InsertFleetContract,
+  type FleetPricingTier,
+  type InsertFleetPricingTier,
+  type FleetMaintenanceSchedule,
+  type InsertFleetMaintenanceSchedule,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, or, inArray, and, gte, lte, ilike, sql, isNull, gt } from "drizzle-orm";
@@ -5174,6 +5189,188 @@ export class DatabaseStorage implements IStorage {
       .values(data)
       .returning();
     return history;
+  }
+
+  // Module 40: Fleet Management
+  async createFleetGroup(data: any): Promise<any> {
+    const [fleetGroup] = await db.insert(fleetGroups)
+      .values(data)
+      .returning();
+    return fleetGroup;
+  }
+
+  async getFleetGroup(id: string): Promise<any> {
+    const [fleetGroup] = await db.select()
+      .from(fleetGroups)
+      .where(eq(fleetGroups.id, id));
+    return fleetGroup;
+  }
+
+  async getFleetGroupsByGarage(garageId: string): Promise<any[]> {
+    return await db.select()
+      .from(fleetGroups)
+      .where(eq(fleetGroups.garageId, garageId))
+      .orderBy(desc(fleetGroups.createdAt));
+  }
+
+  async updateFleetGroup(id: string, data: any): Promise<any> {
+    const [fleetGroup] = await db.update(fleetGroups)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(fleetGroups.id, id))
+      .returning();
+    return fleetGroup;
+  }
+
+  async deleteFleetGroup(id: string): Promise<void> {
+    await db.delete(fleetGroups)
+      .where(eq(fleetGroups.id, id));
+  }
+
+  async createFleetVehicle(data: any): Promise<any> {
+    const [fleetVehicle] = await db.insert(fleetVehicles)
+      .values(data)
+      .returning();
+    return fleetVehicle;
+  }
+
+  async getFleetVehicle(id: string): Promise<any> {
+    const [fleetVehicle] = await db.select()
+      .from(fleetVehicles)
+      .where(eq(fleetVehicles.id, id));
+    return fleetVehicle;
+  }
+
+  async getFleetVehiclesByGroup(fleetGroupId: string): Promise<any[]> {
+    return await db.select({
+      fleetVehicle: fleetVehicles,
+      vehicle: vehicles,
+    })
+    .from(fleetVehicles)
+    .leftJoin(vehicles, eq(fleetVehicles.vehicleId, vehicles.id))
+    .where(eq(fleetVehicles.fleetGroupId, fleetGroupId))
+    .orderBy(desc(fleetVehicles.assignedAt));
+  }
+
+  async updateFleetVehicle(id: string, data: any): Promise<any> {
+    const [fleetVehicle] = await db.update(fleetVehicles)
+      .set(data)
+      .where(eq(fleetVehicles.id, id))
+      .returning();
+    return fleetVehicle;
+  }
+
+  async deleteFleetVehicle(id: string): Promise<void> {
+    await db.delete(fleetVehicles)
+      .where(eq(fleetVehicles.id, id));
+  }
+
+  async createFleetContract(data: any): Promise<any> {
+    const [contract] = await db.insert(fleetContracts)
+      .values(data)
+      .returning();
+    return contract;
+  }
+
+  async getFleetContract(id: string): Promise<any> {
+    const [contract] = await db.select()
+      .from(fleetContracts)
+      .where(eq(fleetContracts.id, id));
+    return contract;
+  }
+
+  async getFleetContractsByGroup(fleetGroupId: string): Promise<any[]> {
+    return await db.select()
+      .from(fleetContracts)
+      .where(eq(fleetContracts.fleetGroupId, fleetGroupId))
+      .orderBy(desc(fleetContracts.createdAt));
+  }
+
+  async updateFleetContract(id: string, data: any): Promise<any> {
+    const [contract] = await db.update(fleetContracts)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(fleetContracts.id, id))
+      .returning();
+    return contract;
+  }
+
+  async deleteFleetContract(id: string): Promise<void> {
+    await db.delete(fleetContracts)
+      .where(eq(fleetContracts.id, id));
+  }
+
+  async createFleetPricingTier(data: any): Promise<any> {
+    const [tier] = await db.insert(fleetPricingTiers)
+      .values(data)
+      .returning();
+    return tier;
+  }
+
+  async getFleetPricingTier(id: string): Promise<any> {
+    const [tier] = await db.select()
+      .from(fleetPricingTiers)
+      .where(eq(fleetPricingTiers.id, id));
+    return tier;
+  }
+
+  async getFleetPricingTiersByGarage(garageId: string): Promise<any[]> {
+    return await db.select()
+      .from(fleetPricingTiers)
+      .where(eq(fleetPricingTiers.garageId, garageId))
+      .orderBy(desc(fleetPricingTiers.createdAt));
+  }
+
+  async getFleetPricingTiersByGroup(fleetGroupId: string): Promise<any[]> {
+    return await db.select()
+      .from(fleetPricingTiers)
+      .where(eq(fleetPricingTiers.fleetGroupId, fleetGroupId))
+      .orderBy(desc(fleetPricingTiers.createdAt));
+  }
+
+  async updateFleetPricingTier(id: string, data: any): Promise<any> {
+    const [tier] = await db.update(fleetPricingTiers)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(fleetPricingTiers.id, id))
+      .returning();
+    return tier;
+  }
+
+  async deleteFleetPricingTier(id: string): Promise<void> {
+    await db.delete(fleetPricingTiers)
+      .where(eq(fleetPricingTiers.id, id));
+  }
+
+  async createFleetMaintenanceSchedule(data: any): Promise<any> {
+    const [schedule] = await db.insert(fleetMaintenanceSchedules)
+      .values(data)
+      .returning();
+    return schedule;
+  }
+
+  async getFleetMaintenanceSchedule(id: string): Promise<any> {
+    const [schedule] = await db.select()
+      .from(fleetMaintenanceSchedules)
+      .where(eq(fleetMaintenanceSchedules.id, id));
+    return schedule;
+  }
+
+  async getFleetMaintenanceSchedulesByGroup(fleetGroupId: string): Promise<any[]> {
+    return await db.select()
+      .from(fleetMaintenanceSchedules)
+      .where(eq(fleetMaintenanceSchedules.fleetGroupId, fleetGroupId))
+      .orderBy(desc(fleetMaintenanceSchedules.createdAt));
+  }
+
+  async updateFleetMaintenanceSchedule(id: string, data: any): Promise<any> {
+    const [schedule] = await db.update(fleetMaintenanceSchedules)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(fleetMaintenanceSchedules.id, id))
+      .returning();
+    return schedule;
+  }
+
+  async deleteFleetMaintenanceSchedule(id: string): Promise<void> {
+    await db.delete(fleetMaintenanceSchedules)
+      .where(eq(fleetMaintenanceSchedules.id, id));
   }
 }
 
