@@ -706,6 +706,17 @@ export interface IStorage {
   getCustomerEstimates(customerId: string, status?: string): Promise<any[]>;
   approveEstimate(estimateId: string, customerId: string): Promise<any>;
   getCustomerPayments(customerId: string): Promise<any[]>;
+  
+  // Module 38: Digital Signatures & Media Documentation
+  createDigitalSignature(data: any): Promise<any>;
+  getDigitalSignatures(relatedType: string, relatedId: string): Promise<any[]>;
+  getDigitalSignature(id: string): Promise<any | undefined>;
+  
+  createMediaAttachment(data: any): Promise<any>;
+  getMediaAttachments(relatedType: string, relatedId: string, category?: string): Promise<any[]>;
+  getMediaAttachment(id: string): Promise<any | undefined>;
+  deleteMediaAttachment(id: string): Promise<void>;
+  updateMediaAttachment(id: string, data: any): Promise<any>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -5004,6 +5015,76 @@ export class DatabaseStorage implements IStorage {
     .leftJoin(invoices, eq(payments.invoiceId, invoices.id))
     .where(inArray(payments.invoiceId, invoiceIds))
     .orderBy(desc(payments.paymentDate));
+  }
+
+  // Module 38: Digital Signatures & Media Documentation
+  async createDigitalSignature(data: any): Promise<any> {
+    const [signature] = await db.insert(digitalSignatures)
+      .values(data)
+      .returning();
+    return signature;
+  }
+
+  async getDigitalSignatures(relatedType: string, relatedId: string): Promise<any[]> {
+    return await db.select()
+      .from(digitalSignatures)
+      .where(
+        and(
+          eq(digitalSignatures.relatedType, relatedType),
+          eq(digitalSignatures.relatedId, relatedId)
+        )
+      )
+      .orderBy(desc(digitalSignatures.createdAt));
+  }
+
+  async getDigitalSignature(id: string): Promise<any | undefined> {
+    const [signature] = await db.select()
+      .from(digitalSignatures)
+      .where(eq(digitalSignatures.id, id));
+    return signature;
+  }
+
+  async createMediaAttachment(data: any): Promise<any> {
+    const [media] = await db.insert(mediaAttachments)
+      .values(data)
+      .returning();
+    return media;
+  }
+
+  async getMediaAttachments(relatedType: string, relatedId: string, category?: string): Promise<any[]> {
+    const conditions = [
+      eq(mediaAttachments.relatedType, relatedType),
+      eq(mediaAttachments.relatedId, relatedId)
+    ];
+    
+    if (category) {
+      conditions.push(eq(mediaAttachments.category, category));
+    }
+    
+    return await db.select()
+      .from(mediaAttachments)
+      .where(and(...conditions))
+      .orderBy(desc(mediaAttachments.createdAt));
+  }
+
+  async getMediaAttachment(id: string): Promise<any | undefined> {
+    const [media] = await db.select()
+      .from(mediaAttachments)
+      .where(eq(mediaAttachments.id, id));
+    return media;
+  }
+
+  async deleteMediaAttachment(id: string): Promise<void> {
+    await db.delete(mediaAttachments)
+      .where(eq(mediaAttachments.id, id));
+  }
+
+  async updateMediaAttachment(id: string, data: any): Promise<any> {
+    const [media] = await db.update(mediaAttachments)
+      .set(data)
+      .where(eq(mediaAttachments.id, id))
+      .returning();
+    return media;
   }
 }
 
