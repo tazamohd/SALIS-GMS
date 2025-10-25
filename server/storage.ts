@@ -226,6 +226,8 @@ import {
   type InsertFleetPricingTier,
   type FleetMaintenanceSchedule,
   type InsertFleetMaintenanceSchedule,
+  warranties,
+  warrantyClaims,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, or, inArray, and, gte, lte, ilike, sql, isNull, gt } from "drizzle-orm";
@@ -736,6 +738,25 @@ export interface IStorage {
   getMediaAttachment(id: string): Promise<any | undefined>;
   deleteMediaAttachment(id: string): Promise<void>;
   updateMediaAttachment(id: string, data: any): Promise<any>;
+  
+  // Module 41: Warranty Tracking
+  createWarranty(data: any): Promise<any>;
+  getWarrantiesByGarage(garageId: string): Promise<any[]>;
+  getWarrantyById(id: string): Promise<any | undefined>;
+  getWarrantiesByVehicle(vehicleId: string): Promise<any[]>;
+  getWarrantiesByCustomer(customerId: string): Promise<any[]>;
+  getActiveWarranties(garageId: string): Promise<any[]>;
+  getExpiredWarranties(garageId: string): Promise<any[]>;
+  getExpiringWarranties(garageId: string, daysThreshold: number): Promise<any[]>;
+  updateWarranty(id: string, data: any): Promise<any>;
+  deleteWarranty(id: string): Promise<void>;
+
+  createWarrantyClaim(data: any): Promise<any>;
+  getWarrantyClaimsByGarage(garageId: string): Promise<any[]>;
+  getWarrantyClaimById(id: string): Promise<any | undefined>;
+  getWarrantyClaimsByWarranty(warrantyId: string): Promise<any[]>;
+  updateWarrantyClaim(id: string, data: any): Promise<any>;
+  deleteWarrantyClaim(id: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -5371,6 +5392,139 @@ export class DatabaseStorage implements IStorage {
   async deleteFleetMaintenanceSchedule(id: string): Promise<void> {
     await db.delete(fleetMaintenanceSchedules)
       .where(eq(fleetMaintenanceSchedules.id, id));
+  }
+
+  // Module 41: Warranty Tracking
+  async createWarranty(data: any): Promise<any> {
+    const [warranty] = await db.insert(warranties)
+      .values(data)
+      .returning();
+    return warranty;
+  }
+
+  async getWarrantiesByGarage(garageId: string): Promise<any[]> {
+    return await db.select()
+      .from(warranties)
+      .where(eq(warranties.garageId, garageId))
+      .orderBy(desc(warranties.createdAt));
+  }
+
+  async getWarrantyById(id: string): Promise<any | undefined> {
+    const [warranty] = await db.select()
+      .from(warranties)
+      .where(eq(warranties.id, id));
+    return warranty;
+  }
+
+  async getWarrantiesByVehicle(vehicleId: string): Promise<any[]> {
+    return await db.select()
+      .from(warranties)
+      .where(eq(warranties.vehicleId, vehicleId))
+      .orderBy(desc(warranties.createdAt));
+  }
+
+  async getWarrantiesByCustomer(customerId: string): Promise<any[]> {
+    return await db.select()
+      .from(warranties)
+      .where(eq(warranties.customerId, customerId))
+      .orderBy(desc(warranties.createdAt));
+  }
+
+  async getActiveWarranties(garageId: string): Promise<any[]> {
+    return await db.select()
+      .from(warranties)
+      .where(and(
+        eq(warranties.garageId, garageId),
+        eq(warranties.status, 'active'),
+        gte(warranties.endDate, new Date())
+      ))
+      .orderBy(desc(warranties.endDate));
+  }
+
+  async getExpiredWarranties(garageId: string): Promise<any[]> {
+    return await db.select()
+      .from(warranties)
+      .where(and(
+        eq(warranties.garageId, garageId),
+        or(
+          eq(warranties.status, 'expired'),
+          lte(warranties.endDate, new Date())
+        )
+      ))
+      .orderBy(desc(warranties.endDate));
+  }
+
+  async getExpiringWarranties(garageId: string, daysThreshold: number): Promise<any[]> {
+    const thresholdDate = new Date();
+    thresholdDate.setDate(thresholdDate.getDate() + daysThreshold);
+    
+    return await db.select()
+      .from(warranties)
+      .where(and(
+        eq(warranties.garageId, garageId),
+        eq(warranties.status, 'active'),
+        lte(warranties.endDate, thresholdDate),
+        gte(warranties.endDate, new Date())
+      ))
+      .orderBy(warranties.endDate);
+  }
+
+  async updateWarranty(id: string, data: any): Promise<any> {
+    const [warranty] = await db.update(warranties)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(warranties.id, id))
+      .returning();
+    return warranty;
+  }
+
+  async deleteWarranty(id: string): Promise<void> {
+    await db.delete(warranties)
+      .where(eq(warranties.id, id));
+  }
+
+  async createWarrantyClaim(data: any): Promise<any> {
+    const [claim] = await db.insert(warrantyClaims)
+      .values(data)
+      .returning();
+    return claim;
+  }
+
+  async getWarrantyClaimsByGarage(garageId: string): Promise<any[]> {
+    return await db.select({
+      claim: warrantyClaims,
+      warranty: warranties
+    })
+      .from(warrantyClaims)
+      .innerJoin(warranties, eq(warrantyClaims.warrantyId, warranties.id))
+      .where(eq(warranties.garageId, garageId))
+      .orderBy(desc(warrantyClaims.createdAt));
+  }
+
+  async getWarrantyClaimById(id: string): Promise<any | undefined> {
+    const [claim] = await db.select()
+      .from(warrantyClaims)
+      .where(eq(warrantyClaims.id, id));
+    return claim;
+  }
+
+  async getWarrantyClaimsByWarranty(warrantyId: string): Promise<any[]> {
+    return await db.select()
+      .from(warrantyClaims)
+      .where(eq(warrantyClaims.warrantyId, warrantyId))
+      .orderBy(desc(warrantyClaims.createdAt));
+  }
+
+  async updateWarrantyClaim(id: string, data: any): Promise<any> {
+    const [claim] = await db.update(warrantyClaims)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(warrantyClaims.id, id))
+      .returning();
+    return claim;
+  }
+
+  async deleteWarrantyClaim(id: string): Promise<void> {
+    await db.delete(warrantyClaims)
+      .where(eq(warrantyClaims.id, id));
   }
 }
 
