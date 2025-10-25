@@ -109,9 +109,9 @@ The application utilizes a full-stack architecture with clear client-server sepa
 35. **Consent Management**: GDPR compliance
 36. **In-App Chat Support**: Real-time WebSocket-based team collaboration
 
-### **Advanced Modules (37-48)** - Database Schema Ready
-37. **Customer Self-Service Portal**: Online booking, service history viewing, estimate approval, payment processing, digital receipts
-38. **Digital Signatures & Media Documentation**: Signature capture, photo/video documentation, before/after comparisons, vehicle walkarounds
+### **Advanced Modules (37-48)**
+37. **Customer Self-Service Portal** (✓ COMPLETED): Online booking, service history viewing, estimate approval, payment processing, digital receipts, session management with token revocation
+38. **Digital Signatures & Media Documentation** (✓ COMPLETED): Canvas-based signature capture with consent tracking, photo/video upload with validation, before/after comparison gallery, media categorization (damage/walkaround/invoice/estimate), server-side security (10MB limit, MIME type whitelist, base64 validation), audit trail (IP address, device info, timestamps), reusable components across job cards/estimates/inspections
 39. **QR Code Check-In System**: QR generation for appointments, scan logging, automated check-in notifications
 40. **Fleet Management**: Corporate fleet tracking, fleet contracts, volume pricing, fleet-specific maintenance schedules
 41. **Warranty Tracking**: Parts & labor warranties, warranty claims processing, expiration alerts, transferable warranties
