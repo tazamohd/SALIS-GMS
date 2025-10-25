@@ -45,6 +45,9 @@ import VehicleInspections from "@/pages/VehicleInspections";
 import TowingAssistance from "@/pages/TowingAssistance";
 import LoanerVehicles from "@/pages/LoanerVehicles";
 import VendorSupplierPortal from "@/pages/VendorSupplierPortal";
+import MarketingAutomation from "@/pages/MarketingAutomation";
+import CustomerLoyalty from "@/pages/CustomerLoyalty";
+import DocumentManagement from "@/pages/DocumentManagement";
 import { CustomerDashboard } from "@/pages/customer/CustomerDashboard";
 import { CustomerAppointments } from "@/pages/customer/CustomerAppointments";
 import { CustomerInvoices } from "@/pages/customer/CustomerInvoices";
@@ -179,6 +182,21 @@ function Router() {
       <Route path="/vendor-supplier-portal">
         <Layout>
           <VendorSupplierPortal />
+        </Layout>
+      </Route>
+      <Route path="/marketing-automation">
+        <Layout>
+          <MarketingAutomation />
+        </Layout>
+      </Route>
+      <Route path="/customer-loyalty">
+        <Layout>
+          <CustomerLoyalty />
+        </Layout>
+      </Route>
+      <Route path="/document-management">
+        <Layout>
+          <DocumentManagement />
         </Layout>
       </Route>
       <Route path="/purchase-orders">

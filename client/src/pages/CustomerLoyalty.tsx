@@ -1,0 +1,643 @@
+import { useState } from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { queryClient, apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Award, Gift, Users, TrendingUp, Star, CreditCard, RefreshCw } from "lucide-react";
+
+// Loyalty Program Form Schema
+const programSchema = z.object({
+  name: z.string().min(1, "Program name is required"),
+  description: z.string().optional(),
+  isActive: z.boolean(),
+  pointsPerDollar: z.number().min(0).default(1),
+  tiers: z.array(z.object({
+    name: z.string(),
+    minimumPoints: z.number(),
+    benefits: z.string()
+  })).optional(),
+});
+
+// Reward Form Schema
+const rewardSchema = z.object({
+  programId: z.string().min(1, "Program is required"),
+  name: z.string().min(1, "Reward name is required"),
+  description: z.string().optional(),
+  pointsCost: z.number().min(1, "Points cost is required"),
+  rewardType: z.enum(["discount", "service", "product", "cashback"]),
+  value: z.number().min(0),
+  isActive: z.boolean().default(true),
+});
+
+type ProgramFormData = z.infer<typeof programSchema>;
+type RewardFormData = z.infer<typeof rewardSchema>;
+
+export default function CustomerLoyalty() {
+  const { toast } = useToast();
+  const [selectedTab, setSelectedTab] = useState("programs");
+  const [isCreateProgramDialogOpen, setIsCreateProgramDialogOpen] = useState(false);
+  const [isCreateRewardDialogOpen, setIsCreateRewardDialogOpen] = useState(false);
+  const [selectedProgram, setSelectedProgram] = useState<any>(null);
+
+  // Fetch loyalty programs
+  const { data: programs = [], isLoading: programsLoading } = useQuery({
+    queryKey: ["/api/loyalty-programs"],
+  });
+
+  // Fetch loyalty accounts
+  const { data: accounts = [] } = useQuery({
+    queryKey: ["/api/loyalty-accounts"],
+  });
+
+  // Fetch loyalty rewards
+  const { data: rewards = [] } = useQuery({
+    queryKey: ["/api/loyalty-programs", selectedProgram?.id, "rewards"],
+    queryFn: () => selectedProgram ? fetch(`/api/loyalty-programs/${selectedProgram.id}/rewards`).then(r => r.json()) : Promise.resolve([]),
+    enabled: !!selectedProgram,
+  });
+
+  // Fetch loyalty redemptions
+  const { data: redemptions = [] } = useQuery({
+    queryKey: ["/api/loyalty-redemptions"],
+  });
+
+  // Create Program Form
+  const programForm = useForm<ProgramFormData>({
+    resolver: zodResolver(programSchema),
+    defaultValues: {
+      name: "",
+      description: "",
+      isActive: true,
+      pointsPerDollar: 1,
+      tiers: [
+        { name: "Bronze", minimumPoints: 0, benefits: "Basic rewards" },
+        { name: "Silver", minimumPoints: 500, benefits: "Enhanced rewards + priority service" },
+        { name: "Gold", minimumPoints: 1500, benefits: "Premium rewards + exclusive offers" },
+        { name: "Platinum", minimumPoints: 5000, benefits: "VIP treatment + maximum benefits" },
+      ],
+    }
+  });
+
+  // Create Reward Form
+  const rewardForm = useForm<RewardFormData>({
+    resolver: zodResolver(rewardSchema),
+    defaultValues: {
+      programId: selectedProgram?.id || "",
+      name: "",
+      description: "",
+      pointsCost: 100,
+      rewardType: "discount",
+      value: 10,
+      isActive: true,
+    }
+  });
+
+  // Create Program Mutation
+  const createProgramMutation = useMutation({
+    mutationFn: (data: ProgramFormData) => apiRequest("POST", "/api/loyalty-programs", data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/loyalty-programs"] });
+      toast({ title: "Success", description: "Loyalty program created successfully" });
+      setIsCreateProgramDialogOpen(false);
+      programForm.reset();
+    },
+    onError: () => {
+      toast({ title: "Error", description: "Failed to create loyalty program", variant: "destructive" });
+    }
+  });
+
+  // Create Reward Mutation
+  const createRewardMutation = useMutation({
+    mutationFn: (data: RewardFormData) => apiRequest("POST", "/api/loyalty-rewards", data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/loyalty-programs", selectedProgram?.id, "rewards"] });
+      toast({ title: "Success", description: "Reward created successfully" });
+      setIsCreateRewardDialogOpen(false);
+      rewardForm.reset();
+    },
+    onError: () => {
+      toast({ title: "Error", description: "Failed to create reward", variant: "destructive" });
+    }
+  });
+
+  // Delete Program Mutation
+  const deleteProgramMutation = useMutation({
+    mutationFn: (id: string) => apiRequest("DELETE", `/api/loyalty-programs/${id}`, undefined),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/loyalty-programs"] });
+      toast({ title: "Success", description: "Program deleted successfully" });
+    }
+  });
+
+  const onSubmitProgram = (data: ProgramFormData) => {
+    createProgramMutation.mutate(data);
+  };
+
+  const onSubmitReward = (data: RewardFormData) => {
+    createRewardMutation.mutate(data);
+  };
+
+  const getTierBadge = (tier: string) => {
+    const colors: Record<string, string> = {
+      bronze: "bg-salis-gray text-white",
+      silver: "bg-salis-gray-dark text-white",
+      gold: "bg-salis-black text-white",
+      platinum: "bg-salis-black text-white",
+    };
+    return colors[tier.toLowerCase()] || "bg-salis-gray text-white";
+  };
+
+  return (
+    <div className="container mx-auto py-6 space-y-6 bg-white dark:bg-[#010101] min-h-screen">
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-montserrat font-semibold text-salis-black dark:text-white" data-testid="heading-loyalty">
+            Customer Loyalty Program
+          </h1>
+          <p className="text-salis-gray dark:text-salis-gray-light font-poppins mt-1" data-testid="text-subtitle">
+            Manage loyalty programs, rewards, points, and customer memberships
+          </p>
+        </div>
+        <Button
+          onClick={() => setIsCreateProgramDialogOpen(true)}
+          className="bg-salis-black hover:bg-salis-gray-dark text-white font-poppins"
+          data-testid="button-create-program"
+        >
+          <Award className="mr-2 h-4 w-4" />
+          Create Program
+        </Button>
+      </div>
+
+      <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full">
+        <TabsList className="bg-salis-gray-light dark:bg-salis-gray-dark" data-testid="tabs-loyalty">
+          <TabsTrigger value="programs" className="font-poppins" data-testid="tab-programs">
+            <Award className="mr-2 h-4 w-4" />
+            Programs
+          </TabsTrigger>
+          <TabsTrigger value="members" className="font-poppins" data-testid="tab-members">
+            <Users className="mr-2 h-4 w-4" />
+            Members
+          </TabsTrigger>
+          <TabsTrigger value="rewards" className="font-poppins" data-testid="tab-rewards">
+            <Gift className="mr-2 h-4 w-4" />
+            Rewards
+          </TabsTrigger>
+          <TabsTrigger value="redemptions" className="font-poppins" data-testid="tab-redemptions">
+            <CreditCard className="mr-2 h-4 w-4" />
+            Redemptions
+          </TabsTrigger>
+        </TabsList>
+
+        {/* Programs Tab */}
+        <TabsContent value="programs" className="space-y-4">
+          <Card className="border-salis-gray-light dark:border-salis-gray-dark bg-white dark:bg-[#010101]">
+            <CardHeader>
+              <CardTitle className="font-montserrat text-salis-black dark:text-white">Loyalty Programs</CardTitle>
+              <CardDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
+                Configure and manage your loyalty programs
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {programsLoading ? (
+                <p className="text-salis-gray font-poppins" data-testid="text-loading">Loading programs...</p>
+              ) : programs.length === 0 ? (
+                <p className="text-salis-gray font-poppins" data-testid="text-no-programs">No loyalty programs found</p>
+              ) : (
+                <div className="grid gap-4">
+                  {programs.map((program: any) => (
+                    <Card 
+                      key={program.id} 
+                      className="border-salis-gray-light dark:border-salis-gray-dark cursor-pointer hover:border-salis-gray dark:hover:border-salis-gray transition-colors"
+                      onClick={() => setSelectedProgram(program)}
+                      data-testid={`card-program-${program.id}`}
+                    >
+                      <CardContent className="p-6">
+                        <div className="flex justify-between items-start">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-3 mb-2">
+                              <Award className="h-5 w-5 text-salis-gray dark:text-salis-gray-light" />
+                              <h3 className="text-lg font-montserrat font-medium text-salis-black dark:text-white" data-testid={`text-program-name-${program.id}`}>
+                                {program.name}
+                              </h3>
+                              <Badge className={program.isActive ? "bg-salis-black text-white" : "bg-salis-gray-light text-salis-black"} data-testid={`badge-active-${program.id}`}>
+                                {program.isActive ? "Active" : "Inactive"}
+                              </Badge>
+                            </div>
+                            <p className="text-sm text-salis-gray dark:text-salis-gray-light font-poppins mb-3" data-testid={`text-program-description-${program.id}`}>
+                              {program.description || "No description"}
+                            </p>
+                            <div className="flex items-center gap-6 text-sm">
+                              <div>
+                                <p className="text-salis-gray dark:text-salis-gray-light font-poppins">Points Per $1</p>
+                                <p className="font-semibold text-salis-black dark:text-white" data-testid={`text-points-per-dollar-${program.id}`}>
+                                  {program.pointsPerDollar}
+                                </p>
+                              </div>
+                              <div>
+                                <p className="text-salis-gray dark:text-salis-gray-light font-poppins">Membership Tiers</p>
+                                <div className="flex gap-1 mt-1">
+                                  {program.tiers && Array.isArray(program.tiers) && program.tiers.map((tier: any, idx: number) => (
+                                    <Badge key={idx} className={getTierBadge(tier.name)} data-testid={`badge-tier-${tier.name}-${program.id}`}>
+                                      {tier.name}
+                                    </Badge>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (confirm("Delete this program?")) {
+                                deleteProgramMutation.mutate(program.id);
+                              }
+                            }}
+                            className="border-salis-gray-light dark:border-salis-gray-dark"
+                            data-testid={`button-delete-program-${program.id}`}
+                          >
+                            Delete
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Members Tab */}
+        <TabsContent value="members" className="space-y-4">
+          <Card className="border-salis-gray-light dark:border-salis-gray-dark bg-white dark:bg-[#010101]">
+            <CardHeader>
+              <CardTitle className="font-montserrat text-salis-black dark:text-white">Loyalty Members</CardTitle>
+              <CardDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
+                View and manage customer loyalty accounts
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {accounts.length === 0 ? (
+                <p className="text-salis-gray font-poppins" data-testid="text-no-members">No loyalty members found</p>
+              ) : (
+                <div className="grid gap-4">
+                  {accounts.map((account: any) => (
+                    <Card key={account.id} className="border-salis-gray-light dark:border-salis-gray-dark" data-testid={`card-member-${account.id}`}>
+                      <CardContent className="p-6">
+                        <div className="flex justify-between items-center">
+                          <div className="flex items-center gap-4">
+                            <Star className="h-8 w-8 text-salis-gray dark:text-salis-gray-light" />
+                            <div>
+                              <p className="font-semibold text-salis-black dark:text-white" data-testid={`text-member-tier-${account.id}`}>
+                                {account.currentTier || "Bronze"} Member
+                              </p>
+                              <p className="text-sm text-salis-gray dark:text-salis-gray-light font-poppins" data-testid={`text-member-points-${account.id}`}>
+                                {account.currentPoints ?? 0} points
+                              </p>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-sm text-salis-gray dark:text-salis-gray-light font-poppins">Total Earned</p>
+                            <p className="font-semibold text-salis-black dark:text-white" data-testid={`text-member-total-${account.id}`}>
+                              {account.totalPointsEarned ?? 0} pts
+                            </p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Rewards Tab */}
+        <TabsContent value="rewards" className="space-y-4">
+          <Card className="border-salis-gray-light dark:border-salis-gray-dark bg-white dark:bg-[#010101]">
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle className="font-montserrat text-salis-black dark:text-white">Loyalty Rewards</CardTitle>
+                <CardDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
+                  {selectedProgram ? `Rewards for: ${selectedProgram.name}` : "Select a program to manage rewards"}
+                </CardDescription>
+              </div>
+              {selectedProgram && (
+                <Button
+                  onClick={() => setIsCreateRewardDialogOpen(true)}
+                  className="bg-salis-black hover:bg-salis-gray-dark text-white font-poppins"
+                  data-testid="button-create-reward"
+                >
+                  <Gift className="mr-2 h-4 w-4" />
+                  Add Reward
+                </Button>
+              )}
+            </CardHeader>
+            <CardContent>
+              {!selectedProgram ? (
+                <p className="text-salis-gray font-poppins text-center py-8" data-testid="text-no-program-selected">
+                  Select a program from the Programs tab to manage its rewards
+                </p>
+              ) : rewards.length === 0 ? (
+                <p className="text-salis-gray font-poppins" data-testid="text-no-rewards">No rewards found</p>
+              ) : (
+                <div className="grid gap-4 md:grid-cols-2">
+                  {rewards.map((reward: any) => (
+                    <Card key={reward.id} className="border-salis-gray-light dark:border-salis-gray-dark" data-testid={`card-reward-${reward.id}`}>
+                      <CardContent className="p-6">
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="flex items-center gap-3">
+                            <Gift className="h-5 w-5 text-salis-gray dark:text-salis-gray-light" />
+                            <h3 className="font-medium text-salis-black dark:text-white" data-testid={`text-reward-name-${reward.id}`}>
+                              {reward.name}
+                            </h3>
+                          </div>
+                          <Badge className={reward.isActive ? "bg-salis-black text-white" : "bg-salis-gray-light text-salis-black"} data-testid={`badge-reward-active-${reward.id}`}>
+                            {reward.isActive ? "Active" : "Inactive"}
+                          </Badge>
+                        </div>
+                        <p className="text-sm text-salis-gray dark:text-salis-gray-light font-poppins mb-3" data-testid={`text-reward-description-${reward.id}`}>
+                          {reward.description || "No description"}
+                        </p>
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-xs text-salis-gray dark:text-salis-gray-light font-poppins">Cost</p>
+                            <p className="text-lg font-bold text-salis-black dark:text-white" data-testid={`text-reward-cost-${reward.id}`}>
+                              {reward.pointsCost} pts
+                            </p>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-xs text-salis-gray dark:text-salis-gray-light font-poppins">Value</p>
+                            <p className="text-lg font-bold text-salis-black dark:text-white" data-testid={`text-reward-value-${reward.id}`}>
+                              ${reward.value}
+                            </p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Redemptions Tab */}
+        <TabsContent value="redemptions" className="space-y-4">
+          <Card className="border-salis-gray-light dark:border-salis-gray-dark bg-white dark:bg-[#010101]">
+            <CardHeader>
+              <CardTitle className="font-montserrat text-salis-black dark:text-white">Reward Redemptions</CardTitle>
+              <CardDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
+                Track and manage customer reward redemptions
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {redemptions.length === 0 ? (
+                <p className="text-salis-gray font-poppins" data-testid="text-no-redemptions">No redemptions found</p>
+              ) : (
+                <div className="grid gap-4">
+                  {redemptions.map((redemption: any) => (
+                    <Card key={redemption.id} className="border-salis-gray-light dark:border-salis-gray-dark" data-testid={`card-redemption-${redemption.id}`}>
+                      <CardContent className="p-6">
+                        <div className="flex justify-between items-center">
+                          <div className="flex items-center gap-4">
+                            <RefreshCw className="h-6 w-6 text-salis-gray dark:text-salis-gray-light" />
+                            <div>
+                              <p className="font-semibold text-salis-black dark:text-white" data-testid={`text-redemption-code-${redemption.id}`}>
+                                {redemption.redemptionCode}
+                              </p>
+                              <p className="text-sm text-salis-gray dark:text-salis-gray-light font-poppins">
+                                {redemption.pointsRedeemed} points redeemed
+                              </p>
+                            </div>
+                          </div>
+                          <Badge className="bg-salis-black text-white" data-testid={`badge-redemption-status-${redemption.id}`}>
+                            {redemption.status || "pending"}
+                          </Badge>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+
+      {/* Create Program Dialog */}
+      <Dialog open={isCreateProgramDialogOpen} onOpenChange={setIsCreateProgramDialogOpen}>
+        <DialogContent className="sm:max-w-[600px] bg-white dark:bg-[#010101] border-salis-gray-light dark:border-salis-gray-dark">
+          <DialogHeader>
+            <DialogTitle className="font-montserrat text-salis-black dark:text-white">Create Loyalty Program</DialogTitle>
+            <DialogDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
+              Set up a new customer loyalty program with tiers and benefits
+            </DialogDescription>
+          </DialogHeader>
+          <Form {...programForm}>
+            <form onSubmit={programForm.handleSubmit(onSubmitProgram)} className="space-y-4">
+              <FormField
+                control={programForm.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-salis-black dark:text-white font-poppins">Program Name</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="VIP Rewards Program" data-testid="input-program-name" className="bg-white dark:bg-[#010101]" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={programForm.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-salis-black dark:text-white font-poppins">Description</FormLabel>
+                    <FormControl>
+                      <Textarea {...field} placeholder="Earn points with every service..." rows={3} data-testid="input-program-description" className="bg-white dark:bg-[#010101]" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={programForm.control}
+                name="pointsPerDollar"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-salis-black dark:text-white font-poppins">Points Per Dollar</FormLabel>
+                    <FormControl>
+                      <Input 
+                        {...field} 
+                        type="number" 
+                        onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                        placeholder="1"
+                        data-testid="input-points-per-dollar"
+                        className="bg-white dark:bg-[#010101]"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <DialogFooter>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsCreateProgramDialogOpen(false)}
+                  className="border-salis-gray-light dark:border-salis-gray-dark"
+                  data-testid="button-cancel-program"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={createProgramMutation.isPending}
+                  className="bg-salis-black hover:bg-salis-gray-dark text-white"
+                  data-testid="button-submit-program"
+                >
+                  {createProgramMutation.isPending ? "Creating..." : "Create Program"}
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Create Reward Dialog */}
+      <Dialog open={isCreateRewardDialogOpen} onOpenChange={setIsCreateRewardDialogOpen}>
+        <DialogContent className="sm:max-w-[600px] bg-white dark:bg-[#010101] border-salis-gray-light dark:border-salis-gray-dark">
+          <DialogHeader>
+            <DialogTitle className="font-montserrat text-salis-black dark:text-white">Add Reward</DialogTitle>
+            <DialogDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
+              Create a new reward for {selectedProgram?.name}
+            </DialogDescription>
+          </DialogHeader>
+          <Form {...rewardForm}>
+            <form onSubmit={rewardForm.handleSubmit(onSubmitReward)} className="space-y-4">
+              <FormField
+                control={rewardForm.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-salis-black dark:text-white font-poppins">Reward Name</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="$10 Service Discount" data-testid="input-reward-name" className="bg-white dark:bg-[#010101]" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={rewardForm.control}
+                name="rewardType"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-salis-black dark:text-white font-poppins">Reward Type</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger data-testid="select-reward-type">
+                          <SelectValue placeholder="Select type" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="discount">Discount</SelectItem>
+                        <SelectItem value="service">Free Service</SelectItem>
+                        <SelectItem value="product">Product</SelectItem>
+                        <SelectItem value="cashback">Cashback</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={rewardForm.control}
+                  name="pointsCost"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-salis-black dark:text-white font-poppins">Points Cost</FormLabel>
+                      <FormControl>
+                        <Input 
+                          {...field} 
+                          type="number"
+                          onChange={(e) => field.onChange(parseInt(e.target.value))}
+                          placeholder="100"
+                          data-testid="input-points-cost"
+                          className="bg-white dark:bg-[#010101]"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={rewardForm.control}
+                  name="value"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-salis-black dark:text-white font-poppins">Value ($)</FormLabel>
+                      <FormControl>
+                        <Input 
+                          {...field} 
+                          type="number"
+                          onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                          placeholder="10"
+                          data-testid="input-reward-value"
+                          className="bg-white dark:bg-[#010101]"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <DialogFooter>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsCreateRewardDialogOpen(false)}
+                  className="border-salis-gray-light dark:border-salis-gray-dark"
+                  data-testid="button-cancel-reward"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={createRewardMutation.isPending}
+                  className="bg-salis-black hover:bg-salis-gray-dark text-white"
+                  data-testid="button-submit-reward"
+                >
+                  {createRewardMutation.isPending ? "Creating..." : "Add Reward"}
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
