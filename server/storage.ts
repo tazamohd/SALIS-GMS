@@ -209,6 +209,8 @@ import {
   customerPortalSessions,
   digitalSignatures,
   mediaAttachments,
+  qrCodeTokens,
+  qrScanLogs,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, or, inArray, and, gte, lte, ilike, sql, isNull, gt } from "drizzle-orm";
@@ -5087,6 +5089,84 @@ export class DatabaseStorage implements IStorage {
       .where(eq(mediaAttachments.id, id))
       .returning();
     return media;
+  }
+
+  // Module 39: QR Code Check-In System
+  async createQRCodeToken(data: any): Promise<any> {
+    const [token] = await db.insert(qrCodeTokens)
+      .values(data)
+      .returning();
+    return token;
+  }
+
+  async getQRCodeToken(id: string): Promise<any | undefined> {
+    const [token] = await db.select()
+      .from(qrCodeTokens)
+      .where(eq(qrCodeTokens.id, id));
+    return token;
+  }
+
+  async getQRCodeTokenByData(qrCodeData: string): Promise<any | undefined> {
+    const [token] = await db.select()
+      .from(qrCodeTokens)
+      .where(eq(qrCodeTokens.qrCodeData, qrCodeData));
+    return token;
+  }
+
+  async getQRCodeTokensByCustomer(customerId: string): Promise<any[]> {
+    return await db.select()
+      .from(qrCodeTokens)
+      .where(eq(qrCodeTokens.customerId, customerId))
+      .orderBy(desc(qrCodeTokens.createdAt));
+  }
+
+  async getQRCodeTokensByAppointment(appointmentId: string): Promise<any[]> {
+    return await db.select()
+      .from(qrCodeTokens)
+      .where(eq(qrCodeTokens.appointmentId, appointmentId))
+      .orderBy(desc(qrCodeTokens.createdAt));
+  }
+
+  async markQRCodeAsUsed(id: string): Promise<any> {
+    const [token] = await db.update(qrCodeTokens)
+      .set({
+        isUsed: true,
+        usedAt: new Date(),
+      })
+      .where(eq(qrCodeTokens.id, id))
+      .returning();
+    return token;
+  }
+
+  async createQRScanLog(data: any): Promise<any> {
+    const [log] = await db.insert(qrScanLogs)
+      .values(data)
+      .returning();
+    return log;
+  }
+
+  async getQRScanLogsByToken(qrCodeId: string): Promise<any[]> {
+    return await db.select()
+      .from(qrScanLogs)
+      .where(eq(qrScanLogs.qrCodeId, qrCodeId))
+      .orderBy(desc(qrScanLogs.createdAt));
+  }
+
+  async getQRScanLogsByGarage(garageId: string, limit?: number): Promise<any[]> {
+    const query = db.select({
+      log: qrScanLogs,
+      token: qrCodeTokens,
+    })
+    .from(qrScanLogs)
+    .leftJoin(qrCodeTokens, eq(qrScanLogs.qrCodeId, qrCodeTokens.id))
+    .where(eq(qrCodeTokens.garageId, garageId))
+    .orderBy(desc(qrScanLogs.createdAt));
+    
+    if (limit) {
+      return await query.limit(limit);
+    }
+    
+    return await query;
   }
 }
 
