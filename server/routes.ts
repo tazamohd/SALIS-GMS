@@ -27,7 +27,9 @@ import {
   insertIntegrationConnectionSchema,
   insertIntegrationSyncLogSchema,
   insertAccountingTransactionSchema,
-  insertOBDDiagnosticDataSchema
+  insertOBDDiagnosticDataSchema,
+  insertWarrantySchema,
+  insertWarrantyClaimSchema
 } from "@shared/schema";
 import Stripe from "stripe";
 import { createPaypalOrder, capturePaypalOrder, loadPaypalDefault } from "./paypal";
@@ -7320,6 +7322,198 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error deleting maintenance schedule:", error);
       res.status(500).json({ message: "Failed to delete maintenance schedule" });
+    }
+  });
+
+  // Module 41: Warranty Tracking
+
+  // Warranties
+  app.post("/api/warranties", isAuthenticated, async (req: any, res) => {
+    try {
+      const user = req.user;
+      const data = insertWarrantySchema.parse({
+        ...req.body,
+        garageId: user.garageId,
+        createdBy: user.id,
+      });
+      const warranty = await storage.createWarranty(data);
+      res.json(warranty);
+    } catch (error: any) {
+      res.status(400).json({ error: error.message });
+    }
+  });
+
+  app.get("/api/warranties", isAuthenticated, async (req: any, res) => {
+    try {
+      const user = req.user;
+      const warranties = await storage.getWarrantiesByGarage(user.garageId);
+      res.json(warranties);
+    } catch (error) {
+      console.error("Error fetching warranties:", error);
+      res.status(500).json({ message: "Failed to fetch warranties" });
+    }
+  });
+
+  app.get("/api/warranties/active", isAuthenticated, async (req: any, res) => {
+    try {
+      const user = req.user;
+      const warranties = await storage.getActiveWarranties(user.garageId);
+      res.json(warranties);
+    } catch (error) {
+      console.error("Error fetching active warranties:", error);
+      res.status(500).json({ message: "Failed to fetch active warranties" });
+    }
+  });
+
+  app.get("/api/warranties/expired", isAuthenticated, async (req: any, res) => {
+    try {
+      const user = req.user;
+      const warranties = await storage.getExpiredWarranties(user.garageId);
+      res.json(warranties);
+    } catch (error) {
+      console.error("Error fetching expired warranties:", error);
+      res.status(500).json({ message: "Failed to fetch expired warranties" });
+    }
+  });
+
+  app.get("/api/warranties/expiring", isAuthenticated, async (req: any, res) => {
+    try {
+      const user = req.user;
+      const daysThreshold = parseInt(req.query.days as string) || 30;
+      const warranties = await storage.getExpiringWarranties(user.garageId, daysThreshold);
+      res.json(warranties);
+    } catch (error) {
+      console.error("Error fetching expiring warranties:", error);
+      res.status(500).json({ message: "Failed to fetch expiring warranties" });
+    }
+  });
+
+  app.get("/api/warranties/vehicle/:vehicleId", isAuthenticated, async (req, res) => {
+    try {
+      const warranties = await storage.getWarrantiesByVehicle(req.params.vehicleId);
+      res.json(warranties);
+    } catch (error) {
+      console.error("Error fetching warranties by vehicle:", error);
+      res.status(500).json({ message: "Failed to fetch warranties" });
+    }
+  });
+
+  app.get("/api/warranties/customer/:customerId", isAuthenticated, async (req, res) => {
+    try {
+      const warranties = await storage.getWarrantiesByCustomer(req.params.customerId);
+      res.json(warranties);
+    } catch (error) {
+      console.error("Error fetching warranties by customer:", error);
+      res.status(500).json({ message: "Failed to fetch warranties" });
+    }
+  });
+
+  app.get("/api/warranties/:id", isAuthenticated, async (req, res) => {
+    try {
+      const warranty = await storage.getWarrantyById(req.params.id);
+      if (!warranty) {
+        return res.status(404).json({ error: "Warranty not found" });
+      }
+      res.json(warranty);
+    } catch (error) {
+      console.error("Error fetching warranty:", error);
+      res.status(500).json({ message: "Failed to fetch warranty" });
+    }
+  });
+
+  app.patch("/api/warranties/:id", isAuthenticated, async (req, res) => {
+    try {
+      const data = insertWarrantySchema.partial().parse(req.body);
+      const warranty = await storage.updateWarranty(req.params.id, data);
+      res.json(warranty);
+    } catch (error: any) {
+      res.status(400).json({ error: error.message });
+    }
+  });
+
+  app.delete("/api/warranties/:id", isAuthenticated, async (req, res) => {
+    try {
+      await storage.deleteWarranty(req.params.id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting warranty:", error);
+      res.status(500).json({ message: "Failed to delete warranty" });
+    }
+  });
+
+  // Warranty Claims
+  app.post("/api/warranty-claims", isAuthenticated, async (req: any, res) => {
+    try {
+      const user = req.user;
+      const data = insertWarrantyClaimSchema.parse({
+        ...req.body,
+        submittedBy: user.id,
+      });
+      const claim = await storage.createWarrantyClaim(data);
+      res.json(claim);
+    } catch (error: any) {
+      res.status(400).json({ error: error.message });
+    }
+  });
+
+  app.get("/api/warranty-claims", isAuthenticated, async (req: any, res) => {
+    try {
+      const user = req.user;
+      const claims = await storage.getWarrantyClaimsByGarage(user.garageId);
+      res.json(claims);
+    } catch (error) {
+      console.error("Error fetching warranty claims:", error);
+      res.status(500).json({ message: "Failed to fetch warranty claims" });
+    }
+  });
+
+  app.get("/api/warranty-claims/warranty/:warrantyId", isAuthenticated, async (req, res) => {
+    try {
+      const claims = await storage.getWarrantyClaimsByWarranty(req.params.warrantyId);
+      res.json(claims);
+    } catch (error) {
+      console.error("Error fetching warranty claims by warranty:", error);
+      res.status(500).json({ message: "Failed to fetch warranty claims" });
+    }
+  });
+
+  app.get("/api/warranty-claims/:id", isAuthenticated, async (req, res) => {
+    try {
+      const claim = await storage.getWarrantyClaimById(req.params.id);
+      if (!claim) {
+        return res.status(404).json({ error: "Warranty claim not found" });
+      }
+      res.json(claim);
+    } catch (error) {
+      console.error("Error fetching warranty claim:", error);
+      res.status(500).json({ message: "Failed to fetch warranty claim" });
+    }
+  });
+
+  app.patch("/api/warranty-claims/:id", isAuthenticated, async (req: any, res) => {
+    try {
+      const user = req.user;
+      const data = insertWarrantyClaimSchema.partial().parse(req.body);
+      
+      // If status is being changed to approved/rejected, add reviewedBy
+      if (data.status && ['approved', 'rejected'].includes(data.status)) {
+        data.reviewedBy = user.id;
+      }
+      
+      const claim = await storage.updateWarrantyClaim(req.params.id, data);
+      res.json(claim);
+    } catch (error: any) {
+      res.status(400).json({ error: error.message });
+    }
+  });
+
+  app.delete("/api/warranty-claims/:id", isAuthenticated, async (req, res) => {
+    try {
+      await storage.deleteWarrantyClaim(req.params.id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting warranty claim:", error);
+      res.status(500).json({ message: "Failed to delete warranty claim" });
     }
   });
 
