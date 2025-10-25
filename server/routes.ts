@@ -7039,6 +7039,290 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Module 40: Fleet Management API Routes
+  
+  // Fleet Groups
+  app.post('/api/fleet/groups', isAuthenticated, async (req, res) => {
+    try {
+      const fleetGroup = await storage.createFleetGroup({
+        ...req.body,
+        garageId: req.user.garageId,
+      });
+      res.status(201).json(fleetGroup);
+    } catch (error) {
+      console.error("Error creating fleet group:", error);
+      res.status(500).json({ message: "Failed to create fleet group" });
+    }
+  });
+
+  app.get('/api/fleet/groups', isAuthenticated, async (req, res) => {
+    try {
+      const fleetGroups = await storage.getFleetGroupsByGarage(req.user.garageId);
+      res.json(fleetGroups);
+    } catch (error) {
+      console.error("Error fetching fleet groups:", error);
+      res.status(500).json({ message: "Failed to fetch fleet groups" });
+    }
+  });
+
+  app.get('/api/fleet/groups/:id', isAuthenticated, async (req, res) => {
+    try {
+      const fleetGroup = await storage.getFleetGroup(req.params.id);
+      if (!fleetGroup) {
+        return res.status(404).json({ message: "Fleet group not found" });
+      }
+      res.json(fleetGroup);
+    } catch (error) {
+      console.error("Error fetching fleet group:", error);
+      res.status(500).json({ message: "Failed to fetch fleet group" });
+    }
+  });
+
+  app.patch('/api/fleet/groups/:id', isAuthenticated, async (req, res) => {
+    try {
+      const fleetGroup = await storage.updateFleetGroup(req.params.id, req.body);
+      res.json(fleetGroup);
+    } catch (error) {
+      console.error("Error updating fleet group:", error);
+      res.status(500).json({ message: "Failed to update fleet group" });
+    }
+  });
+
+  app.delete('/api/fleet/groups/:id', isAuthenticated, async (req, res) => {
+    try {
+      await storage.deleteFleetGroup(req.params.id);
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting fleet group:", error);
+      res.status(500).json({ message: "Failed to delete fleet group" });
+    }
+  });
+
+  // Fleet Vehicles
+  app.post('/api/fleet/vehicles', isAuthenticated, async (req, res) => {
+    try {
+      const fleetVehicle = await storage.createFleetVehicle(req.body);
+      res.status(201).json(fleetVehicle);
+    } catch (error) {
+      console.error("Error creating fleet vehicle:", error);
+      res.status(500).json({ message: "Failed to create fleet vehicle" });
+    }
+  });
+
+  app.get('/api/fleet/vehicles/group/:fleetGroupId', isAuthenticated, async (req, res) => {
+    try {
+      const fleetVehicles = await storage.getFleetVehiclesByGroup(req.params.fleetGroupId);
+      res.json(fleetVehicles);
+    } catch (error) {
+      console.error("Error fetching fleet vehicles:", error);
+      res.status(500).json({ message: "Failed to fetch fleet vehicles" });
+    }
+  });
+
+  app.get('/api/fleet/vehicles/:id', isAuthenticated, async (req, res) => {
+    try {
+      const fleetVehicle = await storage.getFleetVehicle(req.params.id);
+      if (!fleetVehicle) {
+        return res.status(404).json({ message: "Fleet vehicle not found" });
+      }
+      res.json(fleetVehicle);
+    } catch (error) {
+      console.error("Error fetching fleet vehicle:", error);
+      res.status(500).json({ message: "Failed to fetch fleet vehicle" });
+    }
+  });
+
+  app.patch('/api/fleet/vehicles/:id', isAuthenticated, async (req, res) => {
+    try {
+      const fleetVehicle = await storage.updateFleetVehicle(req.params.id, req.body);
+      res.json(fleetVehicle);
+    } catch (error) {
+      console.error("Error updating fleet vehicle:", error);
+      res.status(500).json({ message: "Failed to update fleet vehicle" });
+    }
+  });
+
+  app.delete('/api/fleet/vehicles/:id', isAuthenticated, async (req, res) => {
+    try {
+      await storage.deleteFleetVehicle(req.params.id);
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting fleet vehicle:", error);
+      res.status(500).json({ message: "Failed to delete fleet vehicle" });
+    }
+  });
+
+  // Fleet Contracts
+  app.post('/api/fleet/contracts', isAuthenticated, async (req, res) => {
+    try {
+      const contract = await storage.createFleetContract({
+        ...req.body,
+        createdBy: req.user.id,
+      });
+      res.status(201).json(contract);
+    } catch (error) {
+      console.error("Error creating fleet contract:", error);
+      res.status(500).json({ message: "Failed to create fleet contract" });
+    }
+  });
+
+  app.get('/api/fleet/contracts/group/:fleetGroupId', isAuthenticated, async (req, res) => {
+    try {
+      const contracts = await storage.getFleetContractsByGroup(req.params.fleetGroupId);
+      res.json(contracts);
+    } catch (error) {
+      console.error("Error fetching fleet contracts:", error);
+      res.status(500).json({ message: "Failed to fetch fleet contracts" });
+    }
+  });
+
+  app.get('/api/fleet/contracts/:id', isAuthenticated, async (req, res) => {
+    try {
+      const contract = await storage.getFleetContract(req.params.id);
+      if (!contract) {
+        return res.status(404).json({ message: "Fleet contract not found" });
+      }
+      res.json(contract);
+    } catch (error) {
+      console.error("Error fetching fleet contract:", error);
+      res.status(500).json({ message: "Failed to fetch fleet contract" });
+    }
+  });
+
+  app.patch('/api/fleet/contracts/:id', isAuthenticated, async (req, res) => {
+    try {
+      const contract = await storage.updateFleetContract(req.params.id, req.body);
+      res.json(contract);
+    } catch (error) {
+      console.error("Error updating fleet contract:", error);
+      res.status(500).json({ message: "Failed to update fleet contract" });
+    }
+  });
+
+  app.delete('/api/fleet/contracts/:id', isAuthenticated, async (req, res) => {
+    try {
+      await storage.deleteFleetContract(req.params.id);
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting fleet contract:", error);
+      res.status(500).json({ message: "Failed to delete fleet contract" });
+    }
+  });
+
+  // Fleet Pricing Tiers
+  app.post('/api/fleet/pricing-tiers', isAuthenticated, async (req, res) => {
+    try {
+      const tier = await storage.createFleetPricingTier({
+        ...req.body,
+        garageId: req.user.garageId,
+      });
+      res.status(201).json(tier);
+    } catch (error) {
+      console.error("Error creating pricing tier:", error);
+      res.status(500).json({ message: "Failed to create pricing tier" });
+    }
+  });
+
+  app.get('/api/fleet/pricing-tiers', isAuthenticated, async (req, res) => {
+    try {
+      const { fleetGroupId } = req.query;
+      const tiers = fleetGroupId 
+        ? await storage.getFleetPricingTiersByGroup(fleetGroupId as string)
+        : await storage.getFleetPricingTiersByGarage(req.user.garageId);
+      res.json(tiers);
+    } catch (error) {
+      console.error("Error fetching pricing tiers:", error);
+      res.status(500).json({ message: "Failed to fetch pricing tiers" });
+    }
+  });
+
+  app.get('/api/fleet/pricing-tiers/:id', isAuthenticated, async (req, res) => {
+    try {
+      const tier = await storage.getFleetPricingTier(req.params.id);
+      if (!tier) {
+        return res.status(404).json({ message: "Pricing tier not found" });
+      }
+      res.json(tier);
+    } catch (error) {
+      console.error("Error fetching pricing tier:", error);
+      res.status(500).json({ message: "Failed to fetch pricing tier" });
+    }
+  });
+
+  app.patch('/api/fleet/pricing-tiers/:id', isAuthenticated, async (req, res) => {
+    try {
+      const tier = await storage.updateFleetPricingTier(req.params.id, req.body);
+      res.json(tier);
+    } catch (error) {
+      console.error("Error updating pricing tier:", error);
+      res.status(500).json({ message: "Failed to update pricing tier" });
+    }
+  });
+
+  app.delete('/api/fleet/pricing-tiers/:id', isAuthenticated, async (req, res) => {
+    try {
+      await storage.deleteFleetPricingTier(req.params.id);
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting pricing tier:", error);
+      res.status(500).json({ message: "Failed to delete pricing tier" });
+    }
+  });
+
+  // Fleet Maintenance Schedules
+  app.post('/api/fleet/maintenance-schedules', isAuthenticated, async (req, res) => {
+    try {
+      const schedule = await storage.createFleetMaintenanceSchedule(req.body);
+      res.status(201).json(schedule);
+    } catch (error) {
+      console.error("Error creating maintenance schedule:", error);
+      res.status(500).json({ message: "Failed to create maintenance schedule" });
+    }
+  });
+
+  app.get('/api/fleet/maintenance-schedules/group/:fleetGroupId', isAuthenticated, async (req, res) => {
+    try {
+      const schedules = await storage.getFleetMaintenanceSchedulesByGroup(req.params.fleetGroupId);
+      res.json(schedules);
+    } catch (error) {
+      console.error("Error fetching maintenance schedules:", error);
+      res.status(500).json({ message: "Failed to fetch maintenance schedules" });
+    }
+  });
+
+  app.get('/api/fleet/maintenance-schedules/:id', isAuthenticated, async (req, res) => {
+    try {
+      const schedule = await storage.getFleetMaintenanceSchedule(req.params.id);
+      if (!schedule) {
+        return res.status(404).json({ message: "Maintenance schedule not found" });
+      }
+      res.json(schedule);
+    } catch (error) {
+      console.error("Error fetching maintenance schedule:", error);
+      res.status(500).json({ message: "Failed to fetch maintenance schedule" });
+    }
+  });
+
+  app.patch('/api/fleet/maintenance-schedules/:id', isAuthenticated, async (req, res) => {
+    try {
+      const schedule = await storage.updateFleetMaintenanceSchedule(req.params.id, req.body);
+      res.json(schedule);
+    } catch (error) {
+      console.error("Error updating maintenance schedule:", error);
+      res.status(500).json({ message: "Failed to update maintenance schedule" });
+    }
+  });
+
+  app.delete('/api/fleet/maintenance-schedules/:id', isAuthenticated, async (req, res) => {
+    try {
+      await storage.deleteFleetMaintenanceSchedule(req.params.id);
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting maintenance schedule:", error);
+      res.status(500).json({ message: "Failed to delete maintenance schedule" });
+    }
+  });
+
   const httpServer = createServer(app);
   
   // Initialize WebSocket server for chat
