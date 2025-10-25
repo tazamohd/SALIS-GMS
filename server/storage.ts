@@ -228,6 +228,24 @@ import {
   type InsertFleetMaintenanceSchedule,
   warranties,
   warrantyClaims,
+  inspectionTemplates,
+  vehicleInspections,
+  towingRequests,
+  towTrucks,
+  loanerVehicles,
+  loanerReservations,
+  type InspectionTemplate,
+  type InsertInspectionTemplate,
+  type VehicleInspection,
+  type InsertVehicleInspection,
+  type TowingRequest,
+  type InsertTowingRequest,
+  type TowTruck,
+  type InsertTowTruck,
+  type LoanerVehicle,
+  type InsertLoanerVehicle,
+  type LoanerReservation,
+  type InsertLoanerReservation,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, or, inArray, and, gte, lte, ilike, sql, isNull, gt } from "drizzle-orm";
@@ -757,6 +775,46 @@ export interface IStorage {
   getWarrantyClaimsByWarranty(warrantyId: string): Promise<any[]>;
   updateWarrantyClaim(id: string, data: any): Promise<any>;
   deleteWarrantyClaim(id: string): Promise<void>;
+
+  // Module 45: Vehicle Inspection Checklists
+  createInspectionTemplate(data: InsertInspectionTemplate): Promise<InspectionTemplate>;
+  getInspectionTemplates(garageId: string): Promise<InspectionTemplate[]>;
+  getInspectionTemplateById(id: string): Promise<InspectionTemplate | undefined>;
+  updateInspectionTemplate(id: string, data: Partial<InsertInspectionTemplate>): Promise<InspectionTemplate>;
+  deleteInspectionTemplate(id: string): Promise<void>;
+
+  createVehicleInspection(data: InsertVehicleInspection): Promise<VehicleInspection>;
+  getVehicleInspections(garageId: string, filters?: {status?: string, vehicleId?: string, customerId?: string}): Promise<VehicleInspection[]>;
+  getVehicleInspectionById(id: string): Promise<VehicleInspection | undefined>;
+  updateVehicleInspection(id: string, data: Partial<InsertVehicleInspection>): Promise<VehicleInspection>;
+  deleteVehicleInspection(id: string): Promise<void>;
+
+  // Module 46: Towing & Roadside Assistance
+  createTowingRequest(data: InsertTowingRequest): Promise<TowingRequest>;
+  getTowingRequests(garageId: string, filters?: {status?: string, serviceType?: string}): Promise<TowingRequest[]>;
+  getTowingRequestById(id: string): Promise<TowingRequest | undefined>;
+  updateTowingRequest(id: string, data: Partial<InsertTowingRequest>): Promise<TowingRequest>;
+  deleteTowingRequest(id: string): Promise<void>;
+
+  createTowTruck(data: InsertTowTruck): Promise<TowTruck>;
+  getTowTrucks(garageId: string, filters?: {status?: string}): Promise<TowTruck[]>;
+  getTowTruckById(id: string): Promise<TowTruck | undefined>;
+  updateTowTruck(id: string, data: Partial<InsertTowTruck>): Promise<TowTruck>;
+  deleteTowTruck(id: string): Promise<void>;
+  updateTowTruckLocation(id: string, latitude: string, longitude: string): Promise<TowTruck>;
+
+  // Module 48: Loaner Vehicle Management
+  createLoanerVehicle(data: InsertLoanerVehicle): Promise<LoanerVehicle>;
+  getLoanerVehicles(garageId: string, filters?: {status?: string, condition?: string}): Promise<LoanerVehicle[]>;
+  getLoanerVehicleById(id: string): Promise<LoanerVehicle | undefined>;
+  updateLoanerVehicle(id: string, data: Partial<InsertLoanerVehicle>): Promise<LoanerVehicle>;
+  deleteLoanerVehicle(id: string): Promise<void>;
+
+  createLoanerReservation(data: InsertLoanerReservation): Promise<LoanerReservation>;
+  getLoanerReservations(garageId: string, filters?: {status?: string, loanerVehicleId?: string}): Promise<LoanerReservation[]>;
+  getLoanerReservationById(id: string): Promise<LoanerReservation | undefined>;
+  updateLoanerReservation(id: string, data: Partial<InsertLoanerReservation>): Promise<LoanerReservation>;
+  deleteLoanerReservation(id: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -5525,6 +5583,298 @@ export class DatabaseStorage implements IStorage {
   async deleteWarrantyClaim(id: string): Promise<void> {
     await db.delete(warrantyClaims)
       .where(eq(warrantyClaims.id, id));
+  }
+
+  // Module 45: Vehicle Inspection Checklists
+  async createInspectionTemplate(data: InsertInspectionTemplate): Promise<InspectionTemplate> {
+    const [template] = await db.insert(inspectionTemplates).values(data).returning();
+    return template;
+  }
+
+  async getInspectionTemplates(garageId: string): Promise<InspectionTemplate[]> {
+    return await db.select()
+      .from(inspectionTemplates)
+      .where(eq(inspectionTemplates.garageId, garageId))
+      .orderBy(desc(inspectionTemplates.createdAt));
+  }
+
+  async getInspectionTemplateById(id: string): Promise<InspectionTemplate | undefined> {
+    const [template] = await db.select()
+      .from(inspectionTemplates)
+      .where(eq(inspectionTemplates.id, id));
+    return template;
+  }
+
+  async updateInspectionTemplate(id: string, data: Partial<InsertInspectionTemplate>): Promise<InspectionTemplate> {
+    const [template] = await db.update(inspectionTemplates)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(inspectionTemplates.id, id))
+      .returning();
+    return template;
+  }
+
+  async deleteInspectionTemplate(id: string): Promise<void> {
+    await db.delete(inspectionTemplates)
+      .where(eq(inspectionTemplates.id, id));
+  }
+
+  async createVehicleInspection(data: InsertVehicleInspection): Promise<VehicleInspection> {
+    const inspectionNumber = `INS-${Date.now()}`;
+    const [inspection] = await db.insert(vehicleInspections)
+      .values({ ...data, inspectionNumber })
+      .returning();
+    return inspection;
+  }
+
+  async getVehicleInspections(
+    garageId: string,
+    filters?: {status?: string, vehicleId?: string, customerId?: string}
+  ): Promise<VehicleInspection[]> {
+    const conditions = [eq(vehicleInspections.garageId, garageId)];
+    
+    if (filters?.status) {
+      conditions.push(eq(vehicleInspections.overallStatus, filters.status));
+    }
+    if (filters?.vehicleId) {
+      conditions.push(eq(vehicleInspections.vehicleId, filters.vehicleId));
+    }
+    if (filters?.customerId) {
+      conditions.push(eq(vehicleInspections.customerId, filters.customerId));
+    }
+
+    return await db.select()
+      .from(vehicleInspections)
+      .where(and(...conditions))
+      .orderBy(desc(vehicleInspections.createdAt));
+  }
+
+  async getVehicleInspectionById(id: string): Promise<VehicleInspection | undefined> {
+    const [inspection] = await db.select()
+      .from(vehicleInspections)
+      .where(eq(vehicleInspections.id, id));
+    return inspection;
+  }
+
+  async updateVehicleInspection(id: string, data: Partial<InsertVehicleInspection>): Promise<VehicleInspection> {
+    const [inspection] = await db.update(vehicleInspections)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(vehicleInspections.id, id))
+      .returning();
+    return inspection;
+  }
+
+  async deleteVehicleInspection(id: string): Promise<void> {
+    await db.delete(vehicleInspections)
+      .where(eq(vehicleInspections.id, id));
+  }
+
+  // Module 46: Towing & Roadside Assistance
+  async createTowingRequest(data: InsertTowingRequest): Promise<TowingRequest> {
+    const requestNumber = `TOW-${Date.now()}`;
+    const [request] = await db.insert(towingRequests)
+      .values({ ...data, requestNumber })
+      .returning();
+    return request;
+  }
+
+  async getTowingRequests(
+    garageId: string,
+    filters?: {status?: string, serviceType?: string}
+  ): Promise<TowingRequest[]> {
+    const conditions = [eq(towingRequests.garageId, garageId)];
+    
+    if (filters?.status) {
+      conditions.push(eq(towingRequests.status, filters.status));
+    }
+    if (filters?.serviceType) {
+      conditions.push(eq(towingRequests.serviceType, filters.serviceType));
+    }
+
+    return await db.select()
+      .from(towingRequests)
+      .where(and(...conditions))
+      .orderBy(desc(towingRequests.createdAt));
+  }
+
+  async getTowingRequestById(id: string): Promise<TowingRequest | undefined> {
+    const [request] = await db.select()
+      .from(towingRequests)
+      .where(eq(towingRequests.id, id));
+    return request;
+  }
+
+  async updateTowingRequest(id: string, data: Partial<InsertTowingRequest>): Promise<TowingRequest> {
+    const [request] = await db.update(towingRequests)
+      .set(data)
+      .where(eq(towingRequests.id, id))
+      .returning();
+    return request;
+  }
+
+  async deleteTowingRequest(id: string): Promise<void> {
+    await db.delete(towingRequests)
+      .where(eq(towingRequests.id, id));
+  }
+
+  async createTowTruck(data: InsertTowTruck): Promise<TowTruck> {
+    const [truck] = await db.insert(towTrucks)
+      .values(data)
+      .returning();
+    return truck;
+  }
+
+  async getTowTrucks(
+    garageId: string,
+    filters?: {status?: string}
+  ): Promise<TowTruck[]> {
+    const conditions = [eq(towTrucks.garageId, garageId)];
+    
+    if (filters?.status) {
+      conditions.push(eq(towTrucks.status, filters.status));
+    }
+
+    return await db.select()
+      .from(towTrucks)
+      .where(and(...conditions))
+      .orderBy(desc(towTrucks.createdAt));
+  }
+
+  async getTowTruckById(id: string): Promise<TowTruck | undefined> {
+    const [truck] = await db.select()
+      .from(towTrucks)
+      .where(eq(towTrucks.id, id));
+    return truck;
+  }
+
+  async updateTowTruck(id: string, data: Partial<InsertTowTruck>): Promise<TowTruck> {
+    const [truck] = await db.update(towTrucks)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(towTrucks.id, id))
+      .returning();
+    return truck;
+  }
+
+  async deleteTowTruck(id: string): Promise<void> {
+    await db.delete(towTrucks)
+      .where(eq(towTrucks.id, id));
+  }
+
+  async updateTowTruckLocation(id: string, latitude: string, longitude: string): Promise<TowTruck> {
+    const [truck] = await db.update(towTrucks)
+      .set({
+        lastKnownLatitude: latitude,
+        lastKnownLongitude: longitude,
+        lastLocationUpdate: new Date(),
+      })
+      .where(eq(towTrucks.id, id))
+      .returning();
+    return truck;
+  }
+
+  // Module 48: Loaner Vehicle Management
+  async createLoanerVehicle(data: InsertLoanerVehicle): Promise<LoanerVehicle> {
+    const loanerNumber = `LOAN-${Date.now()}`;
+    const [vehicle] = await db.insert(loanerVehicles)
+      .values({ ...data, loanerNumber })
+      .returning();
+    return vehicle;
+  }
+
+  async getLoanerVehicles(
+    garageId: string,
+    filters?: {status?: string, condition?: string}
+  ): Promise<LoanerVehicle[]> {
+    const conditions = [eq(loanerVehicles.garageId, garageId)];
+    
+    if (filters?.status) {
+      conditions.push(eq(loanerVehicles.status, filters.status));
+    }
+    if (filters?.condition) {
+      conditions.push(eq(loanerVehicles.condition, filters.condition));
+    }
+
+    return await db.select()
+      .from(loanerVehicles)
+      .where(and(...conditions))
+      .orderBy(desc(loanerVehicles.createdAt));
+  }
+
+  async getLoanerVehicleById(id: string): Promise<LoanerVehicle | undefined> {
+    const [vehicle] = await db.select()
+      .from(loanerVehicles)
+      .where(eq(loanerVehicles.id, id));
+    return vehicle;
+  }
+
+  async updateLoanerVehicle(id: string, data: Partial<InsertLoanerVehicle>): Promise<LoanerVehicle> {
+    const [vehicle] = await db.update(loanerVehicles)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(loanerVehicles.id, id))
+      .returning();
+    return vehicle;
+  }
+
+  async deleteLoanerVehicle(id: string): Promise<void> {
+    await db.delete(loanerVehicles)
+      .where(eq(loanerVehicles.id, id));
+  }
+
+  async createLoanerReservation(data: InsertLoanerReservation): Promise<LoanerReservation> {
+    const reservationNumber = `RES-${Date.now()}`;
+    const [reservation] = await db.insert(loanerReservations)
+      .values({ ...data, reservationNumber })
+      .returning();
+    return reservation;
+  }
+
+  async getLoanerReservations(
+    garageId: string,
+    filters?: {status?: string, loanerVehicleId?: string}
+  ): Promise<LoanerReservation[]> {
+    const conditions: any[] = [];
+    
+    if (filters?.status || filters?.loanerVehicleId) {
+      if (filters?.status) {
+        conditions.push(eq(loanerReservations.status, filters.status));
+      }
+      if (filters?.loanerVehicleId) {
+        conditions.push(eq(loanerReservations.loanerVehicleId, filters.loanerVehicleId));
+      }
+
+      return await db.select()
+        .from(loanerReservations)
+        .innerJoin(loanerVehicles, eq(loanerReservations.loanerVehicleId, loanerVehicles.id))
+        .where(and(eq(loanerVehicles.garageId, garageId), ...conditions))
+        .orderBy(desc(loanerReservations.createdAt))
+        .then(results => results.map(r => r.loaner_reservations));
+    }
+
+    return await db.select()
+      .from(loanerReservations)
+      .innerJoin(loanerVehicles, eq(loanerReservations.loanerVehicleId, loanerVehicles.id))
+      .where(eq(loanerVehicles.garageId, garageId))
+      .orderBy(desc(loanerReservations.createdAt))
+      .then(results => results.map(r => r.loaner_reservations));
+  }
+
+  async getLoanerReservationById(id: string): Promise<LoanerReservation | undefined> {
+    const [reservation] = await db.select()
+      .from(loanerReservations)
+      .where(eq(loanerReservations.id, id));
+    return reservation;
+  }
+
+  async updateLoanerReservation(id: string, data: Partial<InsertLoanerReservation>): Promise<LoanerReservation> {
+    const [reservation] = await db.update(loanerReservations)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(loanerReservations.id, id))
+      .returning();
+    return reservation;
+  }
+
+  async deleteLoanerReservation(id: string): Promise<void> {
+    await db.delete(loanerReservations)
+      .where(eq(loanerReservations.id, id));
   }
 }
 
