@@ -5,8 +5,16 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { X, Check, RotateCcw } from "lucide-react";
 
+export interface SignatureData {
+  signatureData: string;
+  consentGiven: boolean;
+  consentText?: string;
+  signatureType: 'customer' | 'technician' | 'manager';
+  timestamp: string;
+}
+
 interface SignaturePadProps {
-  onSign: (signatureData: string) => void;
+  onSign: (data: SignatureData) => void;
   onCancel: () => void;
   title?: string;
   consentText?: string;
@@ -92,8 +100,15 @@ export function SignaturePad({
     const canvas = canvasRef.current;
     if (!canvas || !hasSignature || (consentText && !consentGiven)) return;
 
-    const signatureData = canvas.toDataURL('image/png');
-    onSign(signatureData);
+    const signatureImageData = canvas.toDataURL('image/png');
+    
+    onSign({
+      signatureData: signatureImageData,
+      consentGiven,
+      consentText,
+      signatureType: signatureType || 'customer',
+      timestamp: new Date().toISOString(),
+    });
   };
 
   return (

@@ -2553,6 +2553,8 @@ export const digitalSignatures = pgTable("digital_signatures", {
   ipAddress: varchar("ip_address", { length: 50 }),
   deviceInfo: varchar("device_info", { length: 255 }),
   consentText: text("consent_text"),
+  consentGiven: boolean("consent_given").default(false),
+  signedAt: timestamp("signed_at"), // Client-provided signature timestamp
   createdAt: timestamp("created_at").defaultNow(),
 });
 

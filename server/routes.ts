@@ -6594,12 +6594,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Module 38: Digital Signatures & Media Documentation API Routes
   app.post('/api/digital-signatures', isAuthenticated, async (req: any, res) => {
     try {
-      const { relatedType, relatedId, signatureData, signatureType, consentText } = req.body;
+      const { 
+        relatedType, relatedId, signatureData, signatureType, 
+        consentText, consentGiven, timestamp 
+      } = req.body;
       const garageId = req.user.garageId;
       const userId = req.user.id;
       
+      // Validate required fields
       if (!relatedType || !relatedId || !signatureData) {
         return res.status(400).json({ message: "Missing required fields" });
+      }
+      
+      // Enforce consent tracking when consent text is provided
+      if (consentText && !consentGiven) {
+        return res.status(400).json({ message: "Consent must be given when consent text is provided" });
+      }
+      
+      // Validate signature type
+      const validTypes = ['customer', 'technician', 'manager'];
+      if (signatureType && !validTypes.includes(signatureType)) {
+        return res.status(400).json({ message: "Invalid signature type" });
+      }
+      
+      // Validate base64 signature data
+      if (!signatureData.startsWith('data:image/png;base64,')) {
+        return res.status(400).json({ message: "Invalid signature format. Must be PNG base64 data" });
       }
       
       const ipAddress = req.ip || req.connection.remoteAddress;
@@ -6614,7 +6634,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         signatureType: signatureType || 'customer',
         ipAddress,
         deviceInfo,
-        consentText,
+        consentText: consentGiven ? consentText : undefined,
+        consentGiven: consentGiven || false,
+        signedAt: timestamp ? new Date(timestamp) : new Date(),
       });
       
       res.json(signature);
@@ -6644,8 +6666,56 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const garageId = req.user.garageId;
       const userId = req.user.id;
       
+      // Validate required fields
       if (!relatedType || !relatedId || !mediaType || !fileUrl || !fileName) {
         return res.status(400).json({ message: "Missing required fields" });
+      }
+      
+      // Server-side file size validation (10MB limit)
+      const MAX_FILE_SIZE = 10 * 1024 * 1024;
+      if (fileSize && fileSize > MAX_FILE_SIZE) {
+        return res.status(400).json({ message: "File size exceeds 10MB limit" });
+      }
+      
+      // Validate MIME type
+      const allowedMimeTypes = [
+        'image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp',
+        'video/mp4', 'video/webm', 'video/quicktime',
+        'application/pdf', 'application/msword', 
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+      ];
+      
+      if (mimeType && !allowedMimeTypes.includes(mimeType)) {
+        return res.status(400).json({ message: "Invalid file type. Only images, videos, and documents (PDF, DOC, DOCX) are allowed" });
+      }
+      
+      // Validate base64 format if provided
+      if (fileUrl.startsWith('data:')) {
+        const base64Regex = /^data:([a-zA-Z0-9]+\/[a-zA-Z0-9-.+]+);base64,([A-Za-z0-9+/=]+)$/;
+        if (!base64Regex.test(fileUrl)) {
+          return res.status(400).json({ message: "Invalid base64 data format" });
+        }
+        
+        // Extract and verify base64 size matches reported size
+        const base64Data = fileUrl.split(',')[1];
+        const estimatedSize = (base64Data.length * 3) / 4;
+        if (estimatedSize > MAX_FILE_SIZE) {
+          return res.status(400).json({ message: "File size exceeds 10MB limit" });
+        }
+      }
+      
+      // Validate media type matches file extension
+      const mediaTypeMapping: Record<string, string[]> = {
+        photo: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
+        video: ['mp4', 'webm', 'mov'],
+        document: ['pdf', 'doc', 'docx']
+      };
+      
+      const fileExtension = fileName.split('.').pop()?.toLowerCase();
+      if (fileExtension && mediaTypeMapping[mediaType]) {
+        if (!mediaTypeMapping[mediaType].includes(fileExtension)) {
+          return res.status(400).json({ message: "Media type does not match file extension" });
+        }
       }
       
       const media = await storage.createMediaAttachment({
