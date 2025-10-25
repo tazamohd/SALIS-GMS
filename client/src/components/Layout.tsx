@@ -1,4 +1,4 @@
-import { Home, ClipboardCheck, UserIcon, LogOut, Search, Calendar, Users, ShoppingCart, FileText, BarChart3, Wrench, ClipboardList, Hammer, Package, Building2, HardHat, UserCog, Zap, Car, Receipt, Warehouse, DollarSign, RotateCcw, DatabaseBackup, TrendingUp, UserCheck, Brain, Plug2, Shield, Settings as SettingsIcon, Menu, X, ChevronDown, ChevronRight, MessageCircle, Truck, FileCheck, Radio, Key } from "lucide-react";
+import { Home, ClipboardCheck, UserIcon, LogOut, Search, Calendar, Users, ShoppingCart, FileText, BarChart3, Wrench, ClipboardList, Hammer, Package, Building2, HardHat, UserCog, Zap, Car, Receipt, Warehouse, DollarSign, RotateCcw, DatabaseBackup, TrendingUp, UserCheck, Brain, Plug2, Shield, Settings as SettingsIcon, Menu, X, ChevronDown, ChevronRight, MessageCircle, Truck, FileCheck, Radio, Key, Store } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -93,6 +93,7 @@ export function Layout({ children }: LayoutProps) {
         { path: "/spare-parts", icon: Package, label: t('nav.spareParts') },
         { path: "/tools", icon: Hammer, label: t('nav.tools') },
         { path: "/suppliers", icon: Building2, label: t('nav.suppliers') },
+        { path: "/vendor-supplier-portal", icon: Store, label: "Vendor/Supplier Portal" },
         { path: "/purchase-orders", icon: ShoppingCart, label: t('nav.purchaseOrders') },
         { path: "/estimates", icon: Receipt, label: t('nav.estimates') },
       ]
