@@ -1,4 +1,4 @@
-import { Home, ClipboardCheck, UserIcon, LogOut, Search, Calendar, Users, ShoppingCart, FileText, BarChart3, Wrench, ClipboardList, Hammer, Package, Building2, HardHat, UserCog, Zap, Car, Receipt, Warehouse, DollarSign, RotateCcw, DatabaseBackup, TrendingUp, UserCheck, Brain, Plug2, Shield, Settings as SettingsIcon, Menu, X, ChevronDown, ChevronRight, MessageCircle, Truck } from "lucide-react";
+import { Home, ClipboardCheck, UserIcon, LogOut, Search, Calendar, Users, ShoppingCart, FileText, BarChart3, Wrench, ClipboardList, Hammer, Package, Building2, HardHat, UserCog, Zap, Car, Receipt, Warehouse, DollarSign, RotateCcw, DatabaseBackup, TrendingUp, UserCheck, Brain, Plug2, Shield, Settings as SettingsIcon, Menu, X, ChevronDown, ChevronRight, MessageCircle, Truck, FileCheck, Radio, Key } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -81,6 +81,9 @@ export function Layout({ children }: LayoutProps) {
         { path: "/vehicles", icon: Car, label: t('nav.vehicles') },
         { path: "/fleet-management", icon: Truck, label: "Fleet Management" },
         { path: "/warranty-management", icon: Shield, label: "Warranty Management" },
+        { path: "/vehicle-inspections", icon: FileCheck, label: "Vehicle Inspections" },
+        { path: "/towing-assistance", icon: Radio, label: "Towing & Roadside" },
+        { path: "/loaner-vehicles", icon: Key, label: "Loaner Vehicles" },
       ]
     },
     {

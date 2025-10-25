@@ -41,6 +41,9 @@ import Settings from "@/pages/Settings";
 import Chat from "@/pages/Chat";
 import FleetManagement from "@/pages/FleetManagement";
 import WarrantyManagement from "@/pages/WarrantyManagement";
+import VehicleInspections from "@/pages/VehicleInspections";
+import TowingAssistance from "@/pages/TowingAssistance";
+import LoanerVehicles from "@/pages/LoanerVehicles";
 import { CustomerDashboard } from "@/pages/customer/CustomerDashboard";
 import { CustomerAppointments } from "@/pages/customer/CustomerAppointments";
 import { CustomerInvoices } from "@/pages/customer/CustomerInvoices";
@@ -155,6 +158,21 @@ function Router() {
       <Route path="/warranty-management">
         <Layout>
           <WarrantyManagement />
+        </Layout>
+      </Route>
+      <Route path="/vehicle-inspections">
+        <Layout>
+          <VehicleInspections />
+        </Layout>
+      </Route>
+      <Route path="/towing-assistance">
+        <Layout>
+          <TowingAssistance />
+        </Layout>
+      </Route>
+      <Route path="/loaner-vehicles">
+        <Layout>
+          <LoanerVehicles />
         </Layout>
       </Route>
       <Route path="/purchase-orders">
