@@ -23,6 +23,8 @@ import {
   serviceReminders,
   customerNotes,
   suppliers,
+  supplierPriceList,
+  supplierPerformance,
   purchaseOrders,
   purchaseOrderItems,
   invoices,
@@ -59,6 +61,10 @@ import {
   type InsertCustomerNote,
   type Supplier,
   type InsertSupplier,
+  type SupplierPriceList,
+  type InsertSupplierPriceList,
+  type SupplierPerformance,
+  type InsertSupplierPerformance,
   type PurchaseOrder,
   type InsertPurchaseOrder,
   type PurchaseOrderItem,
@@ -352,6 +358,22 @@ export interface IStorage {
   createSupplier(data: InsertSupplier): Promise<Supplier>;
   updateSupplier(id: string, data: Partial<Supplier>): Promise<Supplier>;
   deleteSupplier(id: string): Promise<void>;
+  
+  // Supplier Price List methods - Module 43
+  getSupplierPriceLists(supplierId?: string, sparePartId?: string): Promise<SupplierPriceList[]>;
+  getSupplierPriceList(id: string): Promise<SupplierPriceList | undefined>;
+  createSupplierPriceList(data: InsertSupplierPriceList): Promise<SupplierPriceList>;
+  updateSupplierPriceList(id: string, data: Partial<SupplierPriceList>): Promise<SupplierPriceList>;
+  deleteSupplierPriceList(id: string): Promise<void>;
+  comparePrices(sparePartId: string): Promise<SupplierPriceList[]>;
+  
+  // Supplier Performance methods - Module 43
+  getSupplierPerformance(supplierId?: string, period?: string): Promise<SupplierPerformance[]>;
+  getSupplierPerformanceRecord(id: string): Promise<SupplierPerformance | undefined>;
+  createSupplierPerformance(data: InsertSupplierPerformance): Promise<SupplierPerformance>;
+  updateSupplierPerformance(id: string, data: Partial<SupplierPerformance>): Promise<SupplierPerformance>;
+  deleteSupplierPerformance(id: string): Promise<void>;
+  
   getPurchaseOrders(garageId?: string, status?: string): Promise<PurchaseOrder[]>;
   getPurchaseOrder(id: string): Promise<PurchaseOrder | undefined>;
   createPurchaseOrder(data: InsertPurchaseOrder): Promise<PurchaseOrder>;
@@ -1447,6 +1469,109 @@ export class DatabaseStorage implements IStorage {
     await db.update(suppliers)
       .set({ isActive: false })
       .where(eq(suppliers.id, id));
+  }
+
+  async getSupplierPriceLists(supplierId?: string, sparePartId?: string): Promise<SupplierPriceList[]> {
+    const conditions = [];
+    
+    if (supplierId) {
+      conditions.push(eq(supplierPriceList.supplierId, supplierId));
+    }
+    
+    if (sparePartId) {
+      conditions.push(eq(supplierPriceList.sparePartId, sparePartId));
+    }
+    
+    if (conditions.length > 0) {
+      return await db.select().from(supplierPriceList)
+        .where(and(...conditions))
+        .orderBy(desc(supplierPriceList.lastUpdated));
+    }
+    
+    return await db.select().from(supplierPriceList)
+      .orderBy(desc(supplierPriceList.lastUpdated));
+  }
+
+  async getSupplierPriceList(id: string): Promise<SupplierPriceList | undefined> {
+    const [priceList] = await db.select().from(supplierPriceList)
+      .where(eq(supplierPriceList.id, id));
+    return priceList;
+  }
+
+  async createSupplierPriceList(data: InsertSupplierPriceList): Promise<SupplierPriceList> {
+    const [priceList] = await db.insert(supplierPriceList)
+      .values(data)
+      .returning();
+    return priceList;
+  }
+
+  async updateSupplierPriceList(id: string, data: Partial<SupplierPriceList>): Promise<SupplierPriceList> {
+    const [priceList] = await db.update(supplierPriceList)
+      .set({ ...data, lastUpdated: new Date() })
+      .where(eq(supplierPriceList.id, id))
+      .returning();
+    return priceList;
+  }
+
+  async deleteSupplierPriceList(id: string): Promise<void> {
+    await db.delete(supplierPriceList)
+      .where(eq(supplierPriceList.id, id));
+  }
+
+  async comparePrices(sparePartId: string): Promise<SupplierPriceList[]> {
+    return await db.select().from(supplierPriceList)
+      .where(and(
+        eq(supplierPriceList.sparePartId, sparePartId),
+        eq(supplierPriceList.isActive, true)
+      ))
+      .orderBy(supplierPriceList.unitPrice);
+  }
+
+  async getSupplierPerformance(supplierId?: string, period?: string): Promise<SupplierPerformance[]> {
+    const conditions = [];
+    
+    if (supplierId) {
+      conditions.push(eq(supplierPerformance.supplierId, supplierId));
+    }
+    
+    if (period) {
+      conditions.push(eq(supplierPerformance.period, period));
+    }
+    
+    if (conditions.length > 0) {
+      return await db.select().from(supplierPerformance)
+        .where(and(...conditions))
+        .orderBy(desc(supplierPerformance.period));
+    }
+    
+    return await db.select().from(supplierPerformance)
+      .orderBy(desc(supplierPerformance.period));
+  }
+
+  async getSupplierPerformanceRecord(id: string): Promise<SupplierPerformance | undefined> {
+    const [performance] = await db.select().from(supplierPerformance)
+      .where(eq(supplierPerformance.id, id));
+    return performance;
+  }
+
+  async createSupplierPerformance(data: InsertSupplierPerformance): Promise<SupplierPerformance> {
+    const [performance] = await db.insert(supplierPerformance)
+      .values(data)
+      .returning();
+    return performance;
+  }
+
+  async updateSupplierPerformance(id: string, data: Partial<SupplierPerformance>): Promise<SupplierPerformance> {
+    const [performance] = await db.update(supplierPerformance)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(supplierPerformance.id, id))
+      .returning();
+    return performance;
+  }
+
+  async deleteSupplierPerformance(id: string): Promise<void> {
+    await db.delete(supplierPerformance)
+      .where(eq(supplierPerformance.id, id));
   }
 
   async getPurchaseOrders(garageId?: string, status?: string): Promise<PurchaseOrder[]> {
