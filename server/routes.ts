@@ -8135,6 +8135,558 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ========================================================================
+  // Module 42: Marketing Automation
+  // ========================================================================
+
+  // Marketing Campaigns
+  app.post("/api/marketing-campaigns", isAuthenticated, async (req: any, res) => {
+    try {
+      const user = req.user;
+      const data = { ...req.body, garageId: user.garageId };
+      const campaign = await storage.createMarketingCampaign(data);
+      res.status(201).json(campaign);
+    } catch (error: any) {
+      console.error("Error creating marketing campaign:", error);
+      res.status(400).json({ error: error.message || "Failed to create marketing campaign" });
+    }
+  });
+
+  app.get("/api/marketing-campaigns", isAuthenticated, async (req: any, res) => {
+    try {
+      const user = req.user;
+      const { status, campaignType } = req.query;
+      const campaigns = await storage.getMarketingCampaigns(user.garageId, {
+        status: status as string | undefined,
+        campaignType: campaignType as string | undefined,
+      });
+      res.json(campaigns);
+    } catch (error) {
+      console.error("Error fetching marketing campaigns:", error);
+      res.status(500).json({ error: "Failed to fetch marketing campaigns" });
+    }
+  });
+
+  app.get("/api/marketing-campaigns/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const campaign = await storage.getMarketingCampaignById(id);
+      if (!campaign) {
+        return res.status(404).json({ error: "Marketing campaign not found" });
+      }
+      res.json(campaign);
+    } catch (error) {
+      console.error("Error fetching marketing campaign:", error);
+      res.status(500).json({ error: "Failed to fetch marketing campaign" });
+    }
+  });
+
+  app.patch("/api/marketing-campaigns/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updated = await storage.updateMarketingCampaign(id, req.body);
+      res.json(updated);
+    } catch (error: any) {
+      console.error("Error updating marketing campaign:", error);
+      res.status(400).json({ error: error.message || "Failed to update marketing campaign" });
+    }
+  });
+
+  app.delete("/api/marketing-campaigns/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteMarketingCampaign(id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting marketing campaign:", error);
+      res.status(500).json({ error: "Failed to delete marketing campaign" });
+    }
+  });
+
+  // Campaign Recipients
+  app.get("/api/marketing-campaigns/:campaignId/recipients", isAuthenticated, async (req, res) => {
+    try {
+      const { campaignId } = req.params;
+      const recipients = await storage.getCampaignRecipients(campaignId);
+      res.json(recipients);
+    } catch (error) {
+      console.error("Error fetching campaign recipients:", error);
+      res.status(500).json({ error: "Failed to fetch campaign recipients" });
+    }
+  });
+
+  app.post("/api/campaign-recipients", isAuthenticated, async (req, res) => {
+    try {
+      const recipient = await storage.createCampaignRecipient(req.body);
+      res.status(201).json(recipient);
+    } catch (error: any) {
+      console.error("Error creating campaign recipient:", error);
+      res.status(400).json({ error: error.message || "Failed to create campaign recipient" });
+    }
+  });
+
+  app.patch("/api/campaign-recipients/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updated = await storage.updateCampaignRecipient(id, req.body);
+      res.json(updated);
+    } catch (error: any) {
+      console.error("Error updating campaign recipient:", error);
+      res.status(400).json({ error: error.message || "Failed to update campaign recipient" });
+    }
+  });
+
+  // Campaign Analytics
+  app.get("/api/marketing-campaigns/:campaignId/analytics", isAuthenticated, async (req, res) => {
+    try {
+      const { campaignId } = req.params;
+      const analytics = await storage.getCampaignAnalytics(campaignId);
+      res.json(analytics);
+    } catch (error) {
+      console.error("Error fetching campaign analytics:", error);
+      res.status(500).json({ error: "Failed to fetch campaign analytics" });
+    }
+  });
+
+  // ========================================================================
+  // Module 44: Customer Loyalty Program
+  // ========================================================================
+
+  // Loyalty Programs
+  app.post("/api/loyalty-programs", isAuthenticated, async (req: any, res) => {
+    try {
+      const user = req.user;
+      const data = { ...req.body, garageId: user.garageId };
+      const program = await storage.createLoyaltyProgram(data);
+      res.status(201).json(program);
+    } catch (error: any) {
+      console.error("Error creating loyalty program:", error);
+      res.status(400).json({ error: error.message || "Failed to create loyalty program" });
+    }
+  });
+
+  app.get("/api/loyalty-programs", isAuthenticated, async (req: any, res) => {
+    try {
+      const user = req.user;
+      const programs = await storage.getLoyaltyPrograms(user.garageId);
+      res.json(programs);
+    } catch (error) {
+      console.error("Error fetching loyalty programs:", error);
+      res.status(500).json({ error: "Failed to fetch loyalty programs" });
+    }
+  });
+
+  app.get("/api/loyalty-programs/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const program = await storage.getLoyaltyProgramById(id);
+      if (!program) {
+        return res.status(404).json({ error: "Loyalty program not found" });
+      }
+      res.json(program);
+    } catch (error) {
+      console.error("Error fetching loyalty program:", error);
+      res.status(500).json({ error: "Failed to fetch loyalty program" });
+    }
+  });
+
+  app.patch("/api/loyalty-programs/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updated = await storage.updateLoyaltyProgram(id, req.body);
+      res.json(updated);
+    } catch (error: any) {
+      console.error("Error updating loyalty program:", error);
+      res.status(400).json({ error: error.message || "Failed to update loyalty program" });
+    }
+  });
+
+  app.delete("/api/loyalty-programs/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteLoyaltyProgram(id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting loyalty program:", error);
+      res.status(500).json({ error: "Failed to delete loyalty program" });
+    }
+  });
+
+  // Loyalty Accounts
+  app.post("/api/loyalty-accounts", isAuthenticated, async (req, res) => {
+    try {
+      const account = await storage.createLoyaltyAccount(req.body);
+      res.status(201).json(account);
+    } catch (error: any) {
+      console.error("Error creating loyalty account:", error);
+      res.status(400).json({ error: error.message || "Failed to create loyalty account" });
+    }
+  });
+
+  app.get("/api/loyalty-accounts", isAuthenticated, async (req, res) => {
+    try {
+      const { programId, customerId } = req.query;
+      const accounts = await storage.getLoyaltyAccounts(
+        programId as string | undefined,
+        customerId as string | undefined
+      );
+      res.json(accounts);
+    } catch (error) {
+      console.error("Error fetching loyalty accounts:", error);
+      res.status(500).json({ error: "Failed to fetch loyalty accounts" });
+    }
+  });
+
+  app.get("/api/loyalty-accounts/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const account = await storage.getLoyaltyAccountById(id);
+      if (!account) {
+        return res.status(404).json({ error: "Loyalty account not found" });
+      }
+      res.json(account);
+    } catch (error) {
+      console.error("Error fetching loyalty account:", error);
+      res.status(500).json({ error: "Failed to fetch loyalty account" });
+    }
+  });
+
+  app.get("/api/loyalty-accounts/customer/:customerId", isAuthenticated, async (req, res) => {
+    try {
+      const { customerId } = req.params;
+      const account = await storage.getLoyaltyAccountByCustomer(customerId);
+      res.json(account || null);
+    } catch (error) {
+      console.error("Error fetching loyalty account by customer:", error);
+      res.status(500).json({ error: "Failed to fetch loyalty account" });
+    }
+  });
+
+  app.patch("/api/loyalty-accounts/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updated = await storage.updateLoyaltyAccount(id, req.body);
+      res.json(updated);
+    } catch (error: any) {
+      console.error("Error updating loyalty account:", error);
+      res.status(400).json({ error: error.message || "Failed to update loyalty account" });
+    }
+  });
+
+  // Loyalty Transactions
+  app.post("/api/loyalty-transactions", isAuthenticated, async (req, res) => {
+    try {
+      const transaction = await storage.createLoyaltyTransaction(req.body);
+      res.status(201).json(transaction);
+    } catch (error: any) {
+      console.error("Error creating loyalty transaction:", error);
+      res.status(400).json({ error: error.message || "Failed to create loyalty transaction" });
+    }
+  });
+
+  app.get("/api/loyalty-accounts/:accountId/transactions", isAuthenticated, async (req, res) => {
+    try {
+      const { accountId } = req.params;
+      const transactions = await storage.getLoyaltyTransactions(accountId);
+      res.json(transactions);
+    } catch (error) {
+      console.error("Error fetching loyalty transactions:", error);
+      res.status(500).json({ error: "Failed to fetch loyalty transactions" });
+    }
+  });
+
+  app.get("/api/loyalty-transactions/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const transaction = await storage.getLoyaltyTransactionById(id);
+      if (!transaction) {
+        return res.status(404).json({ error: "Loyalty transaction not found" });
+      }
+      res.json(transaction);
+    } catch (error) {
+      console.error("Error fetching loyalty transaction:", error);
+      res.status(500).json({ error: "Failed to fetch loyalty transaction" });
+    }
+  });
+
+  // Loyalty Rewards
+  app.post("/api/loyalty-rewards", isAuthenticated, async (req, res) => {
+    try {
+      const reward = await storage.createLoyaltyReward(req.body);
+      res.status(201).json(reward);
+    } catch (error: any) {
+      console.error("Error creating loyalty reward:", error);
+      res.status(400).json({ error: error.message || "Failed to create loyalty reward" });
+    }
+  });
+
+  app.get("/api/loyalty-programs/:programId/rewards", isAuthenticated, async (req, res) => {
+    try {
+      const { programId } = req.params;
+      const { isActive } = req.query;
+      const rewards = await storage.getLoyaltyRewards(programId, {
+        isActive: isActive === 'true' ? true : isActive === 'false' ? false : undefined,
+      });
+      res.json(rewards);
+    } catch (error) {
+      console.error("Error fetching loyalty rewards:", error);
+      res.status(500).json({ error: "Failed to fetch loyalty rewards" });
+    }
+  });
+
+  app.get("/api/loyalty-rewards/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const reward = await storage.getLoyaltyRewardById(id);
+      if (!reward) {
+        return res.status(404).json({ error: "Loyalty reward not found" });
+      }
+      res.json(reward);
+    } catch (error) {
+      console.error("Error fetching loyalty reward:", error);
+      res.status(500).json({ error: "Failed to fetch loyalty reward" });
+    }
+  });
+
+  app.patch("/api/loyalty-rewards/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updated = await storage.updateLoyaltyReward(id, req.body);
+      res.json(updated);
+    } catch (error: any) {
+      console.error("Error updating loyalty reward:", error);
+      res.status(400).json({ error: error.message || "Failed to update loyalty reward" });
+    }
+  });
+
+  app.delete("/api/loyalty-rewards/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteLoyaltyReward(id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting loyalty reward:", error);
+      res.status(500).json({ error: "Failed to delete loyalty reward" });
+    }
+  });
+
+  // Loyalty Redemptions
+  app.post("/api/loyalty-redemptions", isAuthenticated, async (req, res) => {
+    try {
+      const redemption = await storage.createLoyaltyRedemption(req.body);
+      res.status(201).json(redemption);
+    } catch (error: any) {
+      console.error("Error creating loyalty redemption:", error);
+      res.status(400).json({ error: error.message || "Failed to create loyalty redemption" });
+    }
+  });
+
+  app.get("/api/loyalty-redemptions", isAuthenticated, async (req, res) => {
+    try {
+      const { accountId, status } = req.query;
+      const redemptions = await storage.getLoyaltyRedemptions(
+        accountId as string | undefined,
+        { status: status as string | undefined }
+      );
+      res.json(redemptions);
+    } catch (error) {
+      console.error("Error fetching loyalty redemptions:", error);
+      res.status(500).json({ error: "Failed to fetch loyalty redemptions" });
+    }
+  });
+
+  app.get("/api/loyalty-redemptions/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const redemption = await storage.getLoyaltyRedemptionById(id);
+      if (!redemption) {
+        return res.status(404).json({ error: "Loyalty redemption not found" });
+      }
+      res.json(redemption);
+    } catch (error) {
+      console.error("Error fetching loyalty redemption:", error);
+      res.status(500).json({ error: "Failed to fetch loyalty redemption" });
+    }
+  });
+
+  app.patch("/api/loyalty-redemptions/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updated = await storage.updateLoyaltyRedemption(id, req.body);
+      res.json(updated);
+    } catch (error: any) {
+      console.error("Error updating loyalty redemption:", error);
+      res.status(400).json({ error: error.message || "Failed to update loyalty redemption" });
+    }
+  });
+
+  // ========================================================================
+  // Module 47: Document Management
+  // ========================================================================
+
+  // Document Categories
+  app.post("/api/document-categories", isAuthenticated, async (req: any, res) => {
+    try {
+      const user = req.user;
+      const data = { ...req.body, garageId: user.garageId };
+      const category = await storage.createDocumentCategory(data);
+      res.status(201).json(category);
+    } catch (error: any) {
+      console.error("Error creating document category:", error);
+      res.status(400).json({ error: error.message || "Failed to create document category" });
+    }
+  });
+
+  app.get("/api/document-categories", isAuthenticated, async (req: any, res) => {
+    try {
+      const user = req.user;
+      const categories = await storage.getDocumentCategories(user.garageId);
+      res.json(categories);
+    } catch (error) {
+      console.error("Error fetching document categories:", error);
+      res.status(500).json({ error: "Failed to fetch document categories" });
+    }
+  });
+
+  app.get("/api/document-categories/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const category = await storage.getDocumentCategoryById(id);
+      if (!category) {
+        return res.status(404).json({ error: "Document category not found" });
+      }
+      res.json(category);
+    } catch (error) {
+      console.error("Error fetching document category:", error);
+      res.status(500).json({ error: "Failed to fetch document category" });
+    }
+  });
+
+  app.patch("/api/document-categories/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updated = await storage.updateDocumentCategory(id, req.body);
+      res.json(updated);
+    } catch (error: any) {
+      console.error("Error updating document category:", error);
+      res.status(400).json({ error: error.message || "Failed to update document category" });
+    }
+  });
+
+  app.delete("/api/document-categories/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteDocumentCategory(id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting document category:", error);
+      res.status(500).json({ error: "Failed to delete document category" });
+    }
+  });
+
+  // Documents
+  app.post("/api/documents", isAuthenticated, async (req: any, res) => {
+    try {
+      const user = req.user;
+      const data = { ...req.body, garageId: user.garageId };
+      const document = await storage.createDocument(data);
+      res.status(201).json(document);
+    } catch (error: any) {
+      console.error("Error creating document:", error);
+      res.status(400).json({ error: error.message || "Failed to create document" });
+    }
+  });
+
+  app.get("/api/documents", isAuthenticated, async (req: any, res) => {
+    try {
+      const user = req.user;
+      const { categoryId, relatedType, relatedId, status } = req.query;
+      const documents = await storage.getDocuments(user.garageId, {
+        categoryId: categoryId as string | undefined,
+        relatedType: relatedType as string | undefined,
+        relatedId: relatedId as string | undefined,
+        status: status as string | undefined,
+      });
+      res.json(documents);
+    } catch (error) {
+      console.error("Error fetching documents:", error);
+      res.status(500).json({ error: "Failed to fetch documents" });
+    }
+  });
+
+  app.get("/api/documents/expiring", isAuthenticated, async (req: any, res) => {
+    try {
+      const user = req.user;
+      const { daysAhead } = req.query;
+      const days = daysAhead ? parseInt(daysAhead as string) : 30;
+      const documents = await storage.getExpiringDocuments(user.garageId, days);
+      res.json(documents);
+    } catch (error) {
+      console.error("Error fetching expiring documents:", error);
+      res.status(500).json({ error: "Failed to fetch expiring documents" });
+    }
+  });
+
+  app.get("/api/documents/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const document = await storage.getDocumentById(id);
+      if (!document) {
+        return res.status(404).json({ error: "Document not found" });
+      }
+      res.json(document);
+    } catch (error) {
+      console.error("Error fetching document:", error);
+      res.status(500).json({ error: "Failed to fetch document" });
+    }
+  });
+
+  app.patch("/api/documents/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updated = await storage.updateDocument(id, req.body);
+      res.json(updated);
+    } catch (error: any) {
+      console.error("Error updating document:", error);
+      res.status(400).json({ error: error.message || "Failed to update document" });
+    }
+  });
+
+  app.delete("/api/documents/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteDocument(id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting document:", error);
+      res.status(500).json({ error: "Failed to delete document" });
+    }
+  });
+
+  // Document Access Logs
+  app.post("/api/document-access-logs", isAuthenticated, async (req: any, res) => {
+    try {
+      const user = req.user;
+      const data = { ...req.body, userId: user.id };
+      const log = await storage.createDocumentAccessLog(data);
+      res.status(201).json(log);
+    } catch (error: any) {
+      console.error("Error creating document access log:", error);
+      res.status(400).json({ error: error.message || "Failed to create document access log" });
+    }
+  });
+
+  app.get("/api/documents/:documentId/access-logs", isAuthenticated, async (req, res) => {
+    try {
+      const { documentId } = req.params;
+      const logs = await storage.getDocumentAccessLogs(documentId);
+      res.json(logs);
+    } catch (error) {
+      console.error("Error fetching document access logs:", error);
+      res.status(500).json({ error: "Failed to fetch document access logs" });
+    }
+  });
+
   const httpServer = createServer(app);
   
   // Initialize WebSocket server for chat
