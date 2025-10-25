@@ -44,6 +44,7 @@ import { CustomerAppointments } from "@/pages/customer/CustomerAppointments";
 import { CustomerInvoices } from "@/pages/customer/CustomerInvoices";
 import { CustomerVehicles } from "@/pages/customer/CustomerVehicles";
 import { CustomerCommunications } from "@/pages/customer/CustomerCommunications";
+import CustomerPortal from "@/pages/CustomerPortal";
 import { useAuth } from "@/hooks/useAuth";
 import { UndoRedoProvider } from "@/contexts/UndoRedoContext";
 import type { User } from "@shared/schema";
@@ -74,6 +75,7 @@ function Router() {
       <Switch>
         <Route path="/login" component={Login} />
         <Route path="/register" component={Register} />
+        <Route path="/customer-portal" component={CustomerPortal} />
         <Route component={Landing} />
       </Switch>
     );
