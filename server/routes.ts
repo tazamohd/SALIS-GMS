@@ -29,7 +29,13 @@ import {
   insertAccountingTransactionSchema,
   insertOBDDiagnosticDataSchema,
   insertWarrantySchema,
-  insertWarrantyClaimSchema
+  insertWarrantyClaimSchema,
+  insertInspectionTemplateSchema,
+  insertVehicleInspectionSchema,
+  insertTowingRequestSchema,
+  insertTowTruckSchema,
+  insertLoanerVehicleSchema,
+  insertLoanerReservationSchema
 } from "@shared/schema";
 import Stripe from "stripe";
 import { createPaypalOrder, capturePaypalOrder, loadPaypalDefault } from "./paypal";
@@ -7044,7 +7050,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Module 40: Fleet Management API Routes
   
   // Fleet Groups
-  app.post('/api/fleet/groups', isAuthenticated, async (req, res) => {
+  app.post('/api/fleet/groups', isAuthenticated, async (req: any, res) => {
     try {
       const fleetGroup = await storage.createFleetGroup({
         ...req.body,
@@ -7057,7 +7063,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/fleet/groups', isAuthenticated, async (req, res) => {
+  app.get('/api/fleet/groups', isAuthenticated, async (req: any, res) => {
     try {
       const fleetGroups = await storage.getFleetGroupsByGarage(req.user.garageId);
       res.json(fleetGroups);
@@ -7155,7 +7161,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Fleet Contracts
-  app.post('/api/fleet/contracts', isAuthenticated, async (req, res) => {
+  app.post('/api/fleet/contracts', isAuthenticated, async (req: any, res) => {
     try {
       const contract = await storage.createFleetContract({
         ...req.body,
@@ -7212,7 +7218,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Fleet Pricing Tiers
-  app.post('/api/fleet/pricing-tiers', isAuthenticated, async (req, res) => {
+  app.post('/api/fleet/pricing-tiers', isAuthenticated, async (req: any, res) => {
     try {
       const tier = await storage.createFleetPricingTier({
         ...req.body,
@@ -7225,7 +7231,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/fleet/pricing-tiers', isAuthenticated, async (req, res) => {
+  app.get('/api/fleet/pricing-tiers', isAuthenticated, async (req: any, res) => {
     try {
       const { fleetGroupId } = req.query;
       const tiers = fleetGroupId 
@@ -7514,6 +7520,445 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error deleting warranty claim:", error);
       res.status(500).json({ message: "Failed to delete warranty claim" });
+    }
+  });
+
+  // ========================================================================
+  // Module 45: Vehicle Inspection Checklists
+  // ========================================================================
+
+  // Inspection Templates
+  app.post("/api/inspection-templates", isAuthenticated, async (req: any, res) => {
+    try {
+      const user = req.user;
+      const data = insertInspectionTemplateSchema.parse(req.body);
+      const template = await storage.createInspectionTemplate({
+        ...data,
+        garageId: user.garageId,
+        createdBy: user.id,
+      });
+      res.status(201).json(template);
+    } catch (error: any) {
+      console.error("Error creating inspection template:", error);
+      res.status(400).json({ error: error.message || "Failed to create inspection template" });
+    }
+  });
+
+  app.get("/api/inspection-templates", isAuthenticated, async (req: any, res) => {
+    try {
+      const user = req.user;
+      const templates = await storage.getInspectionTemplates(user.garageId);
+      res.json(templates);
+    } catch (error) {
+      console.error("Error fetching inspection templates:", error);
+      res.status(500).json({ error: "Failed to fetch inspection templates" });
+    }
+  });
+
+  app.get("/api/inspection-templates/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const template = await storage.getInspectionTemplateById(id);
+      if (!template) {
+        return res.status(404).json({ error: "Inspection template not found" });
+      }
+      res.json(template);
+    } catch (error) {
+      console.error("Error fetching inspection template:", error);
+      res.status(500).json({ error: "Failed to fetch inspection template" });
+    }
+  });
+
+  app.patch("/api/inspection-templates/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const data = insertInspectionTemplateSchema.partial().parse(req.body);
+      const updated = await storage.updateInspectionTemplate(id, data);
+      res.json(updated);
+    } catch (error: any) {
+      console.error("Error updating inspection template:", error);
+      res.status(400).json({ error: error.message || "Failed to update inspection template" });
+    }
+  });
+
+  app.delete("/api/inspection-templates/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteInspectionTemplate(id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting inspection template:", error);
+      res.status(500).json({ error: "Failed to delete inspection template" });
+    }
+  });
+
+  // Vehicle Inspections
+  app.post("/api/vehicle-inspections", isAuthenticated, async (req: any, res) => {
+    try {
+      const user = req.user;
+      const data = insertVehicleInspectionSchema.parse(req.body);
+      const inspection = await storage.createVehicleInspection({
+        ...data,
+        garageId: user.garageId,
+        inspectorId: user.id,
+      });
+      res.status(201).json(inspection);
+    } catch (error: any) {
+      console.error("Error creating vehicle inspection:", error);
+      res.status(400).json({ error: error.message || "Failed to create vehicle inspection" });
+    }
+  });
+
+  app.get("/api/vehicle-inspections", isAuthenticated, async (req: any, res) => {
+    try {
+      const user = req.user;
+      const { status, vehicleId, customerId } = req.query;
+      const inspections = await storage.getVehicleInspections(user.garageId, {
+        status: status as string | undefined,
+        vehicleId: vehicleId as string | undefined,
+        customerId: customerId as string | undefined,
+      });
+      res.json(inspections);
+    } catch (error) {
+      console.error("Error fetching vehicle inspections:", error);
+      res.status(500).json({ error: "Failed to fetch vehicle inspections" });
+    }
+  });
+
+  app.get("/api/vehicle-inspections/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const inspection = await storage.getVehicleInspectionById(id);
+      if (!inspection) {
+        return res.status(404).json({ error: "Vehicle inspection not found" });
+      }
+      res.json(inspection);
+    } catch (error) {
+      console.error("Error fetching vehicle inspection:", error);
+      res.status(500).json({ error: "Failed to fetch vehicle inspection" });
+    }
+  });
+
+  app.patch("/api/vehicle-inspections/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const data = insertVehicleInspectionSchema.partial().parse(req.body);
+      const updated = await storage.updateVehicleInspection(id, data);
+      res.json(updated);
+    } catch (error: any) {
+      console.error("Error updating vehicle inspection:", error);
+      res.status(400).json({ error: error.message || "Failed to update vehicle inspection" });
+    }
+  });
+
+  app.delete("/api/vehicle-inspections/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteVehicleInspection(id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting vehicle inspection:", error);
+      res.status(500).json({ error: "Failed to delete vehicle inspection" });
+    }
+  });
+
+  // ========================================================================
+  // Module 46: Towing & Roadside Assistance
+  // ========================================================================
+
+  // Towing Requests
+  app.post("/api/towing-requests", isAuthenticated, async (req: any, res) => {
+    try {
+      const user = req.user;
+      const data = insertTowingRequestSchema.parse(req.body);
+      const request = await storage.createTowingRequest({
+        ...data,
+        garageId: user.garageId,
+      });
+      res.status(201).json(request);
+    } catch (error: any) {
+      console.error("Error creating towing request:", error);
+      res.status(400).json({ error: error.message || "Failed to create towing request" });
+    }
+  });
+
+  app.get("/api/towing-requests", isAuthenticated, async (req: any, res) => {
+    try {
+      const user = req.user;
+      const { status, serviceType } = req.query;
+      const requests = await storage.getTowingRequests(user.garageId, {
+        status: status as string | undefined,
+        serviceType: serviceType as string | undefined,
+      });
+      res.json(requests);
+    } catch (error) {
+      console.error("Error fetching towing requests:", error);
+      res.status(500).json({ error: "Failed to fetch towing requests" });
+    }
+  });
+
+  app.get("/api/towing-requests/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const request = await storage.getTowingRequestById(id);
+      if (!request) {
+        return res.status(404).json({ error: "Towing request not found" });
+      }
+      res.json(request);
+    } catch (error) {
+      console.error("Error fetching towing request:", error);
+      res.status(500).json({ error: "Failed to fetch towing request" });
+    }
+  });
+
+  app.patch("/api/towing-requests/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const data = insertTowingRequestSchema.partial().parse(req.body);
+      const updated = await storage.updateTowingRequest(id, data);
+      res.json(updated);
+    } catch (error: any) {
+      console.error("Error updating towing request:", error);
+      res.status(400).json({ error: error.message || "Failed to update towing request" });
+    }
+  });
+
+  app.delete("/api/towing-requests/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteTowingRequest(id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting towing request:", error);
+      res.status(500).json({ error: "Failed to delete towing request" });
+    }
+  });
+
+  // Tow Trucks
+  app.post("/api/tow-trucks", isAuthenticated, async (req: any, res) => {
+    try {
+      const user = req.user;
+      const data = insertTowTruckSchema.parse(req.body);
+      const truck = await storage.createTowTruck({
+        ...data,
+        garageId: user.garageId,
+      });
+      res.status(201).json(truck);
+    } catch (error: any) {
+      console.error("Error creating tow truck:", error);
+      res.status(400).json({ error: error.message || "Failed to create tow truck" });
+    }
+  });
+
+  app.get("/api/tow-trucks", isAuthenticated, async (req: any, res) => {
+    try {
+      const user = req.user;
+      const { status } = req.query;
+      const trucks = await storage.getTowTrucks(user.garageId, {
+        status: status as string | undefined,
+      });
+      res.json(trucks);
+    } catch (error) {
+      console.error("Error fetching tow trucks:", error);
+      res.status(500).json({ error: "Failed to fetch tow trucks" });
+    }
+  });
+
+  app.get("/api/tow-trucks/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const truck = await storage.getTowTruckById(id);
+      if (!truck) {
+        return res.status(404).json({ error: "Tow truck not found" });
+      }
+      res.json(truck);
+    } catch (error) {
+      console.error("Error fetching tow truck:", error);
+      res.status(500).json({ error: "Failed to fetch tow truck" });
+    }
+  });
+
+  app.patch("/api/tow-trucks/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const data = insertTowTruckSchema.partial().parse(req.body);
+      const updated = await storage.updateTowTruck(id, data);
+      res.json(updated);
+    } catch (error: any) {
+      console.error("Error updating tow truck:", error);
+      res.status(400).json({ error: error.message || "Failed to update tow truck" });
+    }
+  });
+
+  app.delete("/api/tow-trucks/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteTowTruck(id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting tow truck:", error);
+      res.status(500).json({ error: "Failed to delete tow truck" });
+    }
+  });
+
+  app.patch("/api/tow-trucks/:id/location", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { latitude, longitude } = req.body;
+      
+      // Validate latitude and longitude
+      const locationSchema = z.object({
+        latitude: z.string().regex(/^-?\d+(\.\d+)?$/, "Invalid latitude format"),
+        longitude: z.string().regex(/^-?\d+(\.\d+)?$/, "Invalid longitude format"),
+      });
+      
+      locationSchema.parse({ latitude, longitude });
+      
+      const updated = await storage.updateTowTruckLocation(id, latitude, longitude);
+      res.json(updated);
+    } catch (error: any) {
+      console.error("Error updating tow truck location:", error);
+      res.status(400).json({ error: error.message || "Failed to update tow truck location" });
+    }
+  });
+
+  // ========================================================================
+  // Module 48: Loaner Vehicle Management
+  // ========================================================================
+
+  // Loaner Vehicles
+  app.post("/api/loaner-vehicles", isAuthenticated, async (req: any, res) => {
+    try {
+      const user = req.user;
+      const data = insertLoanerVehicleSchema.parse(req.body);
+      const vehicle = await storage.createLoanerVehicle({
+        ...data,
+        garageId: user.garageId,
+      });
+      res.status(201).json(vehicle);
+    } catch (error: any) {
+      console.error("Error creating loaner vehicle:", error);
+      res.status(400).json({ error: error.message || "Failed to create loaner vehicle" });
+    }
+  });
+
+  app.get("/api/loaner-vehicles", isAuthenticated, async (req: any, res) => {
+    try {
+      const user = req.user;
+      const { status, condition } = req.query;
+      const vehicles = await storage.getLoanerVehicles(user.garageId, {
+        status: status as string | undefined,
+        condition: condition as string | undefined,
+      });
+      res.json(vehicles);
+    } catch (error) {
+      console.error("Error fetching loaner vehicles:", error);
+      res.status(500).json({ error: "Failed to fetch loaner vehicles" });
+    }
+  });
+
+  app.get("/api/loaner-vehicles/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const vehicle = await storage.getLoanerVehicleById(id);
+      if (!vehicle) {
+        return res.status(404).json({ error: "Loaner vehicle not found" });
+      }
+      res.json(vehicle);
+    } catch (error) {
+      console.error("Error fetching loaner vehicle:", error);
+      res.status(500).json({ error: "Failed to fetch loaner vehicle" });
+    }
+  });
+
+  app.patch("/api/loaner-vehicles/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const data = insertLoanerVehicleSchema.partial().parse(req.body);
+      const updated = await storage.updateLoanerVehicle(id, data);
+      res.json(updated);
+    } catch (error: any) {
+      console.error("Error updating loaner vehicle:", error);
+      res.status(400).json({ error: error.message || "Failed to update loaner vehicle" });
+    }
+  });
+
+  app.delete("/api/loaner-vehicles/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteLoanerVehicle(id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting loaner vehicle:", error);
+      res.status(500).json({ error: "Failed to delete loaner vehicle" });
+    }
+  });
+
+  // Loaner Reservations
+  app.post("/api/loaner-reservations", isAuthenticated, async (req: any, res) => {
+    try {
+      const user = req.user;
+      const data = insertLoanerReservationSchema.parse(req.body);
+      const reservation = await storage.createLoanerReservation({
+        ...data,
+        createdBy: user.id,
+      });
+      res.status(201).json(reservation);
+    } catch (error: any) {
+      console.error("Error creating loaner reservation:", error);
+      res.status(400).json({ error: error.message || "Failed to create loaner reservation" });
+    }
+  });
+
+  app.get("/api/loaner-reservations", isAuthenticated, async (req: any, res) => {
+    try {
+      const user = req.user;
+      const { status, loanerVehicleId } = req.query;
+      const reservations = await storage.getLoanerReservations(user.garageId, {
+        status: status as string | undefined,
+        loanerVehicleId: loanerVehicleId as string | undefined,
+      });
+      res.json(reservations);
+    } catch (error) {
+      console.error("Error fetching loaner reservations:", error);
+      res.status(500).json({ error: "Failed to fetch loaner reservations" });
+    }
+  });
+
+  app.get("/api/loaner-reservations/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const reservation = await storage.getLoanerReservationById(id);
+      if (!reservation) {
+        return res.status(404).json({ error: "Loaner reservation not found" });
+      }
+      res.json(reservation);
+    } catch (error) {
+      console.error("Error fetching loaner reservation:", error);
+      res.status(500).json({ error: "Failed to fetch loaner reservation" });
+    }
+  });
+
+  app.patch("/api/loaner-reservations/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const data = insertLoanerReservationSchema.partial().parse(req.body);
+      const updated = await storage.updateLoanerReservation(id, data);
+      res.json(updated);
+    } catch (error: any) {
+      console.error("Error updating loaner reservation:", error);
+      res.status(400).json({ error: error.message || "Failed to update loaner reservation" });
+    }
+  });
+
+  app.delete("/api/loaner-reservations/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteLoanerReservation(id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting loaner reservation:", error);
+      res.status(500).json({ error: "Failed to delete loaner reservation" });
     }
   });
 
