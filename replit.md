@@ -112,7 +112,7 @@ The application utilizes a full-stack architecture with clear client-server sepa
 ### **Advanced Modules (37-48)**
 37. **Customer Self-Service Portal** (✓ COMPLETED): Online booking, service history viewing, estimate approval, payment processing, digital receipts, session management with token revocation
 38. **Digital Signatures & Media Documentation** (✓ COMPLETED): Canvas-based signature capture with consent tracking, photo/video upload with validation, before/after comparison gallery, media categorization (damage/walkaround/invoice/estimate), server-side security (10MB limit, MIME type whitelist, base64 validation), audit trail (IP address, device info, timestamps), reusable components across job cards/estimates/inspections
-39. **QR Code Check-In System**: QR generation for appointments, scan logging, automated check-in notifications
+39. **QR Code Check-In System** (✓ COMPLETED): Server-side QR generation with PNG images, unique QR codes per appointment/customer/vehicle, scan validation (expiration/already used/invalid), automated check-in workflow (appointment status update, SMS notification, in-app notification), scan logging (device info, IP address, scan results), appointment status history tracking, frontend components (QRCodeGenerator with download/print, QRScanner with autoCheckIn support)
 40. **Fleet Management**: Corporate fleet tracking, fleet contracts, volume pricing, fleet-specific maintenance schedules
 41. **Warranty Tracking**: Parts & labor warranties, warranty claims processing, expiration alerts, transferable warranties
 42. **Marketing Automation**: Email/SMS campaigns, customer segmentation, birthday promotions, review requests, campaign analytics
