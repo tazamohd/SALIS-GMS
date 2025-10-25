@@ -48,12 +48,30 @@ export default function CustomerPortal() {
     }
   }, []);
 
+  const forceLogout = () => {
+    setToken(null);
+    setCustomer(null);
+    setIsLoggedIn(false);
+    localStorage.removeItem('portal_token');
+    localStorage.removeItem('portal_customer');
+    toast({
+      title: "Session Expired",
+      description: "Please log in again",
+      variant: "destructive",
+    });
+  };
+
   const fetchWithAuth = async (url: string, token: string) => {
     const response = await fetch(url, {
       headers: {
         'x-portal-token': token,
       },
     });
+    
+    if (response.status === 401 || response.status === 403) {
+      forceLogout();
+      throw new Error('Session expired or unauthorized');
+    }
     
     if (!response.ok) {
       throw new Error('Failed to fetch');
@@ -133,16 +151,29 @@ export default function CustomerPortal() {
     }
   };
 
-  const handleLogout = () => {
-    setToken(null);
-    setCustomer(null);
-    setIsLoggedIn(false);
-    localStorage.removeItem('portal_token');
-    localStorage.removeItem('portal_customer');
-    toast({
-      title: "Logged Out",
-      description: "You have been logged out successfully",
-    });
+  const handleLogout = async () => {
+    if (!token) return;
+    
+    try {
+      await fetch('/api/customer-portal/logout', {
+        method: 'POST',
+        headers: {
+          'x-portal-token': token,
+        },
+      });
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      setToken(null);
+      setCustomer(null);
+      setIsLoggedIn(false);
+      localStorage.removeItem('portal_token');
+      localStorage.removeItem('portal_customer');
+      toast({
+        title: "Logged Out",
+        description: "You have been logged out successfully",
+      });
+    }
   };
 
   const approveEstimate = async (estimateId: string) => {

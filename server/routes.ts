@@ -6457,6 +6457,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post('/api/customer-portal/logout', async (req, res) => {
+    try {
+      const token = req.headers['x-portal-token'];
+      if (token) {
+        await storage.revokePortalSession(token as string);
+      }
+      res.json({ message: "Logged out successfully" });
+    } catch (error) {
+      console.error("Error logging out:", error);
+      res.status(500).json({ message: "Logout failed" });
+    }
+  });
+
   const portalAuth = async (req: any, res: any, next: any) => {
     try {
       const token = req.headers['x-portal-token'];

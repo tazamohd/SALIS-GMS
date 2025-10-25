@@ -701,6 +701,7 @@ export interface IStorage {
   // Module 37: Customer Self-Service Portal
   createPortalSession(customerId: string): Promise<any>;
   validatePortalSession(token: string): Promise<any | null>;
+  revokePortalSession(token: string): Promise<void>;
   getCustomerServiceHistory(customerId: string, vehicleId?: string): Promise<any[]>;
   getCustomerEstimates(customerId: string, status?: string): Promise<any[]>;
   approveEstimate(estimateId: string, customerId: string): Promise<any>;
@@ -4892,6 +4893,11 @@ export class DatabaseStorage implements IStorage {
       .where(eq(customerPortalSessions.id, session.id));
     
     return session;
+  }
+
+  async revokePortalSession(token: string): Promise<void> {
+    await db.delete(customerPortalSessions)
+      .where(eq(customerPortalSessions.token, token));
   }
 
   async getCustomerServiceHistory(customerId: string, vehicleId?: string): Promise<any[]> {
