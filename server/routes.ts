@@ -6591,6 +6591,131 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Module 38: Digital Signatures & Media Documentation API Routes
+  app.post('/api/digital-signatures', isAuthenticated, async (req: any, res) => {
+    try {
+      const { relatedType, relatedId, signatureData, signatureType, consentText } = req.body;
+      const garageId = req.user.garageId;
+      const userId = req.user.id;
+      
+      if (!relatedType || !relatedId || !signatureData) {
+        return res.status(400).json({ message: "Missing required fields" });
+      }
+      
+      const ipAddress = req.ip || req.connection.remoteAddress;
+      const deviceInfo = req.headers['user-agent'];
+      
+      const signature = await storage.createDigitalSignature({
+        garageId,
+        relatedType,
+        relatedId,
+        signedBy: userId,
+        signatureData,
+        signatureType: signatureType || 'customer',
+        ipAddress,
+        deviceInfo,
+        consentText,
+      });
+      
+      res.json(signature);
+    } catch (error) {
+      console.error("Error creating digital signature:", error);
+      res.status(500).json({ message: "Failed to create signature" });
+    }
+  });
+
+  app.get('/api/digital-signatures/:relatedType/:relatedId', isAuthenticated, async (req, res) => {
+    try {
+      const { relatedType, relatedId } = req.params;
+      const signatures = await storage.getDigitalSignatures(relatedType, relatedId);
+      res.json(signatures);
+    } catch (error) {
+      console.error("Error fetching signatures:", error);
+      res.status(500).json({ message: "Failed to fetch signatures" });
+    }
+  });
+
+  app.post('/api/media-attachments', isAuthenticated, async (req: any, res) => {
+    try {
+      const { 
+        relatedType, relatedId, mediaType, fileUrl, fileName, 
+        fileSize, mimeType, category, description, thumbnailUrl, metadata 
+      } = req.body;
+      const garageId = req.user.garageId;
+      const userId = req.user.id;
+      
+      if (!relatedType || !relatedId || !mediaType || !fileUrl || !fileName) {
+        return res.status(400).json({ message: "Missing required fields" });
+      }
+      
+      const media = await storage.createMediaAttachment({
+        garageId,
+        relatedType,
+        relatedId,
+        mediaType,
+        fileUrl,
+        fileName,
+        fileSize,
+        mimeType,
+        category,
+        description,
+        uploadedBy: userId,
+        thumbnailUrl,
+        metadata: metadata || {},
+      });
+      
+      res.json(media);
+    } catch (error) {
+      console.error("Error creating media attachment:", error);
+      res.status(500).json({ message: "Failed to upload media" });
+    }
+  });
+
+  app.get('/api/media-attachments/:relatedType/:relatedId', isAuthenticated, async (req, res) => {
+    try {
+      const { relatedType, relatedId } = req.params;
+      const { category } = req.query;
+      const media = await storage.getMediaAttachments(
+        relatedType, 
+        relatedId, 
+        category as string | undefined
+      );
+      res.json(media);
+    } catch (error) {
+      console.error("Error fetching media attachments:", error);
+      res.status(500).json({ message: "Failed to fetch media" });
+    }
+  });
+
+  app.delete('/api/media-attachments/:id', isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteMediaAttachment(id);
+      res.json({ message: "Media deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting media attachment:", error);
+      res.status(500).json({ message: "Failed to delete media" });
+    }
+  });
+
+  app.patch('/api/media-attachments/:id', isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { description, category, metadata } = req.body;
+      
+      const media = await storage.updateMediaAttachment(id, {
+        description,
+        category,
+        metadata,
+      });
+      
+      res.json(media);
+    } catch (error) {
+      console.error("Error updating media attachment:", error);
+      res.status(500).json({ message: "Failed to update media" });
+    }
+  });
+
   const httpServer = createServer(app);
   
   // Initialize WebSocket server for chat

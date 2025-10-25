@@ -207,6 +207,8 @@ import {
   type ActionHistory,
   type InsertActionHistory,
   customerPortalSessions,
+  digitalSignatures,
+  mediaAttachments,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, or, inArray, and, gte, lte, ilike, sql, isNull, gt } from "drizzle-orm";
