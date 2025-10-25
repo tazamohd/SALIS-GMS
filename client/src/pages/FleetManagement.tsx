@@ -69,6 +69,7 @@ import {
   type FleetPricingTier,
   type FleetMaintenanceSchedule,
 } from "@shared/schema";
+import { useAuth } from "@/hooks/useAuth";
 
 // Extend insert schemas to handle form inputs (strings that need to be converted to numbers)
 const fleetGroupFormSchema = insertFleetGroupSchema.extend({
@@ -76,20 +77,22 @@ const fleetGroupFormSchema = insertFleetGroupSchema.extend({
 });
 
 const fleetVehicleFormSchema = insertFleetVehicleSchema.extend({
-  assignedMileage: z.string().optional().transform(val => val ? parseInt(val) : undefined),
+  averageMonthlyMileage: z.string().optional().transform(val => val ? parseInt(val) : undefined),
 });
 
 const fleetContractFormSchema = insertFleetContractSchema.extend({
-  numberOfVehicles: z.string().min(1, "Required").transform(val => parseInt(val)),
+  maxVehicles: z.string().optional().transform(val => val && val !== "" ? parseInt(val) : undefined),
   discountPercentage: z.string().optional().transform(val => val ? parseFloat(val) : undefined),
   startDate: z.string().min(1, "Start date required"),
   endDate: z.string().min(1, "End date required"),
 });
 
 const pricingTierFormSchema = insertFleetPricingTierSchema.extend({
+  garageId: z.string().min(1, "Garage ID required"),
   minVehicles: z.string().min(1, "Required").transform(val => parseInt(val)),
   maxVehicles: z.string().optional().transform(val => val && val !== "" ? parseInt(val) : undefined),
   discountPercentage: z.string().min(1, "Required").transform(val => parseFloat(val)),
+  applicableServices: z.string().optional().transform(val => val ? val.split(",").map(s => s.trim()).filter(Boolean) : undefined),
 });
 
 const maintenanceScheduleFormSchema = insertFleetMaintenanceScheduleSchema.extend({
@@ -106,6 +109,7 @@ type MaintenanceScheduleFormData = z.input<typeof maintenanceScheduleFormSchema>
 
 export default function FleetManagement() {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [selectedTab, setSelectedTab] = useState("groups");
   const [isGroupDialogOpen, setIsGroupDialogOpen] = useState(false);
   const [isVehicleDialogOpen, setIsVehicleDialogOpen] = useState(false);
@@ -177,7 +181,7 @@ export default function FleetManagement() {
     defaultValues: {
       fleetGroupId: "",
       vehicleId: "",
-      assignedMileage: "",
+      averageMonthlyMileage: "",
       notes: "",
     },
   });
@@ -191,12 +195,10 @@ export default function FleetManagement() {
       contractType: "standard",
       startDate: "",
       endDate: "",
-      numberOfVehicles: "",
+      maxVehicles: "",
       discountPercentage: "0",
-      paymentTerms: "net_30",
       billingCycle: "monthly",
       terms: "",
-      notes: "",
     },
   });
 
@@ -204,12 +206,12 @@ export default function FleetManagement() {
   const pricingForm = useForm<PricingTierFormData>({
     resolver: zodResolver(pricingTierFormSchema),
     defaultValues: {
+      garageId: (user as any)?.garageId || "",
       tierName: "",
-      description: "",
       minVehicles: "",
       maxVehicles: "",
       discountPercentage: "",
-      serviceTypes: "",
+      applicableServices: "",
       isActive: true,
     },
   });
@@ -398,7 +400,7 @@ export default function FleetManagement() {
     vehicleForm.reset({
       fleetGroupId: vehicle.fleetVehicle.fleetGroupId,
       vehicleId: vehicle.fleetVehicle.vehicleId,
-      assignedMileage: vehicle.fleetVehicle.assignedMileage?.toString() || "",
+      averageMonthlyMileage: vehicle.fleetVehicle.averageMonthlyMileage?.toString() || "",
       notes: vehicle.fleetVehicle.notes || "",
     });
     setIsVehicleDialogOpen(true);
@@ -412,12 +414,10 @@ export default function FleetManagement() {
       contractType: contract.contractType,
       startDate: contract.startDate ? format(new Date(contract.startDate), "yyyy-MM-dd") : "",
       endDate: contract.endDate ? format(new Date(contract.endDate), "yyyy-MM-dd") : "",
-      numberOfVehicles: contract.numberOfVehicles.toString(),
+      maxVehicles: contract.maxVehicles?.toString() || "",
       discountPercentage: contract.discountPercentage?.toString() || "0",
-      paymentTerms: contract.paymentTerms || "net_30",
       billingCycle: contract.billingCycle || "monthly",
       terms: contract.terms || "",
-      notes: contract.notes || "",
     });
     setIsContractDialogOpen(true);
   };
@@ -425,13 +425,12 @@ export default function FleetManagement() {
   const handleEditPricing = (tier: FleetPricingTier) => {
     setEditingPricingId(tier.id);
     pricingForm.reset({
-      fleetGroupId: tier.fleetGroupId || "",
+      garageId: tier.garageId,
       tierName: tier.tierName,
-      description: tier.description || "",
       minVehicles: tier.minVehicles.toString(),
       maxVehicles: tier.maxVehicles?.toString() || "",
       discountPercentage: tier.discountPercentage.toString(),
-      serviceTypes: tier.serviceTypes?.join(", ") || "",
+      applicableServices: tier.applicableServices?.join(", ") || "",
       isActive: tier.isActive,
     });
     setIsPricingDialogOpen(true);
@@ -623,7 +622,7 @@ export default function FleetManagement() {
                   <TableHead className="text-salis-black dark:text-white">Vehicle</TableHead>
                   <TableHead className="text-salis-black dark:text-white">Make/Model</TableHead>
                   <TableHead className="text-salis-black dark:text-white">License Plate</TableHead>
-                  <TableHead className="text-salis-black dark:text-white">Assigned Mileage</TableHead>
+                  <TableHead className="text-salis-black dark:text-white">Avg. Monthly Mileage</TableHead>
                   <TableHead className="text-salis-black dark:text-white">Assigned Date</TableHead>
                   <TableHead className="text-salis-black dark:text-white text-right">Actions</TableHead>
                 </TableRow>
@@ -652,7 +651,7 @@ export default function FleetManagement() {
                       </TableCell>
                       <TableCell className="text-salis-gray">{vehicle.vehicle?.licensePlate || "—"}</TableCell>
                       <TableCell className="text-salis-gray">
-                        {vehicle.fleetVehicle.assignedMileage ? `${vehicle.fleetVehicle.assignedMileage} km` : "—"}
+                        {vehicle.fleetVehicle.averageMonthlyMileage ? `${vehicle.fleetVehicle.averageMonthlyMileage} km` : "—"}
                       </TableCell>
                       <TableCell className="text-salis-gray">
                         {vehicle.fleetVehicle.assignedAt ? format(new Date(vehicle.fleetVehicle.assignedAt), "MMM dd, yyyy") : "—"}
@@ -759,7 +758,7 @@ export default function FleetManagement() {
                       <TableCell className="text-salis-gray">
                         {contract.endDate ? format(new Date(contract.endDate), "MMM dd, yyyy") : "—"}
                       </TableCell>
-                      <TableCell className="text-salis-gray">{contract.numberOfVehicles}</TableCell>
+                      <TableCell className="text-salis-gray">{contract.maxVehicles || "—"}</TableCell>
                       <TableCell>
                         <Badge className="bg-salis-black dark:bg-white text-white dark:text-salis-black">
                           {contract.status || "Active"}
@@ -818,7 +817,6 @@ export default function FleetManagement() {
               <TableHeader>
                 <TableRow className="bg-salis-gray-light dark:bg-salis-gray-dark">
                   <TableHead className="text-salis-black dark:text-white">Tier Name</TableHead>
-                  <TableHead className="text-salis-black dark:text-white">Description</TableHead>
                   <TableHead className="text-salis-black dark:text-white">Min Vehicles</TableHead>
                   <TableHead className="text-salis-black dark:text-white">Max Vehicles</TableHead>
                   <TableHead className="text-salis-black dark:text-white">Discount</TableHead>
@@ -829,7 +827,7 @@ export default function FleetManagement() {
               <TableBody>
                 {pricingTiers.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center text-salis-gray">
+                    <TableCell colSpan={6} className="text-center text-salis-gray">
                       No pricing tiers found. Create one to get started.
                     </TableCell>
                   </TableRow>
@@ -839,7 +837,6 @@ export default function FleetManagement() {
                       <TableCell className="font-medium text-salis-black dark:text-white">
                         {tier.tierName}
                       </TableCell>
-                      <TableCell className="text-salis-gray">{tier.description || "—"}</TableCell>
                       <TableCell className="text-salis-gray">{tier.minVehicles}</TableCell>
                       <TableCell className="text-salis-gray">{tier.maxVehicles || "No limit"}</TableCell>
                       <TableCell className="text-salis-gray">{tier.discountPercentage}%</TableCell>
@@ -1033,7 +1030,7 @@ export default function FleetManagement() {
                     <FormItem>
                       <FormLabel className="text-salis-black dark:text-white">Company Name</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder="ABC Company" data-testid="input-company-name" />
+                        <Input {...field} value={field.value || ""} placeholder="ABC Company" data-testid="input-company-name" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -1046,7 +1043,7 @@ export default function FleetManagement() {
                     <FormItem>
                       <FormLabel className="text-salis-black dark:text-white">Contact Person</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder="John Smith" data-testid="input-contact-person" />
+                        <Input {...field} value={field.value || ""} placeholder="John Smith" data-testid="input-contact-person" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -1059,7 +1056,7 @@ export default function FleetManagement() {
                     <FormItem>
                       <FormLabel className="text-salis-black dark:text-white">Contact Email</FormLabel>
                       <FormControl>
-                        <Input {...field} type="email" placeholder="john@company.com" data-testid="input-contact-email" />
+                        <Input {...field} value={field.value || ""} type="email" placeholder="john@company.com" data-testid="input-contact-email" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -1072,7 +1069,7 @@ export default function FleetManagement() {
                     <FormItem>
                       <FormLabel className="text-salis-black dark:text-white">Contact Phone</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder="+1234567890" data-testid="input-contact-phone" />
+                        <Input {...field} value={field.value || ""} placeholder="+1234567890" data-testid="input-contact-phone" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -1085,7 +1082,7 @@ export default function FleetManagement() {
                     <FormItem>
                       <FormLabel className="text-salis-black dark:text-white">Tax ID</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder="123-45-6789" data-testid="input-tax-id" />
+                        <Input {...field} value={field.value || ""} placeholder="123-45-6789" data-testid="input-tax-id" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -1111,7 +1108,7 @@ export default function FleetManagement() {
                     <FormItem>
                       <FormLabel className="text-salis-black dark:text-white">Payment Terms</FormLabel>
                       <FormControl>
-                        <Select value={field.value} onValueChange={field.onChange}>
+                        <Select value={field.value || "net_30"} onValueChange={field.onChange}>
                           <SelectTrigger data-testid="select-payment-terms">
                             <SelectValue placeholder="Select terms" />
                           </SelectTrigger>
@@ -1135,7 +1132,7 @@ export default function FleetManagement() {
                   <FormItem>
                     <FormLabel className="text-salis-black dark:text-white">Billing Address</FormLabel>
                     <FormControl>
-                      <Textarea {...field} placeholder="123 Main St..." data-testid="input-billing-address" />
+                      <Textarea {...field} value={field.value || ""} placeholder="123 Main St..." data-testid="input-billing-address" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -1148,7 +1145,7 @@ export default function FleetManagement() {
                   <FormItem>
                     <FormLabel className="text-salis-black dark:text-white">Notes</FormLabel>
                     <FormControl>
-                      <Textarea {...field} placeholder="Additional notes..." data-testid="input-notes" />
+                      <Textarea {...field} value={field.value || ""} placeholder="Additional notes..." data-testid="input-notes" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -1223,12 +1220,12 @@ export default function FleetManagement() {
               />
               <FormField
                 control={vehicleForm.control}
-                name="assignedMileage"
+                name="averageMonthlyMileage"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-salis-black dark:text-white">Assigned Mileage (km)</FormLabel>
+                    <FormLabel className="text-salis-black dark:text-white">Avg. Monthly Mileage (km)</FormLabel>
                     <FormControl>
-                      <Input {...field} type="number" placeholder="50000" data-testid="input-assigned-mileage" />
+                      <Input {...field} value={field.value || ""} type="number" placeholder="5000" data-testid="input-avg-monthly-mileage" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -1241,7 +1238,7 @@ export default function FleetManagement() {
                   <FormItem>
                     <FormLabel className="text-salis-black dark:text-white">Notes</FormLabel>
                     <FormControl>
-                      <Textarea {...field} placeholder="Assignment notes..." data-testid="input-vehicle-notes" />
+                      <Textarea {...field} value={field.value || ""} placeholder="Assignment notes..." data-testid="input-vehicle-notes" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -1347,12 +1344,12 @@ export default function FleetManagement() {
                 />
                 <FormField
                   control={contractForm.control}
-                  name="numberOfVehicles"
+                  name="maxVehicles"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">Number of Vehicles *</FormLabel>
+                      <FormLabel className="text-salis-black dark:text-white">Max Vehicles</FormLabel>
                       <FormControl>
-                        <Input {...field} type="number" placeholder="10" data-testid="input-num-vehicles" />
+                        <Input {...field} value={field.value || ""} type="number" placeholder="10" data-testid="input-max-vehicles" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -1365,13 +1362,48 @@ export default function FleetManagement() {
                     <FormItem>
                       <FormLabel className="text-salis-black dark:text-white">Discount %</FormLabel>
                       <FormControl>
-                        <Input {...field} type="number" placeholder="15" data-testid="input-contract-discount" />
+                        <Input {...field} value={field.value || ""} type="number" placeholder="15" data-testid="input-contract-discount" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={contractForm.control}
+                  name="billingCycle"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-salis-black dark:text-white">Billing Cycle</FormLabel>
+                      <FormControl>
+                        <Select value={field.value || "monthly"} onValueChange={field.onChange}>
+                          <SelectTrigger data-testid="select-billing-cycle">
+                            <SelectValue placeholder="Select billing cycle" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="monthly">Monthly</SelectItem>
+                            <SelectItem value="quarterly">Quarterly</SelectItem>
+                            <SelectItem value="annual">Annual</SelectItem>
+                          </SelectContent>
+                        </Select>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
               </div>
+              <FormField
+                control={contractForm.control}
+                name="terms"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-salis-black dark:text-white">Terms</FormLabel>
+                    <FormControl>
+                      <Textarea {...field} value={field.value || ""} placeholder="Contract terms and conditions..." rows={4} data-testid="input-contract-terms" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <DialogFooter>
                 <Button
                   type="button"
@@ -1455,7 +1487,7 @@ export default function FleetManagement() {
                     <FormItem>
                       <FormLabel className="text-salis-black dark:text-white">Max Vehicles</FormLabel>
                       <FormControl>
-                        <Input {...field} type="number" placeholder="20" data-testid="input-max-vehicles" />
+                        <Input {...field} value={field.value || ""} type="number" placeholder="20" data-testid="input-pricing-max-vehicles" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -1464,12 +1496,12 @@ export default function FleetManagement() {
               </div>
               <FormField
                 control={pricingForm.control}
-                name="description"
+                name="applicableServices"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-salis-black dark:text-white">Description</FormLabel>
+                    <FormLabel className="text-salis-black dark:text-white">Applicable Services</FormLabel>
                     <FormControl>
-                      <Textarea {...field} placeholder="Tier description..." data-testid="input-tier-description" />
+                      <Textarea {...field} value={field.value || ""} placeholder="Enter service types separated by commas (e.g., oil change, brake service)" data-testid="input-applicable-services" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -1607,7 +1639,7 @@ export default function FleetManagement() {
                   <FormItem>
                     <FormLabel className="text-salis-black dark:text-white">Description</FormLabel>
                     <FormControl>
-                      <Textarea {...field} placeholder="Schedule description..." data-testid="input-schedule-description" />
+                      <Textarea {...field} value={field.value || ""} placeholder="Schedule description..." data-testid="input-schedule-description" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
