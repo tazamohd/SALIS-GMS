@@ -35,7 +35,9 @@ import {
   insertTowingRequestSchema,
   insertTowTruckSchema,
   insertLoanerVehicleSchema,
-  insertLoanerReservationSchema
+  insertLoanerReservationSchema,
+  insertSupplierPriceListSchema,
+  insertSupplierPerformanceSchema
 } from "@shared/schema";
 import Stripe from "stripe";
 import { createPaypalOrder, capturePaypalOrder, loadPaypalDefault } from "./paypal";
@@ -1377,6 +1379,177 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error deleting supplier:", error);
       res.status(500).json({ message: "Failed to delete supplier" });
+    }
+  });
+
+  // Supplier Price List routes - Module 43: Vendor/Supplier Portal
+  app.get('/api/supplier-price-lists', isAuthenticated, async (req, res) => {
+    try {
+      const { supplierId, sparePartId } = req.query;
+      const priceLists = await storage.getSupplierPriceLists(
+        supplierId as string | undefined,
+        sparePartId as string | undefined
+      );
+      res.json(priceLists);
+    } catch (error) {
+      console.error("Error fetching supplier price lists:", error);
+      res.status(500).json({ message: "Failed to fetch price lists" });
+    }
+  });
+
+  app.get('/api/supplier-price-lists/:id', isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const priceList = await storage.getSupplierPriceList(id);
+      if (!priceList) {
+        return res.status(404).json({ message: "Price list not found" });
+      }
+      res.json(priceList);
+    } catch (error) {
+      console.error("Error fetching price list:", error);
+      res.status(500).json({ message: "Failed to fetch price list" });
+    }
+  });
+
+  app.post('/api/supplier-price-lists', isAuthenticated, async (req, res) => {
+    try {
+      const validationResult = insertSupplierPriceListSchema.safeParse(req.body);
+      
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          message: "Validation error", 
+          errors: validationResult.error.errors 
+        });
+      }
+      
+      const priceList = await storage.createSupplierPriceList(validationResult.data);
+      res.status(201).json(priceList);
+    } catch (error) {
+      console.error("Error creating price list:", error);
+      res.status(500).json({ message: "Failed to create price list" });
+    }
+  });
+
+  app.patch('/api/supplier-price-lists/:id', isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      
+      const validationResult = insertSupplierPriceListSchema.partial().safeParse(req.body);
+      
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          message: "Validation error", 
+          errors: validationResult.error.errors 
+        });
+      }
+      
+      const priceList = await storage.updateSupplierPriceList(id, validationResult.data);
+      res.json(priceList);
+    } catch (error) {
+      console.error("Error updating price list:", error);
+      res.status(500).json({ message: "Failed to update price list" });
+    }
+  });
+
+  app.delete('/api/supplier-price-lists/:id', isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteSupplierPriceList(id);
+      res.json({ message: "Price list deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting price list:", error);
+      res.status(500).json({ message: "Failed to delete price list" });
+    }
+  });
+
+  app.get('/api/supplier-price-lists/compare/:sparePartId', isAuthenticated, async (req, res) => {
+    try {
+      const { sparePartId } = req.params;
+      const comparison = await storage.comparePrices(sparePartId);
+      res.json(comparison);
+    } catch (error) {
+      console.error("Error comparing prices:", error);
+      res.status(500).json({ message: "Failed to compare prices" });
+    }
+  });
+
+  // Supplier Performance routes - Module 43: Vendor/Supplier Portal
+  app.get('/api/supplier-performance', isAuthenticated, async (req, res) => {
+    try {
+      const { supplierId, period } = req.query;
+      const performanceRecords = await storage.getSupplierPerformance(
+        supplierId as string | undefined,
+        period as string | undefined
+      );
+      res.json(performanceRecords);
+    } catch (error) {
+      console.error("Error fetching supplier performance:", error);
+      res.status(500).json({ message: "Failed to fetch performance records" });
+    }
+  });
+
+  app.get('/api/supplier-performance/:id', isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const performanceRecord = await storage.getSupplierPerformanceRecord(id);
+      if (!performanceRecord) {
+        return res.status(404).json({ message: "Performance record not found" });
+      }
+      res.json(performanceRecord);
+    } catch (error) {
+      console.error("Error fetching performance record:", error);
+      res.status(500).json({ message: "Failed to fetch performance record" });
+    }
+  });
+
+  app.post('/api/supplier-performance', isAuthenticated, async (req, res) => {
+    try {
+      const validationResult = insertSupplierPerformanceSchema.safeParse(req.body);
+      
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          message: "Validation error", 
+          errors: validationResult.error.errors 
+        });
+      }
+      
+      const performanceRecord = await storage.createSupplierPerformance(validationResult.data);
+      res.status(201).json(performanceRecord);
+    } catch (error) {
+      console.error("Error creating performance record:", error);
+      res.status(500).json({ message: "Failed to create performance record" });
+    }
+  });
+
+  app.patch('/api/supplier-performance/:id', isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      
+      const validationResult = insertSupplierPerformanceSchema.partial().safeParse(req.body);
+      
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          message: "Validation error", 
+          errors: validationResult.error.errors 
+        });
+      }
+      
+      const performanceRecord = await storage.updateSupplierPerformance(id, validationResult.data);
+      res.json(performanceRecord);
+    } catch (error) {
+      console.error("Error updating performance record:", error);
+      res.status(500).json({ message: "Failed to update performance record" });
+    }
+  });
+
+  app.delete('/api/supplier-performance/:id', isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteSupplierPerformance(id);
+      res.json({ message: "Performance record deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting performance record:", error);
+      res.status(500).json({ message: "Failed to delete performance record" });
     }
   });
 
