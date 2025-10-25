@@ -240,6 +240,16 @@ import {
   towTrucks,
   loanerVehicles,
   loanerReservations,
+  marketingCampaigns,
+  campaignRecipients,
+  loyaltyProgram,
+  customerLoyaltyAccounts,
+  loyaltyTransactions,
+  loyaltyRewards,
+  loyaltyRedemptions,
+  documentCategories,
+  documents,
+  documentAccessLog,
   type InspectionTemplate,
   type InsertInspectionTemplate,
   type VehicleInspection,
@@ -252,6 +262,26 @@ import {
   type InsertLoanerVehicle,
   type LoanerReservation,
   type InsertLoanerReservation,
+  type MarketingCampaign,
+  type InsertMarketingCampaign,
+  type CampaignRecipient,
+  type InsertCampaignRecipient,
+  type LoyaltyProgram,
+  type InsertLoyaltyProgram,
+  type CustomerLoyaltyAccount,
+  type InsertCustomerLoyaltyAccount,
+  type LoyaltyTransaction,
+  type InsertLoyaltyTransaction,
+  type LoyaltyReward,
+  type InsertLoyaltyReward,
+  type LoyaltyRedemption,
+  type InsertLoyaltyRedemption,
+  type DocumentCategory,
+  type InsertDocumentCategory,
+  type Document,
+  type InsertDocument,
+  type DocumentAccessLog,
+  type InsertDocumentAccessLog,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, or, inArray, and, gte, lte, ilike, sql, isNull, gt } from "drizzle-orm";
@@ -837,6 +867,62 @@ export interface IStorage {
   getLoanerReservationById(id: string): Promise<LoanerReservation | undefined>;
   updateLoanerReservation(id: string, data: Partial<InsertLoanerReservation>): Promise<LoanerReservation>;
   deleteLoanerReservation(id: string): Promise<void>;
+
+  // Module 42: Marketing Automation
+  createMarketingCampaign(data: any): Promise<any>;
+  getMarketingCampaigns(garageId: string, filters?: {status?: string, campaignType?: string}): Promise<any[]>;
+  getMarketingCampaignById(id: string): Promise<any | undefined>;
+  updateMarketingCampaign(id: string, data: any): Promise<any>;
+  deleteMarketingCampaign(id: string): Promise<void>;
+  getCampaignRecipients(campaignId: string): Promise<any[]>;
+  createCampaignRecipient(data: any): Promise<any>;
+  updateCampaignRecipient(id: string, data: any): Promise<any>;
+  getCampaignAnalytics(campaignId: string): Promise<any>;
+
+  // Module 44: Customer Loyalty Program
+  createLoyaltyProgram(data: any): Promise<any>;
+  getLoyaltyPrograms(garageId: string): Promise<any[]>;
+  getLoyaltyProgramById(id: string): Promise<any | undefined>;
+  updateLoyaltyProgram(id: string, data: any): Promise<any>;
+  deleteLoyaltyProgram(id: string): Promise<void>;
+  
+  createLoyaltyAccount(data: any): Promise<any>;
+  getLoyaltyAccounts(programId?: string, customerId?: string): Promise<any[]>;
+  getLoyaltyAccountById(id: string): Promise<any | undefined>;
+  updateLoyaltyAccount(id: string, data: any): Promise<any>;
+  getLoyaltyAccountByCustomer(customerId: string): Promise<any | undefined>;
+  
+  createLoyaltyTransaction(data: any): Promise<any>;
+  getLoyaltyTransactions(accountId: string): Promise<any[]>;
+  getLoyaltyTransactionById(id: string): Promise<any | undefined>;
+  
+  createLoyaltyReward(data: any): Promise<any>;
+  getLoyaltyRewards(programId: string, filters?: {isActive?: boolean}): Promise<any[]>;
+  getLoyaltyRewardById(id: string): Promise<any | undefined>;
+  updateLoyaltyReward(id: string, data: any): Promise<any>;
+  deleteLoyaltyReward(id: string): Promise<void>;
+  
+  createLoyaltyRedemption(data: any): Promise<any>;
+  getLoyaltyRedemptions(accountId?: string, filters?: {status?: string}): Promise<any[]>;
+  getLoyaltyRedemptionById(id: string): Promise<any | undefined>;
+  updateLoyaltyRedemption(id: string, data: any): Promise<any>;
+
+  // Module 47: Document Management
+  createDocumentCategory(data: any): Promise<any>;
+  getDocumentCategories(garageId: string): Promise<any[]>;
+  getDocumentCategoryById(id: string): Promise<any | undefined>;
+  updateDocumentCategory(id: string, data: any): Promise<any>;
+  deleteDocumentCategory(id: string): Promise<void>;
+  
+  createDocument(data: any): Promise<any>;
+  getDocuments(garageId: string, filters?: {categoryId?: string, relatedType?: string, relatedId?: string, status?: string}): Promise<any[]>;
+  getDocumentById(id: string): Promise<any | undefined>;
+  updateDocument(id: string, data: any): Promise<any>;
+  deleteDocument(id: string): Promise<void>;
+  getExpiringDocuments(garageId: string, daysAhead: number): Promise<any[]>;
+  
+  createDocumentAccessLog(data: any): Promise<any>;
+  getDocumentAccessLogs(documentId: string): Promise<any[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -6000,6 +6086,443 @@ export class DatabaseStorage implements IStorage {
   async deleteLoanerReservation(id: string): Promise<void> {
     await db.delete(loanerReservations)
       .where(eq(loanerReservations.id, id));
+  }
+
+  // Module 42: Marketing Automation
+  async createMarketingCampaign(data: InsertMarketingCampaign): Promise<MarketingCampaign> {
+    const [campaign] = await db.insert(marketingCampaigns)
+      .values(data)
+      .returning();
+    return campaign;
+  }
+
+  async getMarketingCampaigns(
+    garageId: string,
+    filters?: {status?: string, campaignType?: string}
+  ): Promise<MarketingCampaign[]> {
+    const conditions = [eq(marketingCampaigns.garageId, garageId)];
+    
+    if (filters?.status) {
+      conditions.push(eq(marketingCampaigns.status, filters.status));
+    }
+    if (filters?.campaignType) {
+      conditions.push(eq(marketingCampaigns.campaignType, filters.campaignType));
+    }
+
+    return await db.select()
+      .from(marketingCampaigns)
+      .where(and(...conditions))
+      .orderBy(desc(marketingCampaigns.createdAt));
+  }
+
+  async getMarketingCampaignById(id: string): Promise<MarketingCampaign | undefined> {
+    const [campaign] = await db.select()
+      .from(marketingCampaigns)
+      .where(eq(marketingCampaigns.id, id));
+    return campaign;
+  }
+
+  async updateMarketingCampaign(id: string, data: Partial<InsertMarketingCampaign>): Promise<MarketingCampaign> {
+    const [campaign] = await db.update(marketingCampaigns)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(marketingCampaigns.id, id))
+      .returning();
+    return campaign;
+  }
+
+  async deleteMarketingCampaign(id: string): Promise<void> {
+    await db.delete(marketingCampaigns)
+      .where(eq(marketingCampaigns.id, id));
+  }
+
+  async getCampaignRecipients(campaignId: string): Promise<CampaignRecipient[]> {
+    return await db.select()
+      .from(campaignRecipients)
+      .where(eq(campaignRecipients.campaignId, campaignId))
+      .orderBy(desc(campaignRecipients.createdAt));
+  }
+
+  async createCampaignRecipient(data: InsertCampaignRecipient): Promise<CampaignRecipient> {
+    const [recipient] = await db.insert(campaignRecipients)
+      .values(data)
+      .returning();
+    return recipient;
+  }
+
+  async updateCampaignRecipient(id: string, data: Partial<InsertCampaignRecipient>): Promise<CampaignRecipient> {
+    const [recipient] = await db.update(campaignRecipients)
+      .set(data)
+      .where(eq(campaignRecipients.id, id))
+      .returning();
+    return recipient;
+  }
+
+  async getCampaignAnalytics(campaignId: string): Promise<any> {
+    const [campaign] = await db.select()
+      .from(marketingCampaigns)
+      .where(eq(marketingCampaigns.id, campaignId));
+    
+    if (!campaign) return null;
+
+    const recipients = await db.select()
+      .from(campaignRecipients)
+      .where(eq(campaignRecipients.campaignId, campaignId));
+
+    const totalRecipients = campaign.totalRecipients ?? 0;
+    const sentCount = campaign.sentCount ?? 0;
+    const deliveredCount = campaign.deliveredCount ?? 0;
+    const openedCount = campaign.openedCount ?? 0;
+    const clickedCount = campaign.clickedCount ?? 0;
+    const unsubscribedCount = campaign.unsubscribedCount ?? 0;
+
+    return {
+      totalRecipients,
+      sentCount,
+      deliveredCount,
+      openedCount,
+      clickedCount,
+      unsubscribedCount,
+      deliveryRate: totalRecipients > 0 ? (deliveredCount / totalRecipients * 100).toFixed(2) : 0,
+      openRate: deliveredCount > 0 ? (openedCount / deliveredCount * 100).toFixed(2) : 0,
+      clickRate: deliveredCount > 0 ? (clickedCount / deliveredCount * 100).toFixed(2) : 0,
+      unsubscribeRate: sentCount > 0 ? (unsubscribedCount / sentCount * 100).toFixed(2) : 0,
+      recipients: recipients
+    };
+  }
+
+  // Module 44: Customer Loyalty Program
+  async createLoyaltyProgram(data: InsertLoyaltyProgram): Promise<LoyaltyProgram> {
+    const [program] = await db.insert(loyaltyProgram)
+      .values(data)
+      .returning();
+    return program;
+  }
+
+  async getLoyaltyPrograms(garageId: string): Promise<LoyaltyProgram[]> {
+    return await db.select()
+      .from(loyaltyProgram)
+      .where(eq(loyaltyProgram.garageId, garageId))
+      .orderBy(desc(loyaltyProgram.createdAt));
+  }
+
+  async getLoyaltyProgramById(id: string): Promise<LoyaltyProgram | undefined> {
+    const [program] = await db.select()
+      .from(loyaltyProgram)
+      .where(eq(loyaltyProgram.id, id));
+    return program;
+  }
+
+  async updateLoyaltyProgram(id: string, data: Partial<InsertLoyaltyProgram>): Promise<LoyaltyProgram> {
+    const [program] = await db.update(loyaltyProgram)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(loyaltyProgram.id, id))
+      .returning();
+    return program;
+  }
+
+  async deleteLoyaltyProgram(id: string): Promise<void> {
+    await db.delete(loyaltyProgram)
+      .where(eq(loyaltyProgram.id, id));
+  }
+
+  async createLoyaltyAccount(data: InsertCustomerLoyaltyAccount): Promise<CustomerLoyaltyAccount> {
+    const referralCode = `REF-${Date.now()}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
+    const [account] = await db.insert(customerLoyaltyAccounts)
+      .values({ ...data, referralCode })
+      .returning();
+    return account;
+  }
+
+  async getLoyaltyAccounts(programId?: string, customerId?: string): Promise<CustomerLoyaltyAccount[]> {
+    const conditions: any[] = [];
+    
+    if (programId) {
+      conditions.push(eq(customerLoyaltyAccounts.programId, programId));
+    }
+    if (customerId) {
+      conditions.push(eq(customerLoyaltyAccounts.customerId, customerId));
+    }
+
+    if (conditions.length === 0) {
+      return await db.select()
+        .from(customerLoyaltyAccounts)
+        .orderBy(desc(customerLoyaltyAccounts.enrolledAt));
+    }
+
+    return await db.select()
+      .from(customerLoyaltyAccounts)
+      .where(and(...conditions))
+      .orderBy(desc(customerLoyaltyAccounts.enrolledAt));
+  }
+
+  async getLoyaltyAccountById(id: string): Promise<CustomerLoyaltyAccount | undefined> {
+    const [account] = await db.select()
+      .from(customerLoyaltyAccounts)
+      .where(eq(customerLoyaltyAccounts.id, id));
+    return account;
+  }
+
+  async updateLoyaltyAccount(id: string, data: Partial<InsertCustomerLoyaltyAccount>): Promise<CustomerLoyaltyAccount> {
+    const [account] = await db.update(customerLoyaltyAccounts)
+      .set(data)
+      .where(eq(customerLoyaltyAccounts.id, id))
+      .returning();
+    return account;
+  }
+
+  async getLoyaltyAccountByCustomer(customerId: string): Promise<CustomerLoyaltyAccount | undefined> {
+    const [account] = await db.select()
+      .from(customerLoyaltyAccounts)
+      .where(eq(customerLoyaltyAccounts.customerId, customerId));
+    return account;
+  }
+
+  async createLoyaltyTransaction(data: InsertLoyaltyTransaction): Promise<LoyaltyTransaction> {
+    const [transaction] = await db.insert(loyaltyTransactions)
+      .values(data)
+      .returning();
+    
+    // Update account points
+    const account = await this.getLoyaltyAccountById(data.accountId);
+    if (account) {
+      const currentPoints = account.currentPoints ?? 0;
+      const totalPointsEarned = account.totalPointsEarned ?? 0;
+      const newPoints = currentPoints + data.points;
+      const newTotalEarned = data.points > 0 ? totalPointsEarned + data.points : totalPointsEarned;
+      await this.updateLoyaltyAccount(data.accountId, {
+        currentPoints: newPoints,
+        totalPointsEarned: newTotalEarned
+      });
+    }
+
+    return transaction;
+  }
+
+  async getLoyaltyTransactions(accountId: string): Promise<LoyaltyTransaction[]> {
+    return await db.select()
+      .from(loyaltyTransactions)
+      .where(eq(loyaltyTransactions.accountId, accountId))
+      .orderBy(desc(loyaltyTransactions.createdAt));
+  }
+
+  async getLoyaltyTransactionById(id: string): Promise<LoyaltyTransaction | undefined> {
+    const [transaction] = await db.select()
+      .from(loyaltyTransactions)
+      .where(eq(loyaltyTransactions.id, id));
+    return transaction;
+  }
+
+  async createLoyaltyReward(data: InsertLoyaltyReward): Promise<LoyaltyReward> {
+    const [reward] = await db.insert(loyaltyRewards)
+      .values(data)
+      .returning();
+    return reward;
+  }
+
+  async getLoyaltyRewards(programId: string, filters?: {isActive?: boolean}): Promise<LoyaltyReward[]> {
+    const conditions = [eq(loyaltyRewards.programId, programId)];
+    
+    if (filters?.isActive !== undefined) {
+      conditions.push(eq(loyaltyRewards.isActive, filters.isActive));
+    }
+
+    return await db.select()
+      .from(loyaltyRewards)
+      .where(and(...conditions))
+      .orderBy(desc(loyaltyRewards.createdAt));
+  }
+
+  async getLoyaltyRewardById(id: string): Promise<LoyaltyReward | undefined> {
+    const [reward] = await db.select()
+      .from(loyaltyRewards)
+      .where(eq(loyaltyRewards.id, id));
+    return reward;
+  }
+
+  async updateLoyaltyReward(id: string, data: Partial<InsertLoyaltyReward>): Promise<LoyaltyReward> {
+    const [reward] = await db.update(loyaltyRewards)
+      .set(data)
+      .where(eq(loyaltyRewards.id, id))
+      .returning();
+    return reward;
+  }
+
+  async deleteLoyaltyReward(id: string): Promise<void> {
+    await db.delete(loyaltyRewards)
+      .where(eq(loyaltyRewards.id, id));
+  }
+
+  async createLoyaltyRedemption(data: InsertLoyaltyRedemption): Promise<LoyaltyRedemption> {
+    const redemptionCode = `REDEEM-${Date.now()}-${Math.random().toString(36).substr(2, 8).toUpperCase()}`;
+    const [redemption] = await db.insert(loyaltyRedemptions)
+      .values({ ...data, redemptionCode })
+      .returning();
+    
+    // Deduct points from account
+    const account = await this.getLoyaltyAccountById(data.accountId);
+    if (account) {
+      const currentPoints = account.currentPoints ?? 0;
+      await this.updateLoyaltyAccount(data.accountId, {
+        currentPoints: currentPoints - data.pointsRedeemed
+      });
+    }
+
+    return redemption;
+  }
+
+  async getLoyaltyRedemptions(accountId?: string, filters?: {status?: string}): Promise<LoyaltyRedemption[]> {
+    const conditions: any[] = [];
+    
+    if (accountId) {
+      conditions.push(eq(loyaltyRedemptions.accountId, accountId));
+    }
+    if (filters?.status) {
+      conditions.push(eq(loyaltyRedemptions.status, filters.status));
+    }
+
+    if (conditions.length === 0) {
+      return await db.select()
+        .from(loyaltyRedemptions)
+        .orderBy(desc(loyaltyRedemptions.createdAt));
+    }
+
+    return await db.select()
+      .from(loyaltyRedemptions)
+      .where(and(...conditions))
+      .orderBy(desc(loyaltyRedemptions.createdAt));
+  }
+
+  async getLoyaltyRedemptionById(id: string): Promise<LoyaltyRedemption | undefined> {
+    const [redemption] = await db.select()
+      .from(loyaltyRedemptions)
+      .where(eq(loyaltyRedemptions.id, id));
+    return redemption;
+  }
+
+  async updateLoyaltyRedemption(id: string, data: Partial<InsertLoyaltyRedemption>): Promise<LoyaltyRedemption> {
+    const [redemption] = await db.update(loyaltyRedemptions)
+      .set(data)
+      .where(eq(loyaltyRedemptions.id, id))
+      .returning();
+    return redemption;
+  }
+
+  // Module 47: Document Management
+  async createDocumentCategory(data: InsertDocumentCategory): Promise<DocumentCategory> {
+    const [category] = await db.insert(documentCategories)
+      .values(data)
+      .returning();
+    return category;
+  }
+
+  async getDocumentCategories(garageId: string): Promise<DocumentCategory[]> {
+    return await db.select()
+      .from(documentCategories)
+      .where(eq(documentCategories.garageId, garageId))
+      .orderBy(desc(documentCategories.createdAt));
+  }
+
+  async getDocumentCategoryById(id: string): Promise<DocumentCategory | undefined> {
+    const [category] = await db.select()
+      .from(documentCategories)
+      .where(eq(documentCategories.id, id));
+    return category;
+  }
+
+  async updateDocumentCategory(id: string, data: Partial<InsertDocumentCategory>): Promise<DocumentCategory> {
+    const [category] = await db.update(documentCategories)
+      .set(data)
+      .where(eq(documentCategories.id, id))
+      .returning();
+    return category;
+  }
+
+  async deleteDocumentCategory(id: string): Promise<void> {
+    await db.delete(documentCategories)
+      .where(eq(documentCategories.id, id));
+  }
+
+  async createDocument(data: InsertDocument): Promise<Document> {
+    const [document] = await db.insert(documents)
+      .values(data)
+      .returning();
+    return document;
+  }
+
+  async getDocuments(
+    garageId: string,
+    filters?: {categoryId?: string, relatedType?: string, relatedId?: string, status?: string}
+  ): Promise<Document[]> {
+    const conditions = [eq(documents.garageId, garageId)];
+    
+    if (filters?.categoryId) {
+      conditions.push(eq(documents.categoryId, filters.categoryId));
+    }
+    if (filters?.relatedType) {
+      conditions.push(eq(documents.relatedType, filters.relatedType));
+    }
+    if (filters?.relatedId) {
+      conditions.push(eq(documents.relatedId, filters.relatedId));
+    }
+    if (filters?.status) {
+      conditions.push(eq(documents.status, filters.status));
+    }
+
+    return await db.select()
+      .from(documents)
+      .where(and(...conditions))
+      .orderBy(desc(documents.createdAt));
+  }
+
+  async getDocumentById(id: string): Promise<Document | undefined> {
+    const [document] = await db.select()
+      .from(documents)
+      .where(eq(documents.id, id));
+    return document;
+  }
+
+  async updateDocument(id: string, data: Partial<InsertDocument>): Promise<Document> {
+    const [document] = await db.update(documents)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(documents.id, id))
+      .returning();
+    return document;
+  }
+
+  async deleteDocument(id: string): Promise<void> {
+    await db.delete(documents)
+      .where(eq(documents.id, id));
+  }
+
+  async getExpiringDocuments(garageId: string, daysAhead: number): Promise<Document[]> {
+    const futureDate = new Date();
+    futureDate.setDate(futureDate.getDate() + daysAhead);
+
+    return await db.select()
+      .from(documents)
+      .where(
+        and(
+          eq(documents.garageId, garageId),
+          eq(documents.status, 'active'),
+          lte(documents.expirationDate, futureDate),
+          gte(documents.expirationDate, new Date())
+        )
+      )
+      .orderBy(documents.expirationDate);
+  }
+
+  async createDocumentAccessLog(data: InsertDocumentAccessLog): Promise<DocumentAccessLog> {
+    const [log] = await db.insert(documentAccessLog)
+      .values(data)
+      .returning();
+    return log;
+  }
+
+  async getDocumentAccessLogs(documentId: string): Promise<DocumentAccessLog[]> {
+    return await db.select()
+      .from(documentAccessLog)
+      .where(eq(documentAccessLog.documentId, documentId))
+      .orderBy(desc(documentAccessLog.createdAt));
   }
 }
 
