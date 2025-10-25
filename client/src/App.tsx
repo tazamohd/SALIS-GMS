@@ -39,6 +39,7 @@ import Integrations from "@/pages/Integrations";
 import Security from "@/pages/Security";
 import Settings from "@/pages/Settings";
 import Chat from "@/pages/Chat";
+import FleetManagement from "@/pages/FleetManagement";
 import { CustomerDashboard } from "@/pages/customer/CustomerDashboard";
 import { CustomerAppointments } from "@/pages/customer/CustomerAppointments";
 import { CustomerInvoices } from "@/pages/customer/CustomerInvoices";
@@ -143,6 +144,11 @@ function Router() {
       <Route path="/vehicles">
         <Layout>
           <VehiclesEnhanced />
+        </Layout>
+      </Route>
+      <Route path="/fleet-management">
+        <Layout>
+          <FleetManagement />
         </Layout>
       </Route>
       <Route path="/purchase-orders">
