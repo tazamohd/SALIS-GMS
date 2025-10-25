@@ -33,6 +33,7 @@ import Stripe from "stripe";
 import { createPaypalOrder, capturePaypalOrder, loadPaypalDefault } from "./paypal";
 import { estimateJobTime, predictMaintenance, recommendParts, optimizeSchedule, chatWithCustomer } from './ai';
 import { auditLog } from './auditMiddleware';
+import QRCode from 'qrcode';
 
 // Initialize Stripe (Stripe integration - Module 25)
 const stripe = process.env.STRIPE_SECRET_KEY 
@@ -6783,6 +6784,248 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error updating media attachment:", error);
       res.status(500).json({ message: "Failed to update media" });
+    }
+  });
+
+  // Module 39: QR Code Check-In System API Routes
+  app.post('/api/qr-codes/generate', isAuthenticated, async (req: any, res) => {
+    try {
+      const { appointmentId, customerId, vehicleId, tokenType, expiresInHours } = req.body;
+      const garageId = req.user.garageId;
+      
+      if (!customerId) {
+        return res.status(400).json({ message: "Customer ID is required" });
+      }
+      
+      // Generate unique QR code data
+      const qrCodeData = `SALIS-${garageId}-${Date.now()}-${Math.random().toString(36).substring(7)}`;
+      
+      // Set expiration (default 24 hours)
+      const expirationHours = expiresInHours || 24;
+      const expiresAt = new Date();
+      expiresAt.setHours(expiresAt.getHours() + expirationHours);
+      
+      // Generate QR code image as base64
+      const qrCodeImageUrl = await QRCode.toDataURL(qrCodeData, {
+        errorCorrectionLevel: 'H',
+        type: 'image/png',
+        width: 300,
+        margin: 2,
+      });
+      
+      const qrToken = await storage.createQRCodeToken({
+        garageId,
+        appointmentId,
+        customerId,
+        vehicleId,
+        qrCodeData,
+        qrCodeImageUrl,
+        tokenType: tokenType || 'appointment',
+        expiresAt,
+        metadata: {
+          generatedBy: req.user.id,
+          generatedAt: new Date().toISOString(),
+        },
+      });
+      
+      res.json(qrToken);
+    } catch (error) {
+      console.error("Error generating QR code:", error);
+      res.status(500).json({ message: "Failed to generate QR code" });
+    }
+  });
+
+  app.post('/api/qr-codes/scan', isAuthenticated, async (req: any, res) => {
+    try {
+      const { qrCodeData } = req.body;
+      
+      if (!qrCodeData) {
+        return res.status(400).json({ message: "QR code data is required" });
+      }
+      
+      // Find the QR token
+      const qrToken = await storage.getQRCodeTokenByData(qrCodeData);
+      
+      if (!qrToken) {
+        // Log failed scan
+        await storage.createQRScanLog({
+          qrCodeId: null,
+          scannedBy: req.user.id,
+          deviceInfo: req.headers['user-agent'],
+          ipAddress: req.ip || req.connection.remoteAddress,
+          scanResult: 'invalid',
+        });
+        
+        return res.status(404).json({ message: "Invalid QR code", scanResult: 'invalid' });
+      }
+      
+      // Check if expired
+      if (new Date() > new Date(qrToken.expiresAt)) {
+        await storage.createQRScanLog({
+          qrCodeId: qrToken.id,
+          scannedBy: req.user.id,
+          deviceInfo: req.headers['user-agent'],
+          ipAddress: req.ip || req.connection.remoteAddress,
+          scanResult: 'expired',
+        });
+        
+        return res.status(400).json({ message: "QR code has expired", scanResult: 'expired' });
+      }
+      
+      // Check if already used
+      if (qrToken.isUsed) {
+        await storage.createQRScanLog({
+          qrCodeId: qrToken.id,
+          scannedBy: req.user.id,
+          deviceInfo: req.headers['user-agent'],
+          ipAddress: req.ip || req.connection.remoteAddress,
+          scanResult: 'already_used',
+        });
+        
+        return res.status(400).json({ message: "QR code has already been used", scanResult: 'already_used' });
+      }
+      
+      // Log successful scan
+      await storage.createQRScanLog({
+        qrCodeId: qrToken.id,
+        scannedBy: req.user.id,
+        deviceInfo: req.headers['user-agent'],
+        ipAddress: req.ip || req.connection.remoteAddress,
+        scanResult: 'success',
+      });
+      
+      res.json({ 
+        message: "QR code scanned successfully", 
+        scanResult: 'success',
+        qrToken 
+      });
+    } catch (error) {
+      console.error("Error scanning QR code:", error);
+      res.status(500).json({ message: "Failed to scan QR code" });
+    }
+  });
+
+  app.post('/api/qr-codes/check-in', isAuthenticated, async (req: any, res) => {
+    try {
+      const { qrCodeData, appointmentId, notes } = req.body;
+      
+      if (!qrCodeData) {
+        return res.status(400).json({ message: "QR code data is required" });
+      }
+      
+      // Find and validate the QR token
+      const qrToken = await storage.getQRCodeTokenByData(qrCodeData);
+      
+      if (!qrToken) {
+        return res.status(404).json({ message: "Invalid QR code" });
+      }
+      
+      if (new Date() > new Date(qrToken.expiresAt)) {
+        return res.status(400).json({ message: "QR code has expired" });
+      }
+      
+      if (qrToken.isUsed) {
+        return res.status(400).json({ message: "QR code has already been used" });
+      }
+      
+      // Mark QR code as used
+      await storage.markQRCodeAsUsed(qrToken.id);
+      
+      // Update appointment status if appointment-based check-in
+      if (qrToken.appointmentId) {
+        const appointment = await storage.getAppointment(qrToken.appointmentId);
+        if (appointment && appointment.status === 'confirmed') {
+          await storage.updateAppointment(qrToken.appointmentId, {
+            status: 'checked_in',
+          });
+          
+          // Create status history
+          await storage.createAppointmentStatusHistory({
+            appointmentId: qrToken.appointmentId,
+            status: 'checked_in',
+            notes: notes || 'Customer checked in via QR code',
+            changedBy: req.user.id,
+          });
+          
+          // Send check-in notification to customer
+          try {
+            const customer = await storage.getUser(qrToken.customerId);
+            if (customer?.phone) {
+              await smsService.sendSMS(
+                customer.phone,
+                `You've successfully checked in for your appointment. We'll be with you shortly!`
+              );
+            }
+          } catch (smsError) {
+            console.error("Error sending check-in SMS:", smsError);
+          }
+        }
+      }
+      
+      // Create notification
+      await storage.createNotification({
+        userId: qrToken.customerId,
+        type: 'appointment',
+        title: 'Check-in Successful',
+        message: 'You have successfully checked in. We will be with you shortly.',
+      });
+      
+      res.json({ 
+        message: "Check-in successful", 
+        qrToken,
+        appointmentId: qrToken.appointmentId
+      });
+    } catch (error) {
+      console.error("Error processing check-in:", error);
+      res.status(500).json({ message: "Failed to process check-in" });
+    }
+  });
+
+  app.get('/api/qr-codes/customer/:customerId', isAuthenticated, async (req, res) => {
+    try {
+      const { customerId } = req.params;
+      const tokens = await storage.getQRCodeTokensByCustomer(customerId);
+      res.json(tokens);
+    } catch (error) {
+      console.error("Error fetching QR codes:", error);
+      res.status(500).json({ message: "Failed to fetch QR codes" });
+    }
+  });
+
+  app.get('/api/qr-codes/appointment/:appointmentId', isAuthenticated, async (req, res) => {
+    try {
+      const { appointmentId } = req.params;
+      const tokens = await storage.getQRCodeTokensByAppointment(appointmentId);
+      res.json(tokens);
+    } catch (error) {
+      console.error("Error fetching QR codes:", error);
+      res.status(500).json({ message: "Failed to fetch QR codes" });
+    }
+  });
+
+  app.get('/api/qr-codes/scan-logs/:qrCodeId', isAuthenticated, async (req, res) => {
+    try {
+      const { qrCodeId } = req.params;
+      const logs = await storage.getQRScanLogsByToken(qrCodeId);
+      res.json(logs);
+    } catch (error) {
+      console.error("Error fetching scan logs:", error);
+      res.status(500).json({ message: "Failed to fetch scan logs" });
+    }
+  });
+
+  app.get('/api/qr-codes/scan-logs/garage/:garageId', isAuthenticated, async (req, res) => {
+    try {
+      const { garageId } = req.params;
+      const { limit } = req.query;
+      const logs = await storage.getQRScanLogsByGarage(
+        garageId, 
+        limit ? parseInt(limit as string) : undefined
+      );
+      res.json(logs);
+    } catch (error) {
+      console.error("Error fetching scan logs:", error);
+      res.status(500).json({ message: "Failed to fetch scan logs" });
     }
   });
 
