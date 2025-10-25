@@ -2691,6 +2691,44 @@ export const fleetContracts = pgTable("fleet_contracts", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+export const fleetPricingTiers = pgTable("fleet_pricing_tiers", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id")
+    .references(() => garages.id)
+    .notNull(),
+  fleetGroupId: uuid("fleet_group_id").references(() => fleetGroups.id, { onDelete: "cascade" }), // NULL for global tiers
+  tierName: varchar("tier_name", { length: 255 }).notNull(),
+  minVehicles: integer("min_vehicles").notNull(),
+  maxVehicles: integer("max_vehicles"),
+  discountPercentage: decimal("discount_percentage", { precision: 5, scale: 2 }).notNull(),
+  applicableServices: text("applicable_services").array(), // Array of service types
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const fleetMaintenanceSchedules = pgTable("fleet_maintenance_schedules", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  fleetGroupId: uuid("fleet_group_id")
+    .references(() => fleetGroups.id, { onDelete: "cascade" })
+    .notNull(),
+  scheduleName: varchar("schedule_name", { length: 255 }).notNull(),
+  description: text("description"),
+  serviceType: varchar("service_type", { length: 100 }).notNull(),
+  intervalType: varchar("interval_type").notNull(), // "mileage", "time", "both"
+  intervalMileage: integer("interval_mileage"),
+  intervalMonths: integer("interval_months"),
+  applicableVehicleTypes: text("applicable_vehicle_types").array(), // Array of vehicle types this applies to
+  estimatedCost: decimal("estimated_cost", { precision: 10, scale: 2 }),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Module 41: Warranty Tracking
 export const warranties = pgTable("warranties", {
   id: uuid("id")
@@ -3243,6 +3281,22 @@ export const insertFleetVehicleSchema = createInsertSchema(fleetVehicles).omit({
 export type FleetContract = typeof fleetContracts.$inferSelect;
 export type InsertFleetContract = typeof fleetContracts.$inferInsert;
 export const insertFleetContractSchema = createInsertSchema(fleetContracts).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type FleetPricingTier = typeof fleetPricingTiers.$inferSelect;
+export type InsertFleetPricingTier = typeof fleetPricingTiers.$inferInsert;
+export const insertFleetPricingTierSchema = createInsertSchema(fleetPricingTiers).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type FleetMaintenanceSchedule = typeof fleetMaintenanceSchedules.$inferSelect;
+export type InsertFleetMaintenanceSchedule = typeof fleetMaintenanceSchedules.$inferInsert;
+export const insertFleetMaintenanceScheduleSchema = createInsertSchema(fleetMaintenanceSchedules).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
