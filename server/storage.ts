@@ -701,12 +701,9 @@ export interface IStorage {
   // Module 37: Customer Self-Service Portal
   createPortalSession(customerId: string): Promise<any>;
   validatePortalSession(token: string): Promise<any | null>;
-  getCustomerAppointments(customerId: string, status?: string): Promise<any[]>;
-  getCustomerVehicles(customerId: string): Promise<any[]>;
   getCustomerServiceHistory(customerId: string, vehicleId?: string): Promise<any[]>;
   getCustomerEstimates(customerId: string, status?: string): Promise<any[]>;
   approveEstimate(estimateId: string, customerId: string): Promise<any>;
-  getCustomerInvoices(customerId: string, status?: string): Promise<any[]>;
   getCustomerPayments(customerId: string): Promise<any[]>;
 }
 
@@ -4897,40 +4894,6 @@ export class DatabaseStorage implements IStorage {
     return session;
   }
 
-  async getCustomerAppointments(customerId: string, status?: string): Promise<any[]> {
-    if (status) {
-      return await db.select({
-        appointment: appointments,
-        vehicle: vehicles,
-      })
-      .from(appointments)
-      .leftJoin(vehicles, eq(appointments.vehicleId, vehicles.id))
-      .where(
-        and(
-          eq(appointments.customerId, customerId),
-          eq(appointments.status, status)
-        )
-      )
-      .orderBy(desc(appointments.appointmentDate));
-    }
-    
-    return await db.select({
-      appointment: appointments,
-      vehicle: vehicles,
-    })
-    .from(appointments)
-    .leftJoin(vehicles, eq(appointments.vehicleId, vehicles.id))
-    .where(eq(appointments.customerId, customerId))
-    .orderBy(desc(appointments.appointmentDate));
-  }
-
-  async getCustomerVehicles(customerId: string): Promise<any[]> {
-    return await db.select()
-      .from(vehicles)
-      .where(eq(vehicles.customerId, customerId))
-      .orderBy(desc(vehicles.createdAt));
-  }
-
   async getCustomerServiceHistory(customerId: string, vehicleId?: string): Promise<any[]> {
     if (vehicleId) {
       return await db.select({
@@ -5021,38 +4984,8 @@ export class DatabaseStorage implements IStorage {
     return updated;
   }
 
-  async getCustomerInvoices(customerId: string, status?: string): Promise<any[]> {
-    if (status) {
-      return await db.select({
-        invoice: invoices,
-        vehicle: vehicles,
-      })
-      .from(invoices)
-      .leftJoin(vehicles, eq(invoices.vehicleId, vehicles.id))
-      .where(
-        and(
-          eq(invoices.customerId, customerId),
-          eq(invoices.status, status)
-        )
-      )
-      .orderBy(desc(invoices.issueDate));
-    }
-    
-    return await db.select({
-      invoice: invoices,
-      vehicle: vehicles,
-    })
-    .from(invoices)
-    .leftJoin(vehicles, eq(invoices.vehicleId, vehicles.id))
-    .where(eq(invoices.customerId, customerId))
-    .orderBy(desc(invoices.issueDate));
-  }
-
   async getCustomerPayments(customerId: string): Promise<any[]> {
-    const customerInvoices = await db.select()
-      .from(invoices)
-      .where(eq(invoices.customerId, customerId));
-    
+    const customerInvoices = await this.getCustomerInvoices(customerId);
     const invoiceIds = customerInvoices.map((inv: any) => inv.id);
     
     if (invoiceIds.length === 0) return [];
