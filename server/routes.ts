@@ -6939,7 +6939,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             status: 'checked_in',
           });
           
-          // Create status history
+          // Create status history entry
           await storage.createAppointmentStatusHistory({
             appointmentId: qrToken.appointmentId,
             status: 'checked_in',
@@ -6951,10 +6951,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
           try {
             const customer = await storage.getUser(qrToken.customerId);
             if (customer?.phone) {
-              await smsService.sendSMS(
-                customer.phone,
-                `You've successfully checked in for your appointment. We'll be with you shortly!`
-              );
+              await smsService.sendSMS({
+                to: customer.phone,
+                recipientId: customer.id,
+                garageId: req.user.garageId,
+                template: {
+                  message: `You've successfully checked in for your appointment. We'll be with you shortly!`
+                },
+                category: 'appointment',
+                metadata: {
+                  appointmentId: qrToken.appointmentId,
+                },
+              });
             }
           } catch (smsError) {
             console.error("Error sending check-in SMS:", smsError);
@@ -6964,10 +6972,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Create notification
       await storage.createNotification({
-        userId: qrToken.customerId,
+        recipientId: qrToken.customerId,
         type: 'appointment',
+        category: 'appointment',
         title: 'Check-in Successful',
         message: 'You have successfully checked in. We will be with you shortly.',
+        garageId: req.user.garageId,
       });
       
       res.json({ 

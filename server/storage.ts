@@ -5168,6 +5168,13 @@ export class DatabaseStorage implements IStorage {
     
     return await query;
   }
+
+  async createAppointmentStatusHistory(data: any): Promise<any> {
+    const [history] = await db.insert(appointmentStatusHistory)
+      .values(data)
+      .returning();
+    return history;
+  }
 }
 
 export const storage = new DatabaseStorage();
