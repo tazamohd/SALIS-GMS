@@ -55,110 +55,107 @@ import {
   FileText,
   DollarSign,
   Calendar,
-  Users,
 } from "lucide-react";
 import { format } from "date-fns";
+import {
+  insertFleetGroupSchema,
+  insertFleetVehicleSchema,
+  insertFleetContractSchema,
+  insertFleetPricingTierSchema,
+  insertFleetMaintenanceScheduleSchema,
+  type FleetGroup,
+  type FleetVehicle,
+  type FleetContract,
+  type FleetPricingTier,
+  type FleetMaintenanceSchedule,
+} from "@shared/schema";
 
-// Fleet Group Schema
-const fleetGroupSchema = z.object({
-  fleetName: z.string().min(1, "Fleet name is required"),
-  companyName: z.string().optional(),
-  contactPerson: z.string().optional(),
-  contactEmail: z.string().email().optional().or(z.literal("")),
-  contactPhone: z.string().optional(),
-  billingAddress: z.string().optional(),
-  taxId: z.string().optional(),
-  discountPercentage: z.string().optional(),
-  paymentTerms: z.string().optional(),
-  preferredPaymentMethod: z.string().optional(),
-  notes: z.string().optional(),
+// Extend insert schemas to handle form inputs (strings that need to be converted to numbers)
+const fleetGroupFormSchema = insertFleetGroupSchema.extend({
+  discountPercentage: z.string().optional().transform(val => val ? parseFloat(val) : undefined),
 });
 
-type FleetGroupFormData = z.infer<typeof fleetGroupSchema>;
-
-// Fleet Contract Schema
-const fleetContractSchema = z.object({
-  fleetGroupId: z.string().min(1, "Fleet group is required"),
-  contractNumber: z.string().min(1, "Contract number is required"),
-  contractType: z.string().min(1, "Contract type is required"),
-  startDate: z.string().min(1, "Start date is required"),
-  endDate: z.string().min(1, "End date is required"),
-  numberOfVehicles: z.string().min(1, "Number of vehicles is required"),
-  discountPercentage: z.string().optional(),
-  paymentTerms: z.string().optional(),
-  billingCycle: z.string().optional(),
-  terms: z.string().optional(),
-  notes: z.string().optional(),
+const fleetVehicleFormSchema = insertFleetVehicleSchema.extend({
+  assignedMileage: z.string().optional().transform(val => val ? parseInt(val) : undefined),
 });
 
-type FleetContractFormData = z.infer<typeof fleetContractSchema>;
-
-// Fleet Pricing Tier Schema
-const pricingTierSchema = z.object({
-  fleetGroupId: z.string().optional(),
-  tierName: z.string().min(1, "Tier name is required"),
-  description: z.string().optional(),
-  minVehicles: z.string().min(1, "Minimum vehicles required"),
-  maxVehicles: z.string().optional(),
-  discountPercentage: z.string().min(1, "Discount percentage required"),
-  serviceTypes: z.string().optional(),
-  isActive: z.boolean().optional(),
+const fleetContractFormSchema = insertFleetContractSchema.extend({
+  numberOfVehicles: z.string().min(1, "Required").transform(val => parseInt(val)),
+  discountPercentage: z.string().optional().transform(val => val ? parseFloat(val) : undefined),
+  startDate: z.string().min(1, "Start date required"),
+  endDate: z.string().min(1, "End date required"),
 });
 
-type PricingTierFormData = z.infer<typeof pricingTierSchema>;
-
-// Fleet Maintenance Schedule Schema
-const maintenanceScheduleSchema = z.object({
-  fleetGroupId: z.string().min(1, "Fleet group is required"),
-  scheduleName: z.string().min(1, "Schedule name is required"),
-  description: z.string().optional(),
-  serviceType: z.string().min(1, "Service type is required"),
-  intervalType: z.string().min(1, "Interval type is required"),
-  intervalMileage: z.string().optional(),
-  intervalMonths: z.string().optional(),
-  estimatedCost: z.string().optional(),
+const pricingTierFormSchema = insertFleetPricingTierSchema.extend({
+  minVehicles: z.string().min(1, "Required").transform(val => parseInt(val)),
+  maxVehicles: z.string().optional().transform(val => val && val !== "" ? parseInt(val) : undefined),
+  discountPercentage: z.string().min(1, "Required").transform(val => parseFloat(val)),
 });
 
-type MaintenanceScheduleFormData = z.infer<typeof maintenanceScheduleSchema>;
+const maintenanceScheduleFormSchema = insertFleetMaintenanceScheduleSchema.extend({
+  intervalMileage: z.string().optional().transform(val => val && val !== "" ? parseInt(val) : undefined),
+  intervalMonths: z.string().optional().transform(val => val && val !== "" ? parseInt(val) : undefined),
+  estimatedCost: z.string().optional().transform(val => val && val !== "" ? parseFloat(val) : undefined),
+});
+
+type FleetGroupFormData = z.input<typeof fleetGroupFormSchema>;
+type FleetVehicleFormData = z.input<typeof fleetVehicleFormSchema>;
+type FleetContractFormData = z.input<typeof fleetContractFormSchema>;
+type PricingTierFormData = z.input<typeof pricingTierFormSchema>;
+type MaintenanceScheduleFormData = z.input<typeof maintenanceScheduleFormSchema>;
 
 export default function FleetManagement() {
   const { toast } = useToast();
   const [selectedTab, setSelectedTab] = useState("groups");
   const [isGroupDialogOpen, setIsGroupDialogOpen] = useState(false);
+  const [isVehicleDialogOpen, setIsVehicleDialogOpen] = useState(false);
   const [isContractDialogOpen, setIsContractDialogOpen] = useState(false);
   const [isPricingDialogOpen, setIsPricingDialogOpen] = useState(false);
   const [isScheduleDialogOpen, setIsScheduleDialogOpen] = useState(false);
   const [editingGroupId, setEditingGroupId] = useState<string | null>(null);
+  const [editingVehicleId, setEditingVehicleId] = useState<string | null>(null);
   const [editingContractId, setEditingContractId] = useState<string | null>(null);
   const [editingPricingId, setEditingPricingId] = useState<string | null>(null);
   const [editingScheduleId, setEditingScheduleId] = useState<string | null>(null);
   const [selectedGroupId, setSelectedGroupId] = useState<string>("");
 
   // Fetch fleet groups
-  const { data: fleetGroups = [], isLoading: groupsLoading } = useQuery<any[]>({
+  const { data: fleetGroups = [], isLoading: groupsLoading } = useQuery<FleetGroup[]>({
     queryKey: ["/api/fleet/groups"],
   });
 
+  // Fetch fleet vehicles for selected group
+  const { data: fleetVehicles = [] } = useQuery<any[]>({
+    queryKey: ["/api/fleet/vehicles/group", selectedGroupId],
+    enabled: !!selectedGroupId && selectedTab === "vehicles",
+  });
+
+  // Fetch all vehicles for the dropdown
+  const { data: allVehicles = [] } = useQuery<any[]>({
+    queryKey: ["/api/vehicles"],
+    enabled: isVehicleDialogOpen,
+  });
+
   // Fetch fleet contracts for selected group
-  const { data: contracts = [] } = useQuery<any[]>({
+  const { data: contracts = [] } = useQuery<FleetContract[]>({
     queryKey: ["/api/fleet/contracts/group", selectedGroupId],
     enabled: !!selectedGroupId && selectedTab === "contracts",
   });
 
   // Fetch pricing tiers
-  const { data: pricingTiers = [] } = useQuery<any[]>({
+  const { data: pricingTiers = [] } = useQuery<FleetPricingTier[]>({
     queryKey: ["/api/fleet/pricing-tiers"],
   });
 
   // Fetch maintenance schedules for selected group
-  const { data: schedules = [] } = useQuery<any[]>({
+  const { data: schedules = [] } = useQuery<FleetMaintenanceSchedule[]>({
     queryKey: ["/api/fleet/maintenance-schedules/group", selectedGroupId],
     enabled: !!selectedGroupId && selectedTab === "schedules",
   });
 
   // Fleet Group Form
   const groupForm = useForm<FleetGroupFormData>({
-    resolver: zodResolver(fleetGroupSchema),
+    resolver: zodResolver(fleetGroupFormSchema),
     defaultValues: {
       fleetName: "",
       companyName: "",
@@ -174,16 +171,27 @@ export default function FleetManagement() {
     },
   });
 
+  // Fleet Vehicle Form
+  const vehicleForm = useForm<FleetVehicleFormData>({
+    resolver: zodResolver(fleetVehicleFormSchema),
+    defaultValues: {
+      fleetGroupId: "",
+      vehicleId: "",
+      assignedMileage: "",
+      notes: "",
+    },
+  });
+
   // Contract Form
   const contractForm = useForm<FleetContractFormData>({
-    resolver: zodResolver(fleetContractSchema),
+    resolver: zodResolver(fleetContractFormSchema),
     defaultValues: {
       fleetGroupId: "",
       contractNumber: "",
       contractType: "standard",
       startDate: "",
       endDate: "",
-      numberOfVehicles: "0",
+      numberOfVehicles: "",
       discountPercentage: "0",
       paymentTerms: "net_30",
       billingCycle: "monthly",
@@ -194,13 +202,13 @@ export default function FleetManagement() {
 
   // Pricing Tier Form
   const pricingForm = useForm<PricingTierFormData>({
-    resolver: zodResolver(pricingTierSchema),
+    resolver: zodResolver(pricingTierFormSchema),
     defaultValues: {
       tierName: "",
       description: "",
-      minVehicles: "1",
+      minVehicles: "",
       maxVehicles: "",
-      discountPercentage: "0",
+      discountPercentage: "",
       serviceTypes: "",
       isActive: true,
     },
@@ -208,7 +216,7 @@ export default function FleetManagement() {
 
   // Maintenance Schedule Form
   const scheduleForm = useForm<MaintenanceScheduleFormData>({
-    resolver: zodResolver(maintenanceScheduleSchema),
+    resolver: zodResolver(maintenanceScheduleFormSchema),
     defaultValues: {
       fleetGroupId: "",
       scheduleName: "",
@@ -224,10 +232,11 @@ export default function FleetManagement() {
   // Create/Update Fleet Group Mutation
   const groupMutation = useMutation({
     mutationFn: async (data: FleetGroupFormData) => {
+      const parsed = fleetGroupFormSchema.parse(data);
       if (editingGroupId) {
-        return await apiRequest("PATCH", `/api/fleet/groups/${editingGroupId}`, data);
+        return await apiRequest("PATCH", `/api/fleet/groups/${editingGroupId}`, parsed);
       }
-      return await apiRequest("POST", "/api/fleet/groups", data);
+      return await apiRequest("POST", "/api/fleet/groups", parsed);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/fleet/groups"] });
@@ -241,13 +250,35 @@ export default function FleetManagement() {
     },
   });
 
+  // Create/Update Fleet Vehicle Mutation
+  const vehicleMutation = useMutation({
+    mutationFn: async (data: FleetVehicleFormData) => {
+      const parsed = fleetVehicleFormSchema.parse(data);
+      if (editingVehicleId) {
+        return await apiRequest("PATCH", `/api/fleet/vehicles/${editingVehicleId}`, parsed);
+      }
+      return await apiRequest("POST", "/api/fleet/vehicles", parsed);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/fleet/vehicles/group"] });
+      setIsVehicleDialogOpen(false);
+      setEditingVehicleId(null);
+      vehicleForm.reset();
+      toast({
+        title: editingVehicleId ? "Fleet Vehicle Updated" : "Fleet Vehicle Added",
+        description: "Changes saved successfully",
+      });
+    },
+  });
+
   // Create/Update Contract Mutation
   const contractMutation = useMutation({
     mutationFn: async (data: FleetContractFormData) => {
+      const parsed = fleetContractFormSchema.parse(data);
       if (editingContractId) {
-        return await apiRequest("PATCH", `/api/fleet/contracts/${editingContractId}`, data);
+        return await apiRequest("PATCH", `/api/fleet/contracts/${editingContractId}`, parsed);
       }
-      return await apiRequest("POST", "/api/fleet/contracts", data);
+      return await apiRequest("POST", "/api/fleet/contracts", parsed);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/fleet/contracts/group"] });
@@ -264,10 +295,11 @@ export default function FleetManagement() {
   // Create/Update Pricing Tier Mutation
   const pricingMutation = useMutation({
     mutationFn: async (data: PricingTierFormData) => {
+      const parsed = pricingTierFormSchema.parse(data);
       if (editingPricingId) {
-        return await apiRequest("PATCH", `/api/fleet/pricing-tiers/${editingPricingId}`, data);
+        return await apiRequest("PATCH", `/api/fleet/pricing-tiers/${editingPricingId}`, parsed);
       }
-      return await apiRequest("POST", "/api/fleet/pricing-tiers", data);
+      return await apiRequest("POST", "/api/fleet/pricing-tiers", parsed);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/fleet/pricing-tiers"] });
@@ -284,10 +316,11 @@ export default function FleetManagement() {
   // Create/Update Maintenance Schedule Mutation
   const scheduleMutation = useMutation({
     mutationFn: async (data: MaintenanceScheduleFormData) => {
+      const parsed = maintenanceScheduleFormSchema.parse(data);
       if (editingScheduleId) {
-        return await apiRequest("PATCH", `/api/fleet/maintenance-schedules/${editingScheduleId}`, data);
+        return await apiRequest("PATCH", `/api/fleet/maintenance-schedules/${editingScheduleId}`, parsed);
       }
-      return await apiRequest("POST", "/api/fleet/maintenance-schedules", data);
+      return await apiRequest("POST", "/api/fleet/maintenance-schedules", parsed);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/fleet/maintenance-schedules/group"] });
@@ -307,6 +340,14 @@ export default function FleetManagement() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/fleet/groups"] });
       toast({ title: "Fleet Group Deleted", description: "Group removed successfully" });
+    },
+  });
+
+  const deleteVehicleMutation = useMutation({
+    mutationFn: (id: string) => apiRequest("DELETE", `/api/fleet/vehicles/${id}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/fleet/vehicles/group"] });
+      toast({ title: "Fleet Vehicle Removed", description: "Vehicle removed from fleet" });
     },
   });
 
@@ -334,7 +375,7 @@ export default function FleetManagement() {
     },
   });
 
-  const handleEditGroup = (group: any) => {
+  const handleEditGroup = (group: FleetGroup) => {
     setEditingGroupId(group.id);
     groupForm.reset({
       fleetName: group.fleetName,
@@ -344,7 +385,7 @@ export default function FleetManagement() {
       contactPhone: group.contactPhone || "",
       billingAddress: group.billingAddress || "",
       taxId: group.taxId || "",
-      discountPercentage: group.discountPercentage || "0",
+      discountPercentage: group.discountPercentage?.toString() || "0",
       paymentTerms: group.paymentTerms || "net_30",
       preferredPaymentMethod: group.preferredPaymentMethod || "",
       notes: group.notes || "",
@@ -352,7 +393,18 @@ export default function FleetManagement() {
     setIsGroupDialogOpen(true);
   };
 
-  const handleEditContract = (contract: any) => {
+  const handleEditVehicle = (vehicle: any) => {
+    setEditingVehicleId(vehicle.fleetVehicle.id);
+    vehicleForm.reset({
+      fleetGroupId: vehicle.fleetVehicle.fleetGroupId,
+      vehicleId: vehicle.fleetVehicle.vehicleId,
+      assignedMileage: vehicle.fleetVehicle.assignedMileage?.toString() || "",
+      notes: vehicle.fleetVehicle.notes || "",
+    });
+    setIsVehicleDialogOpen(true);
+  };
+
+  const handleEditContract = (contract: FleetContract) => {
     setEditingContractId(contract.id);
     contractForm.reset({
       fleetGroupId: contract.fleetGroupId,
@@ -360,8 +412,8 @@ export default function FleetManagement() {
       contractType: contract.contractType,
       startDate: contract.startDate ? format(new Date(contract.startDate), "yyyy-MM-dd") : "",
       endDate: contract.endDate ? format(new Date(contract.endDate), "yyyy-MM-dd") : "",
-      numberOfVehicles: String(contract.numberOfVehicles),
-      discountPercentage: contract.discountPercentage || "0",
+      numberOfVehicles: contract.numberOfVehicles.toString(),
+      discountPercentage: contract.discountPercentage?.toString() || "0",
       paymentTerms: contract.paymentTerms || "net_30",
       billingCycle: contract.billingCycle || "monthly",
       terms: contract.terms || "",
@@ -370,22 +422,22 @@ export default function FleetManagement() {
     setIsContractDialogOpen(true);
   };
 
-  const handleEditPricing = (tier: any) => {
+  const handleEditPricing = (tier: FleetPricingTier) => {
     setEditingPricingId(tier.id);
     pricingForm.reset({
       fleetGroupId: tier.fleetGroupId || "",
       tierName: tier.tierName,
       description: tier.description || "",
-      minVehicles: String(tier.minVehicles),
-      maxVehicles: tier.maxVehicles ? String(tier.maxVehicles) : "",
-      discountPercentage: tier.discountPercentage || "0",
+      minVehicles: tier.minVehicles.toString(),
+      maxVehicles: tier.maxVehicles?.toString() || "",
+      discountPercentage: tier.discountPercentage.toString(),
       serviceTypes: tier.serviceTypes?.join(", ") || "",
       isActive: tier.isActive,
     });
     setIsPricingDialogOpen(true);
   };
 
-  const handleEditSchedule = (schedule: any) => {
+  const handleEditSchedule = (schedule: FleetMaintenanceSchedule) => {
     setEditingScheduleId(schedule.id);
     scheduleForm.reset({
       fleetGroupId: schedule.fleetGroupId,
@@ -393,9 +445,9 @@ export default function FleetManagement() {
       description: schedule.description || "",
       serviceType: schedule.serviceType,
       intervalType: schedule.intervalType,
-      intervalMileage: schedule.intervalMileage ? String(schedule.intervalMileage) : "",
-      intervalMonths: schedule.intervalMonths ? String(schedule.intervalMonths) : "",
-      estimatedCost: schedule.estimatedCost || "",
+      intervalMileage: schedule.intervalMileage?.toString() || "",
+      intervalMonths: schedule.intervalMonths?.toString() || "",
+      estimatedCost: schedule.estimatedCost?.toString() || "",
     });
     setIsScheduleDialogOpen(true);
   };
@@ -415,25 +467,25 @@ export default function FleetManagement() {
 
       <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full">
         <TabsList className="grid w-full grid-cols-5 bg-salis-gray-light dark:bg-salis-gray-dark">
-          <TabsTrigger value="groups" className="flex items-center gap-2">
+          <TabsTrigger value="groups" className="flex items-center gap-2" data-testid="tab-fleet-groups">
             <Building2 className="h-4 w-4" />
             Fleet Groups
           </TabsTrigger>
-          <TabsTrigger value="contracts" className="flex items-center gap-2">
+          <TabsTrigger value="vehicles" className="flex items-center gap-2" data-testid="tab-fleet-vehicles">
+            <Car className="h-4 w-4" />
+            Fleet Vehicles
+          </TabsTrigger>
+          <TabsTrigger value="contracts" className="flex items-center gap-2" data-testid="tab-contracts">
             <FileText className="h-4 w-4" />
             Contracts
           </TabsTrigger>
-          <TabsTrigger value="pricing" className="flex items-center gap-2">
+          <TabsTrigger value="pricing" className="flex items-center gap-2" data-testid="tab-pricing">
             <DollarSign className="h-4 w-4" />
             Pricing Tiers
           </TabsTrigger>
-          <TabsTrigger value="schedules" className="flex items-center gap-2">
+          <TabsTrigger value="schedules" className="flex items-center gap-2" data-testid="tab-schedules">
             <Calendar className="h-4 w-4" />
             Maintenance Schedules
-          </TabsTrigger>
-          <TabsTrigger value="vehicles" className="flex items-center gap-2">
-            <Car className="h-4 w-4" />
-            Vehicles
           </TabsTrigger>
         </TabsList>
 
@@ -484,7 +536,7 @@ export default function FleetManagement() {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  fleetGroups.map((group: any) => (
+                  fleetGroups.map((group) => (
                     <TableRow key={group.id} className="border-b border-salis-gray-light dark:border-salis-gray-dark" data-testid={`row-fleet-group-${group.id}`}>
                       <TableCell className="font-medium text-salis-black dark:text-white">
                         {group.fleetName}
@@ -529,6 +581,110 @@ export default function FleetManagement() {
           </div>
         </TabsContent>
 
+        {/* Fleet Vehicles Tab */}
+        <TabsContent value="vehicles" className="space-y-4">
+          <div className="flex justify-between items-center">
+            <h2 className="text-xl font-semibold text-salis-black dark:text-white">
+              Fleet Vehicles
+            </h2>
+            <div className="flex gap-4">
+              <Select value={selectedGroupId} onValueChange={setSelectedGroupId}>
+                <SelectTrigger className="w-64" data-testid="select-vehicle-fleet-group">
+                  <SelectValue placeholder="Select Fleet Group" />
+                </SelectTrigger>
+                <SelectContent>
+                  {fleetGroups.map((group) => (
+                    <SelectItem key={group.id} value={group.id}>
+                      {group.fleetName}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Button
+                onClick={() => {
+                  setEditingVehicleId(null);
+                  vehicleForm.reset({ fleetGroupId: selectedGroupId });
+                  setIsVehicleDialogOpen(true);
+                }}
+                className="bg-salis-black dark:bg-white text-white dark:text-salis-black"
+                disabled={!selectedGroupId}
+                data-testid="button-add-fleet-vehicle"
+              >
+                <Plus className="mr-2 h-4 w-4" />
+                Add Vehicle
+              </Button>
+            </div>
+          </div>
+
+          <div className="border border-salis-gray-light dark:border-salis-gray-dark rounded-lg">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-salis-gray-light dark:bg-salis-gray-dark">
+                  <TableHead className="text-salis-black dark:text-white">Vehicle</TableHead>
+                  <TableHead className="text-salis-black dark:text-white">Make/Model</TableHead>
+                  <TableHead className="text-salis-black dark:text-white">License Plate</TableHead>
+                  <TableHead className="text-salis-black dark:text-white">Assigned Mileage</TableHead>
+                  <TableHead className="text-salis-black dark:text-white">Assigned Date</TableHead>
+                  <TableHead className="text-salis-black dark:text-white text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {!selectedGroupId ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center text-salis-gray">
+                      Select a fleet group to view vehicles
+                    </TableCell>
+                  </TableRow>
+                ) : fleetVehicles.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center text-salis-gray">
+                      No vehicles assigned to this fleet group
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  fleetVehicles.map((vehicle: any) => (
+                    <TableRow key={vehicle.fleetVehicle.id} className="border-b border-salis-gray-light dark:border-salis-gray-dark" data-testid={`row-fleet-vehicle-${vehicle.fleetVehicle.id}`}>
+                      <TableCell className="font-medium text-salis-black dark:text-white">
+                        {vehicle.vehicle?.year} {vehicle.vehicle?.make} {vehicle.vehicle?.model}
+                      </TableCell>
+                      <TableCell className="text-salis-gray">
+                        {vehicle.vehicle?.make} {vehicle.vehicle?.model}
+                      </TableCell>
+                      <TableCell className="text-salis-gray">{vehicle.vehicle?.licensePlate || "—"}</TableCell>
+                      <TableCell className="text-salis-gray">
+                        {vehicle.fleetVehicle.assignedMileage ? `${vehicle.fleetVehicle.assignedMileage} km` : "—"}
+                      </TableCell>
+                      <TableCell className="text-salis-gray">
+                        {vehicle.fleetVehicle.assignedAt ? format(new Date(vehicle.fleetVehicle.assignedAt), "MMM dd, yyyy") : "—"}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleEditVehicle(vehicle)}
+                            data-testid={`button-edit-fleet-vehicle-${vehicle.fleetVehicle.id}`}
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => deleteVehicleMutation.mutate(vehicle.fleetVehicle.id)}
+                            data-testid={`button-delete-fleet-vehicle-${vehicle.fleetVehicle.id}`}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
+        </TabsContent>
+
         {/* Contracts Tab */}
         <TabsContent value="contracts" className="space-y-4">
           <div className="flex justify-between items-center">
@@ -537,11 +693,11 @@ export default function FleetManagement() {
             </h2>
             <div className="flex gap-4">
               <Select value={selectedGroupId} onValueChange={setSelectedGroupId}>
-                <SelectTrigger className="w-64">
+                <SelectTrigger className="w-64" data-testid="select-contract-fleet-group">
                   <SelectValue placeholder="Select Fleet Group" />
                 </SelectTrigger>
                 <SelectContent>
-                  {fleetGroups.map((group: any) => (
+                  {fleetGroups.map((group) => (
                     <SelectItem key={group.id} value={group.id}>
                       {group.fleetName}
                     </SelectItem>
@@ -591,7 +747,7 @@ export default function FleetManagement() {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  contracts.map((contract: any) => (
+                  contracts.map((contract) => (
                     <TableRow key={contract.id} className="border-b border-salis-gray-light dark:border-salis-gray-dark" data-testid={`row-contract-${contract.id}`}>
                       <TableCell className="font-medium text-salis-black dark:text-white">
                         {contract.contractNumber}
@@ -678,7 +834,7 @@ export default function FleetManagement() {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  pricingTiers.map((tier: any) => (
+                  pricingTiers.map((tier) => (
                     <TableRow key={tier.id} className="border-b border-salis-gray-light dark:border-salis-gray-dark" data-testid={`row-pricing-tier-${tier.id}`}>
                       <TableCell className="font-medium text-salis-black dark:text-white">
                         {tier.tierName}
@@ -731,11 +887,11 @@ export default function FleetManagement() {
             </h2>
             <div className="flex gap-4">
               <Select value={selectedGroupId} onValueChange={setSelectedGroupId}>
-                <SelectTrigger className="w-64">
+                <SelectTrigger className="w-64" data-testid="select-schedule-fleet-group">
                   <SelectValue placeholder="Select Fleet Group" />
                 </SelectTrigger>
                 <SelectContent>
-                  {fleetGroups.map((group: any) => (
+                  {fleetGroups.map((group) => (
                     <SelectItem key={group.id} value={group.id}>
                       {group.fleetName}
                     </SelectItem>
@@ -785,7 +941,7 @@ export default function FleetManagement() {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  schedules.map((schedule: any) => (
+                  schedules.map((schedule) => (
                     <TableRow key={schedule.id} className="border-b border-salis-gray-light dark:border-salis-gray-dark" data-testid={`row-schedule-${schedule.id}`}>
                       <TableCell className="font-medium text-salis-black dark:text-white">
                         {schedule.scheduleName}
@@ -793,10 +949,10 @@ export default function FleetManagement() {
                       <TableCell className="text-salis-gray">{schedule.serviceType}</TableCell>
                       <TableCell className="text-salis-gray capitalize">{schedule.intervalType}</TableCell>
                       <TableCell className="text-salis-gray">
-                        {schedule.intervalType === "mileage" && `${schedule.intervalMileage} km`}
-                        {schedule.intervalType === "time" && `${schedule.intervalMonths} months`}
+                        {schedule.intervalType === "mileage" && schedule.intervalMileage && `${schedule.intervalMileage} km`}
+                        {schedule.intervalType === "time" && schedule.intervalMonths && `${schedule.intervalMonths} months`}
                         {schedule.intervalType === "both" &&
-                          `${schedule.intervalMileage} km / ${schedule.intervalMonths} months`}
+                          `${schedule.intervalMileage || 0} km / ${schedule.intervalMonths || 0} months`}
                       </TableCell>
                       <TableCell className="text-salis-gray">
                         ${schedule.estimatedCost || "—"}
@@ -834,19 +990,6 @@ export default function FleetManagement() {
                 )}
               </TableBody>
             </Table>
-          </div>
-        </TabsContent>
-
-        {/* Vehicles Tab - Placeholder */}
-        <TabsContent value="vehicles" className="space-y-4">
-          <div className="text-center py-12">
-            <Car className="h-16 w-16 mx-auto text-salis-gray mb-4" />
-            <h3 className="text-xl font-semibold text-salis-black dark:text-white mb-2">
-              Fleet Vehicle Management
-            </h3>
-            <p className="text-salis-gray">
-              Assign and manage vehicles for fleet groups. This feature integrates with the main Vehicle Management system.
-            </p>
           </div>
         </TabsContent>
       </Tabs>
@@ -1016,7 +1159,7 @@ export default function FleetManagement() {
                   type="button"
                   variant="outline"
                   onClick={() => setIsGroupDialogOpen(false)}
-                  data-testid="button-cancel"
+                  data-testid="button-cancel-group"
                 >
                   Cancel
                 </Button>
@@ -1038,7 +1181,96 @@ export default function FleetManagement() {
         </DialogContent>
       </Dialog>
 
-      {/* Contract Dialog - Simplified for brevity */}
+      {/* Fleet Vehicle Dialog */}
+      <Dialog open={isVehicleDialogOpen} onOpenChange={setIsVehicleDialogOpen}>
+        <DialogContent className="max-w-2xl bg-white dark:bg-salis-black">
+          <DialogHeader>
+            <DialogTitle className="text-salis-black dark:text-white">
+              {editingVehicleId ? "Edit Fleet Vehicle" : "Add Fleet Vehicle"}
+            </DialogTitle>
+            <DialogDescription className="text-salis-gray">
+              Assign a vehicle to this fleet group
+            </DialogDescription>
+          </DialogHeader>
+          <Form {...vehicleForm}>
+            <form
+              onSubmit={vehicleForm.handleSubmit((data) => vehicleMutation.mutate(data))}
+              className="space-y-4"
+            >
+              <FormField
+                control={vehicleForm.control}
+                name="vehicleId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-salis-black dark:text-white">Vehicle *</FormLabel>
+                    <FormControl>
+                      <Select value={field.value} onValueChange={field.onChange}>
+                        <SelectTrigger data-testid="select-vehicle">
+                          <SelectValue placeholder="Select vehicle" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {allVehicles.map((vehicle: any) => (
+                            <SelectItem key={vehicle.id} value={vehicle.id}>
+                              {vehicle.year} {vehicle.make} {vehicle.model} - {vehicle.licensePlate}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={vehicleForm.control}
+                name="assignedMileage"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-salis-black dark:text-white">Assigned Mileage (km)</FormLabel>
+                    <FormControl>
+                      <Input {...field} type="number" placeholder="50000" data-testid="input-assigned-mileage" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={vehicleForm.control}
+                name="notes"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-salis-black dark:text-white">Notes</FormLabel>
+                    <FormControl>
+                      <Textarea {...field} placeholder="Assignment notes..." data-testid="input-vehicle-notes" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <DialogFooter>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsVehicleDialogOpen(false)}
+                  data-testid="button-cancel-vehicle"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={vehicleMutation.isPending}
+                  className="bg-salis-black dark:bg-white text-white dark:text-salis-black"
+                  data-testid="button-submit-fleet-vehicle"
+                >
+                  {vehicleMutation.isPending ? "Saving..." : editingVehicleId ? "Update" : "Add"}
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Contract Dialog */}
       <Dialog open={isContractDialogOpen} onOpenChange={setIsContractDialogOpen}>
         <DialogContent className="max-w-2xl bg-white dark:bg-salis-black">
           <DialogHeader>
@@ -1145,6 +1377,7 @@ export default function FleetManagement() {
                   type="button"
                   variant="outline"
                   onClick={() => setIsContractDialogOpen(false)}
+                  data-testid="button-cancel-contract"
                 >
                   Cancel
                 </Button>
@@ -1162,7 +1395,7 @@ export default function FleetManagement() {
         </DialogContent>
       </Dialog>
 
-      {/* Pricing Tier Dialog - Simplified */}
+      {/* Pricing Tier Dialog */}
       <Dialog open={isPricingDialogOpen} onOpenChange={setIsPricingDialogOpen}>
         <DialogContent className="max-w-2xl bg-white dark:bg-salis-black">
           <DialogHeader>
@@ -1247,6 +1480,7 @@ export default function FleetManagement() {
                   type="button"
                   variant="outline"
                   onClick={() => setIsPricingDialogOpen(false)}
+                  data-testid="button-cancel-pricing"
                 >
                   Cancel
                 </Button>
@@ -1264,7 +1498,7 @@ export default function FleetManagement() {
         </DialogContent>
       </Dialog>
 
-      {/* Maintenance Schedule Dialog - Simplified */}
+      {/* Maintenance Schedule Dialog */}
       <Dialog open={isScheduleDialogOpen} onOpenChange={setIsScheduleDialogOpen}>
         <DialogContent className="max-w-2xl bg-white dark:bg-salis-black">
           <DialogHeader>
@@ -1384,6 +1618,7 @@ export default function FleetManagement() {
                   type="button"
                   variant="outline"
                   onClick={() => setIsScheduleDialogOpen(false)}
+                  data-testid="button-cancel-schedule"
                 >
                   Cancel
                 </Button>
