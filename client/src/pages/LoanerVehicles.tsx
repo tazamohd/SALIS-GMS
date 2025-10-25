@@ -304,36 +304,51 @@ export default function LoanerVehicles() {
     setIsReservationDialogOpen(true);
   };
 
-  const getStatusBadgeVariant = (status: string) => {
-    switch (status) {
-      case "available": return "default";
-      case "reserved": return "secondary";
-      case "on_loan": return "default";
-      case "maintenance": return "outline";
-      case "retired": return "outline";
-      default: return "secondary";
-    }
+  const getLoanerStatusBadge = (status: string, loanerId: string) => {
+    const statusColors: Record<string, string> = {
+      available: "bg-salis-black text-white dark:bg-white dark:text-salis-black",
+      reserved: "bg-salis-50-black text-white",
+      on_loan: "bg-salis-gray text-white",
+      maintenance: "bg-salis-gray-light text-salis-black dark:bg-salis-gray-dark dark:text-white",
+      retired: "bg-salis-gray-light text-salis-black dark:bg-salis-gray-dark dark:text-white",
+    };
+    
+    return (
+      <Badge className={statusColors[status] || "bg-salis-gray text-white"} data-testid={`badge-loaner-status-${loanerId}`}>
+        {status}
+      </Badge>
+    );
   };
 
-  const getConditionBadgeVariant = (condition: string) => {
-    switch (condition) {
-      case "excellent": return "default";
-      case "good": return "secondary";
-      case "fair": return "outline";
-      case "poor": return "destructive";
-      default: return "secondary";
-    }
+  const getConditionBadge = (condition: string, loanerId: string) => {
+    const conditionColors: Record<string, string> = {
+      excellent: "bg-salis-black text-white dark:bg-white dark:text-salis-black",
+      good: "bg-salis-50-black text-white",
+      fair: "bg-salis-gray text-white",
+      poor: "bg-salis-gray-light text-salis-black dark:bg-salis-gray-dark dark:text-white",
+    };
+    
+    return (
+      <Badge className={conditionColors[condition] || "bg-salis-gray text-white"} data-testid={`badge-condition-${loanerId}`}>
+        {condition}
+      </Badge>
+    );
   };
 
-  const getReservationStatusBadgeVariant = (status: string) => {
-    switch (status) {
-      case "reserved": return "secondary";
-      case "active": return "default";
-      case "returned": return "default";
-      case "late": return "destructive";
-      case "cancelled": return "outline";
-      default: return "secondary";
-    }
+  const getReservationStatusBadge = (status: string, reservationId: string) => {
+    const statusColors: Record<string, string> = {
+      reserved: "bg-salis-50-black text-white",
+      active: "bg-salis-gray text-white",
+      returned: "bg-salis-black text-white dark:bg-white dark:text-salis-black",
+      late: "bg-salis-gray text-white",
+      cancelled: "bg-salis-gray-light text-salis-black dark:bg-salis-gray-dark dark:text-white",
+    };
+    
+    return (
+      <Badge className={statusColors[status] || "bg-salis-gray text-white"} data-testid={`badge-reservation-status-${reservationId}`}>
+        {status}
+      </Badge>
+    );
   };
 
   return (
@@ -408,20 +423,10 @@ export default function LoanerVehicles() {
                         </TableCell>
                         <TableCell>{loaner.licensePlate ?? "N/A"}</TableCell>
                         <TableCell>
-                          <Badge
-                            variant={getConditionBadgeVariant(loaner.condition ?? "good")}
-                            data-testid={`badge-condition-${loaner.id}`}
-                          >
-                            {loaner.condition ?? "good"}
-                          </Badge>
+                          {getConditionBadge(loaner.condition ?? "good", loaner.id)}
                         </TableCell>
                         <TableCell>
-                          <Badge
-                            variant={getStatusBadgeVariant(loaner.status ?? "available")}
-                            data-testid={`badge-loaner-status-${loaner.id}`}
-                          >
-                            {loaner.status ?? "available"}
-                          </Badge>
+                          {getLoanerStatusBadge(loaner.status ?? "available", loaner.id)}
                         </TableCell>
                         <TableCell>${loaner.dailyRate ?? "0.00"}</TableCell>
                         <TableCell>${loaner.depositAmount ?? "0.00"}</TableCell>
@@ -522,12 +527,7 @@ export default function LoanerVehicles() {
                               : "N/A"}
                           </TableCell>
                           <TableCell>
-                            <Badge
-                              variant={getReservationStatusBadgeVariant(reservation.status ?? "reserved")}
-                              data-testid={`badge-reservation-status-${reservation.id}`}
-                            >
-                              {reservation.status ?? "reserved"}
-                            </Badge>
+                            {getReservationStatusBadge(reservation.status ?? "reserved", reservation.id)}
                           </TableCell>
                           <TableCell>${reservation.depositPaid ?? "0.00"}</TableCell>
                           <TableCell>${reservation.totalCost ?? "0.00"}</TableCell>

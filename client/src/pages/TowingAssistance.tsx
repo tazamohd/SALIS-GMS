@@ -289,17 +289,17 @@ export default function TowingAssistance() {
 
   const getRequestStatusBadge = (status: string, requestId: string) => {
     const statusColors: Record<string, string> = {
-      requested: "bg-yellow-600 dark:bg-yellow-500",
-      assigned: "bg-blue-600 dark:bg-blue-500",
-      en_route: "bg-cyan-600 dark:bg-cyan-500",
-      arrived: "bg-green-600 dark:bg-green-500",
-      in_progress: "bg-purple-600 dark:bg-purple-500",
-      completed: "bg-green-600 dark:bg-green-500",
-      cancelled: "bg-red-600 dark:bg-red-500",
+      requested: "bg-salis-gray-light text-salis-black dark:bg-salis-gray-dark dark:text-white",
+      assigned: "bg-salis-50-black text-white",
+      en_route: "bg-salis-gray text-white",
+      arrived: "bg-salis-black text-white dark:bg-white dark:text-salis-black",
+      in_progress: "bg-salis-50-black text-white",
+      completed: "bg-salis-black text-white dark:bg-white dark:text-salis-black",
+      cancelled: "bg-salis-gray text-white",
     };
     
     return (
-      <Badge className={`${statusColors[status] || "bg-salis-gray"} text-white`} data-testid={`badge-request-status-${requestId}`}>
+      <Badge className={statusColors[status] || "bg-salis-gray text-white"} data-testid={`badge-request-status-${requestId}`}>
         {status.replace("_", " ").toUpperCase()}
       </Badge>
     );
@@ -307,13 +307,13 @@ export default function TowingAssistance() {
 
   const getUrgencyBadge = (urgency: string, requestId: string) => {
     const urgencyColors: Record<string, string> = {
-      normal: "bg-gray-500 dark:bg-gray-400",
-      urgent: "bg-orange-600 dark:bg-orange-500",
-      emergency: "bg-red-600 dark:bg-red-500",
+      normal: "bg-salis-gray-light text-salis-black dark:bg-salis-gray-dark dark:text-white",
+      urgent: "bg-salis-50-black text-white",
+      emergency: "bg-salis-black text-white dark:bg-white dark:text-salis-black",
     };
     
     return (
-      <Badge className={`${urgencyColors[urgency] || "bg-salis-gray"} text-white`} data-testid={`badge-urgency-${requestId}`}>
+      <Badge className={urgencyColors[urgency] || "bg-salis-gray text-white"} data-testid={`badge-urgency-${requestId}`}>
         {urgency.toUpperCase()}
       </Badge>
     );
@@ -321,14 +321,14 @@ export default function TowingAssistance() {
 
   const getTruckStatusBadge = (status: string, truckId: string) => {
     const statusColors: Record<string, string> = {
-      available: "bg-green-600 dark:bg-green-500",
-      on_job: "bg-blue-600 dark:bg-blue-500",
-      maintenance: "bg-yellow-600 dark:bg-yellow-500",
-      offline: "bg-gray-500 dark:bg-gray-400",
+      available: "bg-salis-black text-white dark:bg-white dark:text-salis-black",
+      on_job: "bg-salis-50-black text-white",
+      maintenance: "bg-salis-gray text-white",
+      offline: "bg-salis-gray-light text-salis-black dark:bg-salis-gray-dark dark:text-white",
     };
     
     return (
-      <Badge className={`${statusColors[status] || "bg-salis-gray"} text-white`} data-testid={`badge-truck-status-${truckId}`}>
+      <Badge className={statusColors[status] || "bg-salis-gray text-white"} data-testid={`badge-truck-status-${truckId}`}>
         {status.replace("_", " ").toUpperCase()}
       </Badge>
     );
@@ -438,7 +438,7 @@ export default function TowingAssistance() {
                             onClick={() => deleteRequestMutation.mutate(request.id)}
                             data-testid={`button-delete-request-${request.id}`}
                           >
-                            <Trash2 className="w-4 h-4 text-red-600" />
+                            <Trash2 className="w-4 h-4 text-salis-gray" />
                           </Button>
                         </div>
                       </TableCell>
@@ -527,7 +527,7 @@ export default function TowingAssistance() {
                             onClick={() => deleteTruckMutation.mutate(truck.id)}
                             data-testid={`button-delete-truck-${truck.id}`}
                           >
-                            <Trash2 className="w-4 h-4 text-red-600" />
+                            <Trash2 className="w-4 h-4 text-salis-gray" />
                           </Button>
                         </div>
                       </TableCell>

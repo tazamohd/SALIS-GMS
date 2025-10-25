@@ -316,14 +316,14 @@ export default function VehicleInspections() {
 
   const getStatusBadge = (status: string, id: string) => {
     const statusColors: Record<string, string> = {
-      in_progress: "bg-salis-gray dark:bg-salis-gray-light",
-      completed: "bg-salis-black dark:bg-white",
-      passed: "bg-salis-black dark:bg-white",
-      failed: "bg-salis-gray dark:bg-salis-gray-light",
+      in_progress: "bg-salis-50-black text-white",
+      completed: "bg-salis-black text-white dark:bg-white dark:text-salis-black",
+      passed: "bg-salis-black text-white dark:bg-white dark:text-salis-black",
+      failed: "bg-salis-gray text-white",
     };
     
     return (
-      <Badge className={`${statusColors[status] || "bg-salis-gray"} text-white dark:text-salis-black`} data-testid={`badge-inspection-status-${id}`}>
+      <Badge className={statusColors[status] || "bg-salis-gray text-white"} data-testid={`badge-inspection-status-${id}`}>
         {status.replace("_", " ").toUpperCase()}
       </Badge>
     );
