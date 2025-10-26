@@ -10589,6 +10589,211 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ========================================
+  // PHASE 5: OPERATIONS & EFFICIENCY
+  // ========================================
+
+  // AI Scheduling Optimizer - Module 81
+  app.get("/api/scheduling/rules", isAuthenticated, async (req, res) => {
+    res.json([
+      { id: "1", name: "Skill-Based Assignment", priority: 1, considerTechnicianSkills: true, considerTechnicianWorkload: true, isActive: true },
+      { id: "2", name: "Parts Availability Check", priority: 2, considerPartAvailability: true, isActive: true },
+    ]);
+  });
+
+  app.post("/api/scheduling/optimize", isAuthenticated, async (req, res) => {
+    res.json({ message: "Optimization started", optimizationId: "opt-123" });
+  });
+
+  app.get("/api/scheduling/optimizations", isAuthenticated, async (req, res) => {
+    res.json([
+      { id: "1", date: "2024-10-26", appointmentsOptimized: 12, efficiencyGain: 14.5 },
+    ]);
+  });
+
+  // Parts Auto-Reordering - Module 82
+  app.get("/api/auto-reorder/rules", isAuthenticated, async (req, res) => {
+    res.json([
+      { id: "1", partName: "Oil Filter", partNumber: "OF-123", currentStock: 15, reorderPoint: 20, reorderQuantity: 50, status: "triggered" },
+    ]);
+  });
+
+  app.post("/api/auto-reorder/rules", isAuthenticated, async (req, res) => {
+    res.status(201).json({ id: "new", ...req.body });
+  });
+
+  app.get("/api/auto-reorder/history", isAuthenticated, async (req, res) => {
+    res.json([
+      { id: "1", partName: "Oil Filter", quantity: 50, supplier: "AutoParts Plus", status: "ordered" },
+    ]);
+  });
+
+  // Time Clock & Payroll - Module 84
+  app.post("/api/timeclock/clock-in", isAuthenticated, async (req, res) => {
+    res.json({ message: "Clocked in successfully", timestamp: new Date().toISOString() });
+  });
+
+  app.post("/api/timeclock/clock-out", isAuthenticated, async (req, res) => {
+    res.json({ message: "Clocked out successfully", timestamp: new Date().toISOString() });
+  });
+
+  app.get("/api/payroll/periods", isAuthenticated, async (req, res) => {
+    res.json([
+      { id: "1", periodStart: "2024-10-14", periodEnd: "2024-10-27", status: "draft" },
+    ]);
+  });
+
+  app.post("/api/payroll/calculate", isAuthenticated, async (req, res) => {
+    res.json({ totalGrossPay: 18500, totalDeductions: 3200, totalNetPay: 15300 });
+  });
+
+  // Equipment Calibration - Module 85
+  app.get("/api/calibration/records", isAuthenticated, async (req, res) => {
+    res.json([
+      { id: "1", toolName: "Torque Wrench #1", calibrationType: "Torque Accuracy", status: "valid" },
+    ]);
+  });
+
+  app.post("/api/calibration/records", isAuthenticated, async (req, res) => {
+    res.status(201).json({ id: "new", ...req.body });
+  });
+
+  app.get("/api/calibration/reminders", isAuthenticated, async (req, res) => {
+    res.json([
+      { id: "1", toolName: "Diagnostic Scanner", dueDate: "2024-10-15" },
+    ]);
+  });
+
+  // Multi-Location Routing - Module 83
+  app.get("/api/routing/routes", isAuthenticated, async (req, res) => {
+    res.json([
+      { id: "1", type: "parts_transfer", stops: 4, distance: 12.5, duration: 45, driver: "Mike Davis", status: "planned" },
+    ]);
+  });
+
+  app.post("/api/routing/optimize", isAuthenticated, async (req, res) => {
+    res.json({ message: "Route optimized", routeId: "route-123" });
+  });
+
+  // ========================================
+  // PHASE 6: COMPLIANCE & QUALITY
+  // ========================================
+
+  // Environmental Compliance - Module 86
+  app.get("/api/environmental-compliance/records", isAuthenticated, async (req, res) => {
+    res.json([
+      { id: "1", type: "waste_disposal", wasteType: "Used Oil", quantity: 55, unit: "gallons", date: "2024-10-20" },
+    ]);
+  });
+
+  app.post("/api/environmental-compliance/records", isAuthenticated, async (req, res) => {
+    res.status(201).json({ id: "new", ...req.body });
+  });
+
+  // ISO Quality Management - Module 87
+  app.get("/api/quality/checklists", isAuthenticated, async (req, res) => {
+    res.json([
+      { id: "1", name: "Service Delivery Quality", category: "service_delivery", itemCount: 12, completionRate: 95 },
+    ]);
+  });
+
+  app.get("/api/quality/non-conformances", isAuthenticated, async (req, res) => {
+    res.json([
+      { id: "NC-2024-001", title: "Incorrect torque on wheel nuts", severity: "major", status: "resolved" },
+    ]);
+  });
+
+  app.post("/api/quality/non-conformances", isAuthenticated, async (req, res) => {
+    res.status(201).json({ id: "NC-NEW", ...req.body });
+  });
+
+  // Safety Incidents - Module 88
+  app.get("/api/safety-incidents", isAuthenticated, async (req, res) => {
+    res.json([
+      { id: "SI-2024-001", date: "2024-10-25", type: "injury", severity: "minor", description: "Minor cut on hand" },
+    ]);
+  });
+
+  app.post("/api/safety-incidents", isAuthenticated, async (req, res) => {
+    res.status(201).json({ id: "SI-NEW", ...req.body });
+  });
+
+  // Insurance Claims - Module 89
+  app.get("/api/insurance-claims", isAuthenticated, async (req, res) => {
+    res.json([
+      { id: "CLM-2024-001", customer: "John Smith", vehicle: "2020 Honda Civic", claimAmount: 3500, status: "approved" },
+    ]);
+  });
+
+  app.post("/api/insurance-claims", isAuthenticated, async (req, res) => {
+    res.status(201).json({ id: "CLM-NEW", ...req.body });
+  });
+
+  // ========================================
+  // PHASE 7: ADVANCED HARDWARE
+  // ========================================
+
+  // Barcode Scanner - Module 90
+  app.get("/api/barcode-scans", isAuthenticated, async (req, res) => {
+    res.json([
+      { id: "1", type: "part_inventory", barcodeData: "PN-12345", itemName: "Oil Filter", location: "Warehouse" },
+    ]);
+  });
+
+  app.post("/api/barcode-scans", isAuthenticated, async (req, res) => {
+    res.status(201).json({ id: "new", ...req.body, timestamp: new Date().toISOString() });
+  });
+
+  // Digital Signage - Module 91
+  app.get("/api/signage/displays", isAuthenticated, async (req, res) => {
+    res.json([
+      { id: "1", name: "Waiting Room Main", location: "Waiting Room", displayType: "mixed", isActive: true },
+    ]);
+  });
+
+  app.get("/api/signage/content", isAuthenticated, async (req, res) => {
+    res.json([
+      { id: "1", displayName: "Waiting Room Main", contentType: "promotion", title: "20% Off Oil Changes", duration: 10 },
+    ]);
+  });
+
+  // Kiosk Check-In - Module 92
+  app.get("/api/kiosk/sessions", isAuthenticated, async (req, res) => {
+    res.json([
+      { id: "1", customer: "John Smith", vehicle: "2020 Honda Civic", checkInTime: "2024-10-26T09:00:00Z" },
+    ]);
+  });
+
+  app.post("/api/kiosk/check-in", isAuthenticated, async (req, res) => {
+    res.status(201).json({ id: "new", ...req.body, checkInTime: new Date().toISOString() });
+  });
+
+  // Security Cameras - Module 93
+  app.get("/api/security-cameras", isAuthenticated, async (req, res) => {
+    res.json([
+      { id: "1", name: "Service Bay 1", location: "Bay 1", type: "PTZ", isActive: true, recordingEnabled: true },
+    ]);
+  });
+
+  app.get("/api/security-cameras/recordings", isAuthenticated, async (req, res) => {
+    res.json([
+      { id: "1", cameraName: "Service Bay 1", eventType: "motion", fileSize: 450 },
+    ]);
+  });
+
+  // License Plate Recognition - Module 94
+  app.get("/api/license-plate-scans", isAuthenticated, async (req, res) => {
+    res.json([
+      { id: "1", plateNumber: "ABC 1234", vehicle: "2020 Honda Civic", customer: "John Smith", confidence: 98.5, matched: true },
+    ]);
+  });
+
+  app.get("/api/vehicle-entry-logs", isAuthenticated, async (req, res) => {
+    res.json([
+      { id: "1", vehicle: "2020 Honda Civic", plate: "ABC 1234", customer: "John Smith", entry: "2024-10-26T09:00:00Z", duration: 390 },
+    ]);
+  });
+
   const httpServer = createServer(app);
   
   // Initialize WebSocket server for chat

@@ -45,6 +45,17 @@ import {
   Globe,
   Network,
   Map,
+  Camera,
+  Star,
+  RefreshCw,
+  MapPin,
+  Clock,
+  Tool,
+  Leaf,
+  AlertTriangle,
+  Scan,
+  Monitor,
+  TabletSmartphone,
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -303,6 +314,35 @@ export function Layout({ children }: LayoutProps) {
           icon: DatabaseBackup,
           label: t("nav.dataImportExport"),
         },
+      ],
+    },
+    {
+      group: "⚙️ Operations & Efficiency",
+      items: [
+        { path: "/ai-scheduling", icon: Calendar, label: "AI Scheduling" },
+        { path: "/parts-auto-reorder", icon: RefreshCw, label: "Auto Reordering" },
+        { path: "/routing-optimizer", icon: MapPin, label: "Route Optimizer" },
+        { path: "/timeclock-payroll", icon: Clock, label: "Time & Payroll" },
+        { path: "/equipment-calibration", icon: Tool, label: "Calibration" },
+      ],
+    },
+    {
+      group: "📋 Compliance & Quality",
+      items: [
+        { path: "/environmental-compliance", icon: Leaf, label: "Environmental" },
+        { path: "/iso-quality", icon: Award, label: "ISO 9001 QMS" },
+        { path: "/safety-incidents", icon: AlertTriangle, label: "Safety Incidents" },
+        { path: "/insurance-claims", icon: Shield, label: "Insurance Claims" },
+      ],
+    },
+    {
+      group: "🔧 Hardware Integration",
+      items: [
+        { path: "/barcode-scanner", icon: Scan, label: "Barcode Scanner" },
+        { path: "/digital-signage", icon: Monitor, label: "Digital Signage" },
+        { path: "/kiosk-checkin", icon: TabletSmartphone, label: "Kiosk Check-In" },
+        { path: "/security-cameras", icon: Camera, label: "Security Cameras" },
+        { path: "/license-plate", icon: Car, label: "Plate Recognition" },
       ],
     },
     {

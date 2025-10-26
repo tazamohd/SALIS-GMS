@@ -72,6 +72,20 @@ import VideoEstimates from "@/pages/VideoEstimates";
 import DigitalVehicleWalkaround from "@/pages/DigitalVehicleWalkaround";
 import CustomerReviewsRatings from "@/pages/CustomerReviewsRatings";
 import ReferralProgram from "@/pages/ReferralProgram";
+import AIScheduling from "@/pages/AIScheduling";
+import PartsAutoReorder from "@/pages/PartsAutoReorder";
+import TimeClockPayroll from "@/pages/TimeClockPayroll";
+import EquipmentCalibration from "@/pages/EquipmentCalibration";
+import RoutingOptimizer from "@/pages/RoutingOptimizer";
+import SafetyIncidents from "@/pages/SafetyIncidents";
+import EnvironmentalCompliance from "@/pages/EnvironmentalCompliance";
+import ISOQualityManagement from "@/pages/ISOQualityManagement";
+import InsuranceClaims from "@/pages/InsuranceClaims";
+import BarcodeScanner from "@/pages/BarcodeScanner";
+import DigitalSignage from "@/pages/DigitalSignage";
+import KioskCheckIn from "@/pages/KioskCheckIn";
+import SecurityCameras from "@/pages/SecurityCameras";
+import LicensePlateRecognition from "@/pages/LicensePlateRecognition";
 import { CustomerDashboard } from "@/pages/customer/CustomerDashboard";
 import { CustomerAppointments } from "@/pages/customer/CustomerAppointments";
 import { CustomerInvoices } from "@/pages/customer/CustomerInvoices";
@@ -466,6 +480,76 @@ function Router() {
       <Route path="/referral-program">
         <Layout>
           <ReferralProgram />
+        </Layout>
+      </Route>
+      <Route path="/ai-scheduling">
+        <Layout>
+          <AIScheduling />
+        </Layout>
+      </Route>
+      <Route path="/parts-auto-reorder">
+        <Layout>
+          <PartsAutoReorder />
+        </Layout>
+      </Route>
+      <Route path="/timeclock-payroll">
+        <Layout>
+          <TimeClockPayroll />
+        </Layout>
+      </Route>
+      <Route path="/equipment-calibration">
+        <Layout>
+          <EquipmentCalibration />
+        </Layout>
+      </Route>
+      <Route path="/routing-optimizer">
+        <Layout>
+          <RoutingOptimizer />
+        </Layout>
+      </Route>
+      <Route path="/safety-incidents">
+        <Layout>
+          <SafetyIncidents />
+        </Layout>
+      </Route>
+      <Route path="/environmental-compliance">
+        <Layout>
+          <EnvironmentalCompliance />
+        </Layout>
+      </Route>
+      <Route path="/iso-quality">
+        <Layout>
+          <ISOQualityManagement />
+        </Layout>
+      </Route>
+      <Route path="/insurance-claims">
+        <Layout>
+          <InsuranceClaims />
+        </Layout>
+      </Route>
+      <Route path="/barcode-scanner">
+        <Layout>
+          <BarcodeScanner />
+        </Layout>
+      </Route>
+      <Route path="/digital-signage">
+        <Layout>
+          <DigitalSignage />
+        </Layout>
+      </Route>
+      <Route path="/kiosk-checkin">
+        <Layout>
+          <KioskCheckIn />
+        </Layout>
+      </Route>
+      <Route path="/security-cameras">
+        <Layout>
+          <SecurityCameras />
+        </Layout>
+      </Route>
+      <Route path="/license-plate">
+        <Layout>
+          <LicensePlateRecognition />
         </Layout>
       </Route>
       <Route component={NotFound} />
