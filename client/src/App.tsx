@@ -57,6 +57,7 @@ import AIChatbot from "@/pages/AIChatbot";
 import PredictiveMaintenance from "@/pages/PredictiveMaintenance";
 import SmartPartsRecommendations from "@/pages/SmartPartsRecommendations";
 import VoiceCommands from "@/pages/VoiceCommands";
+import DocumentOCR from "@/pages/DocumentOCR";
 import { CustomerDashboard } from "@/pages/customer/CustomerDashboard";
 import { CustomerAppointments } from "@/pages/customer/CustomerAppointments";
 import { CustomerInvoices } from "@/pages/customer/CustomerInvoices";
@@ -376,6 +377,11 @@ function Router() {
       <Route path="/voice-commands">
         <Layout>
           <VoiceCommands />
+        </Layout>
+      </Route>
+      <Route path="/document-ocr">
+        <Layout>
+          <DocumentOCR />
         </Layout>
       </Route>
       <Route component={NotFound} />

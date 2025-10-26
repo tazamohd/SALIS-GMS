@@ -266,6 +266,7 @@ export function Layout({ children }: LayoutProps) {
         { path: "/predictive-maintenance", icon: TrendingUp, label: "Predictive Maintenance" },
         { path: "/smart-parts-recommendations", icon: Package, label: "Smart Parts" },
         { path: "/voice-commands", icon: Radio, label: "Voice Commands" },
+        { path: "/document-ocr", icon: FileText, label: "Document OCR" },
         { path: "/integrations", icon: Plug2, label: t("nav.integrations") },
         {
           path: "/data-import-export",
