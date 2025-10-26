@@ -4265,3 +4265,254 @@ export const insertDemandForecastSchema = createInsertSchema(demandForecasts).om
   id: true,
   createdAt: true,
 });
+
+// ========================================
+// PHASE 3: ENHANCED INTEGRATIONS
+// ========================================
+
+// Module 71: Accounting Integration (QuickBooks/Xero)
+export const accountingSync = pgTable("accounting_sync", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  provider: varchar("provider", { length: 50 }).notNull(), // quickbooks, xero
+  syncType: varchar("sync_type", { length: 100 }).notNull(), // invoices, payments, expenses, customers
+  entityType: varchar("entity_type", { length: 100 }).notNull(), // Invoice, Payment, etc.
+  localId: varchar("local_id").notNull(), // ID in our system
+  externalId: varchar("external_id"), // ID in accounting system
+  status: varchar("status", { length: 50 }).default("pending"), // pending, synced, failed
+  syncDirection: varchar("sync_direction", { length: 50 }), // to_accounting, from_accounting, bidirectional
+  lastSyncedAt: timestamp("last_synced_at"),
+  errorMessage: text("error_message"),
+  metadata: jsonb("metadata"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const accountingConnections = pgTable("accounting_connections", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  provider: varchar("provider", { length: 50 }).notNull(),
+  companyId: varchar("company_id").notNull(),
+  companyName: varchar("company_name"),
+  accessToken: text("access_token"), // encrypted
+  refreshToken: text("refresh_token"), // encrypted
+  tokenExpiry: timestamp("token_expiry"),
+  isActive: boolean("is_active").default(true),
+  syncSettings: jsonb("sync_settings"), // auto-sync preferences
+  lastSyncAt: timestamp("last_sync_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Module 72: Email Marketing Integration
+export const emailCampaigns = pgTable("email_campaigns", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  name: varchar("name").notNull(),
+  subject: varchar("subject").notNull(),
+  template: text("template").notNull(),
+  provider: varchar("provider", { length: 50 }).default("sendgrid"), // mailchimp, sendgrid
+  targetAudience: varchar("target_audience", { length: 100 }), // all, new_customers, inactive, vip
+  customerSegment: jsonb("customer_segment"), // filtering criteria
+  scheduledAt: timestamp("scheduled_at"),
+  sentAt: timestamp("sent_at"),
+  status: varchar("status", { length: 50 }).default("draft"), // draft, scheduled, sending, sent, failed
+  totalRecipients: integer("total_recipients").default(0),
+  emailsSent: integer("emails_sent").default(0),
+  emailsOpened: integer("emails_opened").default(0),
+  clickThroughs: integer("click_throughs").default(0),
+  bounces: integer("bounces").default(0),
+  unsubscribes: integer("unsubscribes").default(0),
+  createdBy: varchar("created_by").references(() => users.id).notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const emailTemplates = pgTable("email_templates", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  name: varchar("name").notNull(),
+  category: varchar("category", { length: 100 }), // promotional, reminder, follow_up, newsletter
+  subject: varchar("subject").notNull(),
+  htmlContent: text("html_content").notNull(),
+  textContent: text("text_content"),
+  variables: jsonb("variables"), // merge fields
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Module 73: Social Media Integration
+export const socialPosts = pgTable("social_posts", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  platform: varchar("platform", { length: 50 }).notNull(), // facebook, google, yelp, instagram
+  postType: varchar("post_type", { length: 100 }), // review_response, promotion, update
+  content: text("content").notNull(),
+  mediaUrls: jsonb("media_urls"), // images/videos
+  scheduledAt: timestamp("scheduled_at"),
+  publishedAt: timestamp("published_at"),
+  status: varchar("status", { length: 50 }).default("draft"), // draft, scheduled, published, failed
+  externalId: varchar("external_id"), // post ID on platform
+  likes: integer("likes").default(0),
+  shares: integer("shares").default(0),
+  comments: integer("comments").default(0),
+  reach: integer("reach").default(0),
+  createdBy: varchar("created_by").references(() => users.id).notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const reviewPlatformIntegrations = pgTable("review_platform_integrations", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  platform: varchar("platform", { length: 50 }).notNull(),
+  profileUrl: varchar("profile_url"),
+  apiKey: text("api_key"), // encrypted
+  isActive: boolean("is_active").default(true),
+  autoResponse: boolean("auto_response").default(false),
+  responseTemplate: text("response_template"),
+  lastSyncAt: timestamp("last_sync_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Module 74: Video Consultation System
+export const videoConsultations = pgTable("video_consultations", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  customerId: varchar("customer_id").references(() => users.id).notNull(),
+  technicianId: varchar("technician_id").references(() => users.id),
+  jobCardId: uuid("job_card_id").references(() => jobCards.id),
+  platform: varchar("platform", { length: 50 }).default("zoom"), // zoom, teams, google_meet
+  meetingUrl: varchar("meeting_url"),
+  meetingId: varchar("meeting_id"),
+  passcode: varchar("passcode"),
+  scheduledAt: timestamp("scheduled_at").notNull(),
+  startedAt: timestamp("started_at"),
+  endedAt: timestamp("ended_at"),
+  duration: integer("duration"), // minutes
+  status: varchar("status", { length: 50 }).default("scheduled"), // scheduled, in_progress, completed, cancelled, no_show
+  recordingUrl: varchar("recording_url"),
+  notes: text("notes"),
+  customerAttended: boolean("customer_attended"),
+  technicianAttended: boolean("technician_attended"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Module 75: Parts Marketplace Integration
+export const marketplaceOrders = pgTable("marketplace_orders", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  marketplace: varchar("marketplace", { length: 100 }).notNull(), // ebay_motors, amazon_auto, rock_auto
+  externalOrderId: varchar("external_order_id").notNull(),
+  partNumber: varchar("part_number").notNull(),
+  partName: varchar("part_name").notNull(),
+  quantity: integer("quantity").notNull(),
+  unitPrice: decimal("unit_price", { precision: 10, scale: 2 }).notNull(),
+  totalPrice: decimal("total_price", { precision: 10, scale: 2 }).notNull(),
+  currency: varchar("currency", { length: 10 }).default("USD"),
+  sellerId: varchar("seller_id"),
+  sellerName: varchar("seller_name"),
+  sellerRating: decimal("seller_rating", { precision: 3, scale: 2 }),
+  orderStatus: varchar("order_status", { length: 50 }).default("pending"), // pending, confirmed, shipped, delivered, cancelled
+  trackingNumber: varchar("tracking_number"),
+  estimatedDelivery: timestamp("estimated_delivery"),
+  actualDelivery: timestamp("actual_delivery"),
+  linkedJobCardId: uuid("linked_job_card_id").references(() => jobCards.id),
+  linkedSparePart: uuid("linked_spare_part").references(() => spareParts.id),
+  orderDate: timestamp("order_date").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const marketplaceConnections = pgTable("marketplace_connections", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  marketplace: varchar("marketplace", { length: 100 }).notNull(),
+  apiKey: text("api_key"), // encrypted
+  apiSecret: text("api_secret"), // encrypted
+  accountId: varchar("account_id"),
+  isActive: boolean("is_active").default(true),
+  preferredSellers: jsonb("preferred_sellers"), // array of seller IDs
+  autoOrderThreshold: decimal("auto_order_threshold", { precision: 10, scale: 2 }), // price limit for auto-ordering
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Type exports for Phase 3
+export type AccountingSync = typeof accountingSync.$inferSelect;
+export type InsertAccountingSync = typeof accountingSync.$inferInsert;
+export const insertAccountingSyncSchema = createInsertSchema(accountingSync).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type AccountingConnection = typeof accountingConnections.$inferSelect;
+export type InsertAccountingConnection = typeof accountingConnections.$inferInsert;
+export const insertAccountingConnectionSchema = createInsertSchema(accountingConnections).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type EmailCampaign = typeof emailCampaigns.$inferSelect;
+export type InsertEmailCampaign = typeof emailCampaigns.$inferInsert;
+export const insertEmailCampaignSchema = createInsertSchema(emailCampaigns).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  sentAt: true,
+});
+
+export type EmailTemplate = typeof emailTemplates.$inferSelect;
+export type InsertEmailTemplate = typeof emailTemplates.$inferInsert;
+export const insertEmailTemplateSchema = createInsertSchema(emailTemplates).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type SocialPost = typeof socialPosts.$inferSelect;
+export type InsertSocialPost = typeof socialPosts.$inferInsert;
+export const insertSocialPostSchema = createInsertSchema(socialPosts).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  publishedAt: true,
+});
+
+export type ReviewPlatformIntegration = typeof reviewPlatformIntegrations.$inferSelect;
+export type InsertReviewPlatformIntegration = typeof reviewPlatformIntegrations.$inferInsert;
+export const insertReviewPlatformIntegrationSchema = createInsertSchema(reviewPlatformIntegrations).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type VideoConsultation = typeof videoConsultations.$inferSelect;
+export type InsertVideoConsultation = typeof videoConsultations.$inferInsert;
+export const insertVideoConsultationSchema = createInsertSchema(videoConsultations).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type MarketplaceOrder = typeof marketplaceOrders.$inferSelect;
+export type InsertMarketplaceOrder = typeof marketplaceOrders.$inferInsert;
+export const insertMarketplaceOrderSchema = createInsertSchema(marketplaceOrders).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  orderDate: true,
+});
+
+export type MarketplaceConnection = typeof marketplaceConnections.$inferSelect;
+export type InsertMarketplaceConnection = typeof marketplaceConnections.$inferInsert;
+export const insertMarketplaceConnectionSchema = createInsertSchema(marketplaceConnections).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});

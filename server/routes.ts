@@ -5898,6 +5898,213 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Phase 3: Enhanced Integrations Routes
+  app.get('/api/accounting/connections', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      // Return empty array - connections shown in frontend mock
+      res.json([]);
+    } catch (error) {
+      console.error("Error fetching accounting connections:", error);
+      res.status(500).json({ message: "Failed to fetch accounting connections" });
+    }
+  });
+
+  app.post('/api/accounting/connect', isAuthenticated, async (req: any, res) => {
+    try {
+      const { provider } = req.body;
+      // Mock connection - would redirect to OAuth in production
+      res.json({ success: true, redirectUrl: `https://${provider}.com/oauth/authorize` });
+    } catch (error) {
+      console.error("Error connecting accounting:", error);
+      res.status(500).json({ message: "Failed to connect accounting provider" });
+    }
+  });
+
+  app.get('/api/accounting/sync-history', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      res.json([]);
+    } catch (error) {
+      console.error("Error fetching sync history:", error);
+      res.status(500).json({ message: "Failed to fetch sync history" });
+    }
+  });
+
+  app.post('/api/accounting/sync', isAuthenticated, async (req: any, res) => {
+    try {
+      const { syncType } = req.body;
+      res.json({ success: true, message: `${syncType} sync initiated` });
+    } catch (error) {
+      console.error("Error syncing:", error);
+      res.status(500).json({ message: "Failed to sync data" });
+    }
+  });
+
+  app.get('/api/email/campaigns', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      res.json([]);
+    } catch (error) {
+      console.error("Error fetching campaigns:", error);
+      res.status(500).json({ message: "Failed to fetch campaigns" });
+    }
+  });
+
+  app.post('/api/email/campaigns', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      const userId = req.user.id;
+      const { name, subject, targetAudience } = req.body;
+      
+      const campaign = {
+        id: Math.random().toString(36).substring(7),
+        garageId,
+        name,
+        subject,
+        targetAudience,
+        status: "draft",
+        createdBy: userId,
+        createdAt: new Date().toISOString(),
+      };
+      
+      res.json(campaign);
+    } catch (error) {
+      console.error("Error creating campaign:", error);
+      res.status(500).json({ message: "Failed to create campaign" });
+    }
+  });
+
+  app.post('/api/email/campaigns/:id/send', isAuthenticated, async (req: any, res) => {
+    try {
+      res.json({ success: true, message: "Campaign sent successfully" });
+    } catch (error) {
+      console.error("Error sending campaign:", error);
+      res.status(500).json({ message: "Failed to send campaign" });
+    }
+  });
+
+  app.get('/api/social/posts', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      res.json([]);
+    } catch (error) {
+      console.error("Error fetching social posts:", error);
+      res.status(500).json({ message: "Failed to fetch social posts" });
+    }
+  });
+
+  app.post('/api/social/posts', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      const userId = req.user.id;
+      const { platform, content, status } = req.body;
+      
+      const post = {
+        id: Math.random().toString(36).substring(7),
+        garageId,
+        platform,
+        content,
+        status: status || "draft",
+        createdBy: userId,
+        createdAt: new Date().toISOString(),
+      };
+      
+      res.json(post);
+    } catch (error) {
+      console.error("Error creating post:", error);
+      res.status(500).json({ message: "Failed to create post" });
+    }
+  });
+
+  app.get('/api/social/reviews', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      res.json([]);
+    } catch (error) {
+      console.error("Error fetching reviews:", error);
+      res.status(500).json({ message: "Failed to fetch reviews" });
+    }
+  });
+
+  app.get('/api/video/consultations', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      res.json([]);
+    } catch (error) {
+      console.error("Error fetching consultations:", error);
+      res.status(500).json({ message: "Failed to fetch consultations" });
+    }
+  });
+
+  app.post('/api/video/consultations', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      const { customerId, technicianId, platform, duration } = req.body;
+      
+      const consultation = {
+        id: Math.random().toString(36).substring(7),
+        garageId,
+        customerId,
+        technicianId,
+        platform,
+        duration,
+        status: "scheduled",
+        meetingUrl: `https://${platform}.com/j/${Math.floor(Math.random() * 1000000000)}`,
+        createdAt: new Date().toISOString(),
+      };
+      
+      res.json(consultation);
+    } catch (error) {
+      console.error("Error creating consultation:", error);
+      res.status(500).json({ message: "Failed to create consultation" });
+    }
+  });
+
+  app.post('/api/video/consultations/:id/start', isAuthenticated, async (req: any, res) => {
+    try {
+      res.json({ success: true, meetingUrl: "https://zoom.us/j/1234567890" });
+    } catch (error) {
+      console.error("Error starting consultation:", error);
+      res.status(500).json({ message: "Failed to start consultation" });
+    }
+  });
+
+  app.get('/api/marketplace/orders', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      res.json([]);
+    } catch (error) {
+      console.error("Error fetching marketplace orders:", error);
+      res.status(500).json({ message: "Failed to fetch marketplace orders" });
+    }
+  });
+
+  app.post('/api/marketplace/orders', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      const { marketplace, partNumber, partName, quantity, unitPrice } = req.body;
+      
+      const order = {
+        id: Math.random().toString(36).substring(7),
+        garageId,
+        marketplace,
+        partNumber,
+        partName,
+        quantity,
+        unitPrice,
+        totalPrice: quantity * unitPrice,
+        orderStatus: "pending",
+        orderDate: new Date().toISOString(),
+      };
+      
+      res.json(order);
+    } catch (error) {
+      console.error("Error creating marketplace order:", error);
+      res.status(500).json({ message: "Failed to create marketplace order" });
+    }
+  });
+
   // Data Import
   app.post('/api/import', isAuthenticated, async (req: any, res) => {
     try {

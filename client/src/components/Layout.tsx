@@ -280,8 +280,13 @@ export function Layout({ children }: LayoutProps) {
       ],
     },
     {
-      group: "🔌 Integrations",
+      group: "🔌 Enhanced Integrations",
       items: [
+        { path: "/accounting-integration", icon: DollarSign, label: "Accounting Sync" },
+        { path: "/email-marketing-campaigns", icon: Mail, label: "Email Marketing" },
+        { path: "/social-media-integration", icon: MessageCircle, label: "Social Media" },
+        { path: "/video-consultations", icon: FileText, label: "Video Calls" },
+        { path: "/parts-marketplace", icon: ShoppingCart, label: "Parts Marketplace" },
         { path: "/integrations", icon: Plug2, label: t("nav.integrations") },
         {
           path: "/data-import-export",

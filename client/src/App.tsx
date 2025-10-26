@@ -62,6 +62,11 @@ import BusinessIntelligenceDashboard from "@/pages/BusinessIntelligenceDashboard
 import ProfitAnalysis from "@/pages/ProfitAnalysis";
 import CustomerLTVAnalysis from "@/pages/CustomerLTVAnalysis";
 import BusinessHeatMaps from "@/pages/BusinessHeatMaps";
+import AccountingIntegration from "@/pages/AccountingIntegration";
+import EmailMarketingCampaigns from "@/pages/EmailMarketingCampaigns";
+import SocialMediaIntegration from "@/pages/SocialMediaIntegration";
+import VideoConsultations from "@/pages/VideoConsultations";
+import PartsMarketplace from "@/pages/PartsMarketplace";
 import { CustomerDashboard } from "@/pages/customer/CustomerDashboard";
 import { CustomerAppointments } from "@/pages/customer/CustomerAppointments";
 import { CustomerInvoices } from "@/pages/customer/CustomerInvoices";
@@ -406,6 +411,31 @@ function Router() {
       <Route path="/business-heatmaps">
         <Layout>
           <BusinessHeatMaps />
+        </Layout>
+      </Route>
+      <Route path="/accounting-integration">
+        <Layout>
+          <AccountingIntegration />
+        </Layout>
+      </Route>
+      <Route path="/email-marketing-campaigns">
+        <Layout>
+          <EmailMarketingCampaigns />
+        </Layout>
+      </Route>
+      <Route path="/social-media-integration">
+        <Layout>
+          <SocialMediaIntegration />
+        </Layout>
+      </Route>
+      <Route path="/video-consultations">
+        <Layout>
+          <VideoConsultations />
+        </Layout>
+      </Route>
+      <Route path="/parts-marketplace">
+        <Layout>
+          <PartsMarketplace />
         </Layout>
       </Route>
       <Route component={NotFound} />
