@@ -41,6 +41,9 @@ import {
   Store,
   Mail,
   Award,
+  Cpu,
+  Globe,
+  Network,
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -232,6 +235,26 @@ export function Layout({ children }: LayoutProps) {
           path: "/franchise-management",
           icon: Building2,
           label: "Franchise Management",
+        },
+        {
+          path: "/diagnostics-obd",
+          icon: Cpu,
+          label: "Diagnostics & OBD",
+        },
+        {
+          path: "/oem-software",
+          icon: Key,
+          label: "OEM Software",
+        },
+        {
+          path: "/globalization",
+          icon: Globe,
+          label: "Globalization",
+        },
+        {
+          path: "/parts-supply-network",
+          icon: Network,
+          label: "Parts Network",
         },
       ],
     },

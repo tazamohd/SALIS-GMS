@@ -49,6 +49,10 @@ import MarketingAutomation from "@/pages/MarketingAutomation";
 import CustomerLoyalty from "@/pages/CustomerLoyalty";
 import DocumentManagement from "@/pages/DocumentManagement";
 import FranchiseManagement from "@/pages/FranchiseManagement";
+import GlobalizationLayer from "@/pages/GlobalizationLayer";
+import PartsSupplyNetwork from "@/pages/PartsSupplyNetwork";
+import DiagnosticsOBDHub from "@/pages/DiagnosticsOBDHub";
+import OEMSoftwareSubscriptions from "@/pages/OEMSoftwareSubscriptions";
 import { CustomerDashboard } from "@/pages/customer/CustomerDashboard";
 import { CustomerAppointments } from "@/pages/customer/CustomerAppointments";
 import { CustomerInvoices } from "@/pages/customer/CustomerInvoices";
@@ -328,6 +332,26 @@ function Router() {
       <Route path="/franchise-management">
         <Layout>
           <FranchiseManagement />
+        </Layout>
+      </Route>
+      <Route path="/globalization">
+        <Layout>
+          <GlobalizationLayer />
+        </Layout>
+      </Route>
+      <Route path="/parts-supply-network">
+        <Layout>
+          <PartsSupplyNetwork />
+        </Layout>
+      </Route>
+      <Route path="/diagnostics-obd">
+        <Layout>
+          <DiagnosticsOBDHub />
+        </Layout>
+      </Route>
+      <Route path="/oem-software">
+        <Layout>
+          <OEMSoftwareSubscriptions />
         </Layout>
       </Route>
       <Route component={NotFound} />
