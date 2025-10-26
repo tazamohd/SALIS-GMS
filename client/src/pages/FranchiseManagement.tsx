@@ -322,35 +322,33 @@ export default function FranchiseManagement() {
   };
 
   const getStatusBadge = (status: string) => {
-    const variants: Record<string, { variant: "default" | "secondary" | "destructive" | "outline"; icon: any }> = {
-      draft: { variant: "outline", icon: AlertCircle },
-      active: { variant: "default", icon: CheckCircle2 },
-      pending: { variant: "secondary", icon: AlertCircle },
-      expired: { variant: "destructive", icon: XCircle },
+    const statusColors: { [key: string]: { bg: string; text: string; icon: string } } = {
+      draft: { bg: 'bg-yellow-100 dark:bg-yellow-900/30', text: 'text-yellow-700 dark:text-yellow-300', icon: '📝' },
+      active: { bg: 'bg-green-100 dark:bg-green-900/30', text: 'text-green-700 dark:text-green-300', icon: '✅' },
+      pending: { bg: 'bg-orange-100 dark:bg-orange-900/30', text: 'text-orange-700 dark:text-orange-300', icon: '⏳' },
+      expired: { bg: 'bg-red-100 dark:bg-red-900/30', text: 'text-red-700 dark:text-red-300', icon: '❌' },
     };
-
-    const config = variants[status] || variants.draft;
-    const Icon = config.icon;
+    const config = statusColors[status] || { bg: 'bg-gray-100 dark:bg-gray-800', text: 'text-gray-700 dark:text-gray-300', icon: '○' };
 
     return (
-      <Badge variant={config.variant} data-testid={`status-${status}`} className="gap-1">
-        <Icon className="h-3 w-3" />
+      <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${config.bg} ${config.text}`} data-testid={`status-${status}`}>
+        <span>{config.icon}</span>
         {status.charAt(0).toUpperCase() + status.slice(1)}
-      </Badge>
+      </span>
     );
   };
 
   return (
-    <div className="p-6 space-y-6 bg-background dark:bg-background">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight text-foreground dark:text-foreground" data-testid="text-page-title">Franchise Command Center</h1>
-        <p className="text-muted-foreground dark:text-muted-foreground" data-testid="text-page-description">
+    <div className="flex-1 p-6 bg-gray-50 dark:bg-salis-black min-h-screen">
+      <div className="mb-6">
+        <h1 className="font-montserrat font-semibold text-2xl text-gray-900 dark:text-white" data-testid="text-page-title">Franchise Command Center</h1>
+        <p className="font-poppins text-sm text-gray-600 dark:text-gray-400 mt-1" data-testid="text-page-description">
           Manage franchise groups, contracts, KPIs, and revenue sharing across your network
         </p>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="bg-muted dark:bg-muted" data-testid="tabs-navigation">
+        <TabsList className="bg-white dark:bg-salis-black/50 border border-gray-200 dark:border-salis-gray-dark" data-testid="tabs-navigation">
           <TabsTrigger value="groups" data-testid="tab-groups" className="gap-2">
             <Building2 className="h-4 w-4" />
             Franchise Groups
@@ -371,14 +369,14 @@ export default function FranchiseManagement() {
 
         <TabsContent value="groups" className="space-y-4">
           <div className="flex justify-between items-center">
-            <h2 className="text-xl font-semibold text-foreground dark:text-foreground">Franchise Groups</h2>
+            <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">Franchise Groups</h2>
             <Button onClick={() => { setEditingGroup(null); groupForm.reset(); setShowGroupDialog(true); }} data-testid="button-add-group">
               <Plus className="h-4 w-4 mr-2" />
               Add Franchise Group
             </Button>
           </div>
 
-          <Card className="bg-card dark:bg-card border-border dark:border-border">
+          <Card className="border border-gray-200 dark:border-salis-gray-dark bg-white dark:bg-salis-black">
             <CardContent className="p-0">
               <Table>
                 <TableHeader>
@@ -439,14 +437,14 @@ export default function FranchiseManagement() {
 
         <TabsContent value="contracts" className="space-y-4">
           <div className="flex justify-between items-center">
-            <h2 className="text-xl font-semibold text-foreground dark:text-foreground">Franchise Contracts</h2>
+            <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">Franchise Contracts</h2>
             <Button onClick={() => { setEditingContract(null); contractForm.reset(); setShowContractDialog(true); }} data-testid="button-add-contract">
               <Plus className="h-4 w-4 mr-2" />
               Add Contract
             </Button>
           </div>
 
-          <Card className="bg-card dark:bg-card border-border dark:border-border">
+          <Card className="border border-gray-200 dark:border-salis-gray-dark bg-white dark:bg-salis-black">
             <CardContent className="p-0">
               <Table>
                 <TableHeader>
@@ -499,14 +497,14 @@ export default function FranchiseManagement() {
 
         <TabsContent value="kpis" className="space-y-4">
           <div className="flex justify-between items-center">
-            <h2 className="text-xl font-semibold text-foreground dark:text-foreground">Franchise KPIs</h2>
+            <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">Franchise KPIs</h2>
             <Button onClick={() => { setEditingKpi(null); kpiForm.reset(); setShowKpiDialog(true); }} data-testid="button-add-kpi">
               <Plus className="h-4 w-4 mr-2" />
               Add KPI Report
             </Button>
           </div>
 
-          <Card className="bg-card dark:bg-card border-border dark:border-border">
+          <Card className="border border-gray-200 dark:border-salis-gray-dark bg-white dark:bg-salis-black">
             <CardHeader>
               <CardTitle className="text-foreground dark:text-foreground">Performance Metrics</CardTitle>
               <CardDescription className="text-muted-foreground dark:text-muted-foreground">Track franchise performance across key metrics</CardDescription>
@@ -519,14 +517,14 @@ export default function FranchiseManagement() {
 
         <TabsContent value="revenue" className="space-y-4">
           <div className="flex justify-between items-center">
-            <h2 className="text-xl font-semibold text-foreground dark:text-foreground">Revenue Sharing Rules</h2>
+            <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">Revenue Sharing Rules</h2>
             <Button onClick={() => { setEditingRule(null); ruleForm.reset(); setShowRuleDialog(true); }} data-testid="button-add-rule">
               <Plus className="h-4 w-4 mr-2" />
               Add Revenue Rule
             </Button>
           </div>
 
-          <Card className="bg-card dark:bg-card border-border dark:border-border">
+          <Card className="border border-gray-200 dark:border-salis-gray-dark bg-white dark:bg-salis-black">
             <CardHeader>
               <CardTitle className="text-foreground dark:text-foreground">Revenue Distribution</CardTitle>
               <CardDescription className="text-muted-foreground dark:text-muted-foreground">Manage revenue sharing agreements between franchisor and franchisees</CardDescription>
