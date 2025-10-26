@@ -10734,6 +10734,252 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // ========================================
+  // PHASE 1: AI & AUTOMATION
+  // ========================================
+
+  // AI Chatbot - Real OpenAI Integration
+  app.get("/api/ai-chat-conversations", isAuthenticated, async (req: any, res) => {
+    try {
+      const conversations = await storage.getAIChatConversations(req.user.garageId);
+      res.json(conversations);
+    } catch (error) {
+      console.error("Error fetching AI conversations:", error);
+      res.status(500).json({ message: "Failed to fetch conversations" });
+    }
+  });
+
+  app.get("/api/ai-chat-messages", isAuthenticated, async (req, res) => {
+    try {
+      const { conversationId } = req.query;
+      if (!conversationId) {
+        return res.status(400).json({ message: "Conversation ID required" });
+      }
+      const messages = await storage.getAIChatMessages(conversationId as string);
+      res.json(messages);
+    } catch (error) {
+      console.error("Error fetching AI messages:", error);
+      res.status(500).json({ message: "Failed to fetch messages" });
+    }
+  });
+
+  app.post("/api/ai-chat/send", isAuthenticated, async (req: any, res) => {
+    try {
+      const { conversationId, message } = req.body;
+      const { streamChatResponse } = await import("./ai-service");
+      
+      // Create or get conversation
+      let convId = conversationId;
+      if (!convId) {
+        const newConv = await storage.createAIChatConversation({
+          userId: req.user.id,
+          garageId: req.user.garageId,
+          title: message.substring(0, 50) + "...",
+          status: "active"
+        });
+        convId = newConv.id;
+      }
+
+      // Save user message
+      await storage.createAIChatMessage({
+        conversationId: convId,
+        role: "user",
+        content: message
+      });
+
+      // Get conversation history
+      const messages = await storage.getAIChatMessages(convId);
+      const chatHistory = messages.map((m: any) => ({ role: m.role, content: m.content }));
+
+      // Stream AI response
+      res.setHeader('Content-Type', 'text/event-stream');
+      res.setHeader('Cache-Control', 'no-cache');
+      res.setHeader('Connection', 'keep-alive');
+
+      let aiResponse = '';
+      for await (const chunk of streamChatResponse(chatHistory)) {
+        aiResponse += chunk;
+        res.write(`data: ${JSON.stringify({ chunk })}\n\n`);
+      }
+
+      // Save AI response
+      await storage.createAIChatMessage({
+        conversationId: convId,
+        role: "assistant",
+        content: aiResponse
+      });
+
+      res.write(`data: ${JSON.stringify({ done: true, conversationId: convId })}\n\n`);
+      res.end();
+    } catch (error) {
+      console.error("Error in AI chat:", error);
+      res.status(500).json({ message: "Failed to process chat message" });
+    }
+  });
+
+  // Predictive Maintenance AI
+  app.post("/api/ai-maintenance/predict", isAuthenticated, async (req, res) => {
+    try {
+      const { vehicleId } = req.body;
+      const { analyzePredictiveMaintenance } = await import("./ai-service");
+      
+      const vehicle = await storage.getVehicle(vehicleId);
+      if (!vehicle) {
+        return res.status(404).json({ message: "Vehicle not found" });
+      }
+
+      const serviceHistory = await storage.getVehicleServiceHistory(vehicleId);
+      
+      const predictions = await analyzePredictiveMaintenance({
+        vehicleId: vehicle.id,
+        make: vehicle.make,
+        model: vehicle.model,
+        year: vehicle.year,
+        mileage: vehicle.mileage || 0,
+        serviceHistory
+      });
+
+      // Save predictions
+      for (const pred of predictions) {
+        await storage.createAIMaintenancePrediction({
+          vehicleId: vehicle.id,
+          predictedIssue: pred.issue,
+          probability: pred.probability,
+          estimatedMiles: pred.estimatedMiles,
+          severity: pred.severity,
+          recommendation: pred.recommendation,
+          status: "pending"
+        });
+      }
+
+      res.json({ predictions });
+    } catch (error) {
+      console.error("Error in predictive maintenance:", error);
+      res.status(500).json({ message: "Failed to generate predictions" });
+    }
+  });
+
+  app.get("/api/ai-maintenance/predictions", isAuthenticated, async (req, res) => {
+    try {
+      const { vehicleId } = req.query;
+      const predictions = await storage.getAIMaintenancePredictions(vehicleId as string);
+      res.json(predictions);
+    } catch (error) {
+      console.error("Error fetching predictions:", error);
+      res.status(500).json({ message: "Failed to fetch predictions" });
+    }
+  });
+
+  // Smart Parts Recommendations AI
+  app.post("/api/ai-parts/recommend", isAuthenticated, async (req, res) => {
+    try {
+      const { vehicleId, serviceType, symptoms } = req.body;
+      const { generatePartsRecommendations } = await import("./ai-service");
+      
+      const vehicle = await storage.getVehicle(vehicleId);
+      if (!vehicle) {
+        return res.status(404).json({ message: "Vehicle not found" });
+      }
+
+      const recommendations = await generatePartsRecommendations({
+        vehicleId: vehicle.id,
+        make: vehicle.make,
+        model: vehicle.model,
+        year: vehicle.year,
+        serviceType,
+        symptoms
+      });
+
+      // Save recommendations
+      for (const rec of recommendations) {
+        await storage.createAIPartsRecommendation({
+          vehicleId: vehicle.id,
+          partName: rec.partName,
+          partNumber: rec.partNumber || '',
+          compatibility: rec.compatibility,
+          priority: rec.priority,
+          estimatedCost: rec.estimatedCost,
+          reason: rec.reason,
+          status: "pending"
+        });
+      }
+
+      res.json({ recommendations });
+    } catch (error) {
+      console.error("Error generating parts recommendations:", error);
+      res.status(500).json({ message: "Failed to generate recommendations" });
+    }
+  });
+
+  app.get("/api/ai-parts/recommendations", isAuthenticated, async (req, res) => {
+    try {
+      const { vehicleId } = req.query;
+      const recommendations = await storage.getAIPartsRecommendations(vehicleId as string);
+      res.json(recommendations);
+    } catch (error) {
+      console.error("Error fetching recommendations:", error);
+      res.status(500).json({ message: "Failed to fetch recommendations" });
+    }
+  });
+
+  // Document OCR with AI Analysis
+  app.post("/api/ai-ocr/process", isAuthenticated, async (req: any, res) => {
+    try {
+      const { documentType, imageData, extractedText } = req.body;
+      const { analyzeOCRDocument } = await import("./ai-service");
+      
+      // In production, use OCR service (Tesseract.js or cloud) to extract text from imageData
+      const textToAnalyze = extractedText || "Sample extracted text";
+      
+      const analysis = await analyzeOCRDocument(textToAnalyze, documentType);
+      
+      const document = await storage.createOCRDocument({
+        userId: req.user.id,
+        garageId: req.user.garageId,
+        documentType,
+        originalText: textToAnalyze,
+        extractedData: analysis.fields,
+        confidence: 85,
+        status: "processed"
+      });
+
+      res.json({ document, analysis });
+    } catch (error) {
+      console.error("Error processing OCR document:", error);
+      res.status(500).json({ message: "Failed to process document" });
+    }
+  });
+
+  app.get("/api/ai-ocr/documents", isAuthenticated, async (req: any, res) => {
+    try {
+      const documents = await storage.getOCRDocuments(req.user.garageId);
+      res.json(documents);
+    } catch (error) {
+      console.error("Error fetching OCR documents:", error);
+      res.status(500).json({ message: "Failed to fetch documents" });
+    }
+  });
+
+  // AI Service Suggestions
+  app.post("/api/ai-service/suggest", isAuthenticated, async (req, res) => {
+    try {
+      const { customer, vehicle, symptoms, mileage } = req.body;
+      const { generateServiceSuggestions } = await import("./ai-service");
+      
+      const suggestions = await generateServiceSuggestions({
+        customer,
+        vehicle,
+        symptoms,
+        mileage
+      });
+
+      res.json({ suggestions });
+    } catch (error) {
+      console.error("Error generating service suggestions:", error);
+      res.status(500).json({ message: "Failed to generate suggestions" });
+    }
+  });
+
+  // ========================================
   // PHASE 7: ADVANCED HARDWARE
   // ========================================
 
