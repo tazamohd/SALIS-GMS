@@ -250,6 +250,79 @@ import {
   documentCategories,
   documents,
   documentAccessLog,
+  franchiseGroups,
+  franchiseContracts,
+  franchiseRoles,
+  revenueSharingRules,
+  franchiseKpis,
+  franchiseBranches,
+  locales,
+  translationResources,
+  currencyRates,
+  taxRegions,
+  timezoneRules,
+  networkPartners,
+  partnerContracts,
+  fulfillmentOrders,
+  shipmentEvents,
+  warehouseNodes,
+  crossBorderDocs,
+  obdDevices,
+  deviceAssignments,
+  realtimeStreams,
+  obdSessions,
+  diagnosticReports,
+  vendorCatalogs,
+  oemProducts,
+  subscriptionLicenses,
+  licenseAuditLogs,
+  entitlementAssignments,
+  type FranchiseGroup,
+  type InsertFranchiseGroup,
+  type FranchiseContract,
+  type InsertFranchiseContract,
+  type FranchiseKpi,
+  type InsertFranchiseKpi,
+  type RevenueSharingRule,
+  type InsertRevenueSharingRule,
+  type Locale,
+  type InsertLocale,
+  type TranslationResource,
+  type InsertTranslationResource,
+  type CurrencyRate,
+  type InsertCurrencyRate,
+  type TaxRegion,
+  type InsertTaxRegion,
+  type TimezoneRule,
+  type InsertTimezoneRule,
+  type NetworkPartner,
+  type InsertNetworkPartner,
+  type PartnerContract,
+  type InsertPartnerContract,
+  type FulfillmentOrder,
+  type InsertFulfillmentOrder,
+  type ShipmentEvent,
+  type InsertShipmentEvent,
+  type WarehouseNode,
+  type InsertWarehouseNode,
+  type ObdDevice,
+  type InsertObdDevice,
+  type DeviceAssignment,
+  type InsertDeviceAssignment,
+  type ObdSession,
+  type InsertObdSession,
+  type DiagnosticReport,
+  type InsertDiagnosticReport,
+  type VendorCatalog,
+  type InsertVendorCatalog,
+  type OemProduct,
+  type InsertOemProduct,
+  type SubscriptionLicense,
+  type InsertSubscriptionLicense,
+  type LicenseAuditLog,
+  type InsertLicenseAuditLog,
+  type EntitlementAssignment,
+  type InsertEntitlementAssignment,
   type InspectionTemplate,
   type InsertInspectionTemplate,
   type VehicleInspection,
@@ -923,6 +996,128 @@ export interface IStorage {
   
   createDocumentAccessLog(data: any): Promise<any>;
   getDocumentAccessLogs(documentId: string): Promise<any[]>;
+
+  // Module 56: Franchise Command Center
+  createFranchiseGroup(data: any): Promise<any>;
+  getFranchiseGroups(): Promise<any[]>;
+  getFranchiseGroupById(id: string): Promise<any | undefined>;
+  updateFranchiseGroup(id: string, data: any): Promise<any>;
+  deleteFranchiseGroup(id: string): Promise<void>;
+
+  createFranchiseContract(data: any): Promise<any>;
+  getFranchiseContracts(franchiseGroupId?: string): Promise<any[]>;
+  getFranchiseContractById(id: string): Promise<any | undefined>;
+  updateFranchiseContract(id: string, data: any): Promise<any>;
+  deleteFranchiseContract(id: string): Promise<void>;
+
+  createFranchiseKpi(data: any): Promise<any>;
+  getFranchiseKpis(branchId: string, filters?: {month?: string}): Promise<any[]>;
+  getFranchiseKpiById(id: string): Promise<any | undefined>;
+  updateFranchiseKpi(id: string, data: any): Promise<any>;
+
+  createRevenueSharingRule(data: any): Promise<any>;
+  getRevenueSharingRules(franchiseGroupId: string): Promise<any[]>;
+  getRevenueSharingRuleById(id: string): Promise<any | undefined>;
+  updateRevenueSharingRule(id: string, data: any): Promise<any>;
+  deleteRevenueSharingRule(id: string): Promise<void>;
+
+  // Module 59: Globalization Layer
+  createLocale(data: any): Promise<any>;
+  getLocales(): Promise<any[]>;
+  getLocaleById(id: string): Promise<any | undefined>;
+  updateLocale(id: string, data: any): Promise<any>;
+  deleteLocale(id: string): Promise<void>;
+
+  createTranslationResource(data: any): Promise<any>;
+  getTranslationResources(localeId: string, filters?: {namespace?: string}): Promise<any[]>;
+  getTranslationResourceById(id: string): Promise<any | undefined>;
+  updateTranslationResource(id: string, data: any): Promise<any>;
+  deleteTranslationResource(id: string): Promise<void>;
+
+  createCurrencyRate(data: any): Promise<any>;
+  getCurrencyRates(fromCurrency?: string, toCurrency?: string): Promise<any[]>;
+  getLatestCurrencyRate(fromCurrency: string, toCurrency: string): Promise<any | undefined>;
+
+  createTaxRegion(data: any): Promise<any>;
+  getTaxRegions(countryCode?: string): Promise<any[]>;
+  getTaxRegionById(id: string): Promise<any | undefined>;
+  updateTaxRegion(id: string, data: any): Promise<any>;
+  deleteTaxRegion(id: string): Promise<void>;
+
+  createTimezoneRule(data: any): Promise<any>;
+  getTimezoneRules(branchId?: string): Promise<any[]>;
+  getTimezoneRuleById(id: string): Promise<any | undefined>;
+  updateTimezoneRule(id: string, data: any): Promise<any>;
+
+  // Module 60: Parts Supply Network
+  createNetworkPartner(data: any): Promise<any>;
+  getNetworkPartners(filters?: {partnerType?: string, country?: string}): Promise<any[]>;
+  getNetworkPartnerById(id: string): Promise<any | undefined>;
+  updateNetworkPartner(id: string, data: any): Promise<any>;
+  deleteNetworkPartner(id: string): Promise<void>;
+
+  createFulfillmentOrder(data: any): Promise<any>;
+  getFulfillmentOrders(filters?: {partnerId?: string, branchId?: string, status?: string}): Promise<any[]>;
+  getFulfillmentOrderById(id: string): Promise<any | undefined>;
+  updateFulfillmentOrder(id: string, data: any): Promise<any>;
+  deleteFulfillmentOrder(id: string): Promise<void>;
+
+  createShipmentEvent(data: any): Promise<any>;
+  getShipmentEvents(fulfillmentOrderId: string): Promise<any[]>;
+
+  createWarehouseNode(data: any): Promise<any>;
+  getWarehouseNodes(partnerId?: string): Promise<any[]>;
+  getWarehouseNodeById(id: string): Promise<any | undefined>;
+  updateWarehouseNode(id: string, data: any): Promise<any>;
+  deleteWarehouseNode(id: string): Promise<void>;
+
+  // Module 57: Diagnostics & OBD Hub
+  createObdDevice(data: any): Promise<any>;
+  getObdDevices(branchId?: string): Promise<any[]>;
+  getObdDeviceById(id: string): Promise<any | undefined>;
+  updateObdDevice(id: string, data: any): Promise<any>;
+  deleteObdDevice(id: string): Promise<void>;
+
+  createDeviceAssignment(data: any): Promise<any>;
+  getDeviceAssignments(deviceId?: string, technicianId?: string): Promise<any[]>;
+  getDeviceAssignmentById(id: string): Promise<any | undefined>;
+  updateDeviceAssignment(id: string, data: any): Promise<any>;
+
+  createObdSession(data: any): Promise<any>;
+  getObdSessions(filters?: {deviceId?: string, vehicleId?: string, status?: string}): Promise<any[]>;
+  getObdSessionById(id: string): Promise<any | undefined>;
+  updateObdSession(id: string, data: any): Promise<any>;
+
+  createDiagnosticReport(data: any): Promise<any>;
+  getDiagnosticReports(sessionId: string): Promise<any[]>;
+  getDiagnosticReportById(id: string): Promise<any | undefined>;
+
+  // Module 58: OEM Software Subscriptions
+  createVendorCatalog(data: any): Promise<any>;
+  getVendorCatalogs(): Promise<any[]>;
+  getVendorCatalogById(id: string): Promise<any | undefined>;
+  updateVendorCatalog(id: string, data: any): Promise<any>;
+  deleteVendorCatalog(id: string): Promise<void>;
+
+  createOemProduct(data: any): Promise<any>;
+  getOemProducts(vendorCatalogId?: string): Promise<any[]>;
+  getOemProductById(id: string): Promise<any | undefined>;
+  updateOemProduct(id: string, data: any): Promise<any>;
+  deleteOemProduct(id: string): Promise<void>;
+
+  createSubscriptionLicense(data: any): Promise<any>;
+  getSubscriptionLicenses(branchId?: string, filters?: {status?: string}): Promise<any[]>;
+  getSubscriptionLicenseById(id: string): Promise<any | undefined>;
+  updateSubscriptionLicense(id: string, data: any): Promise<any>;
+  deleteSubscriptionLicense(id: string): Promise<void>;
+
+  createLicenseAuditLog(data: any): Promise<any>;
+  getLicenseAuditLogs(licenseId: string): Promise<any[]>;
+
+  createEntitlementAssignment(data: any): Promise<any>;
+  getEntitlementAssignments(licenseId?: string, userId?: string): Promise<any[]>;
+  getEntitlementAssignmentById(id: string): Promise<any | undefined>;
+  updateEntitlementAssignment(id: string, data: any): Promise<any>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -6523,6 +6718,674 @@ export class DatabaseStorage implements IStorage {
       .from(documentAccessLog)
       .where(eq(documentAccessLog.documentId, documentId))
       .orderBy(desc(documentAccessLog.createdAt));
+  }
+
+  // ========================================================================
+  // ENTERPRISE ERP MODULES (56-60) STORAGE METHODS
+  // ========================================================================
+
+  // Module 56: Franchise Command Center
+  async createFranchiseGroup(data: InsertFranchiseGroup): Promise<FranchiseGroup> {
+    const [group] = await db.insert(franchiseGroups).values(data).returning();
+    return group;
+  }
+
+  async getFranchiseGroups(): Promise<FranchiseGroup[]> {
+    return await db.select().from(franchiseGroups).orderBy(desc(franchiseGroups.createdAt));
+  }
+
+  async getFranchiseGroupById(id: string): Promise<FranchiseGroup | undefined> {
+    const [group] = await db.select().from(franchiseGroups).where(eq(franchiseGroups.id, id));
+    return group;
+  }
+
+  async updateFranchiseGroup(id: string, data: Partial<InsertFranchiseGroup>): Promise<FranchiseGroup> {
+    const [group] = await db.update(franchiseGroups)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(franchiseGroups.id, id))
+      .returning();
+    return group;
+  }
+
+  async deleteFranchiseGroup(id: string): Promise<void> {
+    await db.delete(franchiseGroups).where(eq(franchiseGroups.id, id));
+  }
+
+  async createFranchiseContract(data: InsertFranchiseContract): Promise<FranchiseContract> {
+    const [contract] = await db.insert(franchiseContracts).values(data).returning();
+    return contract;
+  }
+
+  async getFranchiseContracts(franchiseGroupId?: string): Promise<FranchiseContract[]> {
+    if (franchiseGroupId) {
+      return await db.select()
+        .from(franchiseContracts)
+        .where(eq(franchiseContracts.franchiseGroupId, franchiseGroupId))
+        .orderBy(desc(franchiseContracts.createdAt));
+    }
+    return await db.select().from(franchiseContracts).orderBy(desc(franchiseContracts.createdAt));
+  }
+
+  async getFranchiseContractById(id: string): Promise<FranchiseContract | undefined> {
+    const [contract] = await db.select().from(franchiseContracts).where(eq(franchiseContracts.id, id));
+    return contract;
+  }
+
+  async updateFranchiseContract(id: string, data: Partial<InsertFranchiseContract>): Promise<FranchiseContract> {
+    const [contract] = await db.update(franchiseContracts)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(franchiseContracts.id, id))
+      .returning();
+    return contract;
+  }
+
+  async deleteFranchiseContract(id: string): Promise<void> {
+    await db.delete(franchiseContracts).where(eq(franchiseContracts.id, id));
+  }
+
+  async createFranchiseKpi(data: InsertFranchiseKpi): Promise<FranchiseKpi> {
+    const [kpi] = await db.insert(franchiseKpis).values(data).returning();
+    return kpi;
+  }
+
+  async getFranchiseKpis(branchId: string, filters?: {month?: string}): Promise<FranchiseKpi[]> {
+    const conditions = [eq(franchiseKpis.branchId, branchId)];
+    if (filters?.month) {
+      conditions.push(eq(franchiseKpis.month, filters.month));
+    }
+    return await db.select()
+      .from(franchiseKpis)
+      .where(and(...conditions))
+      .orderBy(desc(franchiseKpis.createdAt));
+  }
+
+  async getFranchiseKpiById(id: string): Promise<FranchiseKpi | undefined> {
+    const [kpi] = await db.select().from(franchiseKpis).where(eq(franchiseKpis.id, id));
+    return kpi;
+  }
+
+  async updateFranchiseKpi(id: string, data: Partial<InsertFranchiseKpi>): Promise<FranchiseKpi> {
+    const [kpi] = await db.update(franchiseKpis)
+      .set(data)
+      .where(eq(franchiseKpis.id, id))
+      .returning();
+    return kpi;
+  }
+
+  async createRevenueSharingRule(data: InsertRevenueSharingRule): Promise<RevenueSharingRule> {
+    const [rule] = await db.insert(revenueSharingRules).values(data).returning();
+    return rule;
+  }
+
+  async getRevenueSharingRules(franchiseGroupId: string): Promise<RevenueSharingRule[]> {
+    return await db.select()
+      .from(revenueSharingRules)
+      .where(eq(revenueSharingRules.franchiseGroupId, franchiseGroupId))
+      .orderBy(desc(revenueSharingRules.createdAt));
+  }
+
+  async getRevenueSharingRuleById(id: string): Promise<RevenueSharingRule | undefined> {
+    const [rule] = await db.select().from(revenueSharingRules).where(eq(revenueSharingRules.id, id));
+    return rule;
+  }
+
+  async updateRevenueSharingRule(id: string, data: Partial<InsertRevenueSharingRule>): Promise<RevenueSharingRule> {
+    const [rule] = await db.update(revenueSharingRules)
+      .set(data)
+      .where(eq(revenueSharingRules.id, id))
+      .returning();
+    return rule;
+  }
+
+  async deleteRevenueSharingRule(id: string): Promise<void> {
+    await db.delete(revenueSharingRules).where(eq(revenueSharingRules.id, id));
+  }
+
+  // Module 59: Globalization Layer
+  async createLocale(data: InsertLocale): Promise<Locale> {
+    const [locale] = await db.insert(locales).values(data).returning();
+    return locale;
+  }
+
+  async getLocales(): Promise<Locale[]> {
+    return await db.select().from(locales).orderBy(locales.name);
+  }
+
+  async getLocaleById(id: string): Promise<Locale | undefined> {
+    const [locale] = await db.select().from(locales).where(eq(locales.id, id));
+    return locale;
+  }
+
+  async updateLocale(id: string, data: Partial<InsertLocale>): Promise<Locale> {
+    const [locale] = await db.update(locales)
+      .set(data)
+      .where(eq(locales.id, id))
+      .returning();
+    return locale;
+  }
+
+  async deleteLocale(id: string): Promise<void> {
+    await db.delete(locales).where(eq(locales.id, id));
+  }
+
+  async createTranslationResource(data: InsertTranslationResource): Promise<TranslationResource> {
+    const [resource] = await db.insert(translationResources).values(data).returning();
+    return resource;
+  }
+
+  async getTranslationResources(localeId: string, filters?: {namespace?: string}): Promise<TranslationResource[]> {
+    const conditions = [eq(translationResources.localeId, localeId)];
+    if (filters?.namespace) {
+      conditions.push(eq(translationResources.namespace, filters.namespace));
+    }
+    return await db.select()
+      .from(translationResources)
+      .where(and(...conditions))
+      .orderBy(translationResources.translationKey);
+  }
+
+  async getTranslationResourceById(id: string): Promise<TranslationResource | undefined> {
+    const [resource] = await db.select().from(translationResources).where(eq(translationResources.id, id));
+    return resource;
+  }
+
+  async updateTranslationResource(id: string, data: Partial<InsertTranslationResource>): Promise<TranslationResource> {
+    const [resource] = await db.update(translationResources)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(translationResources.id, id))
+      .returning();
+    return resource;
+  }
+
+  async deleteTranslationResource(id: string): Promise<void> {
+    await db.delete(translationResources).where(eq(translationResources.id, id));
+  }
+
+  async createCurrencyRate(data: InsertCurrencyRate): Promise<CurrencyRate> {
+    const [rate] = await db.insert(currencyRates).values(data).returning();
+    return rate;
+  }
+
+  async getCurrencyRates(fromCurrency?: string, toCurrency?: string): Promise<CurrencyRate[]> {
+    const conditions = [];
+    if (fromCurrency) {
+      conditions.push(eq(currencyRates.fromCurrency, fromCurrency));
+    }
+    if (toCurrency) {
+      conditions.push(eq(currencyRates.toCurrency, toCurrency));
+    }
+    if (conditions.length === 0) {
+      return await db.select().from(currencyRates).orderBy(desc(currencyRates.effectiveDate));
+    }
+    return await db.select()
+      .from(currencyRates)
+      .where(and(...conditions))
+      .orderBy(desc(currencyRates.effectiveDate));
+  }
+
+  async getLatestCurrencyRate(fromCurrency: string, toCurrency: string): Promise<CurrencyRate | undefined> {
+    const [rate] = await db.select()
+      .from(currencyRates)
+      .where(and(
+        eq(currencyRates.fromCurrency, fromCurrency),
+        eq(currencyRates.toCurrency, toCurrency)
+      ))
+      .orderBy(desc(currencyRates.effectiveDate))
+      .limit(1);
+    return rate;
+  }
+
+  async createTaxRegion(data: InsertTaxRegion): Promise<TaxRegion> {
+    const [region] = await db.insert(taxRegions).values(data).returning();
+    return region;
+  }
+
+  async getTaxRegions(countryCode?: string): Promise<TaxRegion[]> {
+    if (countryCode) {
+      return await db.select()
+        .from(taxRegions)
+        .where(eq(taxRegions.countryCode, countryCode))
+        .orderBy(taxRegions.regionName);
+    }
+    return await db.select().from(taxRegions).orderBy(taxRegions.countryCode, taxRegions.regionName);
+  }
+
+  async getTaxRegionById(id: string): Promise<TaxRegion | undefined> {
+    const [region] = await db.select().from(taxRegions).where(eq(taxRegions.id, id));
+    return region;
+  }
+
+  async updateTaxRegion(id: string, data: Partial<InsertTaxRegion>): Promise<TaxRegion> {
+    const [region] = await db.update(taxRegions)
+      .set(data)
+      .where(eq(taxRegions.id, id))
+      .returning();
+    return region;
+  }
+
+  async deleteTaxRegion(id: string): Promise<void> {
+    await db.delete(taxRegions).where(eq(taxRegions.id, id));
+  }
+
+  async createTimezoneRule(data: InsertTimezoneRule): Promise<TimezoneRule> {
+    const [rule] = await db.insert(timezoneRules).values(data).returning();
+    return rule;
+  }
+
+  async getTimezoneRules(branchId?: string): Promise<TimezoneRule[]> {
+    if (branchId) {
+      return await db.select()
+        .from(timezoneRules)
+        .where(eq(timezoneRules.branchId, branchId));
+    }
+    return await db.select().from(timezoneRules);
+  }
+
+  async getTimezoneRuleById(id: string): Promise<TimezoneRule | undefined> {
+    const [rule] = await db.select().from(timezoneRules).where(eq(timezoneRules.id, id));
+    return rule;
+  }
+
+  async updateTimezoneRule(id: string, data: Partial<InsertTimezoneRule>): Promise<TimezoneRule> {
+    const [rule] = await db.update(timezoneRules)
+      .set(data)
+      .where(eq(timezoneRules.id, id))
+      .returning();
+    return rule;
+  }
+
+  // Module 60: Parts Supply Network
+  async createNetworkPartner(data: InsertNetworkPartner): Promise<NetworkPartner> {
+    const [partner] = await db.insert(networkPartners).values(data).returning();
+    return partner;
+  }
+
+  async getNetworkPartners(filters?: {partnerType?: string, country?: string}): Promise<NetworkPartner[]> {
+    const conditions = [];
+    if (filters?.partnerType) {
+      conditions.push(eq(networkPartners.partnerType, filters.partnerType));
+    }
+    if (filters?.country) {
+      conditions.push(eq(networkPartners.country, filters.country));
+    }
+    if (conditions.length === 0) {
+      return await db.select().from(networkPartners).orderBy(networkPartners.name);
+    }
+    return await db.select()
+      .from(networkPartners)
+      .where(and(...conditions))
+      .orderBy(networkPartners.name);
+  }
+
+  async getNetworkPartnerById(id: string): Promise<NetworkPartner | undefined> {
+    const [partner] = await db.select().from(networkPartners).where(eq(networkPartners.id, id));
+    return partner;
+  }
+
+  async updateNetworkPartner(id: string, data: Partial<InsertNetworkPartner>): Promise<NetworkPartner> {
+    const [partner] = await db.update(networkPartners)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(networkPartners.id, id))
+      .returning();
+    return partner;
+  }
+
+  async deleteNetworkPartner(id: string): Promise<void> {
+    await db.delete(networkPartners).where(eq(networkPartners.id, id));
+  }
+
+  async createFulfillmentOrder(data: InsertFulfillmentOrder): Promise<FulfillmentOrder> {
+    const [order] = await db.insert(fulfillmentOrders).values(data).returning();
+    return order;
+  }
+
+  async getFulfillmentOrders(filters?: {partnerId?: string, branchId?: string, status?: string}): Promise<FulfillmentOrder[]> {
+    const conditions = [];
+    if (filters?.partnerId) {
+      conditions.push(eq(fulfillmentOrders.partnerId, filters.partnerId));
+    }
+    if (filters?.branchId) {
+      conditions.push(eq(fulfillmentOrders.branchId, filters.branchId));
+    }
+    if (filters?.status) {
+      conditions.push(eq(fulfillmentOrders.status, filters.status));
+    }
+    if (conditions.length === 0) {
+      return await db.select().from(fulfillmentOrders).orderBy(desc(fulfillmentOrders.createdAt));
+    }
+    return await db.select()
+      .from(fulfillmentOrders)
+      .where(and(...conditions))
+      .orderBy(desc(fulfillmentOrders.createdAt));
+  }
+
+  async getFulfillmentOrderById(id: string): Promise<FulfillmentOrder | undefined> {
+    const [order] = await db.select().from(fulfillmentOrders).where(eq(fulfillmentOrders.id, id));
+    return order;
+  }
+
+  async updateFulfillmentOrder(id: string, data: Partial<InsertFulfillmentOrder>): Promise<FulfillmentOrder> {
+    const [order] = await db.update(fulfillmentOrders)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(fulfillmentOrders.id, id))
+      .returning();
+    return order;
+  }
+
+  async deleteFulfillmentOrder(id: string): Promise<void> {
+    await db.delete(fulfillmentOrders).where(eq(fulfillmentOrders.id, id));
+  }
+
+  async createShipmentEvent(data: InsertShipmentEvent): Promise<ShipmentEvent> {
+    const [event] = await db.insert(shipmentEvents).values(data).returning();
+    return event;
+  }
+
+  async getShipmentEvents(fulfillmentOrderId: string): Promise<ShipmentEvent[]> {
+    return await db.select()
+      .from(shipmentEvents)
+      .where(eq(shipmentEvents.fulfillmentOrderId, fulfillmentOrderId))
+      .orderBy(desc(shipmentEvents.eventDate));
+  }
+
+  async createWarehouseNode(data: InsertWarehouseNode): Promise<WarehouseNode> {
+    const [node] = await db.insert(warehouseNodes).values(data).returning();
+    return node;
+  }
+
+  async getWarehouseNodes(partnerId?: string): Promise<WarehouseNode[]> {
+    if (partnerId) {
+      return await db.select()
+        .from(warehouseNodes)
+        .where(eq(warehouseNodes.partnerId, partnerId))
+        .orderBy(warehouseNodes.name);
+    }
+    return await db.select().from(warehouseNodes).orderBy(warehouseNodes.name);
+  }
+
+  async getWarehouseNodeById(id: string): Promise<WarehouseNode | undefined> {
+    const [node] = await db.select().from(warehouseNodes).where(eq(warehouseNodes.id, id));
+    return node;
+  }
+
+  async updateWarehouseNode(id: string, data: Partial<InsertWarehouseNode>): Promise<WarehouseNode> {
+    const [node] = await db.update(warehouseNodes)
+      .set(data)
+      .where(eq(warehouseNodes.id, id))
+      .returning();
+    return node;
+  }
+
+  async deleteWarehouseNode(id: string): Promise<void> {
+    await db.delete(warehouseNodes).where(eq(warehouseNodes.id, id));
+  }
+
+  // Module 57: Diagnostics & OBD Hub
+  async createObdDevice(data: InsertObdDevice): Promise<ObdDevice> {
+    const [device] = await db.insert(obdDevices).values(data).returning();
+    return device;
+  }
+
+  async getObdDevices(branchId?: string): Promise<ObdDevice[]> {
+    if (branchId) {
+      return await db.select()
+        .from(obdDevices)
+        .where(eq(obdDevices.branchId, branchId))
+        .orderBy(obdDevices.deviceName);
+    }
+    return await db.select().from(obdDevices).orderBy(obdDevices.deviceName);
+  }
+
+  async getObdDeviceById(id: string): Promise<ObdDevice | undefined> {
+    const [device] = await db.select().from(obdDevices).where(eq(obdDevices.id, id));
+    return device;
+  }
+
+  async updateObdDevice(id: string, data: Partial<InsertObdDevice>): Promise<ObdDevice> {
+    const [device] = await db.update(obdDevices)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(obdDevices.id, id))
+      .returning();
+    return device;
+  }
+
+  async deleteObdDevice(id: string): Promise<void> {
+    await db.delete(obdDevices).where(eq(obdDevices.id, id));
+  }
+
+  async createDeviceAssignment(data: InsertDeviceAssignment): Promise<DeviceAssignment> {
+    const [assignment] = await db.insert(deviceAssignments).values(data).returning();
+    return assignment;
+  }
+
+  async getDeviceAssignments(deviceId?: string, technicianId?: string): Promise<DeviceAssignment[]> {
+    const conditions = [];
+    if (deviceId) {
+      conditions.push(eq(deviceAssignments.deviceId, deviceId));
+    }
+    if (technicianId) {
+      conditions.push(eq(deviceAssignments.technicianId, technicianId));
+    }
+    if (conditions.length === 0) {
+      return await db.select().from(deviceAssignments).orderBy(desc(deviceAssignments.assignedAt));
+    }
+    return await db.select()
+      .from(deviceAssignments)
+      .where(and(...conditions))
+      .orderBy(desc(deviceAssignments.assignedAt));
+  }
+
+  async getDeviceAssignmentById(id: string): Promise<DeviceAssignment | undefined> {
+    const [assignment] = await db.select().from(deviceAssignments).where(eq(deviceAssignments.id, id));
+    return assignment;
+  }
+
+  async updateDeviceAssignment(id: string, data: Partial<InsertDeviceAssignment>): Promise<DeviceAssignment> {
+    const [assignment] = await db.update(deviceAssignments)
+      .set(data)
+      .where(eq(deviceAssignments.id, id))
+      .returning();
+    return assignment;
+  }
+
+  async createObdSession(data: InsertObdSession): Promise<ObdSession> {
+    const [session] = await db.insert(obdSessions).values(data).returning();
+    return session;
+  }
+
+  async getObdSessions(filters?: {deviceId?: string, vehicleId?: string, status?: string}): Promise<ObdSession[]> {
+    const conditions = [];
+    if (filters?.deviceId) {
+      conditions.push(eq(obdSessions.deviceId, filters.deviceId));
+    }
+    if (filters?.vehicleId) {
+      conditions.push(eq(obdSessions.vehicleId, filters.vehicleId));
+    }
+    if (filters?.status) {
+      conditions.push(eq(obdSessions.status, filters.status));
+    }
+    if (conditions.length === 0) {
+      return await db.select().from(obdSessions).orderBy(desc(obdSessions.startTime));
+    }
+    return await db.select()
+      .from(obdSessions)
+      .where(and(...conditions))
+      .orderBy(desc(obdSessions.startTime));
+  }
+
+  async getObdSessionById(id: string): Promise<ObdSession | undefined> {
+    const [session] = await db.select().from(obdSessions).where(eq(obdSessions.id, id));
+    return session;
+  }
+
+  async updateObdSession(id: string, data: Partial<InsertObdSession>): Promise<ObdSession> {
+    const [session] = await db.update(obdSessions)
+      .set(data)
+      .where(eq(obdSessions.id, id))
+      .returning();
+    return session;
+  }
+
+  async createDiagnosticReport(data: InsertDiagnosticReport): Promise<DiagnosticReport> {
+    const [report] = await db.insert(diagnosticReports).values(data).returning();
+    return report;
+  }
+
+  async getDiagnosticReports(sessionId: string): Promise<DiagnosticReport[]> {
+    return await db.select()
+      .from(diagnosticReports)
+      .where(eq(diagnosticReports.sessionId, sessionId))
+      .orderBy(desc(diagnosticReports.generatedAt));
+  }
+
+  async getDiagnosticReportById(id: string): Promise<DiagnosticReport | undefined> {
+    const [report] = await db.select().from(diagnosticReports).where(eq(diagnosticReports.id, id));
+    return report;
+  }
+
+  // Module 58: OEM Software Subscriptions
+  async createVendorCatalog(data: InsertVendorCatalog): Promise<VendorCatalog> {
+    const [catalog] = await db.insert(vendorCatalogs).values(data).returning();
+    return catalog;
+  }
+
+  async getVendorCatalogs(): Promise<VendorCatalog[]> {
+    return await db.select().from(vendorCatalogs).orderBy(vendorCatalogs.vendorName);
+  }
+
+  async getVendorCatalogById(id: string): Promise<VendorCatalog | undefined> {
+    const [catalog] = await db.select().from(vendorCatalogs).where(eq(vendorCatalogs.id, id));
+    return catalog;
+  }
+
+  async updateVendorCatalog(id: string, data: Partial<InsertVendorCatalog>): Promise<VendorCatalog> {
+    const [catalog] = await db.update(vendorCatalogs)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(vendorCatalogs.id, id))
+      .returning();
+    return catalog;
+  }
+
+  async deleteVendorCatalog(id: string): Promise<void> {
+    await db.delete(vendorCatalogs).where(eq(vendorCatalogs.id, id));
+  }
+
+  async createOemProduct(data: InsertOemProduct): Promise<OemProduct> {
+    const [product] = await db.insert(oemProducts).values(data).returning();
+    return product;
+  }
+
+  async getOemProducts(vendorCatalogId?: string): Promise<OemProduct[]> {
+    if (vendorCatalogId) {
+      return await db.select()
+        .from(oemProducts)
+        .where(eq(oemProducts.vendorCatalogId, vendorCatalogId))
+        .orderBy(oemProducts.productName);
+    }
+    return await db.select().from(oemProducts).orderBy(oemProducts.productName);
+  }
+
+  async getOemProductById(id: string): Promise<OemProduct | undefined> {
+    const [product] = await db.select().from(oemProducts).where(eq(oemProducts.id, id));
+    return product;
+  }
+
+  async updateOemProduct(id: string, data: Partial<InsertOemProduct>): Promise<OemProduct> {
+    const [product] = await db.update(oemProducts)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(oemProducts.id, id))
+      .returning();
+    return product;
+  }
+
+  async deleteOemProduct(id: string): Promise<void> {
+    await db.delete(oemProducts).where(eq(oemProducts.id, id));
+  }
+
+  async createSubscriptionLicense(data: InsertSubscriptionLicense): Promise<SubscriptionLicense> {
+    const [license] = await db.insert(subscriptionLicenses).values(data).returning();
+    return license;
+  }
+
+  async getSubscriptionLicenses(branchId?: string, filters?: {status?: string}): Promise<SubscriptionLicense[]> {
+    const conditions = [];
+    if (branchId) {
+      conditions.push(eq(subscriptionLicenses.branchId, branchId));
+    }
+    if (filters?.status) {
+      conditions.push(eq(subscriptionLicenses.status, filters.status));
+    }
+    if (conditions.length === 0) {
+      return await db.select().from(subscriptionLicenses).orderBy(desc(subscriptionLicenses.createdAt));
+    }
+    return await db.select()
+      .from(subscriptionLicenses)
+      .where(and(...conditions))
+      .orderBy(desc(subscriptionLicenses.createdAt));
+  }
+
+  async getSubscriptionLicenseById(id: string): Promise<SubscriptionLicense | undefined> {
+    const [license] = await db.select().from(subscriptionLicenses).where(eq(subscriptionLicenses.id, id));
+    return license;
+  }
+
+  async updateSubscriptionLicense(id: string, data: Partial<InsertSubscriptionLicense>): Promise<SubscriptionLicense> {
+    const [license] = await db.update(subscriptionLicenses)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(subscriptionLicenses.id, id))
+      .returning();
+    return license;
+  }
+
+  async deleteSubscriptionLicense(id: string): Promise<void> {
+    await db.delete(subscriptionLicenses).where(eq(subscriptionLicenses.id, id));
+  }
+
+  async createLicenseAuditLog(data: InsertLicenseAuditLog): Promise<LicenseAuditLog> {
+    const [log] = await db.insert(licenseAuditLogs).values(data).returning();
+    return log;
+  }
+
+  async getLicenseAuditLogs(licenseId: string): Promise<LicenseAuditLog[]> {
+    return await db.select()
+      .from(licenseAuditLogs)
+      .where(eq(licenseAuditLogs.licenseId, licenseId))
+      .orderBy(desc(licenseAuditLogs.timestamp));
+  }
+
+  async createEntitlementAssignment(data: InsertEntitlementAssignment): Promise<EntitlementAssignment> {
+    const [assignment] = await db.insert(entitlementAssignments).values(data).returning();
+    return assignment;
+  }
+
+  async getEntitlementAssignments(licenseId?: string, userId?: string): Promise<EntitlementAssignment[]> {
+    const conditions = [];
+    if (licenseId) {
+      conditions.push(eq(entitlementAssignments.licenseId, licenseId));
+    }
+    if (userId) {
+      conditions.push(eq(entitlementAssignments.userId, userId));
+    }
+    if (conditions.length === 0) {
+      return await db.select().from(entitlementAssignments).orderBy(desc(entitlementAssignments.createdAt));
+    }
+    return await db.select()
+      .from(entitlementAssignments)
+      .where(and(...conditions))
+      .orderBy(desc(entitlementAssignments.createdAt));
+  }
+
+  async getEntitlementAssignmentById(id: string): Promise<EntitlementAssignment | undefined> {
+    const [assignment] = await db.select().from(entitlementAssignments).where(eq(entitlementAssignments.id, id));
+    return assignment;
+  }
+
+  async updateEntitlementAssignment(id: string, data: Partial<InsertEntitlementAssignment>): Promise<EntitlementAssignment> {
+    const [assignment] = await db.update(entitlementAssignments)
+      .set(data)
+      .where(eq(entitlementAssignments.id, id))
+      .returning();
+    return assignment;
   }
 }
 
