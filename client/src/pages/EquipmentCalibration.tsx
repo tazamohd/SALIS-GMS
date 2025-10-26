@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Tool, AlertCircle, CheckCircle, Clock } from "lucide-react";
+import { Wrench, AlertCircle, CheckCircle, Clock } from "lucide-react";
 
 export default function EquipmentCalibration() {
   const mockRecords = [
@@ -53,7 +53,7 @@ export default function EquipmentCalibration() {
                 <p className="text-sm text-gray-600 dark:text-gray-400">Total Equipment</p>
                 <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">{stats.totalEquipment}</h3>
               </div>
-              <Tool className="h-12 w-12 text-blue-600" />
+              <Wrench className="h-12 w-12 text-blue-600" />
             </div>
           </CardContent>
         </Card>

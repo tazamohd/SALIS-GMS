@@ -5184,22 +5184,21 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getPermissionOverrides(garageId: string, userId?: string): Promise<PermissionOverride[]> {
-    let query = db.select().from(permissionOverrides)
-      .where(
-        and(
-          eq(permissionOverrides.garageId, garageId),
-          or(
-            isNull(permissionOverrides.expiresAt),
-            gte(permissionOverrides.expiresAt, new Date())
-          ) ?? sql`true`
-        )
-      );
+    const conditions = [
+      eq(permissionOverrides.garageId, garageId),
+      or(
+        isNull(permissionOverrides.expiresAt),
+        gte(permissionOverrides.expiresAt, new Date())
+      ) ?? sql`true`
+    ];
     
     if (userId) {
-      query = query.where(eq(permissionOverrides.userId, userId));
+      conditions.push(eq(permissionOverrides.userId, userId));
     }
     
-    return await query.orderBy(desc(permissionOverrides.createdAt));
+    return await db.select().from(permissionOverrides)
+      .where(and(...conditions))
+      .orderBy(desc(permissionOverrides.createdAt));
   }
 
   async createPermissionOverride(data: InsertPermissionOverride): Promise<PermissionOverride> {
