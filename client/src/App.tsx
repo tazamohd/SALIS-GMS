@@ -48,6 +48,7 @@ import VendorSupplierPortal from "@/pages/VendorSupplierPortal";
 import MarketingAutomation from "@/pages/MarketingAutomation";
 import CustomerLoyalty from "@/pages/CustomerLoyalty";
 import DocumentManagement from "@/pages/DocumentManagement";
+import FranchiseManagement from "@/pages/FranchiseManagement";
 import { CustomerDashboard } from "@/pages/customer/CustomerDashboard";
 import { CustomerAppointments } from "@/pages/customer/CustomerAppointments";
 import { CustomerInvoices } from "@/pages/customer/CustomerInvoices";
@@ -322,6 +323,11 @@ function Router() {
       <Route path="/chat">
         <Layout>
           <Chat />
+        </Layout>
+      </Route>
+      <Route path="/franchise-management">
+        <Layout>
+          <FranchiseManagement />
         </Layout>
       </Route>
       <Route component={NotFound} />

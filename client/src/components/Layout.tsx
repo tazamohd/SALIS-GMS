@@ -226,6 +226,16 @@ export function Layout({ children }: LayoutProps) {
       ],
     },
     {
+      label: "Enterprise",
+      items: [
+        {
+          path: "/franchise-management",
+          icon: Building2,
+          label: "Franchise Management",
+        },
+      ],
+    },
+    {
       label: t("nav.automationTools"),
       items: [
         { path: "/ai-automation", icon: Brain, label: t("nav.aiAutomation") },
