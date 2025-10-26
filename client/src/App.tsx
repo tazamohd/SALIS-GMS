@@ -53,6 +53,7 @@ import GlobalizationLayer from "@/pages/GlobalizationLayer";
 import PartsSupplyNetwork from "@/pages/PartsSupplyNetwork";
 import DiagnosticsOBDHub from "@/pages/DiagnosticsOBDHub";
 import OEMSoftwareSubscriptions from "@/pages/OEMSoftwareSubscriptions";
+import AIChatbot from "@/pages/AIChatbot";
 import { CustomerDashboard } from "@/pages/customer/CustomerDashboard";
 import { CustomerAppointments } from "@/pages/customer/CustomerAppointments";
 import { CustomerInvoices } from "@/pages/customer/CustomerInvoices";
@@ -352,6 +353,11 @@ function Router() {
       <Route path="/oem-software">
         <Layout>
           <OEMSoftwareSubscriptions />
+        </Layout>
+      </Route>
+      <Route path="/ai-chatbot">
+        <Layout>
+          <AIChatbot />
         </Layout>
       </Route>
       <Route component={NotFound} />

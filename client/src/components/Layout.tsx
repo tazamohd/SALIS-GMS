@@ -262,6 +262,7 @@ export function Layout({ children }: LayoutProps) {
       label: t("nav.automationTools"),
       items: [
         { path: "/ai-automation", icon: Brain, label: t("nav.aiAutomation") },
+        { path: "/ai-chatbot", icon: MessageCircle, label: "AI Chatbot" },
         { path: "/integrations", icon: Plug2, label: t("nav.integrations") },
         {
           path: "/data-import-export",
