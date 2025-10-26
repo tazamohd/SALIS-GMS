@@ -50,12 +50,12 @@ export default function DocumentManagement() {
   const [statusFilter, setStatusFilter] = useState<string>("");
 
   // Fetch document categories
-  const { data: categories = [], isLoading: categoriesLoading } = useQuery({
+  const { data: categories = [], isLoading: categoriesLoading } = useQuery<any[]>({
     queryKey: ["/api/document-categories"],
   });
 
   // Fetch documents
-  const { data: documents = [], isLoading: documentsLoading } = useQuery({
+  const { data: documents = [], isLoading: documentsLoading } = useQuery<any[]>({
     queryKey: ["/api/documents", categoryFilter, statusFilter],
     queryFn: () => {
       const params = new URLSearchParams();
@@ -66,7 +66,7 @@ export default function DocumentManagement() {
   });
 
   // Fetch expiring documents
-  const { data: expiringDocuments = [] } = useQuery({
+  const { data: expiringDocuments = [] } = useQuery<any[]>({
     queryKey: ["/api/documents/expiring"],
     queryFn: () => fetch("/api/documents/expiring?daysAhead=30").then(r => r.json()),
   });

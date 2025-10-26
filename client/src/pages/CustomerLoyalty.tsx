@@ -51,24 +51,24 @@ export default function CustomerLoyalty() {
   const [selectedProgram, setSelectedProgram] = useState<any>(null);
 
   // Fetch loyalty programs
-  const { data: programs = [], isLoading: programsLoading } = useQuery({
+  const { data: programs = [], isLoading: programsLoading } = useQuery<any[]>({
     queryKey: ["/api/loyalty-programs"],
   });
 
   // Fetch loyalty accounts
-  const { data: accounts = [] } = useQuery({
+  const { data: accounts = [] } = useQuery<any[]>({
     queryKey: ["/api/loyalty-accounts"],
   });
 
   // Fetch loyalty rewards
-  const { data: rewards = [] } = useQuery({
+  const { data: rewards = [] } = useQuery<any[]>({
     queryKey: ["/api/loyalty-programs", selectedProgram?.id, "rewards"],
     queryFn: () => selectedProgram ? fetch(`/api/loyalty-programs/${selectedProgram.id}/rewards`).then(r => r.json()) : Promise.resolve([]),
     enabled: !!selectedProgram,
   });
 
   // Fetch loyalty redemptions
-  const { data: redemptions = [] } = useQuery({
+  const { data: redemptions = [] } = useQuery<any[]>({
     queryKey: ["/api/loyalty-redemptions"],
   });
 
