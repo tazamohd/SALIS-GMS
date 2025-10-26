@@ -50,7 +50,7 @@ import {
   RefreshCw,
   MapPin,
   Clock,
-  Tool,
+  Wrench as Tool,
   Leaf,
   AlertTriangle,
   Scan,
@@ -362,7 +362,7 @@ export function Layout({ children }: LayoutProps) {
 
   // Track which groups are expanded
   const [expandedGroups, setExpandedGroups] = useState<string[]>(
-    navGroups.map((group) => group.label), // All groups expanded by default
+    navGroups.map((group) => group.label || group.group || ''), // All groups expanded by default
   );
 
   const toggleGroup = (groupLabel: string) => {
@@ -414,24 +414,25 @@ export function Layout({ children }: LayoutProps) {
           <nav className="flex-1 p-3 overflow-y-auto">
             <div className="space-y-0.5">
               {navGroups.map((group) => {
-                const isExpanded = expandedGroups.includes(group.label);
+                const groupLabel = group.label || group.group || '';
+                const isExpanded = expandedGroups.includes(groupLabel);
                 const hasActiveItem = group.items.some(
                   (item) => location === item.path,
                 );
 
                 return (
                   <Collapsible
-                    key={group.label}
+                    key={groupLabel}
                     open={isExpanded}
-                    onOpenChange={() => toggleGroup(group.label)}
+                    onOpenChange={() => toggleGroup(groupLabel)}
                   >
                     <CollapsibleTrigger
                       className="w-full"
-                      data-testid={`nav-group-${group.label.toLowerCase().replace(/\s+/g, "-")}`}
+                      data-testid={`nav-group-${groupLabel.toLowerCase().replace(/\s+/g, "-")}`}
                     >
                       <div className="flex items-center justify-between px-2 py-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-salis-gray-dark transition-colors group">
                         <span className="font-poppins font-semibold text-[10px] uppercase text-gray-500 dark:text-gray-400 tracking-wider">
-                          {group.label}
+                          {groupLabel}
                         </span>
                         {isExpanded ? (
                           <ChevronDown className="w-3 h-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-300" />
