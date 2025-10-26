@@ -10,9 +10,11 @@ import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import type { NetworkPartner, FulfillmentOrder, ShipmentEvent, WarehouseNode } from "@shared/schema";
+import type { NetworkPartner, FulfillmentOrder, ShipmentEvent, WarehouseNode, InsertNetworkPartner, InsertFulfillmentOrder } from "@shared/schema";
+import { insertNetworkPartnerSchema, insertFulfillmentOrderSchema } from "@shared/schema";
 
 export default function PartsSupplyNetwork() {
   const { toast } = useToast();
@@ -25,16 +27,22 @@ export default function PartsSupplyNetwork() {
   const { data: shipments = [] } = useQuery<ShipmentEvent[]>({ queryKey: ["/api/shipment-events"] });
   const { data: warehouses = [] } = useQuery<WarehouseNode[]>({ queryKey: ["/api/warehouse-nodes"] });
 
-  const partnerForm = useForm<any>({ defaultValues: { partnerName: "", partnerType: "supplier", country: "", isActive: true } });
-  const orderForm = useForm<any>({ defaultValues: { partnerId: "", orderNumber: "", status: "pending" } });
+  const partnerForm = useForm<InsertNetworkPartner>({ 
+    resolver: zodResolver(insertNetworkPartnerSchema),
+    defaultValues: { partnerName: "", partnerType: "supplier", country: "", isActive: true } 
+  });
+  const orderForm = useForm<InsertFulfillmentOrder>({ 
+    resolver: zodResolver(insertFulfillmentOrderSchema),
+    defaultValues: { partnerId: "", orderNumber: "", status: "pending" } 
+  });
 
   const createPartnerMutation = useMutation({
-    mutationFn: (data: any) => apiRequest("/api/network-partners", "POST", data),
+    mutationFn: (data: InsertNetworkPartner) => apiRequest("/api/network-partners", "POST", data),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/network-partners"] }); setShowPartnerDialog(false); toast({ title: "Partner created" }); },
   });
 
   const createOrderMutation = useMutation({
-    mutationFn: (data: any) => apiRequest("/api/fulfillment-orders", "POST", data),
+    mutationFn: (data: InsertFulfillmentOrder) => apiRequest("/api/fulfillment-orders", "POST", data),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/fulfillment-orders"] }); setShowOrderDialog(false); toast({ title: "Order created" }); },
   });
 

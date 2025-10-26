@@ -12,9 +12,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import type { Locale, TranslationResource, CurrencyRate, TaxRegion } from "@shared/schema";
+import type { Locale, TranslationResource, CurrencyRate, TaxRegion, InsertLocale, InsertTranslationResource, InsertCurrencyRate, InsertTaxRegion } from "@shared/schema";
+import { insertLocaleSchema, insertTranslationResourceSchema, insertCurrencyRateSchema, insertTaxRegionSchema } from "@shared/schema";
 
 export default function GlobalizationLayer() {
   const { toast } = useToast();
@@ -29,28 +31,40 @@ export default function GlobalizationLayer() {
   const { data: currencies = [] } = useQuery<CurrencyRate[]>({ queryKey: ["/api/currency-rates"] });
   const { data: taxRegions = [] } = useQuery<TaxRegion[]>({ queryKey: ["/api/tax-regions"] });
 
-  const localeForm = useForm<any>({ defaultValues: { code: "", name: "", nativeName: "", isActive: true } });
-  const translationForm = useForm<any>({ defaultValues: { localeCode: "", resourceKey: "", resourceValue: "" } });
-  const currencyForm = useForm<any>({ defaultValues: { fromCurrency: "", toCurrency: "", rate: "1.0", isActive: true } });
-  const taxForm = useForm<any>({ defaultValues: { regionCode: "", regionName: "", taxRate: "0", isActive: true } });
+  const localeForm = useForm<InsertLocale>({ 
+    resolver: zodResolver(insertLocaleSchema),
+    defaultValues: { code: "", name: "", nativeName: "", isActive: true } 
+  });
+  const translationForm = useForm<InsertTranslationResource>({ 
+    resolver: zodResolver(insertTranslationResourceSchema),
+    defaultValues: { localeCode: "", resourceKey: "", resourceValue: "" } 
+  });
+  const currencyForm = useForm<InsertCurrencyRate>({ 
+    resolver: zodResolver(insertCurrencyRateSchema),
+    defaultValues: { fromCurrency: "", toCurrency: "", rate: "1.0", isActive: true } 
+  });
+  const taxForm = useForm<InsertTaxRegion>({ 
+    resolver: zodResolver(insertTaxRegionSchema),
+    defaultValues: { regionCode: "", regionName: "", taxRate: "0", isActive: true } 
+  });
 
   const createLocaleMutation = useMutation({
-    mutationFn: (data: any) => apiRequest("/api/locales", "POST", data),
+    mutationFn: (data: InsertLocale) => apiRequest("/api/locales", "POST", data),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/locales"] }); setShowLocaleDialog(false); toast({ title: "Locale created" }); },
   });
 
   const createTranslationMutation = useMutation({
-    mutationFn: (data: any) => apiRequest("/api/translation-resources", "POST", data),
+    mutationFn: (data: InsertTranslationResource) => apiRequest("/api/translation-resources", "POST", data),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/translation-resources"] }); setShowTranslationDialog(false); toast({ title: "Translation created" }); },
   });
 
   const createCurrencyMutation = useMutation({
-    mutationFn: (data: any) => apiRequest("/api/currency-rates", "POST", data),
+    mutationFn: (data: InsertCurrencyRate) => apiRequest("/api/currency-rates", "POST", data),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/currency-rates"] }); setShowCurrencyDialog(false); toast({ title: "Currency rate created" }); },
   });
 
   const createTaxMutation = useMutation({
-    mutationFn: (data: any) => apiRequest("/api/tax-regions", "POST", data),
+    mutationFn: (data: InsertTaxRegion) => apiRequest("/api/tax-regions", "POST", data),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/tax-regions"] }); setShowTaxDialog(false); toast({ title: "Tax region created" }); },
   });
 

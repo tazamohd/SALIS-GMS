@@ -11,9 +11,11 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import type { ObdDevice, DeviceAssignment, ObdSession, DiagnosticReport } from "@shared/schema";
+import type { ObdDevice, DeviceAssignment, ObdSession, DiagnosticReport, InsertObdDevice, InsertObdSession } from "@shared/schema";
+import { insertObdDeviceSchema, insertObdSessionSchema } from "@shared/schema";
 
 export default function DiagnosticsOBDHub() {
   const { toast } = useToast();
@@ -26,16 +28,22 @@ export default function DiagnosticsOBDHub() {
   const { data: sessions = [] } = useQuery<ObdSession[]>({ queryKey: ["/api/obd-sessions"] });
   const { data: reports = [] } = useQuery<DiagnosticReport[]>({ queryKey: ["/api/diagnostic-reports"] });
 
-  const deviceForm = useForm<any>({ defaultValues: { deviceSerial: "", manufacturer: "Bosch", model: "", firmwareVersion: "", isActive: true } });
-  const sessionForm = useForm<any>({ defaultValues: { deviceId: "", vehicleId: "", status: "active" } });
+  const deviceForm = useForm<InsertObdDevice>({ 
+    resolver: zodResolver(insertObdDeviceSchema),
+    defaultValues: { deviceSerial: "", manufacturer: "Bosch", model: "", firmwareVersion: "", isActive: true } 
+  });
+  const sessionForm = useForm<InsertObdSession>({ 
+    resolver: zodResolver(insertObdSessionSchema),
+    defaultValues: { deviceId: "", vehicleId: "", status: "active" } 
+  });
 
   const createDeviceMutation = useMutation({
-    mutationFn: (data: any) => apiRequest("/api/obd-devices", "POST", data),
+    mutationFn: (data: InsertObdDevice) => apiRequest("/api/obd-devices", "POST", data),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/obd-devices"] }); setShowDeviceDialog(false); toast({ title: "Device registered" }); },
   });
 
   const createSessionMutation = useMutation({
-    mutationFn: (data: any) => apiRequest("/api/obd-sessions", "POST", data),
+    mutationFn: (data: InsertObdSession) => apiRequest("/api/obd-sessions", "POST", data),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/obd-sessions"] }); setShowSessionDialog(false); toast({ title: "Session started" }); },
   });
 

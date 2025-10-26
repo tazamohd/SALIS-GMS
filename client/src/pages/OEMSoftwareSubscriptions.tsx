@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery, useMutation } from "@tantml:react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Package, Key, FileText, Shield, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -11,9 +11,11 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import type { VendorCatalog, OemProduct, SubscriptionLicense, LicenseAuditLog } from "@shared/schema";
+import type { VendorCatalog, OemProduct, SubscriptionLicense, LicenseAuditLog, InsertVendorCatalog, InsertOemProduct, InsertSubscriptionLicense } from "@shared/schema";
+import { insertVendorCatalogSchema, insertOemProductSchema, insertSubscriptionLicenseSchema } from "@shared/schema";
 
 export default function OEMSoftwareSubscriptions() {
   const { toast } = useToast();
@@ -27,22 +29,31 @@ export default function OEMSoftwareSubscriptions() {
   const { data: licenses = [] } = useQuery<SubscriptionLicense[]>({ queryKey: ["/api/subscription-licenses"] });
   const { data: auditLogs = [] } = useQuery<LicenseAuditLog[]>({ queryKey: ["/api/license-audit-logs"] });
 
-  const catalogForm = useForm<any>({ defaultValues: { vendorName: "", vendorCode: "", isActive: true } });
-  const productForm = useForm<any>({ defaultValues: { vendorId: "", productName: "", productType: "diagnostic_software", isActive: true } });
-  const licenseForm = useForm<any>({ defaultValues: { productId: "", licenseKey: "", status: "active" } });
+  const catalogForm = useForm<InsertVendorCatalog>({ 
+    resolver: zodResolver(insertVendorCatalogSchema),
+    defaultValues: { vendorName: "", vendorCode: "", isActive: true } 
+  });
+  const productForm = useForm<InsertOemProduct>({ 
+    resolver: zodResolver(insertOemProductSchema),
+    defaultValues: { vendorId: "", productName: "", productType: "diagnostic_software", isActive: true } 
+  });
+  const licenseForm = useForm<InsertSubscriptionLicense>({ 
+    resolver: zodResolver(insertSubscriptionLicenseSchema),
+    defaultValues: { productId: "", licenseKey: "", status: "active" } 
+  });
 
   const createCatalogMutation = useMutation({
-    mutationFn: (data: any) => apiRequest("/api/vendor-catalogs", "POST", data),
+    mutationFn: (data: InsertVendorCatalog) => apiRequest("/api/vendor-catalogs", "POST", data),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/vendor-catalogs"] }); setShowCatalogDialog(false); toast({ title: "Catalog created" }); },
   });
 
   const createProductMutation = useMutation({
-    mutationFn: (data: any) => apiRequest("/api/oem-products", "POST", data),
+    mutationFn: (data: InsertOemProduct) => apiRequest("/api/oem-products", "POST", data),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/oem-products"] }); setShowProductDialog(false); toast({ title: "Product created" }); },
   });
 
   const createLicenseMutation = useMutation({
-    mutationFn: (data: any) => apiRequest("/api/subscription-licenses", "POST", data),
+    mutationFn: (data: InsertSubscriptionLicense) => apiRequest("/api/subscription-licenses", "POST", data),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/subscription-licenses"] }); setShowLicenseDialog(false); toast({ title: "License created" }); },
   });
 
