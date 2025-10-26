@@ -54,6 +54,9 @@ import PartsSupplyNetwork from "@/pages/PartsSupplyNetwork";
 import DiagnosticsOBDHub from "@/pages/DiagnosticsOBDHub";
 import OEMSoftwareSubscriptions from "@/pages/OEMSoftwareSubscriptions";
 import AIChatbot from "@/pages/AIChatbot";
+import PredictiveMaintenance from "@/pages/PredictiveMaintenance";
+import SmartPartsRecommendations from "@/pages/SmartPartsRecommendations";
+import VoiceCommands from "@/pages/VoiceCommands";
 import { CustomerDashboard } from "@/pages/customer/CustomerDashboard";
 import { CustomerAppointments } from "@/pages/customer/CustomerAppointments";
 import { CustomerInvoices } from "@/pages/customer/CustomerInvoices";
@@ -358,6 +361,21 @@ function Router() {
       <Route path="/ai-chatbot">
         <Layout>
           <AIChatbot />
+        </Layout>
+      </Route>
+      <Route path="/predictive-maintenance">
+        <Layout>
+          <PredictiveMaintenance />
+        </Layout>
+      </Route>
+      <Route path="/smart-parts-recommendations">
+        <Layout>
+          <SmartPartsRecommendations />
+        </Layout>
+      </Route>
+      <Route path="/voice-commands">
+        <Layout>
+          <VoiceCommands />
         </Layout>
       </Route>
       <Route component={NotFound} />

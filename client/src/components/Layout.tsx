@@ -263,6 +263,9 @@ export function Layout({ children }: LayoutProps) {
       items: [
         { path: "/ai-automation", icon: Brain, label: t("nav.aiAutomation") },
         { path: "/ai-chatbot", icon: MessageCircle, label: "AI Chatbot" },
+        { path: "/predictive-maintenance", icon: TrendingUp, label: "Predictive Maintenance" },
+        { path: "/smart-parts-recommendations", icon: Package, label: "Smart Parts" },
+        { path: "/voice-commands", icon: Radio, label: "Voice Commands" },
         { path: "/integrations", icon: Plug2, label: t("nav.integrations") },
         {
           path: "/data-import-export",

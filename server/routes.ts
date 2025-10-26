@@ -5224,6 +5224,62 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post('/api/ai/maintenance-predictions/analyze', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.garageId;
+      
+      // Get all vehicles and their service history for this garage
+      const vehicles = await storage.getVehicles(userGarageId);
+      const predictions = [];
+
+      for (const vehicle of vehicles) {
+        // Get service history for the vehicle - filter by garage, then by vehicle
+        const allJobCards = await storage.getJobCards(userGarageId);
+        const jobCards = allJobCards.filter(jc => jc.vehicleId === vehicle.id);
+        
+        if (jobCards.length > 0) {
+          // Use AI to analyze service patterns and predict maintenance needs
+          // For now, create a simple prediction based on service frequency
+          const lastService = jobCards[jobCards.length - 1];
+          const daysSinceLastService = Math.floor(
+            (Date.now() - new Date(lastService.createdAt!).getTime()) / (1000 * 60 * 60 * 24)
+          );
+
+          // Generate prediction if vehicle hasn't been serviced in 90+ days
+          if (daysSinceLastService > 90) {
+            const predictionData = {
+              garageId: userGarageId,
+              vehicleId: vehicle.id,
+              predictedIssue: `${vehicle.make} ${vehicle.model} may require routine maintenance`,
+              severity: daysSinceLastService > 180 ? 'high' : 'medium',
+              recommendedAction: `Schedule inspection - vehicle hasn't been serviced in ${daysSinceLastService} days`,
+              estimatedTimeframe: 'Within 2 weeks',
+              confidence: 75 + (daysSinceLastService > 180 ? 10 : 0),
+              basedOnData: {
+                lastServiceDate: lastService.createdAt,
+                daysSinceLastService,
+                totalServices: jobCards.length,
+                vehicleInfo: `${vehicle.year} ${vehicle.make} ${vehicle.model}`,
+              },
+              status: 'pending'
+            };
+
+            const prediction = await storage.createAIMaintenancePrediction(predictionData);
+            predictions.push(prediction);
+          }
+        }
+      }
+
+      res.json({
+        message: `Analysis complete. Generated ${predictions.length} new predictions.`,
+        predictions,
+      });
+    } catch (error: any) {
+      console.error("Error running maintenance analysis:", error);
+      res.status(500).json({ message: "Failed to run maintenance analysis", error: error.message });
+    }
+  });
+
   // Parts Recommendation Routes
   app.post('/api/ai/recommend-parts', isAuthenticated, async (req: any, res) => {
     try {
@@ -5555,6 +5611,101 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error handing off conversation:", error);
       res.status(500).json({ message: "Failed to hand off conversation" });
+    }
+  });
+
+  // Voice Commands Routes
+  app.get('/api/voice-commands', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const commands = await storage.getVoiceCommands(userId);
+      res.json(commands);
+    } catch (error) {
+      console.error("Error fetching voice commands:", error);
+      res.status(500).json({ message: "Failed to fetch voice commands" });
+    }
+  });
+
+  app.post('/api/voice-commands/process', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const { command, rawTranscript } = req.body;
+      
+      // Simple command processing logic
+      const lowerCommand = (command || rawTranscript || "").toLowerCase().trim();
+      let intent = "unknown";
+      let actionExecuted = null;
+      let success = false;
+      let path = null;
+
+      // Basic intent matching
+      if (lowerCommand.includes("open") || lowerCommand.includes("show") || lowerCommand.includes("view")) {
+        intent = "navigate";
+        
+        if (lowerCommand.includes("job card") || lowerCommand.includes("jobcard")) {
+          actionExecuted = "navigate_to_job_cards";
+          path = "/job-cards";
+          success = true;
+        } else if (lowerCommand.includes("customer")) {
+          actionExecuted = "navigate_to_customers";
+          path = "/customers";
+          success = true;
+        } else if (lowerCommand.includes("appointment")) {
+          actionExecuted = "navigate_to_appointments";
+          path = "/appointments";
+          success = true;
+        } else if (lowerCommand.includes("inventory") || lowerCommand.includes("part")) {
+          actionExecuted = "navigate_to_inventory";
+          path = "/inventory";
+          success = true;
+        } else if (lowerCommand.includes("setting")) {
+          actionExecuted = "navigate_to_settings";
+          path = "/settings";
+          success = true;
+        } else if (lowerCommand.includes("report")) {
+          actionExecuted = "navigate_to_reports";
+          path = "/reports";
+          success = true;
+        }
+      } else if (lowerCommand.includes("create") || lowerCommand.includes("new")) {
+        intent = "create";
+        if (lowerCommand.includes("appointment")) {
+          actionExecuted = "navigate_to_new_appointment";
+          path = "/appointments";
+          success = true;
+        } else if (lowerCommand.includes("invoice")) {
+          actionExecuted = "navigate_to_new_invoice";
+          path = "/invoices";
+          success = true;
+        }
+      } else if (lowerCommand.includes("search") || lowerCommand.includes("find")) {
+        intent = "search";
+        actionExecuted = "trigger_search";
+        success = true;
+      }
+
+      // Store the command in database
+      const commandData = {
+        userId,
+        transcript: rawTranscript || command,
+        intent,
+        entities: { originalCommand: command },
+        confidence: success ? 85 : 30,
+        actionExecuted,
+        success,
+        responseTime: 100,
+      };
+
+      const savedCommand = await storage.createVoiceCommand(commandData);
+
+      res.json({
+        ...savedCommand,
+        path,
+        message: success ? `Executing: ${actionExecuted}` : "Command not recognized",
+      });
+    } catch (error: any) {
+      console.error("Error processing voice command:", error);
+      res.status(500).json({ message: "Failed to process voice command", error: error.message });
     }
   });
 

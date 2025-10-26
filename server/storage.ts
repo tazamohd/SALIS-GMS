@@ -176,6 +176,10 @@ import {
   aiPartsRecommendations,
   aiScheduleOptimizations,
   aiChatConversations,
+  voiceCommands,
+  ocrDocuments,
+  aiChatMessages,
+  aiServiceSuggestions,
   integrationConnections,
   integrationSyncLogs,
   accountingTransactions,
@@ -842,6 +846,15 @@ export interface IStorage {
   getAIChatConversation(id: string): Promise<any | undefined>;
   createAIChatConversation(data: any): Promise<any>;
   updateAIChatConversation(id: string, data: any): Promise<any>;
+  
+  // Phase 1: AI & Automation - Voice Commands & OCR
+  getVoiceCommands(userId: string, limit?: number): Promise<any[]>;
+  createVoiceCommand(data: any): Promise<any>;
+  
+  getOCRDocuments(garageId: string, status?: string): Promise<any[]>;
+  getOCRDocument(id: string): Promise<any | undefined>;
+  createOCRDocument(data: any): Promise<any>;
+  updateOCRDocument(id: string, data: any): Promise<any>;
   
   // Module 36: In-App Chat Support
   getChatConversations(garageId: string, userId?: string): Promise<any[]>;
@@ -4918,6 +4931,51 @@ export class DatabaseStorage implements IStorage {
       .where(eq(aiChatConversations.id, id))
       .returning();
     return conversation;
+  }
+
+  // Phase 1: AI & Automation - Voice Commands & OCR
+  async getVoiceCommands(userId: string, limit: number = 50): Promise<any[]> {
+    return await db.select().from(voiceCommands)
+      .where(eq(voiceCommands.userId, userId))
+      .orderBy(desc(voiceCommands.createdAt))
+      .limit(limit);
+  }
+
+  async createVoiceCommand(data: any): Promise<any> {
+    const [command] = await db.insert(voiceCommands).values(data).returning();
+    return command;
+  }
+
+  async getOCRDocuments(garageId: string, status?: string): Promise<any[]> {
+    const conditions = [];
+    if (status) {
+      conditions.push(eq(ocrDocuments.status, status));
+    }
+    
+    const query = db.select().from(ocrDocuments).orderBy(desc(ocrDocuments.createdAt));
+    
+    if (conditions.length > 0) {
+      return await query.where(and(...conditions));
+    }
+    return await query;
+  }
+
+  async getOCRDocument(id: string): Promise<any | undefined> {
+    const [document] = await db.select().from(ocrDocuments).where(eq(ocrDocuments.id, id));
+    return document;
+  }
+
+  async createOCRDocument(data: any): Promise<any> {
+    const [document] = await db.insert(ocrDocuments).values(data).returning();
+    return document;
+  }
+
+  async updateOCRDocument(id: string, data: any): Promise<any> {
+    const [document] = await db.update(ocrDocuments)
+      .set({ ...data })
+      .where(eq(ocrDocuments.id, id))
+      .returning();
+    return document;
   }
 
   // Module 33: Third-Party Integrations
