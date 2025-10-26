@@ -37,7 +37,29 @@ import {
   insertLoanerVehicleSchema,
   insertLoanerReservationSchema,
   insertSupplierPriceListSchema,
-  insertSupplierPerformanceSchema
+  insertSupplierPerformanceSchema,
+  insertFranchiseGroupSchema,
+  insertFranchiseContractSchema,
+  insertFranchiseKpiSchema,
+  insertRevenueSharingRuleSchema,
+  insertLocaleSchema,
+  insertTranslationResourceSchema,
+  insertCurrencyRateSchema,
+  insertTaxRegionSchema,
+  insertTimezoneRuleSchema,
+  insertNetworkPartnerSchema,
+  insertFulfillmentOrderSchema,
+  insertShipmentEventSchema,
+  insertWarehouseNodeSchema,
+  insertObdDeviceSchema,
+  insertDeviceAssignmentSchema,
+  insertObdSessionSchema,
+  insertDiagnosticReportSchema,
+  insertVendorCatalogSchema,
+  insertOemProductSchema,
+  insertSubscriptionLicenseSchema,
+  insertLicenseAuditLogSchema,
+  insertEntitlementAssignmentSchema
 } from "@shared/schema";
 import Stripe from "stripe";
 import { createPaypalOrder, capturePaypalOrder, loadPaypalDefault } from "./paypal";
@@ -8684,6 +8706,1191 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching document access logs:", error);
       res.status(500).json({ error: "Failed to fetch document access logs" });
+    }
+  });
+
+  // ========================================================================
+  // ENTERPRISE ERP MODULES (56-60) API ROUTES
+  // ========================================================================
+
+  // ========================================================================
+  // Module 56: Franchise Command Center
+  // ========================================================================
+
+  // Franchise Groups
+  app.post("/api/franchise-groups", isAuthenticated, async (req: any, res) => {
+    try {
+      const validatedData = insertFranchiseGroupSchema.parse(req.body);
+      const group = await storage.createFranchiseGroup(validatedData);
+      res.status(201).json(group);
+    } catch (error: any) {
+      console.error("Error creating franchise group:", error);
+      res.status(400).json({ error: error.message || "Failed to create franchise group" });
+    }
+  });
+
+  app.get("/api/franchise-groups", isAuthenticated, async (req, res) => {
+    try {
+      const groups = await storage.getFranchiseGroups();
+      res.json(groups);
+    } catch (error) {
+      console.error("Error fetching franchise groups:", error);
+      res.status(500).json({ error: "Failed to fetch franchise groups" });
+    }
+  });
+
+  app.get("/api/franchise-groups/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const group = await storage.getFranchiseGroupById(id);
+      if (!group) {
+        return res.status(404).json({ error: "Franchise group not found" });
+      }
+      res.json(group);
+    } catch (error) {
+      console.error("Error fetching franchise group:", error);
+      res.status(500).json({ error: "Failed to fetch franchise group" });
+    }
+  });
+
+  app.patch("/api/franchise-groups/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updated = await storage.updateFranchiseGroup(id, req.body);
+      res.json(updated);
+    } catch (error: any) {
+      console.error("Error updating franchise group:", error);
+      res.status(400).json({ error: error.message || "Failed to update franchise group" });
+    }
+  });
+
+  app.delete("/api/franchise-groups/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteFranchiseGroup(id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting franchise group:", error);
+      res.status(500).json({ error: "Failed to delete franchise group" });
+    }
+  });
+
+  // Franchise Contracts
+  app.post("/api/franchise-contracts", isAuthenticated, async (req: any, res) => {
+    try {
+      const validatedData = insertFranchiseContractSchema.parse(req.body);
+      const contract = await storage.createFranchiseContract(validatedData);
+      res.status(201).json(contract);
+    } catch (error: any) {
+      console.error("Error creating franchise contract:", error);
+      res.status(400).json({ error: error.message || "Failed to create franchise contract" });
+    }
+  });
+
+  app.get("/api/franchise-contracts", isAuthenticated, async (req, res) => {
+    try {
+      const { franchiseGroupId } = req.query;
+      const contracts = await storage.getFranchiseContracts(franchiseGroupId as string | undefined);
+      res.json(contracts);
+    } catch (error) {
+      console.error("Error fetching franchise contracts:", error);
+      res.status(500).json({ error: "Failed to fetch franchise contracts" });
+    }
+  });
+
+  app.get("/api/franchise-contracts/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const contract = await storage.getFranchiseContractById(id);
+      if (!contract) {
+        return res.status(404).json({ error: "Franchise contract not found" });
+      }
+      res.json(contract);
+    } catch (error) {
+      console.error("Error fetching franchise contract:", error);
+      res.status(500).json({ error: "Failed to fetch franchise contract" });
+    }
+  });
+
+  app.patch("/api/franchise-contracts/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updated = await storage.updateFranchiseContract(id, req.body);
+      res.json(updated);
+    } catch (error: any) {
+      console.error("Error updating franchise contract:", error);
+      res.status(400).json({ error: error.message || "Failed to update franchise contract" });
+    }
+  });
+
+  app.delete("/api/franchise-contracts/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteFranchiseContract(id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting franchise contract:", error);
+      res.status(500).json({ error: "Failed to delete franchise contract" });
+    }
+  });
+
+  // Franchise KPIs
+  app.post("/api/franchise-kpis", isAuthenticated, async (req: any, res) => {
+    try {
+      const validatedData = insertFranchiseKpiSchema.parse(req.body);
+      const kpi = await storage.createFranchiseKpi(validatedData);
+      res.status(201).json(kpi);
+    } catch (error: any) {
+      console.error("Error creating franchise KPI:", error);
+      res.status(400).json({ error: error.message || "Failed to create franchise KPI" });
+    }
+  });
+
+  app.get("/api/franchise-kpis", isAuthenticated, async (req: any, res) => {
+    try {
+      const { branchId, month } = req.query;
+      if (!branchId) {
+        return res.status(400).json({ error: "branchId is required" });
+      }
+      const kpis = await storage.getFranchiseKpis(branchId as string, {
+        month: month as string | undefined
+      });
+      res.json(kpis);
+    } catch (error) {
+      console.error("Error fetching franchise KPIs:", error);
+      res.status(500).json({ error: "Failed to fetch franchise KPIs" });
+    }
+  });
+
+  app.get("/api/franchise-kpis/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const kpi = await storage.getFranchiseKpiById(id);
+      if (!kpi) {
+        return res.status(404).json({ error: "Franchise KPI not found" });
+      }
+      res.json(kpi);
+    } catch (error) {
+      console.error("Error fetching franchise KPI:", error);
+      res.status(500).json({ error: "Failed to fetch franchise KPI" });
+    }
+  });
+
+  app.patch("/api/franchise-kpis/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updated = await storage.updateFranchiseKpi(id, req.body);
+      res.json(updated);
+    } catch (error: any) {
+      console.error("Error updating franchise KPI:", error);
+      res.status(400).json({ error: error.message || "Failed to update franchise KPI" });
+    }
+  });
+
+  // Revenue Sharing Rules
+  app.post("/api/revenue-sharing-rules", isAuthenticated, async (req: any, res) => {
+    try {
+      const validatedData = insertRevenueSharingRuleSchema.parse(req.body);
+      const rule = await storage.createRevenueSharingRule(validatedData);
+      res.status(201).json(rule);
+    } catch (error: any) {
+      console.error("Error creating revenue sharing rule:", error);
+      res.status(400).json({ error: error.message || "Failed to create revenue sharing rule" });
+    }
+  });
+
+  app.get("/api/revenue-sharing-rules", isAuthenticated, async (req, res) => {
+    try {
+      const { franchiseGroupId } = req.query;
+      if (!franchiseGroupId) {
+        return res.status(400).json({ error: "franchiseGroupId is required" });
+      }
+      const rules = await storage.getRevenueSharingRules(franchiseGroupId as string);
+      res.json(rules);
+    } catch (error) {
+      console.error("Error fetching revenue sharing rules:", error);
+      res.status(500).json({ error: "Failed to fetch revenue sharing rules" });
+    }
+  });
+
+  app.get("/api/revenue-sharing-rules/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const rule = await storage.getRevenueSharingRuleById(id);
+      if (!rule) {
+        return res.status(404).json({ error: "Revenue sharing rule not found" });
+      }
+      res.json(rule);
+    } catch (error) {
+      console.error("Error fetching revenue sharing rule:", error);
+      res.status(500).json({ error: "Failed to fetch revenue sharing rule" });
+    }
+  });
+
+  app.patch("/api/revenue-sharing-rules/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updated = await storage.updateRevenueSharingRule(id, req.body);
+      res.json(updated);
+    } catch (error: any) {
+      console.error("Error updating revenue sharing rule:", error);
+      res.status(400).json({ error: error.message || "Failed to update revenue sharing rule" });
+    }
+  });
+
+  app.delete("/api/revenue-sharing-rules/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteRevenueSharingRule(id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting revenue sharing rule:", error);
+      res.status(500).json({ error: "Failed to delete revenue sharing rule" });
+    }
+  });
+
+  // ========================================================================
+  // Module 59: Globalization Layer
+  // ========================================================================
+
+  // Locales
+  app.post("/api/locales", isAuthenticated, async (req: any, res) => {
+    try {
+      const validatedData = insertLocaleSchema.parse(req.body);
+      const locale = await storage.createLocale(validatedData);
+      res.status(201).json(locale);
+    } catch (error: any) {
+      console.error("Error creating locale:", error);
+      res.status(400).json({ error: error.message || "Failed to create locale" });
+    }
+  });
+
+  app.get("/api/locales", isAuthenticated, async (req, res) => {
+    try {
+      const locales = await storage.getLocales();
+      res.json(locales);
+    } catch (error) {
+      console.error("Error fetching locales:", error);
+      res.status(500).json({ error: "Failed to fetch locales" });
+    }
+  });
+
+  app.get("/api/locales/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const locale = await storage.getLocaleById(id);
+      if (!locale) {
+        return res.status(404).json({ error: "Locale not found" });
+      }
+      res.json(locale);
+    } catch (error) {
+      console.error("Error fetching locale:", error);
+      res.status(500).json({ error: "Failed to fetch locale" });
+    }
+  });
+
+  app.patch("/api/locales/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updated = await storage.updateLocale(id, req.body);
+      res.json(updated);
+    } catch (error: any) {
+      console.error("Error updating locale:", error);
+      res.status(400).json({ error: error.message || "Failed to update locale" });
+    }
+  });
+
+  app.delete("/api/locales/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteLocale(id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting locale:", error);
+      res.status(500).json({ error: "Failed to delete locale" });
+    }
+  });
+
+  // Translation Resources
+  app.post("/api/translation-resources", isAuthenticated, async (req: any, res) => {
+    try {
+      const validatedData = insertTranslationResourceSchema.parse(req.body);
+      const resource = await storage.createTranslationResource(validatedData);
+      res.status(201).json(resource);
+    } catch (error: any) {
+      console.error("Error creating translation resource:", error);
+      res.status(400).json({ error: error.message || "Failed to create translation resource" });
+    }
+  });
+
+  app.get("/api/translation-resources", isAuthenticated, async (req, res) => {
+    try {
+      const { localeId, namespace } = req.query;
+      if (!localeId) {
+        return res.status(400).json({ error: "localeId is required" });
+      }
+      const resources = await storage.getTranslationResources(localeId as string, {
+        namespace: namespace as string | undefined
+      });
+      res.json(resources);
+    } catch (error) {
+      console.error("Error fetching translation resources:", error);
+      res.status(500).json({ error: "Failed to fetch translation resources" });
+    }
+  });
+
+  app.get("/api/translation-resources/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const resource = await storage.getTranslationResourceById(id);
+      if (!resource) {
+        return res.status(404).json({ error: "Translation resource not found" });
+      }
+      res.json(resource);
+    } catch (error) {
+      console.error("Error fetching translation resource:", error);
+      res.status(500).json({ error: "Failed to fetch translation resource" });
+    }
+  });
+
+  app.patch("/api/translation-resources/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updated = await storage.updateTranslationResource(id, req.body);
+      res.json(updated);
+    } catch (error: any) {
+      console.error("Error updating translation resource:", error);
+      res.status(400).json({ error: error.message || "Failed to update translation resource" });
+    }
+  });
+
+  app.delete("/api/translation-resources/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteTranslationResource(id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting translation resource:", error);
+      res.status(500).json({ error: "Failed to delete translation resource" });
+    }
+  });
+
+  // Currency Rates
+  app.post("/api/currency-rates", isAuthenticated, async (req: any, res) => {
+    try {
+      const validatedData = insertCurrencyRateSchema.parse(req.body);
+      const rate = await storage.createCurrencyRate(validatedData);
+      res.status(201).json(rate);
+    } catch (error: any) {
+      console.error("Error creating currency rate:", error);
+      res.status(400).json({ error: error.message || "Failed to create currency rate" });
+    }
+  });
+
+  app.get("/api/currency-rates", isAuthenticated, async (req, res) => {
+    try {
+      const { fromCurrency, toCurrency } = req.query;
+      const rates = await storage.getCurrencyRates(
+        fromCurrency as string | undefined,
+        toCurrency as string | undefined
+      );
+      res.json(rates);
+    } catch (error) {
+      console.error("Error fetching currency rates:", error);
+      res.status(500).json({ error: "Failed to fetch currency rates" });
+    }
+  });
+
+  app.get("/api/currency-rates/latest", isAuthenticated, async (req, res) => {
+    try {
+      const { fromCurrency, toCurrency } = req.query;
+      if (!fromCurrency || !toCurrency) {
+        return res.status(400).json({ error: "fromCurrency and toCurrency are required" });
+      }
+      const rate = await storage.getLatestCurrencyRate(fromCurrency as string, toCurrency as string);
+      res.json(rate);
+    } catch (error) {
+      console.error("Error fetching latest currency rate:", error);
+      res.status(500).json({ error: "Failed to fetch latest currency rate" });
+    }
+  });
+
+  // Tax Regions
+  app.post("/api/tax-regions", isAuthenticated, async (req: any, res) => {
+    try {
+      const validatedData = insertTaxRegionSchema.parse(req.body);
+      const region = await storage.createTaxRegion(validatedData);
+      res.status(201).json(region);
+    } catch (error: any) {
+      console.error("Error creating tax region:", error);
+      res.status(400).json({ error: error.message || "Failed to create tax region" });
+    }
+  });
+
+  app.get("/api/tax-regions", isAuthenticated, async (req, res) => {
+    try {
+      const { countryCode } = req.query;
+      const regions = await storage.getTaxRegions(countryCode as string | undefined);
+      res.json(regions);
+    } catch (error) {
+      console.error("Error fetching tax regions:", error);
+      res.status(500).json({ error: "Failed to fetch tax regions" });
+    }
+  });
+
+  app.get("/api/tax-regions/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const region = await storage.getTaxRegionById(id);
+      if (!region) {
+        return res.status(404).json({ error: "Tax region not found" });
+      }
+      res.json(region);
+    } catch (error) {
+      console.error("Error fetching tax region:", error);
+      res.status(500).json({ error: "Failed to fetch tax region" });
+    }
+  });
+
+  app.patch("/api/tax-regions/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updated = await storage.updateTaxRegion(id, req.body);
+      res.json(updated);
+    } catch (error: any) {
+      console.error("Error updating tax region:", error);
+      res.status(400).json({ error: error.message || "Failed to update tax region" });
+    }
+  });
+
+  app.delete("/api/tax-regions/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteTaxRegion(id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting tax region:", error);
+      res.status(500).json({ error: "Failed to delete tax region" });
+    }
+  });
+
+  // Timezone Rules
+  app.post("/api/timezone-rules", isAuthenticated, async (req: any, res) => {
+    try {
+      const validatedData = insertTimezoneRuleSchema.parse(req.body);
+      const rule = await storage.createTimezoneRule(validatedData);
+      res.status(201).json(rule);
+    } catch (error: any) {
+      console.error("Error creating timezone rule:", error);
+      res.status(400).json({ error: error.message || "Failed to create timezone rule" });
+    }
+  });
+
+  app.get("/api/timezone-rules", isAuthenticated, async (req, res) => {
+    try {
+      const { branchId } = req.query;
+      const rules = await storage.getTimezoneRules(branchId as string | undefined);
+      res.json(rules);
+    } catch (error) {
+      console.error("Error fetching timezone rules:", error);
+      res.status(500).json({ error: "Failed to fetch timezone rules" });
+    }
+  });
+
+  app.get("/api/timezone-rules/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const rule = await storage.getTimezoneRuleById(id);
+      if (!rule) {
+        return res.status(404).json({ error: "Timezone rule not found" });
+      }
+      res.json(rule);
+    } catch (error) {
+      console.error("Error fetching timezone rule:", error);
+      res.status(500).json({ error: "Failed to fetch timezone rule" });
+    }
+  });
+
+  app.patch("/api/timezone-rules/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updated = await storage.updateTimezoneRule(id, req.body);
+      res.json(updated);
+    } catch (error: any) {
+      console.error("Error updating timezone rule:", error);
+      res.status(400).json({ error: error.message || "Failed to update timezone rule" });
+    }
+  });
+
+  // ========================================================================
+  // Module 60: Parts Supply Network
+  // ========================================================================
+
+  // Network Partners
+  app.post("/api/network-partners", isAuthenticated, async (req: any, res) => {
+    try {
+      const validatedData = insertNetworkPartnerSchema.parse(req.body);
+      const partner = await storage.createNetworkPartner(validatedData);
+      res.status(201).json(partner);
+    } catch (error: any) {
+      console.error("Error creating network partner:", error);
+      res.status(400).json({ error: error.message || "Failed to create network partner" });
+    }
+  });
+
+  app.get("/api/network-partners", isAuthenticated, async (req, res) => {
+    try {
+      const { partnerType, country } = req.query;
+      const partners = await storage.getNetworkPartners({
+        partnerType: partnerType as string | undefined,
+        country: country as string | undefined
+      });
+      res.json(partners);
+    } catch (error) {
+      console.error("Error fetching network partners:", error);
+      res.status(500).json({ error: "Failed to fetch network partners" });
+    }
+  });
+
+  app.get("/api/network-partners/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const partner = await storage.getNetworkPartnerById(id);
+      if (!partner) {
+        return res.status(404).json({ error: "Network partner not found" });
+      }
+      res.json(partner);
+    } catch (error) {
+      console.error("Error fetching network partner:", error);
+      res.status(500).json({ error: "Failed to fetch network partner" });
+    }
+  });
+
+  app.patch("/api/network-partners/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updated = await storage.updateNetworkPartner(id, req.body);
+      res.json(updated);
+    } catch (error: any) {
+      console.error("Error updating network partner:", error);
+      res.status(400).json({ error: error.message || "Failed to update network partner" });
+    }
+  });
+
+  app.delete("/api/network-partners/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteNetworkPartner(id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting network partner:", error);
+      res.status(500).json({ error: "Failed to delete network partner" });
+    }
+  });
+
+  // Fulfillment Orders
+  app.post("/api/fulfillment-orders", isAuthenticated, async (req: any, res) => {
+    try {
+      const validatedData = insertFulfillmentOrderSchema.parse(req.body);
+      const order = await storage.createFulfillmentOrder(validatedData);
+      res.status(201).json(order);
+    } catch (error: any) {
+      console.error("Error creating fulfillment order:", error);
+      res.status(400).json({ error: error.message || "Failed to create fulfillment order" });
+    }
+  });
+
+  app.get("/api/fulfillment-orders", isAuthenticated, async (req, res) => {
+    try {
+      const { partnerId, branchId, status } = req.query;
+      const orders = await storage.getFulfillmentOrders({
+        partnerId: partnerId as string | undefined,
+        branchId: branchId as string | undefined,
+        status: status as string | undefined
+      });
+      res.json(orders);
+    } catch (error) {
+      console.error("Error fetching fulfillment orders:", error);
+      res.status(500).json({ error: "Failed to fetch fulfillment orders" });
+    }
+  });
+
+  app.get("/api/fulfillment-orders/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const order = await storage.getFulfillmentOrderById(id);
+      if (!order) {
+        return res.status(404).json({ error: "Fulfillment order not found" });
+      }
+      res.json(order);
+    } catch (error) {
+      console.error("Error fetching fulfillment order:", error);
+      res.status(500).json({ error: "Failed to fetch fulfillment order" });
+    }
+  });
+
+  app.patch("/api/fulfillment-orders/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updated = await storage.updateFulfillmentOrder(id, req.body);
+      res.json(updated);
+    } catch (error: any) {
+      console.error("Error updating fulfillment order:", error);
+      res.status(400).json({ error: error.message || "Failed to update fulfillment order" });
+    }
+  });
+
+  app.delete("/api/fulfillment-orders/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteFulfillmentOrder(id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting fulfillment order:", error);
+      res.status(500).json({ error: "Failed to delete fulfillment order" });
+    }
+  });
+
+  // Shipment Events
+  app.post("/api/shipment-events", isAuthenticated, async (req: any, res) => {
+    try {
+      const validatedData = insertShipmentEventSchema.parse(req.body);
+      const event = await storage.createShipmentEvent(validatedData);
+      res.status(201).json(event);
+    } catch (error: any) {
+      console.error("Error creating shipment event:", error);
+      res.status(400).json({ error: error.message || "Failed to create shipment event" });
+    }
+  });
+
+  app.get("/api/fulfillment-orders/:fulfillmentOrderId/shipment-events", isAuthenticated, async (req, res) => {
+    try {
+      const { fulfillmentOrderId } = req.params;
+      const events = await storage.getShipmentEvents(fulfillmentOrderId);
+      res.json(events);
+    } catch (error) {
+      console.error("Error fetching shipment events:", error);
+      res.status(500).json({ error: "Failed to fetch shipment events" });
+    }
+  });
+
+  // Warehouse Nodes
+  app.post("/api/warehouse-nodes", isAuthenticated, async (req: any, res) => {
+    try {
+      const validatedData = insertWarehouseNodeSchema.parse(req.body);
+      const node = await storage.createWarehouseNode(validatedData);
+      res.status(201).json(node);
+    } catch (error: any) {
+      console.error("Error creating warehouse node:", error);
+      res.status(400).json({ error: error.message || "Failed to create warehouse node" });
+    }
+  });
+
+  app.get("/api/warehouse-nodes", isAuthenticated, async (req, res) => {
+    try {
+      const { partnerId } = req.query;
+      const nodes = await storage.getWarehouseNodes(partnerId as string | undefined);
+      res.json(nodes);
+    } catch (error) {
+      console.error("Error fetching warehouse nodes:", error);
+      res.status(500).json({ error: "Failed to fetch warehouse nodes" });
+    }
+  });
+
+  app.get("/api/warehouse-nodes/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const node = await storage.getWarehouseNodeById(id);
+      if (!node) {
+        return res.status(404).json({ error: "Warehouse node not found" });
+      }
+      res.json(node);
+    } catch (error) {
+      console.error("Error fetching warehouse node:", error);
+      res.status(500).json({ error: "Failed to fetch warehouse node" });
+    }
+  });
+
+  app.patch("/api/warehouse-nodes/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updated = await storage.updateWarehouseNode(id, req.body);
+      res.json(updated);
+    } catch (error: any) {
+      console.error("Error updating warehouse node:", error);
+      res.status(400).json({ error: error.message || "Failed to update warehouse node" });
+    }
+  });
+
+  app.delete("/api/warehouse-nodes/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteWarehouseNode(id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting warehouse node:", error);
+      res.status(500).json({ error: "Failed to delete warehouse node" });
+    }
+  });
+
+  // ========================================================================
+  // Module 57: Diagnostics & OBD Hub
+  // ========================================================================
+
+  // OBD Devices
+  app.post("/api/obd-devices", isAuthenticated, async (req: any, res) => {
+    try {
+      const validatedData = insertObdDeviceSchema.parse(req.body);
+      const device = await storage.createObdDevice(validatedData);
+      res.status(201).json(device);
+    } catch (error: any) {
+      console.error("Error creating OBD device:", error);
+      res.status(400).json({ error: error.message || "Failed to create OBD device" });
+    }
+  });
+
+  app.get("/api/obd-devices", isAuthenticated, async (req, res) => {
+    try {
+      const { branchId } = req.query;
+      const devices = await storage.getObdDevices(branchId as string | undefined);
+      res.json(devices);
+    } catch (error) {
+      console.error("Error fetching OBD devices:", error);
+      res.status(500).json({ error: "Failed to fetch OBD devices" });
+    }
+  });
+
+  app.get("/api/obd-devices/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const device = await storage.getObdDeviceById(id);
+      if (!device) {
+        return res.status(404).json({ error: "OBD device not found" });
+      }
+      res.json(device);
+    } catch (error) {
+      console.error("Error fetching OBD device:", error);
+      res.status(500).json({ error: "Failed to fetch OBD device" });
+    }
+  });
+
+  app.patch("/api/obd-devices/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updated = await storage.updateObdDevice(id, req.body);
+      res.json(updated);
+    } catch (error: any) {
+      console.error("Error updating OBD device:", error);
+      res.status(400).json({ error: error.message || "Failed to update OBD device" });
+    }
+  });
+
+  app.delete("/api/obd-devices/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteObdDevice(id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting OBD device:", error);
+      res.status(500).json({ error: "Failed to delete OBD device" });
+    }
+  });
+
+  // Device Assignments
+  app.post("/api/device-assignments", isAuthenticated, async (req: any, res) => {
+    try {
+      const validatedData = insertDeviceAssignmentSchema.parse(req.body);
+      const assignment = await storage.createDeviceAssignment(validatedData);
+      res.status(201).json(assignment);
+    } catch (error: any) {
+      console.error("Error creating device assignment:", error);
+      res.status(400).json({ error: error.message || "Failed to create device assignment" });
+    }
+  });
+
+  app.get("/api/device-assignments", isAuthenticated, async (req, res) => {
+    try {
+      const { deviceId, technicianId } = req.query;
+      const assignments = await storage.getDeviceAssignments(
+        deviceId as string | undefined,
+        technicianId as string | undefined
+      );
+      res.json(assignments);
+    } catch (error) {
+      console.error("Error fetching device assignments:", error);
+      res.status(500).json({ error: "Failed to fetch device assignments" });
+    }
+  });
+
+  app.get("/api/device-assignments/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const assignment = await storage.getDeviceAssignmentById(id);
+      if (!assignment) {
+        return res.status(404).json({ error: "Device assignment not found" });
+      }
+      res.json(assignment);
+    } catch (error) {
+      console.error("Error fetching device assignment:", error);
+      res.status(500).json({ error: "Failed to fetch device assignment" });
+    }
+  });
+
+  app.patch("/api/device-assignments/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updated = await storage.updateDeviceAssignment(id, req.body);
+      res.json(updated);
+    } catch (error: any) {
+      console.error("Error updating device assignment:", error);
+      res.status(400).json({ error: error.message || "Failed to update device assignment" });
+    }
+  });
+
+  // OBD Sessions
+  app.post("/api/obd-sessions", isAuthenticated, async (req: any, res) => {
+    try {
+      const validatedData = insertObdSessionSchema.parse(req.body);
+      const session = await storage.createObdSession(validatedData);
+      res.status(201).json(session);
+    } catch (error: any) {
+      console.error("Error creating OBD session:", error);
+      res.status(400).json({ error: error.message || "Failed to create OBD session" });
+    }
+  });
+
+  app.get("/api/obd-sessions", isAuthenticated, async (req, res) => {
+    try {
+      const { deviceId, vehicleId, status } = req.query;
+      const sessions = await storage.getObdSessions({
+        deviceId: deviceId as string | undefined,
+        vehicleId: vehicleId as string | undefined,
+        status: status as string | undefined
+      });
+      res.json(sessions);
+    } catch (error) {
+      console.error("Error fetching OBD sessions:", error);
+      res.status(500).json({ error: "Failed to fetch OBD sessions" });
+    }
+  });
+
+  app.get("/api/obd-sessions/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const session = await storage.getObdSessionById(id);
+      if (!session) {
+        return res.status(404).json({ error: "OBD session not found" });
+      }
+      res.json(session);
+    } catch (error) {
+      console.error("Error fetching OBD session:", error);
+      res.status(500).json({ error: "Failed to fetch OBD session" });
+    }
+  });
+
+  app.patch("/api/obd-sessions/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updated = await storage.updateObdSession(id, req.body);
+      res.json(updated);
+    } catch (error: any) {
+      console.error("Error updating OBD session:", error);
+      res.status(400).json({ error: error.message || "Failed to update OBD session" });
+    }
+  });
+
+  // Diagnostic Reports
+  app.post("/api/diagnostic-reports", isAuthenticated, async (req: any, res) => {
+    try {
+      const validatedData = insertDiagnosticReportSchema.parse(req.body);
+      const report = await storage.createDiagnosticReport(validatedData);
+      res.status(201).json(report);
+    } catch (error: any) {
+      console.error("Error creating diagnostic report:", error);
+      res.status(400).json({ error: error.message || "Failed to create diagnostic report" });
+    }
+  });
+
+  app.get("/api/obd-sessions/:sessionId/diagnostic-reports", isAuthenticated, async (req, res) => {
+    try {
+      const { sessionId } = req.params;
+      const reports = await storage.getDiagnosticReports(sessionId);
+      res.json(reports);
+    } catch (error) {
+      console.error("Error fetching diagnostic reports:", error);
+      res.status(500).json({ error: "Failed to fetch diagnostic reports" });
+    }
+  });
+
+  app.get("/api/diagnostic-reports/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const report = await storage.getDiagnosticReportById(id);
+      if (!report) {
+        return res.status(404).json({ error: "Diagnostic report not found" });
+      }
+      res.json(report);
+    } catch (error) {
+      console.error("Error fetching diagnostic report:", error);
+      res.status(500).json({ error: "Failed to fetch diagnostic report" });
+    }
+  });
+
+  // ========================================================================
+  // Module 58: OEM Software Subscriptions
+  // ========================================================================
+
+  // Vendor Catalogs
+  app.post("/api/vendor-catalogs", isAuthenticated, async (req: any, res) => {
+    try {
+      const validatedData = insertVendorCatalogSchema.parse(req.body);
+      const catalog = await storage.createVendorCatalog(validatedData);
+      res.status(201).json(catalog);
+    } catch (error: any) {
+      console.error("Error creating vendor catalog:", error);
+      res.status(400).json({ error: error.message || "Failed to create vendor catalog" });
+    }
+  });
+
+  app.get("/api/vendor-catalogs", isAuthenticated, async (req, res) => {
+    try {
+      const catalogs = await storage.getVendorCatalogs();
+      res.json(catalogs);
+    } catch (error) {
+      console.error("Error fetching vendor catalogs:", error);
+      res.status(500).json({ error: "Failed to fetch vendor catalogs" });
+    }
+  });
+
+  app.get("/api/vendor-catalogs/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const catalog = await storage.getVendorCatalogById(id);
+      if (!catalog) {
+        return res.status(404).json({ error: "Vendor catalog not found" });
+      }
+      res.json(catalog);
+    } catch (error) {
+      console.error("Error fetching vendor catalog:", error);
+      res.status(500).json({ error: "Failed to fetch vendor catalog" });
+    }
+  });
+
+  app.patch("/api/vendor-catalogs/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updated = await storage.updateVendorCatalog(id, req.body);
+      res.json(updated);
+    } catch (error: any) {
+      console.error("Error updating vendor catalog:", error);
+      res.status(400).json({ error: error.message || "Failed to update vendor catalog" });
+    }
+  });
+
+  app.delete("/api/vendor-catalogs/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteVendorCatalog(id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting vendor catalog:", error);
+      res.status(500).json({ error: "Failed to delete vendor catalog" });
+    }
+  });
+
+  // OEM Products
+  app.post("/api/oem-products", isAuthenticated, async (req: any, res) => {
+    try {
+      const validatedData = insertOemProductSchema.parse(req.body);
+      const product = await storage.createOemProduct(validatedData);
+      res.status(201).json(product);
+    } catch (error: any) {
+      console.error("Error creating OEM product:", error);
+      res.status(400).json({ error: error.message || "Failed to create OEM product" });
+    }
+  });
+
+  app.get("/api/oem-products", isAuthenticated, async (req, res) => {
+    try {
+      const { vendorCatalogId } = req.query;
+      const products = await storage.getOemProducts(vendorCatalogId as string | undefined);
+      res.json(products);
+    } catch (error) {
+      console.error("Error fetching OEM products:", error);
+      res.status(500).json({ error: "Failed to fetch OEM products" });
+    }
+  });
+
+  app.get("/api/oem-products/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const product = await storage.getOemProductById(id);
+      if (!product) {
+        return res.status(404).json({ error: "OEM product not found" });
+      }
+      res.json(product);
+    } catch (error) {
+      console.error("Error fetching OEM product:", error);
+      res.status(500).json({ error: "Failed to fetch OEM product" });
+    }
+  });
+
+  app.patch("/api/oem-products/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updated = await storage.updateOemProduct(id, req.body);
+      res.json(updated);
+    } catch (error: any) {
+      console.error("Error updating OEM product:", error);
+      res.status(400).json({ error: error.message || "Failed to update OEM product" });
+    }
+  });
+
+  app.delete("/api/oem-products/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteOemProduct(id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting OEM product:", error);
+      res.status(500).json({ error: "Failed to delete OEM product" });
+    }
+  });
+
+  // Subscription Licenses
+  app.post("/api/subscription-licenses", isAuthenticated, async (req: any, res) => {
+    try {
+      const validatedData = insertSubscriptionLicenseSchema.parse(req.body);
+      const license = await storage.createSubscriptionLicense(validatedData);
+      res.status(201).json(license);
+    } catch (error: any) {
+      console.error("Error creating subscription license:", error);
+      res.status(400).json({ error: error.message || "Failed to create subscription license" });
+    }
+  });
+
+  app.get("/api/subscription-licenses", isAuthenticated, async (req, res) => {
+    try {
+      const { branchId, status } = req.query;
+      const licenses = await storage.getSubscriptionLicenses(
+        branchId as string | undefined,
+        { status: status as string | undefined }
+      );
+      res.json(licenses);
+    } catch (error) {
+      console.error("Error fetching subscription licenses:", error);
+      res.status(500).json({ error: "Failed to fetch subscription licenses" });
+    }
+  });
+
+  app.get("/api/subscription-licenses/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const license = await storage.getSubscriptionLicenseById(id);
+      if (!license) {
+        return res.status(404).json({ error: "Subscription license not found" });
+      }
+      res.json(license);
+    } catch (error) {
+      console.error("Error fetching subscription license:", error);
+      res.status(500).json({ error: "Failed to fetch subscription license" });
+    }
+  });
+
+  app.patch("/api/subscription-licenses/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updated = await storage.updateSubscriptionLicense(id, req.body);
+      res.json(updated);
+    } catch (error: any) {
+      console.error("Error updating subscription license:", error);
+      res.status(400).json({ error: error.message || "Failed to update subscription license" });
+    }
+  });
+
+  app.delete("/api/subscription-licenses/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteSubscriptionLicense(id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting subscription license:", error);
+      res.status(500).json({ error: "Failed to delete subscription license" });
+    }
+  });
+
+  // License Audit Logs
+  app.post("/api/license-audit-logs", isAuthenticated, async (req: any, res) => {
+    try {
+      const user = req.user;
+      const validatedData = insertLicenseAuditLogSchema.parse({ ...req.body, userId: user.id });
+      const log = await storage.createLicenseAuditLog(validatedData);
+      res.status(201).json(log);
+    } catch (error: any) {
+      console.error("Error creating license audit log:", error);
+      res.status(400).json({ error: error.message || "Failed to create license audit log" });
+    }
+  });
+
+  app.get("/api/subscription-licenses/:licenseId/audit-logs", isAuthenticated, async (req, res) => {
+    try {
+      const { licenseId } = req.params;
+      const logs = await storage.getLicenseAuditLogs(licenseId);
+      res.json(logs);
+    } catch (error) {
+      console.error("Error fetching license audit logs:", error);
+      res.status(500).json({ error: "Failed to fetch license audit logs" });
+    }
+  });
+
+  // Entitlement Assignments
+  app.post("/api/entitlement-assignments", isAuthenticated, async (req: any, res) => {
+    try {
+      const validatedData = insertEntitlementAssignmentSchema.parse(req.body);
+      const assignment = await storage.createEntitlementAssignment(validatedData);
+      res.status(201).json(assignment);
+    } catch (error: any) {
+      console.error("Error creating entitlement assignment:", error);
+      res.status(400).json({ error: error.message || "Failed to create entitlement assignment" });
+    }
+  });
+
+  app.get("/api/entitlement-assignments", isAuthenticated, async (req, res) => {
+    try {
+      const { licenseId, userId } = req.query;
+      const assignments = await storage.getEntitlementAssignments(
+        licenseId as string | undefined,
+        userId as string | undefined
+      );
+      res.json(assignments);
+    } catch (error) {
+      console.error("Error fetching entitlement assignments:", error);
+      res.status(500).json({ error: "Failed to fetch entitlement assignments" });
+    }
+  });
+
+  app.get("/api/entitlement-assignments/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const assignment = await storage.getEntitlementAssignmentById(id);
+      if (!assignment) {
+        return res.status(404).json({ error: "Entitlement assignment not found" });
+      }
+      res.json(assignment);
+    } catch (error) {
+      console.error("Error fetching entitlement assignment:", error);
+      res.status(500).json({ error: "Failed to fetch entitlement assignment" });
+    }
+  });
+
+  app.patch("/api/entitlement-assignments/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updated = await storage.updateEntitlementAssignment(id, req.body);
+      res.json(updated);
+    } catch (error: any) {
+      console.error("Error updating entitlement assignment:", error);
+      res.status(400).json({ error: error.message || "Failed to update entitlement assignment" });
     }
   });
 
