@@ -4675,3 +4675,603 @@ export const insertCustomerReferralSchema = createInsertSchema(customerReferrals
   id: true,
   createdAt: true,
 });
+
+// ========================================
+// PHASE 5: OPERATIONS & EFFICIENCY
+// ========================================
+
+// Module 81: AI-Powered Scheduling
+export const aiSchedulingRules = pgTable("ai_scheduling_rules", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  name: varchar("name").notNull(),
+  priority: integer("priority").default(1),
+  considerTechnicianSkills: boolean("consider_technician_skills").default(true),
+  considerTechnicianWorkload: boolean("consider_technician_workload").default(true),
+  considerPartAvailability: boolean("consider_part_availability").default(true),
+  considerCustomerPreference: boolean("consider_customer_preference").default(true),
+  bufferTimeBetweenJobs: integer("buffer_time_between_jobs").default(15), // minutes
+  maxJobsPerTechnician: integer("max_jobs_per_technician").default(5),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const schedulingOptimizations = pgTable("scheduling_optimizations", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  optimizationDate: timestamp("optimization_date").notNull(),
+  appointmentsOptimized: integer("appointments_optimized").default(0),
+  efficiencyGain: decimal("efficiency_gain", { precision: 5, scale: 2 }), // percentage
+  technicianUtilization: jsonb("technician_utilization"), // {technicianId: utilizationPercent}
+  suggestions: jsonb("suggestions"), // AI suggestions applied
+  status: varchar("status", { length: 50 }).default("pending"), // pending, applied, rejected
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Module 82: Parts Auto-Reordering
+export const autoReorderRules = pgTable("auto_reorder_rules", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  partId: uuid("part_id").references(() => spareParts.id).notNull(),
+  reorderPoint: integer("reorder_point").notNull(), // stock level to trigger reorder
+  reorderQuantity: integer("reorder_quantity").notNull(),
+  preferredSupplier: varchar("preferred_supplier"),
+  maxPrice: decimal("max_price", { precision: 10, scale: 2 }),
+  isActive: boolean("is_active").default(true),
+  lastTriggered: timestamp("last_triggered"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const autoReorderHistory = pgTable("auto_reorder_history", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  ruleId: uuid("rule_id").references(() => autoReorderRules.id).notNull(),
+  partId: uuid("part_id").references(() => spareParts.id).notNull(),
+  stockLevelAtTrigger: integer("stock_level_at_trigger").notNull(),
+  quantityOrdered: integer("quantity_ordered").notNull(),
+  supplier: varchar("supplier"),
+  orderStatus: varchar("order_status", { length: 50 }).default("pending"), // pending, ordered, received, cancelled
+  purchaseOrderId: uuid("purchase_order_id").references(() => purchaseOrders.id),
+  triggeredAt: timestamp("triggered_at").defaultNow(),
+});
+
+// Module 83: Multi-Location Routing
+export const routingOptimizations = pgTable("routing_optimizations", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  routeDate: timestamp("route_date").notNull(),
+  routeType: varchar("route_type", { length: 50 }).notNull(), // parts_transfer, towing, mobile_service
+  startLocation: varchar("start_location"),
+  stops: jsonb("stops").notNull(), // array of {location, type, priority, timeWindow}
+  optimizedRoute: jsonb("optimized_route"), // ordered stops with distances/times
+  totalDistance: decimal("total_distance", { precision: 10, scale: 2 }),
+  estimatedDuration: integer("estimated_duration"), // minutes
+  assignedDriver: varchar("assigned_driver").references(() => users.id),
+  status: varchar("status", { length: 50 }).default("planned"), // planned, in_progress, completed, cancelled
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Module 84: Time Clock & Payroll
+export const timeClockEntries = pgTable("time_clock_entries", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  employeeId: varchar("employee_id").references(() => users.id).notNull(),
+  clockInTime: timestamp("clock_in_time").notNull(),
+  clockOutTime: timestamp("clock_out_time"),
+  breakDuration: integer("break_duration").default(0), // minutes
+  totalHours: decimal("total_hours", { precision: 5, scale: 2 }),
+  overtimeHours: decimal("overtime_hours", { precision: 5, scale: 2 }).default("0"),
+  location: varchar("location"), // GPS or garage location
+  notes: text("notes"),
+  approvedBy: varchar("approved_by").references(() => users.id),
+  approvedAt: timestamp("approved_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const payrollPeriods = pgTable("payroll_periods", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  periodStart: timestamp("period_start").notNull(),
+  periodEnd: timestamp("period_end").notNull(),
+  payDate: timestamp("pay_date").notNull(),
+  status: varchar("status", { length: 50 }).default("draft"), // draft, processing, approved, paid
+  totalGrossPay: decimal("total_gross_pay", { precision: 12, scale: 2 }),
+  totalDeductions: decimal("total_deductions", { precision: 12, scale: 2 }),
+  totalNetPay: decimal("total_net_pay", { precision: 12, scale: 2 }),
+  processedBy: varchar("processed_by").references(() => users.id),
+  processedAt: timestamp("processed_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const payrollEntries = pgTable("payroll_entries", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  periodId: uuid("period_id").references(() => payrollPeriods.id).notNull(),
+  employeeId: varchar("employee_id").references(() => users.id).notNull(),
+  regularHours: decimal("regular_hours", { precision: 5, scale: 2 }).default("0"),
+  overtimeHours: decimal("overtime_hours", { precision: 5, scale: 2 }).default("0"),
+  hourlyRate: decimal("hourly_rate", { precision: 10, scale: 2 }).notNull(),
+  commission: decimal("commission", { precision: 10, scale: 2 }).default("0"),
+  bonuses: decimal("bonuses", { precision: 10, scale: 2 }).default("0"),
+  grossPay: decimal("gross_pay", { precision: 10, scale: 2 }).notNull(),
+  taxDeductions: decimal("tax_deductions", { precision: 10, scale: 2 }).default("0"),
+  otherDeductions: decimal("other_deductions", { precision: 10, scale: 2 }).default("0"),
+  netPay: decimal("net_pay", { precision: 10, scale: 2 }).notNull(),
+  paymentMethod: varchar("payment_method", { length: 50 }).default("direct_deposit"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Module 85: Equipment Calibration
+export const equipmentCalibration = pgTable("equipment_calibration", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  toolId: uuid("tool_id").references(() => tools.id).notNull(),
+  calibrationType: varchar("calibration_type", { length: 100 }).notNull(), // torque, alignment, diagnostic, etc
+  calibrationStandard: varchar("calibration_standard"), // ISO, NIST, etc
+  lastCalibrationDate: timestamp("last_calibration_date").notNull(),
+  nextCalibrationDue: timestamp("next_calibration_due").notNull(),
+  calibrationInterval: integer("calibration_interval").notNull(), // days
+  calibratedBy: varchar("calibrated_by"),
+  certificationNumber: varchar("certification_number"),
+  calibrationResults: jsonb("calibration_results"), // measurements, pass/fail
+  status: varchar("status", { length: 50 }).default("valid"), // valid, due, overdue, failed
+  attachments: jsonb("attachments"), // certification documents
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const calibrationReminders = pgTable("calibration_reminders", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  calibrationId: uuid("calibration_id").references(() => equipmentCalibration.id).notNull(),
+  reminderDate: timestamp("reminder_date").notNull(),
+  notifiedUsers: jsonb("notified_users"), // array of user IDs
+  status: varchar("status", { length: 50 }).default("pending"), // pending, sent, completed
+  sentAt: timestamp("sent_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Type exports for Phase 5
+export type AiSchedulingRule = typeof aiSchedulingRules.$inferSelect;
+export type InsertAiSchedulingRule = typeof aiSchedulingRules.$inferInsert;
+export const insertAiSchedulingRuleSchema = createInsertSchema(aiSchedulingRules).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type SchedulingOptimization = typeof schedulingOptimizations.$inferSelect;
+export type InsertSchedulingOptimization = typeof schedulingOptimizations.$inferInsert;
+export const insertSchedulingOptimizationSchema = createInsertSchema(schedulingOptimizations).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type AutoReorderRule = typeof autoReorderRules.$inferSelect;
+export type InsertAutoReorderRule = typeof autoReorderRules.$inferInsert;
+export const insertAutoReorderRuleSchema = createInsertSchema(autoReorderRules).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type AutoReorderHistory = typeof autoReorderHistory.$inferSelect;
+export type InsertAutoReorderHistory = typeof autoReorderHistory.$inferInsert;
+export const insertAutoReorderHistorySchema = createInsertSchema(autoReorderHistory).omit({
+  id: true,
+  triggeredAt: true,
+});
+
+export type RoutingOptimization = typeof routingOptimizations.$inferSelect;
+export type InsertRoutingOptimization = typeof routingOptimizations.$inferInsert;
+export const insertRoutingOptimizationSchema = createInsertSchema(routingOptimizations).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type TimeClockEntry = typeof timeClockEntries.$inferSelect;
+export type InsertTimeClockEntry = typeof timeClockEntries.$inferInsert;
+export const insertTimeClockEntrySchema = createInsertSchema(timeClockEntries).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type PayrollPeriod = typeof payrollPeriods.$inferSelect;
+export type InsertPayrollPeriod = typeof payrollPeriods.$inferInsert;
+export const insertPayrollPeriodSchema = createInsertSchema(payrollPeriods).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type PayrollEntry = typeof payrollEntries.$inferSelect;
+export type InsertPayrollEntry = typeof payrollEntries.$inferInsert;
+export const insertPayrollEntrySchema = createInsertSchema(payrollEntries).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type EquipmentCalibration = typeof equipmentCalibration.$inferSelect;
+export type InsertEquipmentCalibration = typeof equipmentCalibration.$inferInsert;
+export const insertEquipmentCalibrationSchema = createInsertSchema(equipmentCalibration).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type CalibrationReminder = typeof calibrationReminders.$inferSelect;
+export type InsertCalibrationReminder = typeof calibrationReminders.$inferInsert;
+export const insertCalibrationReminderSchema = createInsertSchema(calibrationReminders).omit({
+  id: true,
+  createdAt: true,
+});
+
+// ========================================
+// PHASE 6: COMPLIANCE & QUALITY
+// ========================================
+
+// Module 86: Environmental Compliance
+export const environmentalCompliance = pgTable("environmental_compliance", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  complianceType: varchar("compliance_type", { length: 100 }).notNull(), // waste_disposal, emissions, recycling
+  recordDate: timestamp("record_date").notNull(),
+  wasteType: varchar("waste_type"), // oil, coolant, batteries, tires, etc
+  quantity: decimal("quantity", { precision: 10, scale: 2 }),
+  unit: varchar("unit", { length: 50 }),
+  disposalMethod: varchar("disposal_method"),
+  disposalCompany: varchar("disposal_company"),
+  certificationNumber: varchar("certification_number"),
+  cost: decimal("cost", { precision: 10, scale: 2 }),
+  regulatoryStandard: varchar("regulatory_standard"), // EPA, state regulations
+  attachments: jsonb("attachments"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Module 87: ISO 9001 Quality Management
+export const qualityChecklists = pgTable("quality_checklists", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  name: varchar("name").notNull(),
+  category: varchar("category", { length: 100 }), // service_delivery, parts_inspection, customer_satisfaction
+  checklistItems: jsonb("checklistItems").notNull(), // array of items with pass/fail criteria
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const nonConformances = pgTable("non_conformances", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  ncNumber: varchar("nc_number").notNull().unique(),
+  title: varchar("title").notNull(),
+  description: text("description").notNull(),
+  category: varchar("category", { length: 100 }), // product, process, customer_complaint
+  severity: varchar("severity", { length: 50 }), // minor, major, critical
+  detectedBy: varchar("detected_by").references(() => users.id).notNull(),
+  detectedDate: timestamp("detected_date").notNull(),
+  jobCardId: uuid("job_card_id").references(() => jobCards.id),
+  rootCause: text("root_cause"),
+  status: varchar("status", { length: 50 }).default("open"), // open, investigating, resolved, closed
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const correctiveActions = pgTable("corrective_actions", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  nonConformanceId: uuid("non_conformance_id").references(() => nonConformances.id).notNull(),
+  actionDescription: text("action_description").notNull(),
+  assignedTo: varchar("assigned_to").references(() => users.id).notNull(),
+  dueDate: timestamp("due_date").notNull(),
+  completedDate: timestamp("completed_date"),
+  effectiveness: varchar("effectiveness", { length: 50 }), // effective, partially_effective, ineffective
+  verifiedBy: varchar("verified_by").references(() => users.id),
+  verifiedDate: timestamp("verified_date"),
+  status: varchar("status", { length: 50 }).default("pending"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Module 88: Safety Incident Reporting
+export const safetyIncidents = pgTable("safety_incidents", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  incidentNumber: varchar("incident_number").notNull().unique(),
+  incidentDate: timestamp("incident_date").notNull(),
+  incidentType: varchar("incident_type", { length: 100 }).notNull(), // injury, near_miss, property_damage, spill
+  severity: varchar("severity", { length: 50 }).notNull(), // minor, moderate, serious, fatal
+  location: varchar("location"),
+  involvedPersons: jsonb("involved_persons"), // array of person objects
+  witnesses: jsonb("witnesses"),
+  description: text("description").notNull(),
+  immediateActions: text("immediate_actions"),
+  reportedBy: varchar("reported_by").references(() => users.id).notNull(),
+  oshaRecordable: boolean("osha_recordable").default(false),
+  medicalTreatment: boolean("medical_treatment").default(false),
+  lostWorkDays: integer("lost_work_days").default(0),
+  status: varchar("status", { length: 50 }).default("reported"),
+  attachments: jsonb("attachments"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const incidentInvestigations = pgTable("incident_investigations", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  incidentId: uuid("incident_id").references(() => safetyIncidents.id).notNull(),
+  investigator: varchar("investigator").references(() => users.id).notNull(),
+  rootCauseAnalysis: text("root_cause_analysis"),
+  contributingFactors: jsonb("contributing_factors"),
+  preventiveMeasures: jsonb("preventive_measures"),
+  completedDate: timestamp("completed_date"),
+  status: varchar("status", { length: 50 }).default("in_progress"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Module 89: Insurance Claims
+export const insuranceClaims = pgTable("insurance_claims", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  claimNumber: varchar("claim_number").notNull().unique(),
+  jobCardId: uuid("job_card_id").references(() => jobCards.id),
+  customerId: varchar("customer_id").references(() => users.id).notNull(),
+  vehicleId: uuid("vehicle_id").references(() => vehicles.id),
+  insuranceCompany: varchar("insurance_company").notNull(),
+  policyNumber: varchar("policy_number"),
+  claimType: varchar("claim_type", { length: 100 }), // collision, comprehensive, liability
+  incidentDate: timestamp("incident_date").notNull(),
+  claimAmount: decimal("claim_amount", { precision: 12, scale: 2 }).notNull(),
+  approvedAmount: decimal("approved_amount", { precision: 12, scale: 2 }),
+  deductible: decimal("deductible", { precision: 10, scale: 2 }),
+  status: varchar("status", { length: 50 }).default("submitted"),
+  adjusterName: varchar("adjuster_name"),
+  adjusterContact: varchar("adjuster_contact"),
+  estimateUrl: varchar("estimate_url"),
+  documents: jsonb("documents"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// ========================================
+// PHASE 7: ADVANCED HARDWARE
+// ========================================
+
+// Module 90: Barcode/QR Scanner
+export const barcodeScans = pgTable("barcode_scans", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  scanType: varchar("scan_type", { length: 50 }).notNull(), // part_inventory, vehicle_checkin, tool_tracking
+  barcodeData: varchar("barcode_data").notNull(),
+  partId: uuid("part_id").references(() => spareParts.id),
+  vehicleId: uuid("vehicle_id").references(() => vehicles.id),
+  toolId: uuid("tool_id").references(() => tools.id),
+  scannedBy: varchar("scanned_by").references(() => users.id).notNull(),
+  location: varchar("location"),
+  associatedAction: varchar("associated_action"), // check_in, check_out, inventory_update
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Module 91: Digital Signage
+export const signageDisplays = pgTable("signage_displays", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  displayName: varchar("display_name").notNull(),
+  location: varchar("location"), // waiting_room, service_area, entrance
+  displayType: varchar("display_type", { length: 50 }), // service_status, promotions, mixed
+  isActive: boolean("is_active").default(true),
+  orientation: varchar("orientation", { length: 20 }).default("landscape"),
+  refreshInterval: integer("refresh_interval").default(30), // seconds
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const signageContent = pgTable("signage_content", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  displayId: uuid("display_id").references(() => signageDisplays.id).notNull(),
+  contentType: varchar("content_type", { length: 50 }).notNull(), // job_status, promotion, announcement, video
+  priority: integer("priority").default(1),
+  content: jsonb("content").notNull(), // flexible content structure
+  duration: integer("duration").default(10), // seconds
+  validFrom: timestamp("valid_from").defaultNow(),
+  validUntil: timestamp("valid_until"),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Module 92: Kiosk Check-In
+export const kioskSessions = pgTable("kiosk_sessions", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  kioskId: varchar("kiosk_id").notNull(),
+  sessionStart: timestamp("session_start").defaultNow(),
+  sessionEnd: timestamp("session_end"),
+  customerId: varchar("customer_id").references(() => users.id),
+  vehicleId: uuid("vehicle_id").references(() => vehicles.id),
+  checkInCompleted: boolean("check_in_completed").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const kioskCheckIns = pgTable("kiosk_check_ins", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  sessionId: uuid("session_id").references(() => kioskSessions.id).notNull(),
+  customerId: varchar("customer_id").references(() => users.id).notNull(),
+  vehicleId: uuid("vehicle_id").references(() => vehicles.id).notNull(),
+  appointmentId: uuid("appointment_id").references(() => appointments.id),
+  serviceRequested: jsonb("service_requested"),
+  mileage: integer("mileage"),
+  signatureUrl: varchar("signature_url"),
+  checkInTime: timestamp("check_in_time").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Module 93: Security Cameras
+export const securityCameras = pgTable("security_cameras", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  cameraName: varchar("camera_name").notNull(),
+  location: varchar("location").notNull(),
+  cameraType: varchar("camera_type", { length: 50 }), // indoor, outdoor, PTZ
+  streamUrl: varchar("stream_url"),
+  recordingEnabled: boolean("recording_enabled").default(true),
+  motionDetection: boolean("motion_detection").default(true),
+  retentionDays: integer("retention_days").default(30),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const cameraRecordings = pgTable("camera_recordings", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  cameraId: uuid("camera_id").references(() => securityCameras.id).notNull(),
+  vehicleId: uuid("vehicle_id").references(() => vehicles.id),
+  recordingStart: timestamp("recording_start").notNull(),
+  recordingEnd: timestamp("recording_end").notNull(),
+  recordingUrl: varchar("recording_url"),
+  fileSize: integer("file_size"), // MB
+  eventType: varchar("event_type", { length: 50 }), // motion, manual, incident
+  isBookmarked: boolean("is_bookmarked").default(false),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Module 94: License Plate Recognition
+export const licensePlateScans = pgTable("license_plate_scans", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  plateNumber: varchar("plate_number").notNull(),
+  confidence: decimal("confidence", { precision: 5, scale: 2 }), // recognition confidence %
+  vehicleId: uuid("vehicle_id").references(() => vehicles.id),
+  customerId: varchar("customer_id").references(() => users.id),
+  cameraId: uuid("camera_id").references(() => securityCameras.id),
+  imageUrl: varchar("image_url"),
+  scanType: varchar("scan_type", { length: 50 }), // entry, exit, parking
+  location: varchar("location"),
+  matchedAutomatically: boolean("matched_automatically").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const vehicleEntryLogs = pgTable("vehicle_entry_logs", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  vehicleId: uuid("vehicle_id").references(() => vehicles.id).notNull(),
+  customerId: varchar("customer_id").references(() => users.id),
+  plateNumber: varchar("plate_number"),
+  entryTime: timestamp("entry_time").notNull(),
+  exitTime: timestamp("exit_time"),
+  duration: integer("duration"), // minutes
+  purpose: varchar("purpose"), // service, dropoff, pickup
+  entryScanId: uuid("entry_scan_id").references(() => licensePlateScans.id),
+  exitScanId: uuid("exit_scan_id").references(() => licensePlateScans.id),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Type exports for Phase 6
+export type EnvironmentalCompliance = typeof environmentalCompliance.$inferSelect;
+export type InsertEnvironmentalCompliance = typeof environmentalCompliance.$inferInsert;
+export const insertEnvironmentalComplianceSchema = createInsertSchema(environmentalCompliance).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type QualityChecklist = typeof qualityChecklists.$inferSelect;
+export type InsertQualityChecklist = typeof qualityChecklists.$inferInsert;
+export const insertQualityChecklistSchema = createInsertSchema(qualityChecklists).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type NonConformance = typeof nonConformances.$inferSelect;
+export type InsertNonConformance = typeof nonConformances.$inferInsert;
+export const insertNonConformanceSchema = createInsertSchema(nonConformances).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type CorrectiveAction = typeof correctiveActions.$inferSelect;
+export type InsertCorrectiveAction = typeof correctiveActions.$inferInsert;
+export const insertCorrectiveActionSchema = createInsertSchema(correctiveActions).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type SafetyIncident = typeof safetyIncidents.$inferSelect;
+export type InsertSafetyIncident = typeof safetyIncidents.$inferInsert;
+export const insertSafetyIncidentSchema = createInsertSchema(safetyIncidents).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type IncidentInvestigation = typeof incidentInvestigations.$inferSelect;
+export type InsertIncidentInvestigation = typeof incidentInvestigations.$inferInsert;
+export const insertIncidentInvestigationSchema = createInsertSchema(incidentInvestigations).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsuranceClaim = typeof insuranceClaims.$inferSelect;
+export type InsertInsuranceClaim = typeof insuranceClaims.$inferInsert;
+export const insertInsuranceClaimSchema = createInsertSchema(insuranceClaims).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+// Type exports for Phase 7
+export type BarcodeScan = typeof barcodeScans.$inferSelect;
+export type InsertBarcodeScan = typeof barcodeScans.$inferInsert;
+export const insertBarcodeScanSchema = createInsertSchema(barcodeScans).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type SignageDisplay = typeof signageDisplays.$inferSelect;
+export type InsertSignageDisplay = typeof signageDisplays.$inferInsert;
+export const insertSignageDisplaySchema = createInsertSchema(signageDisplays).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type SignageContent = typeof signageContent.$inferSelect;
+export type InsertSignageContent = typeof signageContent.$inferInsert;
+export const insertSignageContentSchema = createInsertSchema(signageContent).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type KioskSession = typeof kioskSessions.$inferSelect;
+export type InsertKioskSession = typeof kioskSessions.$inferInsert;
+export const insertKioskSessionSchema = createInsertSchema(kioskSessions).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type KioskCheckIn = typeof kioskCheckIns.$inferSelect;
+export type InsertKioskCheckIn = typeof kioskCheckIns.$inferInsert;
+export const insertKioskCheckInSchema = createInsertSchema(kioskCheckIns).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type SecurityCamera = typeof securityCameras.$inferSelect;
+export type InsertSecurityCamera = typeof securityCameras.$inferInsert;
+export const insertSecurityCameraSchema = createInsertSchema(securityCameras).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type CameraRecording = typeof cameraRecordings.$inferSelect;
+export type InsertCameraRecording = typeof cameraRecordings.$inferInsert;
+export const insertCameraRecordingSchema = createInsertSchema(cameraRecordings).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type LicensePlateScan = typeof licensePlateScans.$inferSelect;
+export type InsertLicensePlateScan = typeof licensePlateScans.$inferInsert;
+export const insertLicensePlateScanSchema = createInsertSchema(licensePlateScans).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type VehicleEntryLog = typeof vehicleEntryLogs.$inferSelect;
+export type InsertVehicleEntryLog = typeof vehicleEntryLogs.$inferInsert;
+export const insertVehicleEntryLogSchema = createInsertSchema(vehicleEntryLogs).omit({
+  id: true,
+  createdAt: true,
+});
