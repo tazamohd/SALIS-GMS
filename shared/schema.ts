@@ -3993,3 +3993,103 @@ export const insertEntitlementAssignmentSchema = createInsertSchema(entitlementA
   createdAt: true,
   assignedAt: true,
 });
+
+// =============================================================================
+// PHASE 1: AI & AUTOMATION (Modules 61-66) - Additional Tables
+// =============================================================================
+
+// Module 61: AI Chatbot - Additional message history table (companion to existing aiChatConversations)
+export const aiChatMessages = pgTable("ai_chat_messages", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  conversationId: uuid("conversation_id").references(() => aiChatConversations.id).notNull(),
+  role: varchar("role", { length: 50 }).notNull(), // user, assistant, system
+  content: text("content").notNull(),
+  intent: varchar("intent", { length: 100 }), // book_appointment, check_status, get_quote, etc.
+  confidence: decimal("confidence", { precision: 5, scale: 2 }),
+  actionTaken: text("action_taken"), // JSON of actions performed
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Module 64: Voice Commands
+export const voiceCommands = pgTable("voice_commands", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  transcript: text("transcript").notNull(),
+  intent: varchar("intent", { length: 100 }).notNull(), // navigate, search, create, update, etc.
+  entities: jsonb("entities"), // Extracted entities from command
+  confidence: decimal("confidence", { precision: 5, scale: 2 }),
+  actionExecuted: text("action_executed"),
+  success: boolean("success").default(true),
+  errorMessage: text("error_message"),
+  responseTime: integer("response_time"), // milliseconds
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Module 65: Document OCR
+export const ocrDocuments = pgTable("ocr_documents", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  documentType: varchar("document_type", { length: 100 }).notNull(), // invoice, receipt, vin_sticker, insurance_card, etc.
+  fileName: varchar("file_name", { length: 500 }).notNull(),
+  fileUrl: text("file_url").notNull(),
+  status: varchar("status", { length: 50 }).notNull().default("pending"), // pending, processing, completed, failed
+  extractedData: jsonb("extracted_data"), // JSON of extracted fields
+  confidence: decimal("confidence", { precision: 5, scale: 2 }),
+  customerId: varchar("customer_id").references(() => users.id),
+  vehicleId: uuid("vehicle_id").references(() => vehicles.id),
+  invoiceId: uuid("invoice_id").references(() => invoices.id),
+  uploadedBy: varchar("uploaded_by").references(() => users.id).notNull(),
+  verifiedBy: varchar("verified_by").references(() => users.id),
+  verifiedAt: timestamp("verified_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  processedAt: timestamp("processed_at"),
+});
+
+// Module 66: AI Service Assistant (combines multiple AI features)
+export const aiServiceSuggestions = pgTable("ai_service_suggestions", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  vehicleId: uuid("vehicle_id").references(() => vehicles.id).notNull(),
+  suggestionType: varchar("suggestion_type", { length: 100 }).notNull(), // upsell, preventive, recall, warranty
+  serviceDescription: text("service_description").notNull(),
+  estimatedCost: decimal("estimated_cost", { precision: 10, scale: 2 }),
+  priority: varchar("priority", { length: 50 }).notNull().default("medium"),
+  reasoning: text("reasoning"), // AI explanation of why this service is suggested
+  confidence: decimal("confidence", { precision: 5, scale: 2 }),
+  relatedJobCardId: uuid("related_job_card_id").references(() => jobCards.id),
+  status: varchar("status", { length: 50 }).notNull().default("pending"), // pending, presented, accepted, declined
+  presentedAt: timestamp("presented_at"),
+  decidedAt: timestamp("decided_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Type exports and insert schemas for Phase 1: AI & Automation (Additional Tables)
+export type AiChatMessage = typeof aiChatMessages.$inferSelect;
+export type InsertAiChatMessage = typeof aiChatMessages.$inferInsert;
+export const insertAiChatMessageSchema = createInsertSchema(aiChatMessages).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type VoiceCommand = typeof voiceCommands.$inferSelect;
+export type InsertVoiceCommand = typeof voiceCommands.$inferInsert;
+export const insertVoiceCommandSchema = createInsertSchema(voiceCommands).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type OcrDocument = typeof ocrDocuments.$inferSelect;
+export type InsertOcrDocument = typeof ocrDocuments.$inferInsert;
+export const insertOcrDocumentSchema = createInsertSchema(ocrDocuments).omit({
+  id: true,
+  createdAt: true,
+  processedAt: true,
+  verifiedAt: true,
+});
+
+export type AiServiceSuggestion = typeof aiServiceSuggestions.$inferSelect;
+export type InsertAiServiceSuggestion = typeof aiServiceSuggestions.$inferInsert;
+export const insertAiServiceSuggestionSchema = createInsertSchema(aiServiceSuggestions).omit({
+  id: true,
+  createdAt: true,
+  presentedAt: true,
+  decidedAt: true,
+});
