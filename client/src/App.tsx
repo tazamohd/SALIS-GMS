@@ -58,6 +58,10 @@ import PredictiveMaintenance from "@/pages/PredictiveMaintenance";
 import SmartPartsRecommendations from "@/pages/SmartPartsRecommendations";
 import VoiceCommands from "@/pages/VoiceCommands";
 import DocumentOCR from "@/pages/DocumentOCR";
+import BusinessIntelligenceDashboard from "@/pages/BusinessIntelligenceDashboard";
+import ProfitAnalysis from "@/pages/ProfitAnalysis";
+import CustomerLTVAnalysis from "@/pages/CustomerLTVAnalysis";
+import BusinessHeatMaps from "@/pages/BusinessHeatMaps";
 import { CustomerDashboard } from "@/pages/customer/CustomerDashboard";
 import { CustomerAppointments } from "@/pages/customer/CustomerAppointments";
 import { CustomerInvoices } from "@/pages/customer/CustomerInvoices";
@@ -382,6 +386,26 @@ function Router() {
       <Route path="/document-ocr">
         <Layout>
           <DocumentOCR />
+        </Layout>
+      </Route>
+      <Route path="/business-intelligence-dashboard">
+        <Layout>
+          <BusinessIntelligenceDashboard />
+        </Layout>
+      </Route>
+      <Route path="/profit-analysis">
+        <Layout>
+          <ProfitAnalysis />
+        </Layout>
+      </Route>
+      <Route path="/customer-ltv-analysis">
+        <Layout>
+          <CustomerLTVAnalysis />
+        </Layout>
+      </Route>
+      <Route path="/business-heatmaps">
+        <Layout>
+          <BusinessHeatMaps />
         </Layout>
       </Route>
       <Route component={NotFound} />

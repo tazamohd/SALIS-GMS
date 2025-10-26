@@ -4093,3 +4093,175 @@ export const insertAiServiceSuggestionSchema = createInsertSchema(aiServiceSugge
   presentedAt: true,
   decidedAt: true,
 });
+
+// ============================================================================
+// Phase 2: Advanced Analytics
+// ============================================================================
+
+// Module 67: Custom Reports & Dashboards
+export const customReports = pgTable("custom_reports", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  name: varchar("name", { length: 255 }).notNull(),
+  description: text("description"),
+  reportType: varchar("report_type", { length: 100 }).notNull(), // revenue, expenses, inventory, performance, custom
+  configuration: jsonb("configuration").notNull(), // Filters, grouping, chart types, etc.
+  schedule: varchar("schedule", { length: 100 }), // daily, weekly, monthly, custom cron
+  recipients: jsonb("recipients"), // Array of user IDs or emails
+  lastRunAt: timestamp("last_run_at"),
+  createdBy: varchar("created_by").references(() => users.id).notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const dashboardWidgets = pgTable("dashboard_widgets", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  widgetType: varchar("widget_type", { length: 100 }).notNull(), // kpi, chart, table, metric
+  title: varchar("title", { length: 255 }).notNull(),
+  dataSource: varchar("data_source", { length: 255 }).notNull(), // invoices, job_cards, customers, etc.
+  configuration: jsonb("configuration").notNull(),
+  position: jsonb("position"), // { x, y, width, height }
+  refreshInterval: integer("refresh_interval"), // seconds
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Module 68: Profit Margin Analysis
+export const profitAnalysis = pgTable("profit_analysis", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  periodType: varchar("period_type", { length: 50 }).notNull(), // daily, weekly, monthly, quarterly, yearly
+  periodStart: timestamp("period_start").notNull(),
+  periodEnd: timestamp("period_end").notNull(),
+  totalRevenue: decimal("total_revenue", { precision: 12, scale: 2 }).notNull(),
+  totalCosts: decimal("total_costs", { precision: 12, scale: 2 }).notNull(),
+  laborCosts: decimal("labor_costs", { precision: 12, scale: 2 }),
+  partsCosts: decimal("parts_costs", { precision: 12, scale: 2 }),
+  overheadCosts: decimal("overhead_costs", { precision: 12, scale: 2 }),
+  grossProfit: decimal("gross_profit", { precision: 12, scale: 2 }).notNull(),
+  netProfit: decimal("net_profit", { precision: 12, scale: 2 }).notNull(),
+  profitMargin: decimal("profit_margin", { precision: 5, scale: 2 }).notNull(), // percentage
+  topServiceRevenue: jsonb("top_service_revenue"), // Top revenue-generating services
+  topTechnicianRevenue: jsonb("top_technician_revenue"),
+  topCustomerRevenue: jsonb("top_customer_revenue"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const serviceTypeProfitability = pgTable("service_type_profitability", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  serviceType: varchar("service_type", { length: 255 }).notNull(),
+  periodStart: timestamp("period_start").notNull(),
+  periodEnd: timestamp("period_end").notNull(),
+  jobCount: integer("job_count").notNull().default(0),
+  totalRevenue: decimal("total_revenue", { precision: 12, scale: 2 }).notNull(),
+  totalCost: decimal("total_cost", { precision: 12, scale: 2 }).notNull(),
+  avgRevenue: decimal("avg_revenue", { precision: 10, scale: 2 }),
+  avgCost: decimal("avg_cost", { precision: 10, scale: 2 }),
+  profitMargin: decimal("profit_margin", { precision: 5, scale: 2 }),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Module 69: Customer Lifetime Value (LTV)
+export const customerLtvAnalysis = pgTable("customer_ltv_analysis", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  customerId: varchar("customer_id").references(() => users.id).notNull(),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  totalRevenue: decimal("total_revenue", { precision: 12, scale: 2 }).notNull(),
+  totalVisits: integer("total_visits").notNull().default(0),
+  avgOrderValue: decimal("avg_order_value", { precision: 10, scale: 2 }),
+  firstVisitDate: timestamp("first_visit_date"),
+  lastVisitDate: timestamp("last_visit_date"),
+  daysSinceLastVisit: integer("days_since_last_visit"),
+  visitFrequency: decimal("visit_frequency", { precision: 5, scale: 2 }), // visits per year
+  predictedLtv: decimal("predicted_ltv", { precision: 12, scale: 2 }),
+  retentionRisk: varchar("retention_risk", { length: 50 }), // low, medium, high
+  retentionScore: decimal("retention_score", { precision: 5, scale: 2 }), // 0-100
+  churnProbability: decimal("churn_probability", { precision: 5, scale: 2 }), // percentage
+  recommendedAction: text("recommended_action"),
+  calculatedAt: timestamp("calculated_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Module 70: Heat Maps & Business Intelligence
+export const businessHeatmaps = pgTable("business_heatmaps", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  heatmapType: varchar("heatmap_type", { length: 100 }).notNull(), // time_demand, service_demand, geographic, technician_utilization
+  periodType: varchar("period_type", { length: 50 }).notNull(), // day, week, month
+  periodStart: timestamp("period_start").notNull(),
+  periodEnd: timestamp("period_end").notNull(),
+  dataPoints: jsonb("data_points").notNull(), // Array of {label, value, metadata}
+  aggregationLevel: varchar("aggregation_level", { length: 50 }), // hourly, daily, weekly
+  metadata: jsonb("metadata"), // Additional context
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const demandForecasts = pgTable("demand_forecasts", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  forecastType: varchar("forecast_type", { length: 100 }).notNull(), // appointments, revenue, parts_demand
+  targetDate: timestamp("target_date").notNull(),
+  predictedValue: decimal("predicted_value", { precision: 12, scale: 2 }).notNull(),
+  confidenceInterval: jsonb("confidence_interval"), // {lower, upper}
+  actualValue: decimal("actual_value", { precision: 12, scale: 2 }),
+  accuracy: decimal("accuracy", { precision: 5, scale: 2 }), // percentage
+  modelUsed: varchar("model_used", { length: 100 }), // linear_regression, arima, prophet, etc.
+  inputFeatures: jsonb("input_features"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Type exports for Phase 2
+export type CustomReport = typeof customReports.$inferSelect;
+export type InsertCustomReport = typeof customReports.$inferInsert;
+export const insertCustomReportSchema = createInsertSchema(customReports).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  lastRunAt: true,
+});
+
+export type DashboardWidget = typeof dashboardWidgets.$inferSelect;
+export type InsertDashboardWidget = typeof dashboardWidgets.$inferInsert;
+export const insertDashboardWidgetSchema = createInsertSchema(dashboardWidgets).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type ProfitAnalysis = typeof profitAnalysis.$inferSelect;
+export type InsertProfitAnalysis = typeof profitAnalysis.$inferInsert;
+export const insertProfitAnalysisSchema = createInsertSchema(profitAnalysis).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type ServiceTypeProfitability = typeof serviceTypeProfitability.$inferSelect;
+export type InsertServiceTypeProfitability = typeof serviceTypeProfitability.$inferInsert;
+export const insertServiceTypeProfitabilitySchema = createInsertSchema(serviceTypeProfitability).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type CustomerLtvAnalysis = typeof customerLtvAnalysis.$inferSelect;
+export type InsertCustomerLtvAnalysis = typeof customerLtvAnalysis.$inferInsert;
+export const insertCustomerLtvAnalysisSchema = createInsertSchema(customerLtvAnalysis).omit({
+  id: true,
+  calculatedAt: true,
+  updatedAt: true,
+});
+
+export type BusinessHeatmap = typeof businessHeatmaps.$inferSelect;
+export type InsertBusinessHeatmap = typeof businessHeatmaps.$inferInsert;
+export const insertBusinessHeatmapSchema = createInsertSchema(businessHeatmaps).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type DemandForecast = typeof demandForecasts.$inferSelect;
+export type InsertDemandForecast = typeof demandForecasts.$inferInsert;
+export const insertDemandForecastSchema = createInsertSchema(demandForecasts).omit({
+  id: true,
+  createdAt: true,
+});

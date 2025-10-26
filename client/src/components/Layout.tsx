@@ -44,6 +44,7 @@ import {
   Cpu,
   Globe,
   Network,
+  Map,
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -267,6 +268,20 @@ export function Layout({ children }: LayoutProps) {
         { path: "/smart-parts-recommendations", icon: Package, label: "Smart Parts" },
         { path: "/voice-commands", icon: Radio, label: "Voice Commands" },
         { path: "/document-ocr", icon: FileText, label: "Document OCR" },
+      ],
+    },
+    {
+      group: "📊 Advanced Analytics",
+      items: [
+        { path: "/business-intelligence-dashboard", icon: BarChart3, label: "BI Dashboard" },
+        { path: "/profit-analysis", icon: DollarSign, label: "Profit Analysis" },
+        { path: "/customer-ltv-analysis", icon: TrendingUp, label: "Customer LTV" },
+        { path: "/business-heatmaps", icon: Map, label: "Heat Maps" },
+      ],
+    },
+    {
+      group: "🔌 Integrations",
+      items: [
         { path: "/integrations", icon: Plug2, label: t("nav.integrations") },
         {
           path: "/data-import-export",

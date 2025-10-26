@@ -5785,6 +5785,119 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Phase 2: Advanced Analytics Routes
+  app.get('/api/analytics/dashboard-metrics', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      const { period } = req.query;
+      
+      // Return mock dashboard metrics
+      res.json({
+        totalRevenue: 328000,
+        totalCosts: 214000,
+        netProfit: 114000,
+        profitMargin: 34.8,
+        activeCustomers: 1284,
+        jobCards: 856,
+        period,
+      });
+    } catch (error) {
+      console.error("Error fetching dashboard metrics:", error);
+      res.status(500).json({ message: "Failed to fetch dashboard metrics" });
+    }
+  });
+
+  app.get('/api/analytics/custom-reports', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      // Return empty array for now - reports can be created
+      res.json([]);
+    } catch (error) {
+      console.error("Error fetching custom reports:", error);
+      res.status(500).json({ message: "Failed to fetch custom reports" });
+    }
+  });
+
+  app.post('/api/analytics/custom-reports', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      const userId = req.user.id;
+      const { name, description, reportType, schedule } = req.body;
+      
+      // Mock creation - would use storage in production
+      const report = {
+        id: Math.random().toString(36).substring(7),
+        garageId,
+        name,
+        description,
+        reportType,
+        schedule,
+        createdBy: userId,
+        createdAt: new Date().toISOString(),
+      };
+      
+      res.json(report);
+    } catch (error) {
+      console.error("Error creating custom report:", error);
+      res.status(500).json({ message: "Failed to create custom report" });
+    }
+  });
+
+  app.post('/api/analytics/custom-reports/:id/run', isAuthenticated, async (req: any, res) => {
+    try {
+      // Mock running a report
+      res.json({ success: true, message: "Report generated successfully" });
+    } catch (error) {
+      console.error("Error running report:", error);
+      res.status(500).json({ message: "Failed to run report" });
+    }
+  });
+
+  app.get('/api/analytics/profit-analysis', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      const { periodType } = req.query;
+      
+      // Return mock profit analysis data
+      res.json({
+        totalRevenue: 328000,
+        totalCosts: 214000,
+        netProfit: 114000,
+        profitMargin: 34.8,
+        periodType,
+      });
+    } catch (error) {
+      console.error("Error fetching profit analysis:", error);
+      res.status(500).json({ message: "Failed to fetch profit analysis" });
+    }
+  });
+
+  app.get('/api/analytics/customer-ltv', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      const { riskFilter } = req.query;
+      
+      // Return empty array for now - mock data in frontend
+      res.json([]);
+    } catch (error) {
+      console.error("Error fetching customer LTV:", error);
+      res.status(500).json({ message: "Failed to fetch customer LTV data" });
+    }
+  });
+
+  app.get('/api/analytics/heatmaps', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      const { heatmapType, period } = req.query;
+      
+      // Return empty array for now - mock data in frontend
+      res.json([]);
+    } catch (error) {
+      console.error("Error fetching heatmaps:", error);
+      res.status(500).json({ message: "Failed to fetch heatmap data" });
+    }
+  });
+
   // Data Import
   app.post('/api/import', isAuthenticated, async (req: any, res) => {
     try {
