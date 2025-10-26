@@ -288,6 +288,16 @@ export function Layout({ children }: LayoutProps) {
         { path: "/video-consultations", icon: FileText, label: "Video Calls" },
         { path: "/parts-marketplace", icon: ShoppingCart, label: "Parts Marketplace" },
         { path: "/integrations", icon: Plug2, label: t("nav.integrations") },
+      ],
+    },
+    {
+      group: "💝 Customer Experience",
+      items: [
+        { path: "/live-service-tracking", icon: Radio, label: "Live Tracking" },
+        { path: "/video-estimates", icon: FileText, label: "Video Estimates" },
+        { path: "/digital-vehicle-walkaround", icon: Camera, label: "Vehicle Walkaround" },
+        { path: "/customer-reviews-ratings", icon: Star, label: "Reviews & Ratings" },
+        { path: "/referral-program", icon: Users, label: "Referral Program" },
         {
           path: "/data-import-export",
           icon: DatabaseBackup,

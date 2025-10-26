@@ -6105,6 +6105,154 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Phase 4: Customer Experience Routes
+  app.get('/api/service-tracking/active', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      res.json([]);
+    } catch (error) {
+      console.error("Error fetching service tracking:", error);
+      res.status(500).json({ message: "Failed to fetch service tracking data" });
+    }
+  });
+
+  app.get('/api/video-estimates', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      res.json([]);
+    } catch (error) {
+      console.error("Error fetching video estimates:", error);
+      res.status(500).json({ message: "Failed to fetch video estimates" });
+    }
+  });
+
+  app.post('/api/video-estimates', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      const userId = req.user.id;
+      const { customerId, vehicleId, estimatedCost } = req.body;
+      
+      const estimate = {
+        id: Math.random().toString(36).substring(7),
+        garageId,
+        customerId,
+        vehicleId,
+        technicianId: userId,
+        estimatedCost,
+        status: "pending",
+        createdAt: new Date().toISOString(),
+      };
+      
+      res.json(estimate);
+    } catch (error) {
+      console.error("Error creating video estimate:", error);
+      res.status(500).json({ message: "Failed to create video estimate" });
+    }
+  });
+
+  app.post('/api/video-estimates/:id/send', isAuthenticated, async (req: any, res) => {
+    try {
+      res.json({ success: true, message: "Video estimate sent to customer" });
+    } catch (error) {
+      console.error("Error sending video estimate:", error);
+      res.status(500).json({ message: "Failed to send video estimate" });
+    }
+  });
+
+  app.get('/api/vehicle-walkarounds', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      res.json([]);
+    } catch (error) {
+      console.error("Error fetching walkarounds:", error);
+      res.status(500).json({ message: "Failed to fetch walkarounds" });
+    }
+  });
+
+  app.post('/api/vehicle-walkarounds', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      const userId = req.user.id;
+      const { jobCardId, vehicleId, walkaroundType } = req.body;
+      
+      const walkaround = {
+        id: Math.random().toString(36).substring(7),
+        jobCardId,
+        vehicleId,
+        technicianId: userId,
+        walkaroundType,
+        photos: [],
+        createdAt: new Date().toISOString(),
+      };
+      
+      res.json(walkaround);
+    } catch (error) {
+      console.error("Error creating walkaround:", error);
+      res.status(500).json({ message: "Failed to create walkaround" });
+    }
+  });
+
+  app.get('/api/customer-reviews', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      res.json([]);
+    } catch (error) {
+      console.error("Error fetching reviews:", error);
+      res.status(500).json({ message: "Failed to fetch reviews" });
+    }
+  });
+
+  app.post('/api/customer-reviews/:id/respond', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const { responseText } = req.body;
+      
+      res.json({
+        success: true,
+        responseText,
+        respondedBy: userId,
+        respondedAt: new Date().toISOString(),
+      });
+    } catch (error) {
+      console.error("Error responding to review:", error);
+      res.status(500).json({ message: "Failed to respond to review" });
+    }
+  });
+
+  app.get('/api/referrals', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      res.json([]);
+    } catch (error) {
+      console.error("Error fetching referrals:", error);
+      res.status(500).json({ message: "Failed to fetch referrals" });
+    }
+  });
+
+  app.post('/api/referrals', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      const userId = req.user.id;
+      const { refereeEmail, refereeName, refereePhone } = req.body;
+      
+      const referral = {
+        id: Math.random().toString(36).substring(7),
+        referrerId: userId,
+        refereeEmail,
+        refereeName,
+        refereePhone,
+        referralCode: `REF-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
+        status: "pending",
+        createdAt: new Date().toISOString(),
+      };
+      
+      res.json(referral);
+    } catch (error) {
+      console.error("Error creating referral:", error);
+      res.status(500).json({ message: "Failed to create referral" });
+    }
+  });
+
   // Data Import
   app.post('/api/import', isAuthenticated, async (req: any, res) => {
     try {

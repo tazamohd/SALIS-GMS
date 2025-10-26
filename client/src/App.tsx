@@ -67,6 +67,11 @@ import EmailMarketingCampaigns from "@/pages/EmailMarketingCampaigns";
 import SocialMediaIntegration from "@/pages/SocialMediaIntegration";
 import VideoConsultations from "@/pages/VideoConsultations";
 import PartsMarketplace from "@/pages/PartsMarketplace";
+import LiveServiceTracking from "@/pages/LiveServiceTracking";
+import VideoEstimates from "@/pages/VideoEstimates";
+import DigitalVehicleWalkaround from "@/pages/DigitalVehicleWalkaround";
+import CustomerReviewsRatings from "@/pages/CustomerReviewsRatings";
+import ReferralProgram from "@/pages/ReferralProgram";
 import { CustomerDashboard } from "@/pages/customer/CustomerDashboard";
 import { CustomerAppointments } from "@/pages/customer/CustomerAppointments";
 import { CustomerInvoices } from "@/pages/customer/CustomerInvoices";
@@ -436,6 +441,31 @@ function Router() {
       <Route path="/parts-marketplace">
         <Layout>
           <PartsMarketplace />
+        </Layout>
+      </Route>
+      <Route path="/live-service-tracking">
+        <Layout>
+          <LiveServiceTracking />
+        </Layout>
+      </Route>
+      <Route path="/video-estimates">
+        <Layout>
+          <VideoEstimates />
+        </Layout>
+      </Route>
+      <Route path="/digital-vehicle-walkaround">
+        <Layout>
+          <DigitalVehicleWalkaround />
+        </Layout>
+      </Route>
+      <Route path="/customer-reviews-ratings">
+        <Layout>
+          <CustomerReviewsRatings />
+        </Layout>
+      </Route>
+      <Route path="/referral-program">
+        <Layout>
+          <ReferralProgram />
         </Layout>
       </Route>
       <Route component={NotFound} />

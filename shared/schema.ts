@@ -4516,3 +4516,162 @@ export const insertMarketplaceConnectionSchema = createInsertSchema(marketplaceC
   createdAt: true,
   updatedAt: true,
 });
+
+// ========================================
+// PHASE 4: CUSTOMER EXPERIENCE
+// ========================================
+
+// Module 76: Live Service Tracking
+export const serviceTrackingUpdates = pgTable("service_tracking_updates", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  jobCardId: uuid("job_card_id").references(() => jobCards.id).notNull(),
+  status: varchar("status", { length: 100 }).notNull(), // checked_in, diagnosing, parts_ordered, in_progress, quality_check, ready, completed
+  title: varchar("title").notNull(),
+  description: text("description"),
+  estimatedCompletion: timestamp("estimated_completion"),
+  completedAt: timestamp("completed_at"),
+  technicianId: varchar("technician_id").references(() => users.id),
+  photoUrls: jsonb("photo_urls"), // progress photos
+  customerNotified: boolean("customer_notified").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Module 77: Video Estimates
+export const videoEstimates = pgTable("video_estimates", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  customerId: varchar("customer_id").references(() => users.id).notNull(),
+  vehicleId: uuid("vehicle_id").references(() => vehicles.id),
+  technicianId: varchar("technician_id").references(() => users.id).notNull(),
+  videoUrl: varchar("video_url").notNull(),
+  thumbnailUrl: varchar("thumbnail_url"),
+  duration: integer("duration"), // seconds
+  transcription: text("transcription"),
+  estimatedCost: decimal("estimated_cost", { precision: 10, scale: 2 }),
+  recommendedServices: jsonb("recommended_services"), // array of service objects
+  status: varchar("status", { length: 50 }).default("pending"), // pending, sent, viewed, approved, declined
+  viewedAt: timestamp("viewed_at"),
+  approvedAt: timestamp("approved_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Module 78: Digital Vehicle Walkarounds
+export const digitalWalkarounds = pgTable("digital_walkarounds", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  jobCardId: uuid("job_card_id").references(() => jobCards.id).notNull(),
+  vehicleId: uuid("vehicle_id").references(() => vehicles.id).notNull(),
+  technicianId: varchar("technician_id").references(() => users.id).notNull(),
+  walkaroundType: varchar("walkaround_type", { length: 50 }).notNull(), // pre_service, post_service
+  photos: jsonb("photos").notNull(), // array of {url, angle, annotations, timestamp}
+  mileageReading: integer("mileage_reading"),
+  fuelLevel: varchar("fuel_level", { length: 20 }), // 1/4, 1/2, 3/4, full
+  damagePreviouslyNoted: jsonb("damage_previously_noted"), // array of damage descriptions
+  newDamageIdentified: jsonb("new_damage_identified"),
+  interiorCondition: varchar("interior_condition", { length: 50 }),
+  customerSignatureUrl: varchar("customer_signature_url"),
+  signedAt: timestamp("signed_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Module 79: Customer Reviews & Ratings
+export const customerReviews = pgTable("customer_reviews", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  customerId: varchar("customer_id").references(() => users.id).notNull(),
+  jobCardId: uuid("job_card_id").references(() => jobCards.id),
+  rating: integer("rating").notNull(), // 1-5
+  serviceQualityRating: integer("service_quality_rating"),
+  pricingRating: integer("pricing_rating"),
+  speedRating: integer("speed_rating"),
+  communicationRating: integer("communication_rating"),
+  title: varchar("title"),
+  comment: text("comment"),
+  wouldRecommend: boolean("would_recommend"),
+  platform: varchar("platform", { length: 50 }), // internal, google, yelp, facebook
+  externalReviewId: varchar("external_review_id"),
+  isPublic: boolean("is_public").default(true),
+  responseText: text("response_text"),
+  respondedAt: timestamp("responded_at"),
+  respondedBy: varchar("responded_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Module 80: Referral Program
+export const referralPrograms = pgTable("referral_programs", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  name: varchar("name").notNull(),
+  referrerRewardType: varchar("referrer_reward_type", { length: 50 }).notNull(), // discount, cash, credit
+  referrerRewardAmount: decimal("referrer_reward_amount", { precision: 10, scale: 2 }).notNull(),
+  refereeRewardType: varchar("referee_reward_type", { length: 50 }),
+  refereeRewardAmount: decimal("referee_reward_amount", { precision: 10, scale: 2 }),
+  minimumPurchase: decimal("minimum_purchase", { precision: 10, scale: 2 }),
+  expiryDays: integer("expiry_days"),
+  isActive: boolean("is_active").default(true),
+  termsAndConditions: text("terms_and_conditions"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const customerReferrals = pgTable("customer_referrals", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  programId: uuid("program_id").references(() => referralPrograms.id).notNull(),
+  referrerId: varchar("referrer_id").references(() => users.id).notNull(),
+  refereeEmail: varchar("referee_email").notNull(),
+  refereePhone: varchar("referee_phone"),
+  refereeName: varchar("referee_name"),
+  refereeId: varchar("referee_id").references(() => users.id),
+  referralCode: varchar("referral_code").notNull().unique(),
+  status: varchar("status", { length: 50 }).default("pending"), // pending, completed, rewarded, expired
+  firstVisitDate: timestamp("first_visit_date"),
+  firstPurchaseAmount: decimal("first_purchase_amount", { precision: 10, scale: 2 }),
+  referrerRewardClaimed: boolean("referrer_reward_claimed").default(false),
+  referrerRewardClaimedAt: timestamp("referrer_reward_claimed_at"),
+  refereeRewardClaimed: boolean("referee_reward_claimed").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+  expiresAt: timestamp("expires_at"),
+});
+
+// Type exports for Phase 4
+export type ServiceTrackingUpdate = typeof serviceTrackingUpdates.$inferSelect;
+export type InsertServiceTrackingUpdate = typeof serviceTrackingUpdates.$inferInsert;
+export const insertServiceTrackingUpdateSchema = createInsertSchema(serviceTrackingUpdates).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type VideoEstimate = typeof videoEstimates.$inferSelect;
+export type InsertVideoEstimate = typeof videoEstimates.$inferInsert;
+export const insertVideoEstimateSchema = createInsertSchema(videoEstimates).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type DigitalWalkaround = typeof digitalWalkarounds.$inferSelect;
+export type InsertDigitalWalkaround = typeof digitalWalkarounds.$inferInsert;
+export const insertDigitalWalkaroundSchema = createInsertSchema(digitalWalkarounds).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type CustomerReview = typeof customerReviews.$inferSelect;
+export type InsertCustomerReview = typeof customerReviews.$inferInsert;
+export const insertCustomerReviewSchema = createInsertSchema(customerReviews).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type ReferralProgram = typeof referralPrograms.$inferSelect;
+export type InsertReferralProgram = typeof referralPrograms.$inferInsert;
+export const insertReferralProgramSchema = createInsertSchema(referralPrograms).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type CustomerReferral = typeof customerReferrals.$inferSelect;
+export type InsertCustomerReferral = typeof customerReferrals.$inferInsert;
+export const insertCustomerReferralSchema = createInsertSchema(customerReferrals).omit({
+  id: true,
+  createdAt: true,
+});
