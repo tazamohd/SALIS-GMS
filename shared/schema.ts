@@ -3461,3 +3461,535 @@ export const insertLoanerReservationSchema = createInsertSchema(loanerReservatio
   createdAt: true,
   updatedAt: true,
 });
+
+// ============================================================================
+// ENTERPRISE ERP MODULES (56-60)
+// ============================================================================
+
+// Module 56: Franchise Command Center
+export const franchiseGroups = pgTable("franchise_groups", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: varchar("name", { length: 255 }).notNull(),
+  description: text("description"),
+  headquarters: varchar("headquarters", { length: 500 }),
+  totalBranches: integer("total_branches").default(0),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const franchiseContracts = pgTable("franchise_contracts", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  franchiseGroupId: uuid("franchise_group_id").references(() => franchiseGroups.id).notNull(),
+  branchId: uuid("branch_id").references(() => branches.id).notNull(),
+  contractNumber: varchar("contract_number", { length: 100 }).notNull().unique(),
+  startDate: timestamp("start_date").notNull(),
+  endDate: timestamp("end_date"),
+  royaltyPercentage: decimal("royalty_percentage", { precision: 5, scale: 2 }),
+  marketingFeePercentage: decimal("marketing_fee_percentage", { precision: 5, scale: 2 }),
+  status: varchar("status", { length: 50 }).default("active"),
+  terms: text("terms"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const franchiseRoles = pgTable("franchise_roles", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: varchar("name", { length: 255 }).notNull(),
+  franchiseGroupId: uuid("franchise_group_id").references(() => franchiseGroups.id),
+  permissions: jsonb("permissions"),
+  level: varchar("level", { length: 50 }),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const revenueSharingRules = pgTable("revenue_sharing_rules", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  franchiseGroupId: uuid("franchise_group_id").references(() => franchiseGroups.id).notNull(),
+  revenueType: varchar("revenue_type", { length: 100 }).notNull(),
+  franchisePercentage: decimal("franchise_percentage", { precision: 5, scale: 2 }).notNull(),
+  corporatePercentage: decimal("corporate_percentage", { precision: 5, scale: 2 }).notNull(),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const franchiseKpis = pgTable("franchise_kpis", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  branchId: uuid("branch_id").references(() => branches.id).notNull(),
+  month: varchar("month", { length: 7 }).notNull(),
+  totalRevenue: decimal("total_revenue", { precision: 12, scale: 2 }).default("0"),
+  totalJobCards: integer("total_job_cards").default(0),
+  customerSatisfaction: decimal("customer_satisfaction", { precision: 3, scale: 2 }),
+  royaltyPaid: decimal("royalty_paid", { precision: 12, scale: 2 }).default("0"),
+  marketingFeePaid: decimal("marketing_fee_paid", { precision: 12, scale: 2 }).default("0"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const franchiseBranches = pgTable("franchise_branches", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  franchiseGroupId: uuid("franchise_group_id").references(() => franchiseGroups.id).notNull(),
+  branchId: uuid("branch_id").references(() => branches.id).notNull(),
+  franchiseeOwnerId: varchar("franchisee_owner_id").references(() => users.id),
+  joinedAt: timestamp("joined_at").defaultNow(),
+  status: varchar("status", { length: 50 }).default("active"),
+});
+
+// Module 59: Globalization Layer
+export const locales = pgTable("locales", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  code: varchar("code", { length: 10 }).notNull().unique(),
+  name: varchar("name", { length: 100 }).notNull(),
+  englishName: varchar("english_name", { length: 100 }),
+  isRtl: boolean("is_rtl").default(false),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const translationResources = pgTable("translation_resources", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  localeId: uuid("locale_id").references(() => locales.id).notNull(),
+  translationKey: varchar("translation_key", { length: 255 }).notNull(),
+  translationValue: text("translation_value").notNull(),
+  namespace: varchar("namespace", { length: 100 }),
+  context: text("context"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const currencyRates = pgTable("currency_rates", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  fromCurrency: varchar("from_currency", { length: 3 }).notNull(),
+  toCurrency: varchar("to_currency", { length: 3 }).notNull(),
+  rate: decimal("rate", { precision: 18, scale: 8 }).notNull(),
+  effectiveDate: timestamp("effective_date").notNull(),
+  source: varchar("source", { length: 100 }),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const taxRegions = pgTable("tax_regions", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  countryCode: varchar("country_code", { length: 3 }).notNull(),
+  regionCode: varchar("region_code", { length: 10 }),
+  regionName: varchar("region_name", { length: 255 }).notNull(),
+  taxRate: decimal("tax_rate", { precision: 5, scale: 2 }).notNull(),
+  taxType: varchar("tax_type", { length: 50 }),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const timezoneRules = pgTable("timezone_rules", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  branchId: uuid("branch_id").references(() => branches.id),
+  timezone: varchar("timezone", { length: 100 }).notNull(),
+  utcOffset: varchar("utc_offset", { length: 10 }),
+  supportsDst: boolean("supports_dst").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Module 60: Parts Supply Network
+export const networkPartners = pgTable("network_partners", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: varchar("name", { length: 255 }).notNull(),
+  partnerType: varchar("partner_type", { length: 50 }).notNull(),
+  country: varchar("country", { length: 100 }),
+  contactEmail: varchar("contact_email", { length: 255 }),
+  contactPhone: varchar("contact_phone", { length: 20 }),
+  rating: decimal("rating", { precision: 3, scale: 2 }),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const partnerContracts = pgTable("partner_contracts", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  partnerId: uuid("partner_id").references(() => networkPartners.id).notNull(),
+  contractNumber: varchar("contract_number", { length: 100 }).notNull().unique(),
+  startDate: timestamp("start_date").notNull(),
+  endDate: timestamp("end_date"),
+  commissionRate: decimal("commission_rate", { precision: 5, scale: 2 }),
+  paymentTerms: varchar("payment_terms", { length: 255 }),
+  status: varchar("status", { length: 50 }).default("active"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const fulfillmentOrders = pgTable("fulfillment_orders", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  orderNumber: varchar("order_number", { length: 100 }).notNull().unique(),
+  partnerId: uuid("partner_id").references(() => networkPartners.id).notNull(),
+  branchId: uuid("branch_id").references(() => branches.id).notNull(),
+  orderDate: timestamp("order_date").defaultNow(),
+  requestedDeliveryDate: timestamp("requested_delivery_date"),
+  status: varchar("status", { length: 50 }).default("pending"),
+  totalAmount: decimal("total_amount", { precision: 12, scale: 2 }).default("0"),
+  shippingCost: decimal("shipping_cost", { precision: 10, scale: 2 }).default("0"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const shipmentEvents = pgTable("shipment_events", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  fulfillmentOrderId: uuid("fulfillment_order_id").references(() => fulfillmentOrders.id).notNull(),
+  eventType: varchar("event_type", { length: 100 }).notNull(),
+  eventDate: timestamp("event_date").defaultNow(),
+  location: varchar("location", { length: 500 }),
+  description: text("description"),
+  trackingNumber: varchar("tracking_number", { length: 100 }),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const warehouseNodes = pgTable("warehouse_nodes", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: varchar("name", { length: 255 }).notNull(),
+  partnerId: uuid("partner_id").references(() => networkPartners.id),
+  country: varchar("country", { length: 100 }).notNull(),
+  city: varchar("city", { length: 100 }),
+  address: text("address"),
+  capacity: integer("capacity"),
+  currentStock: integer("current_stock").default(0),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const crossBorderDocs = pgTable("cross_border_docs", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  fulfillmentOrderId: uuid("fulfillment_order_id").references(() => fulfillmentOrders.id).notNull(),
+  documentType: varchar("document_type", { length: 100 }).notNull(),
+  documentNumber: varchar("document_number", { length: 100 }),
+  documentUrl: varchar("document_url", { length: 500 }),
+  issuedDate: timestamp("issued_date"),
+  expiryDate: timestamp("expiry_date"),
+  status: varchar("status", { length: 50 }).default("pending"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Module 57: Diagnostics & OBD Hub
+export const obdDevices = pgTable("obd_devices", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  deviceId: varchar("device_id", { length: 100 }).notNull().unique(),
+  deviceName: varchar("device_name", { length: 255 }).notNull(),
+  manufacturer: varchar("manufacturer", { length: 100 }),
+  model: varchar("model", { length: 100 }),
+  protocolVersion: varchar("protocol_version", { length: 50 }),
+  firmwareVersion: varchar("firmware_version", { length: 50 }),
+  branchId: uuid("branch_id").references(() => branches.id),
+  status: varchar("status", { length: 50 }).default("active"),
+  lastConnected: timestamp("last_connected"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const deviceAssignments = pgTable("device_assignments", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  deviceId: uuid("device_id").references(() => obdDevices.id).notNull(),
+  technicianId: varchar("technician_id").references(() => users.id),
+  vehicleId: uuid("vehicle_id").references(() => vehicles.id),
+  assignedAt: timestamp("assigned_at").defaultNow(),
+  unassignedAt: timestamp("unassigned_at"),
+  status: varchar("status", { length: 50 }).default("active"),
+});
+
+export const realtimeStreams = pgTable("realtime_streams", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  deviceId: uuid("device_id").references(() => obdDevices.id).notNull(),
+  sessionId: varchar("session_id", { length: 100 }),
+  streamType: varchar("stream_type", { length: 50 }),
+  dataPayload: jsonb("data_payload"),
+  timestamp: timestamp("timestamp").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const obdSessions = pgTable("obd_sessions", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  sessionId: varchar("session_id", { length: 100 }).notNull().unique(),
+  deviceId: uuid("device_id").references(() => obdDevices.id).notNull(),
+  vehicleId: uuid("vehicle_id").references(() => vehicles.id),
+  jobCardId: uuid("job_card_id").references(() => jobCards.id),
+  technicianId: varchar("technician_id").references(() => users.id),
+  startTime: timestamp("start_time").defaultNow(),
+  endTime: timestamp("end_time"),
+  status: varchar("status", { length: 50 }).default("active"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const diagnosticReports = pgTable("diagnostic_reports", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  sessionId: uuid("session_id").references(() => obdSessions.id).notNull(),
+  reportType: varchar("report_type", { length: 100 }),
+  faultCodes: text("fault_codes").array(),
+  liveData: jsonb("live_data"),
+  recommendations: text("recommendations"),
+  severity: varchar("severity", { length: 50 }),
+  generatedAt: timestamp("generated_at").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Module 58: OEM Software Subscriptions
+export const vendorCatalogs = pgTable("vendor_catalogs", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  vendorName: varchar("vendor_name", { length: 255 }).notNull(),
+  vendorCode: varchar("vendor_code", { length: 50 }).notNull().unique(),
+  description: text("description"),
+  website: varchar("website", { length: 500 }),
+  supportEmail: varchar("support_email", { length: 255 }),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const oemProducts = pgTable("oem_products", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  vendorCatalogId: uuid("vendor_catalog_id").references(() => vendorCatalogs.id).notNull(),
+  productName: varchar("product_name", { length: 255 }).notNull(),
+  productCode: varchar("product_code", { length: 100 }).notNull(),
+  softwareType: varchar("software_type", { length: 100 }),
+  version: varchar("version", { length: 50 }),
+  licensingModel: varchar("licensing_model", { length: 50 }),
+  pricePerSeat: decimal("price_per_seat", { precision: 10, scale: 2 }),
+  pricePerYear: decimal("price_per_year", { precision: 10, scale: 2 }),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const subscriptionLicenses = pgTable("subscription_licenses", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  licenseKey: varchar("license_key", { length: 255 }).notNull().unique(),
+  oemProductId: uuid("oem_product_id").references(() => oemProducts.id).notNull(),
+  branchId: uuid("branch_id").references(() => branches.id).notNull(),
+  startDate: timestamp("start_date").notNull(),
+  endDate: timestamp("end_date").notNull(),
+  maxSeats: integer("max_seats").default(1),
+  usedSeats: integer("used_seats").default(0),
+  status: varchar("status", { length: 50 }).default("active"),
+  autoRenew: boolean("auto_renew").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const licenseAuditLogs = pgTable("license_audit_logs", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  licenseId: uuid("license_id").references(() => subscriptionLicenses.id).notNull(),
+  eventType: varchar("event_type", { length: 100 }).notNull(),
+  userId: varchar("user_id").references(() => users.id),
+  eventDetails: text("event_details"),
+  ipAddress: varchar("ip_address", { length: 50 }),
+  timestamp: timestamp("timestamp").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const entitlementAssignments = pgTable("entitlement_assignments", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  licenseId: uuid("license_id").references(() => subscriptionLicenses.id).notNull(),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  assignedAt: timestamp("assigned_at").defaultNow(),
+  revokedAt: timestamp("revoked_at"),
+  status: varchar("status", { length: 50 }).default("active"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Type exports and insert schemas for Module 56: Franchise Command Center
+export type FranchiseGroup = typeof franchiseGroups.$inferSelect;
+export type InsertFranchiseGroup = typeof franchiseGroups.$inferInsert;
+export const insertFranchiseGroupSchema = createInsertSchema(franchiseGroups).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type FranchiseContract = typeof franchiseContracts.$inferSelect;
+export type InsertFranchiseContract = typeof franchiseContracts.$inferInsert;
+export const insertFranchiseContractSchema = createInsertSchema(franchiseContracts).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type FranchiseRole = typeof franchiseRoles.$inferSelect;
+export type InsertFranchiseRole = typeof franchiseRoles.$inferInsert;
+export const insertFranchiseRoleSchema = createInsertSchema(franchiseRoles).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type RevenueSharingRule = typeof revenueSharingRules.$inferSelect;
+export type InsertRevenueSharingRule = typeof revenueSharingRules.$inferInsert;
+export const insertRevenueSharingRuleSchema = createInsertSchema(revenueSharingRules).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type FranchiseKpi = typeof franchiseKpis.$inferSelect;
+export type InsertFranchiseKpi = typeof franchiseKpis.$inferInsert;
+export const insertFranchiseKpiSchema = createInsertSchema(franchiseKpis).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type FranchiseBranch = typeof franchiseBranches.$inferSelect;
+export type InsertFranchiseBranch = typeof franchiseBranches.$inferInsert;
+export const insertFranchiseBranchSchema = createInsertSchema(franchiseBranches).omit({
+  id: true,
+  joinedAt: true,
+});
+
+// Type exports and insert schemas for Module 59: Globalization Layer
+export type Locale = typeof locales.$inferSelect;
+export type InsertLocale = typeof locales.$inferInsert;
+export const insertLocaleSchema = createInsertSchema(locales).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type TranslationResource = typeof translationResources.$inferSelect;
+export type InsertTranslationResource = typeof translationResources.$inferInsert;
+export const insertTranslationResourceSchema = createInsertSchema(translationResources).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type CurrencyRate = typeof currencyRates.$inferSelect;
+export type InsertCurrencyRate = typeof currencyRates.$inferInsert;
+export const insertCurrencyRateSchema = createInsertSchema(currencyRates).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type TaxRegion = typeof taxRegions.$inferSelect;
+export type InsertTaxRegion = typeof taxRegions.$inferInsert;
+export const insertTaxRegionSchema = createInsertSchema(taxRegions).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type TimezoneRule = typeof timezoneRules.$inferSelect;
+export type InsertTimezoneRule = typeof timezoneRules.$inferInsert;
+export const insertTimezoneRuleSchema = createInsertSchema(timezoneRules).omit({
+  id: true,
+  createdAt: true,
+});
+
+// Type exports and insert schemas for Module 60: Parts Supply Network
+export type NetworkPartner = typeof networkPartners.$inferSelect;
+export type InsertNetworkPartner = typeof networkPartners.$inferInsert;
+export const insertNetworkPartnerSchema = createInsertSchema(networkPartners).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type PartnerContract = typeof partnerContracts.$inferSelect;
+export type InsertPartnerContract = typeof partnerContracts.$inferInsert;
+export const insertPartnerContractSchema = createInsertSchema(partnerContracts).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type FulfillmentOrder = typeof fulfillmentOrders.$inferSelect;
+export type InsertFulfillmentOrder = typeof fulfillmentOrders.$inferInsert;
+export const insertFulfillmentOrderSchema = createInsertSchema(fulfillmentOrders).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type ShipmentEvent = typeof shipmentEvents.$inferSelect;
+export type InsertShipmentEvent = typeof shipmentEvents.$inferInsert;
+export const insertShipmentEventSchema = createInsertSchema(shipmentEvents).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type WarehouseNode = typeof warehouseNodes.$inferSelect;
+export type InsertWarehouseNode = typeof warehouseNodes.$inferInsert;
+export const insertWarehouseNodeSchema = createInsertSchema(warehouseNodes).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type CrossBorderDoc = typeof crossBorderDocs.$inferSelect;
+export type InsertCrossBorderDoc = typeof crossBorderDocs.$inferInsert;
+export const insertCrossBorderDocSchema = createInsertSchema(crossBorderDocs).omit({
+  id: true,
+  createdAt: true,
+});
+
+// Type exports and insert schemas for Module 57: Diagnostics & OBD Hub
+export type ObdDevice = typeof obdDevices.$inferSelect;
+export type InsertObdDevice = typeof obdDevices.$inferInsert;
+export const insertObdDeviceSchema = createInsertSchema(obdDevices).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type DeviceAssignment = typeof deviceAssignments.$inferSelect;
+export type InsertDeviceAssignment = typeof deviceAssignments.$inferInsert;
+export const insertDeviceAssignmentSchema = createInsertSchema(deviceAssignments).omit({
+  id: true,
+  assignedAt: true,
+});
+
+export type RealtimeStream = typeof realtimeStreams.$inferSelect;
+export type InsertRealtimeStream = typeof realtimeStreams.$inferInsert;
+export const insertRealtimeStreamSchema = createInsertSchema(realtimeStreams).omit({
+  id: true,
+  createdAt: true,
+  timestamp: true,
+});
+
+export type ObdSession = typeof obdSessions.$inferSelect;
+export type InsertObdSession = typeof obdSessions.$inferInsert;
+export const insertObdSessionSchema = createInsertSchema(obdSessions).omit({
+  id: true,
+  createdAt: true,
+  startTime: true,
+});
+
+export type DiagnosticReport = typeof diagnosticReports.$inferSelect;
+export type InsertDiagnosticReport = typeof diagnosticReports.$inferInsert;
+export const insertDiagnosticReportSchema = createInsertSchema(diagnosticReports).omit({
+  id: true,
+  createdAt: true,
+  generatedAt: true,
+});
+
+// Type exports and insert schemas for Module 58: OEM Software Subscriptions
+export type VendorCatalog = typeof vendorCatalogs.$inferSelect;
+export type InsertVendorCatalog = typeof vendorCatalogs.$inferInsert;
+export const insertVendorCatalogSchema = createInsertSchema(vendorCatalogs).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type OemProduct = typeof oemProducts.$inferSelect;
+export type InsertOemProduct = typeof oemProducts.$inferInsert;
+export const insertOemProductSchema = createInsertSchema(oemProducts).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type SubscriptionLicense = typeof subscriptionLicenses.$inferSelect;
+export type InsertSubscriptionLicense = typeof subscriptionLicenses.$inferInsert;
+export const insertSubscriptionLicenseSchema = createInsertSchema(subscriptionLicenses).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type LicenseAuditLog = typeof licenseAuditLogs.$inferSelect;
+export type InsertLicenseAuditLog = typeof licenseAuditLogs.$inferInsert;
+export const insertLicenseAuditLogSchema = createInsertSchema(licenseAuditLogs).omit({
+  id: true,
+  createdAt: true,
+  timestamp: true,
+});
+
+export type EntitlementAssignment = typeof entitlementAssignments.$inferSelect;
+export type InsertEntitlementAssignment = typeof entitlementAssignments.$inferInsert;
+export const insertEntitlementAssignmentSchema = createInsertSchema(entitlementAssignments).omit({
+  id: true,
+  createdAt: true,
+  assignedAt: true,
+});
