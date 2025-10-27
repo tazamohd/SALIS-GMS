@@ -66,6 +66,7 @@ import { createPaypalOrder, capturePaypalOrder, loadPaypalDefault } from "./payp
 import { estimateJobTime, predictMaintenance, recommendParts, optimizeSchedule, chatWithCustomer } from './ai';
 import { auditLog } from './auditMiddleware';
 import QRCode from 'qrcode';
+import * as phase3Service from './phase3-integrations-service';
 
 // Initialize Stripe (Stripe integration - Module 25)
 const stripe = process.env.STRIPE_SECRET_KEY 
@@ -5902,175 +5903,238 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Phase 3: Enhanced Integrations Routes
-  app.get('/api/accounting/connections', isAuthenticated, async (req: any, res) => {
-    try {
-      const garageId = req.user.garageId;
-      // Return empty array - connections shown in frontend mock
-      res.json([]);
-    } catch (error) {
-      console.error("Error fetching accounting connections:", error);
-      res.status(500).json({ message: "Failed to fetch accounting connections" });
-    }
-  });
-
+  // ========================================
+  // PHASE 3: ENHANCED INTEGRATIONS (Real Backend)
+  // ========================================
+  
+  // 1. ACCOUNTING INTEGRATION (QuickBooks/Xero)
   app.post('/api/accounting/connect', isAuthenticated, async (req: any, res) => {
     try {
-      const { provider } = req.body;
-      // Mock connection - would redirect to OAuth in production
-      res.json({ success: true, redirectUrl: `https://${provider}.com/oauth/authorize` });
-    } catch (error) {
+      const { platform } = req.body;
+      const result = await phase3Service.initiateAccountingConnection(req.user.garageId, platform);
+      res.json(result);
+    } catch (error: any) {
       console.error("Error connecting accounting:", error);
-      res.status(500).json({ message: "Failed to connect accounting provider" });
+      res.status(500).json({ message: error.message || "Failed to connect accounting provider" });
     }
   });
 
-  app.get('/api/accounting/sync-history', isAuthenticated, async (req: any, res) => {
+  app.get('/api/accounting/dashboard', isAuthenticated, async (req: any, res) => {
     try {
-      const garageId = req.user.garageId;
-      res.json([]);
-    } catch (error) {
-      console.error("Error fetching sync history:", error);
-      res.status(500).json({ message: "Failed to fetch sync history" });
+      const dashboard = await phase3Service.getAccountingDashboard(req.user.garageId);
+      res.json(dashboard);
+    } catch (error: any) {
+      console.error("Error fetching accounting dashboard:", error);
+      res.status(500).json({ message: error.message || "Failed to fetch accounting dashboard" });
     }
   });
 
   app.post('/api/accounting/sync', isAuthenticated, async (req: any, res) => {
     try {
-      const { syncType } = req.body;
-      res.json({ success: true, message: `${syncType} sync initiated` });
-    } catch (error) {
-      console.error("Error syncing:", error);
-      res.status(500).json({ message: "Failed to sync data" });
+      const { connectionId, syncType } = req.body;
+      const result = await phase3Service.syncAccountingData(connectionId, syncType);
+      res.json(result);
+    } catch (error: any) {
+      console.error("Error syncing accounting:", error);
+      res.status(500).json({ message: error.message || "Failed to sync accounting data" });
     }
   });
 
-  app.get('/api/email/campaigns', isAuthenticated, async (req: any, res) => {
-    try {
-      const garageId = req.user.garageId;
-      res.json([]);
-    } catch (error) {
-      console.error("Error fetching campaigns:", error);
-      res.status(500).json({ message: "Failed to fetch campaigns" });
-    }
-  });
-
+  // 2. EMAIL MARKETING CAMPAIGNS
   app.post('/api/email/campaigns', isAuthenticated, async (req: any, res) => {
     try {
-      const garageId = req.user.garageId;
-      const userId = req.user.id;
-      const { name, subject, targetAudience } = req.body;
-      
-      const campaign = {
-        id: Math.random().toString(36).substring(7),
-        garageId,
-        name,
+      const { campaignName, subject, content, recipientSegment, scheduledFor } = req.body;
+      const campaign = await phase3Service.createEmailCampaign({
+        garageId: req.user.garageId,
+        campaignName,
         subject,
-        targetAudience,
-        status: "draft",
-        createdBy: userId,
-        createdAt: new Date().toISOString(),
-      };
-      
-      res.json(campaign);
-    } catch (error) {
+        content,
+        recipientSegment,
+        scheduledFor: scheduledFor ? new Date(scheduledFor) : undefined
+      });
+      res.status(201).json(campaign);
+    } catch (error: any) {
       console.error("Error creating campaign:", error);
-      res.status(500).json({ message: "Failed to create campaign" });
+      res.status(500).json({ message: error.message || "Failed to create campaign" });
     }
   });
 
   app.post('/api/email/campaigns/:id/send', isAuthenticated, async (req: any, res) => {
     try {
-      res.json({ success: true, message: "Campaign sent successfully" });
-    } catch (error) {
+      const { id } = req.params;
+      const result = await phase3Service.sendEmailCampaign(id);
+      res.json(result);
+    } catch (error: any) {
       console.error("Error sending campaign:", error);
-      res.status(500).json({ message: "Failed to send campaign" });
+      res.status(500).json({ message: error.message || "Failed to send campaign" });
     }
   });
 
-  app.get('/api/social/posts', isAuthenticated, async (req: any, res) => {
+  app.post('/api/email/campaigns/:id/track', isAuthenticated, async (req: any, res) => {
     try {
-      const garageId = req.user.garageId;
-      res.json([]);
-    } catch (error) {
-      console.error("Error fetching social posts:", error);
-      res.status(500).json({ message: "Failed to fetch social posts" });
+      const { id } = req.params;
+      const { action } = req.body;
+      const result = await phase3Service.trackEmailEngagement(id, action);
+      res.json(result);
+    } catch (error: any) {
+      console.error("Error tracking engagement:", error);
+      res.status(500).json({ message: error.message || "Failed to track engagement" });
     }
   });
 
+  // 3. SOCIAL MEDIA INTEGRATION
   app.post('/api/social/posts', isAuthenticated, async (req: any, res) => {
     try {
-      const garageId = req.user.garageId;
-      const userId = req.user.id;
-      const { platform, content, status } = req.body;
-      
-      const post = {
-        id: Math.random().toString(36).substring(7),
-        garageId,
-        platform,
+      const { platforms, content, mediaUrls, scheduledFor } = req.body;
+      const posts = await phase3Service.postToSocialMedia({
+        garageId: req.user.garageId,
+        platforms,
         content,
-        status: status || "draft",
-        createdBy: userId,
-        createdAt: new Date().toISOString(),
-      };
-      
-      res.json(post);
-    } catch (error) {
+        mediaUrls,
+        scheduledFor: scheduledFor ? new Date(scheduledFor) : undefined
+      });
+      res.status(201).json(posts);
+    } catch (error: any) {
       console.error("Error creating post:", error);
-      res.status(500).json({ message: "Failed to create post" });
+      res.status(500).json({ message: error.message || "Failed to create post" });
     }
   });
 
   app.get('/api/social/reviews', isAuthenticated, async (req: any, res) => {
     try {
-      const garageId = req.user.garageId;
-      res.json([]);
-    } catch (error) {
+      const reviews = await phase3Service.fetchSocialMediaReviews(req.user.garageId);
+      res.json(reviews);
+    } catch (error: any) {
       console.error("Error fetching reviews:", error);
-      res.status(500).json({ message: "Failed to fetch reviews" });
+      res.status(500).json({ message: error.message || "Failed to fetch reviews" });
     }
   });
 
-  app.get('/api/video/consultations', isAuthenticated, async (req: any, res) => {
+  app.post('/api/social/reviews/:id/respond', isAuthenticated, async (req: any, res) => {
     try {
-      const garageId = req.user.garageId;
-      res.json([]);
-    } catch (error) {
-      console.error("Error fetching consultations:", error);
-      res.status(500).json({ message: "Failed to fetch consultations" });
+      const { id } = req.params;
+      const { response } = req.body;
+      const result = await phase3Service.respondToReview(id, response, req.user.id);
+      res.json(result);
+    } catch (error: any) {
+      console.error("Error responding to review:", error);
+      res.status(500).json({ message: error.message || "Failed to respond to review" });
     }
   });
 
+  // 4. VIDEO CONSULTATIONS (Zoom/Teams)
   app.post('/api/video/consultations', isAuthenticated, async (req: any, res) => {
     try {
-      const garageId = req.user.garageId;
-      const { customerId, technicianId, platform, duration } = req.body;
-      
-      const consultation = {
-        id: Math.random().toString(36).substring(7),
-        garageId,
+      const { customerId, technicianId, scheduledFor, duration, purpose } = req.body;
+      const consultation = await phase3Service.scheduleVideoConsultation({
+        garageId: req.user.garageId,
         customerId,
         technicianId,
-        platform,
+        scheduledFor: new Date(scheduledFor),
         duration,
-        status: "scheduled",
-        meetingUrl: `https://${platform}.com/j/${Math.floor(Math.random() * 1000000000)}`,
-        createdAt: new Date().toISOString(),
-      };
-      
-      res.json(consultation);
-    } catch (error) {
+        purpose
+      });
+      res.status(201).json(consultation);
+    } catch (error: any) {
       console.error("Error creating consultation:", error);
-      res.status(500).json({ message: "Failed to create consultation" });
+      res.status(500).json({ message: error.message || "Failed to create consultation" });
     }
   });
 
   app.post('/api/video/consultations/:id/start', isAuthenticated, async (req: any, res) => {
     try {
-      res.json({ success: true, meetingUrl: "https://zoom.us/j/1234567890" });
-    } catch (error) {
+      const { id } = req.params;
+      const result = await phase3Service.startVideoConsultation(id);
+      res.json(result);
+    } catch (error: any) {
       console.error("Error starting consultation:", error);
-      res.status(500).json({ message: "Failed to start consultation" });
+      res.status(500).json({ message: error.message || "Failed to start consultation" });
+    }
+  });
+
+  app.post('/api/video/consultations/:id/end', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const { notes, recordingUrl } = req.body;
+      const result = await phase3Service.endVideoConsultation(id, notes, recordingUrl);
+      res.json(result);
+    } catch (error: any) {
+      console.error("Error ending consultation:", error);
+      res.status(500).json({ message: error.message || "Failed to end consultation" });
+    }
+  });
+
+  // 5. PARTS MARKETPLACE (eBay/Amazon)
+  app.get('/api/marketplace/search', isAuthenticated, async (req: any, res) => {
+    try {
+      const { partNumber, marketplace } = req.query;
+      const results = await phase3Service.searchMarketplaceParts(
+        partNumber as string,
+        marketplace as 'ebay' | 'amazon'
+      );
+      res.json(results);
+    } catch (error: any) {
+      console.error("Error searching marketplace:", error);
+      res.status(500).json({ message: error.message || "Failed to search marketplace" });
+    }
+  });
+
+  app.post('/api/marketplace/orders', isAuthenticated, async (req: any, res) => {
+    try {
+      const orderData = {
+        ...req.body,
+        garageId: req.user.garageId
+      };
+      const order = await phase3Service.placeMarketplaceOrder(orderData);
+      res.status(201).json(order);
+    } catch (error: any) {
+      console.error("Error placing marketplace order:", error);
+      res.status(500).json({ message: error.message || "Failed to place order" });
+    }
+  });
+
+  app.get('/api/marketplace/orders/:id/track', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const tracking = await phase3Service.trackMarketplaceOrder(id);
+      res.json(tracking);
+    } catch (error: any) {
+      console.error("Error tracking order:", error);
+      res.status(500).json({ message: error.message || "Failed to track order" });
+    }
+  });
+
+  // 6. STRIPE PAYMENT PROCESSING
+  app.post('/api/stripe/create-payment-intent', isAuthenticated, async (req: any, res) => {
+    try {
+      const { amount, currency } = req.body;
+      const result = await phase3Service.createPaymentIntent(amount, currency);
+      res.json(result);
+    } catch (error: any) {
+      console.error("Error creating payment intent:", error);
+      res.status(500).json({ message: error.message || "Failed to create payment intent" });
+    }
+  });
+
+  app.get('/api/stripe/payment-status/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const status = await phase3Service.retrievePaymentStatus(id);
+      res.json(status);
+    } catch (error: any) {
+      console.error("Error retrieving payment status:", error);
+      res.status(500).json({ message: error.message || "Failed to retrieve payment status" });
+    }
+  });
+
+  app.post('/api/stripe/refund', isAuthenticated, async (req: any, res) => {
+    try {
+      const { paymentIntentId, amount } = req.body;
+      const result = await phase3Service.processRefund(paymentIntentId, amount);
+      res.json(result);
+    } catch (error: any) {
+      console.error("Error processing refund:", error);
+      res.status(500).json({ message: error.message || "Failed to process refund" });
     }
   });
 
