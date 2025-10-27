@@ -67,6 +67,10 @@ import { estimateJobTime, predictMaintenance, recommendParts, optimizeSchedule, 
 import { auditLog } from './auditMiddleware';
 import QRCode from 'qrcode';
 import * as phase3Service from './phase3-integrations-service';
+import * as phase4Service from './phase4-customer-experience-service';
+import * as phase5Service from './phase5-operations-service';
+import * as phase6Service from './phase6-compliance-service';
+import * as phase7Service from './phase7-hardware-service';
 
 // Initialize Stripe (Stripe integration - Module 25)
 const stripe = process.env.STRIPE_SECRET_KEY 
