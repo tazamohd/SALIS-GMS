@@ -13,12 +13,23 @@ import {
   marketplaceOrders
 } from "@shared/schema";
 
-// Initialize Stripe if keys are available
+// Initialize Stripe with validation
+const STRIPE_AVAILABLE = !!process.env.STRIPE_SECRET_KEY;
+
+if (!STRIPE_AVAILABLE) {
+  console.warn('⚠️  STRIPE_SECRET_KEY not found. Payment features will be disabled.');
+}
+
 let stripe: Stripe | null = null;
-if (process.env.STRIPE_SECRET_KEY) {
-  stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-    apiVersion: "2025-09-30.clover",
-  });
+if (STRIPE_AVAILABLE) {
+  try {
+    stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+      apiVersion: "2025-09-30.clover",
+    });
+    console.log('✅ Stripe initialized successfully');
+  } catch (error) {
+    console.error('❌ Failed to initialize Stripe:', error);
+  }
 }
 
 // ========================================

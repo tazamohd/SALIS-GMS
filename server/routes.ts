@@ -6104,11 +6104,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // 6. STRIPE PAYMENT PROCESSING
+  // 6. STRIPE PAYMENT PROCESSING (with input validation)
   app.post('/api/stripe/create-payment-intent', isAuthenticated, async (req: any, res) => {
     try {
       const { amount, currency } = req.body;
-      const result = await phase3Service.createPaymentIntent(amount, currency);
+      
+      // Input validation
+      if (!amount || typeof amount !== 'number' || amount <= 0) {
+        return res.status(400).json({ message: "Invalid amount" });
+      }
+      
+      const result = await phase3Service.createPaymentIntent(amount, currency || 'usd');
       res.json(result);
     } catch (error: any) {
       console.error("Error creating payment intent:", error);

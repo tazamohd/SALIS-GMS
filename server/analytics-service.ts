@@ -1,5 +1,5 @@
 // Analytics Service for SALIS AUTO - Phase 2: Advanced Analytics
-// Real SQL aggregation queries for business intelligence
+// Real SQL aggregation queries with error handling and pagination
 
 import { db } from "./db";
 import { sql } from "drizzle-orm";
@@ -13,10 +13,26 @@ import {
   appointments as appointmentsTable
 } from "@shared/schema";
 
+// Helper function to safely execute SQL with error handling
+async function safeExecuteSQL<T>(query: Promise<any>, defaultValue: T): Promise<T> {
+  try {
+    const result = await query;
+    return result;
+  } catch (error) {
+    console.error('SQL execution error:', error);
+    return defaultValue;
+  }
+}
+
 // Business Intelligence Dashboard - Custom Reports & KPIs
-export async function generateBusinessIntelligenceReport(garageId: string, dateRange?: { start: Date; end: Date }) {
-  const start = dateRange?.start || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000); // Default 30 days
-  const end = dateRange?.end || new Date();
+export async function generateBusinessIntelligenceReport(
+  garageId: string, 
+  dateRange?: { start: Date; end: Date },
+  limit: number = 100
+) {
+  try {
+    const start = dateRange?.start || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000); // Default 30 days
+    const end = dateRange?.end || new Date();
 
   // Revenue metrics
   const revenueData = await db.execute(sql`
@@ -59,16 +75,26 @@ export async function generateBusinessIntelligenceReport(garageId: string, dateR
     LIMIT 10
   `);
 
-  return {
-    period: { start, end },
-    revenue: revenueData.rows[0],
-    payments: paymentData.rows[0],
-    topServices: topServices.rows
-  };
+    return {
+      period: { start, end },
+      revenue: revenueData.rows[0] || {},
+      payments: paymentData.rows[0] || {},
+      topServices: topServices.rows || []
+    };
+  } catch (error) {
+    console.error('BI Report generation error:', error);
+    return {
+      period: { start: new Date(), end: new Date() },
+      revenue: {},
+      payments: {},
+      topServices: []
+    };
+  }
 }
 
-// Profit Margin Analysis
-export async function analyzeProfitMargins(garageId: string, groupBy: 'service' | 'technician' | 'customer') {
+// Profit Margin Analysis (with error handling)
+export async function analyzeProfitMargins(garageId: string, groupBy: 'service' | 'technician' | 'customer', limit: number = 50) {
+  try {
   if (groupBy === 'service') {
     const result = await db.execute(sql`
       SELECT 
@@ -134,13 +160,18 @@ export async function analyzeProfitMargins(garageId: string, groupBy: 'service' 
       AND customer_id IS NOT NULL
     GROUP BY customer_id
     ORDER BY gross_profit DESC
-    LIMIT 50
+    LIMIT ${limit}
   `);
-  return result.rows;
+    return result.rows;
+  } catch (error) {
+    console.error('Profit margin analysis error:', error);
+    return [];
+  }
 }
 
-// Customer Lifetime Value Analysis
-export async function analyzeCustomerLTV(garageId: string) {
+// Customer Lifetime Value Analysis (with error handling)
+export async function analyzeCustomerLTV(garageId: string, limit: number = 100) {
+  try {
   const result = await db.execute(sql`
     WITH customer_metrics AS (
       SELECT 
@@ -179,14 +210,19 @@ export async function analyzeCustomerLTV(garageId: string) {
       END as customer_segment
     FROM customer_metrics
     ORDER BY total_spent DESC
-    LIMIT 100
+    LIMIT ${limit}
   `);
 
-  return result.rows;
+    return result.rows;
+  } catch (error) {
+    console.error('Customer LTV analysis error:', error);
+    return [];
+  }
 }
 
-// Business Heat Maps - Demand Forecasting
+// Business Heat Maps - Demand Forecasting (with error handling)
 export async function generateBusinessHeatMaps(garageId: string, mapType: 'time' | 'service' | 'technician') {
+  try {
   if (mapType === 'time') {
     // Time-based demand (hour of day + day of week)
     const result = await db.execute(sql`
@@ -241,11 +277,16 @@ export async function generateBusinessHeatMaps(garageId: string, mapType: 'time'
     GROUP BY assigned_to, date
     ORDER BY date DESC, jobs_assigned DESC
   `);
-  return result.rows;
+    return result.rows;
+  } catch (error) {
+    console.error('Heat map generation error:', error);
+    return [];
+  }
 }
 
-// Real-time KPIs for dashboards
+// Real-time KPIs for dashboards (with error handling)
 export async function getRealtimeKPIs(garageId: string) {
+  try {
   // Today's metrics
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -278,9 +319,20 @@ export async function getRealtimeKPIs(garageId: string) {
       AND DATE(scheduled_date) = DATE(${today})
   `);
 
-  return {
-    ...todayMetrics.rows[0],
-    ...activeTechs.rows[0],
-    ...appointmentsToday.rows[0]
-  };
+    return {
+      ...todayMetrics.rows[0],
+      ...activeTechs.rows[0],
+      ...appointmentsToday.rows[0]
+    };
+  } catch (error) {
+    console.error('Realtime KPIs error:', error);
+    return {
+      jobs_today: 0,
+      completed_today: 0,
+      in_progress: 0,
+      revenue_today: 0,
+      active_technicians: 0,
+      appointments_today: 0
+    };
+  }
 }

@@ -18,32 +18,42 @@ const openai = AI_AVAILABLE ? new OpenAI({
 
 // AI Chatbot - Module 85
 export async function* streamChatResponse(messages: any[]) {
-  const stream = await openai.chat.completions.create({
-    model: "gpt-5",
-    messages: [
-      {
-        role: "system",
-        content: `You are an expert automotive service assistant for SALIS AUTO, a professional garage management system. 
-        You help with:
-        - Vehicle diagnostics and troubleshooting
-        - Service recommendations and maintenance schedules
-        - Parts identification and compatibility
-        - Repair procedures and best practices
-        - Customer service inquiries
-        
-        Provide clear, professional, and helpful responses. If you're unsure about something, acknowledge it honestly.`
-      },
-      ...messages
-    ],
-    stream: true,
-    max_completion_tokens: 8192
-  });
+  if (!openai) {
+    yield "I'm currently in demo mode. AI features require OpenAI credentials to be configured.";
+    return;
+  }
 
-  for await (const chunk of stream) {
-    const content = chunk.choices[0]?.delta?.content;
-    if (content) {
-      yield content;
+  try {
+    const stream = await openai.chat.completions.create({
+      model: "gpt-5",
+      messages: [
+        {
+          role: "system",
+          content: `You are an expert automotive service assistant for SALIS AUTO, a professional garage management system. 
+          You help with:
+          - Vehicle diagnostics and troubleshooting
+          - Service recommendations and maintenance schedules
+          - Parts identification and compatibility
+          - Repair procedures and best practices
+          - Customer service inquiries
+          
+          Provide clear, professional, and helpful responses. If you're unsure about something, acknowledge it honestly.`
+        },
+        ...messages
+      ],
+      stream: true,
+      max_completion_tokens: 8192
+    });
+
+    for await (const chunk of stream) {
+      const content = chunk.choices[0]?.delta?.content;
+      if (content) {
+        yield content;
+      }
     }
+  } catch (error) {
+    console.error('AI streaming error:', error);
+    yield "I encountered an error processing your request. Please try again later.";
   }
 }
 
@@ -56,7 +66,14 @@ export async function analyzePredictiveMaintenance(vehicleData: {
   mileage: number;
   serviceHistory: any[];
 }) {
-  const completion = await openai.chat.completions.create({
+  if (!openai) {
+    return [
+      { component: 'Oil Change', priority: 'medium', estimatedDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), confidence: 0.85, reason: 'Demo mode' }
+    ];
+  }
+
+  try {
+    const completion = await openai.chat.completions.create({
     model: "gpt-5",
     messages: [
       {
@@ -78,8 +95,12 @@ export async function analyzePredictiveMaintenance(vehicleData: {
     max_completion_tokens: 8192
   });
 
-  const result = JSON.parse(completion.choices[0].message.content || '{"predictions": []}');
-  return result.predictions;
+    const result = JSON.parse(completion.choices[0].message.content || '{"predictions": []}');
+    return result.predictions || [];
+  } catch (error) {
+    console.error('Predictive maintenance error:', error);
+    return [];
+  }
 }
 
 // Smart Parts Recommendations - Module 87
@@ -91,7 +112,14 @@ export async function generatePartsRecommendations(context: {
   serviceType: string;
   symptoms?: string;
 }) {
-  const completion = await openai.chat.completions.create({
+  if (!openai) {
+    return [
+      { partName: 'Standard Oil Filter', partNumber: 'OF-123', compatibility: 95, priority: 'high', estimatedCost: 25, reason: 'Demo mode' }
+    ];
+  }
+
+  try {
+    const completion = await openai.chat.completions.create({
     model: "gpt-5",
     messages: [
       {
@@ -112,13 +140,22 @@ export async function generatePartsRecommendations(context: {
     max_completion_tokens: 8192
   });
 
-  const result = JSON.parse(completion.choices[0].message.content || '{"recommendations": []}');
-  return result.recommendations;
+    const result = JSON.parse(completion.choices[0].message.content || '{"recommendations": []}');
+    return result.recommendations || [];
+  } catch (error) {
+    console.error('Parts recommendation error:', error);
+    return [];
+  }
 }
 
 // Document OCR Analysis - Module 88
 export async function analyzeOCRDocument(extractedText: string, documentType: string) {
-  const completion = await openai.chat.completions.create({
+  if (!openai) {
+    return { type: documentType, fields: {}, summary: 'Demo mode - AI not configured' };
+  }
+
+  try {
+    const completion = await openai.chat.completions.create({
     model: "gpt-5",
     messages: [
       {
@@ -138,8 +175,12 @@ export async function analyzeOCRDocument(extractedText: string, documentType: st
     max_completion_tokens: 8192
   });
 
-  const result = JSON.parse(completion.choices[0].message.content || '{"type": "unknown", "fields": {}}');
-  return result;
+    const result = JSON.parse(completion.choices[0].message.content || '{"type": "unknown", "fields": {}}');
+    return result;
+  } catch (error) {
+    console.error('OCR analysis error:', error);
+    return { type: documentType, fields: {}, summary: 'Analysis failed' };
+  }
 }
 
 // AI Service Suggestions - Module 89
@@ -149,7 +190,14 @@ export async function generateServiceSuggestions(context: {
   symptoms: string;
   mileage: number;
 }) {
-  const completion = await openai.chat.completions.create({
+  if (!openai) {
+    return [
+      { service: 'General Inspection', reason: 'Demo mode', priority: 'medium', estimatedCost: 50, estimatedTime: 60 }
+    ];
+  }
+
+  try {
+    const completion = await openai.chat.completions.create({
     model: "gpt-5",
     messages: [
       {
@@ -170,6 +218,10 @@ export async function generateServiceSuggestions(context: {
     max_completion_tokens: 8192
   });
 
-  const result = JSON.parse(completion.choices[0].message.content || '{"suggestions": []}');
-  return result.suggestions;
+    const result = JSON.parse(completion.choices[0].message.content || '{"suggestions": []}');
+    return result.suggestions || [];
+  } catch (error) {
+    console.error('Service suggestions error:', error);
+    return [];
+  }
 }
