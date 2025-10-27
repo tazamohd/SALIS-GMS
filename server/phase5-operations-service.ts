@@ -52,7 +52,10 @@ export async function createSchedulingOptimization(data: {
   try {
     const [optimization] = await db
       .insert(schedulingOptimizations)
-      .values(data)
+      .values({
+        ...data,
+        efficiencyGain: data.efficiencyGain?.toString(),
+      })
       .returning();
     
     return optimization;
@@ -196,6 +199,8 @@ export async function createRoutingOptimization(data: {
   routeType: string;
   startLocation?: string;
   stops: any;
+  totalDistance?: number;
+  estimatedDuration?: number;
   assignedDriver?: string;
 }) {
   try {
@@ -203,6 +208,7 @@ export async function createRoutingOptimization(data: {
       .insert(routingOptimizations)
       .values({
         ...data,
+        totalDistance: data.totalDistance?.toString(),
         optimizedRoute: data.stops, // Simple pass-through, real optimization would use mapping API
         status: 'planned',
       })

@@ -102,7 +102,10 @@ export async function createVideoEstimate(data: {
   try {
     const [estimate] = await db
       .insert(videoEstimates)
-      .values(data)
+      .values({
+        ...data,
+        estimatedCost: data.estimatedCost?.toString(),
+      })
       .returning();
     
     return estimate;

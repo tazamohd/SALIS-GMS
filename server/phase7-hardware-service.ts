@@ -161,12 +161,18 @@ export async function getActiveContentForDisplay(displayId: string) {
       .from(signageContent)
       .where(and(
         eq(signageContent.displayId, displayId),
-        eq(signageContent.isActive, true),
-        lte(signageContent.validFrom, now)
+        eq(signageContent.isActive, true)
       ))
       .orderBy(desc(signageContent.priority));
     
-    return content.filter(c => !c.validUntil || new Date(c.validUntil) >= now);
+    // Filter in memory to handle nullable validFrom/validUntil
+    return content.filter(c => {
+      const validFrom = c.validFrom ? new Date(c.validFrom) : null;
+      const validUntil = c.validUntil ? new Date(c.validUntil) : null;
+      const isAfterStart = !validFrom || validFrom <= now;
+      const isBeforeEnd = !validUntil || validUntil >= now;
+      return isAfterStart && isBeforeEnd;
+    });
   } catch (error) {
     console.error('Error fetching signage content:', error);
     return [];
@@ -370,7 +376,10 @@ export async function recordLicensePlateScan(data: {
   try {
     const [scan] = await db
       .insert(licensePlateScans)
-      .values(data)
+      .values({
+        ...data,
+        confidence: data.confidence?.toString(),
+      })
       .returning();
     
     // Try to match vehicle

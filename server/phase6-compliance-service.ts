@@ -37,7 +37,11 @@ export async function createComplianceRecord(data: {
   try {
     const [record] = await db
       .insert(environmentalCompliance)
-      .values(data)
+      .values({
+        ...data,
+        quantity: data.quantity?.toString(),
+        cost: data.cost?.toString(),
+      })
       .returning();
     
     return record;
@@ -372,7 +376,11 @@ export async function createInsuranceClaim(data: {
   try {
     const [claim] = await db
       .insert(insuranceClaims)
-      .values(data)
+      .values({
+        ...data,
+        claimAmount: data.claimAmount.toString(),
+        deductible: data.deductible?.toString(),
+      })
       .returning();
     
     return claim;
