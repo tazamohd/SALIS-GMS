@@ -68,7 +68,7 @@ export async function analyzePredictiveMaintenance(vehicleData: {
 }) {
   if (!openai) {
     return [
-      { component: 'Oil Change', priority: 'medium', estimatedDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), confidence: 0.85, reason: 'Demo mode' }
+      { issue: 'Oil Change Due', probability: 0.85, estimatedMiles: vehicleData.mileage + 500, severity: 'medium', recommendation: 'Schedule oil change within 500 miles' }
     ];
   }
 
