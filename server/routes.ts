@@ -11598,6 +11598,866 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ==========================================
+  // PHASE 4: CUSTOMER EXPERIENCE ROUTES
+  // ==========================================
+
+  // Live Service Tracking
+  app.get('/api/service-tracking/:jobCardId', isAuthenticated, async (req, res) => {
+    try {
+      const { jobCardId } = req.params;
+      const timeline = await phase4Service.getServiceTrackingTimeline(jobCardId);
+      res.json(timeline);
+    } catch (error) {
+      console.error("Error fetching service tracking timeline:", error);
+      res.status(500).json({ message: "Failed to fetch service tracking timeline" });
+    }
+  });
+
+  app.post('/api/service-tracking/:jobCardId/update', isAuthenticated, async (req: any, res) => {
+    try {
+      const { jobCardId } = req.params;
+      const userId = req.user.id;
+      const updateData = {
+        jobCardId,
+        userId,
+        status: req.body.status,
+        message: req.body.message,
+        photoUrl: req.body.photoUrl,
+        estimatedCompletion: req.body.estimatedCompletion ? new Date(req.body.estimatedCompletion) : undefined,
+      };
+      const update = await phase4Service.postServiceUpdate(updateData);
+      res.status(201).json(update);
+    } catch (error) {
+      console.error("Error posting service update:", error);
+      res.status(500).json({ message: "Failed to post service update" });
+    }
+  });
+
+  // Video Estimates
+  app.post('/api/video-estimates', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      const estimateData = {
+        garageId,
+        customerId: req.body.customerId,
+        vehicleId: req.body.vehicleId,
+        technicianId: req.body.technicianId,
+        videoUrl: req.body.videoUrl,
+        thumbnailUrl: req.body.thumbnailUrl,
+        duration: req.body.duration,
+        transcription: req.body.transcription,
+        estimatedCost: req.body.estimatedCost,
+        recommendedServices: req.body.recommendedServices,
+      };
+      const estimate = await phase4Service.createVideoEstimate(estimateData);
+      res.status(201).json(estimate);
+    } catch (error) {
+      console.error("Error creating video estimate:", error);
+      res.status(500).json({ message: "Failed to create video estimate" });
+    }
+  });
+
+  app.get('/api/video-estimates/customer/:customerId', isAuthenticated, async (req, res) => {
+    try {
+      const { customerId } = req.params;
+      const estimates = await phase4Service.getVideoEstimates(customerId);
+      res.json(estimates);
+    } catch (error) {
+      console.error("Error fetching video estimates:", error);
+      res.status(500).json({ message: "Failed to fetch video estimates" });
+    }
+  });
+
+  app.patch('/api/video-estimates/:id/approve', isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const estimate = await phase4Service.approveVideoEstimate(id);
+      res.json(estimate);
+    } catch (error) {
+      console.error("Error approving video estimate:", error);
+      res.status(500).json({ message: "Failed to approve video estimate" });
+    }
+  });
+
+  // Digital Vehicle Walkaround
+  app.post('/api/digital-walkaround', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      const walkaroundData = {
+        garageId,
+        jobCardId: req.body.jobCardId,
+        vehicleId: req.body.vehicleId,
+        customerId: req.body.customerId,
+        technicianId: req.body.technicianId,
+        inspectionType: req.body.inspectionType,
+        photos: req.body.photos,
+        damageNotes: req.body.damageNotes,
+      };
+      const walkaround = await phase4Service.createDigitalWalkaround(walkaroundData);
+      res.status(201).json(walkaround);
+    } catch (error) {
+      console.error("Error creating digital walkaround:", error);
+      res.status(500).json({ message: "Failed to create digital walkaround" });
+    }
+  });
+
+  app.get('/api/digital-walkaround/:id', isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const walkaround = await phase4Service.getDigitalWalkaround(id);
+      if (!walkaround) {
+        return res.status(404).json({ message: "Digital walkaround not found" });
+      }
+      res.json(walkaround);
+    } catch (error) {
+      console.error("Error fetching digital walkaround:", error);
+      res.status(500).json({ message: "Failed to fetch digital walkaround" });
+    }
+  });
+
+  // Customer Reviews & Ratings
+  app.post('/api/reviews', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      const reviewData = {
+        garageId,
+        customerId: req.body.customerId,
+        jobCardId: req.body.jobCardId,
+        platform: req.body.platform,
+        rating: req.body.rating,
+        reviewText: req.body.reviewText,
+        reviewUrl: req.body.reviewUrl,
+      };
+      const review = await phase4Service.postCustomerReview(reviewData);
+      res.status(201).json(review);
+    } catch (error) {
+      console.error("Error posting customer review:", error);
+      res.status(500).json({ message: "Failed to post customer review" });
+    }
+  });
+
+  app.get('/api/reviews', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      const { platform } = req.query;
+      const reviews = await phase4Service.getReviewsByPlatform(garageId, platform as string);
+      res.json(reviews);
+    } catch (error) {
+      console.error("Error fetching reviews:", error);
+      res.status(500).json({ message: "Failed to fetch reviews" });
+    }
+  });
+
+  app.post('/api/reviews/:id/respond', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const userId = req.user.id;
+      const review = await phase4Service.respondToReview(id, req.body.response, userId);
+      res.json(review);
+    } catch (error) {
+      console.error("Error responding to review:", error);
+      res.status(500).json({ message: "Failed to respond to review" });
+    }
+  });
+
+  // Referral Program
+  app.post('/api/referrals/generate-code', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      const customerId = req.body.customerId;
+      const code = await phase4Service.generateReferralCode(garageId, customerId);
+      res.json({ code });
+    } catch (error) {
+      console.error("Error generating referral code:", error);
+      res.status(500).json({ message: "Failed to generate referral code" });
+    }
+  });
+
+  app.post('/api/referrals/apply', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      const { referralCode, newCustomerId } = req.body;
+      const result = await phase4Service.applyReferralCode(garageId, referralCode, newCustomerId);
+      res.json(result);
+    } catch (error) {
+      console.error("Error applying referral code:", error);
+      res.status(500).json({ message: "Failed to apply referral code" });
+    }
+  });
+
+  app.get('/api/referrals/analytics', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      const analytics = await phase4Service.getReferralAnalytics(garageId);
+      res.json(analytics);
+    } catch (error) {
+      console.error("Error fetching referral analytics:", error);
+      res.status(500).json({ message: "Failed to fetch referral analytics" });
+    }
+  });
+
+  // ==========================================
+  // PHASE 5: OPERATIONS & EFFICIENCY ROUTES
+  // ==========================================
+
+  // AI-Powered Scheduling Optimizer
+  app.get('/api/scheduling/rules', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      const rules = await phase5Service.getSchedulingRules(garageId);
+      res.json(rules);
+    } catch (error) {
+      console.error("Error fetching scheduling rules:", error);
+      res.status(500).json({ message: "Failed to fetch scheduling rules" });
+    }
+  });
+
+  app.post('/api/scheduling/optimize', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      const optimizationData = {
+        garageId,
+        optimizationDate: new Date(req.body.optimizationDate),
+        appointmentsOptimized: req.body.appointmentsOptimized,
+        efficiencyGain: req.body.efficiencyGain,
+        technicianUtilization: req.body.technicianUtilization,
+        suggestions: req.body.suggestions,
+      };
+      const optimization = await phase5Service.createSchedulingOptimization(optimizationData);
+      res.status(201).json(optimization);
+    } catch (error) {
+      console.error("Error creating scheduling optimization:", error);
+      res.status(500).json({ message: "Failed to create scheduling optimization" });
+    }
+  });
+
+  app.get('/api/scheduling/history', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      const { limit } = req.query;
+      const history = await phase5Service.getSchedulingHistory(garageId, limit ? parseInt(limit) : 30);
+      res.json(history);
+    } catch (error) {
+      console.error("Error fetching scheduling history:", error);
+      res.status(500).json({ message: "Failed to fetch scheduling history" });
+    }
+  });
+
+  // Parts Auto-Reordering System
+  app.post('/api/auto-reorder/rules', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      const ruleData = {
+        garageId,
+        partId: req.body.partId,
+        minQuantity: req.body.minQuantity,
+        reorderQuantity: req.body.reorderQuantity,
+        preferredSupplierId: req.body.preferredSupplierId,
+      };
+      const rule = await phase5Service.createAutoReorderRule(ruleData);
+      res.status(201).json(rule);
+    } catch (error) {
+      console.error("Error creating auto-reorder rule:", error);
+      res.status(500).json({ message: "Failed to create auto-reorder rule" });
+    }
+  });
+
+  app.get('/api/auto-reorder/rules', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      const rules = await phase5Service.getAutoReorderRules(garageId);
+      res.json(rules);
+    } catch (error) {
+      console.error("Error fetching auto-reorder rules:", error);
+      res.status(500).json({ message: "Failed to fetch auto-reorder rules" });
+    }
+  });
+
+  app.post('/api/auto-reorder/check', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      const triggeredOrders = await phase5Service.checkAndTriggerReorders(garageId);
+      res.json({ triggered: triggeredOrders.length, orders: triggeredOrders });
+    } catch (error) {
+      console.error("Error checking auto-reorders:", error);
+      res.status(500).json({ message: "Failed to check auto-reorders" });
+    }
+  });
+
+  // Multi-Location Routing Optimizer
+  app.post('/api/routing/optimize', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      const routeData = {
+        garageId,
+        routeDate: new Date(req.body.routeDate),
+        routeType: req.body.routeType,
+        startLocation: req.body.startLocation,
+        stops: req.body.stops,
+        totalDistance: req.body.totalDistance,
+        estimatedDuration: req.body.estimatedDuration,
+        assignedDriver: req.body.assignedDriver,
+      };
+      const route = await phase5Service.createRoutingOptimization(routeData);
+      res.status(201).json(route);
+    } catch (error) {
+      console.error("Error creating route optimization:", error);
+      res.status(500).json({ message: "Failed to create route optimization" });
+    }
+  });
+
+  app.get('/api/routing/routes', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      const { status } = req.query;
+      const routes = await phase5Service.getRoutes(garageId, status as string);
+      res.json(routes);
+    } catch (error) {
+      console.error("Error fetching routes:", error);
+      res.status(500).json({ message: "Failed to fetch routes" });
+    }
+  });
+
+  // Time Clock & Payroll
+  app.post('/api/timeclock/clock-in', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const garageId = req.user.garageId;
+      const entry = await phase5Service.clockIn(garageId, userId);
+      res.status(201).json(entry);
+    } catch (error) {
+      console.error("Error clocking in:", error);
+      res.status(500).json({ message: "Failed to clock in" });
+    }
+  });
+
+  app.post('/api/timeclock/clock-out', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const entry = await phase5Service.clockOut(userId);
+      res.json(entry);
+    } catch (error) {
+      console.error("Error clocking out:", error);
+      res.status(500).json({ message: "Failed to clock out" });
+    }
+  });
+
+  app.get('/api/payroll/periods', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      const { status } = req.query;
+      const periods = await phase5Service.getPayrollPeriods(garageId, status as string);
+      res.json(periods);
+    } catch (error) {
+      console.error("Error fetching payroll periods:", error);
+      res.status(500).json({ message: "Failed to fetch payroll periods" });
+    }
+  });
+
+  app.post('/api/payroll/calculate/:periodId', isAuthenticated, async (req, res) => {
+    try {
+      const { periodId } = req.params;
+      const payrollEntries = await phase5Service.calculatePayroll(periodId);
+      res.json(payrollEntries);
+    } catch (error) {
+      console.error("Error calculating payroll:", error);
+      res.status(500).json({ message: "Failed to calculate payroll" });
+    }
+  });
+
+  // Equipment Calibration Tracking
+  app.post('/api/calibration', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      const calibrationData = {
+        garageId,
+        equipmentId: req.body.equipmentId,
+        equipmentName: req.body.equipmentName,
+        calibrationDate: new Date(req.body.calibrationDate),
+        nextDueDate: new Date(req.body.nextDueDate),
+        calibratedBy: req.body.calibratedBy,
+        certificationNumber: req.body.certificationNumber,
+        notes: req.body.notes,
+      };
+      const calibration = await phase5Service.createCalibrationRecord(calibrationData);
+      res.status(201).json(calibration);
+    } catch (error) {
+      console.error("Error creating calibration record:", error);
+      res.status(500).json({ message: "Failed to create calibration record" });
+    }
+  });
+
+  app.get('/api/calibration/due', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      const { days } = req.query;
+      const dueCalibrations = await phase5Service.getCalibrationsDue(garageId, days ? parseInt(days) : 30);
+      res.json(dueCalibrations);
+    } catch (error) {
+      console.error("Error fetching due calibrations:", error);
+      res.status(500).json({ message: "Failed to fetch due calibrations" });
+    }
+  });
+
+  // ==========================================
+  // PHASE 6: COMPLIANCE & QUALITY ROUTES
+  // ==========================================
+
+  // Environmental Compliance
+  app.post('/api/compliance/environmental', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      const recordData = {
+        garageId,
+        complianceType: req.body.complianceType,
+        recordDate: new Date(req.body.recordDate),
+        wasteType: req.body.wasteType,
+        quantity: req.body.quantity,
+        unit: req.body.unit,
+        disposalMethod: req.body.disposalMethod,
+        disposalCompany: req.body.disposalCompany,
+        certificationNumber: req.body.certificationNumber,
+        cost: req.body.cost,
+        regulatoryStandard: req.body.regulatoryStandard,
+        attachments: req.body.attachments,
+        notes: req.body.notes,
+      };
+      const record = await phase6Service.createComplianceRecord(recordData);
+      res.status(201).json(record);
+    } catch (error) {
+      console.error("Error creating compliance record:", error);
+      res.status(500).json({ message: "Failed to create compliance record" });
+    }
+  });
+
+  app.get('/api/compliance/environmental', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      const { complianceType } = req.query;
+      const records = await phase6Service.getComplianceRecords(garageId, complianceType as string);
+      res.json(records);
+    } catch (error) {
+      console.error("Error fetching compliance records:", error);
+      res.status(500).json({ message: "Failed to fetch compliance records" });
+    }
+  });
+
+  app.get('/api/compliance/environmental/analytics', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      const { startDate, endDate } = req.query;
+      const analytics = await phase6Service.getComplianceAnalytics(
+        garageId,
+        startDate ? new Date(startDate as string) : undefined,
+        endDate ? new Date(endDate as string) : undefined
+      );
+      res.json(analytics);
+    } catch (error) {
+      console.error("Error fetching compliance analytics:", error);
+      res.status(500).json({ message: "Failed to fetch compliance analytics" });
+    }
+  });
+
+  // ISO 9001 Quality Management
+  app.post('/api/quality/checklists', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      const checklistData = {
+        garageId,
+        checklistName: req.body.checklistName,
+        checklistType: req.body.checklistType,
+        items: req.body.items,
+      };
+      const checklist = await phase6Service.createQualityChecklist(checklistData);
+      res.status(201).json(checklist);
+    } catch (error) {
+      console.error("Error creating quality checklist:", error);
+      res.status(500).json({ message: "Failed to create quality checklist" });
+    }
+  });
+
+  app.post('/api/quality/non-conformances', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      const ncData = {
+        garageId,
+        ncNumber: req.body.ncNumber,
+        jobCardId: req.body.jobCardId,
+        description: req.body.description,
+        severity: req.body.severity,
+        reportedBy: req.body.reportedBy,
+        category: req.body.category,
+      };
+      const nonConformance = await phase6Service.createNonConformance(ncData);
+      res.status(201).json(nonConformance);
+    } catch (error) {
+      console.error("Error creating non-conformance:", error);
+      res.status(500).json({ message: "Failed to create non-conformance" });
+    }
+  });
+
+  app.get('/api/quality/non-conformances', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      const { status } = req.query;
+      const nonConformances = await phase6Service.getNonConformances(garageId, status as string);
+      res.json(nonConformances);
+    } catch (error) {
+      console.error("Error fetching non-conformances:", error);
+      res.status(500).json({ message: "Failed to fetch non-conformances" });
+    }
+  });
+
+  // Safety Incident Reporting
+  app.post('/api/safety/incidents', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      const incidentData = {
+        garageId,
+        incidentDate: new Date(req.body.incidentDate),
+        incidentType: req.body.incidentType,
+        severity: req.body.severity,
+        location: req.body.location,
+        description: req.body.description,
+        injuredPerson: req.body.injuredPerson,
+        witnessNames: req.body.witnessNames,
+        reportedBy: req.body.reportedBy,
+        immediateAction: req.body.immediateAction,
+        photos: req.body.photos,
+      };
+      const incident = await phase6Service.createSafetyIncident(incidentData);
+      res.status(201).json(incident);
+    } catch (error) {
+      console.error("Error creating safety incident:", error);
+      res.status(500).json({ message: "Failed to create safety incident" });
+    }
+  });
+
+  app.get('/api/safety/incidents', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      const { status } = req.query;
+      const incidents = await phase6Service.getSafetyIncidents(garageId, status as string);
+      res.json(incidents);
+    } catch (error) {
+      console.error("Error fetching safety incidents:", error);
+      res.status(500).json({ message: "Failed to fetch safety incidents" });
+    }
+  });
+
+  app.get('/api/safety/analytics', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      const { startDate, endDate } = req.query;
+      const analytics = await phase6Service.getSafetyAnalytics(
+        garageId,
+        startDate ? new Date(startDate as string) : undefined,
+        endDate ? new Date(endDate as string) : undefined
+      );
+      res.json(analytics);
+    } catch (error) {
+      console.error("Error fetching safety analytics:", error);
+      res.status(500).json({ message: "Failed to fetch safety analytics" });
+    }
+  });
+
+  // Insurance Claims
+  app.post('/api/insurance/claims', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      const claimData = {
+        garageId,
+        claimNumber: req.body.claimNumber,
+        jobCardId: req.body.jobCardId,
+        customerId: req.body.customerId,
+        vehicleId: req.body.vehicleId,
+        insuranceCompany: req.body.insuranceCompany,
+        policyNumber: req.body.policyNumber,
+        claimType: req.body.claimType,
+        incidentDate: new Date(req.body.incidentDate),
+        claimAmount: req.body.claimAmount,
+        deductible: req.body.deductible,
+        adjusterName: req.body.adjusterName,
+        adjusterContact: req.body.adjusterContact,
+        estimateUrl: req.body.estimateUrl,
+        documents: req.body.documents,
+        notes: req.body.notes,
+      };
+      const claim = await phase6Service.createInsuranceClaim(claimData);
+      res.status(201).json(claim);
+    } catch (error) {
+      console.error("Error creating insurance claim:", error);
+      res.status(500).json({ message: "Failed to create insurance claim" });
+    }
+  });
+
+  app.get('/api/insurance/claims', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      const { status } = req.query;
+      const claims = await phase6Service.getInsuranceClaims(garageId, status as string);
+      res.json(claims);
+    } catch (error) {
+      console.error("Error fetching insurance claims:", error);
+      res.status(500).json({ message: "Failed to fetch insurance claims" });
+    }
+  });
+
+  app.patch('/api/insurance/claims/:id/status', isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { status, notes } = req.body;
+      const claim = await phase6Service.updateClaimStatus(id, status, notes);
+      res.json(claim);
+    } catch (error) {
+      console.error("Error updating claim status:", error);
+      res.status(500).json({ message: "Failed to update claim status" });
+    }
+  });
+
+  app.get('/api/insurance/claims/analytics', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      const analytics = await phase6Service.getClaimsAnalytics(garageId);
+      res.json(analytics);
+    } catch (error) {
+      console.error("Error fetching claims analytics:", error);
+      res.status(500).json({ message: "Failed to fetch claims analytics" });
+    }
+  });
+
+  // ==========================================
+  // PHASE 7: ADVANCED HARDWARE ROUTES
+  // ==========================================
+
+  // Barcode/QR Scanner Integration
+  app.post('/api/barcode/scan', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      const scanData = {
+        garageId,
+        barcodeValue: req.body.barcodeValue,
+        barcodeType: req.body.barcodeType,
+        entityType: req.body.entityType,
+        entityId: req.body.entityId,
+        scannedBy: req.body.scannedBy,
+        location: req.body.location,
+      };
+      const scan = await phase7Service.recordBarcodeScan(scanData);
+      res.status(201).json(scan);
+    } catch (error) {
+      console.error("Error recording barcode scan:", error);
+      res.status(500).json({ message: "Failed to record barcode scan" });
+    }
+  });
+
+  app.get('/api/barcode/history', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      const { entityType, limit } = req.query;
+      const history = await phase7Service.getScanHistory(
+        garageId,
+        entityType as string,
+        limit ? parseInt(limit) : 100
+      );
+      res.json(history);
+    } catch (error) {
+      console.error("Error fetching scan history:", error);
+      res.status(500).json({ message: "Failed to fetch scan history" });
+    }
+  });
+
+  // Digital Signage System
+  app.post('/api/signage/displays', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      const displayData = {
+        garageId,
+        displayName: req.body.displayName,
+        location: req.body.location,
+        resolution: req.body.resolution,
+        orientation: req.body.orientation,
+      };
+      const display = await phase7Service.createSignageDisplay(displayData);
+      res.status(201).json(display);
+    } catch (error) {
+      console.error("Error creating signage display:", error);
+      res.status(500).json({ message: "Failed to create signage display" });
+    }
+  });
+
+  app.post('/api/signage/content', isAuthenticated, async (req, res) => {
+    try {
+      const contentData = {
+        displayId: req.body.displayId,
+        contentType: req.body.contentType,
+        contentUrl: req.body.contentUrl,
+        title: req.body.title,
+        description: req.body.description,
+        duration: req.body.duration,
+        validFrom: req.body.validFrom ? new Date(req.body.validFrom) : undefined,
+        validUntil: req.body.validUntil ? new Date(req.body.validUntil) : undefined,
+        priority: req.body.priority,
+      };
+      const content = await phase7Service.createSignageContent(contentData);
+      res.status(201).json(content);
+    } catch (error) {
+      console.error("Error creating signage content:", error);
+      res.status(500).json({ message: "Failed to create signage content" });
+    }
+  });
+
+  app.get('/api/signage/displays/:displayId/active-content', isAuthenticated, async (req, res) => {
+    try {
+      const { displayId } = req.params;
+      const content = await phase7Service.getActiveContentForDisplay(displayId);
+      res.json(content);
+    } catch (error) {
+      console.error("Error fetching active content:", error);
+      res.status(500).json({ message: "Failed to fetch active content" });
+    }
+  });
+
+  // Kiosk Check-In Interface
+  app.post('/api/kiosk/sessions', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      const sessionData = {
+        garageId,
+        kioskId: req.body.kioskId,
+        sessionType: req.body.sessionType,
+      };
+      const session = await phase7Service.createKioskSession(sessionData);
+      res.status(201).json(session);
+    } catch (error) {
+      console.error("Error creating kiosk session:", error);
+      res.status(500).json({ message: "Failed to create kiosk session" });
+    }
+  });
+
+  app.post('/api/kiosk/check-in', isAuthenticated, async (req, res) => {
+    try {
+      const checkInData = {
+        sessionId: req.body.sessionId,
+        customerId: req.body.customerId,
+        vehicleId: req.body.vehicleId,
+        appointmentId: req.body.appointmentId,
+        checkInType: req.body.checkInType,
+        signature: req.body.signature,
+        additionalNotes: req.body.additionalNotes,
+      };
+      const checkIn = await phase7Service.completeKioskCheckIn(checkInData);
+      res.status(201).json(checkIn);
+    } catch (error) {
+      console.error("Error completing kiosk check-in:", error);
+      res.status(500).json({ message: "Failed to complete kiosk check-in" });
+    }
+  });
+
+  // Security Camera Integration
+  app.post('/api/security/cameras', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      const cameraData = {
+        garageId,
+        cameraName: req.body.cameraName,
+        location: req.body.location,
+        ipAddress: req.body.ipAddress,
+        streamUrl: req.body.streamUrl,
+        resolution: req.body.resolution,
+        hasMotionDetection: req.body.hasMotionDetection,
+      };
+      const camera = await phase7Service.createSecurityCamera(cameraData);
+      res.status(201).json(camera);
+    } catch (error) {
+      console.error("Error creating security camera:", error);
+      res.status(500).json({ message: "Failed to create security camera" });
+    }
+  });
+
+  app.post('/api/security/recordings', isAuthenticated, async (req, res) => {
+    try {
+      const recordingData = {
+        cameraId: req.body.cameraId,
+        startTime: new Date(req.body.startTime),
+        endTime: new Date(req.body.endTime),
+        recordingUrl: req.body.recordingUrl,
+        fileSize: req.body.fileSize,
+        eventType: req.body.eventType,
+        vehicleId: req.body.vehicleId,
+        notes: req.body.notes,
+      };
+      const recording = await phase7Service.createCameraRecording(recordingData);
+      res.status(201).json(recording);
+    } catch (error) {
+      console.error("Error creating camera recording:", error);
+      res.status(500).json({ message: "Failed to create camera recording" });
+    }
+  });
+
+  app.get('/api/security/recordings/:id', isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const recording = await phase7Service.getRecordingPlayback(id);
+      if (!recording) {
+        return res.status(404).json({ message: "Recording not found" });
+      }
+      res.json(recording);
+    } catch (error) {
+      console.error("Error fetching recording:", error);
+      res.status(500).json({ message: "Failed to fetch recording" });
+    }
+  });
+
+  // License Plate Recognition
+  app.post('/api/lpr/scan', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      const scanData = {
+        garageId,
+        plateNumber: req.body.plateNumber,
+        confidence: req.body.confidence,
+        vehicleId: req.body.vehicleId,
+        customerId: req.body.customerId,
+        cameraId: req.body.cameraId,
+        imageUrl: req.body.imageUrl,
+        scanType: req.body.scanType,
+        location: req.body.location,
+        matchedAutomatically: req.body.matchedAutomatically,
+      };
+      const scan = await phase7Service.recordLicensePlateScan(scanData);
+      res.status(201).json(scan);
+    } catch (error) {
+      console.error("Error recording license plate scan:", error);
+      res.status(500).json({ message: "Failed to record license plate scan" });
+    }
+  });
+
+  app.get('/api/lpr/scans', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      const { limit } = req.query;
+      const scans = await phase7Service.getLicensePlateScans(garageId, limit ? parseInt(limit) : 100);
+      res.json(scans);
+    } catch (error) {
+      console.error("Error fetching license plate scans:", error);
+      res.status(500).json({ message: "Failed to fetch license plate scans" });
+    }
+  });
+
+  app.get('/api/lpr/entry-logs', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      const { status } = req.query;
+      const logs = await phase7Service.getVehicleEntryLogs(garageId, status as string);
+      res.json(logs);
+    } catch (error) {
+      console.error("Error fetching entry logs:", error);
+      res.status(500).json({ message: "Failed to fetch entry logs" });
+    }
+  });
+
   const httpServer = createServer(app);
   
   // Initialize WebSocket server for chat
