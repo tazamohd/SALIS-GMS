@@ -1,21 +1,54 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Wrench, AlertCircle, CheckCircle, Clock } from "lucide-react";
 
 export default function EquipmentCalibration() {
-  const mockRecords = [
-    { id: "1", toolName: "Torque Wrench #1", calibrationType: "Torque Accuracy", lastCalibration: "2024-09-15", nextDue: "2024-12-15", status: "valid", certNumber: "CAL-2024-001" },
-    { id: "2", toolName: "Alignment Machine", calibrationType: "4-Wheel Alignment", lastCalibration: "2024-08-20", nextDue: "2024-11-20", status: "due", certNumber: "CAL-2024-002" },
-    { id: "3", toolName: "Diagnostic Scanner", calibrationType: "OBD-II Compliance", lastCalibration: "2024-06-10", nextDue: "2024-10-15", status: "overdue", certNumber: "CAL-2024-003" },
-  ];
+  const { toast } = useToast();
 
+  // Fetch calibration records from backend
+  const { data: records = [] } = useQuery<any[]>({
+    queryKey: ['/api/calibration/due'],
+  });
+
+  // Add calibration mutation
+  const addCalibrationMutation = useMutation({
+    mutationFn: async () => {
+      return apiRequest('POST', '/api/calibration', {
+        equipmentId: 'sample-equipment-id',
+        equipmentName: 'Sample Equipment',
+        calibrationDate: new Date().toISOString(),
+        nextDueDate: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(),
+        certificationNumber: `CAL-${Date.now()}`,
+        calibratedBy: 'Technician',
+        notes: 'Standard calibration performed',
+      });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Calibration Added",
+        description: "Calibration record has been added successfully",
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/calibration/due'] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Failed to Add",
+        description: error.message || "Failed to add calibration record",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Calculate statistics from records
   const stats = {
-    totalEquipment: 24,
-    valid: 18,
-    due: 3,
-    overdue: 3,
+    totalEquipment: records.length,
+    valid: records.filter((r: any) => r.status === 'valid').length,
+    due: records.filter((r: any) => r.status === 'due').length,
+    overdue: records.filter((r: any) => r.status === 'overdue').length,
   };
 
   const getStatusBadge = (status: string) => {
@@ -42,7 +75,13 @@ export default function EquipmentCalibration() {
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mt-1">Track tool calibration and certifications</p>
         </div>
-        <Button data-testid="button-add-calibration">Add Calibration</Button>
+        <Button 
+          onClick={() => addCalibrationMutation.mutate()}
+          disabled={addCalibrationMutation.isPending}
+          data-testid="button-add-calibration"
+        >
+          {addCalibrationMutation.isPending ? "Adding..." : "Add Calibration"}
+        </Button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -51,7 +90,7 @@ export default function EquipmentCalibration() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Total Equipment</p>
-                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">{stats.totalEquipment}</h3>
+                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="text-total-equipment">{stats.totalEquipment}</h3>
               </div>
               <Wrench className="h-12 w-12 text-blue-600" />
             </div>
@@ -62,7 +101,7 @@ export default function EquipmentCalibration() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Valid</p>
-                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">{stats.valid}</h3>
+                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="text-valid">{stats.valid}</h3>
               </div>
               <CheckCircle className="h-12 w-12 text-green-600" />
             </div>
@@ -73,7 +112,7 @@ export default function EquipmentCalibration() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Due Soon</p>
-                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">{stats.due}</h3>
+                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="text-due">{stats.due}</h3>
               </div>
               <Clock className="h-12 w-12 text-yellow-600" />
             </div>
@@ -84,7 +123,7 @@ export default function EquipmentCalibration() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Overdue</p>
-                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">{stats.overdue}</h3>
+                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="text-overdue">{stats.overdue}</h3>
               </div>
               <AlertCircle className="h-12 w-12 text-red-600" />
             </div>
@@ -97,21 +136,30 @@ export default function EquipmentCalibration() {
           <CardTitle>Calibration Records</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-3">
-            {mockRecords.map((record) => (
-              <div key={record.id} className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-800 rounded-lg" data-testid={`calibration-${record.id}`}>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-gray-900 dark:text-white">{record.toolName}</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">{record.calibrationType} • Cert: {record.certNumber}</p>
+          {records.length === 0 ? (
+            <div className="text-center py-8 text-gray-500">
+              No calibration records available. Click "Add Calibration" to create a new record.
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {records.map((record: any) => (
+                <div key={record.id} className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-800 rounded-lg" data-testid={`calibration-${record.id}`}>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-gray-900 dark:text-white">{record.toolName || `#${record.toolNumber}`}</h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      {record.calibrationType || 'Standard Calibration'}
+                    </p>
+                  </div>
+                  <div className="text-right mr-4">
+                    <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                      Due: {record.nextCalibrationDue ? new Date(record.nextCalibrationDue).toLocaleDateString() : 'N/A'}
+                    </p>
+                  </div>
+                  {getStatusBadge(record.status)}
                 </div>
-                <div className="text-right mr-4">
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Last: {new Date(record.lastCalibration).toLocaleDateString()}</p>
-                  <p className="text-sm font-semibold text-gray-900 dark:text-white">Due: {new Date(record.nextDue).toLocaleDateString()}</p>
-                </div>
-                {getStatusBadge(record.status)}
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

@@ -12253,6 +12253,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get('/api/auto-reorder/history', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      const { limit } = req.query;
+      const history = await phase5Service.getReorderHistory(garageId, limit ? parseInt(limit) : 50);
+      res.json(history);
+    } catch (error) {
+      console.error("Error fetching reorder history:", error);
+      res.status(500).json({ message: "Failed to fetch reorder history" });
+    }
+  });
+
   // Multi-Location Routing Optimizer
   app.post('/api/routing/optimize', isAuthenticated, async (req: any, res) => {
     try {
@@ -12349,13 +12361,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const calibrationData = {
         garageId,
-        equipmentId: validated.equipmentId,
-        equipmentName: validated.equipmentName,
-        calibrationDate: new Date(validated.calibrationDate),
-        nextDueDate: new Date(validated.nextDueDate),
+        toolId: validated.equipmentId,
+        calibrationType: 'Standard Calibration',
+        lastCalibrationDate: new Date(validated.calibrationDate),
+        nextCalibrationDue: new Date(validated.nextDueDate),
+        calibrationInterval: 90,
         calibratedBy: validated.calibratedBy,
         certificationNumber: validated.certificationNumber,
-        notes: validated.notes,
       };
       const calibration = await phase5Service.createCalibrationRecord(calibrationData);
       res.status(201).json(calibration);
