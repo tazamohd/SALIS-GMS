@@ -72,6 +72,30 @@ import * as phase5Service from './phase5-operations-service';
 import * as phase6Service from './phase6-compliance-service';
 import * as phase7Service from './phase7-hardware-service';
 
+// Helper function to sanitize Zod validation errors for production
+function sanitizeZodError(error: z.ZodError) {
+  return {
+    message: "Validation failed",
+    errors: error.errors.map(err => ({
+      field: err.path.join('.'),
+      message: err.message
+    }))
+  };
+}
+
+// Helper function to sanitize array validation errors
+function sanitizeArrayValidationErrors(invalidItems: Array<{ success: false; error: z.ZodError }>) {
+  return {
+    message: "Validation failed",
+    errors: invalidItems.flatMap(v => 
+      v.error.errors.map(err => ({
+        field: err.path.join('.'),
+        message: err.message
+      }))
+    )
+  };
+}
+
 // Initialize Stripe (Stripe integration - Module 25)
 const stripe = process.env.STRIPE_SECRET_KEY 
   ? new Stripe(process.env.STRIPE_SECRET_KEY)
@@ -1003,10 +1027,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const validationResult = insertSparePartSchema.safeParse(req.body);
       if (!validationResult.success) {
-        return res.status(400).json({ 
-          message: "Validation failed", 
-          errors: validationResult.error.errors 
-        });
+        return res.status(400).json(sanitizeZodError(validationResult.error));
       }
 
       const partData = {
@@ -1029,10 +1050,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const validationResult = insertSparePartSchema.partial().safeParse(req.body);
       if (!validationResult.success) {
-        return res.status(400).json({ 
-          message: "Validation failed", 
-          errors: validationResult.error.errors 
-        });
+        return res.status(400).json(sanitizeZodError(validationResult.error));
       }
 
       const updatedPart = await storage.updateSparePart(id, validationResult.data);
@@ -1078,10 +1096,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const validationResult = insertSparePartInventorySchema.safeParse(req.body);
       if (!validationResult.success) {
-        return res.status(400).json({ 
-          message: "Validation failed", 
-          errors: validationResult.error.errors 
-        });
+        return res.status(400).json(sanitizeZodError(validationResult.error));
       }
 
       const inventory = await storage.createSparePartInventory(validationResult.data);
@@ -1099,10 +1114,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const validationResult = insertSparePartInventorySchema.partial().safeParse(req.body);
       if (!validationResult.success) {
-        return res.status(400).json({ 
-          message: "Validation failed", 
-          errors: validationResult.error.errors 
-        });
+        return res.status(400).json(sanitizeZodError(validationResult.error));
       }
 
       const updatedInventory = await storage.updateSparePartInventory(id, validationResult.data);
@@ -1154,7 +1166,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!validationResult.success) {
         return res.status(400).json({ 
           message: "Validation error", 
-          errors: validationResult.error.errors 
+          ...sanitizeZodError(validationResult.error) 
         });
       }
       
@@ -1181,7 +1193,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!validationResult.success) {
         return res.status(400).json({ 
           message: "Validation error", 
-          errors: validationResult.error.errors 
+          ...sanitizeZodError(validationResult.error) 
         });
       }
       
@@ -1278,7 +1290,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!validationResult.success) {
         return res.status(400).json({ 
           message: "Validation error", 
-          errors: validationResult.error.errors 
+          ...sanitizeZodError(validationResult.error) 
         });
       }
       
@@ -1300,7 +1312,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!validationResult.success) {
         return res.status(400).json({ 
           message: "Validation error", 
-          errors: validationResult.error.errors 
+          ...sanitizeZodError(validationResult.error) 
         });
       }
       
@@ -1350,7 +1362,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!validationResult.success) {
         return res.status(400).json({
           message: "Validation error",
-          errors: validationResult.error.errors
+          ...sanitizeZodError(validationResult.error)
         });
       }
 
@@ -1398,7 +1410,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!validationResult.success) {
         return res.status(400).json({
           message: "Validation error",
-          errors: validationResult.error.errors
+          ...sanitizeZodError(validationResult.error)
         });
       }
 
@@ -1420,7 +1432,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!validationResult.success) {
         return res.status(400).json({
           message: "Validation error",
-          errors: validationResult.error.errors
+          ...sanitizeZodError(validationResult.error)
         });
       }
 
@@ -1469,7 +1481,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!validationResult.success) {
         return res.status(400).json({
           message: "Validation error",
-          errors: validationResult.error.errors
+          ...sanitizeZodError(validationResult.error)
         });
       }
 
@@ -1491,7 +1503,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!validationResult.success) {
         return res.status(400).json({
           message: "Validation error",
-          errors: validationResult.error.errors
+          ...sanitizeZodError(validationResult.error)
         });
       }
 
@@ -1553,7 +1565,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!validationResult.success) {
         return res.status(400).json({ 
           message: "Validation error", 
-          errors: validationResult.error.errors 
+          ...sanitizeZodError(validationResult.error) 
         });
       }
       
@@ -1616,7 +1628,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!validationResult.success) {
         return res.status(400).json({ 
           message: "Validation error", 
-          errors: validationResult.error.errors 
+          ...sanitizeZodError(validationResult.error) 
         });
       }
       
@@ -1638,7 +1650,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!validationResult.success) {
         return res.status(400).json({ 
           message: "Validation error", 
-          errors: validationResult.error.errors 
+          ...sanitizeZodError(validationResult.error) 
         });
       }
       
@@ -1697,7 +1709,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!validationResult.success) {
         return res.status(400).json({ 
           message: "Validation error", 
-          errors: validationResult.error.errors 
+          ...sanitizeZodError(validationResult.error) 
         });
       }
       
@@ -1718,7 +1730,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!validationResult.success) {
         return res.status(400).json({ 
           message: "Validation error", 
-          errors: validationResult.error.errors 
+          ...sanitizeZodError(validationResult.error) 
         });
       }
       
@@ -1788,7 +1800,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!validationResult.success) {
         return res.status(400).json({ 
           message: "Validation error", 
-          errors: validationResult.error.errors 
+          ...sanitizeZodError(validationResult.error) 
         });
       }
       
@@ -1809,7 +1821,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!validationResult.success) {
         return res.status(400).json({ 
           message: "Validation error", 
-          errors: validationResult.error.errors 
+          ...sanitizeZodError(validationResult.error) 
         });
       }
       
@@ -1867,7 +1879,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!validationResult.success) {
         return res.status(400).json({ 
           message: "Validation error", 
-          errors: validationResult.error.errors 
+          ...sanitizeZodError(validationResult.error) 
         });
       }
       
@@ -1898,10 +1910,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const poValidation = insertPurchaseOrderSchema.safeParse(purchaseOrder);
       if (!poValidation.success) {
-        return res.status(400).json({ 
-          message: "Purchase order validation error", 
-          errors: poValidation.error.errors 
-        });
+        return res.status(400).json(sanitizeZodError(poValidation.error));
       }
       
       const itemsValidation = items.map((item: any) => 
@@ -1910,10 +1919,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const invalidItems = itemsValidation.filter(v => !v.success);
       if (invalidItems.length > 0) {
-        return res.status(400).json({ 
-          message: "Items validation error", 
-          errors: invalidItems.flatMap(v => v.success ? [] : v.error.errors)
-        });
+        return res.status(400).json(sanitizeArrayValidationErrors(invalidItems as any));
       }
       
       const orderData = {
@@ -1941,7 +1947,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!validationResult.success) {
         return res.status(400).json({ 
           message: "Validation error", 
-          errors: validationResult.error.errors 
+          ...sanitizeZodError(validationResult.error) 
         });
       }
       
@@ -1983,7 +1989,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!validationResult.success) {
         return res.status(400).json({ 
           message: "Validation error", 
-          errors: validationResult.error.errors 
+          ...sanitizeZodError(validationResult.error) 
         });
       }
       
@@ -2042,7 +2048,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!validationResult.success) {
         return res.status(400).json({ 
           message: "Validation error", 
-          errors: validationResult.error.errors 
+          ...sanitizeZodError(validationResult.error) 
         });
       }
       
@@ -2073,10 +2079,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const invoiceValidation = insertInvoiceSchema.safeParse(invoice);
       if (!invoiceValidation.success) {
-        return res.status(400).json({ 
-          message: "Invoice validation error", 
-          errors: invoiceValidation.error.errors 
-        });
+        return res.status(400).json(sanitizeZodError(invoiceValidation.error));
       }
       
       const itemsValidation = items.map((item: any) => 
@@ -2085,10 +2088,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const invalidItems = itemsValidation.filter(v => !v.success);
       if (invalidItems.length > 0) {
-        return res.status(400).json({ 
-          message: "Items validation error", 
-          errors: invalidItems.flatMap(v => v.success ? [] : v.error.errors)
-        });
+        return res.status(400).json(sanitizeArrayValidationErrors(invalidItems as any));
       }
       
       const invoiceData = {
@@ -2116,7 +2116,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!validationResult.success) {
         return res.status(400).json({ 
           message: "Validation error", 
-          errors: validationResult.error.errors 
+          ...sanitizeZodError(validationResult.error) 
         });
       }
       
@@ -2194,7 +2194,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!validationResult.success) {
         return res.status(400).json({ 
           message: "Validation error", 
-          errors: validationResult.error.errors 
+          ...sanitizeZodError(validationResult.error) 
         });
       }
       
@@ -2281,10 +2281,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const estimateValidation = insertEstimateSchema.safeParse(estimate);
       if (!estimateValidation.success) {
-        return res.status(400).json({ 
-          message: "Estimate validation error", 
-          errors: estimateValidation.error.errors 
-        });
+        return res.status(400).json(sanitizeZodError(estimateValidation.error));
       }
       
       const itemsValidation = items.map((item: any) => 
@@ -2293,10 +2290,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const invalidItems = itemsValidation.filter(v => !v.success);
       if (invalidItems.length > 0) {
-        return res.status(400).json({ 
-          message: "Items validation error", 
-          errors: invalidItems.flatMap(v => v.success ? [] : v.error.errors)
-        });
+        return res.status(400).json(sanitizeArrayValidationErrors(invalidItems as any));
       }
       
       const estimateData = {
@@ -2324,7 +2318,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!validationResult.success) {
         return res.status(400).json({ 
           message: "Validation error", 
-          errors: validationResult.error.errors 
+          ...sanitizeZodError(validationResult.error) 
         });
       }
       
@@ -2762,7 +2756,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: 'Appointment confirmation sent' });
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Invalid request data", errors: error.errors });
+        return res.status(400).json(sanitizeZodError(error));
       }
       console.error("Error sending appointment confirmation:", error);
       res.status(500).json({ message: "Failed to send appointment confirmation" });
@@ -2787,7 +2781,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: 'Invoice notification sent' });
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Invalid request data", errors: error.errors });
+        return res.status(400).json(sanitizeZodError(error));
       }
       console.error("Error sending invoice notification:", error);
       res.status(500).json({ message: "Failed to send invoice notification" });
@@ -2812,7 +2806,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: 'Job completion notification sent' });
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Invalid request data", errors: error.errors });
+        return res.status(400).json(sanitizeZodError(error));
       }
       console.error("Error sending job completion notification:", error);
       res.status(500).json({ message: "Failed to send job completion notification" });
@@ -2837,7 +2831,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: 'Feedback request sent' });
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Invalid request data", errors: error.errors });
+        return res.status(400).json(sanitizeZodError(error));
       }
       console.error("Error sending feedback request:", error);
       res.status(500).json({ message: "Failed to send feedback request" });
@@ -2862,7 +2856,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: 'Appointment reminder sent' });
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Invalid request data", errors: error.errors });
+        return res.status(400).json(sanitizeZodError(error));
       }
       console.error("Error sending appointment reminder:", error);
       res.status(500).json({ message: "Failed to send appointment reminder" });
@@ -2888,7 +2882,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: 'SMS appointment reminder sent' });
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Invalid request data", errors: error.errors });
+        return res.status(400).json(sanitizeZodError(error));
       }
       console.error("Error sending SMS appointment reminder:", error);
       res.status(500).json({ message: "Failed to send SMS appointment reminder" });
@@ -2913,7 +2907,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: 'SMS appointment confirmation sent' });
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Invalid request data", errors: error.errors });
+        return res.status(400).json(sanitizeZodError(error));
       }
       console.error("Error sending SMS appointment confirmation:", error);
       res.status(500).json({ message: "Failed to send SMS appointment confirmation" });
@@ -2938,7 +2932,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: 'SMS job status update sent' });
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Invalid request data", errors: error.errors });
+        return res.status(400).json(sanitizeZodError(error));
       }
       console.error("Error sending SMS job status:", error);
       res.status(500).json({ message: "Failed to send SMS job status update" });
@@ -2963,7 +2957,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: 'SMS job completion notification sent' });
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Invalid request data", errors: error.errors });
+        return res.status(400).json(sanitizeZodError(error));
       }
       console.error("Error sending SMS job completed:", error);
       res.status(500).json({ message: "Failed to send SMS job completion notification" });
@@ -2988,7 +2982,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: 'SMS invoice notification sent' });
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Invalid request data", errors: error.errors });
+        return res.status(400).json(sanitizeZodError(error));
       }
       console.error("Error sending SMS invoice:", error);
       res.status(500).json({ message: "Failed to send SMS invoice notification" });
@@ -3013,7 +3007,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: 'SMS payment confirmation sent' });
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Invalid request data", errors: error.errors });
+        return res.status(400).json(sanitizeZodError(error));
       }
       console.error("Error sending SMS payment received:", error);
       res.status(500).json({ message: "Failed to send SMS payment confirmation" });
@@ -3038,7 +3032,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: 'SMS estimate notification sent' });
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Invalid request data", errors: error.errors });
+        return res.status(400).json(sanitizeZodError(error));
       }
       console.error("Error sending SMS estimate:", error);
       res.status(500).json({ message: "Failed to send SMS estimate notification" });
@@ -3063,7 +3057,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: 'SMS feedback request sent' });
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Invalid request data", errors: error.errors });
+        return res.status(400).json(sanitizeZodError(error));
       }
       console.error("Error sending SMS feedback request:", error);
       res.status(500).json({ message: "Failed to send SMS feedback request" });
@@ -3174,7 +3168,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(appointment);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Invalid appointment data", errors: error.errors });
+        return res.status(400).json(sanitizeZodError(error));
       }
       console.error("Error booking appointment:", error);
       res.status(500).json({ message: "Failed to book appointment" });
@@ -4160,7 +4154,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error("Error creating filter preset:", error);
       if (error.errors) {
-        return res.status(400).json({ message: "Validation failed", errors: error.errors });
+        return res.status(400).json(sanitizeZodError(error));
       }
       res.status(500).json({ message: "Failed to create filter preset" });
     }
@@ -4277,7 +4271,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error("Error creating export:", error);
       if (error.errors) {
-        return res.status(400).json({ message: "Validation failed", errors: error.errors });
+        return res.status(400).json(sanitizeZodError(error));
       }
       res.status(500).json({ message: "Failed to create export" });
     }
@@ -4494,7 +4488,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error("Error creating attendance:", error);
       if (error.name === 'ZodError') {
-        return res.status(400).json({ message: "Invalid request data", errors: error.errors });
+        return res.status(400).json(sanitizeZodError(error));
       }
       res.status(500).json({ message: "Failed to create attendance record" });
     }
@@ -4524,7 +4518,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error("Error updating attendance:", error);
       if (error.name === 'ZodError') {
-        return res.status(400).json({ message: "Invalid request data", errors: error.errors });
+        return res.status(400).json(sanitizeZodError(error));
       }
       res.status(500).json({ message: "Failed to update attendance record" });
     }
@@ -4653,7 +4647,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error("Error creating shift template:", error);
       if (error.name === 'ZodError') {
-        return res.status(400).json({ message: "Invalid request data", errors: error.errors });
+        return res.status(400).json(sanitizeZodError(error));
       }
       res.status(500).json({ message: "Failed to create shift template" });
     }
@@ -4675,10 +4669,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const validated = insertShiftTemplateSchema.partial().safeParse(req.body);
       
       if (!validated.success) {
-        return res.status(400).json({ 
-          message: "Validation failed", 
-          errors: validated.error.errors 
-        });
+        return res.status(400).json(sanitizeZodError(validated.error));
       }
       
       if (validated.data.garageId && validated.data.garageId !== userGarageId) {
@@ -4747,7 +4738,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error("Error creating shift assignment:", error);
       if (error.name === 'ZodError') {
-        return res.status(400).json({ message: "Invalid request data", errors: error.errors });
+        return res.status(400).json(sanitizeZodError(error));
       }
       res.status(500).json({ message: "Failed to create shift assignment" });
     }
@@ -4769,10 +4760,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const validated = insertShiftAssignmentSchema.partial().safeParse(req.body);
       
       if (!validated.success) {
-        return res.status(400).json({ 
-          message: "Validation failed", 
-          errors: validated.error.errors 
-        });
+        return res.status(400).json(sanitizeZodError(validated.error));
       }
       
       if (validated.data.garageId && validated.data.garageId !== userGarageId) {
@@ -4835,7 +4823,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error("Error creating commission rule:", error);
       if (error.name === 'ZodError') {
-        return res.status(400).json({ message: "Invalid request data", errors: error.errors });
+        return res.status(400).json(sanitizeZodError(error));
       }
       res.status(500).json({ message: "Failed to create commission rule" });
     }
@@ -4857,10 +4845,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const validated = insertCommissionRuleSchema.partial().safeParse(req.body);
       
       if (!validated.success) {
-        return res.status(400).json({ 
-          message: "Validation failed", 
-          errors: validated.error.errors 
-        });
+        return res.status(400).json(sanitizeZodError(validated.error));
       }
       
       if (validated.data.garageId && validated.data.garageId !== userGarageId) {
@@ -4929,7 +4914,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error("Error creating commission:", error);
       if (error.name === 'ZodError') {
-        return res.status(400).json({ message: "Invalid request data", errors: error.errors });
+        return res.status(400).json(sanitizeZodError(error));
       }
       res.status(500).json({ message: "Failed to create commission" });
     }
@@ -4951,10 +4936,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const validated = insertCommissionSchema.partial().safeParse(req.body);
       
       if (!validated.success) {
-        return res.status(400).json({ 
-          message: "Validation failed", 
-          errors: validated.error.errors 
-        });
+        return res.status(400).json(sanitizeZodError(validated.error));
       }
       
       if (validated.data.garageId && validated.data.garageId !== userGarageId) {
@@ -5042,7 +5024,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error("Error creating performance review:", error);
       if (error.name === 'ZodError') {
-        return res.status(400).json({ message: "Invalid request data", errors: error.errors });
+        return res.status(400).json(sanitizeZodError(error));
       }
       res.status(500).json({ message: "Failed to create performance review" });
     }
@@ -5064,10 +5046,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const validated = insertPerformanceReviewSchema.partial().safeParse(req.body);
       
       if (!validated.success) {
-        return res.status(400).json({ 
-          message: "Validation failed", 
-          errors: validated.error.errors 
-        });
+        return res.status(400).json(sanitizeZodError(validated.error));
       }
       
       if (validated.data.garageId && validated.data.garageId !== userGarageId) {
@@ -5130,7 +5109,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error("Error creating training:", error);
       if (error.name === 'ZodError') {
-        return res.status(400).json({ message: "Invalid request data", errors: error.errors });
+        return res.status(400).json(sanitizeZodError(error));
       }
       res.status(500).json({ message: "Failed to create training" });
     }
@@ -5152,10 +5131,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const validated = insertTrainingSchema.partial().safeParse(req.body);
       
       if (!validated.success) {
-        return res.status(400).json({ 
-          message: "Validation failed", 
-          errors: validated.error.errors 
-        });
+        return res.status(400).json(sanitizeZodError(validated.error));
       }
       
       if (validated.data.garageId && validated.data.garageId !== userGarageId) {
@@ -5223,7 +5199,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error("Error creating employee training:", error);
       if (error.name === 'ZodError') {
-        return res.status(400).json({ message: "Invalid request data", errors: error.errors });
+        return res.status(400).json(sanitizeZodError(error));
       }
       res.status(500).json({ message: "Failed to create employee training" });
     }
@@ -5245,10 +5221,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const validated = insertEmployeeTrainingSchema.partial().safeParse(req.body);
       
       if (!validated.success) {
-        return res.status(400).json({ 
-          message: "Validation failed", 
-          errors: validated.error.errors 
-        });
+        return res.status(400).json(sanitizeZodError(validated.error));
       }
       
       if (validated.data.garageId && validated.data.garageId !== userGarageId) {
@@ -5368,10 +5341,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const validated = insertAIJobEstimationSchema.partial().safeParse(req.body);
       
       if (!validated.success) {
-        return res.status(400).json({ 
-          message: "Validation failed", 
-          errors: validated.error.errors 
-        });
+        return res.status(400).json(sanitizeZodError(validated.error));
       }
       
       if (validated.data.garageId && validated.data.garageId !== userGarageId) {
@@ -5628,10 +5598,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const validated = insertAIPartsRecommendationSchema.partial().safeParse(req.body);
       
       if (!validated.success) {
-        return res.status(400).json({ 
-          message: "Validation failed", 
-          errors: validated.error.errors 
-        });
+        return res.status(400).json(sanitizeZodError(validated.error));
       }
       
       if (validated.data.garageId && validated.data.garageId !== userGarageId) {
@@ -5726,10 +5693,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const validated = insertAIScheduleOptimizationSchema.partial().safeParse(req.body);
       
       if (!validated.success) {
-        return res.status(400).json({ 
-          message: "Validation failed", 
-          errors: validated.error.errors 
-        });
+        return res.status(400).json(sanitizeZodError(validated.error));
       }
       
       if (validated.data.garageId && validated.data.garageId !== userGarageId) {
@@ -5805,7 +5769,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error("Error processing chat:", error);
       if (error.name === 'ZodError') {
-        return res.status(400).json({ message: "Invalid request data", errors: error.errors });
+        return res.status(400).json(sanitizeZodError(error));
       }
       res.status(500).json({ message: "Failed to process chat" });
     }
@@ -11885,7 +11849,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(201).json(update);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Validation error", errors: error.errors });
+        return res.status(400).json(sanitizeZodError(error));
       }
       console.error("Error posting service update:", error);
       res.status(500).json({ message: "Failed to post service update" });
@@ -11915,7 +11879,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(201).json(estimate);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Validation error", errors: error.errors });
+        return res.status(400).json(sanitizeZodError(error));
       }
       console.error("Error creating video estimate:", error);
       res.status(500).json({ message: "Failed to create video estimate" });
@@ -11965,7 +11929,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(201).json(walkaround);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Validation error", errors: error.errors });
+        return res.status(400).json(sanitizeZodError(error));
       }
       console.error("Error creating digital walkaround:", error);
       res.status(500).json({ message: "Failed to create digital walkaround" });
@@ -12006,7 +11970,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(201).json(review);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Validation error", errors: error.errors });
+        return res.status(400).json(sanitizeZodError(error));
       }
       console.error("Error posting customer review:", error);
       res.status(500).json({ message: "Failed to post customer review" });
@@ -12036,7 +12000,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(review);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Validation error", errors: error.errors });
+        return res.status(400).json(sanitizeZodError(error));
       }
       console.error("Error responding to review:", error);
       res.status(500).json({ message: "Failed to respond to review" });
@@ -12054,7 +12018,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ code });
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Validation error", errors: error.errors });
+        return res.status(400).json(sanitizeZodError(error));
       }
       console.error("Error generating referral code:", error);
       res.status(500).json({ message: "Failed to generate referral code" });
@@ -12071,7 +12035,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(result);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Validation error", errors: error.errors });
+        return res.status(400).json(sanitizeZodError(error));
       }
       console.error("Error applying referral code:", error);
       res.status(500).json({ message: "Failed to apply referral code" });
@@ -12123,7 +12087,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(201).json(optimization);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Validation error", errors: error.errors });
+        return res.status(400).json(sanitizeZodError(error));
       }
       console.error("Error creating scheduling optimization:", error);
       res.status(500).json({ message: "Failed to create scheduling optimization" });
@@ -12160,7 +12124,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(201).json(rule);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Validation error", errors: error.errors });
+        return res.status(400).json(sanitizeZodError(error));
       }
       console.error("Error creating auto-reorder rule:", error);
       res.status(500).json({ message: "Failed to create auto-reorder rule" });
@@ -12210,7 +12174,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(201).json(route);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Validation error", errors: error.errors });
+        return res.status(400).json(sanitizeZodError(error));
       }
       console.error("Error creating route optimization:", error);
       res.status(500).json({ message: "Failed to create route optimization" });
@@ -12297,7 +12261,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(201).json(calibration);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Validation error", errors: error.errors });
+        return res.status(400).json(sanitizeZodError(error));
       }
       console.error("Error creating calibration record:", error);
       res.status(500).json({ message: "Failed to create calibration record" });
@@ -12346,7 +12310,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(201).json(record);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Validation error", errors: error.errors });
+        return res.status(400).json(sanitizeZodError(error));
       }
       console.error("Error creating compliance record:", error);
       res.status(500).json({ message: "Failed to create compliance record" });
@@ -12398,7 +12362,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(201).json(checklist);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Validation error", errors: error.errors });
+        return res.status(400).json(sanitizeZodError(error));
       }
       console.error("Error creating quality checklist:", error);
       res.status(500).json({ message: "Failed to create quality checklist" });
@@ -12424,7 +12388,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(201).json(nonConformance);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Validation error", errors: error.errors });
+        return res.status(400).json(sanitizeZodError(error));
       }
       console.error("Error creating non-conformance:", error);
       res.status(500).json({ message: "Failed to create non-conformance" });
@@ -12467,7 +12431,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(201).json(incident);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Validation error", errors: error.errors });
+        return res.status(400).json(sanitizeZodError(error));
       }
       console.error("Error creating safety incident:", error);
       res.status(500).json({ message: "Failed to create safety incident" });
@@ -12531,7 +12495,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(201).json(claim);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Validation error", errors: error.errors });
+        return res.status(400).json(sanitizeZodError(error));
       }
       console.error("Error creating insurance claim:", error);
       res.status(500).json({ message: "Failed to create insurance claim" });
@@ -12560,7 +12524,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(claim);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Validation error", errors: error.errors });
+        return res.status(400).json(sanitizeZodError(error));
       }
       console.error("Error updating claim status:", error);
       res.status(500).json({ message: "Failed to update claim status" });
@@ -12602,7 +12566,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(201).json(scan);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Validation error", errors: error.errors });
+        return res.status(400).json(sanitizeZodError(error));
       }
       console.error("Error recording barcode scan:", error);
       res.status(500).json({ message: "Failed to record barcode scan" });
@@ -12643,7 +12607,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(201).json(display);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Validation error", errors: error.errors });
+        return res.status(400).json(sanitizeZodError(error));
       }
       console.error("Error creating signage display:", error);
       res.status(500).json({ message: "Failed to create signage display" });
@@ -12669,7 +12633,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(201).json(content);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Validation error", errors: error.errors });
+        return res.status(400).json(sanitizeZodError(error));
       }
       console.error("Error creating signage content:", error);
       res.status(500).json({ message: "Failed to create signage content" });
@@ -12703,7 +12667,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(201).json(session);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Validation error", errors: error.errors });
+        return res.status(400).json(sanitizeZodError(error));
       }
       console.error("Error creating kiosk session:", error);
       res.status(500).json({ message: "Failed to create kiosk session" });
@@ -12727,7 +12691,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(201).json(checkIn);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Validation error", errors: error.errors });
+        return res.status(400).json(sanitizeZodError(error));
       }
       console.error("Error completing kiosk check-in:", error);
       res.status(500).json({ message: "Failed to complete kiosk check-in" });
@@ -12754,7 +12718,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(201).json(camera);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Validation error", errors: error.errors });
+        return res.status(400).json(sanitizeZodError(error));
       }
       console.error("Error creating security camera:", error);
       res.status(500).json({ message: "Failed to create security camera" });
@@ -12779,7 +12743,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(201).json(recording);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Validation error", errors: error.errors });
+        return res.status(400).json(sanitizeZodError(error));
       }
       console.error("Error creating camera recording:", error);
       res.status(500).json({ message: "Failed to create camera recording" });
@@ -12823,7 +12787,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(201).json(scan);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Validation error", errors: error.errors });
+        return res.status(400).json(sanitizeZodError(error));
       }
       console.error("Error recording license plate scan:", error);
       res.status(500).json({ message: "Failed to record license plate scan" });
