@@ -11870,17 +11870,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { jobCardId } = req.params;
       const userId = req.user.id;
+      
+      const validated = serviceTrackingUpdateSchema.parse(req.body);
+      
       const updateData = {
         jobCardId,
         userId,
-        status: req.body.status,
-        message: req.body.message,
-        photoUrl: req.body.photoUrl,
-        estimatedCompletion: req.body.estimatedCompletion ? new Date(req.body.estimatedCompletion) : undefined,
+        status: validated.status,
+        message: validated.message,
+        photoUrl: validated.photoUrl,
+        estimatedCompletion: validated.estimatedCompletion ? new Date(validated.estimatedCompletion) : undefined,
       };
       const update = await phase4Service.postServiceUpdate(updateData);
       res.status(201).json(update);
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
       console.error("Error posting service update:", error);
       res.status(500).json({ message: "Failed to post service update" });
     }
@@ -11890,21 +11896,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/video-estimates', isAuthenticated, async (req: any, res) => {
     try {
       const garageId = req.user.garageId;
+      
+      const validated = videoEstimateSchema.parse(req.body);
+      
       const estimateData = {
         garageId,
-        customerId: req.body.customerId,
-        vehicleId: req.body.vehicleId,
-        technicianId: req.body.technicianId,
-        videoUrl: req.body.videoUrl,
-        thumbnailUrl: req.body.thumbnailUrl,
-        duration: req.body.duration,
-        transcription: req.body.transcription,
-        estimatedCost: req.body.estimatedCost,
-        recommendedServices: req.body.recommendedServices,
+        customerId: validated.customerId,
+        vehicleId: validated.vehicleId,
+        technicianId: validated.technicianId,
+        videoUrl: validated.videoUrl,
+        thumbnailUrl: validated.thumbnailUrl,
+        duration: validated.duration,
+        transcription: validated.transcription,
+        estimatedCost: validated.estimatedCost,
+        recommendedServices: validated.recommendedServices,
       };
       const estimate = await phase4Service.createVideoEstimate(estimateData);
       res.status(201).json(estimate);
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
       console.error("Error creating video estimate:", error);
       res.status(500).json({ message: "Failed to create video estimate" });
     }
@@ -11936,19 +11948,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/digital-walkaround', isAuthenticated, async (req: any, res) => {
     try {
       const garageId = req.user.garageId;
+      
+      const validated = digitalWalkaroundSchema.parse(req.body);
+      
       const walkaroundData = {
         garageId,
-        jobCardId: req.body.jobCardId,
-        vehicleId: req.body.vehicleId,
-        customerId: req.body.customerId,
-        technicianId: req.body.technicianId,
-        inspectionType: req.body.inspectionType,
-        photos: req.body.photos,
-        damageNotes: req.body.damageNotes,
+        jobCardId: validated.jobCardId,
+        vehicleId: validated.vehicleId,
+        customerId: validated.customerId,
+        technicianId: validated.technicianId,
+        inspectionType: validated.inspectionType,
+        photos: validated.photos,
+        damageNotes: validated.damageNotes,
       };
       const walkaround = await phase4Service.createDigitalWalkaround(walkaroundData);
       res.status(201).json(walkaround);
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
       console.error("Error creating digital walkaround:", error);
       res.status(500).json({ message: "Failed to create digital walkaround" });
     }
@@ -11972,18 +11990,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/reviews', isAuthenticated, async (req: any, res) => {
     try {
       const garageId = req.user.garageId;
+      
+      const validated = customerReviewSchema.parse(req.body);
+      
       const reviewData = {
         garageId,
-        customerId: req.body.customerId,
-        jobCardId: req.body.jobCardId,
-        platform: req.body.platform,
-        rating: req.body.rating,
-        reviewText: req.body.reviewText,
-        reviewUrl: req.body.reviewUrl,
+        customerId: validated.customerId,
+        jobCardId: validated.jobCardId,
+        platform: validated.platform,
+        rating: validated.rating,
+        reviewText: validated.reviewText,
+        reviewUrl: validated.reviewUrl,
       };
       const review = await phase4Service.postCustomerReview(reviewData);
       res.status(201).json(review);
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
       console.error("Error posting customer review:", error);
       res.status(500).json({ message: "Failed to post customer review" });
     }
@@ -12005,9 +12029,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { id } = req.params;
       const userId = req.user.id;
-      const review = await phase4Service.respondToReview(id, req.body.response, userId);
+      
+      const validated = reviewResponseSchema.parse(req.body);
+      
+      const review = await phase4Service.respondToReview(id, validated.response, userId);
       res.json(review);
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
       console.error("Error responding to review:", error);
       res.status(500).json({ message: "Failed to respond to review" });
     }
@@ -12017,10 +12047,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/referrals/generate-code', isAuthenticated, async (req: any, res) => {
     try {
       const garageId = req.user.garageId;
-      const customerId = req.body.customerId;
-      const code = await phase4Service.generateReferralCode(garageId, customerId);
+      
+      const validated = generateReferralCodeSchema.parse(req.body);
+      
+      const code = await phase4Service.generateReferralCode(garageId, validated.customerId);
       res.json({ code });
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
       console.error("Error generating referral code:", error);
       res.status(500).json({ message: "Failed to generate referral code" });
     }
@@ -12029,10 +12064,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/referrals/apply', isAuthenticated, async (req: any, res) => {
     try {
       const garageId = req.user.garageId;
-      const { referralCode, newCustomerId } = req.body;
-      const result = await phase4Service.applyReferralCode(garageId, referralCode, newCustomerId);
+      
+      const validated = applyReferralCodeSchema.parse(req.body);
+      
+      const result = await phase4Service.applyReferralCode(garageId, validated.referralCode, validated.newCustomerId);
       res.json(result);
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
       console.error("Error applying referral code:", error);
       res.status(500).json({ message: "Failed to apply referral code" });
     }
@@ -12068,17 +12108,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/scheduling/optimize', isAuthenticated, async (req: any, res) => {
     try {
       const garageId = req.user.garageId;
+      
+      const validated = schedulingOptimizationSchema.parse(req.body);
+      
       const optimizationData = {
         garageId,
-        optimizationDate: new Date(req.body.optimizationDate),
-        appointmentsOptimized: req.body.appointmentsOptimized,
-        efficiencyGain: req.body.efficiencyGain,
-        technicianUtilization: req.body.technicianUtilization,
-        suggestions: req.body.suggestions,
+        optimizationDate: new Date(validated.optimizationDate),
+        appointmentsOptimized: validated.appointmentsOptimized,
+        efficiencyGain: validated.efficiencyGain,
+        technicianUtilization: validated.technicianUtilization,
+        suggestions: validated.suggestions,
       };
       const optimization = await phase5Service.createSchedulingOptimization(optimizationData);
       res.status(201).json(optimization);
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
       console.error("Error creating scheduling optimization:", error);
       res.status(500).json({ message: "Failed to create scheduling optimization" });
     }
@@ -12100,16 +12146,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/auto-reorder/rules', isAuthenticated, async (req: any, res) => {
     try {
       const garageId = req.user.garageId;
+      
+      const validated = autoReorderRuleSchema.parse(req.body);
+      
       const ruleData = {
         garageId,
-        partId: req.body.partId,
-        minQuantity: req.body.minQuantity,
-        reorderQuantity: req.body.reorderQuantity,
-        preferredSupplierId: req.body.preferredSupplierId,
+        partId: validated.partId,
+        minQuantity: validated.minQuantity,
+        reorderQuantity: validated.reorderQuantity,
+        preferredSupplierId: validated.preferredSupplierId,
       };
       const rule = await phase5Service.createAutoReorderRule(ruleData);
       res.status(201).json(rule);
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
       console.error("Error creating auto-reorder rule:", error);
       res.status(500).json({ message: "Failed to create auto-reorder rule" });
     }
@@ -12141,19 +12193,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/routing/optimize', isAuthenticated, async (req: any, res) => {
     try {
       const garageId = req.user.garageId;
+      
+      const validated = routingOptimizationSchema.parse(req.body);
+      
       const routeData = {
         garageId,
-        routeDate: new Date(req.body.routeDate),
-        routeType: req.body.routeType,
-        startLocation: req.body.startLocation,
-        stops: req.body.stops,
-        totalDistance: req.body.totalDistance,
-        estimatedDuration: req.body.estimatedDuration,
-        assignedDriver: req.body.assignedDriver,
+        routeDate: new Date(validated.routeDate),
+        routeType: validated.routeType,
+        startLocation: validated.startLocation,
+        stops: validated.stops,
+        totalDistance: validated.totalDistance,
+        estimatedDuration: validated.estimatedDuration,
+        assignedDriver: validated.assignedDriver,
       };
       const route = await phase5Service.createRoutingOptimization(routeData);
       res.status(201).json(route);
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
       console.error("Error creating route optimization:", error);
       res.status(500).json({ message: "Failed to create route optimization" });
     }
@@ -12222,19 +12280,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/calibration', isAuthenticated, async (req: any, res) => {
     try {
       const garageId = req.user.garageId;
+      
+      const validated = calibrationRecordSchema.parse(req.body);
+      
       const calibrationData = {
         garageId,
-        equipmentId: req.body.equipmentId,
-        equipmentName: req.body.equipmentName,
-        calibrationDate: new Date(req.body.calibrationDate),
-        nextDueDate: new Date(req.body.nextDueDate),
-        calibratedBy: req.body.calibratedBy,
-        certificationNumber: req.body.certificationNumber,
-        notes: req.body.notes,
+        equipmentId: validated.equipmentId,
+        equipmentName: validated.equipmentName,
+        calibrationDate: new Date(validated.calibrationDate),
+        nextDueDate: new Date(validated.nextDueDate),
+        calibratedBy: validated.calibratedBy,
+        certificationNumber: validated.certificationNumber,
+        notes: validated.notes,
       };
       const calibration = await phase5Service.createCalibrationRecord(calibrationData);
       res.status(201).json(calibration);
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
       console.error("Error creating calibration record:", error);
       res.status(500).json({ message: "Failed to create calibration record" });
     }
@@ -12260,24 +12324,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/compliance/environmental', isAuthenticated, async (req: any, res) => {
     try {
       const garageId = req.user.garageId;
+      
+      const validated = complianceRecordSchema.parse(req.body);
+      
       const recordData = {
         garageId,
-        complianceType: req.body.complianceType,
-        recordDate: new Date(req.body.recordDate),
-        wasteType: req.body.wasteType,
-        quantity: req.body.quantity,
-        unit: req.body.unit,
-        disposalMethod: req.body.disposalMethod,
-        disposalCompany: req.body.disposalCompany,
-        certificationNumber: req.body.certificationNumber,
-        cost: req.body.cost,
-        regulatoryStandard: req.body.regulatoryStandard,
-        attachments: req.body.attachments,
-        notes: req.body.notes,
+        complianceType: validated.complianceType,
+        recordDate: new Date(validated.recordDate),
+        wasteType: validated.wasteType,
+        quantity: validated.quantity,
+        unit: validated.unit,
+        disposalMethod: validated.disposalMethod,
+        disposalCompany: validated.disposalCompany,
+        certificationNumber: validated.certificationNumber,
+        cost: validated.cost,
+        regulatoryStandard: validated.regulatoryStandard,
+        attachments: validated.attachments,
+        notes: validated.notes,
       };
       const record = await phase6Service.createComplianceRecord(recordData);
       res.status(201).json(record);
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
       console.error("Error creating compliance record:", error);
       res.status(500).json({ message: "Failed to create compliance record" });
     }
@@ -12315,15 +12385,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/quality/checklists', isAuthenticated, async (req: any, res) => {
     try {
       const garageId = req.user.garageId;
+      
+      const validated = qualityChecklistSchema.parse(req.body);
+      
       const checklistData = {
         garageId,
-        checklistName: req.body.checklistName,
-        checklistType: req.body.checklistType,
-        items: req.body.items,
+        checklistName: validated.checklistName,
+        checklistType: validated.checklistType,
+        items: validated.items,
       };
       const checklist = await phase6Service.createQualityChecklist(checklistData);
       res.status(201).json(checklist);
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
       console.error("Error creating quality checklist:", error);
       res.status(500).json({ message: "Failed to create quality checklist" });
     }
@@ -12332,18 +12408,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/quality/non-conformances', isAuthenticated, async (req: any, res) => {
     try {
       const garageId = req.user.garageId;
+      
+      const validated = nonConformanceSchema.parse(req.body);
+      
       const ncData = {
         garageId,
-        ncNumber: req.body.ncNumber,
-        jobCardId: req.body.jobCardId,
-        description: req.body.description,
-        severity: req.body.severity,
-        reportedBy: req.body.reportedBy,
-        category: req.body.category,
+        ncNumber: validated.ncNumber,
+        jobCardId: validated.jobCardId,
+        description: validated.description,
+        severity: validated.severity,
+        reportedBy: validated.reportedBy,
+        category: validated.category,
       };
       const nonConformance = await phase6Service.createNonConformance(ncData);
       res.status(201).json(nonConformance);
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
       console.error("Error creating non-conformance:", error);
       res.status(500).json({ message: "Failed to create non-conformance" });
     }
@@ -12365,22 +12447,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/safety/incidents', isAuthenticated, async (req: any, res) => {
     try {
       const garageId = req.user.garageId;
+      
+      const validated = safetyIncidentSchema.parse(req.body);
+      
       const incidentData = {
         garageId,
-        incidentDate: new Date(req.body.incidentDate),
-        incidentType: req.body.incidentType,
-        severity: req.body.severity,
-        location: req.body.location,
-        description: req.body.description,
-        injuredPerson: req.body.injuredPerson,
-        witnessNames: req.body.witnessNames,
-        reportedBy: req.body.reportedBy,
-        immediateAction: req.body.immediateAction,
-        photos: req.body.photos,
+        incidentDate: new Date(validated.incidentDate),
+        incidentType: validated.incidentType,
+        severity: validated.severity,
+        location: validated.location,
+        description: validated.description,
+        injuredPerson: validated.injuredPerson,
+        witnessNames: validated.witnessNames,
+        reportedBy: validated.reportedBy,
+        immediateAction: validated.immediateAction,
+        photos: validated.photos,
       };
       const incident = await phase6Service.createSafetyIncident(incidentData);
       res.status(201).json(incident);
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
       console.error("Error creating safety incident:", error);
       res.status(500).json({ message: "Failed to create safety incident" });
     }
@@ -12418,27 +12506,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/insurance/claims', isAuthenticated, async (req: any, res) => {
     try {
       const garageId = req.user.garageId;
+      
+      const validated = insuranceClaimSchema.parse(req.body);
+      
       const claimData = {
         garageId,
-        claimNumber: req.body.claimNumber,
-        jobCardId: req.body.jobCardId,
-        customerId: req.body.customerId,
-        vehicleId: req.body.vehicleId,
-        insuranceCompany: req.body.insuranceCompany,
-        policyNumber: req.body.policyNumber,
-        claimType: req.body.claimType,
-        incidentDate: new Date(req.body.incidentDate),
-        claimAmount: req.body.claimAmount,
-        deductible: req.body.deductible,
-        adjusterName: req.body.adjusterName,
-        adjusterContact: req.body.adjusterContact,
-        estimateUrl: req.body.estimateUrl,
-        documents: req.body.documents,
-        notes: req.body.notes,
+        claimNumber: validated.claimNumber,
+        jobCardId: validated.jobCardId,
+        customerId: validated.customerId,
+        vehicleId: validated.vehicleId,
+        insuranceCompany: validated.insuranceCompany,
+        policyNumber: validated.policyNumber,
+        claimType: validated.claimType,
+        incidentDate: new Date(validated.incidentDate),
+        claimAmount: validated.claimAmount,
+        deductible: validated.deductible,
+        adjusterName: validated.adjusterName,
+        adjusterContact: validated.adjusterContact,
+        estimateUrl: validated.estimateUrl,
+        documents: validated.documents,
+        notes: validated.notes,
       };
       const claim = await phase6Service.createInsuranceClaim(claimData);
       res.status(201).json(claim);
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
       console.error("Error creating insurance claim:", error);
       res.status(500).json({ message: "Failed to create insurance claim" });
     }
@@ -12459,10 +12553,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch('/api/insurance/claims/:id/status', isAuthenticated, async (req, res) => {
     try {
       const { id } = req.params;
-      const { status, notes } = req.body;
-      const claim = await phase6Service.updateClaimStatus(id, status, notes);
+      
+      const validated = claimStatusUpdateSchema.parse(req.body);
+      
+      const claim = await phase6Service.updateClaimStatus(id, validated.status, validated.notes);
       res.json(claim);
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
       console.error("Error updating claim status:", error);
       res.status(500).json({ message: "Failed to update claim status" });
     }
@@ -12487,18 +12586,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/barcode/scan', isAuthenticated, async (req: any, res) => {
     try {
       const garageId = req.user.garageId;
+      
+      const validated = barcodeScanSchema.parse(req.body);
+      
       const scanData = {
         garageId,
-        barcodeValue: req.body.barcodeValue,
-        barcodeType: req.body.barcodeType,
-        entityType: req.body.entityType,
-        entityId: req.body.entityId,
-        scannedBy: req.body.scannedBy,
-        location: req.body.location,
+        barcodeValue: validated.barcodeValue,
+        barcodeType: validated.barcodeType,
+        entityType: validated.entityType,
+        entityId: validated.entityId,
+        scannedBy: validated.scannedBy,
+        location: validated.location,
       };
       const scan = await phase7Service.recordBarcodeScan(scanData);
       res.status(201).json(scan);
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
       console.error("Error recording barcode scan:", error);
       res.status(500).json({ message: "Failed to record barcode scan" });
     }
@@ -12524,16 +12629,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/signage/displays', isAuthenticated, async (req: any, res) => {
     try {
       const garageId = req.user.garageId;
+      
+      const validated = signageDisplaySchema.parse(req.body);
+      
       const displayData = {
         garageId,
-        displayName: req.body.displayName,
-        location: req.body.location,
-        resolution: req.body.resolution,
-        orientation: req.body.orientation,
+        displayName: validated.displayName,
+        location: validated.location,
+        resolution: validated.resolution,
+        orientation: validated.orientation,
       };
       const display = await phase7Service.createSignageDisplay(displayData);
       res.status(201).json(display);
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
       console.error("Error creating signage display:", error);
       res.status(500).json({ message: "Failed to create signage display" });
     }
@@ -12541,20 +12652,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/signage/content', isAuthenticated, async (req, res) => {
     try {
+      const validated = signageContentSchema.parse(req.body);
+      
       const contentData = {
-        displayId: req.body.displayId,
-        contentType: req.body.contentType,
-        contentUrl: req.body.contentUrl,
-        title: req.body.title,
-        description: req.body.description,
-        duration: req.body.duration,
-        validFrom: req.body.validFrom ? new Date(req.body.validFrom) : undefined,
-        validUntil: req.body.validUntil ? new Date(req.body.validUntil) : undefined,
-        priority: req.body.priority,
+        displayId: validated.displayId,
+        contentType: validated.contentType,
+        contentUrl: validated.contentUrl,
+        title: validated.title,
+        description: validated.description,
+        duration: validated.duration,
+        validFrom: validated.validFrom ? new Date(validated.validFrom) : undefined,
+        validUntil: validated.validUntil ? new Date(validated.validUntil) : undefined,
+        priority: validated.priority,
       };
       const content = await phase7Service.createSignageContent(contentData);
       res.status(201).json(content);
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
       console.error("Error creating signage content:", error);
       res.status(500).json({ message: "Failed to create signage content" });
     }
@@ -12575,14 +12691,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/kiosk/sessions', isAuthenticated, async (req: any, res) => {
     try {
       const garageId = req.user.garageId;
+      
+      const validated = kioskSessionSchema.parse(req.body);
+      
       const sessionData = {
         garageId,
-        kioskId: req.body.kioskId,
-        sessionType: req.body.sessionType,
+        kioskId: validated.kioskId,
+        sessionType: validated.sessionType,
       };
       const session = await phase7Service.createKioskSession(sessionData);
       res.status(201).json(session);
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
       console.error("Error creating kiosk session:", error);
       res.status(500).json({ message: "Failed to create kiosk session" });
     }
@@ -12590,18 +12712,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/kiosk/check-in', isAuthenticated, async (req, res) => {
     try {
+      const validated = kioskCheckInSchema.parse(req.body);
+      
       const checkInData = {
-        sessionId: req.body.sessionId,
-        customerId: req.body.customerId,
-        vehicleId: req.body.vehicleId,
-        appointmentId: req.body.appointmentId,
-        checkInType: req.body.checkInType,
-        signature: req.body.signature,
-        additionalNotes: req.body.additionalNotes,
+        sessionId: validated.sessionId,
+        customerId: validated.customerId,
+        vehicleId: validated.vehicleId,
+        appointmentId: validated.appointmentId,
+        checkInType: validated.checkInType,
+        signature: validated.signature,
+        additionalNotes: validated.additionalNotes,
       };
       const checkIn = await phase7Service.completeKioskCheckIn(checkInData);
       res.status(201).json(checkIn);
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
       console.error("Error completing kiosk check-in:", error);
       res.status(500).json({ message: "Failed to complete kiosk check-in" });
     }
@@ -12611,18 +12738,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/security/cameras', isAuthenticated, async (req: any, res) => {
     try {
       const garageId = req.user.garageId;
+      
+      const validated = securityCameraSchema.parse(req.body);
+      
       const cameraData = {
         garageId,
-        cameraName: req.body.cameraName,
-        location: req.body.location,
-        ipAddress: req.body.ipAddress,
-        streamUrl: req.body.streamUrl,
-        resolution: req.body.resolution,
-        hasMotionDetection: req.body.hasMotionDetection,
+        cameraName: validated.cameraName,
+        location: validated.location,
+        ipAddress: validated.ipAddress,
+        streamUrl: validated.streamUrl,
+        resolution: validated.resolution,
+        hasMotionDetection: validated.hasMotionDetection,
       };
       const camera = await phase7Service.createSecurityCamera(cameraData);
       res.status(201).json(camera);
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
       console.error("Error creating security camera:", error);
       res.status(500).json({ message: "Failed to create security camera" });
     }
@@ -12630,19 +12763,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/security/recordings', isAuthenticated, async (req, res) => {
     try {
+      const validated = cameraRecordingSchema.parse(req.body);
+      
       const recordingData = {
-        cameraId: req.body.cameraId,
-        startTime: new Date(req.body.startTime),
-        endTime: new Date(req.body.endTime),
-        recordingUrl: req.body.recordingUrl,
-        fileSize: req.body.fileSize,
-        eventType: req.body.eventType,
-        vehicleId: req.body.vehicleId,
-        notes: req.body.notes,
+        cameraId: validated.cameraId,
+        startTime: new Date(validated.startTime),
+        endTime: new Date(validated.endTime),
+        recordingUrl: validated.recordingUrl,
+        fileSize: validated.fileSize,
+        eventType: validated.eventType,
+        vehicleId: validated.vehicleId,
+        notes: validated.notes,
       };
       const recording = await phase7Service.createCameraRecording(recordingData);
       res.status(201).json(recording);
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
       console.error("Error creating camera recording:", error);
       res.status(500).json({ message: "Failed to create camera recording" });
     }
@@ -12666,21 +12804,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/lpr/scan', isAuthenticated, async (req: any, res) => {
     try {
       const garageId = req.user.garageId;
+      
+      const validated = licensePlateScanSchema.parse(req.body);
+      
       const scanData = {
         garageId,
-        plateNumber: req.body.plateNumber,
-        confidence: req.body.confidence,
-        vehicleId: req.body.vehicleId,
-        customerId: req.body.customerId,
-        cameraId: req.body.cameraId,
-        imageUrl: req.body.imageUrl,
-        scanType: req.body.scanType,
-        location: req.body.location,
-        matchedAutomatically: req.body.matchedAutomatically,
+        plateNumber: validated.plateNumber,
+        confidence: validated.confidence,
+        vehicleId: validated.vehicleId,
+        customerId: validated.customerId,
+        cameraId: validated.cameraId,
+        imageUrl: validated.imageUrl,
+        scanType: validated.scanType,
+        location: validated.location,
+        matchedAutomatically: validated.matchedAutomatically,
       };
       const scan = await phase7Service.recordLicensePlateScan(scanData);
       res.status(201).json(scan);
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
       console.error("Error recording license plate scan:", error);
       res.status(500).json({ message: "Failed to record license plate scan" });
     }
