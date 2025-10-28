@@ -217,6 +217,258 @@ const smsFeedbackRequestSchema = z.object({
   feedbackLink: z.string().optional(),
 });
 
+// ==========================================
+// PHASE 4-7 VALIDATION SCHEMAS
+// ==========================================
+
+// Phase 4: Customer Experience
+const serviceTrackingUpdateSchema = z.object({
+  status: z.string(),
+  message: z.string(),
+  photoUrl: z.string().optional(),
+  estimatedCompletion: z.string().optional(),
+});
+
+const videoEstimateSchema = z.object({
+  customerId: z.string(),
+  vehicleId: z.string(),
+  technicianId: z.string(),
+  videoUrl: z.string().url(),
+  thumbnailUrl: z.string().url().optional(),
+  duration: z.number().int().positive(),
+  transcription: z.string().optional(),
+  estimatedCost: z.string(),
+  recommendedServices: z.array(z.string()).optional(),
+});
+
+const digitalWalkaroundSchema = z.object({
+  jobCardId: z.string().optional(),
+  vehicleId: z.string(),
+  customerId: z.string(),
+  technicianId: z.string(),
+  inspectionType: z.enum(['pre-service', 'post-service', 'damage-assessment']),
+  photos: z.array(z.object({
+    url: z.string().url(),
+    angle: z.string(),
+    timestamp: z.string().optional(),
+  })),
+  damageNotes: z.string().optional(),
+});
+
+const customerReviewSchema = z.object({
+  customerId: z.string(),
+  jobCardId: z.string().optional(),
+  platform: z.enum(['google', 'facebook', 'yelp', 'internal']),
+  rating: z.number().min(1).max(5),
+  reviewText: z.string().optional(),
+  reviewUrl: z.string().url().optional(),
+});
+
+const reviewResponseSchema = z.object({
+  response: z.string().min(1),
+});
+
+const generateReferralCodeSchema = z.object({
+  customerId: z.string(),
+});
+
+const applyReferralCodeSchema = z.object({
+  referralCode: z.string(),
+  newCustomerId: z.string(),
+});
+
+// Phase 5: Operations & Efficiency
+const schedulingOptimizationSchema = z.object({
+  optimizationDate: z.string(),
+  appointmentsOptimized: z.number().int().positive(),
+  efficiencyGain: z.string(),
+  technicianUtilization: z.record(z.string(), z.string()),
+  suggestions: z.array(z.string()).optional(),
+});
+
+const autoReorderRuleSchema = z.object({
+  partId: z.string(),
+  minQuantity: z.number().int().positive(),
+  reorderQuantity: z.number().int().positive(),
+  preferredSupplierId: z.string().optional(),
+});
+
+const routingOptimizationSchema = z.object({
+  routeDate: z.string(),
+  routeType: z.enum(['delivery', 'pickup', 'service-call', 'parts-run']),
+  startLocation: z.object({
+    address: z.string(),
+    latitude: z.number().optional(),
+    longitude: z.number().optional(),
+  }),
+  stops: z.array(z.object({
+    address: z.string(),
+    latitude: z.number().optional(),
+    longitude: z.number().optional(),
+    estimatedDuration: z.number().optional(),
+  })),
+  totalDistance: z.string(),
+  estimatedDuration: z.number().int().positive(),
+  assignedDriver: z.string().optional(),
+});
+
+const calibrationRecordSchema = z.object({
+  equipmentId: z.string(),
+  equipmentName: z.string(),
+  calibrationDate: z.string(),
+  nextDueDate: z.string(),
+  calibratedBy: z.string(),
+  certificationNumber: z.string().optional(),
+  notes: z.string().optional(),
+});
+
+// Phase 6: Compliance & Quality
+const complianceRecordSchema = z.object({
+  complianceType: z.enum(['waste-disposal', 'emissions', 'safety-inspection', 'environmental-permit']),
+  recordDate: z.string(),
+  wasteType: z.string().optional(),
+  quantity: z.string().optional(),
+  unit: z.string().optional(),
+  disposalMethod: z.string().optional(),
+  disposalCompany: z.string().optional(),
+  certificationNumber: z.string().optional(),
+  cost: z.string().optional(),
+  regulatoryStandard: z.string().optional(),
+  attachments: z.array(z.string()).optional(),
+  notes: z.string().optional(),
+});
+
+const qualityChecklistSchema = z.object({
+  checklistName: z.string(),
+  checklistType: z.enum(['pre-delivery', 'quality-audit', 'process-check', 'customer-satisfaction']),
+  items: z.array(z.object({
+    item: z.string(),
+    required: z.boolean(),
+    passed: z.boolean().optional(),
+  })),
+});
+
+const nonConformanceSchema = z.object({
+  ncNumber: z.string(),
+  jobCardId: z.string().optional(),
+  description: z.string(),
+  severity: z.enum(['minor', 'major', 'critical']),
+  reportedBy: z.string(),
+  category: z.enum(['workmanship', 'parts', 'process', 'documentation', 'customer-complaint']),
+});
+
+const safetyIncidentSchema = z.object({
+  incidentDate: z.string(),
+  incidentType: z.enum(['injury', 'near-miss', 'property-damage', 'equipment-failure', 'spill']),
+  severity: z.enum(['minor', 'moderate', 'serious', 'critical']),
+  location: z.string(),
+  description: z.string(),
+  injuredPerson: z.string().optional(),
+  witnessNames: z.array(z.string()).optional(),
+  reportedBy: z.string(),
+  immediateAction: z.string(),
+  photos: z.array(z.string()).optional(),
+});
+
+const insuranceClaimSchema = z.object({
+  claimNumber: z.string(),
+  jobCardId: z.string().optional(),
+  customerId: z.string(),
+  vehicleId: z.string(),
+  insuranceCompany: z.string(),
+  policyNumber: z.string(),
+  claimType: z.enum(['collision', 'comprehensive', 'liability', 'warranty']),
+  incidentDate: z.string(),
+  claimAmount: z.string(),
+  deductible: z.string().optional(),
+  adjusterName: z.string().optional(),
+  adjusterContact: z.string().optional(),
+  estimateUrl: z.string().optional(),
+  documents: z.array(z.string()).optional(),
+  notes: z.string().optional(),
+});
+
+const claimStatusUpdateSchema = z.object({
+  status: z.enum(['submitted', 'under-review', 'approved', 'partially-approved', 'denied', 'paid']),
+  notes: z.string().optional(),
+});
+
+// Phase 7: Advanced Hardware
+const barcodeScanSchema = z.object({
+  barcodeValue: z.string(),
+  barcodeType: z.enum(['qr-code', 'ean-13', 'code-128', 'data-matrix']),
+  entityType: z.enum(['part', 'vehicle', 'tool', 'customer', 'employee']),
+  entityId: z.string(),
+  scannedBy: z.string(),
+  location: z.string().optional(),
+});
+
+const signageDisplaySchema = z.object({
+  displayName: z.string(),
+  location: z.string(),
+  resolution: z.string(),
+  orientation: z.enum(['landscape', 'portrait']),
+});
+
+const signageContentSchema = z.object({
+  displayId: z.string(),
+  contentType: z.enum(['image', 'video', 'slideshow', 'html']),
+  contentUrl: z.string().url(),
+  title: z.string(),
+  description: z.string().optional(),
+  duration: z.number().int().positive(),
+  validFrom: z.string().optional(),
+  validUntil: z.string().optional(),
+  priority: z.number().int().min(1).max(10).optional(),
+});
+
+const kioskSessionSchema = z.object({
+  kioskId: z.string(),
+  sessionType: z.enum(['check-in', 'survey', 'payment', 'info']),
+});
+
+const kioskCheckInSchema = z.object({
+  sessionId: z.string(),
+  customerId: z.string(),
+  vehicleId: z.string(),
+  appointmentId: z.string().optional(),
+  checkInType: z.enum(['appointment', 'walk-in', 'pickup']),
+  signature: z.string().optional(),
+  additionalNotes: z.string().optional(),
+});
+
+const securityCameraSchema = z.object({
+  cameraName: z.string(),
+  location: z.string(),
+  ipAddress: z.string().optional(),
+  streamUrl: z.string().url().optional(),
+  resolution: z.string(),
+  hasMotionDetection: z.boolean().optional(),
+});
+
+const cameraRecordingSchema = z.object({
+  cameraId: z.string(),
+  startTime: z.string(),
+  endTime: z.string(),
+  recordingUrl: z.string().url(),
+  fileSize: z.number().int().positive(),
+  eventType: z.enum(['motion', 'manual', 'scheduled', 'alarm']),
+  vehicleId: z.string().optional(),
+  notes: z.string().optional(),
+});
+
+const licensePlateScanSchema = z.object({
+  plateNumber: z.string(),
+  confidence: z.number().min(0).max(100),
+  vehicleId: z.string().optional(),
+  customerId: z.string().optional(),
+  cameraId: z.string().optional(),
+  imageUrl: z.string().url().optional(),
+  scanType: z.enum(['entry', 'exit']),
+  location: z.string().optional(),
+  matchedAutomatically: z.boolean().optional(),
+});
+
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
   await setupAuth(app);
