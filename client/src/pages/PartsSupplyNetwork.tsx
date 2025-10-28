@@ -29,11 +29,11 @@ export default function PartsSupplyNetwork() {
 
   const partnerForm = useForm<InsertNetworkPartner>({ 
     resolver: zodResolver(insertNetworkPartnerSchema),
-    defaultValues: { partnerName: "", partnerType: "supplier", country: "", isActive: true } 
+    defaultValues: { name: "", partnerType: "", country: "" } 
   });
   const orderForm = useForm<InsertFulfillmentOrder>({ 
     resolver: zodResolver(insertFulfillmentOrderSchema),
-    defaultValues: { partnerId: "", orderNumber: "", status: "pending" } 
+    defaultValues: { partnerId: "", branchId: "", orderNumber: "", totalAmount: "0", estimatedDelivery: new Date(), status: "pending" } 
   });
 
   const createPartnerMutation = useMutation({
@@ -130,12 +130,12 @@ export default function PartsSupplyNetwork() {
                 <TableBody>
                   {partners.map((partner) => (
                     <TableRow key={partner.id}>
-                      <TableCell className="font-semibold">{partner.partnerName}</TableCell>
-                      <TableCell>{getPartnerTypeBadge(partner.partnerType)}</TableCell>
-                      <TableCell>{partner.country}</TableCell>
+                      <TableCell className="font-semibold">{partner.name}</TableCell>
+                      <TableCell>{getPartnerTypeBadge(partner.partnerType || '')}</TableCell>
+                      <TableCell>{partner.country || 'N/A'}</TableCell>
                       <TableCell>
-                        <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${partner.isActive ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'}`}>
-                          {partner.isActive ? '✅ Active' : '○ Inactive'}
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300">
+                          ✅ Active
                         </span>
                       </TableCell>
                     </TableRow>
@@ -170,9 +170,9 @@ export default function PartsSupplyNetwork() {
                   {orders.map((order) => (
                     <TableRow key={order.id}>
                       <TableCell className="font-mono font-semibold">{order.orderNumber}</TableCell>
-                      <TableCell>{partners.find(p => p.id === order.partnerId)?.partnerName || 'N/A'}</TableCell>
-                      <TableCell>{getOrderStatusBadge(order.status)}</TableCell>
-                      <TableCell>{new Date(order.createdAt).toLocaleDateString()}</TableCell>
+                      <TableCell>{partners.find(p => p.id === order.partnerId)?.name || 'N/A'}</TableCell>
+                      <TableCell>{getOrderStatusBadge(order.status || '')}</TableCell>
+                      <TableCell>{order.createdAt ? new Date(order.createdAt).toLocaleDateString() : 'N/A'}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -200,10 +200,10 @@ export default function PartsSupplyNetwork() {
                 <TableBody>
                   {shipments.map((shipment) => (
                     <TableRow key={shipment.id}>
-                      <TableCell className="font-mono">{orders.find(o => o.id === shipment.orderId)?.orderNumber || 'N/A'}</TableCell>
-                      <TableCell>{shipment.eventType}</TableCell>
+                      <TableCell className="font-mono">{orders.find(o => o.id === shipment.fulfillmentOrderId)?.orderNumber || 'N/A'}</TableCell>
+                      <TableCell>{shipment.eventType || 'N/A'}</TableCell>
                       <TableCell>{shipment.location || 'N/A'}</TableCell>
-                      <TableCell>{new Date(shipment.eventTimestamp).toLocaleString()}</TableCell>
+                      <TableCell>{shipment.eventDate ? new Date(shipment.eventDate).toLocaleString() : 'N/A'}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -231,12 +231,12 @@ export default function PartsSupplyNetwork() {
                 <TableBody>
                   {warehouses.map((warehouse) => (
                     <TableRow key={warehouse.id}>
-                      <TableCell className="font-mono font-semibold">{warehouse.warehouseCode}</TableCell>
-                      <TableCell>{warehouse.warehouseName}</TableCell>
-                      <TableCell>{warehouse.city}, {warehouse.country}</TableCell>
+                      <TableCell className="font-mono font-semibold">{warehouse.id}</TableCell>
+                      <TableCell>{warehouse.name}</TableCell>
+                      <TableCell>{warehouse.city || 'N/A'}, {warehouse.country || 'N/A'}</TableCell>
                       <TableCell>
-                        <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${warehouse.isActive ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'}`}>
-                          {warehouse.isActive ? '✅ Active' : '○ Inactive'}
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300">
+                          ✅ Active
                         </span>
                       </TableCell>
                     </TableRow>
@@ -256,7 +256,7 @@ export default function PartsSupplyNetwork() {
           </DialogHeader>
           <Form {...partnerForm}>
             <form onSubmit={partnerForm.handleSubmit((data) => createPartnerMutation.mutate(data))} className="space-y-4">
-              <FormField control={partnerForm.control} name="partnerName" render={({ field }) => (
+              <FormField control={partnerForm.control} name="name" render={({ field }) => (
                 <FormItem>
                   <FormLabel>Partner Name</FormLabel>
                   <FormControl><Input {...field} placeholder="ACME Parts Co" /></FormControl>
@@ -265,7 +265,7 @@ export default function PartsSupplyNetwork() {
               <FormField control={partnerForm.control} name="partnerType" render={({ field }) => (
                 <FormItem>
                   <FormLabel>Type</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select onValueChange={field.onChange} defaultValue={field.value || undefined}>
                     <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
                     <SelectContent>
                       <SelectItem value="supplier">Supplier</SelectItem>
@@ -278,7 +278,7 @@ export default function PartsSupplyNetwork() {
               <FormField control={partnerForm.control} name="country" render={({ field }) => (
                 <FormItem>
                   <FormLabel>Country</FormLabel>
-                  <FormControl><Input {...field} placeholder="United States" /></FormControl>
+                  <FormControl><Input {...field} value={field.value || ''} placeholder="United States" /></FormControl>
                 </FormItem>
               )} />
               <Button type="submit" className="w-full" disabled={createPartnerMutation.isPending}>

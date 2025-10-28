@@ -31,15 +31,15 @@ export default function OEMSoftwareSubscriptions() {
 
   const catalogForm = useForm<InsertVendorCatalog>({ 
     resolver: zodResolver(insertVendorCatalogSchema),
-    defaultValues: { vendorName: "", vendorCode: "", isActive: true } 
+    defaultValues: { vendorName: "", vendorCode: "" } 
   });
   const productForm = useForm<InsertOemProduct>({ 
     resolver: zodResolver(insertOemProductSchema),
-    defaultValues: { vendorId: "", productName: "", productType: "diagnostic_software", isActive: true } 
+    defaultValues: { vendorCatalogId: "", productName: "", productCode: "", softwareType: "" } 
   });
   const licenseForm = useForm<InsertSubscriptionLicense>({ 
     resolver: zodResolver(insertSubscriptionLicenseSchema),
-    defaultValues: { productId: "", licenseKey: "", status: "active" } 
+    defaultValues: { oemProductId: "", branchId: "", licenseKey: "", startDate: new Date(), endDate: new Date(), status: "active" } 
   });
 
   const createCatalogMutation = useMutation({
@@ -156,7 +156,7 @@ export default function OEMSoftwareSubscriptions() {
                     <TableRow key={catalog.id}>
                       <TableCell>{getVendorBadge(catalog.vendorName)}</TableCell>
                       <TableCell className="font-mono">{catalog.vendorCode}</TableCell>
-                      <TableCell>{catalog.contactEmail || 'N/A'}</TableCell>
+                      <TableCell>{catalog.supportEmail || 'N/A'}</TableCell>
                       <TableCell>
                         <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${catalog.isActive ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'}`}>
                           {catalog.isActive ? '✅ Active' : '○ Inactive'}
@@ -195,8 +195,8 @@ export default function OEMSoftwareSubscriptions() {
                   {products.map((product) => (
                     <TableRow key={product.id}>
                       <TableCell className="font-semibold">{product.productName}</TableCell>
-                      <TableCell>{catalogs.find(c => c.id === product.vendorId)?.vendorName || 'N/A'}</TableCell>
-                      <TableCell>{getProductTypeBadge(product.productType)}</TableCell>
+                      <TableCell>{catalogs.find(c => c.id === product.vendorCatalogId)?.vendorName || 'N/A'}</TableCell>
+                      <TableCell>{getProductTypeBadge(product.softwareType || '')}</TableCell>
                       <TableCell className="font-mono text-xs">{product.version || 'N/A'}</TableCell>
                       <TableCell>
                         <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${product.isActive ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'}`}>
@@ -235,9 +235,9 @@ export default function OEMSoftwareSubscriptions() {
                   {licenses.map((license) => (
                     <TableRow key={license.id}>
                       <TableCell className="font-mono text-xs">{license.licenseKey.substring(0, 16)}...</TableCell>
-                      <TableCell>{products.find(p => p.id === license.productId)?.productName || 'N/A'}</TableCell>
-                      <TableCell>{license.expiresAt ? new Date(license.expiresAt).toLocaleDateString() : 'Never'}</TableCell>
-                      <TableCell>{getLicenseStatusBadge(license.status)}</TableCell>
+                      <TableCell>{products.find(p => p.id === license.oemProductId)?.productName || 'N/A'}</TableCell>
+                      <TableCell>{new Date(license.endDate).toLocaleDateString()}</TableCell>
+                      <TableCell>{getLicenseStatusBadge(license.status || '')}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -268,7 +268,7 @@ export default function OEMSoftwareSubscriptions() {
                       <TableCell className="font-mono text-xs">{licenses.find(l => l.id === log.licenseId)?.licenseKey.substring(0, 12) || 'N/A'}</TableCell>
                       <TableCell>{log.eventType}</TableCell>
                       <TableCell>{log.userId || 'System'}</TableCell>
-                      <TableCell>{new Date(log.eventTimestamp).toLocaleString()}</TableCell>
+                      <TableCell>{log.timestamp ? new Date(log.timestamp).toLocaleString() : 'N/A'}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -301,7 +301,7 @@ export default function OEMSoftwareSubscriptions() {
               <FormField control={catalogForm.control} name="isActive" render={({ field }) => (
                 <FormItem className="flex items-center justify-between">
                   <FormLabel>Active</FormLabel>
-                  <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
+                  <FormControl><Switch checked={field.value ?? false} onCheckedChange={field.onChange} /></FormControl>
                 </FormItem>
               )} />
               <Button type="submit" className="w-full" disabled={createCatalogMutation.isPending}>

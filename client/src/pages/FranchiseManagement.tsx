@@ -20,6 +20,11 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { insertFranchiseGroupSchema, insertFranchiseContractSchema, insertFranchiseKpiSchema, insertRevenueSharingRuleSchema } from "@shared/schema";
 import { z } from "zod";
 
+type InsertFranchiseGroup = z.infer<typeof insertFranchiseGroupSchema>;
+type InsertFranchiseContract = z.infer<typeof insertFranchiseContractSchema>;
+type InsertFranchiseKpi = z.infer<typeof insertFranchiseKpiSchema>;
+type InsertRevenueSharingRule = z.infer<typeof insertRevenueSharingRuleSchema>;
+
 type FranchiseGroup = {
   id: string;
   name: string;
@@ -107,10 +112,10 @@ export default function FranchiseManagement() {
 
   const { data: revenueSharingRules = [], isLoading: rulesLoading } = useQuery<RevenueSharingRule[]>({
     queryKey: ["/api/revenue-sharing-rules"],
-    enabled: false,
   });
 
-  const groupForm = useForm<any>({
+  const groupForm = useForm<InsertFranchiseGroup>({
+    resolver: zodResolver(insertFranchiseGroupSchema),
     defaultValues: {
       name: "",
       parentGroupId: undefined,
@@ -122,7 +127,8 @@ export default function FranchiseManagement() {
     },
   });
 
-  const contractForm = useForm<any>({
+  const contractForm = useForm<InsertFranchiseContract>({
+    resolver: zodResolver(insertFranchiseContractSchema),
     defaultValues: {
       franchiseGroupId: "",
       branchId: "",
@@ -140,7 +146,8 @@ export default function FranchiseManagement() {
     },
   });
 
-  const kpiForm = useForm<any>({
+  const kpiForm = useForm<InsertFranchiseKpi>({
+    resolver: zodResolver(insertFranchiseKpiSchema),
     defaultValues: {
       branchId: "",
       month: new Date().toISOString().slice(0, 7),
@@ -158,7 +165,8 @@ export default function FranchiseManagement() {
     },
   });
 
-  const ruleForm = useForm<any>({
+  const ruleForm = useForm<InsertRevenueSharingRule>({
+    resolver: zodResolver(insertRevenueSharingRuleSchema),
     defaultValues: {
       franchiseGroupId: "",
       ruleName: "",
@@ -174,7 +182,7 @@ export default function FranchiseManagement() {
   });
 
   const createGroupMutation = useMutation({
-    mutationFn: (data: any) => apiRequest("/api/franchise-groups", "POST", data),
+    mutationFn: (data: InsertFranchiseGroup) => apiRequest("/api/franchise-groups", "POST", data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/franchise-groups"] });
       toast({ title: "Franchise group created successfully" });
@@ -187,7 +195,7 @@ export default function FranchiseManagement() {
   });
 
   const updateGroupMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: any }) => apiRequest(`/api/franchise-groups/${id}`, "PATCH", data),
+    mutationFn: ({ id, data }: { id: string; data: Partial<InsertFranchiseGroup> }) => apiRequest(`/api/franchise-groups/${id}`, "PATCH", data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/franchise-groups"] });
       toast({ title: "Franchise group updated successfully" });
@@ -212,7 +220,7 @@ export default function FranchiseManagement() {
   });
 
   const createContractMutation = useMutation({
-    mutationFn: (data: any) => apiRequest("/api/franchise-contracts", "POST", data),
+    mutationFn: (data: InsertFranchiseContract) => apiRequest("/api/franchise-contracts", "POST", data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/franchise-contracts"] });
       toast({ title: "Franchise contract created successfully" });
@@ -225,7 +233,7 @@ export default function FranchiseManagement() {
   });
 
   const updateContractMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: any }) => apiRequest(`/api/franchise-contracts/${id}`, "PATCH", data),
+    mutationFn: ({ id, data }: { id: string; data: Partial<InsertFranchiseContract> }) => apiRequest(`/api/franchise-contracts/${id}`, "PATCH", data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/franchise-contracts"] });
       toast({ title: "Franchise contract updated successfully" });
@@ -239,7 +247,7 @@ export default function FranchiseManagement() {
   });
 
   const createKpiMutation = useMutation({
-    mutationFn: (data: any) => apiRequest("/api/franchise-kpis", "POST", data),
+    mutationFn: (data: InsertFranchiseKpi) => apiRequest("/api/franchise-kpis", "POST", data),
     onSuccess: () => {
       toast({ title: "Franchise KPI created successfully" });
       setShowKpiDialog(false);
@@ -251,7 +259,7 @@ export default function FranchiseManagement() {
   });
 
   const createRuleMutation = useMutation({
-    mutationFn: (data: any) => apiRequest("/api/revenue-sharing-rules", "POST", data),
+    mutationFn: (data: InsertRevenueSharingRule) => apiRequest("/api/revenue-sharing-rules", "POST", data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/revenue-sharing-rules"] });
       toast({ title: "Revenue sharing rule created successfully" });
@@ -263,7 +271,7 @@ export default function FranchiseManagement() {
     },
   });
 
-  const onGroupSubmit = (data: any) => {
+  const onGroupSubmit = (data: InsertFranchiseGroup) => {
     if (editingGroup) {
       updateGroupMutation.mutate({ id: editingGroup.id, data });
     } else {
@@ -271,7 +279,7 @@ export default function FranchiseManagement() {
     }
   };
 
-  const onContractSubmit = (data: any) => {
+  const onContractSubmit = (data: InsertFranchiseContract) => {
     if (editingContract) {
       updateContractMutation.mutate({ id: editingContract.id, data });
     } else {
@@ -279,11 +287,11 @@ export default function FranchiseManagement() {
     }
   };
 
-  const onKpiSubmit = (data: any) => {
+  const onKpiSubmit = (data: InsertFranchiseKpi) => {
     createKpiMutation.mutate(data);
   };
 
-  const onRuleSubmit = (data: any) => {
+  const onRuleSubmit = (data: InsertRevenueSharingRule) => {
     createRuleMutation.mutate(data);
   };
 

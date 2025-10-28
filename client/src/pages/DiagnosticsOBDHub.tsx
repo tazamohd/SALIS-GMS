@@ -30,11 +30,11 @@ export default function DiagnosticsOBDHub() {
 
   const deviceForm = useForm<InsertObdDevice>({ 
     resolver: zodResolver(insertObdDeviceSchema),
-    defaultValues: { deviceSerial: "", manufacturer: "Bosch", model: "", firmwareVersion: "", isActive: true } 
+    defaultValues: { deviceId: "", deviceName: "", manufacturer: "", model: "", firmwareVersion: "" } 
   });
   const sessionForm = useForm<InsertObdSession>({ 
     resolver: zodResolver(insertObdSessionSchema),
-    defaultValues: { deviceId: "", vehicleId: "", status: "active" } 
+    defaultValues: { deviceId: "", sessionId: "", vehicleId: "", status: "active" } 
   });
 
   const createDeviceMutation = useMutation({
@@ -145,13 +145,13 @@ export default function DiagnosticsOBDHub() {
                 <TableBody>
                   {devices.map((device) => (
                     <TableRow key={device.id}>
-                      <TableCell className="font-mono font-semibold">{device.deviceSerial}</TableCell>
-                      <TableCell>{getManufacturerBadge(device.manufacturer)}</TableCell>
-                      <TableCell>{device.model}</TableCell>
-                      <TableCell className="font-mono text-xs">{device.firmwareVersion}</TableCell>
+                      <TableCell className="font-mono font-semibold">{device.deviceId}</TableCell>
+                      <TableCell>{getManufacturerBadge(device.manufacturer || '')}</TableCell>
+                      <TableCell>{device.model || 'N/A'}</TableCell>
+                      <TableCell className="font-mono text-xs">{device.firmwareVersion || 'N/A'}</TableCell>
                       <TableCell>
-                        <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${device.isActive ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'}`}>
-                          {device.isActive ? '🟢 Online' : '○ Offline'}
+                        <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${device.status === 'active' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'}`}>
+                          {device.status === 'active' ? '🟢 Online' : '○ Offline'}
                         </span>
                       </TableCell>
                     </TableRow>
@@ -186,9 +186,9 @@ export default function DiagnosticsOBDHub() {
                   {sessions.map((session) => (
                     <TableRow key={session.id}>
                       <TableCell className="font-mono text-xs">{session.id.substring(0, 8)}</TableCell>
-                      <TableCell>{devices.find(d => d.id === session.deviceId)?.deviceSerial || 'N/A'}</TableCell>
-                      <TableCell>{getSessionStatusBadge(session.status)}</TableCell>
-                      <TableCell>{new Date(session.startedAt).toLocaleString()}</TableCell>
+                      <TableCell>{devices.find(d => d.id === session.deviceId)?.deviceId || 'N/A'}</TableCell>
+                      <TableCell>{getSessionStatusBadge(session.status || '')}</TableCell>
+                      <TableCell>{session.startTime ? new Date(session.startTime).toLocaleString() : 'N/A'}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -219,9 +219,9 @@ export default function DiagnosticsOBDHub() {
                     <TableRow key={report.id}>
                       <TableCell className="font-mono text-xs">{report.id.substring(0, 8)}</TableCell>
                       <TableCell className="font-mono text-xs">{report.sessionId.substring(0, 8)}</TableCell>
-                      <TableCell>{getSeverityBadge(report.severity)}</TableCell>
-                      <TableCell className="font-mono text-xs">{Array.isArray(report.dtcCodes) ? report.dtcCodes.join(', ') : 'None'}</TableCell>
-                      <TableCell>{new Date(report.generatedAt).toLocaleString()}</TableCell>
+                      <TableCell>{getSeverityBadge(report.severity || '')}</TableCell>
+                      <TableCell className="font-mono text-xs">{Array.isArray(report.faultCodes) ? report.faultCodes.join(', ') : 'None'}</TableCell>
+                      <TableCell>{report.generatedAt ? new Date(report.generatedAt).toLocaleString() : 'N/A'}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -249,12 +249,12 @@ export default function DiagnosticsOBDHub() {
                 <TableBody>
                   {assignments.map((assignment) => (
                     <TableRow key={assignment.id}>
-                      <TableCell>{devices.find(d => d.id === assignment.deviceId)?.deviceSerial || 'N/A'}</TableCell>
-                      <TableCell>{assignment.branchId}</TableCell>
-                      <TableCell>{new Date(assignment.assignedAt).toLocaleDateString()}</TableCell>
+                      <TableCell>{devices.find(d => d.id === assignment.deviceId)?.deviceId || 'N/A'}</TableCell>
+                      <TableCell>{assignment.technicianId || 'Unassigned'}</TableCell>
+                      <TableCell>{assignment.assignedAt ? new Date(assignment.assignedAt).toLocaleDateString() : 'N/A'}</TableCell>
                       <TableCell>
-                        <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${assignment.isActive ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'}`}>
-                          {assignment.isActive ? '✅ Active' : '○ Inactive'}
+                        <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${assignment.status === 'active' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'}`}>
+                          {assignment.status === 'active' ? '✅ Active' : '○ Inactive'}
                         </span>
                       </TableCell>
                     </TableRow>
@@ -274,16 +274,22 @@ export default function DiagnosticsOBDHub() {
           </DialogHeader>
           <Form {...deviceForm}>
             <form onSubmit={deviceForm.handleSubmit((data) => createDeviceMutation.mutate(data))} className="space-y-4">
-              <FormField control={deviceForm.control} name="deviceSerial" render={({ field }) => (
+              <FormField control={deviceForm.control} name="deviceId" render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Device Serial Number</FormLabel>
+                  <FormLabel>Device ID</FormLabel>
                   <FormControl><Input {...field} placeholder="BSH-2024-001" /></FormControl>
+                </FormItem>
+              )} />
+              <FormField control={deviceForm.control} name="deviceName" render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Device Name</FormLabel>
+                  <FormControl><Input {...field} placeholder="OBD Scanner 1" /></FormControl>
                 </FormItem>
               )} />
               <FormField control={deviceForm.control} name="manufacturer" render={({ field }) => (
                 <FormItem>
                   <FormLabel>Manufacturer</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select onValueChange={field.onChange} defaultValue={field.value || undefined}>
                     <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
                     <SelectContent>
                       <SelectItem value="Bosch">Bosch</SelectItem>
@@ -296,19 +302,13 @@ export default function DiagnosticsOBDHub() {
               <FormField control={deviceForm.control} name="model" render={({ field }) => (
                 <FormItem>
                   <FormLabel>Model</FormLabel>
-                  <FormControl><Input {...field} placeholder="KTS 590" /></FormControl>
+                  <FormControl><Input {...field} value={field.value || ''} placeholder="KTS 590" /></FormControl>
                 </FormItem>
               )} />
               <FormField control={deviceForm.control} name="firmwareVersion" render={({ field }) => (
                 <FormItem>
                   <FormLabel>Firmware Version</FormLabel>
-                  <FormControl><Input {...field} placeholder="v2.5.1" /></FormControl>
-                </FormItem>
-              )} />
-              <FormField control={deviceForm.control} name="isActive" render={({ field }) => (
-                <FormItem className="flex items-center justify-between">
-                  <FormLabel>Active</FormLabel>
-                  <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
+                  <FormControl><Input {...field} value={field.value || ''} placeholder="v2.5.1" /></FormControl>
                 </FormItem>
               )} />
               <Button type="submit" className="w-full" disabled={createDeviceMutation.isPending}>

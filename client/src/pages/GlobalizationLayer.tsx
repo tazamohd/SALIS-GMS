@@ -33,19 +33,19 @@ export default function GlobalizationLayer() {
 
   const localeForm = useForm<InsertLocale>({ 
     resolver: zodResolver(insertLocaleSchema),
-    defaultValues: { code: "", name: "", nativeName: "", isActive: true } 
+    defaultValues: { code: "", name: "" } 
   });
   const translationForm = useForm<InsertTranslationResource>({ 
     resolver: zodResolver(insertTranslationResourceSchema),
-    defaultValues: { localeCode: "", resourceKey: "", resourceValue: "" } 
+    defaultValues: { localeId: "", translationKey: "", translationValue: "" } 
   });
   const currencyForm = useForm<InsertCurrencyRate>({ 
     resolver: zodResolver(insertCurrencyRateSchema),
-    defaultValues: { fromCurrency: "", toCurrency: "", rate: "1.0", isActive: true } 
+    defaultValues: { fromCurrency: "", toCurrency: "", rate: "1.0", effectiveDate: new Date() } 
   });
   const taxForm = useForm<InsertTaxRegion>({ 
     resolver: zodResolver(insertTaxRegionSchema),
-    defaultValues: { regionCode: "", regionName: "", taxRate: "0", isActive: true } 
+    defaultValues: { countryCode: "", regionName: "", taxRate: "0" } 
   });
 
   const createLocaleMutation = useMutation({
@@ -113,7 +113,7 @@ export default function GlobalizationLayer() {
                   <TableRow>
                     <TableHead>Code</TableHead>
                     <TableHead>Name</TableHead>
-                    <TableHead>Native Name</TableHead>
+                    <TableHead>English Name</TableHead>
                     <TableHead>Status</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -122,7 +122,7 @@ export default function GlobalizationLayer() {
                     <TableRow key={locale.id}>
                       <TableCell className="font-mono">{locale.code}</TableCell>
                       <TableCell>{locale.name}</TableCell>
-                      <TableCell>{locale.nativeName}</TableCell>
+                      <TableCell>{locale.englishName || 'N/A'}</TableCell>
                       <TableCell>
                         <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${locale.isActive ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'}`}>
                           {locale.isActive ? '✅ Active' : '○ Inactive'}
@@ -158,9 +158,9 @@ export default function GlobalizationLayer() {
                 <TableBody>
                   {translations.map((trans) => (
                     <TableRow key={trans.id}>
-                      <TableCell className="font-mono">{trans.localeCode}</TableCell>
-                      <TableCell className="font-mono text-sm">{trans.resourceKey}</TableCell>
-                      <TableCell>{trans.resourceValue}</TableCell>
+                      <TableCell className="font-mono">{locales.find(l => l.id === trans.localeId)?.code || 'N/A'}</TableCell>
+                      <TableCell className="font-mono text-sm">{trans.translationKey}</TableCell>
+                      <TableCell>{trans.translationValue}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -196,8 +196,8 @@ export default function GlobalizationLayer() {
                       <TableCell className="font-mono font-semibold">{curr.toCurrency}</TableCell>
                       <TableCell>{parseFloat(curr.rate).toFixed(4)}</TableCell>
                       <TableCell>
-                        <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${curr.isActive ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'}`}>
-                          {curr.isActive ? '✅ Active' : '○ Inactive'}
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300">
+                          ✅ {curr.source || 'Manual'}
                         </span>
                       </TableCell>
                     </TableRow>
@@ -268,16 +268,16 @@ export default function GlobalizationLayer() {
                   <FormControl><Input {...field} placeholder="English (United States)" /></FormControl>
                 </FormItem>
               )} />
-              <FormField control={localeForm.control} name="nativeName" render={({ field }) => (
+              <FormField control={localeForm.control} name="englishName" render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Native Name</FormLabel>
-                  <FormControl><Input {...field} placeholder="English (United States)" /></FormControl>
+                  <FormLabel>English Name</FormLabel>
+                  <FormControl><Input {...field} value={field.value || ''} placeholder="English (United States)" /></FormControl>
                 </FormItem>
               )} />
               <FormField control={localeForm.control} name="isActive" render={({ field }) => (
                 <FormItem className="flex items-center justify-between">
                   <FormLabel>Active</FormLabel>
-                  <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
+                  <FormControl><Switch checked={field.value ?? false} onCheckedChange={field.onChange} /></FormControl>
                 </FormItem>
               )} />
               <Button type="submit" className="w-full" disabled={createLocaleMutation.isPending}>
