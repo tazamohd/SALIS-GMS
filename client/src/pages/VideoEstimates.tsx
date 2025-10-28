@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Video, Play, Send, Eye, CheckCircle, Upload, Plus } from "lucide-react";
+import { Video, Play, Send, Eye, CheckCircle, Upload, Plus, AlertCircle } from "lucide-react";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
@@ -13,8 +13,22 @@ export default function VideoEstimates() {
   const [selectedVideo, setSelectedVideo] = useState<any>(null);
   const { toast } = useToast();
 
-  const { data: estimates = [] } = useQuery({
-    queryKey: ["/api/video-estimates"],
+  const { data: userResponse } = useQuery({
+    queryKey: ["/api/user"],
+  });
+
+  const user = (userResponse as any)?.user;
+  const customerId = user?.id;
+
+  const { data: estimates = [], isLoading } = useQuery({
+    queryKey: ["/api/video-estimates", customerId],
+    queryFn: async () => {
+      if (!customerId) return [];
+      const response = await fetch(`/api/video-estimates/customer/${customerId}`);
+      if (!response.ok) return [];
+      return response.json();
+    },
+    enabled: !!customerId,
   });
 
   const createEstimate = useMutation({
@@ -24,83 +38,32 @@ export default function VideoEstimates() {
     onSuccess: () => {
       toast({ title: "Estimate created", description: "Video estimate has been saved." });
       setIsCreateDialogOpen(false);
-      queryClient.invalidateQueries({ queryKey: ["/api/video-estimates"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/video-estimates", customerId] });
     },
   });
 
-  const sendEstimate = useMutation({
+  const approveEstimate = useMutation({
     mutationFn: async (id: string) => {
-      return await apiRequest(`/api/video-estimates/${id}/send`, "POST", {});
+      return await apiRequest(`/api/video-estimates/${id}/approve`, "PATCH", {});
     },
     onSuccess: () => {
-      toast({ title: "Estimate sent", description: "Video estimate sent to customer." });
-      queryClient.invalidateQueries({ queryKey: ["/api/video-estimates"] });
+      toast({ title: "Estimate approved", description: "Video estimate has been approved." });
+      queryClient.invalidateQueries({ queryKey: ["/api/video-estimates", customerId] });
     },
   });
 
-  // Mock data
-  const mockEstimates = [
-    {
-      id: "1",
-      customerName: "John Smith",
-      vehicle: "2020 Honda Civic",
-      technicianName: "Mike Davis",
-      videoUrl: "https://example.com/video1.mp4",
-      thumbnailUrl: "https://via.placeholder.com/300x200",
-      duration: 125, // seconds
-      estimatedCost: 850.00,
-      recommendedServices: [
-        { name: "Brake Pad Replacement", cost: 450.00 },
-        { name: "Brake Rotor Resurfacing", cost: 250.00 },
-        { name: "Brake Fluid Flush", cost: 150.00 },
-      ],
-      status: "sent",
-      createdAt: "2024-10-25T10:00:00Z",
-      viewedAt: "2024-10-25T14:30:00Z",
-    },
-    {
-      id: "2",
-      customerName: "Sarah Johnson",
-      vehicle: "2019 Toyota Camry",
-      technicianName: "Emily Brown",
-      videoUrl: "https://example.com/video2.mp4",
-      thumbnailUrl: "https://via.placeholder.com/300x200",
-      duration: 180,
-      estimatedCost: 1250.00,
-      recommendedServices: [
-        { name: "Timing Belt Replacement", cost: 850.00 },
-        { name: "Water Pump Replacement", cost: 400.00 },
-      ],
-      status: "approved",
-      createdAt: "2024-10-24T09:00:00Z",
-      viewedAt: "2024-10-24T15:20:00Z",
-      approvedAt: "2024-10-24T16:00:00Z",
-    },
-    {
-      id: "3",
-      customerName: "Mike Wilson",
-      vehicle: "2021 Ford F-150",
-      technicianName: "John Smith",
-      videoUrl: "https://example.com/video3.mp4",
-      thumbnailUrl: "https://via.placeholder.com/300x200",
-      duration: 90,
-      estimatedCost: 450.00,
-      recommendedServices: [
-        { name: "Oil Change", cost: 75.00 },
-        { name: "Air Filter Replacement", cost: 45.00 },
-        { name: "Tire Rotation", cost: 50.00 },
-        { name: "Alignment Check", cost: 280.00 },
-      ],
-      status: "pending",
-      createdAt: "2024-10-26T08:00:00Z",
-    },
-  ];
-
   const stats = {
-    totalEstimates: 45,
-    pendingApproval: 12,
-    approvalRate: 78,
-    averageValue: 925,
+    totalEstimates: estimates.length || 0,
+    pendingApproval: estimates.filter((e: any) => e.status === 'pending' || e.status === 'sent').length || 0,
+    approvalRate: estimates.length > 0 
+      ? Math.round((estimates.filter((e: any) => e.status === 'approved').length / estimates.length) * 100)
+      : 0,
+    averageValue: estimates.length > 0
+      ? Math.round(estimates.reduce((sum: number, e: any) => {
+          const cost = e.estimatedCost ? parseFloat(e.estimatedCost) : 0;
+          return sum + cost;
+        }, 0) / estimates.length)
+      : 0,
   };
 
   const getStatusBadge = (status: string) => {
@@ -111,15 +74,27 @@ export default function VideoEstimates() {
       approved: { variant: "default", label: "Approved" },
       declined: { variant: "destructive", label: "Declined" },
     };
-    const config = variants[status] || { variant: "secondary", label: status };
+    const config = variants[status] || { variant: "secondary", label: status || "Unknown" };
     return <Badge variant={config.variant}>{config.label}</Badge>;
   };
 
-  const formatDuration = (seconds: number) => {
+  const formatDuration = (seconds: number | null | undefined) => {
+    if (!seconds) return "N/A";
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
+
+  if (isLoading) {
+    return (
+      <div className="p-8">
+        <div className="animate-pulse space-y-4">
+          <div className="h-8 bg-gray-200 dark:bg-gray-800 rounded w-64"></div>
+          <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded w-96"></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-8 space-y-6">
@@ -167,9 +142,12 @@ export default function VideoEstimates() {
                 className="w-full"
                 onClick={() => {
                   createEstimate.mutate({
-                    customerId: "1",
+                    customerId: customerId,
                     vehicleId: "1",
                     estimatedCost: 500,
+                    videoUrl: "https://example.com/video.mp4",
+                    technicianId: user?.id,
+                    garageId: user?.garageId,
                   });
                 }}
                 data-testid="button-save-estimate"
@@ -224,7 +202,9 @@ export default function VideoEstimates() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Avg Value</p>
-                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">${stats.averageValue}</h3>
+                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">
+                  ${stats.averageValue}
+                </h3>
               </div>
               <Video className="h-12 w-12 text-purple-600" />
             </div>
@@ -232,100 +212,171 @@ export default function VideoEstimates() {
         </Card>
       </div>
 
-      {/* Estimates Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {mockEstimates.map((estimate) => (
-          <Card
-            key={estimate.id}
-            className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800 overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
-            onClick={() => setSelectedVideo(estimate)}
-            data-testid={`estimate-${estimate.id}`}
-          >
-            <div className="relative">
-              <img
-                src={estimate.thumbnailUrl}
-                alt="Video thumbnail"
-                className="w-full h-48 object-cover"
-              />
-              <div className="absolute bottom-2 right-2 bg-black/75 text-white px-2 py-1 rounded text-sm">
-                {formatDuration(estimate.duration)}
-              </div>
-              <Button
-                size="sm"
-                className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
-                data-testid={`button-play-${estimate.id}`}
-              >
-                <Play className="h-6 w-6" />
+      {/* Empty State */}
+      {estimates.length === 0 && !isLoading && (
+        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+          <CardContent className="p-12">
+            <div className="text-center">
+              <AlertCircle className="h-16 w-16 mx-auto mb-4 text-gray-400" />
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                No Video Estimates
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400 mb-4">
+                No video estimates found. Create your first estimate to get started.
+              </p>
+              <Button onClick={() => setIsCreateDialogOpen(true)} data-testid="button-create-first">
+                <Plus className="h-4 w-4 mr-2" />
+                Create First Estimate
               </Button>
             </div>
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="font-semibold text-gray-900 dark:text-white">{estimate.customerName}</h3>
-                {getStatusBadge(estimate.status)}
-              </div>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">{estimate.vehicle}</p>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-600 dark:text-gray-400">Estimated Cost:</span>
-                  <span className="font-bold text-gray-900 dark:text-white">${estimate.estimatedCost.toFixed(2)}</span>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Estimates Grid */}
+      {estimates.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {estimates.map((estimate: any, index: number) => {
+            const estimatedCost = estimate.estimatedCost ? parseFloat(estimate.estimatedCost) : 0;
+            const services = estimate.recommendedServices || [];
+            
+            return (
+              <Card
+                key={`estimate-${estimate.id || index}`}
+                className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800 overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+                onClick={() => setSelectedVideo(estimate)}
+                data-testid={`estimate-${estimate.id || index}`}
+              >
+                <div className="relative">
+                  {estimate.thumbnailUrl ? (
+                    <img
+                      src={estimate.thumbnailUrl}
+                      alt="Video thumbnail"
+                      className="w-full h-48 object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-48 bg-gray-200 dark:bg-gray-800 flex items-center justify-center">
+                      <Video className="h-16 w-16 text-gray-400" />
+                    </div>
+                  )}
+                  <div className="absolute bottom-2 right-2 bg-black/75 text-white px-2 py-1 rounded text-sm">
+                    {formatDuration(estimate.duration)}
+                  </div>
+                  <Button
+                    size="sm"
+                    className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+                    data-testid={`button-play-${estimate.id || index}`}
+                  >
+                    <Play className="h-6 w-6" />
+                  </Button>
                 </div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">
-                  Technician: {estimate.technicianName}
-                </div>
-              </div>
-              {estimate.status === "pending" && (
-                <Button
-                  size="sm"
-                  className="w-full mt-3"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    sendEstimate.mutate(estimate.id);
-                  }}
-                  data-testid={`button-send-${estimate.id}`}
-                >
-                  <Send className="h-4 w-4 mr-2" />
-                  Send to Customer
-                </Button>
-              )}
-              {estimate.viewedAt && (
-                <p className="text-xs text-gray-500 mt-2">
-                  Viewed: {new Date(estimate.viewedAt).toLocaleString()}
-                </p>
-              )}
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="font-semibold text-gray-900 dark:text-white">
+                      {estimate.technicianName || "Technician"}
+                    </h3>
+                    {getStatusBadge(estimate.status)}
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-gray-600 dark:text-gray-400">Estimated Cost:</span>
+                      <span className="font-bold text-gray-900 dark:text-white">
+                        {estimatedCost > 0 ? `$${estimatedCost.toFixed(2)}` : "Not available"}
+                      </span>
+                    </div>
+                    {estimate.technicianName && (
+                      <div className="text-sm text-gray-600 dark:text-gray-400">
+                        Technician: {estimate.technicianName}
+                      </div>
+                    )}
+                  </div>
+                  {estimate.status === "pending" && (
+                    <Button
+                      size="sm"
+                      className="w-full mt-3"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        approveEstimate.mutate(estimate.id);
+                      }}
+                      data-testid={`button-approve-${estimate.id || index}`}
+                    >
+                      <CheckCircle className="h-4 w-4 mr-2" />
+                      Approve Estimate
+                    </Button>
+                  )}
+                  {estimate.viewedAt && (
+                    <p className="text-xs text-gray-500 mt-2">
+                      Viewed: {new Date(estimate.viewedAt).toLocaleString()}
+                    </p>
+                  )}
+                  {estimate.approvedAt && (
+                    <p className="text-xs text-gray-500 mt-2">
+                      Approved: {new Date(estimate.approvedAt).toLocaleString()}
+                    </p>
+                  )}
+                  {!estimate.viewedAt && !estimate.approvedAt && estimate.createdAt && (
+                    <p className="text-xs text-gray-500 mt-2">
+                      Created: {new Date(estimate.createdAt).toLocaleString()}
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+      )}
 
       {/* Video Player Dialog */}
       {selectedVideo && (
         <Dialog open={!!selectedVideo} onOpenChange={() => setSelectedVideo(null)}>
           <DialogContent className="sm:max-w-4xl">
             <DialogHeader>
-              <DialogTitle>{selectedVideo.customerName} - {selectedVideo.vehicle}</DialogTitle>
+              <DialogTitle>
+                Video Estimate - {selectedVideo.technicianName || "Technician"}
+              </DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
               <div className="bg-black rounded-lg aspect-video flex items-center justify-center">
-                <p className="text-white">Video Player Placeholder</p>
+                {selectedVideo.videoUrl ? (
+                  <p className="text-white text-sm">Video URL: {selectedVideo.videoUrl}</p>
+                ) : (
+                  <p className="text-white text-sm">No video URL available</p>
+                )}
               </div>
-              <div>
-                <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Recommended Services</h4>
-                <div className="space-y-2">
-                  {selectedVideo.recommendedServices.map((service: any, index: number) => (
-                    <div
-                      key={index}
-                      className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-900 rounded"
-                    >
-                      <span className="text-sm text-gray-900 dark:text-white">{service.name}</span>
-                      <span className="text-sm font-semibold text-gray-900 dark:text-white">${service.cost.toFixed(2)}</span>
+              {selectedVideo.transcription && (
+                <div>
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Transcription</h4>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">{selectedVideo.transcription}</p>
+                </div>
+              )}
+              {selectedVideo.recommendedServices && Array.isArray(selectedVideo.recommendedServices) && selectedVideo.recommendedServices.length > 0 && (
+                <div>
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Recommended Services</h4>
+                  <div className="space-y-2">
+                    {selectedVideo.recommendedServices.map((service: any, index: number) => (
+                      <div
+                        key={`service-${index}`}
+                        className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-900 rounded"
+                      >
+                        <span className="text-sm text-gray-900 dark:text-white">
+                          {service.name || "Service"}
+                        </span>
+                        <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                          {service.cost ? `$${parseFloat(service.cost).toFixed(2)}` : "N/A"}
+                        </span>
+                      </div>
+                    ))}
+                    <div className="flex items-center justify-between p-2 bg-blue-50 dark:bg-blue-900 rounded font-semibold">
+                      <span className="text-gray-900 dark:text-white">Total</span>
+                      <span className="text-gray-900 dark:text-white">
+                        {selectedVideo.estimatedCost 
+                          ? `$${parseFloat(selectedVideo.estimatedCost).toFixed(2)}`
+                          : "Not available"}
+                      </span>
                     </div>
-                  ))}
-                  <div className="flex items-center justify-between p-2 bg-blue-50 dark:bg-blue-900 rounded font-semibold">
-                    <span className="text-gray-900 dark:text-white">Total</span>
-                    <span className="text-gray-900 dark:text-white">${selectedVideo.estimatedCost.toFixed(2)}</span>
                   </div>
                 </div>
-              </div>
+              )}
             </div>
           </DialogContent>
         </Dialog>
