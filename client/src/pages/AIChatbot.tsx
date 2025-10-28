@@ -16,26 +16,16 @@ export default function AIChatbot() {
   const [activeTab, setActiveTab] = useState("chat");
   const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
   const [messageInput, setMessageInput] = useState("");
+  const [localMessages, setLocalMessages] = useState<any[]>([]);
+  const [isStreaming, setIsStreaming] = useState(false);
 
   const { data: conversations = [] } = useQuery<AIChatConversation[]>({ queryKey: ["/api/ai-chat-conversations"] });
-  const { data: messages = [] } = useQuery<AiChatMessage[]>({ 
+  const { data: fetchedMessages = [] } = useQuery<AiChatMessage[]>({ 
     queryKey: ["/api/ai-chat-messages", selectedConversation],
     enabled: !!selectedConversation 
   });
 
-  const sendMessageMutation = useMutation({
-    mutationFn: (data: { conversationId?: string; message: string }) => 
-      apiRequest("/api/ai-chat/send", "POST", data),
-    onSuccess: (response: any) => {
-      queryClient.invalidateQueries({ queryKey: ["/api/ai-chat-conversations"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/ai-chat-messages"] });
-      if (response?.conversationId) {
-        setSelectedConversation(response.conversationId);
-      }
-      setMessageInput("");
-      toast({ title: "Message sent" });
-    },
-  });
+  const messages = localMessages.length > 0 ? localMessages : fetchedMessages;
 
   const getStatusBadge = (status: string) => {
     const statuses: { [key: string]: { bg: string; text: string; icon: string } } = {
@@ -48,12 +38,157 @@ export default function AIChatbot() {
   };
 
 
-  const handleSendMessage = () => {
-    if (!messageInput.trim()) return;
-    sendMessageMutation.mutate({
-      conversationId: selectedConversation || undefined,
-      message: messageInput,
-    });
+  const handleSendMessage = async () => {
+    if (!messageInput.trim() || isStreaming) return;
+    
+    const userMessage = messageInput;
+    setMessageInput("");
+    setIsStreaming(true);
+
+    // Preserve existing messages and add new ones
+    const userMsg = {
+      id: `user-${Date.now()}`,
+      role: 'user',
+      content: userMessage,
+      createdAt: new Date().toISOString()
+    };
+    
+    const aiMsgId = `ai-${Date.now()}`;
+    const aiMsg = {
+      id: aiMsgId,
+      role: 'assistant',
+      content: '',
+      createdAt: new Date().toISOString()
+    };
+
+    // Seed with existing fetched messages to preserve history during streaming
+    setLocalMessages([...fetchedMessages, userMsg, aiMsg]);
+
+    let streamController: AbortController | null = null;
+    let streamTimeout: NodeJS.Timeout | null = null;
+
+    try {
+      // Overall timeout after 60 seconds
+      const controller = new AbortController();
+      streamController = controller;
+      const timeoutId = setTimeout(() => controller.abort(), 60000);
+
+      const response = await fetch('/api/ai-chat/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          conversationId: selectedConversation || undefined,
+          message: userMessage
+        }),
+        credentials: 'include',
+        signal: controller.signal
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        throw new Error('Failed to send message');
+      }
+
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder();
+
+      if (!reader) {
+        throw new Error('No response body');
+      }
+
+      let accumulatedText = '';
+      let newConvId = selectedConversation;
+      let buffer = ''; // Buffer for incomplete SSE frames
+
+      const resetStreamTimeout = () => {
+        if (streamTimeout) clearTimeout(streamTimeout);
+        streamTimeout = setTimeout(() => {
+          if (streamController) {
+            streamController.abort();
+          }
+        }, 30000);
+      };
+
+      resetStreamTimeout();
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) {
+          if (streamTimeout) clearTimeout(streamTimeout);
+          break;
+        }
+
+        resetStreamTimeout();
+
+        // Append new chunk to buffer
+        buffer += decoder.decode(value, { stream: true });
+        
+        // Process complete SSE frames (ending with \n\n)
+        const frames = buffer.split('\n\n');
+        
+        // Keep the last incomplete frame in buffer
+        buffer = frames.pop() || '';
+        
+        // Process complete frames
+        for (const frame of frames) {
+          if (!frame.trim()) continue; // Skip empty frames
+          
+          const lines = frame.split('\n');
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              try {
+                const jsonStr = line.slice(6);
+                const data = JSON.parse(jsonStr);
+                
+                if (data.chunk) {
+                  accumulatedText += data.chunk;
+                  setLocalMessages(prev => prev.map(msg =>
+                    msg.id === aiMsgId ? { ...msg, content: accumulatedText } : msg
+                  ));
+                }
+                if (data.done && data.conversationId) {
+                  newConvId = data.conversationId;
+                }
+              } catch (e) {
+                console.warn('Failed to parse SSE data:', line, e);
+              }
+            }
+          }
+        }
+      }
+
+      // Update conversation after streaming completes
+      if (newConvId && !selectedConversation) {
+        setSelectedConversation(newConvId);
+      }
+      
+      // Clear local messages and refetch from backend to reconcile
+      setLocalMessages([]);
+      queryClient.invalidateQueries({ queryKey: ["/api/ai-chat-conversations"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/ai-chat-messages", newConvId || selectedConversation] });
+      
+    } catch (error: any) {
+      console.error('Streaming error:', error);
+      
+      const isAborted = error.name === 'AbortError' || error.message?.includes('abort');
+      const errorMessage = isAborted 
+        ? "Request timed out. Please try again."
+        : "Failed to send message. Please try again.";
+      
+      toast({ 
+        title: "Error", 
+        description: errorMessage, 
+        variant: "destructive" 
+      });
+      
+      // Remove all local messages on error
+      setLocalMessages([]);
+    } finally {
+      // Always cleanup
+      if (streamTimeout) clearTimeout(streamTimeout);
+      setIsStreaming(false);
+    }
   };
 
   return (
@@ -140,15 +275,15 @@ export default function AIChatbot() {
                   value={messageInput}
                   onChange={(e) => setMessageInput(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                  disabled={sendMessageMutation.isPending}
+                  disabled={isStreaming}
                   data-testid="input-message"
                 />
                 <Button
                   onClick={handleSendMessage}
-                  disabled={sendMessageMutation.isPending || !messageInput.trim()}
+                  disabled={isStreaming || !messageInput.trim()}
                   data-testid="button-send"
                 >
-                  <Send className="w-4 h-4" />
+                  {isStreaming ? "..." : <Send className="w-4 h-4" />}
                 </Button>
               </div>
             </Card>
