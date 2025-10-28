@@ -6015,16 +6015,57 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const garageId = req.user.garageId;
       const { period } = req.query;
+      const { generateBusinessIntelligenceReport, getRealtimeKPIs } = await import("./analytics-service");
       
-      // Return mock dashboard metrics
+      // Calculate date range from period
+      const dateRange = (() => {
+        const now = new Date();
+        const start = new Date();
+        switch(period) {
+          case 'week':
+            start.setDate(now.getDate() - 7);
+            break;
+          case 'month':
+            start.setMonth(now.getMonth() - 1);
+            break;
+          case 'quarter':
+            start.setMonth(now.getMonth() - 3);
+            break;
+          case 'year':
+            start.setFullYear(now.getFullYear() - 1);
+            break;
+          default:
+            start.setMonth(now.getMonth() - 1);
+        }
+        return { start, end: now };
+      })();
+      
+      // Get real analytics data from service
+      const report = await generateBusinessIntelligenceReport(garageId, dateRange);
+      const kpis = await getRealtimeKPIs(garageId);
+      
+      // Transform to frontend contract (camelCase, flat structure)
+      const revenue: any = report.revenue || {};
+      const payments: any = report.payments || {};
+      
+      const totalRevenue = Number(revenue.total_revenue || 0);
+      const totalInvoiced = Number(payments.total_invoiced || 0);
+      const totalCollected = Number(payments.total_collected || 0);
+      
+      // Calculate costs estimate (assuming 65% margin)
+      const totalCosts = totalRevenue * 0.65;
+      const netProfit = totalRevenue - totalCosts;
+      const profitMargin = totalRevenue > 0 ? (netProfit / totalRevenue) * 100 : 0;
+      
       res.json({
-        totalRevenue: 328000,
-        totalCosts: 214000,
-        netProfit: 114000,
-        profitMargin: 34.8,
-        activeCustomers: 1284,
-        jobCards: 856,
+        totalRevenue,
+        totalCosts: Math.round(totalCosts),
+        netProfit: Math.round(netProfit),
+        profitMargin: Number(profitMargin.toFixed(1)),
+        activeCustomers: Number(revenue.unique_customers || 0),
+        jobCards: Number(revenue.total_jobs || 0),
         period,
+        ...kpis,
       });
     } catch (error) {
       console.error("Error fetching dashboard metrics:", error);
@@ -6081,15 +6122,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/analytics/profit-analysis', isAuthenticated, async (req: any, res) => {
     try {
       const garageId = req.user.garageId;
-      const { periodType } = req.query;
+      const { periodType = 'service' } = req.query;
+      const { analyzeProfitMargins } = await import("./analytics-service");
       
-      // Return mock profit analysis data
+      // Get real profit analysis from service
+      const analysis: any = await analyzeProfitMargins(
+        garageId,
+        periodType as 'service' | 'technician' | 'customer'
+      );
+      
+      // Transform snake_case to camelCase for frontend
+      const transformRow = (row: any) => ({
+        name: row.service_type || row.technician_name || row.customer_name || row.name || 'Unknown',
+        totalRevenue: Number(row.total_revenue || row.revenue || 0),
+        totalCosts: Number(row.total_costs || row.costs || 0),
+        netProfit: Number(row.net_profit || row.profit || 0),
+        profitMargin: Number(row.profit_margin || row.margin || 0),
+        jobCount: Number(row.job_count || row.jobs || 0),
+      });
+      
+      const data = Array.isArray(analysis) ? analysis.map(transformRow) : (analysis.data || []).map(transformRow);
+      
       res.json({
-        totalRevenue: 328000,
-        totalCosts: 214000,
-        netProfit: 114000,
-        profitMargin: 34.8,
+        data,
         periodType,
+        totalRevenue: data.reduce((sum: number, row: any) => sum + row.totalRevenue, 0),
+        totalCosts: data.reduce((sum: number, row: any) => sum + row.totalCosts, 0),
+        netProfit: data.reduce((sum: number, row: any) => sum + row.netProfit, 0),
       });
     } catch (error) {
       console.error("Error fetching profit analysis:", error);
@@ -6101,9 +6160,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const garageId = req.user.garageId;
       const { riskFilter } = req.query;
+      const { analyzeCustomerLTV } = await import("./analytics-service");
       
-      // Return empty array for now - mock data in frontend
-      res.json([]);
+      // Get real customer LTV analysis from service
+      const ltvAnalysis: any = await analyzeCustomerLTV(garageId);
+      
+      // Transform snake_case to camelCase
+      const transformCustomer = (c: any) => ({
+        customerId: c.customer_id || c.id,
+        customerName: c.customer_name || c.name,
+        lifetimeValue: Number(c.lifetime_value || c.ltv || 0),
+        totalJobs: Number(c.total_jobs || c.jobs || 0),
+        totalSpent: Number(c.total_spent || c.spent || 0),
+        avgJobValue: Number(c.avg_job_value || c.avgValue || 0),
+        lastVisit: c.last_visit || c.lastVisit,
+        churnRisk: c.churn_risk || c.risk || 'low',
+        segment: c.segment || 'regular',
+      });
+      
+      // Extract customers array (handles both array and object response)
+      let customers = Array.isArray(ltvAnalysis) ? ltvAnalysis : (ltvAnalysis.customers || ltvAnalysis.data || []);
+      customers = customers.map(transformCustomer);
+      
+      // Apply risk filter if provided
+      if (riskFilter) {
+        customers = customers.filter((c: any) => c.churnRisk === riskFilter);
+      }
+      
+      res.json(customers);
     } catch (error) {
       console.error("Error fetching customer LTV:", error);
       res.status(500).json({ message: "Failed to fetch customer LTV data" });
@@ -6113,10 +6197,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/analytics/heatmaps', isAuthenticated, async (req: any, res) => {
     try {
       const garageId = req.user.garageId;
-      const { heatmapType, period } = req.query;
+      const { heatmapType = 'time', period } = req.query;
+      const { generateBusinessHeatMaps } = await import("./analytics-service");
       
-      // Return empty array for now - mock data in frontend
-      res.json([]);
+      // Get real heat map data from service
+      const heatmap: any = await generateBusinessHeatMaps(
+        garageId,
+        heatmapType as 'time' | 'service' | 'technician'
+      );
+      
+      // Transform snake_case to camelCase
+      const transformDataPoint = (point: any) => ({
+        label: point.hour_of_day || point.day_of_week || point.service_type || point.technician_name || point.label || 'Unknown',
+        value: Number(point.job_count || point.count || point.value || 0),
+        revenue: Number(point.revenue || point.total_revenue || 0),
+        avgValue: Number(point.avg_value || point.avg_job_value || 0),
+      });
+      
+      // Extract data array (handles both array and object response)
+      const data = Array.isArray(heatmap) ? heatmap.map(transformDataPoint) : (heatmap.data || heatmap.points || []).map(transformDataPoint);
+      
+      res.json(data);
     } catch (error) {
       console.error("Error fetching heatmaps:", error);
       res.status(500).json({ message: "Failed to fetch heatmap data" });
@@ -11312,35 +11413,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Customer Lifetime Value Analysis - Real SQL
-  app.get("/api/analytics/customer-ltv", isAuthenticated, async (req: any, res) => {
-    try {
-      const { analyzeCustomerLTV } = await import("./analytics-service");
-      const ltvAnalysis = await analyzeCustomerLTV(req.user.garageId);
-      res.json(ltvAnalysis);
-    } catch (error) {
-      console.error("Error analyzing customer LTV:", error);
-      res.status(500).json({ message: "Failed to analyze customer LTV" });
-    }
-  });
+  // NOTE: Duplicate routes commented out - primary routes are at lines 6103-6143
+  // app.get("/api/analytics/customer-ltv", isAuthenticated, async (req: any, res) => {
+  //   try {
+  //     const { analyzeCustomerLTV } = await import("./analytics-service");
+  //     const ltvAnalysis = await analyzeCustomerLTV(req.user.garageId);
+  //     res.json(ltvAnalysis);
+  //   } catch (error) {
+  //     console.error("Error analyzing customer LTV:", error);
+  //     res.status(500).json({ message: "Failed to analyze customer LTV" });
+  //   }
+  // });
 
-  // Business Heat Maps - Real SQL Aggregation
-  app.get("/api/analytics/heatmaps", isAuthenticated, async (req: any, res) => {
-    try {
-      const { mapType } = req.query;
-      const { generateBusinessHeatMaps } = await import("./analytics-service");
-      
-      const heatmap = await generateBusinessHeatMaps(
-        req.user.garageId,
-        (mapType as 'time' | 'service' | 'technician') || 'time'
-      );
-      
-      res.json(heatmap);
-    } catch (error) {
-      console.error("Error generating heat maps:", error);
-      res.status(500).json({ message: "Failed to generate heat maps" });
-    }
-  });
+  // app.get("/api/analytics/heatmaps", isAuthenticated, async (req: any, res) => {
+  //   try {
+  //     const { mapType } = req.query;
+  //     const { generateBusinessHeatMaps } = await import("./analytics-service");
+  //     
+  //     const heatmap = await generateBusinessHeatMaps(
+  //       req.user.garageId,
+  //       (mapType as 'time' | 'service' | 'technician') || 'time'
+  //     );
+  //     
+  //     res.json(heatmap);
+  //   } catch (error) {
+  //     console.error("Error generating heat maps:", error);
+  //     res.status(500).json({ message: "Failed to generate heat maps" });
+  //   }
+  // });
 
   // Custom Reports Builder (using mock data until storage methods are implemented)
   app.post("/api/analytics/custom-report", isAuthenticated, async (req: any, res) => {
