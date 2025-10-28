@@ -67,6 +67,7 @@ import EmailMarketingCampaigns from "@/pages/EmailMarketingCampaigns";
 import SocialMediaIntegration from "@/pages/SocialMediaIntegration";
 import VideoConsultations from "@/pages/VideoConsultations";
 import PartsMarketplace from "@/pages/PartsMarketplace";
+import StripePaymentProcessing from "@/pages/StripePaymentProcessing";
 import LiveServiceTracking from "@/pages/LiveServiceTracking";
 import VideoEstimates from "@/pages/VideoEstimates";
 import DigitalVehicleWalkaround from "@/pages/DigitalVehicleWalkaround";
@@ -455,6 +456,11 @@ function Router() {
       <Route path="/parts-marketplace">
         <Layout>
           <PartsMarketplace />
+        </Layout>
+      </Route>
+      <Route path="/stripe-payment-processing">
+        <Layout>
+          <StripePaymentProcessing />
         </Layout>
       </Route>
       <Route path="/live-service-tracking">
