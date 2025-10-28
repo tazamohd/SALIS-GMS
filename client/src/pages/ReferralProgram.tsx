@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 
 export default function ReferralProgram() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [customerId, setCustomerId] = useState("");
   const { toast } = useToast();
 
   const { data: referrals = [], isLoading: referralsLoading } = useQuery({
@@ -31,6 +32,7 @@ export default function ReferralProgram() {
     onSuccess: () => {
       toast({ title: "Referral code generated", description: "Referral code created successfully." });
       setIsCreateDialogOpen(false);
+      setCustomerId("");
       queryClient.invalidateQueries({ queryKey: ["/api/referrals"] });
       queryClient.invalidateQueries({ queryKey: ["/api/referrals/analytics"] });
     },
@@ -96,7 +98,13 @@ export default function ReferralProgram() {
             <div className="space-y-4 py-4">
               <div>
                 <label className="text-sm font-medium">Customer ID</label>
-                <Input placeholder="Enter customer ID..." className="mt-1" data-testid="input-customer-id" />
+                <Input
+                  placeholder="Enter customer ID..."
+                  className="mt-1"
+                  value={customerId}
+                  onChange={(e) => setCustomerId(e.target.value)}
+                  data-testid="input-customer-id"
+                />
               </div>
               <div className="bg-blue-50 dark:bg-blue-900 rounded-lg p-4">
                 <h4 className="font-semibold text-blue-900 dark:text-blue-100 mb-2">Referral Rewards</h4>
@@ -109,14 +117,19 @@ export default function ReferralProgram() {
               <Button
                 className="w-full"
                 onClick={() => {
+                  if (!customerId.trim()) {
+                    toast({ title: "Validation error", description: "Please enter customer ID", variant: "destructive" });
+                    return;
+                  }
                   createReferral.mutate({
-                    customerId: "1",
+                    customerId: customerId.trim(),
                   });
                 }}
+                disabled={createReferral.isPending}
                 data-testid="button-generate-code"
               >
                 <Gift className="h-4 w-4 mr-2" />
-                Generate Code
+                {createReferral.isPending ? "Generating..." : "Generate Code"}
               </Button>
             </div>
           </DialogContent>

@@ -12,6 +12,14 @@ import { useToast } from "@/hooks/use-toast";
 export default function DigitalVehicleWalkaround() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [selectedWalkaround, setSelectedWalkaround] = useState<any>(null);
+  const [formData, setFormData] = useState({
+    jobCardId: "",
+    vehicleId: "",
+    technicianId: "",
+    walkaroundType: "pre_service",
+    mileageReading: "",
+    fuelLevel: "1/2",
+  });
   const { toast } = useToast();
 
   const { data: walkarounds = [], isLoading } = useQuery({
@@ -27,6 +35,7 @@ export default function DigitalVehicleWalkaround() {
     onSuccess: () => {
       toast({ title: "Walkaround created", description: "Vehicle inspection saved successfully." });
       setIsCreateDialogOpen(false);
+      setFormData({ jobCardId: "", vehicleId: "", technicianId: "", walkaroundType: "pre_service", mileageReading: "", fuelLevel: "1/2" });
       queryClient.invalidateQueries({ queryKey: ["/api/vehicle-walkarounds"] });
     },
   });
@@ -92,18 +101,46 @@ export default function DigitalVehicleWalkaround() {
             <div className="space-y-4 py-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium">Job Card</label>
+                  <label className="text-sm font-medium">Job Card ID</label>
                   <input
                     type="text"
                     className="w-full mt-1 px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md"
-                    placeholder="JC-2024-XXXX"
+                    placeholder="Enter job card ID"
+                    value={formData.jobCardId}
+                    onChange={(e) => setFormData({ ...formData, jobCardId: e.target.value })}
                     data-testid="input-job-card"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Vehicle ID</label>
+                  <input
+                    type="text"
+                    className="w-full mt-1 px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md"
+                    placeholder="Enter vehicle ID"
+                    value={formData.vehicleId}
+                    onChange={(e) => setFormData({ ...formData, vehicleId: e.target.value })}
+                    data-testid="input-vehicle-id"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium">Technician ID</label>
+                  <input
+                    type="text"
+                    className="w-full mt-1 px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md"
+                    placeholder="Enter technician ID"
+                    value={formData.technicianId}
+                    onChange={(e) => setFormData({ ...formData, technicianId: e.target.value })}
+                    data-testid="input-technician-id"
                   />
                 </div>
                 <div>
                   <label className="text-sm font-medium">Type</label>
                   <select
                     className="w-full mt-1 px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md"
+                    value={formData.walkaroundType}
+                    onChange={(e) => setFormData({ ...formData, walkaroundType: e.target.value })}
                     data-testid="select-type"
                   >
                     <option value="pre_service">Pre-Service</option>
@@ -118,6 +155,8 @@ export default function DigitalVehicleWalkaround() {
                     type="number"
                     className="w-full mt-1 px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md"
                     placeholder="0"
+                    value={formData.mileageReading}
+                    onChange={(e) => setFormData({ ...formData, mileageReading: e.target.value })}
                     data-testid="input-mileage"
                   />
                 </div>
@@ -125,6 +164,8 @@ export default function DigitalVehicleWalkaround() {
                   <label className="text-sm font-medium">Fuel Level</label>
                   <select
                     className="w-full mt-1 px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md"
+                    value={formData.fuelLevel}
+                    onChange={(e) => setFormData({ ...formData, fuelLevel: e.target.value })}
                     data-testid="select-fuel"
                   >
                     <option value="1/4">1/4</option>
@@ -134,30 +175,27 @@ export default function DigitalVehicleWalkaround() {
                   </select>
                 </div>
               </div>
-              <div className="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg p-8 text-center">
-                <Camera className="h-12 w-12 mx-auto mb-3 text-gray-400" />
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-                  Take photos from all angles
-                </p>
-                <Button variant="outline" size="sm" data-testid="button-take-photos">
-                  <Camera className="h-4 w-4 mr-2" />
-                  Open Camera
-                </Button>
-              </div>
               <Button
                 className="w-full"
                 onClick={() => {
+                  if (!formData.jobCardId || !formData.vehicleId || !formData.technicianId) {
+                    toast({ title: "Validation error", description: "Please fill in all required fields", variant: "destructive" });
+                    return;
+                  }
                   createWalkaround.mutate({
-                    jobCardId: "1",
-                    vehicleId: "1",
-                    technicianId: "1",
-                    walkaroundType: "pre_service",
+                    jobCardId: formData.jobCardId,
+                    vehicleId: formData.vehicleId,
+                    technicianId: formData.technicianId,
+                    walkaroundType: formData.walkaroundType,
                     photos: [],
+                    mileageReading: formData.mileageReading ? parseInt(formData.mileageReading) : undefined,
+                    fuelLevel: formData.fuelLevel,
                   });
                 }}
+                disabled={createWalkaround.isPending}
                 data-testid="button-save-walkaround"
               >
-                Save Walkaround
+                {createWalkaround.isPending ? "Saving..." : "Save Walkaround"}
               </Button>
             </div>
           </DialogContent>

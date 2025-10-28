@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 export default function VideoEstimates() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [selectedVideo, setSelectedVideo] = useState<any>(null);
+  const [formData, setFormData] = useState({ vehicleId: "", estimatedCost: "", videoUrl: "" });
   const { toast } = useToast();
 
   const { data: userResponse } = useQuery({
@@ -38,6 +39,7 @@ export default function VideoEstimates() {
     onSuccess: () => {
       toast({ title: "Estimate created", description: "Video estimate has been saved." });
       setIsCreateDialogOpen(false);
+      setFormData({ vehicleId: "", estimatedCost: "", videoUrl: "" });
       queryClient.invalidateQueries({ queryKey: ["/api/video-estimates", customerId] });
     },
   });
@@ -119,15 +121,27 @@ export default function VideoEstimates() {
               <DialogTitle>Create Video Estimate</DialogTitle>
             </DialogHeader>
             <div className="space-y-4 py-4">
-              <div className="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg p-8 text-center">
-                <Upload className="h-12 w-12 mx-auto mb-3 text-gray-400" />
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-                  Upload video or record new
-                </p>
-                <Button variant="outline" size="sm" data-testid="button-upload-video">
-                  <Video className="h-4 w-4 mr-2" />
-                  Choose File
-                </Button>
+              <div>
+                <label className="text-sm font-medium">Vehicle ID</label>
+                <input
+                  type="text"
+                  className="w-full mt-1 px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md"
+                  placeholder="Enter vehicle ID"
+                  value={formData.vehicleId}
+                  onChange={(e) => setFormData({ ...formData, vehicleId: e.target.value })}
+                  data-testid="input-vehicle-id"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Video URL</label>
+                <input
+                  type="url"
+                  className="w-full mt-1 px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md"
+                  placeholder="https://example.com/video.mp4"
+                  value={formData.videoUrl}
+                  onChange={(e) => setFormData({ ...formData, videoUrl: e.target.value })}
+                  data-testid="input-video-url"
+                />
               </div>
               <div>
                 <label className="text-sm font-medium">Estimated Cost ($)</label>
@@ -135,24 +149,31 @@ export default function VideoEstimates() {
                   type="number"
                   className="w-full mt-1 px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md"
                   placeholder="0.00"
+                  value={formData.estimatedCost}
+                  onChange={(e) => setFormData({ ...formData, estimatedCost: e.target.value })}
                   data-testid="input-cost"
                 />
               </div>
               <Button
                 className="w-full"
                 onClick={() => {
+                  if (!formData.vehicleId || !formData.videoUrl || !formData.estimatedCost) {
+                    toast({ title: "Validation error", description: "Please fill in all fields", variant: "destructive" });
+                    return;
+                  }
                   createEstimate.mutate({
                     customerId: customerId,
-                    vehicleId: "1",
-                    estimatedCost: 500,
-                    videoUrl: "https://example.com/video.mp4",
+                    vehicleId: formData.vehicleId,
+                    estimatedCost: parseFloat(formData.estimatedCost),
+                    videoUrl: formData.videoUrl,
                     technicianId: user?.id,
                     garageId: user?.garageId,
                   });
                 }}
+                disabled={createEstimate.isPending}
                 data-testid="button-save-estimate"
               >
-                Save Estimate
+                {createEstimate.isPending ? "Saving..." : "Save Estimate"}
               </Button>
             </div>
           </DialogContent>
