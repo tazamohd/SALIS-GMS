@@ -1,17 +1,53 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 import { AlertTriangle, Shield, Activity, Users } from "lucide-react";
 
 export default function SafetyIncidents() {
-  const mockIncidents = [
-    { id: "SI-2024-001", date: "2024-10-25", type: "injury", severity: "minor", description: "Minor cut on hand while handling metal part", employee: "Mike Davis", status: "closed" },
-    { id: "SI-2024-002", date: "2024-10-23", type: "near_miss", severity: "moderate", description: "Forklift nearly collided with vehicle", employee: "John Smith", status: "investigating" },
-    { id: "SI-2024-003", date: "2024-10-20", type: "spill", severity: "minor", description: "Oil spill in service bay cleaned immediately", employee: "Emily Brown", status: "closed" },
-  ];
+  const { toast } = useToast();
 
-  const stats = { totalIncidents: 8, openInvestigations: 2, oshaRecordable: 1, daysWithoutIncident: 145 };
+  // Fetch safety incidents from backend
+  const { data: incidents = [], isLoading: incidentsLoading } = useQuery<any[]>({
+    queryKey: ['/api/safety/incidents'],
+  });
+
+  // Fetch analytics for KPIs
+  const { data: analytics } = useQuery<any>({
+    queryKey: ['/api/safety/analytics'],
+  });
+
+  // Calculate KPIs from real data
+  const stats = {
+    totalIncidents: incidents.length,
+    openInvestigations: incidents.filter((i: any) => i.status === 'investigating').length,
+    oshaRecordable: analytics?.oshaRecordable || 0,
+    daysWithoutIncident: analytics?.daysWithoutIncident || 0,
+  };
+
+  // Create safety incident mutation
+  const createIncidentMutation = useMutation({
+    mutationFn: async (data: any) => {
+      return apiRequest('POST', '/api/safety/incidents', data);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Incident Reported",
+        description: "Safety incident created successfully",
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/safety/incidents'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/safety/analytics'] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Report Failed",
+        description: error.message || "Failed to report incident",
+        variant: "destructive",
+      });
+    },
+  });
 
   const getSeverityColor = (severity: string) => {
     return severity === "minor" ? "secondary" : severity === "moderate" ? "default" : "destructive";
@@ -26,7 +62,25 @@ export default function SafetyIncidents() {
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mt-1">Track and investigate workplace safety incidents</p>
         </div>
-        <Button data-testid="button-report-incident">Report Incident</Button>
+        <Button 
+          onClick={() => {
+            createIncidentMutation.mutate({
+              incidentNumber: `SI-${Date.now()}`,
+              incidentDate: new Date().toISOString(),
+              incidentType: 'near_miss',
+              severity: 'minor',
+              location: 'Service Bay 1',
+              description: 'Sample incident description',
+              involvedPersons: ['current-user'],
+              witnesses: [],
+              immediateActions: 'Area secured and cleaned',
+            });
+          }}
+          disabled={createIncidentMutation.isPending}
+          data-testid="button-report-incident"
+        >
+          {createIncidentMutation.isPending ? "Reporting..." : "Report Incident"}
+        </Button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -35,7 +89,7 @@ export default function SafetyIncidents() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Total This Year</p>
-                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">{stats.totalIncidents}</h3>
+                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="text-total-incidents">{stats.totalIncidents}</h3>
               </div>
               <AlertTriangle className="h-12 w-12 text-yellow-600" />
             </div>
@@ -46,7 +100,7 @@ export default function SafetyIncidents() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Investigating</p>
-                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">{stats.openInvestigations}</h3>
+                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="text-open-investigations">{stats.openInvestigations}</h3>
               </div>
               <Activity className="h-12 w-12 text-blue-600" />
             </div>
@@ -57,7 +111,7 @@ export default function SafetyIncidents() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400">OSHA Recordable</p>
-                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">{stats.oshaRecordable}</h3>
+                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="text-osha-recordable">{stats.oshaRecordable}</h3>
               </div>
               <Shield className="h-12 w-12 text-red-600" />
             </div>
@@ -68,7 +122,7 @@ export default function SafetyIncidents() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Days Without</p>
-                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">{stats.daysWithoutIncident}</h3>
+                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="text-days-without">{stats.daysWithoutIncident}</h3>
               </div>
               <Users className="h-12 w-12 text-green-600" />
             </div>
@@ -81,24 +135,30 @@ export default function SafetyIncidents() {
           <CardTitle>Recent Incidents</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-3">
-            {mockIncidents.map((incident) => (
-              <div key={incident.id} className="flex items-start justify-between p-4 border border-gray-200 dark:border-gray-800 rounded-lg" data-testid={`incident-${incident.id}`}>
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
-                    <h3 className="font-semibold text-gray-900 dark:text-white">{incident.id}</h3>
-                    <Badge variant={getSeverityColor(incident.severity)}>{incident.severity}</Badge>
-                    <Badge>{incident.type.replace("_", " ")}</Badge>
+          {incidentsLoading ? (
+            <div className="text-center py-8 text-gray-500">Loading incidents...</div>
+          ) : incidents.length === 0 ? (
+            <div className="text-center py-8 text-gray-500">No incidents found</div>
+          ) : (
+            <div className="space-y-3">
+              {incidents.map((incident) => (
+                <div key={incident.id} className="flex items-start justify-between p-4 border border-gray-200 dark:border-gray-800 rounded-lg" data-testid={`incident-${incident.id}`}>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-2">
+                      <h3 className="font-semibold text-gray-900 dark:text-white">{incident.incidentNumber}</h3>
+                      <Badge variant={getSeverityColor(incident.severity)}>{incident.severity}</Badge>
+                      <Badge>{incident.incidentType?.replace("_", " ")}</Badge>
+                    </div>
+                    <p className="text-sm text-gray-900 dark:text-white mb-1">{incident.description}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      {incident.location} • {new Date(incident.incidentDate).toLocaleDateString()}
+                    </p>
                   </div>
-                  <p className="text-sm text-gray-900 dark:text-white mb-1">{incident.description}</p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    {incident.employee} • {new Date(incident.date).toLocaleDateString()}
-                  </p>
+                  <Badge variant={incident.status === "closed" ? "default" : "secondary"}>{incident.status}</Badge>
                 </div>
-                <Badge variant={incident.status === "closed" ? "default" : "secondary"}>{incident.status}</Badge>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

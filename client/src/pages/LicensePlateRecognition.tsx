@@ -1,21 +1,77 @@
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Camera, Car, CheckCircle, Clock } from "lucide-react";
 
 export default function LicensePlateRecognition() {
-  const mockScans = [
-    { id: "1", plateNumber: "ABC 1234", vehicle: "2020 Honda Civic", customer: "John Smith", confidence: 98.5, scanType: "entry", timestamp: "2024-10-26T09:00:00Z", matched: true },
-    { id: "2", plateNumber: "XYZ 5678", vehicle: "2019 Toyota Camry", customer: "Sarah Johnson", confidence: 95.2, scanType: "exit", timestamp: "2024-10-26T10:30:00Z", matched: true },
-    { id: "3", plateNumber: "DEF 9012", vehicle: "Unknown", customer: null, confidence: 87.3, scanType: "entry", timestamp: "2024-10-26T11:15:00Z", matched: false },
-  ];
+  const { toast } = useToast();
 
-  const mockEntryLogs = [
-    { id: "1", vehicle: "2020 Honda Civic", plate: "ABC 1234", customer: "John Smith", entry: "2024-10-26T09:00:00Z", exit: "2024-10-26T15:30:00Z", duration: 390 },
-    { id: "2", vehicle: "2019 Toyota Camry", plate: "XYZ 5678", customer: "Sarah Johnson", entry: "2024-10-26T10:30:00Z", exit: null, duration: null },
-  ];
+  // Fetch license plate scans
+  const { data: scans = [], isLoading: loadingScans } = useQuery({
+    queryKey: ["/api/license-plate/scans"],
+  });
 
-  const stats = { todayScans: 45, autoMatched: 38, manualReview: 7, avgConfidence: 94.2 };
+  // Fetch vehicle entry logs
+  const { data: entryLogs = [], isLoading: loadingLogs } = useQuery({
+    queryKey: ["/api/license-plate/entry-logs"],
+  });
+
+  // Record scan mutation
+  const recordScanMutation = useMutation({
+    mutationFn: async (scanData: {
+      plateNumber: string;
+      confidence: number;
+      scanType: string;
+      vehicleId?: string;
+      location?: string;
+    }) => {
+      return await apiRequest("/api/license-plate/scan", {
+        method: "POST",
+        body: JSON.stringify(scanData),
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/license-plate/scans"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/license-plate/entry-logs"] });
+      toast({
+        title: "Success",
+        description: "License plate scan recorded successfully",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message || "Failed to record scan",
+      });
+    },
+  });
+
+  // Calculate stats
+  const stats = {
+    todayScans: scans.length || 0,
+    autoMatched: scans.filter((s: any) => s.matchedAutomatically).length || 0,
+    manualReview: scans.filter((s: any) => !s.matchedAutomatically).length || 0,
+    avgConfidence: scans.length > 0
+      ? (scans.reduce((sum: number, s: any) => sum + (parseFloat(s.confidence) || 0), 0) / scans.length).toFixed(1)
+      : 0,
+  };
+
+  // Simulate scan for testing
+  const simulateScan = () => {
+    const plateNumbers = ["ABC 1234", "XYZ 5678", "DEF 9012"];
+    const randomPlate = plateNumbers[Math.floor(Math.random() * plateNumbers.length)];
+    
+    recordScanMutation.mutate({
+      plateNumber: randomPlate,
+      confidence: Math.random() * 20 + 80,
+      scanType: Math.random() > 0.5 ? "entry" : "exit",
+      location: "Main Entrance",
+    });
+  };
 
   return (
     <div className="p-8 space-y-6">
@@ -26,6 +82,13 @@ export default function LicensePlateRecognition() {
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mt-1">Automatic vehicle identification and entry tracking</p>
         </div>
+        <Button 
+          onClick={simulateScan}
+          disabled={recordScanMutation.isPending}
+          data-testid="button-simulate-scan"
+        >
+          Simulate Scan
+        </Button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -34,7 +97,7 @@ export default function LicensePlateRecognition() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Today's Scans</p>
-                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">{stats.todayScans}</h3>
+                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="stat-today-scans">{stats.todayScans}</h3>
               </div>
               <Camera className="h-12 w-12 text-blue-600" />
             </div>
@@ -45,7 +108,7 @@ export default function LicensePlateRecognition() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Auto-Matched</p>
-                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">{stats.autoMatched}</h3>
+                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="stat-auto-matched">{stats.autoMatched}</h3>
               </div>
               <CheckCircle className="h-12 w-12 text-green-600" />
             </div>
@@ -56,7 +119,7 @@ export default function LicensePlateRecognition() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Manual Review</p>
-                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">{stats.manualReview}</h3>
+                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="stat-manual-review">{stats.manualReview}</h3>
               </div>
               <Clock className="h-12 w-12 text-yellow-600" />
             </div>
@@ -67,7 +130,7 @@ export default function LicensePlateRecognition() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Avg Confidence</p>
-                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">{stats.avgConfidence}%</h3>
+                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="stat-avg-confidence">{stats.avgConfidence}%</h3>
               </div>
               <Car className="h-12 w-12 text-purple-600" />
             </div>
@@ -80,35 +143,47 @@ export default function LicensePlateRecognition() {
           <CardTitle>Recent Plate Scans</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-3">
-            {mockScans.map((scan) => (
-              <div key={scan.id} className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-800 rounded-lg" data-testid={`scan-${scan.id}`}>
-                <div className="flex items-center gap-4">
-                  <div className="bg-blue-100 dark:bg-blue-900 px-4 py-2 rounded font-mono font-bold text-gray-900 dark:text-white">
-                    {scan.plateNumber}
+          {loadingScans ? (
+            <div className="text-center py-8">
+              <p className="text-gray-600 dark:text-gray-400">Loading scans...</p>
+            </div>
+          ) : scans.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-gray-600 dark:text-gray-400">No license plate scans recorded yet. Scans will appear here automatically.</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {scans.map((scan: any) => (
+                <div key={scan.id} className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-800 rounded-lg" data-testid={`scan-${scan.id}`}>
+                  <div className="flex items-center gap-4">
+                    <div className="bg-blue-100 dark:bg-blue-900 px-4 py-2 rounded font-mono font-bold text-gray-900 dark:text-white">
+                      {scan.plateNumber}
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-gray-900 dark:text-white">
+                        {scan.vehicleMake && scan.vehicleModel 
+                          ? `${scan.vehicleMake} ${scan.vehicleModel}` 
+                          : "Unknown Vehicle"}
+                      </h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        {scan.customerName || "No match found"} • Confidence: {parseFloat(scan.confidence).toFixed(1)}%
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-900 dark:text-white">
-                      {scan.vehicle !== "Unknown" ? scan.vehicle : "Unknown Vehicle"}
-                    </h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      {scan.customer || "No match found"} • Confidence: {scan.confidence}%
-                    </p>
+                  <div className="flex items-center gap-3">
+                    <Badge variant={scan.scanType === "entry" ? "default" : "secondary"}>
+                      {scan.scanType}
+                    </Badge>
+                    {scan.matchedAutomatically ? (
+                      <CheckCircle className="h-5 w-5 text-green-600" />
+                    ) : (
+                      <Button size="sm" variant="outline">Match Manually</Button>
+                    )}
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
-                  <Badge variant={scan.scanType === "entry" ? "default" : "secondary"}>
-                    {scan.scanType}
-                  </Badge>
-                  {scan.matched ? (
-                    <CheckCircle className="h-5 w-5 text-green-600" />
-                  ) : (
-                    <Button size="sm" variant="outline">Match Manually</Button>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -117,33 +192,47 @@ export default function LicensePlateRecognition() {
           <CardTitle>Vehicle Entry Log</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-3">
-            {mockEntryLogs.map((log) => (
-              <div key={log.id} className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-800 rounded-lg">
-                <div>
-                  <h3 className="font-semibold text-gray-900 dark:text-white">{log.vehicle} ({log.plate})</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">{log.customer}</p>
+          {loadingLogs ? (
+            <div className="text-center py-8">
+              <p className="text-gray-600 dark:text-gray-400">Loading entry logs...</p>
+            </div>
+          ) : entryLogs.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-gray-600 dark:text-gray-400">No entry logs recorded yet.</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {entryLogs.map((log: any) => (
+                <div key={log.id} className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-800 rounded-lg" data-testid={`entry-log-${log.id}`}>
+                  <div>
+                    <h3 className="font-semibold text-gray-900 dark:text-white">
+                      {log.vehicleMake && log.vehicleModel 
+                        ? `${log.vehicleMake} ${log.vehicleModel} (${log.plateNumber})` 
+                        : log.plateNumber}
+                    </h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">{log.customerName || "Unknown"}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      Entry: {log.entryTime ? new Date(log.entryTime).toLocaleTimeString() : ""}
+                    </p>
+                    {log.exitTime ? (
+                      <>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          Exit: {new Date(log.exitTime).toLocaleTimeString()}
+                        </p>
+                        <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                          Duration: {log.duration} min
+                        </p>
+                      </>
+                    ) : (
+                      <Badge variant="secondary">In Progress</Badge>
+                    )}
+                  </div>
                 </div>
-                <div className="text-right">
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Entry: {new Date(log.entry).toLocaleTimeString()}
-                  </p>
-                  {log.exit ? (
-                    <>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        Exit: {new Date(log.exit).toLocaleTimeString()}
-                      </p>
-                      <p className="text-sm font-semibold text-gray-900 dark:text-white">
-                        Duration: {log.duration} min
-                      </p>
-                    </>
-                  ) : (
-                    <Badge variant="secondary">In Progress</Badge>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

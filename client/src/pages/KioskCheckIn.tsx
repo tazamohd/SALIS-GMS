@@ -1,4 +1,7 @@
 import { useState } from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,13 +9,71 @@ import { TabletSmartphone, User, Car, Calendar, CheckCircle } from "lucide-react
 
 export default function KioskCheckIn() {
   const [checkInStep, setCheckInStep] = useState<"idle" | "phone" | "vehicle" | "confirm" | "complete">("idle");
+  const { toast } = useToast();
 
-  const mockSessions = [
-    { id: "1", customer: "John Smith", vehicle: "2020 Honda Civic", checkInTime: "2024-10-26T09:00:00Z", appointment: "Yes" },
-    { id: "2", customer: "Sarah Johnson", vehicle: "2019 Toyota Camry", checkInTime: "2024-10-26T10:30:00Z", appointment: "No" },
-  ];
+  // Fetch kiosk check-in sessions
+  const { data: sessions = [], isLoading } = useQuery({
+    queryKey: ["/api/kiosk/sessions"],
+  });
 
-  const stats = { todayCheckIns: 12, withAppointment: 8, walkIns: 4, avgCheckInTime: 45 };
+  // Complete check-in mutation
+  const checkInMutation = useMutation({
+    mutationFn: async (checkInData: {
+      customerId: string;
+      vehicleId: string;
+      appointmentId?: string;
+      phoneNumber: string;
+      checkInMethod: string;
+    }) => {
+      return await apiRequest("/api/kiosk/checkin", {
+        method: "POST",
+        body: JSON.stringify(checkInData),
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/kiosk/sessions"] });
+      toast({
+        title: "Success",
+        description: "Check-in completed successfully",
+      });
+      setCheckInStep("complete");
+    },
+    onError: (error: any) => {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message || "Failed to complete check-in",
+      });
+    },
+  });
+
+  // Calculate stats
+  const todayStart = new Date();
+  todayStart.setHours(0, 0, 0, 0);
+  const todaySessions = sessions.filter((s: any) => new Date(s.checkInTime || s.createdAt) >= todayStart);
+  
+  // Calculate average check-in duration if available
+  const sessionsWithDuration = todaySessions.filter((s: any) => s.checkInDuration);
+  const avgDuration = sessionsWithDuration.length > 0
+    ? Math.round(sessionsWithDuration.reduce((sum: number, s: any) => sum + (Number(s.checkInDuration) || 0), 0) / sessionsWithDuration.length)
+    : (todaySessions.length > 0 ? 45 : 0); // Default to 45 if no duration data but sessions exist
+  
+  const stats = {
+    todayCheckIns: todaySessions.length || 0,
+    withAppointment: todaySessions.filter((s: any) => s.appointmentId).length || 0,
+    walkIns: todaySessions.filter((s: any) => !s.appointmentId).length || 0,
+    avgCheckInTime: avgDuration,
+  };
+
+  // Simulate check-in for demo
+  const simulateCheckIn = () => {
+    checkInMutation.mutate({
+      customerId: "demo-customer",
+      vehicleId: "demo-vehicle",
+      phoneNumber: "(555) 123-4567",
+      checkInMethod: "kiosk",
+    });
+  };
 
   return (
     <div className="p-8 space-y-6">
@@ -31,7 +92,7 @@ export default function KioskCheckIn() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Today's Check-Ins</p>
-                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">{stats.todayCheckIns}</h3>
+                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="stat-today-checkins">{stats.todayCheckIns}</h3>
               </div>
               <TabletSmartphone className="h-12 w-12 text-blue-600" />
             </div>
@@ -42,7 +103,7 @@ export default function KioskCheckIn() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400">With Appointment</p>
-                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">{stats.withAppointment}</h3>
+                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="stat-with-appointment">{stats.withAppointment}</h3>
               </div>
               <Calendar className="h-12 w-12 text-green-600" />
             </div>
@@ -53,7 +114,7 @@ export default function KioskCheckIn() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Walk-Ins</p>
-                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">{stats.walkIns}</h3>
+                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="stat-walk-ins">{stats.walkIns}</h3>
               </div>
               <User className="h-12 w-12 text-purple-600" />
             </div>
@@ -64,7 +125,7 @@ export default function KioskCheckIn() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Avg Time (sec)</p>
-                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">{stats.avgCheckInTime}</h3>
+                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="stat-avg-time">{stats.avgCheckInTime}</h3>
               </div>
               <CheckCircle className="h-12 w-12 text-yellow-600" />
             </div>
@@ -119,7 +180,12 @@ export default function KioskCheckIn() {
                   <p className="font-semibold text-gray-900 dark:text-white">2020 Honda Civic</p>
                   <p className="text-sm text-gray-600 dark:text-gray-400">Oil Change & Inspection</p>
                 </div>
-                <Button size="lg" onClick={() => setCheckInStep("complete")} className="w-full">
+                <Button 
+                  size="lg" 
+                  onClick={simulateCheckIn} 
+                  disabled={checkInMutation.isPending}
+                  className="w-full"
+                >
                   Confirm Check-In
                 </Button>
               </div>
@@ -143,20 +209,36 @@ export default function KioskCheckIn() {
           <CardTitle>Recent Check-Ins</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-3">
-            {mockSessions.map((session) => (
-              <div key={session.id} className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-800 rounded-lg">
-                <div>
-                  <h3 className="font-semibold text-gray-900 dark:text-white">{session.customer}</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">{session.vehicle}</p>
+          {isLoading ? (
+            <div className="text-center py-8">
+              <p className="text-gray-600 dark:text-gray-400">Loading check-ins...</p>
+            </div>
+          ) : sessions.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-gray-600 dark:text-gray-400">No check-ins recorded yet.</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {sessions.map((session: any) => (
+                <div key={session.id} className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-800 rounded-lg" data-testid={`session-${session.id}`}>
+                  <div>
+                    <h3 className="font-semibold text-gray-900 dark:text-white">{session.customerName || "Unknown Customer"}</h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      {session.vehicleMake} {session.vehicleModel} - {session.vehiclePlate}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm font-medium text-gray-900 dark:text-white">
+                      {session.appointmentId ? "Appointment" : "Walk-In"}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      {session.checkInTime ? new Date(session.checkInTime).toLocaleTimeString() : ""}
+                    </p>
+                  </div>
                 </div>
-                <div className="text-right">
-                  <p className="text-sm font-medium text-gray-900 dark:text-white">{session.appointment === "Yes" ? "Appointment" : "Walk-In"}</p>
-                  <p className="text-xs text-gray-500">{new Date(session.checkInTime).toLocaleTimeString()}</p>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

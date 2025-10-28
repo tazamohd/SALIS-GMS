@@ -1,22 +1,108 @@
+import { useState } from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Monitor, Play, Pause, Plus } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function DigitalSignage() {
-  const mockDisplays = [
-    { id: "1", name: "Waiting Room Main", location: "Waiting Room", displayType: "mixed", isActive: true, contentCount: 5 },
-    { id: "2", name: "Service Bay Status", location: "Service Area", displayType: "service_status", isActive: true, contentCount: 3 },
-    { id: "3", name: "Entrance Promotions", location: "Entrance", displayType: "promotions", isActive: false, contentCount: 2 },
-  ];
+  const { toast } = useToast();
+  const [openDisplayDialog, setOpenDisplayDialog] = useState(false);
 
-  const mockContent = [
-    { id: "1", displayName: "Waiting Room Main", contentType: "promotion", title: "20% Off Oil Changes", duration: 10, status: "active" },
-    { id: "2", displayName: "Service Bay Status", contentType: "job_status", title: "Current Service Jobs", duration: 15, status: "active" },
-    { id: "3", displayName: "Waiting Room Main", contentType: "announcement", title: "Free WiFi Available", duration: 8, status: "active" },
-  ];
+  // Fetch displays
+  const { data: displays = [], isLoading: loadingDisplays } = useQuery({
+    queryKey: ["/api/signage/displays"],
+  });
 
-  const stats = { totalDisplays: 3, activeDisplays: 2, totalContent: 10, activeContent: 8 };
+  // Fetch content
+  const { data: content = [], isLoading: loadingContent } = useQuery({
+    queryKey: ["/api/signage/content"],
+  });
+
+  // Create display mutation
+  const createDisplayMutation = useMutation({
+    mutationFn: async (displayData: {
+      name: string;
+      location: string;
+      displayType: string;
+      resolution: string;
+    }) => {
+      return await apiRequest("/api/signage/displays", {
+        method: "POST",
+        body: JSON.stringify(displayData),
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/signage/displays"] });
+      toast({
+        title: "Success",
+        description: "Display created successfully",
+      });
+      setOpenDisplayDialog(false);
+    },
+    onError: (error: any) => {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message || "Failed to create display",
+      });
+    },
+  });
+
+  // Create content mutation
+  const createContentMutation = useMutation({
+    mutationFn: async (contentData: {
+      displayId: string;
+      contentType: string;
+      title: string;
+      contentUrl: string;
+      duration: number;
+    }) => {
+      return await apiRequest("/api/signage/content", {
+        method: "POST",
+        body: JSON.stringify(contentData),
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/signage/content"] });
+      toast({
+        title: "Success",
+        description: "Content created successfully",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message || "Failed to create content",
+      });
+    },
+  });
+
+  // Calculate stats
+  const stats = {
+    totalDisplays: displays.length || 0,
+    activeDisplays: displays.filter((d: any) => d.isActive).length || 0,
+    totalContent: content.length || 0,
+    activeContent: content.filter((c: any) => c.isActive).length || 0,
+  };
+
+  const handleCreateDisplay = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    createDisplayMutation.mutate({
+      name: formData.get("name") as string,
+      location: formData.get("location") as string,
+      displayType: formData.get("displayType") as string,
+      resolution: formData.get("resolution") as string,
+    });
+  };
 
   return (
     <div className="p-8 space-y-6">
@@ -27,10 +113,49 @@ export default function DigitalSignage() {
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mt-1">Manage waiting room displays and content</p>
         </div>
-        <Button data-testid="button-add-display">
-          <Plus className="h-4 w-4 mr-2" />
-          Add Display
-        </Button>
+        <Dialog open={openDisplayDialog} onOpenChange={setOpenDisplayDialog}>
+          <DialogTrigger asChild>
+            <Button data-testid="button-add-display">
+              <Plus className="h-4 w-4 mr-2" />
+              Add Display
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Add New Display</DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleCreateDisplay} className="space-y-4">
+              <div>
+                <Label htmlFor="name">Display Name</Label>
+                <Input id="name" name="name" required placeholder="Waiting Room Main" />
+              </div>
+              <div>
+                <Label htmlFor="location">Location</Label>
+                <Input id="location" name="location" required placeholder="Waiting Room" />
+              </div>
+              <div>
+                <Label htmlFor="displayType">Display Type</Label>
+                <Select name="displayType" required>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="mixed">Mixed Content</SelectItem>
+                    <SelectItem value="service_status">Service Status</SelectItem>
+                    <SelectItem value="promotions">Promotions</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="resolution">Resolution</Label>
+                <Input id="resolution" name="resolution" required placeholder="1920x1080" />
+              </div>
+              <Button type="submit" disabled={createDisplayMutation.isPending} className="w-full">
+                Create Display
+              </Button>
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -39,7 +164,7 @@ export default function DigitalSignage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Total Displays</p>
-                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">{stats.totalDisplays}</h3>
+                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="stat-total-displays">{stats.totalDisplays}</h3>
               </div>
               <Monitor className="h-12 w-12 text-blue-600" />
             </div>
@@ -50,7 +175,7 @@ export default function DigitalSignage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Active</p>
-                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">{stats.activeDisplays}</h3>
+                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="stat-active-displays">{stats.activeDisplays}</h3>
               </div>
               <Play className="h-12 w-12 text-green-600" />
             </div>
@@ -61,7 +186,7 @@ export default function DigitalSignage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Total Content</p>
-                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">{stats.totalContent}</h3>
+                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="stat-total-content">{stats.totalContent}</h3>
               </div>
               <Monitor className="h-12 w-12 text-purple-600" />
             </div>
@@ -72,7 +197,7 @@ export default function DigitalSignage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Active Content</p>
-                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">{stats.activeContent}</h3>
+                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="stat-active-content">{stats.activeContent}</h3>
               </div>
               <Play className="h-12 w-12 text-yellow-600" />
             </div>
@@ -85,24 +210,34 @@ export default function DigitalSignage() {
           <CardTitle>Displays</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-3">
-            {mockDisplays.map((display) => (
-              <div key={display.id} className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-800 rounded-lg" data-testid={`display-${display.id}`}>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-gray-900 dark:text-white">{display.name}</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    {display.location} • {display.contentCount} content items
-                  </p>
+          {loadingDisplays ? (
+            <div className="text-center py-8">
+              <p className="text-gray-600 dark:text-gray-400">Loading displays...</p>
+            </div>
+          ) : displays.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-gray-600 dark:text-gray-400">No displays configured yet. Add a display to get started.</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {displays.map((display: any) => (
+                <div key={display.id} className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-800 rounded-lg" data-testid={`display-${display.id}`}>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-gray-900 dark:text-white">{display.displayName}</h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      {display.location}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Badge>{display.displayType?.replace("_", " ")}</Badge>
+                    <Badge variant={display.isActive ? "default" : "secondary"}>
+                      {display.isActive ? "Active" : "Inactive"}
+                    </Badge>
+                  </div>
                 </div>
-                <div className="flex items-center gap-3">
-                  <Badge>{display.displayType.replace("_", " ")}</Badge>
-                  <Badge variant={display.isActive ? "default" : "secondary"}>
-                    {display.isActive ? "Active" : "Inactive"}
-                  </Badge>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -111,19 +246,29 @@ export default function DigitalSignage() {
           <CardTitle>Content</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-3">
-            {mockContent.map((content) => (
-              <div key={content.id} className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-800 rounded-lg">
-                <div className="flex-1">
-                  <h3 className="font-semibold text-gray-900 dark:text-white">{content.title}</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    {content.displayName} • {content.duration}s duration
-                  </p>
+          {loadingContent ? (
+            <div className="text-center py-8">
+              <p className="text-gray-600 dark:text-gray-400">Loading content...</p>
+            </div>
+          ) : content.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-gray-600 dark:text-gray-400">No content created yet. Add content to your displays.</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {content.map((item: any) => (
+                <div key={item.id} className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-800 rounded-lg" data-testid={`content-${item.id}`}>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-gray-900 dark:text-white">{item.title || "Untitled Content"}</h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      {item.displayName} • {item.duration}s duration
+                    </p>
+                  </div>
+                  <Badge>{item.contentType?.replace("_", " ")}</Badge>
                 </div>
-                <Badge>{content.contentType.replace("_", " ")}</Badge>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

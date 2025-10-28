@@ -11501,68 +11501,115 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // ========================================
-  // PHASE 7: ADVANCED HARDWARE
+  // PHASE 7: ADVANCED HARDWARE (GET Routes)
   // ========================================
 
   // Barcode Scanner - Module 90
-  app.get("/api/barcode-scans", isAuthenticated, async (req, res) => {
-    res.json([
-      { id: "1", type: "part_inventory", barcodeData: "PN-12345", itemName: "Oil Filter", location: "Warehouse" },
-    ]);
-  });
-
-  app.post("/api/barcode-scans", isAuthenticated, async (req, res) => {
-    res.status(201).json({ id: "new", ...req.body, timestamp: new Date().toISOString() });
+  app.get("/api/barcode/scans", isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      const { scanType } = req.query;
+      const scans = await phase7Service.getBarcodeScanHistory(garageId, scanType as string);
+      res.json(scans);
+    } catch (error) {
+      console.error("Error fetching barcode scans:", error);
+      res.status(500).json({ message: "Failed to fetch barcode scans" });
+    }
   });
 
   // Digital Signage - Module 91
-  app.get("/api/signage/displays", isAuthenticated, async (req, res) => {
-    res.json([
-      { id: "1", name: "Waiting Room Main", location: "Waiting Room", displayType: "mixed", isActive: true },
-    ]);
+  app.get("/api/signage/displays", isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      const displays = await phase7Service.getSignageDisplays(garageId);
+      res.json(displays);
+    } catch (error) {
+      console.error("Error fetching signage displays:", error);
+      res.status(500).json({ message: "Failed to fetch signage displays" });
+    }
   });
 
-  app.get("/api/signage/content", isAuthenticated, async (req, res) => {
-    res.json([
-      { id: "1", displayName: "Waiting Room Main", contentType: "promotion", title: "20% Off Oil Changes", duration: 10 },
-    ]);
+  app.get("/api/signage/content", isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      const displays = await phase7Service.getSignageDisplays(garageId);
+      
+      // Fetch content for all displays
+      const allContent = [];
+      for (const display of displays) {
+        const content = await phase7Service.getActiveContentForDisplay(display.id);
+        allContent.push(...content.map((c: any) => ({ ...c, displayName: display.displayName })));
+      }
+      
+      res.json(allContent);
+    } catch (error) {
+      console.error("Error fetching signage content:", error);
+      res.status(500).json({ message: "Failed to fetch signage content" });
+    }
   });
 
   // Kiosk Check-In - Module 92
-  app.get("/api/kiosk/sessions", isAuthenticated, async (req, res) => {
-    res.json([
-      { id: "1", customer: "John Smith", vehicle: "2020 Honda Civic", checkInTime: "2024-10-26T09:00:00Z" },
-    ]);
-  });
-
-  app.post("/api/kiosk/check-in", isAuthenticated, async (req, res) => {
-    res.status(201).json({ id: "new", ...req.body, checkInTime: new Date().toISOString() });
+  app.get("/api/kiosk/sessions", isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      const { limit } = req.query;
+      const checkIns = await phase7Service.getKioskCheckIns(garageId, limit ? parseInt(limit) : 50);
+      res.json(checkIns);
+    } catch (error) {
+      console.error("Error fetching kiosk sessions:", error);
+      res.status(500).json({ message: "Failed to fetch kiosk sessions" });
+    }
   });
 
   // Security Cameras - Module 93
-  app.get("/api/security-cameras", isAuthenticated, async (req, res) => {
-    res.json([
-      { id: "1", name: "Service Bay 1", location: "Bay 1", type: "PTZ", isActive: true, recordingEnabled: true },
-    ]);
+  app.get("/api/cameras/cameras", isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      const cameras = await phase7Service.getSecurityCameras(garageId);
+      res.json(cameras);
+    } catch (error) {
+      console.error("Error fetching security cameras:", error);
+      res.status(500).json({ message: "Failed to fetch security cameras" });
+    }
   });
 
-  app.get("/api/security-cameras/recordings", isAuthenticated, async (req, res) => {
-    res.json([
-      { id: "1", cameraName: "Service Bay 1", eventType: "motion", fileSize: 450 },
-    ]);
+  app.get("/api/cameras/recordings", isAuthenticated, async (req: any, res) => {
+    try {
+      const { cameraId, limit } = req.query;
+      if (!cameraId) {
+        return res.status(400).json({ message: "cameraId query parameter is required" });
+      }
+      const recordings = await phase7Service.getCameraRecordings(cameraId as string, limit ? parseInt(limit as string) : 50);
+      res.json(recordings);
+    } catch (error) {
+      console.error("Error fetching camera recordings:", error);
+      res.status(500).json({ message: "Failed to fetch camera recordings" });
+    }
   });
 
   // License Plate Recognition - Module 94
-  app.get("/api/license-plate-scans", isAuthenticated, async (req, res) => {
-    res.json([
-      { id: "1", plateNumber: "ABC 1234", vehicle: "2020 Honda Civic", customer: "John Smith", confidence: 98.5, matched: true },
-    ]);
+  app.get("/api/license-plate/scans", isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      const { limit } = req.query;
+      const scans = await phase7Service.getLicensePlateScans(garageId, limit ? parseInt(limit) : 100);
+      res.json(scans);
+    } catch (error) {
+      console.error("Error fetching license plate scans:", error);
+      res.status(500).json({ message: "Failed to fetch license plate scans" });
+    }
   });
 
-  app.get("/api/vehicle-entry-logs", isAuthenticated, async (req, res) => {
-    res.json([
-      { id: "1", vehicle: "2020 Honda Civic", plate: "ABC 1234", customer: "John Smith", entry: "2024-10-26T09:00:00Z", duration: 390 },
-    ]);
+  app.get("/api/license-plate/entry-logs", isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      const { vehicleId } = req.query;
+      const logs = await phase7Service.getVehicleEntryLogs(garageId, vehicleId as string);
+      res.json(logs);
+    } catch (error) {
+      console.error("Error fetching vehicle entry logs:", error);
+      res.status(500).json({ message: "Failed to fetch vehicle entry logs" });
+    }
   });
 
   // ========================================
@@ -12927,6 +12974,125 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching entry logs:", error);
       res.status(500).json({ message: "Failed to fetch entry logs" });
+    }
+  });
+
+  // ==========================================
+  // PHASE 7: ROUTE ALIASES FOR FRONTEND
+  // ==========================================
+
+  // Barcode/QR Scanner - POST alias
+  app.post('/api/barcode/scan', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      const userId = req.user.id;
+      
+      const { barcodeData, scanType, itemType, itemId } = req.body;
+      
+      const scanData = {
+        garageId,
+        scanType,
+        barcodeData,
+        partId: scanType === 'part_inventory' ? itemId : undefined,
+        vehicleId: scanType === 'vehicle_checkin' ? itemId : undefined,
+        toolId: scanType === 'tool_tracking' ? itemId : undefined,
+        scannedBy: userId,
+        location: req.body.location,
+        associatedAction: req.body.associatedAction,
+      };
+      const scan = await phase7Service.recordBarcodeScan(scanData);
+      res.status(201).json(scan);
+    } catch (error) {
+      console.error("Error recording barcode scan:", error);
+      res.status(500).json({ message: "Failed to record barcode scan" });
+    }
+  });
+
+  // Kiosk Check-In - POST alias
+  app.post('/api/kiosk/checkin', isAuthenticated, async (req, res) => {
+    try {
+      const { customerId, vehicleId, appointmentId, phoneNumber, checkInMethod, sessionId } = req.body;
+      
+      const checkInData = {
+        sessionId: sessionId || 'temp-session',
+        customerId,
+        vehicleId,
+        appointmentId,
+        serviceRequested: { method: checkInMethod, phone: phoneNumber },
+      };
+      const checkIn = await phase7Service.completeKioskCheckIn(checkInData);
+      res.status(201).json(checkIn);
+    } catch (error) {
+      console.error("Error completing kiosk check-in:", error);
+      res.status(500).json({ message: "Failed to complete kiosk check-in" });
+    }
+  });
+
+  // Security Cameras - POST aliases
+  app.post('/api/cameras/cameras', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      
+      const { name, location, cameraType, ipAddress, streamUrl, resolution } = req.body;
+      
+      const cameraData = {
+        garageId,
+        cameraName: name,
+        location,
+        cameraType,
+        streamUrl,
+        recordingEnabled: true,
+        motionDetection: false,
+      };
+      const camera = await phase7Service.createSecurityCamera(cameraData);
+      res.status(201).json(camera);
+    } catch (error) {
+      console.error("Error creating security camera:", error);
+      res.status(500).json({ message: "Failed to create security camera" });
+    }
+  });
+
+  app.post('/api/cameras/recordings', isAuthenticated, async (req, res) => {
+    try {
+      const { cameraId, startTime, endTime, eventType, fileSize, vehicleId } = req.body;
+      
+      const recordingData = {
+        cameraId,
+        recordingStart: new Date(startTime),
+        recordingEnd: new Date(endTime),
+        eventType,
+        fileSize,
+        vehicleId,
+      };
+      const recording = await phase7Service.createCameraRecording(recordingData);
+      res.status(201).json(recording);
+    } catch (error) {
+      console.error("Error creating camera recording:", error);
+      res.status(500).json({ message: "Failed to create camera recording" });
+    }
+  });
+
+  // License Plate Recognition - POST alias
+  app.post('/api/license-plate/scan', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      
+      const { plateNumber, confidence, scanType, vehicleId, location } = req.body;
+      
+      const scanData = {
+        garageId,
+        plateNumber,
+        confidence,
+        vehicleId,
+        scanType,
+        location,
+        matchedAutomatically: confidence && confidence > 90,
+      };
+      const scan = await phase7Service.recordLicensePlateScan(scanData);
+      res.status(201).json(scan);
+    } catch (error) {
+      console.error("Error recording license plate scan:", error);
+      res.status(500).json({ message: "Failed to record license plate scan" });
     }
   });
 
