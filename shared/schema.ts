@@ -5275,3 +5275,50 @@ export const insertVehicleEntryLogSchema = createInsertSchema(vehicleEntryLogs).
   id: true,
   createdAt: true,
 });
+
+// ========================================
+// SAUDI ARABIA TAX & COMPLIANCE
+// ========================================
+
+// Saudi VAT & ZATCA E-Invoicing Compliance
+export const saudiTaxCompliance = pgTable("saudi_tax_compliance", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull().unique(),
+  
+  // VAT Registration
+  vatRegistrationNumber: varchar("vat_registration_number", { length: 15 }), // TRN (Tax Registration Number) - 15 digits
+  vatRegistrationDate: timestamp("vat_registration_date"),
+  vatRate: decimal("vat_rate", { precision: 5, scale: 2 }).default("15.00"), // Saudi VAT is 15%
+  isVatRegistered: boolean("is_vat_registered").default(false),
+  
+  // ZATCA E-Invoicing Compliance (Fatoora)
+  zatcaCertificateId: varchar("zatca_certificate_id", { length: 100 }),
+  zatcaComplianceStatus: varchar("zatca_compliance_status", { length: 50 }).default("pending"), // pending, compliant, non_compliant
+  zatcaLastSync: timestamp("zatca_last_sync"),
+  
+  // Zakat (Islamic Tax) - Optional for businesses
+  zakatEnabled: boolean("zakat_enabled").default(false),
+  zakatRate: decimal("zakat_rate", { precision: 5, scale: 2 }).default("2.50"), // Typically 2.5% on wealth
+  
+  // Hijri Calendar Support
+  useHijriCalendar: boolean("use_hijri_calendar").default(false),
+  
+  // Company Details for Tax Invoices
+  companyNameArabic: varchar("company_name_arabic", { length: 255 }),
+  commercialRegistrationNumber: varchar("commercial_registration_number", { length: 50 }),
+  addressLine1Arabic: varchar("address_line1_arabic", { length: 255 }),
+  addressLine2Arabic: varchar("address_line2_arabic", { length: 255 }),
+  cityArabic: varchar("city_arabic", { length: 100 }),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Types and schemas for Saudi compliance
+export type SaudiTaxCompliance = typeof saudiTaxCompliance.$inferSelect;
+export type InsertSaudiTaxCompliance = typeof saudiTaxCompliance.$inferInsert;
+export const insertSaudiTaxComplianceSchema = createInsertSchema(saudiTaxCompliance).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
