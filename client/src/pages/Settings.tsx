@@ -21,10 +21,7 @@ export default function Settings() {
   });
 
   const updateSettingsMutation = useMutation({
-    mutationFn: (data: Partial<UserSettings>) => apiRequest('/api/settings', {
-      method: 'PATCH',
-      body: JSON.stringify(data),
-    }),
+    mutationFn: (data: Partial<UserSettings>) => apiRequest('PATCH', '/api/settings', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/settings'] });
       toast({ title: "Settings Updated", description: "Your preferences have been saved" });
