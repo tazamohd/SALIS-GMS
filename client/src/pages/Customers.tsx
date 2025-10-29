@@ -367,7 +367,7 @@ export function Customers() {
                                   {note.noteType}
                                 </span>
                                 <span className="text-xs text-gray-900 dark:text-white/60">
-                                  {new Date(note.createdAt).toLocaleDateString()}
+                                  {note.createdAt ? new Date(note.createdAt).toLocaleDateString() : 'N/A'}
                                 </span>
                               </div>
                             </div>

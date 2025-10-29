@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { TaskDetailsDialog } from "@/components/TaskDetailsDialog";
 import { useAuth } from "@/hooks/useAuth";
-import type { JobCard } from "@shared/schema";
+import type { JobCard, User, Invoice, SparePart } from "@shared/schema";
 
 export function Dashboard() {
   const { t } = useTranslation();
@@ -24,6 +24,26 @@ export function Dashboard() {
   
   const { data: jobCards, isLoading } = useQuery<JobCard[]>({
     queryKey: ['/api/job-cards'],
+    retry: false,
+  });
+
+  const { data: customers = [] } = useQuery<User[]>({
+    queryKey: ['/api/customers'],
+    retry: false,
+  });
+
+  const { data: invoices = [] } = useQuery<Invoice[]>({
+    queryKey: ['/api/invoices'],
+    retry: false,
+  });
+
+  const { data: spareParts = [] } = useQuery<SparePart[]>({
+    queryKey: ['/api/spare-parts'],
+    retry: false,
+  });
+
+  const { data: sparePartInventories = [] } = useQuery<any[]>({
+    queryKey: ['/api/spare-part-inventories'],
     retry: false,
   });
 
@@ -90,15 +110,26 @@ export function Dashboard() {
     return id.substring(0, 8).toUpperCase();
   };
 
+  // Calculate real metrics from backend data
+  const totalRevenue = invoices
+    .filter(inv => inv.status === 'paid')
+    .reduce((sum, inv) => sum + (parseFloat(inv.totalAmount) || 0), 0);
+  
+  const activeCustomersCount = customers.filter(c => c.userType === 'customer').length;
+  
+  const inStockParts = sparePartInventories.filter(inv => (inv.stockQuantity || 0) > 0).length;
+  const totalInventoryItems = sparePartInventories.length || 1;
+  const inventoryPercentage = Math.round((inStockParts / totalInventoryItems) * 100);
+
   // Role-based metrics
   const roleBasedMetrics = () => {
-    const role = user?.role || 'technician';
+    const role = (user as any)?.role || (user as User | undefined)?.userType || 'technician';
     
     if (role === 'admin' || role === 'manager') {
       return [
-        { label: 'Total Revenue', value: '$12,450', icon: DollarSign, color: 'text-green-600 dark:text-green-400' },
-        { label: 'Active Customers', value: '156', icon: Users, color: 'text-blue-600 dark:text-blue-400' },
-        { label: 'Parts Inventory', value: '89%', icon: Package, color: 'text-purple-600 dark:text-purple-400' },
+        { label: 'Total Revenue', value: `$${totalRevenue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, icon: DollarSign, color: 'text-green-600 dark:text-green-400' },
+        { label: 'Active Customers', value: activeCustomersCount.toString(), icon: Users, color: 'text-blue-600 dark:text-blue-400' },
+        { label: 'Parts Inventory', value: `${inventoryPercentage}%`, icon: Package, color: 'text-purple-600 dark:text-purple-400' },
       ];
     } else {
       return [
@@ -114,7 +145,7 @@ export function Dashboard() {
       {/* Compact Header */}
       <div className="mb-6">
         <h1 className="font-montserrat font-semibold text-2xl text-gray-900 dark:text-white">{t('dashboard.title')}</h1>
-        <p className="font-poppins text-sm text-gray-600 dark:text-gray-400 mt-1">{t('common.welcome')} {user?.name}</p>
+        <p className="font-poppins text-sm text-gray-600 dark:text-gray-400 mt-1">{t('common.welcome')} {(user as User | undefined)?.fullName || (user as any)?.name}</p>
       </div>
 
       {/* Role-based Quick Metrics */}
@@ -175,28 +206,31 @@ export function Dashboard() {
         </Card>
       </div>
 
-      {/* Compact Chart Section */}
-      <Card className="border border-gray-200 dark:border-salis-gray-dark mb-6 bg-white dark:bg-salis-black" data-testid="card-chart">
+      {/* Task Summary Section */}
+      <Card className="border border-gray-200 dark:border-salis-gray-dark mb-6 bg-white dark:bg-salis-black" data-testid="card-summary">
         <CardContent className="p-5">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">{t('dashboard.totalTasks')}</h2>
-            <Badge variant="outline" className="text-xs">Last 7 days</Badge>
+            <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">Task Overview</h2>
+            <Badge variant="outline" className="text-xs">All Time</Badge>
           </div>
           
-          <div className="h-40 flex items-end justify-between gap-3">
-            {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((day, i) => {
-              const heights = [60, 40, 80, 70, 50, 65, 75];
-              const colors = ['bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-orange-500', 'bg-pink-500', 'bg-indigo-500', 'bg-teal-500'];
-              return (
-                <div key={i} className="flex-1 flex flex-col items-center gap-2 group">
-                  <div 
-                    className={`w-full ${colors[i]} rounded-t hover:opacity-80 transition-all cursor-pointer`}
-                    style={{ height: `${heights[i]}%` }}
-                  ></div>
-                  <span className="text-xs font-poppins text-gray-600 dark:text-gray-400">{day}</span>
-                </div>
-              );
-            })}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="text-center">
+              <p className="text-3xl font-montserrat font-bold text-gray-900 dark:text-white">{jobCards?.length || 0}</p>
+              <p className="text-xs font-poppins text-gray-600 dark:text-gray-400 mt-1">Total Jobs</p>
+            </div>
+            <div className="text-center">
+              <p className="text-3xl font-montserrat font-bold text-gray-900 dark:text-white">{invoices.length}</p>
+              <p className="text-xs font-poppins text-gray-600 dark:text-gray-400 mt-1">Total Invoices</p>
+            </div>
+            <div className="text-center">
+              <p className="text-3xl font-montserrat font-bold text-gray-900 dark:text-white">{activeCustomersCount}</p>
+              <p className="text-xs font-poppins text-gray-600 dark:text-gray-400 mt-1">Customers</p>
+            </div>
+            <div className="text-center">
+              <p className="text-3xl font-montserrat font-bold text-gray-900 dark:text-white">{spareParts.length}</p>
+              <p className="text-xs font-poppins text-gray-600 dark:text-gray-400 mt-1">Parts in Catalog</p>
+            </div>
           </div>
         </CardContent>
       </Card>
