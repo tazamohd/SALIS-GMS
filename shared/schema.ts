@@ -5322,3 +5322,628 @@ export const insertSaudiTaxComplianceSchema = createInsertSchema(saudiTaxComplia
   createdAt: true,
   updatedAt: true,
 });
+
+// ========================================
+// EMERGING TECHNOLOGIES (12 FEATURES)
+// ========================================
+
+// 1. BLOCKCHAIN VEHICLE HISTORY
+export const blockchainRecords = pgTable("blockchain_records", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  vehicleId: uuid("vehicle_id").references(() => vehicles.id).notNull(),
+  recordType: varchar("record_type", { length: 50 }).notNull(), // service, repair, inspection, ownership_transfer
+  transactionHash: varchar("transaction_hash", { length: 66 }).notNull().unique(), // Blockchain transaction hash
+  blockNumber: integer("block_number"),
+  blockchainNetwork: varchar("blockchain_network", { length: 50 }).default("ethereum"), // ethereum, polygon, etc.
+  recordData: jsonb("record_data").notNull(), // Service details, parts used, etc.
+  previousHash: varchar("previous_hash", { length: 66 }), // Link to previous record
+  timestamp: timestamp("timestamp").notNull(),
+  verificationStatus: varchar("verification_status", { length: 20 }).default("verified"), // verified, pending, failed
+  smartContractAddress: varchar("smart_contract_address", { length: 42 }),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// 2. AUGMENTED REALITY REPAIR GUIDES
+export const arRepairGuides = pgTable("ar_repair_guides", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  title: varchar("title", { length: 255 }).notNull(),
+  vehicleMake: varchar("vehicle_make", { length: 100 }),
+  vehicleModel: varchar("vehicle_model", { length: 100 }),
+  repairCategory: varchar("repair_category", { length: 100 }), // engine, transmission, brakes, etc.
+  difficultyLevel: varchar("difficulty_level", { length: 20 }).default("intermediate"), // beginner, intermediate, expert
+  estimatedDuration: integer("estimated_duration"), // in minutes
+  arModelUrl: varchar("ar_model_url", { length: 500 }), // 3D model for AR overlay
+  steps: jsonb("steps"), // Step-by-step instructions with AR positions
+  requiredTools: jsonb("required_tools"),
+  safetyWarnings: text("safety_warnings"),
+  viewCount: integer("view_count").default(0),
+  averageRating: decimal("average_rating", { precision: 3, scale: 2 }),
+  isPublished: boolean("is_published").default(false),
+  createdBy: varchar("created_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const arGuideSessions = pgTable("ar_guide_sessions", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  guideId: uuid("guide_id").references(() => arRepairGuides.id).notNull(),
+  technicianId: varchar("technician_id").references(() => users.id).notNull(),
+  jobCardId: uuid("job_card_id").references(() => jobCards.id),
+  startedAt: timestamp("started_at").defaultNow(),
+  completedAt: timestamp("completed_at"),
+  duration: integer("duration"), // in seconds
+  stepsCompleted: integer("steps_completed").default(0),
+  accuracy: decimal("accuracy", { precision: 5, scale: 2 }), // percentage
+  rating: integer("rating"), // 1-5
+  feedback: text("feedback"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// 3. IOT SENSOR INTEGRATION
+export const iotSensors = pgTable("iot_sensors", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  vehicleId: uuid("vehicle_id").references(() => vehicles.id).notNull(),
+  sensorType: varchar("sensor_type", { length: 50 }).notNull(), // obd2, tpms, temperature, battery, fuel
+  sensorIdentifier: varchar("sensor_identifier", { length: 100 }).notNull().unique(), // Device ID
+  manufacturer: varchar("manufacturer", { length: 100 }),
+  model: varchar("model", { length: 100 }),
+  installationDate: timestamp("installation_date"),
+  lastCommunication: timestamp("last_communication"),
+  batteryLevel: integer("battery_level"), // percentage
+  firmwareVersion: varchar("firmware_version", { length: 50 }),
+  status: varchar("status", { length: 20 }).default("active"), // active, inactive, offline, fault
+  alertsEnabled: boolean("alerts_enabled").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const iotSensorReadings = pgTable("iot_sensor_readings", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  sensorId: uuid("sensor_id").references(() => iotSensors.id).notNull(),
+  readingType: varchar("reading_type", { length: 50 }).notNull(), // dtc, rpm, speed, temp, pressure
+  value: decimal("value", { precision: 10, scale: 2 }).notNull(),
+  unit: varchar("unit", { length: 20 }), // rpm, celsius, psi, volts
+  threshold: decimal("threshold", { precision: 10, scale: 2 }), // Alert threshold
+  isAbnormal: boolean("is_abnormal").default(false),
+  rawData: jsonb("raw_data"),
+  timestamp: timestamp("timestamp").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const iotAlerts = pgTable("iot_alerts", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  sensorId: uuid("sensor_id").references(() => iotSensors.id).notNull(),
+  vehicleId: uuid("vehicle_id").references(() => vehicles.id).notNull(),
+  alertType: varchar("alert_type", { length: 50 }).notNull(), // critical, warning, info
+  severity: varchar("severity", { length: 20 }).default("medium"), // low, medium, high, critical
+  message: text("message").notNull(),
+  triggerValue: decimal("trigger_value", { precision: 10, scale: 2 }),
+  recommendedAction: text("recommended_action"),
+  status: varchar("status", { length: 20 }).default("active"), // active, acknowledged, resolved
+  acknowledgedBy: varchar("acknowledged_by").references(() => users.id),
+  acknowledgedAt: timestamp("acknowledged_at"),
+  resolvedAt: timestamp("resolved_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// 4. 3D PARTS VISUALIZATION
+export const parts3DModels = pgTable("parts_3d_models", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  partName: varchar("part_name", { length: 255 }).notNull(),
+  partNumber: varchar("part_number", { length: 100 }),
+  category: varchar("category", { length: 100 }), // engine, transmission, suspension, etc.
+  manufacturer: varchar("manufacturer", { length: 100 }),
+  modelFileUrl: varchar("model_file_url", { length: 500 }).notNull(), // .glb, .gltf, .obj
+  textureFileUrl: varchar("texture_file_url", { length: 500 }),
+  fileSize: integer("file_size"), // in KB
+  polygonCount: integer("polygon_count"),
+  compatibility: jsonb("compatibility"), // Compatible vehicles
+  explosionViewUrl: varchar("explosion_view_url", { length: 500 }), // Assembly view
+  annotations: jsonb("annotations"), // Labels and callouts
+  viewCount: integer("view_count").default(0),
+  downloadCount: integer("download_count").default(0),
+  isPublic: boolean("is_public").default(true),
+  uploadedBy: varchar("uploaded_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const parts3DViewSessions = pgTable("parts_3d_view_sessions", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  modelId: uuid("model_id").references(() => parts3DModels.id).notNull(),
+  userId: varchar("user_id").references(() => users.id),
+  customerId: varchar("customer_id").references(() => customerProfiles.userId),
+  sessionType: varchar("session_type", { length: 50 }).default("view"), // view, customer_approval, training
+  duration: integer("duration"), // in seconds
+  interactions: jsonb("interactions"), // Rotations, zooms, annotations added
+  approved: boolean("approved"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// 5. DRONE INSPECTION SERVICES
+export const droneInspections = pgTable("drone_inspections", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  vehicleId: uuid("vehicle_id").references(() => vehicles.id).notNull(),
+  customerId: varchar("customer_id").references(() => customerProfiles.userId),
+  inspectionType: varchar("inspection_type", { length: 50 }).notNull(), // exterior, roof, undercarriage, accident
+  droneModel: varchar("drone_model", { length: 100 }),
+  pilotId: varchar("pilot_id").references(() => users.id),
+  flightDuration: integer("flight_duration"), // in seconds
+  altitudeRange: varchar("altitude_range", { length: 50 }), // "2-10 meters"
+  weatherConditions: varchar("weather_conditions", { length: 100 }),
+  imageCount: integer("image_count").default(0),
+  videoCount: integer("video_count").default(0),
+  damageDetected: boolean("damage_detected").default(false),
+  aiAnalysisCompleted: boolean("ai_analysis_completed").default(false),
+  inspectionStatus: varchar("inspection_status", { length: 20 }).default("scheduled"), // scheduled, in_progress, completed, cancelled
+  scheduledAt: timestamp("scheduled_at"),
+  completedAt: timestamp("completed_at"),
+  reportUrl: varchar("report_url", { length: 500 }),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const droneMedia = pgTable("drone_media", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  inspectionId: uuid("inspection_id").references(() => droneInspections.id).notNull(),
+  mediaType: varchar("media_type", { length: 20 }).notNull(), // image, video
+  fileUrl: varchar("file_url", { length: 500 }).notNull(),
+  thumbnailUrl: varchar("thumbnail_url", { length: 500 }),
+  fileSize: integer("file_size"), // in KB
+  resolution: varchar("resolution", { length: 20 }), // "4K", "1080p"
+  captureAngle: varchar("capture_angle", { length: 50 }), // top, front, rear, side
+  gpsCoordinates: varchar("gps_coordinates", { length: 100 }),
+  altitude: decimal("altitude", { precision: 6, scale: 2 }), // in meters
+  damageAnnotations: jsonb("damage_annotations"), // AI-detected damage areas
+  aiConfidenceScore: decimal("ai_confidence_score", { precision: 5, scale: 2 }),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// 6. AI VIDEO ANALYSIS
+export const aiVideoAnalysis = pgTable("ai_video_analysis", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  customerId: varchar("customer_id").references(() => customerProfiles.userId),
+  vehicleId: uuid("vehicle_id").references(() => vehicles.id),
+  videoUrl: varchar("video_url", { length: 500 }).notNull(),
+  videoSize: integer("video_size"), // in MB
+  videoDuration: integer("video_duration"), // in seconds
+  uploadedAt: timestamp("uploaded_at").defaultNow(),
+  analysisStatus: varchar("analysis_status", { length: 20 }).default("pending"), // pending, processing, completed, failed
+  aiModel: varchar("ai_model", { length: 50 }).default("gpt-4-vision"), // OpenAI model used
+  detectedIssues: jsonb("detected_issues"), // Array of detected problems
+  confidence: decimal("confidence", { precision: 5, scale: 2 }), // Overall confidence
+  suggestedServices: jsonb("suggested_services"),
+  estimatedCost: decimal("estimated_cost", { precision: 10, scale: 2 }),
+  priorityLevel: varchar("priority_level", { length: 20 }).default("medium"), // low, medium, high, urgent
+  triageCategory: varchar("triage_category", { length: 50 }), // safety_critical, maintenance, cosmetic
+  appointmentScheduled: boolean("appointment_scheduled").default(false),
+  appointmentId: uuid("appointment_id").references(() => appointments.id),
+  analysisNotes: text("analysis_notes"),
+  processedAt: timestamp("processed_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// 7. DIGITAL TWIN TECHNOLOGY
+export const digitalTwins = pgTable("digital_twins", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  vehicleId: uuid("vehicle_id").references(() => vehicles.id).notNull().unique(),
+  twinStatus: varchar("twin_status", { length: 20 }).default("active"), // active, updating, archived
+  lastSyncedAt: timestamp("last_synced_at"),
+  dataPoints: integer("data_points").default(0), // Number of data points collected
+  simulationRuns: integer("simulation_runs").default(0),
+  virtualModel: jsonb("virtual_model"), // 3D model data
+  sensorData: jsonb("sensor_data"), // Latest sensor readings
+  maintenanceHistory: jsonb("maintenance_history"),
+  wearPatterns: jsonb("wear_patterns"), // Predicted wear on components
+  performanceMetrics: jsonb("performance_metrics"),
+  fuelEfficiency: decimal("fuel_efficiency", { precision: 5, scale: 2 }),
+  predictedFailures: jsonb("predicted_failures"), // AI predictions
+  nextMaintenanceDate: timestamp("next_maintenance_date"),
+  estimatedRemainingLife: integer("estimated_remaining_life"), // in months
+  totalMileage: integer("total_mileage"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const twinSimulations = pgTable("twin_simulations", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  twinId: uuid("twin_id").references(() => digitalTwins.id).notNull(),
+  simulationType: varchar("simulation_type", { length: 50 }).notNull(), // repair_test, wear_prediction, performance
+  parameters: jsonb("parameters"), // Simulation inputs
+  results: jsonb("results"), // Simulation outputs
+  duration: integer("duration"), // in seconds
+  accuracy: decimal("accuracy", { precision: 5, scale: 2 }),
+  recommendations: jsonb("recommendations"),
+  performedBy: varchar("performed_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// 8. MACHINE LEARNING FRAUD DETECTION
+export const fraudDetectionCases = pgTable("fraud_detection_cases", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  caseType: varchar("case_type", { length: 50 }).notNull(), // warranty_fraud, parts_theft, false_claim, price_manipulation
+  entityType: varchar("entity_type", { length: 50 }), // invoice, warranty_claim, customer, employee
+  entityId: varchar("entity_id", { length: 100 }),
+  detectionMethod: varchar("detection_method", { length: 50 }).default("ml_algorithm"), // ml_algorithm, pattern_analysis, manual_report
+  riskScore: decimal("risk_score", { precision: 5, scale: 2 }).notNull(), // 0-100
+  confidence: decimal("confidence", { precision: 5, scale: 2 }), // ML confidence
+  anomalyIndicators: jsonb("anomaly_indicators"), // What triggered the alert
+  suspiciousPatterns: jsonb("suspicious_patterns"),
+  historicalData: jsonb("historical_data"), // Related past incidents
+  estimatedLoss: decimal("estimated_loss", { precision: 10, scale: 2 }),
+  status: varchar("status", { length: 20 }).default("detected"), // detected, investigating, confirmed, false_positive, resolved
+  investigator: varchar("investigator").references(() => users.id),
+  investigationNotes: text("investigation_notes"),
+  resolution: text("resolution"),
+  actionTaken: text("action_taken"),
+  detectedAt: timestamp("detected_at").defaultNow(),
+  resolvedAt: timestamp("resolved_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const fraudDetectionRules = pgTable("fraud_detection_rules", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  ruleName: varchar("rule_name", { length: 255 }).notNull(),
+  ruleType: varchar("rule_type", { length: 50 }).notNull(), // threshold, pattern, anomaly, ml_model
+  category: varchar("category", { length: 50 }), // warranty, inventory, pricing, employee
+  conditions: jsonb("conditions").notNull(), // Rule logic
+  threshold: decimal("threshold", { precision: 10, scale: 2 }),
+  severity: varchar("severity", { length: 20 }).default("medium"), // low, medium, high, critical
+  isActive: boolean("is_active").default(true),
+  triggerCount: integer("trigger_count").default(0),
+  falsePositiveRate: decimal("false_positive_rate", { precision: 5, scale: 2 }),
+  createdBy: varchar("created_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// 9. BIOMETRIC AUTHENTICATION
+export const biometricProfiles = pgTable("biometric_profiles", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id).notNull().unique(),
+  fingerprintHash: varchar("fingerprint_hash", { length: 255 }), // Encrypted fingerprint template
+  faceEmbedding: text("face_embedding"), // Encrypted face recognition data
+  voiceprintHash: varchar("voiceprint_hash", { length: 255 }),
+  enrollmentDate: timestamp("enrollment_date").defaultNow(),
+  lastVerified: timestamp("last_verified"),
+  verificationCount: integer("verification_count").default(0),
+  failedAttempts: integer("failed_attempts").default(0),
+  isActive: boolean("is_active").default(true),
+  deviceBindings: jsonb("device_bindings"), // Authorized devices
+  securityLevel: varchar("security_level", { length: 20 }).default("standard"), // standard, high, maximum
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const biometricLogs = pgTable("biometric_logs", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  profileId: uuid("profile_id").references(() => biometricProfiles.id).notNull(),
+  authenticationType: varchar("authentication_type", { length: 50 }).notNull(), // fingerprint, face, voice
+  success: boolean("success").notNull(),
+  confidence: decimal("confidence", { precision: 5, scale: 2 }), // Match confidence
+  deviceId: varchar("device_id", { length: 100 }),
+  ipAddress: varchar("ip_address", { length: 50 }),
+  location: varchar("location", { length: 255 }),
+  action: varchar("action", { length: 100 }), // clock_in, tool_access, approval, etc.
+  failureReason: varchar("failure_reason", { length: 255 }),
+  timestamp: timestamp("timestamp").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// 10. 5G REAL-TIME COLLABORATION
+export const collaborationSessions = pgTable("collaboration_sessions", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  sessionType: varchar("session_type", { length: 50 }).default("video_consultation"), // video_consultation, screen_share, ar_assisted
+  jobCardId: uuid("job_card_id").references(() => jobCards.id),
+  hostUserId: varchar("host_user_id").references(() => users.id).notNull(),
+  expertUserId: varchar("expert_user_id").references(() => users.id),
+  participants: jsonb("participants"), // Array of participant IDs
+  sessionStatus: varchar("session_status", { length: 20 }).default("scheduled"), // scheduled, active, completed, cancelled
+  connectionQuality: varchar("connection_quality", { length: 20 }), // excellent, good, fair, poor
+  bandwidth: integer("bandwidth"), // in Mbps
+  latency: integer("latency"), // in ms
+  recordingUrl: varchar("recording_url", { length: 500 }),
+  transcript: text("transcript"),
+  sharedNotes: text("shared_notes"),
+  resolution: varchar("resolution", { length: 255 }),
+  rating: integer("rating"), // 1-5
+  feedback: text("feedback"),
+  startedAt: timestamp("started_at"),
+  endedAt: timestamp("ended_at"),
+  duration: integer("duration"), // in seconds
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const collaborationExperts = pgTable("collaboration_experts", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  specialization: jsonb("specialization"), // Array of specialties
+  certifications: jsonb("certifications"),
+  availability: jsonb("availability"), // Schedule
+  hourlyRate: decimal("hourly_rate", { precision: 10, scale: 2 }),
+  averageRating: decimal("average_rating", { precision: 3, scale: 2 }),
+  totalSessions: integer("total_sessions").default(0),
+  successRate: decimal("success_rate", { precision: 5, scale: 2 }),
+  languages: jsonb("languages"),
+  isAvailable: boolean("is_available").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// 11. EDGE COMPUTING DIAGNOSTICS
+export const edgeDevices = pgTable("edge_devices", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  deviceName: varchar("device_name", { length: 255 }).notNull(),
+  deviceType: varchar("device_type", { length: 50 }).notNull(), // diagnostic_scanner, edge_server, mobile_device
+  deviceId: varchar("device_id", { length: 100 }).notNull().unique(),
+  ipAddress: varchar("ip_address", { length: 50 }),
+  macAddress: varchar("mac_address", { length: 20 }),
+  manufacturer: varchar("manufacturer", { length: 100 }),
+  model: varchar("model", { length: 100 }),
+  firmwareVersion: varchar("firmware_version", { length: 50 }),
+  cpuUsage: decimal("cpu_usage", { precision: 5, scale: 2 }), // percentage
+  memoryUsage: decimal("memory_usage", { precision: 5, scale: 2 }), // percentage
+  storageUsage: decimal("storage_usage", { precision: 5, scale: 2 }), // percentage
+  capabilities: jsonb("capabilities"), // Processing capabilities
+  offlineMode: boolean("offline_mode").default(false),
+  lastSync: timestamp("last_sync"),
+  status: varchar("status", { length: 20 }).default("online"), // online, offline, syncing, error
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const edgeDiagnostics = pgTable("edge_diagnostics", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  deviceId: uuid("device_id").references(() => edgeDevices.id).notNull(),
+  vehicleId: uuid("vehicle_id").references(() => vehicles.id).notNull(),
+  diagnosticType: varchar("diagnostic_type", { length: 50 }).notNull(), // obd2, dtc_scan, emissions, performance
+  processedLocally: boolean("processed_locally").default(true),
+  dataSize: integer("data_size"), // in KB
+  processingTime: integer("processing_time"), // in milliseconds
+  rawData: jsonb("raw_data"),
+  results: jsonb("results"),
+  dtcCodes: jsonb("dtc_codes"),
+  recommendations: jsonb("recommendations"),
+  cloudSynced: boolean("cloud_synced").default(false),
+  syncedAt: timestamp("synced_at"),
+  performedBy: varchar("performed_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// 12. QUANTUM COMPUTING PRICE OPTIMIZATION
+export const pricingOptimization = pgTable("pricing_optimization", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  optimizationType: varchar("optimization_type", { length: 50 }).notNull(), // service_pricing, parts_pricing, labor_rate
+  serviceId: uuid("service_id"),
+  partId: uuid("part_id"),
+  currentPrice: decimal("current_price", { precision: 10, scale: 2 }).notNull(),
+  optimizedPrice: decimal("optimized_price", { precision: 10, scale: 2 }).notNull(),
+  priceChange: decimal("price_change", { precision: 5, scale: 2 }), // percentage
+  algorithm: varchar("algorithm", { length: 50 }).default("quantum_annealing"), // quantum_annealing, ml_regression, hybrid
+  factors: jsonb("factors"), // Market demand, competition, costs, etc.
+  competitorPrices: jsonb("competitor_prices"),
+  demandForecast: jsonb("demand_forecast"),
+  confidenceScore: decimal("confidence_score", { precision: 5, scale: 2 }),
+  estimatedRevenueImpact: decimal("estimated_revenue_impact", { precision: 10, scale: 2 }),
+  status: varchar("status", { length: 20 }).default("suggested"), // suggested, approved, rejected, implemented
+  implementedAt: timestamp("implemented_at"),
+  approvedBy: varchar("approved_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const pricingRules = pgTable("pricing_rules", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  ruleName: varchar("rule_name", { length: 255 }).notNull(),
+  ruleType: varchar("rule_type", { length: 50 }).notNull(), // dynamic, seasonal, competitor_based, demand_based
+  conditions: jsonb("conditions").notNull(),
+  priceAdjustment: jsonb("price_adjustment"), // How to adjust prices
+  minPrice: decimal("min_price", { precision: 10, scale: 2 }),
+  maxPrice: decimal("max_price", { precision: 10, scale: 2 }),
+  priority: integer("priority").default(50), // 1-100, higher = more important
+  isActive: boolean("is_active").default(true),
+  triggerCount: integer("trigger_count").default(0),
+  revenueImpact: decimal("revenue_impact", { precision: 12, scale: 2 }),
+  createdBy: varchar("created_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// ========================================
+// TYPE EXPORTS FOR EMERGING TECHNOLOGIES
+// ========================================
+
+// 1. Blockchain
+export type BlockchainRecord = typeof blockchainRecords.$inferSelect;
+export type InsertBlockchainRecord = typeof blockchainRecords.$inferInsert;
+export const insertBlockchainRecordSchema = createInsertSchema(blockchainRecords).omit({
+  id: true,
+  createdAt: true,
+});
+
+// 2. AR Repair Guides
+export type ARRepairGuide = typeof arRepairGuides.$inferSelect;
+export type InsertARRepairGuide = typeof arRepairGuides.$inferInsert;
+export const insertARRepairGuideSchema = createInsertSchema(arRepairGuides).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type ARGuideSession = typeof arGuideSessions.$inferSelect;
+export type InsertARGuideSession = typeof arGuideSessions.$inferInsert;
+export const insertARGuideSessionSchema = createInsertSchema(arGuideSessions).omit({
+  id: true,
+  createdAt: true,
+});
+
+// 3. IoT Sensors
+export type IoTSensor = typeof iotSensors.$inferSelect;
+export type InsertIoTSensor = typeof iotSensors.$inferInsert;
+export const insertIoTSensorSchema = createInsertSchema(iotSensors).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type IoTSensorReading = typeof iotSensorReadings.$inferSelect;
+export type InsertIoTSensorReading = typeof iotSensorReadings.$inferInsert;
+export const insertIoTSensorReadingSchema = createInsertSchema(iotSensorReadings).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type IoTAlert = typeof iotAlerts.$inferSelect;
+export type InsertIoTAlert = typeof iotAlerts.$inferInsert;
+export const insertIoTAlertSchema = createInsertSchema(iotAlerts).omit({
+  id: true,
+  createdAt: true,
+});
+
+// 4. 3D Parts
+export type Parts3DModel = typeof parts3DModels.$inferSelect;
+export type InsertParts3DModel = typeof parts3DModels.$inferInsert;
+export const insertParts3DModelSchema = createInsertSchema(parts3DModels).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type Parts3DViewSession = typeof parts3DViewSessions.$inferSelect;
+export type InsertParts3DViewSession = typeof parts3DViewSessions.$inferInsert;
+export const insertParts3DViewSessionSchema = createInsertSchema(parts3DViewSessions).omit({
+  id: true,
+  createdAt: true,
+});
+
+// 5. Drone Inspections
+export type DroneInspection = typeof droneInspections.$inferSelect;
+export type InsertDroneInspection = typeof droneInspections.$inferInsert;
+export const insertDroneInspectionSchema = createInsertSchema(droneInspections).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type DroneMedia = typeof droneMedia.$inferSelect;
+export type InsertDroneMedia = typeof droneMedia.$inferInsert;
+export const insertDroneMediaSchema = createInsertSchema(droneMedia).omit({
+  id: true,
+  createdAt: true,
+});
+
+// 6. AI Video Analysis
+export type AIVideoAnalysis = typeof aiVideoAnalysis.$inferSelect;
+export type InsertAIVideoAnalysis = typeof aiVideoAnalysis.$inferInsert;
+export const insertAIVideoAnalysisSchema = createInsertSchema(aiVideoAnalysis).omit({
+  id: true,
+  createdAt: true,
+});
+
+// 7. Digital Twins
+export type DigitalTwin = typeof digitalTwins.$inferSelect;
+export type InsertDigitalTwin = typeof digitalTwins.$inferInsert;
+export const insertDigitalTwinSchema = createInsertSchema(digitalTwins).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type TwinSimulation = typeof twinSimulations.$inferSelect;
+export type InsertTwinSimulation = typeof twinSimulations.$inferInsert;
+export const insertTwinSimulationSchema = createInsertSchema(twinSimulations).omit({
+  id: true,
+  createdAt: true,
+});
+
+// 8. Fraud Detection
+export type FraudDetectionCase = typeof fraudDetectionCases.$inferSelect;
+export type InsertFraudDetectionCase = typeof fraudDetectionCases.$inferInsert;
+export const insertFraudDetectionCaseSchema = createInsertSchema(fraudDetectionCases).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type FraudDetectionRule = typeof fraudDetectionRules.$inferSelect;
+export type InsertFraudDetectionRule = typeof fraudDetectionRules.$inferInsert;
+export const insertFraudDetectionRuleSchema = createInsertSchema(fraudDetectionRules).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+// 9. Biometric Authentication
+export type BiometricProfile = typeof biometricProfiles.$inferSelect;
+export type InsertBiometricProfile = typeof biometricProfiles.$inferInsert;
+export const insertBiometricProfileSchema = createInsertSchema(biometricProfiles).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type BiometricLog = typeof biometricLogs.$inferSelect;
+export type InsertBiometricLog = typeof biometricLogs.$inferInsert;
+export const insertBiometricLogSchema = createInsertSchema(biometricLogs).omit({
+  id: true,
+  createdAt: true,
+});
+
+// 10. 5G Collaboration
+export type CollaborationSession = typeof collaborationSessions.$inferSelect;
+export type InsertCollaborationSession = typeof collaborationSessions.$inferInsert;
+export const insertCollaborationSessionSchema = createInsertSchema(collaborationSessions).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type CollaborationExpert = typeof collaborationExperts.$inferSelect;
+export type InsertCollaborationExpert = typeof collaborationExperts.$inferInsert;
+export const insertCollaborationExpertSchema = createInsertSchema(collaborationExperts).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+// 11. Edge Computing
+export type EdgeDevice = typeof edgeDevices.$inferSelect;
+export type InsertEdgeDevice = typeof edgeDevices.$inferInsert;
+export const insertEdgeDeviceSchema = createInsertSchema(edgeDevices).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type EdgeDiagnostic = typeof edgeDiagnostics.$inferSelect;
+export type InsertEdgeDiagnostic = typeof edgeDiagnostics.$inferInsert;
+export const insertEdgeDiagnosticSchema = createInsertSchema(edgeDiagnostics).omit({
+  id: true,
+  createdAt: true,
+});
+
+// 12. Quantum Pricing
+export type PricingOptimization = typeof pricingOptimization.$inferSelect;
+export type InsertPricingOptimization = typeof pricingOptimization.$inferInsert;
+export const insertPricingOptimizationSchema = createInsertSchema(pricingOptimization).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type PricingRule = typeof pricingRules.$inferSelect;
+export type InsertPricingRule = typeof pricingRules.$inferInsert;
+export const insertPricingRuleSchema = createInsertSchema(pricingRules).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
