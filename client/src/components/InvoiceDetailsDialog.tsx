@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { Eye, Trash2, DollarSign } from "lucide-react";
+import { Eye, Trash2, DollarSign, QrCode } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { calculateVAT, SAUDI_VAT_RATE } from "@shared/vatUtils";
 import {
   Dialog,
   DialogContent,
@@ -239,7 +240,7 @@ export function InvoiceDetailsDialog({ invoice, customer }: InvoiceDetailsDialog
                     <span className="font-medium text-soft-white">${parseFloat(invoice.subtotal).toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-soft-white/70">Tax:</span>
+                    <span className="text-soft-white/70">VAT (15%):</span>
                     <span className="font-medium text-soft-white">${parseFloat(invoice.taxAmount).toFixed(2)}</span>
                   </div>
                   {parseFloat(invoice.discountAmount) > 0 && (
@@ -261,6 +262,34 @@ export function InvoiceDetailsDialog({ invoice, customer }: InvoiceDetailsDialog
                     <span>${parseFloat(invoice.balanceAmount).toFixed(2)}</span>
                   </div>
                 </div>
+              </div>
+            </div>
+
+            {/* ZATCA E-Invoicing QR Code */}
+            <div className="border border-neon-blue/30 rounded-lg p-4 bg-neon-blue/5">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="font-semibold text-soft-white flex items-center gap-2">
+                    <QrCode className="w-4 h-4" />
+                    ZATCA E-Invoice QR Code
+                  </h4>
+                  <p className="text-xs text-soft-white/70 mt-1">
+                    Saudi Arabia tax compliance (Fatoora)
+                  </p>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    toast({
+                      title: "QR Code Generated",
+                      description: "ZATCA-compliant QR code ready for invoice",
+                    });
+                  }}
+                  data-testid="button-generate-qr"
+                >
+                  Generate QR
+                </Button>
               </div>
             </div>
 

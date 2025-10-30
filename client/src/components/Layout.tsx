@@ -63,6 +63,7 @@ import { Input } from "@/components/ui/input";
 import { useAuth } from "@/hooks/useAuth";
 import { NotificationBell } from "@/components/NotificationBell";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { QuickActionsModal } from "@/components/QuickActionsModal";
 import { SkipLink } from "@/components/SkipLink";
 import { OfflineIndicator } from "@/components/OfflineIndicator";
@@ -535,6 +536,7 @@ export function Layout({ children }: LayoutProps) {
               </kbd>
             </Button>
             <LanguageSwitcher />
+            <ThemeToggle />
             <NotificationBell />
           </header>
 
