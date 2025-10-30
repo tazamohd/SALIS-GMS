@@ -4,7 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
-  Shield, Glasses, Radio, Box, Drone, Video, Binary,
+  Shield, Glasses, Radio, Box, Plane, Video, Binary,
   Brain, Fingerprint, Signal, Cpu, Zap, CheckCircle2
 } from 'lucide-react';
 
@@ -51,7 +51,7 @@ export default function EmergingTechnologies() {
     {
       id: 'drone-inspection',
       name: 'Drone Inspection Services',
-      icon: Drone,
+      icon: Plane,
       color: 'text-indigo-500',
       description: 'Aerial vehicle inspections using drones with AI damage detection',
       features: ['Automated flight paths', 'AI damage detection', '4K image capture', 'Detailed reports'],
