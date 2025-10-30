@@ -2,8 +2,11 @@
 ## Comprehensive Garage Management System
 
 **Version:** 2.0.0  
-**Last Updated:** October 20, 2025  
-**Document Type:** Complete System Documentation
+**Last Updated:** October 30, 2025  
+**Document Type:** Complete System Documentation  
+**🇸🇦 Saudi Arabia**: Production Ready
+
+**NEW**: Saudi Arabia market expansion complete with VAT compliance, ZATCA e-invoicing, Hijri calendar, and more. [See full documentation →](./SAUDI_ARABIA_FEATURES.md)
 
 ---
 

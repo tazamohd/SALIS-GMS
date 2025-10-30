@@ -2,9 +2,12 @@
 
 ## Garage Management SaaS Platform
 
-**Last Updated**: October 17, 2025  
+**Last Updated**: October 30, 2025  
 **Application Version**: 1.0.0  
-**Status**: ✅ Ready for Production
+**Status**: ✅ Ready for Production  
+**🇸🇦 Saudi Arabia Market**: ✅ Ready for Launch
+
+**NEW**: Complete Saudi compliance package implemented. See [SAUDI_ARABIA_FEATURES.md](./SAUDI_ARABIA_FEATURES.md) for details.
 
 ---
 
@@ -72,8 +75,10 @@ VITE_STRIPE_PUBLIC_KEY=<Stripe public key>
 PAYPAL_CLIENT_ID=<PayPal client ID>
 PAYPAL_CLIENT_SECRET=<PayPal client secret>
 
-# SMS Notifications (Optional but recommended)
-# Twilio credentials are configured
+# SMS Notifications (REQUIRED for Saudi Arabia market)
+TWILIO_ACCOUNT_SID=<Twilio account SID>
+TWILIO_AUTH_TOKEN=<Twilio auth token>
+TWILIO_PHONE_NUMBER=<Saudi phone number with +966>
 
 # AI Features (Optional but recommended)
 AI_INTEGRATIONS_OPENAI_BASE_URL=<OpenAI API URL>
