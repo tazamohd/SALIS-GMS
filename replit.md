@@ -1,7 +1,20 @@
 # Login Dashboard Project
 
 ## Overview
-This project is a world-class automotive ERP platform (SALIS AUTO) designed to manage efficient garage operations at scale. It offers enterprise-grade features including franchise management, OBD diagnostics integration, OEM software licensing, global multi-currency/multi-language support, and a B2B spare parts supply network. The platform has expanded to 60 comprehensive modules, supporting multi-tenant franchise networks and advanced hardware integrations, aiming to solidify its position as a leading solution in the automotive industry.
+This project is a world-class automotive ERP platform (SALIS AUTO) designed to manage efficient garage operations at scale. It offers enterprise-grade features including franchise management, OBD diagnostics integration, OEM software licensing, global multi-currency/multi-language support, and a B2B spare parts supply network. The platform has expanded to 60 comprehensive modules, supporting multi-tenant franchise networks and advanced hardware integrations.
+
+**NEW: Saudi Arabia Market Expansion (October 2025)**
+The platform now includes comprehensive compliance and localization features for the Saudi Arabian market:
+- **VAT Compliance**: 15% Saudi VAT calculations with automatic tax breakdown on all invoices and estimates
+- **ZATCA E-Invoicing**: QR code generation following ZATCA (Fatoora) standards for tax compliance
+- **Hijri Calendar**: Islamic calendar support with Gregorian-Hijri date conversion utilities
+- **Zakat Calculations**: Islamic tax (2.5%) calculation utilities for businesses
+- **TRN Validation**: 15-digit Tax Registration Number format validation and display
+- **Arabic Support**: RTL language support with comprehensive Arabic translations (ar.json)
+- **Dark/Light Theme Toggle**: User preference-based theme switching throughout the platform
+- **PDF Export**: Professional invoice, estimate, and job card PDF generation with VAT breakdown
+- **Excel Export**: CSV/Excel export for invoices, job cards, customers, vehicles, and VAT reports
+- **SMS Reminders**: Twilio integration for appointment reminders, job completion, and payment notifications with Saudi (+966) phone formatting
 
 ## User Preferences
 - Modern React patterns with hooks
@@ -38,6 +51,18 @@ The application utilizes a full-stack architecture with clear client-server sepa
 
 **Technical Implementations**: Form validation uses Zod schemas shared between frontend and backend. Features include comprehensive user settings, print system, undo/redo, keyboard shortcuts, robust currency system, and action history tracking for audit trails. The database is seeded with realistic sample data.
 
+**Saudi Arabia Compliance Stack**:
+- **Database**: `saudi_tax_compliance` table with VAT registration, ZATCA certification, Zakat settings, and Arabic company details
+- **Utilities**: 
+  - `shared/vatUtils.ts` - VAT calculations, TRN validation, invoice totals with 15% Saudi rate
+  - `shared/zatcaUtils.ts` - ZATCA QR code generation (Base64 TLV format), compliance validation
+  - `shared/hijriUtils.ts` - Hijri calendar conversion, dual calendar formatting, Islamic month names
+- **Export Services**:
+  - `client/src/lib/pdfExport.ts` - jsPDF integration for invoices, job cards, estimates with VAT breakdown
+  - `client/src/lib/excelExport.ts` - CSV export utilities for all major entities and VAT reports
+- **SMS Service**: `server/smsService.ts` - Twilio integration with Saudi phone number formatting (+966)
+- **Theme System**: `client/src/components/ThemeToggle.tsx` - Persistent dark/light/system theme preference
+
 ## External Dependencies
 -   Replit Auth
 -   PostgreSQL
@@ -51,7 +76,7 @@ The application utilizes a full-stack architecture with clear client-server sepa
 -   Drizzle ORM
 -   Zod
 -   recharts
--   Twilio
+-   Twilio (SMS notifications)
 -   NHTSA API
 -   TecDoc API
 -   Stripe
@@ -64,3 +89,16 @@ The application utilizes a full-stack architecture with clear client-server sepa
 -   Gmail
 -   speakeasy
 -   qrcode
+-   jspdf + jspdf-autotable (PDF generation)
+
+## Recent Changes (October 30, 2025)
+**Saudi Arabia Market Launch Features**:
+1. ✅ VAT compliance system (15% Saudi rate)
+2. ✅ ZATCA e-invoicing QR codes
+3. ✅ Hijri calendar support + Zakat calculations
+4. ✅ Dark/Light theme toggle with localStorage persistence
+5. ✅ PDF export service (invoices, estimates, job cards)
+6. ✅ Excel/CSV export service (all entities + VAT reports)
+7. ✅ Twilio SMS integration for appointment/payment reminders
+8. ✅ TRN (Tax Registration Number) validation
+9. ✅ Arabic RTL support (existing i18n system)

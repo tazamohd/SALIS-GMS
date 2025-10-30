@@ -12,6 +12,7 @@ export interface ZATCAInvoiceData {
 
 /**
  * Generate ZATCA-compliant QR code data (Base64 TLV format)
+ * Browser-compatible implementation using Uint8Array
  * 
  * Tags:
  * 1 = Seller name
@@ -24,7 +25,7 @@ export interface ZATCAInvoiceData {
  * @returns Base64-encoded TLV string
  */
 export function generateZATCAQRCode(data: ZATCAInvoiceData): string {
-  const tlvData: Buffer[] = [];
+  const tlvData: Uint8Array[] = [];
 
   // Tag 1: Seller name
   tlvData.push(createTLV(1, data.sellerName));
@@ -42,45 +43,85 @@ export function generateZATCAQRCode(data: ZATCAInvoiceData): string {
   tlvData.push(createTLV(5, data.vatAmount.toFixed(2)));
 
   // Combine all TLV entries
-  const combined = Buffer.concat(tlvData);
+  const totalLength = tlvData.reduce((sum, arr) => sum + arr.length, 0);
+  const combined = new Uint8Array(totalLength);
+  
+  let offset = 0;
+  for (const tlv of tlvData) {
+    combined.set(tlv, offset);
+    offset += tlv.length;
+  }
 
-  // Return Base64-encoded string
-  return combined.toString('base64');
+  // Return Base64-encoded string (browser-compatible)
+  return arrayBufferToBase64(combined);
 }
 
 /**
  * Create a TLV (Tag-Length-Value) entry
+ * Browser-compatible using Uint8Array
  * @param tag - Tag number
  * @param value - Value string
- * @returns Buffer containing TLV entry
+ * @returns Uint8Array containing TLV entry
  */
-function createTLV(tag: number, value: string): Buffer {
-  const valueBuffer = Buffer.from(value, 'utf8');
+function createTLV(tag: number, value: string): Uint8Array {
+  const encoder = new TextEncoder();
+  const valueBuffer = encoder.encode(value);
   const length = valueBuffer.length;
 
-  const tlv = Buffer.allocUnsafe(2 + length);
-  tlv.writeUInt8(tag, 0);
-  tlv.writeUInt8(length, 1);
-  valueBuffer.copy(tlv, 2);
+  const tlv = new Uint8Array(2 + length);
+  tlv[0] = tag;
+  tlv[1] = length;
+  tlv.set(valueBuffer, 2);
 
   return tlv;
 }
 
 /**
+ * Convert Uint8Array to Base64 string (browser-compatible)
+ * @param buffer - Uint8Array buffer
+ * @returns Base64 string
+ */
+function arrayBufferToBase64(buffer: Uint8Array): string {
+  let binary = '';
+  const bytes = new Uint8Array(buffer);
+  for (let i = 0; i < bytes.length; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary);
+}
+
+/**
+ * Convert Base64 string to Uint8Array (browser-compatible)
+ * @param base64 - Base64 string
+ * @returns Uint8Array buffer
+ */
+function base64ToArrayBuffer(base64: string): Uint8Array {
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  return bytes;
+}
+
+/**
  * Decode ZATCA QR code (for testing/verification)
+ * Browser-compatible using Uint8Array
  * @param base64QR - Base64-encoded QR code
  * @returns Decoded invoice data
  */
 export function decodeZATCAQRCode(base64QR: string): Partial<ZATCAInvoiceData> {
-  const buffer = Buffer.from(base64QR, 'base64');
+  const buffer = base64ToArrayBuffer(base64QR);
+  const decoder = new TextDecoder();
   const result: Partial<ZATCAInvoiceData> = {};
   
   let offset = 0;
   
   while (offset < buffer.length) {
-    const tag = buffer.readUInt8(offset);
-    const length = buffer.readUInt8(offset + 1);
-    const value = buffer.toString('utf8', offset + 2, offset + 2 + length);
+    const tag = buffer[offset];
+    const length = buffer[offset + 1];
+    const valueBytes = buffer.slice(offset + 2, offset + 2 + length);
+    const value = decoder.decode(valueBytes);
     
     switch (tag) {
       case 1:
