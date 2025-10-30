@@ -77,25 +77,37 @@ function createTLV(tag: number, value: string): Uint8Array {
 }
 
 /**
- * Convert Uint8Array to Base64 string (browser-compatible)
+ * Convert Uint8Array to Base64 string (universal: works in browser AND Node.js)
  * @param buffer - Uint8Array buffer
  * @returns Base64 string
  */
 function arrayBufferToBase64(buffer: Uint8Array): string {
+  // Check if running in Node.js (Buffer available)
+  if (typeof Buffer !== 'undefined') {
+    return Buffer.from(buffer).toString('base64');
+  }
+  
+  // Browser environment (use btoa)
   let binary = '';
-  const bytes = new Uint8Array(buffer);
-  for (let i = 0; i < bytes.length; i++) {
-    binary += String.fromCharCode(bytes[i]);
+  for (let i = 0; i < buffer.length; i++) {
+    binary += String.fromCharCode(buffer[i]);
   }
   return btoa(binary);
 }
 
 /**
- * Convert Base64 string to Uint8Array (browser-compatible)
+ * Convert Base64 string to Uint8Array (universal: works in browser AND Node.js)
  * @param base64 - Base64 string
  * @returns Uint8Array buffer
  */
 function base64ToArrayBuffer(base64: string): Uint8Array {
+  // Check if running in Node.js (Buffer available)
+  if (typeof Buffer !== 'undefined') {
+    const nodeBuffer = Buffer.from(base64, 'base64');
+    return new Uint8Array(nodeBuffer);
+  }
+  
+  // Browser environment (use atob)
   const binary = atob(base64);
   const bytes = new Uint8Array(binary.length);
   for (let i = 0; i < binary.length; i++) {
