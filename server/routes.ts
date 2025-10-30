@@ -13280,6 +13280,218 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Seed sample data for Emerging Technologies
+  app.post('/api/emerging-tech/seed', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      const userId = req.user.id;
+
+      // Get first vehicle for testing (or use a sample vehicle ID)
+      const vehicles = await storage.getVehicles(garageId);
+      const vehicleId = vehicles[0]?.id || 'sample-vehicle-id';
+
+      const results = {
+        blockchain: 0,
+        arGuides: 0,
+        iotSensors: 0,
+        models3D: 0,
+        droneInspections: 0,
+        aiVideo: 0,
+        digitalTwins: 0,
+        fraudCases: 0,
+        biometricProfile: 0,
+        collaborationSessions: 0,
+        edgeDevices: 0,
+        pricingOptimizations: 0
+      };
+
+      // Seed Blockchain Records (3 records)
+      for (let i = 0; i < 3; i++) {
+        await storage.createBlockchainRecord({
+          vehicleId,
+          garageId,
+          transactionHash: `0x${Math.random().toString(16).substring(2, 66)}`,
+          blockNumber: 15000000 + i,
+          eventType: ['service_completed', 'ownership_transfer', 'warranty_claim'][i % 3],
+          eventData: { description: `Sample event ${i + 1}`, amount: 100 + i * 50 },
+          verified: true,
+        });
+        results.blockchain++;
+      }
+
+      // Seed AR Repair Guides (2 guides)
+      for (let i = 0; i < 2; i++) {
+        await storage.createArRepairGuide({
+          garageId,
+          guideName: `${['Engine Repair', 'Brake Service'][i]} AR Guide`,
+          description: `Step-by-step AR instructions for ${['engine repair', 'brake service'][i]}`,
+          targetVehicleModels: ['Toyota Camry', 'Honda Accord'],
+          difficultyLevel: ['intermediate', 'beginner'][i],
+          estimatedDuration: [60, 45][i],
+          arModelUrl: `https://example.com/ar/model-${i + 1}.glb`,
+          steps: [
+            { stepNumber: 1, title: 'Preparation', instruction: 'Gather tools and materials' },
+            { stepNumber: 2, title: 'Diagnosis', instruction: 'Identify the issue' },
+            { stepNumber: 3, title: 'Repair', instruction: 'Perform the repair' }
+          ],
+          createdBy: userId,
+        });
+        results.arGuides++;
+      }
+
+      // Seed IoT Sensors (4 sensors)
+      for (let i = 0; i < 4; i++) {
+        await storage.createIotSensor({
+          vehicleId,
+          sensorType: ['temperature', 'pressure', 'vibration', 'fuel_level'][i],
+          sensorId: `IOT-${1000 + i}`,
+          manufacturer: 'SensorTech',
+          installDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+          calibrationDate: new Date().toISOString(),
+          status: 'active',
+        });
+        results.iotSensors++;
+      }
+
+      // Seed 3D Parts Models (3 models)
+      for (let i = 0; i < 3; i++) {
+        await storage.createParts3DModel({
+          garageId,
+          partName: ['Brake Rotor', 'Oil Filter', 'Air Filter'][i],
+          partNumber: `PART-${2000 + i}`,
+          manufacturer: 'AutoParts Inc',
+          modelUrl: `https://example.com/3d/part-${i + 1}.glb`,
+          thumbnailUrl: `https://example.com/3d/thumb-${i + 1}.jpg`,
+          fileSize: 5.2 + i * 0.5,
+          polygonCount: 10000 + i * 2000,
+          category: 'Brake System',
+        });
+        results.models3D++;
+      }
+
+      // Seed Drone Inspections (2 inspections)
+      for (let i = 0; i < 2; i++) {
+        await storage.createDroneInspection({
+          garageId,
+          vehicleId,
+          inspectionType: ['exterior_damage', 'roof_inspection'][i],
+          pilotName: 'John Pilot',
+          flightDuration: 15 + i * 5,
+          capturedImages: 25 + i * 10,
+          aiAnalysisResults: { damageDetected: i === 0, confidence: 0.95, issues: i === 0 ? ['Dent on hood', 'Scratch on door'] : [] },
+          status: 'completed',
+        });
+        results.droneInspections++;
+      }
+
+      // Seed AI Video Analysis (2 analyses)
+      for (let i = 0; i < 2; i++) {
+        await storage.createAiVideoAnalysis({
+          customerId: userId,
+          vehicleId,
+          videoUrl: `https://example.com/videos/analysis-${i + 1}.mp4`,
+          analysisType: ['damage_assessment', 'walkaround'][i],
+          aiModel: 'GPT-5-Vision',
+          detectedIssues: i === 0 ? ['Minor dent', 'Paint scratch'] : [],
+          estimatedCost: i === 0 ? 350.00 : 0,
+          confidence: 0.92,
+          status: 'completed',
+        });
+        results.aiVideo++;
+      }
+
+      // Seed Digital Twins (1 twin)
+      await storage.createDigitalTwin({
+        vehicleId,
+        twinName: `Digital Twin - ${vehicleId.substring(0, 8)}`,
+        lastSyncTime: new Date().toISOString(),
+        sensorDataPoints: 1250,
+        predictedIssues: ['Brake pad wear in 2 months', 'Oil change due in 3 weeks'],
+        healthScore: 85,
+        status: 'active',
+      });
+      results.digitalTwins++;
+
+      // Seed Fraud Detection Cases (2 cases)
+      for (let i = 0; i < 2; i++) {
+        await storage.createFraudDetectionCase({
+          garageId,
+          caseType: ['invoice_manipulation', 'parts_theft'][i],
+          detectedAt: new Date(Date.now() - i * 24 * 60 * 60 * 1000).toISOString(),
+          riskScore: [75, 60][i],
+          mlModel: 'FraudDetector-v2',
+          indicators: i === 0 ? ['Unusual pricing', 'Multiple edits'] : ['Inventory mismatch'],
+          status: 'investigating',
+        });
+        results.fraudCases++;
+      }
+
+      // Seed Biometric Profile (1 profile)
+      await storage.createBiometricProfile({
+        userId,
+        fingerprintHash: `FP-${Math.random().toString(36).substring(7).toUpperCase()}`,
+        faceEmbedding: Array(128).fill(0).map(() => Math.random()),
+        enrolledAt: new Date().toISOString(),
+        lastAuthAt: new Date().toISOString(),
+        authSuccessCount: 42,
+        authFailureCount: 2,
+        status: 'active',
+      });
+      results.biometricProfile = 1;
+
+      // Seed Collaboration Sessions (2 sessions)
+      for (let i = 0; i < 2; i++) {
+        await storage.createCollaborationSession({
+          garageId,
+          jobCardId: 'sample-job-' + i,
+          technicianId: userId,
+          sessionType: ['video_call', 'ar_annotation'][i],
+          duration: 25 + i * 10,
+          recordingUrl: `https://example.com/recordings/session-${i + 1}.mp4`,
+          annotations: i === 1 ? [{ x: 100, y: 200, note: 'Check here' }] : [],
+        });
+        results.collaborationSessions++;
+      }
+
+      // Seed Edge Devices (3 devices)
+      for (let i = 0; i < 3; i++) {
+        await storage.createEdgeDevice({
+          garageId,
+          deviceName: `Edge Gateway ${i + 1}`,
+          deviceType: 'diagnostic_hub',
+          ipAddress: `192.168.1.${100 + i}`,
+          macAddress: `00:1B:44:11:3A:${(10 + i).toString(16).toUpperCase()}`,
+          firmwareVersion: '2.1.0',
+          status: 'online',
+        });
+        results.edgeDevices++;
+      }
+
+      // Seed Pricing Optimizations (2 optimizations)
+      for (let i = 0; i < 2; i++) {
+        await storage.createPricingOptimization({
+          garageId,
+          optimizationType: 'dynamic_pricing',
+          targetService: ['Oil Change', 'Brake Service'][i],
+          currentPrice: [45.00, 220.00][i],
+          optimizedPrice: [49.99, 199.99][i],
+          expectedRevenue: [1250.00, 3500.00][i],
+          confidence: 0.88,
+          factors: ['Market demand', 'Competition', 'Time of day'],
+        });
+        results.pricingOptimizations++;
+      }
+
+      res.json({ 
+        message: 'Sample data seeded successfully!', 
+        results 
+      });
+    } catch (error) {
+      console.error("Error seeding emerging tech data:", error);
+      res.status(500).json({ message: "Failed to seed data", error: String(error) });
+    }
+  });
+
   const httpServer = createServer(app);
   
   // Initialize WebSocket server for chat

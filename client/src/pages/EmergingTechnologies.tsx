@@ -5,12 +5,35 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   Shield, Glasses, Radio, Box, Plane, Video, Binary,
-  Brain, Fingerprint, Signal, Cpu, Zap, CheckCircle2, Loader2
+  Brain, Fingerprint, Signal, Cpu, Zap, CheckCircle2, Loader2, Database
 } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { apiRequest, queryClient } from '@/lib/queryClient';
+import { useToast } from '@/hooks/use-toast';
 
 export default function EmergingTechnologies() {
   const [activeTab, setActiveTab] = useState('blockchain');
+  const { toast } = useToast();
+
+  // Mutation to seed sample data
+  const seedMutation = useMutation({
+    mutationFn: () => apiRequest('/api/emerging-tech/seed', 'POST', {}),
+    onSuccess: (data: any) => {
+      toast({
+        title: "Sample Data Seeded!",
+        description: `Successfully created sample data for all 12 modules.`,
+      });
+      // Invalidate all queries to refetch data
+      queryClient.invalidateQueries({ queryKey: ['/api/emerging-tech'] });
+    },
+    onError: (error) => {
+      toast({
+        title: "Seeding Failed",
+        description: "Failed to seed sample data. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
 
   // Fetch data for all emerging technologies
   const { data: blockchainData, isLoading: loadingBlockchain } = useQuery<any[]>({
@@ -225,10 +248,31 @@ export default function EmergingTechnologies() {
               Cutting-edge innovations for next-generation automotive service management
             </p>
           </div>
-          <Badge variant="outline" className="text-green-600 border-green-600">
-            <CheckCircle2 className="w-4 h-4 mr-1" />
-            12 Modules Active
-          </Badge>
+          <div className="flex items-center gap-3">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => seedMutation.mutate()}
+              disabled={seedMutation.isPending}
+              data-testid="button-seed-data"
+            >
+              {seedMutation.isPending ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Seeding...
+                </>
+              ) : (
+                <>
+                  <Database className="w-4 h-4 mr-2" />
+                  Seed Sample Data
+                </>
+              )}
+            </Button>
+            <Badge variant="outline" className="text-green-600 border-green-600">
+              <CheckCircle2 className="w-4 h-4 mr-1" />
+              12 Modules Active
+            </Badge>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
