@@ -5,11 +5,77 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   Shield, Glasses, Radio, Box, Plane, Video, Binary,
-  Brain, Fingerprint, Signal, Cpu, Zap, CheckCircle2
+  Brain, Fingerprint, Signal, Cpu, Zap, CheckCircle2, Loader2
 } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 
 export default function EmergingTechnologies() {
   const [activeTab, setActiveTab] = useState('blockchain');
+
+  // Fetch data for all emerging technologies
+  const { data: blockchainData, isLoading: loadingBlockchain } = useQuery<any[]>({
+    queryKey: ['/api/emerging-tech/blockchain'],
+  });
+  const blockchainRecords = blockchainData ?? [];
+
+  const { data: arGuidesData, isLoading: loadingAR } = useQuery<any[]>({
+    queryKey: ['/api/emerging-tech/ar-guides'],
+  });
+  const arGuides = arGuidesData ?? [];
+
+  const { data: iotSensorsData, isLoading: loadingIoT } = useQuery<any[]>({
+    queryKey: ['/api/emerging-tech/iot-sensors'],
+  });
+  const iotSensors = iotSensorsData ?? [];
+
+  const { data: models3DData, isLoading: loading3D } = useQuery<any[]>({
+    queryKey: ['/api/emerging-tech/3d-models'],
+  });
+  const models3D = models3DData ?? [];
+
+  const { data: droneInspectionsData, isLoading: loadingDrone } = useQuery<any[]>({
+    queryKey: ['/api/emerging-tech/drone-inspections'],
+  });
+  const droneInspections = droneInspectionsData ?? [];
+
+  const { data: aiVideoAnalysesData, isLoading: loadingAIVideo } = useQuery<any[]>({
+    queryKey: ['/api/emerging-tech/ai-video'],
+  });
+  const aiVideoAnalyses = aiVideoAnalysesData ?? [];
+
+  const { data: digitalTwinsData, isLoading: loadingTwins } = useQuery<any[]>({
+    queryKey: ['/api/emerging-tech/digital-twins'],
+  });
+  const digitalTwins = digitalTwinsData ?? [];
+
+  const { data: fraudCasesData, isLoading: loadingFraud } = useQuery<any[]>({
+    queryKey: ['/api/emerging-tech/fraud-cases'],
+  });
+  const fraudCases = fraudCasesData ?? [];
+
+  const { data: biometricData, isLoading: loadingBiometric } = useQuery<any>({
+    queryKey: ['/api/emerging-tech/biometric-profile'],
+  });
+  const biometricProfile = biometricData;
+
+  const { data: collaborationSessionsData, isLoading: loadingCollab } = useQuery<any[]>({
+    queryKey: ['/api/emerging-tech/collaboration-sessions'],
+  });
+  const collaborationSessions = collaborationSessionsData ?? [];
+
+  const { data: edgeDevicesData, isLoading: loadingEdge } = useQuery<any[]>({
+    queryKey: ['/api/emerging-tech/edge-devices'],
+  });
+  const edgeDevices = edgeDevicesData ?? [];
+
+  const { data: pricingOptimizationsData, isLoading: loadingPricing } = useQuery<any[]>({
+    queryKey: ['/api/emerging-tech/pricing-optimization'],
+  });
+  const pricingOptimizations = pricingOptimizationsData ?? [];
+
+  const isLoading = loadingBlockchain || loadingAR || loadingIoT || loading3D ||
+    loadingDrone || loadingAIVideo || loadingTwins || loadingFraud ||
+    loadingBiometric || loadingCollab || loadingEdge || loadingPricing;
 
   const technologies = [
     {
@@ -19,7 +85,8 @@ export default function EmergingTechnologies() {
       color: 'text-blue-500',
       description: 'Immutable vehicle service records on blockchain for tamper-proof history verification',
       features: ['Ethereum/Polygon integration', 'Smart contract tracking', 'Transaction verification', 'Ownership transfers'],
-      status: 'active'
+      status: 'active',
+      count: blockchainRecords.length
     },
     {
       id: 'ar-guides',
@@ -28,7 +95,8 @@ export default function EmergingTechnologies() {
       color: 'text-purple-500',
       description: 'Augmented reality step-by-step repair instructions with 3D overlays',
       features: ['Interactive AR models', 'Real-time guidance', 'Skill level tracking', 'Safety warnings'],
-      status: 'active'
+      status: 'active',
+      count: arGuides.length
     },
     {
       id: 'iot-sensors',
@@ -37,7 +105,8 @@ export default function EmergingTechnologies() {
       color: 'text-green-500',
       description: 'Real-time vehicle monitoring with connected IoT sensors and predictive alerts',
       features: ['OBD2 integration', 'TPMS monitoring', 'Live dashboards', 'Automated alerts'],
-      status: 'active'
+      status: 'active',
+      count: iotSensors.length
     },
     {
       id: '3d-parts',
@@ -46,7 +115,8 @@ export default function EmergingTechnologies() {
       color: 'text-orange-500',
       description: 'Interactive 3D models of parts for customer approval and technician training',
       features: ['360° part views', 'Explosion diagrams', 'Customer approval', 'AR compatibility'],
-      status: 'active'
+      status: 'active',
+      count: models3D.length
     },
     {
       id: 'drone-inspection',
@@ -55,7 +125,8 @@ export default function EmergingTechnologies() {
       color: 'text-indigo-500',
       description: 'Aerial vehicle inspections using drones with AI damage detection',
       features: ['Automated flight paths', 'AI damage detection', '4K image capture', 'Detailed reports'],
-      status: 'active'
+      status: 'active',
+      count: droneInspections.length
     },
     {
       id: 'ai-video',
@@ -64,7 +135,8 @@ export default function EmergingTechnologies() {
       color: 'text-pink-500',
       description: 'AI-powered video analysis for damage detection and cost estimation',
       features: ['GPT-5 integration', 'Automated estimates', 'Customer consultations', 'Video walkarounds'],
-      status: 'active'
+      status: 'active',
+      count: aiVideoAnalyses.length
     },
     {
       id: 'digital-twin',
@@ -73,7 +145,8 @@ export default function EmergingTechnologies() {
       color: 'text-cyan-500',
       description: 'Real-time digital replicas of vehicles for predictive maintenance',
       features: ['Live synchronization', 'Predictive analytics', 'Performance simulation', 'Failure prediction'],
-      status: 'active'
+      status: 'active',
+      count: digitalTwins.length
     },
     {
       id: 'fraud-detection',
@@ -82,7 +155,8 @@ export default function EmergingTechnologies() {
       color: 'text-red-500',
       description: 'Machine learning algorithms to detect fraudulent transactions and claims',
       features: ['Risk scoring', 'Pattern recognition', 'Real-time alerts', 'Investigation workflow'],
-      status: 'active'
+      status: 'active',
+      count: fraudCases.length
     },
     {
       id: 'biometric-auth',
@@ -91,7 +165,8 @@ export default function EmergingTechnologies() {
       color: 'text-yellow-500',
       description: 'Multi-factor biometric authentication with fingerprint and face recognition',
       features: ['Fingerprint enrollment', 'Face recognition', 'Access logs', 'QR code MFA'],
-      status: 'active'
+      status: 'active',
+      count: biometricProfile ? 1 : 0
     },
     {
       id: '5g-collaboration',
@@ -100,7 +175,8 @@ export default function EmergingTechnologies() {
       color: 'text-emerald-500',
       description: 'Real-time expert collaboration via 5G with AR annotations and video streaming',
       features: ['HD video streaming', 'AR annotations', 'Screen sharing', 'Expert network'],
-      status: 'active'
+      status: 'active',
+      count: collaborationSessions.length
     },
     {
       id: 'edge-computing',
@@ -109,7 +185,8 @@ export default function EmergingTechnologies() {
       color: 'text-violet-500',
       description: 'Local edge processing for instant OBD diagnostics with offline capability',
       features: ['Instant analysis', 'Offline diagnostics', 'Cloud sync', 'Edge devices'],
-      status: 'active'
+      status: 'active',
+      count: edgeDevices.length
     },
     {
       id: 'quantum-pricing',
@@ -118,11 +195,23 @@ export default function EmergingTechnologies() {
       color: 'text-amber-500',
       description: 'Quantum-inspired algorithms for dynamic pricing and profit maximization',
       features: ['Dynamic pricing', 'Competitor analysis', 'Demand forecasting', 'Profit optimization'],
-      status: 'active'
+      status: 'active',
+      count: pricingOptimizations.length
     }
   ];
 
   const selectedTech = technologies.find(t => t.id === activeTab);
+
+  if (isLoading) {
+    return (
+      <div className="p-6 dark:bg-gray-900 min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-12 h-12 animate-spin text-primary mx-auto mb-4" />
+          <p className="text-gray-600 dark:text-gray-400">Loading emerging technologies...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 dark:bg-gray-900 min-h-screen" data-testid="page-emerging-technologies">
@@ -163,6 +252,9 @@ export default function EmergingTechnologies() {
                       <CardTitle className="text-sm font-semibold truncate dark:text-white">
                         {tech.name}
                       </CardTitle>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        {tech.count} {tech.count === 1 ? 'record' : 'records'}
+                      </p>
                     </div>
                   </div>
                 </CardHeader>
