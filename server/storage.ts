@@ -364,44 +364,58 @@ import {
   type InsertBlockchainRecord,
   arRepairGuides,
   arGuideSessions,
-  type ArRepairGuide,
-  type InsertArRepairGuide,
-  type ArGuideSession,
-  type InsertArGuideSession,
+  type ARRepairGuide,
+  type InsertARRepairGuide,
+  type ARGuideSession,
+  type InsertARGuideSession,
   iotSensors,
   iotSensorReadings,
   iotAlerts,
-  type IotSensor,
-  type InsertIotSensor,
-  type IotSensorReading,
-  type InsertIotSensorReading,
+  type IoTSensor,
+  type InsertIoTSensor,
+  type IoTSensorReading,
+  type InsertIoTSensorReading,
+  type IoTAlert,
+  type InsertIoTAlert,
   parts3DModels,
   parts3DViewSessions,
   type Parts3DModel,
   type InsertParts3DModel,
+  type Parts3DViewSession,
+  type InsertParts3DViewSession,
   droneInspections,
   droneMedia,
   type DroneInspection,
   type InsertDroneInspection,
+  type DroneMedia,
+  type InsertDroneMedia,
   aiVideoAnalysis,
-  type AiVideoAnalysis,
-  type InsertAiVideoAnalysis,
+  type AIVideoAnalysis,
+  type InsertAIVideoAnalysis,
   digitalTwins,
   twinSimulations,
   type DigitalTwin,
   type InsertDigitalTwin,
+  type TwinSimulation,
+  type InsertTwinSimulation,
   fraudDetectionCases,
   fraudDetectionRules,
   type FraudDetectionCase,
   type InsertFraudDetectionCase,
+  type FraudDetectionRule,
+  type InsertFraudDetectionRule,
   biometricProfiles,
   biometricLogs,
   type BiometricProfile,
   type InsertBiometricProfile,
+  type BiometricLog,
+  type InsertBiometricLog,
   collaborationSessions,
   collaborationExperts,
   type CollaborationSession,
   type InsertCollaborationSession,
+  type CollaborationExpert,
+  type InsertCollaborationExpert,
   edgeDevices,
   edgeDiagnostics,
   type EdgeDevice,
@@ -412,6 +426,8 @@ import {
   pricingRules,
   type PricingOptimization,
   type InsertPricingOptimization,
+  type PricingRule,
+  type InsertPricingRule,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, or, inArray, and, gte, lte, ilike, sql, isNull, gt } from "drizzle-orm";
@@ -1190,64 +1206,108 @@ export interface IStorage {
   createBlockchainRecord(data: InsertBlockchainRecord): Promise<BlockchainRecord>;
   getBlockchainRecords(vehicleId?: string, garageId?: string): Promise<BlockchainRecord[]>;
   getBlockchainRecord(id: string): Promise<BlockchainRecord | undefined>;
+  updateBlockchainRecord(id: string, data: Partial<BlockchainRecord>): Promise<BlockchainRecord>;
+  deleteBlockchainRecord(id: string): Promise<void>;
   
   // AR Repair Guides
-  createArRepairGuide(data: InsertArRepairGuide): Promise<ArRepairGuide>;
-  getArRepairGuides(garageId?: string): Promise<ArRepairGuide[]>;
-  getArRepairGuide(id: string): Promise<ArRepairGuide | undefined>;
-  updateArRepairGuide(id: string, data: Partial<ArRepairGuide>): Promise<ArRepairGuide>;
-  createArGuideSession(data: InsertArGuideSession): Promise<ArGuideSession>;
+  createArRepairGuide(data: InsertARRepairGuide): Promise<ARRepairGuide>;
+  getArRepairGuides(garageId?: string): Promise<ARRepairGuide[]>;
+  getArRepairGuide(id: string): Promise<ARRepairGuide | undefined>;
+  updateArRepairGuide(id: string, data: Partial<ARRepairGuide>): Promise<ARRepairGuide>;
+  deleteArRepairGuide(id: string): Promise<void>;
+  createArGuideSession(data: InsertARGuideSession): Promise<ARGuideSession>;
+  getArGuideSessions(guideId?: string, technicianId?: string): Promise<ARGuideSession[]>;
+  deleteArGuideSession(id: string): Promise<void>;
   
   // IoT Sensor Integration
-  createIotSensor(data: InsertIotSensor): Promise<IotSensor>;
-  getIotSensors(vehicleId?: string): Promise<IotSensor[]>;
-  createIotSensorReading(data: InsertIotSensorReading): Promise<IotSensorReading>;
-  getIotSensorReadings(sensorId?: string, vehicleId?: string): Promise<IotSensorReading[]>;
+  createIotSensor(data: InsertIoTSensor): Promise<IoTSensor>;
+  getIotSensors(vehicleId?: string): Promise<IoTSensor[]>;
+  updateIotSensor(id: string, data: Partial<IoTSensor>): Promise<IoTSensor>;
+  deleteIotSensor(id: string): Promise<void>;
+  createIotSensorReading(data: InsertIoTSensorReading): Promise<IoTSensorReading>;
+  getIotSensorReadings(sensorId?: string, vehicleId?: string): Promise<IoTSensorReading[]>;
+  createIotAlert(data: InsertIoTAlert): Promise<IoTAlert>;
+  getIotAlerts(sensorId?: string, status?: string): Promise<IoTAlert[]>;
+  updateIotAlert(id: string, data: Partial<IoTAlert>): Promise<IoTAlert>;
   
   // 3D Parts Visualization
   createParts3DModel(data: InsertParts3DModel): Promise<Parts3DModel>;
   getParts3DModels(garageId?: string): Promise<Parts3DModel[]>;
   getParts3DModel(id: string): Promise<Parts3DModel | undefined>;
+  updateParts3DModel(id: string, data: Partial<Parts3DModel>): Promise<Parts3DModel>;
+  deleteParts3DModel(id: string): Promise<void>;
+  createParts3DViewSession(data: InsertParts3DViewSession): Promise<Parts3DViewSession>;
+  getParts3DViewSessions(modelId?: string): Promise<Parts3DViewSession[]>;
   
   // Drone Inspection Services
   createDroneInspection(data: InsertDroneInspection): Promise<DroneInspection>;
   getDroneInspections(garageId?: string, vehicleId?: string): Promise<DroneInspection[]>;
   getDroneInspection(id: string): Promise<DroneInspection | undefined>;
+  updateDroneInspection(id: string, data: Partial<DroneInspection>): Promise<DroneInspection>;
+  deleteDroneInspection(id: string): Promise<void>;
+  createDroneMedia(data: InsertDroneMedia): Promise<DroneMedia>;
+  getDroneMedia(inspectionId: string): Promise<DroneMedia[]>;
   
   // AI Video Analysis
-  createAiVideoAnalysis(data: InsertAiVideoAnalysis): Promise<AiVideoAnalysis>;
-  getAiVideoAnalyses(customerId?: string, vehicleId?: string): Promise<AiVideoAnalysis[]>;
-  updateAiVideoAnalysis(id: string, data: Partial<AiVideoAnalysis>): Promise<AiVideoAnalysis>;
+  createAiVideoAnalysis(data: InsertAIVideoAnalysis): Promise<AIVideoAnalysis>;
+  getAiVideoAnalyses(customerId?: string, vehicleId?: string): Promise<AIVideoAnalysis[]>;
+  updateAiVideoAnalysis(id: string, data: Partial<AIVideoAnalysis>): Promise<AIVideoAnalysis>;
+  deleteAiVideoAnalysis(id: string): Promise<void>;
   
   // Digital Twin Simulations
   createDigitalTwin(data: InsertDigitalTwin): Promise<DigitalTwin>;
   getDigitalTwins(vehicleId?: string): Promise<DigitalTwin[]>;
   updateDigitalTwin(id: string, data: Partial<DigitalTwin>): Promise<DigitalTwin>;
+  deleteDigitalTwin(id: string): Promise<void>;
+  createTwinSimulation(data: InsertTwinSimulation): Promise<TwinSimulation>;
+  getTwinSimulations(twinId: string): Promise<TwinSimulation[]>;
+  updateTwinSimulation(id: string, data: Partial<TwinSimulation>): Promise<TwinSimulation>;
   
   // ML Fraud Detection
   createFraudDetectionCase(data: InsertFraudDetectionCase): Promise<FraudDetectionCase>;
   getFraudDetectionCases(garageId?: string, riskLevel?: string): Promise<FraudDetectionCase[]>;
+  updateFraudDetectionCase(id: string, data: Partial<FraudDetectionCase>): Promise<FraudDetectionCase>;
+  deleteFraudDetectionCase(id: string): Promise<void>;
+  createFraudDetectionRule(data: InsertFraudDetectionRule): Promise<FraudDetectionRule>;
+  getFraudDetectionRules(garageId: string): Promise<FraudDetectionRule[]>;
+  updateFraudDetectionRule(id: string, data: Partial<FraudDetectionRule>): Promise<FraudDetectionRule>;
+  deleteFraudDetectionRule(id: string): Promise<void>;
   
   // Biometric Authentication
   createBiometricProfile(data: InsertBiometricProfile): Promise<BiometricProfile>;
   getBiometricProfile(userId: string): Promise<BiometricProfile | undefined>;
   updateBiometricProfile(userId: string, data: Partial<BiometricProfile>): Promise<BiometricProfile>;
+  deleteBiometricProfile(userId: string): Promise<void>;
+  createBiometricLog(data: InsertBiometricLog): Promise<BiometricLog>;
+  getBiometricLogs(userId: string): Promise<BiometricLog[]>;
   
   // 5G Remote Collaboration
   createCollaborationSession(data: InsertCollaborationSession): Promise<CollaborationSession>;
   getCollaborationSessions(garageId?: string, status?: string): Promise<CollaborationSession[]>;
   updateCollaborationSession(id: string, data: Partial<CollaborationSession>): Promise<CollaborationSession>;
+  deleteCollaborationSession(id: string): Promise<void>;
+  createCollaborationExpert(data: InsertCollaborationExpert): Promise<CollaborationExpert>;
+  getCollaborationExperts(sessionId: string): Promise<CollaborationExpert[]>;
   
   // Edge Computing Diagnostics
   createEdgeDevice(data: InsertEdgeDevice): Promise<EdgeDevice>;
   getEdgeDevices(garageId?: string): Promise<EdgeDevice[]>;
+  updateEdgeDevice(id: string, data: Partial<EdgeDevice>): Promise<EdgeDevice>;
+  deleteEdgeDevice(id: string): Promise<void>;
   createEdgeDiagnostic(data: InsertEdgeDiagnostic): Promise<EdgeDiagnostic>;
   getEdgeDiagnostics(deviceId?: string, vehicleId?: string): Promise<EdgeDiagnostic[]>;
+  updateEdgeDiagnostic(id: string, data: Partial<EdgeDiagnostic>): Promise<EdgeDiagnostic>;
+  deleteEdgeDiagnostic(id: string): Promise<void>;
   
   // Quantum-Inspired Pricing
   createPricingOptimization(data: InsertPricingOptimization): Promise<PricingOptimization>;
   getPricingOptimizations(garageId: string, serviceType?: string): Promise<PricingOptimization[]>;
   updatePricingOptimization(id: string, data: Partial<PricingOptimization>): Promise<PricingOptimization>;
+  deletePricingOptimization(id: string): Promise<void>;
+  createPricingRule(data: InsertPricingRule): Promise<PricingRule>;
+  getPricingRules(garageId: string): Promise<PricingRule[]>;
+  updatePricingRule(id: string, data: Partial<PricingRule>): Promise<PricingRule>;
+  deletePricingRule(id: string): Promise<void>;
   
   // Supporting tables for emerging technologies
   createIotAlert(data: any): Promise<any>;

@@ -13096,6 +13096,190 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ==========================================
+  // EMERGING TECHNOLOGIES ROUTES
+  // ==========================================
+
+  // Blockchain Vehicle History
+  app.get('/api/emerging-tech/blockchain', isAuthenticated, async (req: any, res) => {
+    try {
+      const { vehicleId } = req.query;
+      const garageId = req.user.garageId;
+      const records = await storage.getBlockchainRecords(vehicleId, garageId);
+      res.json(records);
+    } catch (error) {
+      console.error("Error fetching blockchain records:", error);
+      res.status(500).json({ message: "Failed to fetch blockchain records" });
+    }
+  });
+
+  // AR Repair Guides
+  app.get('/api/emerging-tech/ar-guides', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      const guides = await storage.getArRepairGuides(garageId);
+      res.json(guides);
+    } catch (error) {
+      console.error("Error fetching AR guides:", error);
+      res.status(500).json({ message: "Failed to fetch AR guides" });
+    }
+  });
+
+  // IoT Sensors
+  app.get('/api/emerging-tech/iot-sensors', isAuthenticated, async (req, res) => {
+    try {
+      const { vehicleId } = req.query;
+      const sensors = await storage.getIotSensors(vehicleId as string | undefined);
+      res.json(sensors);
+    } catch (error) {
+      console.error("Error fetching IoT sensors:", error);
+      res.status(500).json({ message: "Failed to fetch IoT sensors" });
+    }
+  });
+
+  app.get('/api/emerging-tech/iot-readings', isAuthenticated, async (req, res) => {
+    try {
+      const { sensorId, vehicleId } = req.query;
+      const readings = await storage.getIotSensorReadings(
+        sensorId as string | undefined,
+        vehicleId as string | undefined
+      );
+      res.json(readings);
+    } catch (error) {
+      console.error("Error fetching IoT readings:", error);
+      res.status(500).json({ message: "Failed to fetch IoT readings" });
+    }
+  });
+
+  // 3D Parts Models
+  app.get('/api/emerging-tech/3d-models', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      const models = await storage.getParts3DModels(garageId);
+      res.json(models);
+    } catch (error) {
+      console.error("Error fetching 3D models:", error);
+      res.status(500).json({ message: "Failed to fetch 3D models" });
+    }
+  });
+
+  // Drone Inspections
+  app.get('/api/emerging-tech/drone-inspections', isAuthenticated, async (req: any, res) => {
+    try {
+      const { vehicleId } = req.query;
+      const garageId = req.user.garageId;
+      const inspections = await storage.getDroneInspections(garageId, vehicleId);
+      res.json(inspections);
+    } catch (error) {
+      console.error("Error fetching drone inspections:", error);
+      res.status(500).json({ message: "Failed to fetch drone inspections" });
+    }
+  });
+
+  // AI Video Analysis
+  app.get('/api/emerging-tech/ai-video', isAuthenticated, async (req, res) => {
+    try {
+      const { customerId, vehicleId } = req.query;
+      const analyses = await storage.getAiVideoAnalyses(
+        customerId as string | undefined,
+        vehicleId as string | undefined
+      );
+      res.json(analyses);
+    } catch (error) {
+      console.error("Error fetching AI video analyses:", error);
+      res.status(500).json({ message: "Failed to fetch AI video analyses" });
+    }
+  });
+
+  // Digital Twins
+  app.get('/api/emerging-tech/digital-twins', isAuthenticated, async (req, res) => {
+    try {
+      const { vehicleId } = req.query;
+      const twins = await storage.getDigitalTwins(vehicleId as string | undefined);
+      res.json(twins);
+    } catch (error) {
+      console.error("Error fetching digital twins:", error);
+      res.status(500).json({ message: "Failed to fetch digital twins" });
+    }
+  });
+
+  // Fraud Detection
+  app.get('/api/emerging-tech/fraud-cases', isAuthenticated, async (req: any, res) => {
+    try {
+      const { riskLevel } = req.query;
+      const garageId = req.user.garageId;
+      const cases = await storage.getFraudDetectionCases(garageId, riskLevel);
+      res.json(cases);
+    } catch (error) {
+      console.error("Error fetching fraud cases:", error);
+      res.status(500).json({ message: "Failed to fetch fraud cases" });
+    }
+  });
+
+  // Biometric Profiles
+  app.get('/api/emerging-tech/biometric-profile', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const profile = await storage.getBiometricProfile(userId);
+      res.json(profile || {});
+    } catch (error) {
+      console.error("Error fetching biometric profile:", error);
+      res.status(500).json({ message: "Failed to fetch biometric profile" });
+    }
+  });
+
+  // Collaboration Sessions
+  app.get('/api/emerging-tech/collaboration-sessions', isAuthenticated, async (req: any, res) => {
+    try {
+      const { status } = req.query;
+      const garageId = req.user.garageId;
+      const sessions = await storage.getCollaborationSessions(garageId, status as string | undefined);
+      res.json(sessions);
+    } catch (error) {
+      console.error("Error fetching collaboration sessions:", error);
+      res.status(500).json({ message: "Failed to fetch collaboration sessions" });
+    }
+  });
+
+  // Edge Devices
+  app.get('/api/emerging-tech/edge-devices', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      const devices = await storage.getEdgeDevices(garageId);
+      res.json(devices);
+    } catch (error) {
+      console.error("Error fetching edge devices:", error);
+      res.status(500).json({ message: "Failed to fetch edge devices" });
+    }
+  });
+
+  app.get('/api/emerging-tech/edge-diagnostics', isAuthenticated, async (req, res) => {
+    try {
+      const { deviceId, vehicleId } = req.query;
+      const diagnostics = await storage.getEdgeDiagnostics(
+        deviceId as string | undefined,
+        vehicleId as string | undefined
+      );
+      res.json(diagnostics);
+    } catch (error) {
+      console.error("Error fetching edge diagnostics:", error);
+      res.status(500).json({ message: "Failed to fetch edge diagnostics" });
+    }
+  });
+
+  // Pricing Optimization
+  app.get('/api/emerging-tech/pricing-optimization', isAuthenticated, async (req: any, res) => {
+    try {
+      const { serviceType } = req.query;
+      const garageId = req.user.garageId;
+      const optimizations = await storage.getPricingOptimizations(garageId, serviceType as string | undefined);
+      res.json(optimizations);
+    } catch (error) {
+      console.error("Error fetching pricing optimizations:", error);
+      res.status(500).json({ message: "Failed to fetch pricing optimizations" });
+    }
+  });
+
   const httpServer = createServer(app);
   
   // Initialize WebSocket server for chat
