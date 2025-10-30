@@ -359,6 +359,59 @@ import {
   type InsertDocument,
   type DocumentAccessLog,
   type InsertDocumentAccessLog,
+  blockchainRecords,
+  type BlockchainRecord,
+  type InsertBlockchainRecord,
+  arRepairGuides,
+  arGuideSessions,
+  type ArRepairGuide,
+  type InsertArRepairGuide,
+  type ArGuideSession,
+  type InsertArGuideSession,
+  iotSensors,
+  iotSensorReadings,
+  iotAlerts,
+  type IotSensor,
+  type InsertIotSensor,
+  type IotSensorReading,
+  type InsertIotSensorReading,
+  parts3DModels,
+  parts3DViewSessions,
+  type Parts3DModel,
+  type InsertParts3DModel,
+  droneInspections,
+  droneMedia,
+  type DroneInspection,
+  type InsertDroneInspection,
+  aiVideoAnalysis,
+  type AiVideoAnalysis,
+  type InsertAiVideoAnalysis,
+  digitalTwins,
+  twinSimulations,
+  type DigitalTwin,
+  type InsertDigitalTwin,
+  fraudDetectionCases,
+  fraudDetectionRules,
+  type FraudDetectionCase,
+  type InsertFraudDetectionCase,
+  biometricProfiles,
+  biometricLogs,
+  type BiometricProfile,
+  type InsertBiometricProfile,
+  collaborationSessions,
+  collaborationExperts,
+  type CollaborationSession,
+  type InsertCollaborationSession,
+  edgeDevices,
+  edgeDiagnostics,
+  type EdgeDevice,
+  type InsertEdgeDevice,
+  type EdgeDiagnostic,
+  type InsertEdgeDiagnostic,
+  pricingOptimization,
+  pricingRules,
+  type PricingOptimization,
+  type InsertPricingOptimization,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, or, inArray, and, gte, lte, ilike, sql, isNull, gt } from "drizzle-orm";
@@ -1131,6 +1184,86 @@ export interface IStorage {
   getEntitlementAssignments(licenseId?: string, userId?: string): Promise<any[]>;
   getEntitlementAssignmentById(id: string): Promise<any | undefined>;
   updateEntitlementAssignment(id: string, data: any): Promise<any>;
+
+  // Emerging Technologies
+  // Blockchain Vehicle History
+  createBlockchainRecord(data: InsertBlockchainRecord): Promise<BlockchainRecord>;
+  getBlockchainRecords(vehicleId?: string, garageId?: string): Promise<BlockchainRecord[]>;
+  getBlockchainRecord(id: string): Promise<BlockchainRecord | undefined>;
+  
+  // AR Repair Guides
+  createArRepairGuide(data: InsertArRepairGuide): Promise<ArRepairGuide>;
+  getArRepairGuides(garageId?: string): Promise<ArRepairGuide[]>;
+  getArRepairGuide(id: string): Promise<ArRepairGuide | undefined>;
+  updateArRepairGuide(id: string, data: Partial<ArRepairGuide>): Promise<ArRepairGuide>;
+  createArGuideSession(data: InsertArGuideSession): Promise<ArGuideSession>;
+  
+  // IoT Sensor Integration
+  createIotSensor(data: InsertIotSensor): Promise<IotSensor>;
+  getIotSensors(vehicleId?: string): Promise<IotSensor[]>;
+  createIotSensorReading(data: InsertIotSensorReading): Promise<IotSensorReading>;
+  getIotSensorReadings(sensorId?: string, vehicleId?: string): Promise<IotSensorReading[]>;
+  
+  // 3D Parts Visualization
+  createParts3DModel(data: InsertParts3DModel): Promise<Parts3DModel>;
+  getParts3DModels(garageId?: string): Promise<Parts3DModel[]>;
+  getParts3DModel(id: string): Promise<Parts3DModel | undefined>;
+  
+  // Drone Inspection Services
+  createDroneInspection(data: InsertDroneInspection): Promise<DroneInspection>;
+  getDroneInspections(garageId?: string, vehicleId?: string): Promise<DroneInspection[]>;
+  getDroneInspection(id: string): Promise<DroneInspection | undefined>;
+  
+  // AI Video Analysis
+  createAiVideoAnalysis(data: InsertAiVideoAnalysis): Promise<AiVideoAnalysis>;
+  getAiVideoAnalyses(customerId?: string, vehicleId?: string): Promise<AiVideoAnalysis[]>;
+  updateAiVideoAnalysis(id: string, data: Partial<AiVideoAnalysis>): Promise<AiVideoAnalysis>;
+  
+  // Digital Twin Simulations
+  createDigitalTwin(data: InsertDigitalTwin): Promise<DigitalTwin>;
+  getDigitalTwins(vehicleId?: string): Promise<DigitalTwin[]>;
+  updateDigitalTwin(id: string, data: Partial<DigitalTwin>): Promise<DigitalTwin>;
+  
+  // ML Fraud Detection
+  createFraudDetectionCase(data: InsertFraudDetectionCase): Promise<FraudDetectionCase>;
+  getFraudDetectionCases(garageId?: string, riskLevel?: string): Promise<FraudDetectionCase[]>;
+  
+  // Biometric Authentication
+  createBiometricProfile(data: InsertBiometricProfile): Promise<BiometricProfile>;
+  getBiometricProfile(userId: string): Promise<BiometricProfile | undefined>;
+  updateBiometricProfile(userId: string, data: Partial<BiometricProfile>): Promise<BiometricProfile>;
+  
+  // 5G Remote Collaboration
+  createCollaborationSession(data: InsertCollaborationSession): Promise<CollaborationSession>;
+  getCollaborationSessions(garageId?: string, status?: string): Promise<CollaborationSession[]>;
+  updateCollaborationSession(id: string, data: Partial<CollaborationSession>): Promise<CollaborationSession>;
+  
+  // Edge Computing Diagnostics
+  createEdgeDevice(data: InsertEdgeDevice): Promise<EdgeDevice>;
+  getEdgeDevices(garageId?: string): Promise<EdgeDevice[]>;
+  createEdgeDiagnostic(data: InsertEdgeDiagnostic): Promise<EdgeDiagnostic>;
+  getEdgeDiagnostics(deviceId?: string, vehicleId?: string): Promise<EdgeDiagnostic[]>;
+  
+  // Quantum-Inspired Pricing
+  createPricingOptimization(data: InsertPricingOptimization): Promise<PricingOptimization>;
+  getPricingOptimizations(garageId: string, serviceType?: string): Promise<PricingOptimization[]>;
+  updatePricingOptimization(id: string, data: Partial<PricingOptimization>): Promise<PricingOptimization>;
+  
+  // Supporting tables for emerging technologies
+  createIotAlert(data: any): Promise<any>;
+  getIotAlerts(sensorId?: string, vehicleId?: string): Promise<any[]>;
+  createDroneMedia(data: any): Promise<any>;
+  getDroneMedia(inspectionId: string): Promise<any[]>;
+  createTwinSimulation(data: any): Promise<any>;
+  getTwinSimulations(twinId: string): Promise<any[]>;
+  createCollaborationExpert(data: any): Promise<any>;
+  getCollaborationExperts(): Promise<any[]>;
+  createPricingRule(data: any): Promise<any>;
+  getPricingRules(garageId?: string): Promise<any[]>;
+  createBiometricLog(data: any): Promise<any>;
+  getBiometricLogs(userId: string): Promise<any[]>;
+  createFraudDetectionRule(data: any): Promise<any>;
+  getFraudDetectionRules(garageId?: string): Promise<any[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -7443,6 +7576,369 @@ export class DatabaseStorage implements IStorage {
       .where(eq(entitlementAssignments.id, id))
       .returning();
     return assignment;
+  }
+
+  // Emerging Technologies Implementations
+  
+  // Blockchain Vehicle History
+  async createBlockchainRecord(data: InsertBlockchainRecord): Promise<BlockchainRecord> {
+    const [record] = await db.insert(blockchainRecords).values(data).returning();
+    return record;
+  }
+
+  async getBlockchainRecords(vehicleId?: string, garageId?: string): Promise<BlockchainRecord[]> {
+    const conditions = [];
+    if (vehicleId) conditions.push(eq(blockchainRecords.vehicleId, vehicleId));
+    if (garageId) conditions.push(eq(blockchainRecords.garageId, garageId));
+    
+    if (conditions.length === 0) {
+      return await db.select().from(blockchainRecords).orderBy(desc(blockchainRecords.timestamp));
+    }
+    return await db.select().from(blockchainRecords).where(and(...conditions)).orderBy(desc(blockchainRecords.timestamp));
+  }
+
+  async getBlockchainRecord(id: string): Promise<BlockchainRecord | undefined> {
+    const [record] = await db.select().from(blockchainRecords).where(eq(blockchainRecords.id, id));
+    return record;
+  }
+
+  // AR Repair Guides
+  async createArRepairGuide(data: InsertArRepairGuide): Promise<ArRepairGuide> {
+    const [guide] = await db.insert(arRepairGuides).values(data).returning();
+    return guide;
+  }
+
+  async getArRepairGuides(garageId?: string): Promise<ArRepairGuide[]> {
+    if (garageId) {
+      return await db.select().from(arRepairGuides).where(eq(arRepairGuides.garageId, garageId)).orderBy(desc(arRepairGuides.createdAt));
+    }
+    return await db.select().from(arRepairGuides).orderBy(desc(arRepairGuides.createdAt));
+  }
+
+  async getArRepairGuide(id: string): Promise<ArRepairGuide | undefined> {
+    const [guide] = await db.select().from(arRepairGuides).where(eq(arRepairGuides.id, id));
+    return guide;
+  }
+
+  async updateArRepairGuide(id: string, data: Partial<ArRepairGuide>): Promise<ArRepairGuide> {
+    const [guide] = await db.update(arRepairGuides)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(arRepairGuides.id, id))
+      .returning();
+    return guide;
+  }
+
+  async createArGuideSession(data: InsertArGuideSession): Promise<ArGuideSession> {
+    const [session] = await db.insert(arGuideSessions).values(data).returning();
+    return session;
+  }
+
+  // IoT Sensor Integration
+  async createIotSensor(data: InsertIotSensor): Promise<IotSensor> {
+    const [sensor] = await db.insert(iotSensors).values(data).returning();
+    return sensor;
+  }
+
+  async getIotSensors(vehicleId?: string): Promise<IotSensor[]> {
+    if (vehicleId) {
+      return await db.select().from(iotSensors).where(eq(iotSensors.vehicleId, vehicleId));
+    }
+    return await db.select().from(iotSensors).orderBy(desc(iotSensors.createdAt));
+  }
+
+  async createIotSensorReading(data: InsertIotSensorReading): Promise<IotSensorReading> {
+    const [reading] = await db.insert(iotSensorReadings).values(data).returning();
+    return reading;
+  }
+
+  async getIotSensorReadings(sensorId?: string, vehicleId?: string): Promise<IotSensorReading[]> {
+    const conditions = [];
+    if (sensorId) conditions.push(eq(iotSensorReadings.sensorId, sensorId));
+    
+    if (conditions.length === 0) {
+      return await db.select().from(iotSensorReadings).orderBy(desc(iotSensorReadings.timestamp)).limit(500);
+    }
+    return await db.select().from(iotSensorReadings).where(and(...conditions)).orderBy(desc(iotSensorReadings.timestamp)).limit(500);
+  }
+
+  // 3D Parts Visualization
+  async createParts3DModel(data: InsertParts3DModel): Promise<Parts3DModel> {
+    const [model] = await db.insert(parts3DModels).values(data).returning();
+    return model;
+  }
+
+  async getParts3DModels(garageId?: string): Promise<Parts3DModel[]> {
+    if (garageId) {
+      return await db.select().from(parts3DModels).where(eq(parts3DModels.garageId, garageId));
+    }
+    return await db.select().from(parts3DModels);
+  }
+
+  async getParts3DModel(id: string): Promise<Parts3DModel | undefined> {
+    const [model] = await db.select().from(parts3DModels).where(eq(parts3DModels.id, id));
+    return model;
+  }
+
+  // Drone Inspection Services
+  async createDroneInspection(data: InsertDroneInspection): Promise<DroneInspection> {
+    const [inspection] = await db.insert(droneInspections).values(data).returning();
+    return inspection;
+  }
+
+  async getDroneInspections(garageId?: string, vehicleId?: string): Promise<DroneInspection[]> {
+    const conditions = [];
+    if (garageId) conditions.push(eq(droneInspections.garageId, garageId));
+    if (vehicleId) conditions.push(eq(droneInspections.vehicleId, vehicleId));
+    
+    if (conditions.length === 0) {
+      return await db.select().from(droneInspections).orderBy(desc(droneInspections.inspectionDate));
+    }
+    return await db.select().from(droneInspections).where(and(...conditions)).orderBy(desc(droneInspections.inspectionDate));
+  }
+
+  async getDroneInspection(id: string): Promise<DroneInspection | undefined> {
+    const [inspection] = await db.select().from(droneInspections).where(eq(droneInspections.id, id));
+    return inspection;
+  }
+
+  // AI Video Analysis
+  async createAiVideoAnalysis(data: InsertAiVideoAnalysis): Promise<AiVideoAnalysis> {
+    const [analysis] = await db.insert(aiVideoAnalysis).values(data).returning();
+    return analysis;
+  }
+
+  async getAiVideoAnalyses(customerId?: string, vehicleId?: string): Promise<AiVideoAnalysis[]> {
+    const conditions = [];
+    if (customerId) conditions.push(eq(aiVideoAnalysis.customerId, customerId));
+    if (vehicleId) conditions.push(eq(aiVideoAnalysis.vehicleId, vehicleId));
+    
+    if (conditions.length === 0) {
+      return await db.select().from(aiVideoAnalysis).orderBy(desc(aiVideoAnalysis.uploadedAt));
+    }
+    return await db.select().from(aiVideoAnalysis).where(and(...conditions)).orderBy(desc(aiVideoAnalysis.uploadedAt));
+  }
+
+  async updateAiVideoAnalysis(id: string, data: Partial<AiVideoAnalysis>): Promise<AiVideoAnalysis> {
+    const [analysis] = await db.update(aiVideoAnalysis)
+      .set(data)
+      .where(eq(aiVideoAnalysis.id, id))
+      .returning();
+    return analysis;
+  }
+
+  // Digital Twin Simulations
+  async createDigitalTwin(data: InsertDigitalTwin): Promise<DigitalTwin> {
+    const [twin] = await db.insert(digitalTwins).values(data).returning();
+    return twin;
+  }
+
+  async getDigitalTwins(vehicleId?: string): Promise<DigitalTwin[]> {
+    if (vehicleId) {
+      return await db.select().from(digitalTwins).where(eq(digitalTwins.vehicleId, vehicleId));
+    }
+    return await db.select().from(digitalTwins).orderBy(desc(digitalTwins.lastSyncedAt));
+  }
+
+  async updateDigitalTwin(id: string, data: Partial<DigitalTwin>): Promise<DigitalTwin> {
+    const [twin] = await db.update(digitalTwins)
+      .set({ ...data, lastSyncedAt: new Date() })
+      .where(eq(digitalTwins.id, id))
+      .returning();
+    return twin;
+  }
+
+  // ML Fraud Detection
+  async createFraudDetectionCase(data: InsertFraudDetectionCase): Promise<FraudDetectionCase> {
+    const [detectionCase] = await db.insert(fraudDetectionCases).values(data).returning();
+    return detectionCase;
+  }
+
+  async getFraudDetectionCases(garageId?: string, riskLevel?: string): Promise<FraudDetectionCase[]> {
+    const conditions = [];
+    if (garageId) conditions.push(eq(fraudDetectionCases.garageId, garageId));
+    if (riskLevel) conditions.push(eq(fraudDetectionCases.riskLevel, riskLevel));
+    
+    if (conditions.length === 0) {
+      return await db.select().from(fraudDetectionCases).orderBy(desc(fraudDetectionCases.detectedAt)).limit(100);
+    }
+    return await db.select().from(fraudDetectionCases).where(and(...conditions)).orderBy(desc(fraudDetectionCases.detectedAt)).limit(100);
+  }
+
+  // Biometric Authentication
+  async createBiometricProfile(data: InsertBiometricProfile): Promise<BiometricProfile> {
+    const [profile] = await db.insert(biometricProfiles).values(data).returning();
+    return profile;
+  }
+
+  async getBiometricProfile(userId: string): Promise<BiometricProfile | undefined> {
+    const [profile] = await db.select().from(biometricProfiles).where(eq(biometricProfiles.userId, userId));
+    return profile;
+  }
+
+  async updateBiometricProfile(userId: string, data: Partial<BiometricProfile>): Promise<BiometricProfile> {
+    const [profile] = await db.update(biometricProfiles)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(biometricProfiles.userId, userId))
+      .returning();
+    return profile;
+  }
+
+  // 5G Remote Collaboration
+  async createCollaborationSession(data: InsertCollaborationSession): Promise<CollaborationSession> {
+    const [session] = await db.insert(collaborationSessions).values(data).returning();
+    return session;
+  }
+
+  async getCollaborationSessions(garageId?: string, status?: string): Promise<CollaborationSession[]> {
+    const conditions = [];
+    if (garageId) conditions.push(eq(collaborationSessions.garageId, garageId));
+    if (status) conditions.push(eq(collaborationSessions.status, status));
+    
+    if (conditions.length === 0) {
+      return await db.select().from(collaborationSessions).orderBy(desc(collaborationSessions.startTime));
+    }
+    return await db.select().from(collaborationSessions).where(and(...conditions)).orderBy(desc(collaborationSessions.startTime));
+  }
+
+  async updateCollaborationSession(id: string, data: Partial<CollaborationSession>): Promise<CollaborationSession> {
+    const [session] = await db.update(collaborationSessions)
+      .set(data)
+      .where(eq(collaborationSessions.id, id))
+      .returning();
+    return session;
+  }
+
+  // Edge Computing Diagnostics
+  async createEdgeDevice(data: InsertEdgeDevice): Promise<EdgeDevice> {
+    const [device] = await db.insert(edgeDevices).values(data).returning();
+    return device;
+  }
+
+  async getEdgeDevices(garageId?: string): Promise<EdgeDevice[]> {
+    if (garageId) {
+      return await db.select().from(edgeDevices).where(eq(edgeDevices.garageId, garageId));
+    }
+    return await db.select().from(edgeDevices);
+  }
+
+  async createEdgeDiagnostic(data: InsertEdgeDiagnostic): Promise<EdgeDiagnostic> {
+    const [diagnostic] = await db.insert(edgeDiagnostics).values(data).returning();
+    return diagnostic;
+  }
+
+  async getEdgeDiagnostics(deviceId?: string, vehicleId?: string): Promise<EdgeDiagnostic[]> {
+    const conditions = [];
+    if (deviceId) conditions.push(eq(edgeDiagnostics.deviceId, deviceId));
+    if (vehicleId) conditions.push(eq(edgeDiagnostics.vehicleId, vehicleId));
+    
+    if (conditions.length === 0) {
+      return await db.select().from(edgeDiagnostics).orderBy(desc(edgeDiagnostics.diagnosedAt)).limit(500);
+    }
+    return await db.select().from(edgeDiagnostics).where(and(...conditions)).orderBy(desc(edgeDiagnostics.diagnosedAt)).limit(500);
+  }
+
+  // Quantum-Inspired Pricing
+  async createPricingOptimization(data: InsertPricingOptimization): Promise<PricingOptimization> {
+    const [pricing] = await db.insert(pricingOptimization).values(data).returning();
+    return pricing;
+  }
+
+  async getPricingOptimizations(garageId: string, serviceType?: string): Promise<PricingOptimization[]> {
+    if (serviceType) {
+      return await db.select()
+        .from(pricingOptimization)
+        .where(and(eq(pricingOptimization.garageId, garageId), eq(pricingOptimization.serviceType, serviceType)))
+        .orderBy(desc(pricingOptimization.calculatedAt));
+    }
+    return await db.select()
+      .from(pricingOptimization)
+      .where(eq(pricingOptimization.garageId, garageId))
+      .orderBy(desc(pricingOptimization.calculatedAt));
+  }
+
+  async updatePricingOptimization(id: string, data: Partial<PricingOptimization>): Promise<PricingOptimization> {
+    const [pricing] = await db.update(pricingOptimization)
+      .set({ ...data, calculatedAt: new Date() })
+      .where(eq(pricingOptimization.id, id))
+      .returning();
+    return pricing;
+  }
+
+  // Supporting tables for emerging technologies
+  async createIotAlert(data: any): Promise<any> {
+    const [alert] = await db.insert(iotAlerts).values(data).returning();
+    return alert;
+  }
+
+  async getIotAlerts(sensorId?: string, vehicleId?: string): Promise<any[]> {
+    const conditions = [];
+    if (sensorId) conditions.push(eq(iotAlerts.sensorId, sensorId));
+    if (vehicleId) conditions.push(eq(iotAlerts.vehicleId, vehicleId));
+    
+    if (conditions.length === 0) {
+      return await db.select().from(iotAlerts).orderBy(desc(iotAlerts.createdAt)).limit(100);
+    }
+    return await db.select().from(iotAlerts).where(and(...conditions)).orderBy(desc(iotAlerts.createdAt)).limit(100);
+  }
+
+  async createDroneMedia(data: any): Promise<any> {
+    const [media] = await db.insert(droneMedia).values(data).returning();
+    return media;
+  }
+
+  async getDroneMedia(inspectionId: string): Promise<any[]> {
+    return await db.select().from(droneMedia).where(eq(droneMedia.inspectionId, inspectionId));
+  }
+
+  async createTwinSimulation(data: any): Promise<any> {
+    const [simulation] = await db.insert(twinSimulations).values(data).returning();
+    return simulation;
+  }
+
+  async getTwinSimulations(twinId: string): Promise<any[]> {
+    return await db.select().from(twinSimulations).where(eq(twinSimulations.twinId, twinId)).orderBy(desc(twinSimulations.simulatedAt));
+  }
+
+  async createCollaborationExpert(data: any): Promise<any> {
+    const [expert] = await db.insert(collaborationExperts).values(data).returning();
+    return expert;
+  }
+
+  async getCollaborationExperts(): Promise<any[]> {
+    return await db.select().from(collaborationExperts);
+  }
+
+  async createPricingRule(data: any): Promise<any> {
+    const [rule] = await db.insert(pricingRules).values(data).returning();
+    return rule;
+  }
+
+  async getPricingRules(garageId?: string): Promise<any[]> {
+    if (garageId) {
+      return await db.select().from(pricingRules).where(eq(pricingRules.garageId, garageId));
+    }
+    return await db.select().from(pricingRules);
+  }
+
+  async createBiometricLog(data: any): Promise<any> {
+    const [log] = await db.insert(biometricLogs).values(data).returning();
+    return log;
+  }
+
+  async getBiometricLogs(userId: string): Promise<any[]> {
+    return await db.select().from(biometricLogs).where(eq(biometricLogs.userId, userId)).orderBy(desc(biometricLogs.timestamp)).limit(100);
+  }
+
+  async createFraudDetectionRule(data: any): Promise<any> {
+    const [rule] = await db.insert(fraudDetectionRules).values(data).returning();
+    return rule;
+  }
+
+  async getFraudDetectionRules(garageId?: string): Promise<any[]> {
+    if (garageId) {
+      return await db.select().from(fraudDetectionRules).where(eq(fraudDetectionRules.garageId, garageId)).orderBy(fraudDetectionRules.ruleName);
+    }
+    return await db.select().from(fraudDetectionRules).orderBy(fraudDetectionRules.ruleName);
   }
 }
 
