@@ -14231,6 +14231,515 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post("/api/nextgen/seed", isAuthenticated, async (req, res) => {
+    try {
+      const garageId = req.user!.garageId!;
+      const userId = req.user!.id;
+
+      const vehicles = await storage.getVehicles(garageId);
+      const vehicleId = vehicles[0]?.id || 'sample-vehicle-id';
+
+      let totalRecords = 0;
+
+      // 1. Neural Diagnostics - Create 3 neural diagnostics with realistic AI prediction data
+      for (let i = 0; i < 3; i++) {
+        const diagnostic = await storage.createNeuralDiagnostic({
+          garageId,
+          vehicleId,
+          modelVersion: ['v2.5', 'v3.0', 'v2.8'][i],
+          inputData: {
+            engineTemp: 95 + i * 5,
+            oilPressure: 45 + i * 2,
+            fuelLevel: 75 - i * 10,
+            batteryVoltage: 12.6 + i * 0.1
+          },
+          prediction: ['engine_maintenance_required', 'normal_operation', 'oil_change_soon'][i],
+          confidence: 0.92 + i * 0.02,
+          processingTime: 150 + i * 50,
+          status: 'completed',
+        });
+        
+        if (i < 2) {
+          await storage.createNeuralTrainingSession({
+            garageId,
+            diagnosticId: diagnostic.id,
+            trainingDataCount: 5000 + i * 1000,
+            epochs: 50 + i * 10,
+            accuracy: 0.94 + i * 0.02,
+            loss: 0.08 - i * 0.01,
+            status: 'completed',
+          });
+          totalRecords++;
+        }
+        totalRecords++;
+      }
+
+      // 2. Computer Vision - Create 2 quality checks with defect detection results
+      for (let i = 0; i < 2; i++) {
+        const qualityCheck = await storage.createVisionQualityCheck({
+          garageId,
+          vehicleId,
+          imageUrl: `https://storage.example.com/qc/${Date.now()}-${i}.jpg`,
+          modelVersion: 'YOLOv8-QC',
+          overallScore: 88 + i * 5,
+          defectsDetected: i === 0 ? 2 : 0,
+          processingTime: 320 + i * 80,
+          status: 'completed',
+        });
+
+        if (i === 0) {
+          await storage.createVisionDefect({
+            qualityCheckId: qualityCheck.id,
+            defectType: 'paint_scratch',
+            severity: 'minor',
+            confidence: 0.89,
+            boundingBox: { x: 245, y: 156, width: 85, height: 42 },
+            location: 'front_door_panel',
+          });
+
+          await storage.createVisionDefect({
+            qualityCheckId: qualityCheck.id,
+            defectType: 'dent',
+            severity: 'moderate',
+            confidence: 0.93,
+            boundingBox: { x: 512, y: 234, width: 120, height: 95 },
+            location: 'rear_bumper',
+          });
+          totalRecords += 2;
+        }
+        totalRecords++;
+      }
+
+      // 3. NLP Service Writer - Create 3 service requests with processed complaints
+      const complaints = [
+        'My car makes a strange squeaking noise when I brake, especially at low speeds',
+        'The engine is running rough and I smell fuel, also the check engine light is on',
+        'Air conditioning is not cooling properly and makes a rattling sound'
+      ];
+
+      for (let i = 0; i < 3; i++) {
+        await storage.createNLPServiceRequest({
+          garageId,
+          customerId: userId,
+          vehicleId,
+          originalComplaint: complaints[i],
+          processedText: complaints[i].toLowerCase(),
+          detectedIssues: [
+            ['brake_noise', 'brake_service'],
+            ['engine_misfire', 'fuel_leak', 'diagnostic_required'],
+            ['ac_malfunction', 'ac_compressor']
+          ][i],
+          suggestedServices: [
+            ['Brake Inspection', 'Brake Pad Replacement'],
+            ['Engine Diagnostic', 'Fuel System Check'],
+            ['AC System Diagnostic', 'AC Compressor Service']
+          ][i],
+          sentiment: ['neutral', 'concerned', 'frustrated'][i],
+          priority: ['medium', 'high', 'medium'][i],
+          confidence: 0.91 + i * 0.02,
+          modelVersion: 'GPT-4-Turbo',
+          status: 'processed',
+        });
+        totalRecords++;
+      }
+
+      // 4. RL Parts Optimizer - Create 2 parts optimizations with learning metrics
+      for (let i = 0; i < 2; i++) {
+        const optimization = await storage.createRLPartsOptimization({
+          garageId,
+          partCategory: ['brake_pads', 'oil_filters'][i],
+          currentStockLevel: 45 + i * 15,
+          recommendedStockLevel: 60 + i * 10,
+          reorderPoint: 25 + i * 5,
+          reorderQuantity: 30 + i * 10,
+          confidenceScore: 0.88 + i * 0.04,
+          costSavings: 450 + i * 200,
+          agentVersion: 'RL-Agent-v1.2',
+          status: 'active',
+        });
+
+        await storage.createRLLearningEpisode({
+          optimizationId: optimization.id,
+          episodeNumber: 150 + i * 50,
+          reward: 0.85 + i * 0.05,
+          loss: 0.12 - i * 0.02,
+          epsilon: 0.15 - i * 0.03,
+          learningRate: 0.001,
+          stateData: { stockLevel: 45 + i * 15, demandForecast: 55 },
+          actionTaken: 'reorder_triggered',
+        });
+        totalRecords += 2;
+      }
+
+      // 5. Metaverse Showroom - Create 1 showroom with 2 virtual visits
+      const showroom = await storage.createMetaverseShowroom({
+        garageId,
+        showroomName: 'Virtual Service Center - Premium',
+        metaversePlatform: 'Decentraland',
+        showroomUrl: 'https://metaverse.example.com/garage/' + garageId,
+        virtualCoordinates: 'X:125, Y:67, Z:3',
+        featuredVehicles: [vehicleId],
+        interactiveFeatures: ['3D vehicle viewer', 'service history', 'live chat'],
+        status: 'active',
+      });
+      totalRecords++;
+
+      const visitTime = Date.now();
+      for (let i = 0; i < 2; i++) {
+        await storage.createMetaverseVisit({
+          showroomId: showroom.id,
+          visitorId: `visitor-${Date.now()}-${i}`,
+          visitorType: i === 0 ? 'customer' : 'prospect',
+          durationMinutes: 15 + i * 8,
+          interactionsCount: 12 + i * 5,
+          viewedVehicles: [vehicleId],
+          virtualAssistantUsed: i === 0,
+          leadGenerated: i === 1,
+          visitDate: new Date(visitTime - (i * 24 * 60 * 60 * 1000)).toISOString(),
+        });
+        totalRecords++;
+      }
+
+      // 6. Holographic Guides - Create 2 repair guides with 1 active session
+      for (let i = 0; i < 2; i++) {
+        const guide = await storage.createHolographicGuide({
+          garageId,
+          guideName: ['Engine Oil Change Holographic Guide', 'Brake Service AR Guide'][i],
+          targetService: ['oil_change', 'brake_service'][i],
+          vehicleModels: ['Toyota Camry', 'Honda Accord', 'Nissan Altima'],
+          hologramModelUrl: `https://holograms.example.com/guides/${i + 1}.glb`,
+          steps: [
+            { stepNumber: 1, instruction: 'Prepare tools and safety equipment', duration: 120 },
+            { stepNumber: 2, instruction: 'Locate service points', duration: 180 },
+            { stepNumber: 3, instruction: 'Perform service procedure', duration: 600 }
+          ],
+          difficultyLevel: i === 0 ? 'beginner' : 'intermediate',
+          estimatedDuration: i === 0 ? 30 : 60,
+          createdBy: userId,
+          status: 'published',
+        });
+
+        if (i === 0) {
+          await storage.createHolographicSession({
+            guideId: guide.id,
+            garageId,
+            technicianId: userId,
+            vehicleId,
+            deviceType: 'HoloLens 3',
+            sessionDuration: 28,
+            completionPercentage: 100,
+            stepsCompleted: 3,
+            totalSteps: 3,
+            feedback: 'Very helpful and clear instructions',
+            status: 'completed',
+          });
+          totalRecords++;
+        }
+        totalRecords++;
+      }
+
+      // 7. Spatial Computing - Create 1 workstation with 1 diagnostic session
+      const workstation = await storage.createSpatialWorkstation({
+        garageId,
+        workstationName: 'Bay 3 - Diagnostic Station',
+        location: 'Service Bay 3',
+        deviceType: 'Apple Vision Pro',
+        capabilities: ['3D overlay', 'parts identification', 'torque specs display', 'AR instructions'],
+        calibrationDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+        status: 'active',
+      });
+      totalRecords++;
+
+      await storage.createSpatialDiagnosticSession({
+        workstationId: workstation.id,
+        garageId,
+        technicianId: userId,
+        vehicleId,
+        diagnosticType: 'comprehensive',
+        spatialMarkers: 8,
+        annotationsCreated: 5,
+        measurementsTaken: 12,
+        sessionDuration: 45,
+        accuracy: 0.97,
+        status: 'completed',
+      });
+      totalRecords++;
+
+      // 8. Autonomous Robots - Create 2 robots with 3 tasks
+      const robots = [];
+      for (let i = 0; i < 2; i++) {
+        const robot = await storage.createAutonomousRobot({
+          garageId,
+          robotName: ['AutoBot-Inspect-01', 'AutoBot-Parts-02'][i],
+          robotType: i === 0 ? 'inspection' : 'parts_delivery',
+          capabilities: i === 0 
+            ? ['undercarriage_scan', 'fluid_level_check', 'tire_pressure_check']
+            : ['parts_retrieval', 'parts_delivery', 'inventory_scan'],
+          batteryLevel: 85 + i * 10,
+          firmwareVersion: 'v4.2.1',
+          lastMaintenanceDate: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
+          status: 'active',
+        });
+        robots.push(robot);
+        totalRecords++;
+      }
+
+      const taskTypes = ['undercarriage_inspection', 'parts_retrieval', 'inventory_scan'];
+      for (let i = 0; i < 3; i++) {
+        await storage.createRobotTask({
+          robotId: robots[i % 2].id,
+          taskType: taskTypes[i],
+          vehicleId: i === 0 ? vehicleId : undefined,
+          priority: ['high', 'medium', 'low'][i],
+          estimatedDuration: [15, 8, 12][i],
+          actualDuration: [14, 9, 11][i],
+          completionPercentage: 100,
+          status: 'completed',
+          completedAt: new Date(Date.now() - (2 - i) * 60 * 60 * 1000).toISOString(),
+        });
+        totalRecords++;
+      }
+
+      // 9. Drone Fleet - Create 1 drone with 2 missions
+      const drone = await storage.createDroneFleet({
+        garageId,
+        droneName: 'SkyInspect-Alpha',
+        droneType: 'inspection',
+        model: 'DJI Matrice 300 RTK',
+        capabilities: ['thermal_imaging', 'high_res_camera', 'lidar_scanning'],
+        batteryLevel: 92,
+        flightHours: 245,
+        lastMaintenanceDate: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toISOString(),
+        status: 'ready',
+      });
+      totalRecords++;
+
+      for (let i = 0; i < 2; i++) {
+        await storage.createDroneMission({
+          droneId: drone.id,
+          missionType: i === 0 ? 'roof_inspection' : 'facility_survey',
+          targetLocation: i === 0 ? 'Customer Location - Warehouse' : 'Garage Facility',
+          flightDuration: 18 + i * 7,
+          imagesCaptured: 45 + i * 20,
+          videoRecorded: i === 0,
+          findingsDetected: i === 0 ? ['roof_damage', 'gutter_blockage'] : [],
+          pilotId: userId,
+          status: 'completed',
+          completedAt: new Date(Date.now() - (1 - i) * 24 * 60 * 60 * 1000).toISOString(),
+        });
+        totalRecords++;
+      }
+
+      // 10. Smart Contracts - Create 1 smart contract with 2 events
+      const contract = await storage.createSmartContract({
+        garageId,
+        contractType: 'service_warranty',
+        blockchainNetwork: 'Ethereum',
+        contractAddress: '0x' + Math.random().toString(16).substring(2, 42),
+        abi: JSON.stringify([{ type: 'function', name: 'claimWarranty' }]),
+        terms: {
+          warrantyPeriod: '12 months',
+          coverageAmount: 5000,
+          conditions: ['regular_maintenance', 'authorized_parts']
+        },
+        partyA: garageId,
+        partyB: userId,
+        status: 'active',
+      });
+      totalRecords++;
+
+      for (let i = 0; i < 2; i++) {
+        await storage.createContractEvent({
+          contractId: contract.id,
+          eventType: i === 0 ? 'contract_created' : 'milestone_reached',
+          transactionHash: '0x' + Math.random().toString(16).substring(2, 66),
+          blockNumber: 18500000 + i * 100,
+          eventData: i === 0 
+            ? { action: 'contract_deployed', parties: 2 }
+            : { milestone: 'first_service_completed', value: 1200 },
+          gasUsed: 21000 + i * 5000,
+          eventDate: new Date(Date.now() - (1 - i) * 12 * 60 * 60 * 1000).toISOString(),
+        });
+        totalRecords++;
+      }
+
+      // 11. Carbon Credits - Create 1 credit and 2 emission records
+      const carbonCredit = await storage.createCarbonCredit({
+        garageId,
+        creditAmount: 15.5,
+        carbonOffsetTons: 15.5,
+        projectName: 'Solar Panel Installation & EV Fleet Conversion',
+        verificationStandard: 'Gold Standard',
+        issuanceDate: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString(),
+        expirationDate: new Date(Date.now() + 305 * 24 * 60 * 60 * 1000).toISOString(),
+        certificateUrl: 'https://certificates.example.com/carbon/' + garageId,
+        status: 'active',
+      });
+      totalRecords++;
+
+      for (let i = 0; i < 2; i++) {
+        await storage.createCarbonEmission({
+          garageId,
+          creditId: carbonCredit.id,
+          emissionSource: i === 0 ? 'electricity_usage' : 'vehicle_fleet',
+          co2Tons: i === 0 ? 8.5 : 6.2,
+          calculationMethod: 'EPA Standard',
+          verifiedBy: 'Third-party Auditor',
+          reportingPeriod: `2024-Q${i + 3}`,
+          recordDate: new Date(Date.now() - (1 - i) * 30 * 24 * 60 * 60 * 1000).toISOString(),
+        });
+        totalRecords++;
+      }
+
+      // 12. Green Energy - Create 1 solar asset and 1 EV charging station
+      await storage.createGreenEnergyAsset({
+        garageId,
+        assetName: 'Rooftop Solar Array - Main Building',
+        assetType: 'solar_panel',
+        capacity: 50.0,
+        capacityUnit: 'kW',
+        installationDate: new Date(Date.now() - 180 * 24 * 60 * 60 * 1000).toISOString(),
+        manufacturer: 'SunPower',
+        model: 'Maxeon 5',
+        efficiency: 0.22,
+        currentOutput: 38.5,
+        totalEnergyGenerated: 15250.0,
+        status: 'operational',
+      });
+      totalRecords++;
+
+      await storage.createEVChargingStation({
+        garageId,
+        stationName: 'Customer EV Charger - Bay 1',
+        stationType: 'Level 2',
+        powerOutput: 7.2,
+        connector: 'J1772',
+        manufacturer: 'ChargePoint',
+        installationDate: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString(),
+        utilizationRate: 0.68,
+        totalChargingSessions: 245,
+        totalEnergyDispensed: 3580.5,
+        status: 'available',
+      });
+      totalRecords++;
+
+      // 13. Circular Economy - Create 2 recycled parts and 1 sustainability metric
+      for (let i = 0; i < 2; i++) {
+        await storage.createRecycledPart({
+          garageId,
+          partName: ['Alternator - Remanufactured', 'Starter Motor - Refurbished'][i],
+          partNumber: `RCY-${10000 + i}`,
+          originalPartSource: i === 0 ? 'Toyota Camry 2020' : 'Honda Accord 2019',
+          recyclingProcess: i === 0 ? 'remanufacturing' : 'refurbishment',
+          qualityGrade: i === 0 ? 'A' : 'A-',
+          costSavings: i === 0 ? 250 : 180,
+          co2Saved: i === 0 ? 12.5 : 9.8,
+          certificationNumber: `CERT-RCY-${2025000 + i}`,
+          supplier: 'GreenParts International',
+          status: 'available',
+        });
+        totalRecords++;
+      }
+
+      await storage.createSustainabilityMetric({
+        garageId,
+        metricType: 'waste_recycling',
+        metricValue: 78.5,
+        unit: 'percentage',
+        reportingPeriod: '2024-Q4',
+        benchmark: 75.0,
+        improvement: 5.2,
+        certificationBody: 'ISO 14001',
+        notes: 'Exceeded quarterly recycling target',
+        recordDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+      });
+      totalRecords++;
+
+      // 14. Satellite - Create 1 satellite connection with 2 usage logs
+      const satellite = await storage.createSatelliteConnection({
+        garageId,
+        providerName: 'Starlink Business',
+        connectionType: 'satellite_internet',
+        bandwidth: '250 Mbps',
+        latency: 35,
+        terminalId: 'STARLINK-' + garageId.substring(0, 8),
+        installationDate: new Date(Date.now() - 120 * 24 * 60 * 60 * 1000).toISOString(),
+        monthlyDataAllowance: 1000.0,
+        status: 'active',
+      });
+      totalRecords++;
+
+      for (let i = 0; i < 2; i++) {
+        await storage.createSatelliteUsageLog({
+          connectionId: satellite.id,
+          dataUsed: 45.5 + i * 12.3,
+          peakBandwidth: 185 + i * 25,
+          averageLatency: 38 + i * 3,
+          uptime: 99.8 - i * 0.2,
+          usageDate: new Date(Date.now() - (1 - i) * 24 * 60 * 60 * 1000).toISOString(),
+        });
+        totalRecords++;
+      }
+
+      // 15. Quantum Encryption - Create 1 encryption key and 2 secure messages
+      const quantumKey = await storage.createQuantumEncryptionKey({
+        garageId,
+        keyName: 'Master Encryption Key - Q1',
+        algorithm: 'Lattice-based-Kyber-1024',
+        keyLength: 1024,
+        generatedDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+        expirationDate: new Date(Date.now() + 335 * 24 * 60 * 60 * 1000).toISOString(),
+        quantumResistant: true,
+        usageCount: 24,
+        status: 'active',
+      });
+      totalRecords++;
+
+      for (let i = 0; i < 2; i++) {
+        await storage.createQuantumSecureMessage({
+          keyId: quantumKey.id,
+          senderId: userId,
+          recipientId: userId,
+          encryptedPayload: 'QE-' + Buffer.from(`Secure message ${i + 1}`).toString('base64'),
+          encryptionAlgorithm: 'Lattice-based-Kyber-1024',
+          messageHash: 'SHA3-512-' + Math.random().toString(36).substring(2, 15),
+          transmissionDate: new Date(Date.now() - (1 - i) * 6 * 60 * 60 * 1000).toISOString(),
+          status: i === 0 ? 'delivered' : 'pending',
+        });
+        totalRecords++;
+      }
+
+      res.json({ 
+        data: { 
+          message: "Successfully seeded all 15 next-gen technology modules",
+          modules: 15,
+          tablesPopulated: 30,
+          totalRecords: totalRecords,
+          breakdown: {
+            neuralDiagnostics: 5,
+            computerVision: 4,
+            nlpServiceRequests: 3,
+            rlPartsOptimization: 4,
+            metaverseShowroom: 3,
+            holographicGuides: 3,
+            spatialComputing: 2,
+            autonomousRobots: 5,
+            droneFleet: 3,
+            smartContracts: 3,
+            carbonCredits: 3,
+            greenEnergy: 2,
+            circularEconomy: 3,
+            satellite: 3,
+            quantumEncryption: 3
+          }
+        } 
+      });
+    } catch (error: any) {
+      console.error('Error seeding next-gen data:', error);
+      res.status(500).json({ error: error.message || "Failed to seed next-gen technology data" });
+    }
+  });
+
   const httpServer = createServer(app);
   
   // Initialize WebSocket server for chat

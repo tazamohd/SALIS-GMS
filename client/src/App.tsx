@@ -88,6 +88,7 @@ import KioskCheckIn from "@/pages/KioskCheckIn";
 import SecurityCameras from "@/pages/SecurityCameras";
 import LicensePlateRecognition from "@/pages/LicensePlateRecognition";
 import EmergingTechnologies from "@/pages/EmergingTechnologies";
+import NextGenTechnologies from "@/pages/NextGenTechnologies";
 import { CustomerDashboard } from "@/pages/customer/CustomerDashboard";
 import { CustomerAppointments } from "@/pages/customer/CustomerAppointments";
 import { CustomerInvoices } from "@/pages/customer/CustomerInvoices";
@@ -562,6 +563,11 @@ function Router() {
       <Route path="/emerging-technologies">
         <Layout>
           <EmergingTechnologies />
+        </Layout>
+      </Route>
+      <Route path="/nextgen-technologies">
+        <Layout>
+          <NextGenTechnologies />
         </Layout>
       </Route>
       <Route component={NotFound} />
