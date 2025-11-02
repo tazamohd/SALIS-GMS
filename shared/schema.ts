@@ -5947,3 +5947,803 @@ export const insertPricingRuleSchema = createInsertSchema(pricingRules).omit({
   createdAt: true,
   updatedAt: true,
 });
+
+// ========================================
+// PHASE 10: NEXT-GENERATION TECHNOLOGIES
+// ========================================
+
+// 1. Neural Network Vehicle Diagnostics
+export const neuralDiagnostics = pgTable("neural_diagnostics", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  vehicleId: uuid("vehicle_id").references(() => vehicles.id),
+  jobCardId: uuid("job_card_id").references(() => jobCards.id),
+  modelVersion: varchar("model_version", { length: 50 }).notNull(),
+  inputData: jsonb("input_data").notNull(),
+  predictedFailures: jsonb("predicted_failures").notNull(),
+  confidenceScore: decimal("confidence_score", { precision: 5, scale: 2 }).notNull(),
+  timeToFailure: integer("time_to_failure"),
+  recommendedActions: text("recommended_actions").array(),
+  actualOutcome: varchar("actual_outcome", { length: 100 }),
+  accuracyRating: decimal("accuracy_rating", { precision: 5, scale: 2 }),
+  trainingDataUsed: integer("training_data_used"),
+  processingTimeMs: integer("processing_time_ms"),
+  status: varchar("status", { length: 50 }).default("pending"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const neuralTrainingSessions = pgTable("neural_training_sessions", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  modelVersion: varchar("model_version", { length: 50 }).notNull(),
+  datasetSize: integer("dataset_size").notNull(),
+  epochs: integer("epochs").notNull(),
+  accuracy: decimal("accuracy", { precision: 5, scale: 2 }),
+  loss: decimal("loss", { precision: 10, scale: 6 }),
+  trainingDurationMinutes: integer("training_duration_minutes"),
+  hyperparameters: jsonb("hyperparameters"),
+  status: varchar("status", { length: 50 }).default("in_progress"),
+  createdAt: timestamp("created_at").defaultNow(),
+  completedAt: timestamp("completed_at"),
+});
+
+// 2. Computer Vision Quality Control
+export const visionQualityChecks = pgTable("vision_quality_checks", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  vehicleId: uuid("vehicle_id").references(() => vehicles.id),
+  jobCardId: uuid("job_card_id").references(() => jobCards.id),
+  checkType: varchar("check_type", { length: 100 }).notNull(),
+  imageUrl: varchar("image_url", { length: 500 }).notNull(),
+  defectsDetected: jsonb("defects_detected").notNull(),
+  qualityScore: decimal("quality_score", { precision: 5, scale: 2 }).notNull(),
+  passedInspection: boolean("passed_inspection").default(false),
+  inspectorId: varchar("inspector_id").references(() => users.id),
+  manualOverride: boolean("manual_override").default(false),
+  overrideReason: text("override_reason"),
+  aiModel: varchar("ai_model", { length: 100 }).notNull(),
+  processingTimeMs: integer("processing_time_ms"),
+  annotatedImageUrl: varchar("annotated_image_url", { length: 500 }),
+  status: varchar("status", { length: 50 }).default("completed"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const visionDefects = pgTable("vision_defects", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  qualityCheckId: uuid("quality_check_id").references(() => visionQualityChecks.id).notNull(),
+  defectType: varchar("defect_type", { length: 100 }).notNull(),
+  severity: varchar("severity", { length: 50 }).notNull(),
+  location: jsonb("location").notNull(),
+  confidence: decimal("confidence", { precision: 5, scale: 2 }).notNull(),
+  dimensions: jsonb("dimensions"),
+  description: text("description"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// 3. NLP Service Writer
+export const nlpServiceRequests = pgTable("nlp_service_requests", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  customerId: uuid("customer_id").references(() => customers.id).notNull(),
+  vehicleId: uuid("vehicle_id").references(() => vehicles.id),
+  originalComplaint: text("original_complaint").notNull(),
+  processedComplaint: text("processed_complaint").notNull(),
+  extractedSymptoms: text("extracted_symptoms").array(),
+  suggestedServices: jsonb("suggested_services").notNull(),
+  urgencyLevel: varchar("urgency_level", { length: 50 }).notNull(),
+  estimatedCost: decimal("estimated_cost", { precision: 10, scale: 2 }),
+  sentiment: varchar("sentiment", { length: 50 }),
+  confidence: decimal("confidence", { precision: 5, scale: 2 }).notNull(),
+  jobCardId: uuid("job_card_id").references(() => jobCards.id),
+  approved: boolean("approved").default(false),
+  approvedBy: varchar("approved_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const nlpTrainingData = pgTable("nlp_training_data", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  originalText: text("original_text").notNull(),
+  processedText: text("processed_text").notNull(),
+  labels: text("labels").array(),
+  category: varchar("category", { length: 100 }),
+  isValidated: boolean("is_validated").default(false),
+  validatedBy: varchar("validated_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// 4. Reinforcement Learning Parts Optimizer
+export const rlPartsOptimizations = pgTable("rl_parts_optimizations", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  partId: uuid("part_id").references(() => parts.id).notNull(),
+  currentStockLevel: integer("current_stock_level").notNull(),
+  recommendedStockLevel: integer("recommended_stock_level").notNull(),
+  reorderPoint: integer("reorder_point").notNull(),
+  reorderQuantity: integer("reorder_quantity").notNull(),
+  expectedDemand: decimal("expected_demand", { precision: 10, scale: 2 }).notNull(),
+  demandVariance: decimal("demand_variance", { precision: 10, scale: 2 }),
+  leadTime: integer("lead_time").notNull(),
+  holdingCost: decimal("holding_cost", { precision: 10, scale: 2 }),
+  stockoutCost: decimal("stockout_cost", { precision: 10, scale: 2 }),
+  confidenceLevel: decimal("confidence_level", { precision: 5, scale: 2 }).notNull(),
+  reward: decimal("reward", { precision: 10, scale: 2 }),
+  actionTaken: varchar("action_taken", { length: 100 }),
+  modelVersion: varchar("model_version", { length: 50 }).notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const rlLearningEpisodes = pgTable("rl_learning_episodes", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  episodeNumber: integer("episode_number").notNull(),
+  totalReward: decimal("total_reward", { precision: 10, scale: 2 }).notNull(),
+  averageReward: decimal("average_reward", { precision: 10, scale: 2 }),
+  explorationRate: decimal("exploration_rate", { precision: 5, scale: 4 }),
+  learningRate: decimal("learning_rate", { precision: 5, scale: 4 }),
+  stepsCompleted: integer("steps_completed").notNull(),
+  convergenceMetric: decimal("convergence_metric", { precision: 10, scale: 6 }),
+  status: varchar("status", { length: 50 }).default("completed"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// 5. Metaverse Virtual Showroom
+export const metaverseShowrooms = pgTable("metaverse_showrooms", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  name: varchar("name", { length: 255 }).notNull(),
+  description: text("description"),
+  virtualWorldUrl: varchar("virtual_world_url", { length: 500 }).notNull(),
+  platform: varchar("platform", { length: 100 }).notNull(),
+  maxConcurrentUsers: integer("max_concurrent_users").default(50),
+  currentUsers: integer("current_users").default(0),
+  totalVisits: integer("total_visits").default(0),
+  averageSessionDuration: integer("average_session_duration"),
+  vehiclesDisplayed: integer("vehicles_displayed").default(0),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const metaverseVisits = pgTable("metaverse_visits", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  showroomId: uuid("showroom_id").references(() => metaverseShowrooms.id).notNull(),
+  customerId: uuid("customer_id").references(() => customers.id),
+  sessionId: varchar("session_id", { length: 255 }).notNull(),
+  duration: integer("duration"),
+  vehiclesViewed: text("vehicles_viewed").array(),
+  interactionCount: integer("interaction_count").default(0),
+  leadGenerated: boolean("lead_generated").default(false),
+  deviceType: varchar("device_type", { length: 100 }),
+  vrHeadset: varchar("vr_headset", { length: 100 }),
+  createdAt: timestamp("created_at").defaultNow(),
+  endedAt: timestamp("ended_at"),
+});
+
+// 6. Holographic Repair Instructions
+export const holographicGuides = pgTable("holographic_guides", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  serviceId: uuid("service_id").references(() => services.id),
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description"),
+  hologramModelUrl: varchar("hologram_model_url", { length: 500 }).notNull(),
+  difficulty: varchar("difficulty", { length: 50 }).notNull(),
+  estimatedDuration: integer("estimated_duration").notNull(),
+  steps: jsonb("steps").notNull(),
+  safetyWarnings: text("safety_warnings").array(),
+  requiredTools: text("required_tools").array(),
+  vehicleMake: varchar("vehicle_make", { length: 100 }),
+  vehicleModel: varchar("vehicle_model", { length: 100 }),
+  version: varchar("version", { length: 50 }).default("1.0"),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const holographicSessions = pgTable("holographic_sessions", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  guideId: uuid("guide_id").references(() => holographicGuides.id).notNull(),
+  technicianId: varchar("technician_id").references(() => users.id).notNull(),
+  jobCardId: uuid("job_card_id").references(() => jobCards.id),
+  deviceType: varchar("device_type", { length: 100 }).notNull(),
+  sessionDuration: integer("session_duration"),
+  stepsCompleted: integer("steps_completed").default(0),
+  totalSteps: integer("total_steps").notNull(),
+  errorsMade: integer("errors_made").default(0),
+  completed: boolean("completed").default(false),
+  rating: integer("rating"),
+  feedback: text("feedback"),
+  createdAt: timestamp("created_at").defaultNow(),
+  endedAt: timestamp("ended_at"),
+});
+
+// 7. Spatial Computing Workshop
+export const spatialWorkstations = pgTable("spatial_workstations", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  name: varchar("name", { length: 255 }).notNull(),
+  location: varchar("location", { length: 255 }),
+  deviceType: varchar("device_type", { length: 100 }).notNull(),
+  deviceSerial: varchar("device_serial", { length: 255 }).unique(),
+  firmwareVersion: varchar("firmware_version", { length: 50 }),
+  calibrationStatus: varchar("calibration_status", { length: 50 }).default("calibrated"),
+  lastCalibration: timestamp("last_calibration"),
+  assignedTechnician: varchar("assigned_technician").references(() => users.id),
+  isActive: boolean("is_active").default(true),
+  batteryLevel: integer("battery_level"),
+  usageHours: decimal("usage_hours", { precision: 10, scale: 2 }).default("0"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const spatialDiagnosticSessions = pgTable("spatial_diagnostic_sessions", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  workstationId: uuid("workstation_id").references(() => spatialWorkstations.id).notNull(),
+  technicianId: varchar("technician_id").references(() => users.id).notNull(),
+  vehicleId: uuid("vehicle_id").references(() => vehicles.id),
+  jobCardId: uuid("job_card_id").references(() => jobCards.id),
+  sessionType: varchar("session_type", { length: 100 }).notNull(),
+  duration: integer("duration"),
+  diagnosticsPerformed: jsonb("diagnostics_performed").notNull(),
+  issuesFound: integer("issues_found").default(0),
+  virtualAssetsLoaded: integer("virtual_assets_loaded").default(0),
+  handGesturesUsed: integer("hand_gestures_used").default(0),
+  accuracy: decimal("accuracy", { precision: 5, scale: 2 }),
+  createdAt: timestamp("created_at").defaultNow(),
+  endedAt: timestamp("ended_at"),
+});
+
+// 8. Autonomous Robot Integration
+export const autonomousRobots = pgTable("autonomous_robots", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  robotName: varchar("robot_name", { length: 255 }).notNull(),
+  robotType: varchar("robot_type", { length: 100 }).notNull(),
+  serialNumber: varchar("serial_number", { length: 255 }).unique().notNull(),
+  manufacturer: varchar("manufacturer", { length: 255 }),
+  capabilities: text("capabilities").array(),
+  currentLocation: varchar("current_location", { length: 255 }),
+  batteryLevel: integer("battery_level").default(100),
+  status: varchar("status", { length: 50 }).default("idle"),
+  lastMaintenance: timestamp("last_maintenance"),
+  totalOperatingHours: decimal("total_operating_hours", { precision: 10, scale: 2 }).default("0"),
+  tasksCompleted: integer("tasks_completed").default(0),
+  errorCount: integer("error_count").default(0),
+  firmwareVersion: varchar("firmware_version", { length: 50 }),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const robotTasks = pgTable("robot_tasks", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  robotId: uuid("robot_id").references(() => autonomousRobots.id).notNull(),
+  jobCardId: uuid("job_card_id").references(() => jobCards.id),
+  taskType: varchar("task_type", { length: 100 }).notNull(),
+  priority: varchar("priority", { length: 50 }).default("medium"),
+  description: text("description"),
+  parameters: jsonb("parameters"),
+  status: varchar("status", { length: 50 }).default("pending"),
+  startedAt: timestamp("started_at"),
+  completedAt: timestamp("completed_at"),
+  duration: integer("duration"),
+  successRate: decimal("success_rate", { precision: 5, scale: 2 }),
+  errorMessage: text("error_message"),
+  assignedBy: varchar("assigned_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// 9. Drone Fleet Management
+export const droneFleets = pgTable("drone_fleets", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  droneName: varchar("drone_name", { length: 255 }).notNull(),
+  droneModel: varchar("drone_model", { length: 100 }).notNull(),
+  serialNumber: varchar("serial_number", { length: 255 }).unique().notNull(),
+  registrationNumber: varchar("registration_number", { length: 100 }),
+  maxFlightTime: integer("max_flight_time").notNull(),
+  maxRange: decimal("max_range", { precision: 10, scale: 2 }).notNull(),
+  cameraResolution: varchar("camera_resolution", { length: 50 }),
+  sensors: text("sensors").array(),
+  batteryLevel: integer("battery_level").default(100),
+  totalFlightHours: decimal("total_flight_hours", { precision: 10, scale: 2 }).default("0"),
+  missionsCompleted: integer("missions_completed").default(0),
+  lastMaintenance: timestamp("last_maintenance"),
+  status: varchar("status", { length: 50 }).default("available"),
+  currentLocation: jsonb("current_location"),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const droneMissions = pgTable("drone_missions", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  droneId: uuid("drone_id").references(() => droneFleets.id).notNull(),
+  missionType: varchar("mission_type", { length: 100 }).notNull(),
+  targetLocation: jsonb("target_location").notNull(),
+  flightPlan: jsonb("flight_plan"),
+  pilotId: varchar("pilot_id").references(() => users.id),
+  vehicleId: uuid("vehicle_id").references(() => vehicles.id),
+  status: varchar("status", { length: 50 }).default("planned"),
+  startTime: timestamp("start_time"),
+  endTime: timestamp("end_time"),
+  flightDuration: integer("flight_duration"),
+  distanceCovered: decimal("distance_covered", { precision: 10, scale: 2 }),
+  mediaCollected: integer("media_collected").default(0),
+  weatherConditions: varchar("weather_conditions", { length: 255 }),
+  issuesDetected: integer("issues_detected").default(0),
+  reportUrl: varchar("report_url", { length: 500 }),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// 10. Smart Contract Automation
+export const smartContracts = pgTable("smart_contracts", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  contractType: varchar("contract_type", { length: 100 }).notNull(),
+  contractAddress: varchar("contract_address", { length: 255 }).unique(),
+  blockchain: varchar("blockchain", { length: 100 }).default("Ethereum"),
+  partyA: varchar("party_a", { length: 255 }).notNull(),
+  partyB: varchar("party_b", { length: 255 }).notNull(),
+  terms: jsonb("terms").notNull(),
+  contractValue: decimal("contract_value", { precision: 15, scale: 2 }),
+  currency: varchar("currency", { length: 10 }).default("USD"),
+  status: varchar("status", { length: 50 }).default("draft"),
+  deployedAt: timestamp("deployed_at"),
+  executedAt: timestamp("executed_at"),
+  gasFee: decimal("gas_fee", { precision: 15, scale: 8 }),
+  transactionHash: varchar("transaction_hash", { length: 255 }),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const contractEvents = pgTable("contract_events", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  contractId: uuid("contract_id").references(() => smartContracts.id).notNull(),
+  eventType: varchar("event_type", { length: 100 }).notNull(),
+  eventData: jsonb("event_data").notNull(),
+  blockNumber: integer("block_number"),
+  transactionHash: varchar("transaction_hash", { length: 255 }),
+  triggeredBy: varchar("triggered_by", { length: 255 }),
+  gasUsed: decimal("gas_used", { precision: 15, scale: 8 }),
+  status: varchar("status", { length: 50 }).default("confirmed"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// 11. Carbon Credit Trading Platform
+export const carbonCredits = pgTable("carbon_credits", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  creditType: varchar("credit_type", { length: 100 }).notNull(),
+  quantity: decimal("quantity", { precision: 15, scale: 2 }).notNull(),
+  unitPrice: decimal("unit_price", { precision: 10, scale: 2 }).notNull(),
+  totalValue: decimal("total_value", { precision: 15, scale: 2 }).notNull(),
+  verificationStandard: varchar("verification_standard", { length: 100 }),
+  projectName: varchar("project_name", { length: 255 }),
+  vintageYear: integer("vintage_year"),
+  expiryDate: timestamp("expiry_date"),
+  status: varchar("status", { length: 50 }).default("available"),
+  tradedTo: uuid("traded_to").references(() => garages.id),
+  tradedAt: timestamp("traded_at"),
+  certificateUrl: varchar("certificate_url", { length: 500 }),
+  blockchainRecord: varchar("blockchain_record", { length: 255 }),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const carbonEmissions = pgTable("carbon_emissions", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  emissionSource: varchar("emission_source", { length: 100 }).notNull(),
+  emissionDate: timestamp("emission_date").notNull(),
+  co2Equivalent: decimal("co2_equivalent", { precision: 10, scale: 2 }).notNull(),
+  unit: varchar("unit", { length: 20 }).default("kg"),
+  activity: varchar("activity", { length: 255 }),
+  offsetBy: uuid("offset_by").references(() => carbonCredits.id),
+  isOffset: boolean("is_offset").default(false),
+  reportingPeriod: varchar("reporting_period", { length: 50 }),
+  verifiedBy: varchar("verified_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// 12. Green Energy Management
+export const greenEnergyAssets = pgTable("green_energy_assets", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  assetType: varchar("asset_type", { length: 100 }).notNull(),
+  assetName: varchar("asset_name", { length: 255 }).notNull(),
+  manufacturer: varchar("manufacturer", { length: 255 }),
+  capacity: decimal("capacity", { precision: 10, scale: 2 }).notNull(),
+  unit: varchar("unit", { length: 20 }).default("kWh"),
+  installationDate: timestamp("installation_date"),
+  warrantyExpiry: timestamp("warranty_expiry"),
+  totalEnergyGenerated: decimal("total_energy_generated", { precision: 15, scale: 2 }).default("0"),
+  totalEnergySaved: decimal("total_energy_saved", { precision: 15, scale: 2 }).default("0"),
+  currentOutput: decimal("current_output", { precision: 10, scale: 2 }),
+  efficiency: decimal("efficiency", { precision: 5, scale: 2 }),
+  status: varchar("status", { length: 50 }).default("operational"),
+  lastMaintenance: timestamp("last_maintenance"),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const evChargingStations = pgTable("ev_charging_stations", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  stationName: varchar("station_name", { length: 255 }).notNull(),
+  location: varchar("location", { length: 255 }),
+  chargerType: varchar("charger_type", { length: 100 }).notNull(),
+  powerRating: decimal("power_rating", { precision: 10, scale: 2 }).notNull(),
+  connectorTypes: text("connector_types").array(),
+  simultaneousCharging: integer("simultaneous_charging").default(1),
+  totalChargingSessions: integer("total_charging_sessions").default(0),
+  totalEnergyDelivered: decimal("total_energy_delivered", { precision: 15, scale: 2 }).default("0"),
+  currentStatus: varchar("current_status", { length: 50 }).default("available"),
+  pricing: jsonb("pricing"),
+  isPublic: boolean("is_public").default(false),
+  networkProvider: varchar("network_provider", { length: 255 }),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// 13. Circular Economy Tracking
+export const recycledParts = pgTable("recycled_parts", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  originalPartId: uuid("original_part_id").references(() => parts.id),
+  partName: varchar("part_name", { length: 255 }).notNull(),
+  condition: varchar("condition", { length: 50 }).notNull(),
+  recyclingMethod: varchar("recycling_method", { length: 100 }).notNull(),
+  sourceVehicleId: uuid("source_vehicle_id").references(() => vehicles.id),
+  dismantledDate: timestamp("dismantled_date"),
+  certificationNumber: varchar("certification_number", { length: 255 }),
+  qualityGrade: varchar("quality_grade", { length: 50 }),
+  sellingPrice: decimal("selling_price", { precision: 10, scale: 2 }),
+  environmentalSavings: jsonb("environmental_savings"),
+  soldTo: uuid("sold_to").references(() => customers.id),
+  soldDate: timestamp("sold_date"),
+  status: varchar("status", { length: 50 }).default("available"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const sustainabilityMetrics = pgTable("sustainability_metrics", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  metricType: varchar("metric_type", { length: 100 }).notNull(),
+  metricValue: decimal("metric_value", { precision: 15, scale: 2 }).notNull(),
+  unit: varchar("unit", { length: 50 }),
+  reportingPeriod: varchar("reporting_period", { length: 50 }).notNull(),
+  targetValue: decimal("target_value", { precision: 15, scale: 2 }),
+  achievementRate: decimal("achievement_rate", { precision: 5, scale: 2 }),
+  category: varchar("category", { length: 100 }),
+  esgScore: decimal("esg_score", { precision: 5, scale: 2 }),
+  certifications: text("certifications").array(),
+  verified: boolean("verified").default(false),
+  verifiedBy: varchar("verified_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// 14. Satellite Connectivity Hub
+export const satelliteConnections = pgTable("satellite_connections", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  provider: varchar("provider", { length: 100 }).notNull(),
+  terminalId: varchar("terminal_id", { length: 255 }).unique().notNull(),
+  location: jsonb("location").notNull(),
+  bandwidth: decimal("bandwidth", { precision: 10, scale: 2 }),
+  latency: integer("latency"),
+  dataUsage: decimal("data_usage", { precision: 15, scale: 2 }).default("0"),
+  dataLimit: decimal("data_limit", { precision: 15, scale: 2 }),
+  signalStrength: integer("signal_strength"),
+  uptime: decimal("uptime", { precision: 5, scale: 2 }),
+  status: varchar("status", { length: 50 }).default("active"),
+  lastConnected: timestamp("last_connected"),
+  monthlyFee: decimal("monthly_fee", { precision: 10, scale: 2 }),
+  contractExpiry: timestamp("contract_expiry"),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const satelliteUsageLogs = pgTable("satellite_usage_logs", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  connectionId: uuid("connection_id").references(() => satelliteConnections.id).notNull(),
+  sessionStart: timestamp("session_start").notNull(),
+  sessionEnd: timestamp("session_end"),
+  dataTransferred: decimal("data_transferred", { precision: 10, scale: 2 }),
+  averageSpeed: decimal("average_speed", { precision: 10, scale: 2 }),
+  applicationUsed: varchar("application_used", { length: 255 }),
+  userId: varchar("user_id").references(() => users.id),
+  cost: decimal("cost", { precision: 10, scale: 2 }),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// 15. Quantum-Encrypted Communications
+export const quantumEncryptionKeys = pgTable("quantum_encryption_keys", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  keyName: varchar("key_name", { length: 255 }).notNull(),
+  keyType: varchar("key_type", { length: 100 }).notNull(),
+  algorithm: varchar("algorithm", { length: 100 }).default("QKD-BB84"),
+  keySize: integer("key_size").notNull(),
+  generatedAt: timestamp("generated_at").defaultNow(),
+  expiresAt: timestamp("expires_at"),
+  usageCount: integer("usage_count").default(0),
+  maxUsage: integer("max_usage"),
+  status: varchar("status", { length: 50 }).default("active"),
+  associatedUsers: text("associated_users").array(),
+  securityLevel: varchar("security_level", { length: 50 }).default("top_secret"),
+  isRevoked: boolean("is_revoked").default(false),
+  revokedAt: timestamp("revoked_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const quantumSecureMessages = pgTable("quantum_secure_messages", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  encryptionKeyId: uuid("encryption_key_id").references(() => quantumEncryptionKeys.id).notNull(),
+  senderId: varchar("sender_id").references(() => users.id).notNull(),
+  recipientId: varchar("recipient_id").references(() => users.id).notNull(),
+  messageType: varchar("message_type", { length: 100 }).notNull(),
+  encryptedContent: text("encrypted_content").notNull(),
+  integrityHash: varchar("integrity_hash", { length: 255 }).notNull(),
+  transmissionMethod: varchar("transmission_method", { length: 100 }),
+  deliveryStatus: varchar("delivery_status", { length: 50 }).default("pending"),
+  sentAt: timestamp("sent_at").defaultNow(),
+  receivedAt: timestamp("received_at"),
+  readAt: timestamp("read_at"),
+  isCompromised: boolean("is_compromised").default(false),
+  securityAudit: jsonb("security_audit"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Type Exports for Next-Gen Technologies
+
+// 1. Neural Diagnostics
+export type NeuralDiagnostic = typeof neuralDiagnostics.$inferSelect;
+export type InsertNeuralDiagnostic = typeof neuralDiagnostics.$inferInsert;
+export const insertNeuralDiagnosticSchema = createInsertSchema(neuralDiagnostics).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type NeuralTrainingSession = typeof neuralTrainingSessions.$inferSelect;
+export type InsertNeuralTrainingSession = typeof neuralTrainingSessions.$inferInsert;
+export const insertNeuralTrainingSessionSchema = createInsertSchema(neuralTrainingSessions).omit({
+  id: true,
+  createdAt: true,
+});
+
+// 2. Computer Vision
+export type VisionQualityCheck = typeof visionQualityChecks.$inferSelect;
+export type InsertVisionQualityCheck = typeof visionQualityChecks.$inferInsert;
+export const insertVisionQualityCheckSchema = createInsertSchema(visionQualityChecks).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type VisionDefect = typeof visionDefects.$inferSelect;
+export type InsertVisionDefect = typeof visionDefects.$inferInsert;
+export const insertVisionDefectSchema = createInsertSchema(visionDefects).omit({
+  id: true,
+  createdAt: true,
+});
+
+// 3. NLP Service Writer
+export type NLPServiceRequest = typeof nlpServiceRequests.$inferSelect;
+export type InsertNLPServiceRequest = typeof nlpServiceRequests.$inferInsert;
+export const insertNLPServiceRequestSchema = createInsertSchema(nlpServiceRequests).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type NLPTrainingData = typeof nlpTrainingData.$inferSelect;
+export type InsertNLPTrainingData = typeof nlpTrainingData.$inferInsert;
+export const insertNLPTrainingDataSchema = createInsertSchema(nlpTrainingData).omit({
+  id: true,
+  createdAt: true,
+});
+
+// 4. Reinforcement Learning
+export type RLPartsOptimization = typeof rlPartsOptimizations.$inferSelect;
+export type InsertRLPartsOptimization = typeof rlPartsOptimizations.$inferInsert;
+export const insertRLPartsOptimizationSchema = createInsertSchema(rlPartsOptimizations).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type RLLearningEpisode = typeof rlLearningEpisodes.$inferSelect;
+export type InsertRLLearningEpisode = typeof rlLearningEpisodes.$inferInsert;
+export const insertRLLearningEpisodeSchema = createInsertSchema(rlLearningEpisodes).omit({
+  id: true,
+  createdAt: true,
+});
+
+// 5. Metaverse
+export type MetaverseShowroom = typeof metaverseShowrooms.$inferSelect;
+export type InsertMetaverseShowroom = typeof metaverseShowrooms.$inferInsert;
+export const insertMetaverseShowroomSchema = createInsertSchema(metaverseShowrooms).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type MetaverseVisit = typeof metaverseVisits.$inferSelect;
+export type InsertMetaverseVisit = typeof metaverseVisits.$inferInsert;
+export const insertMetaverseVisitSchema = createInsertSchema(metaverseVisits).omit({
+  id: true,
+  createdAt: true,
+});
+
+// 6. Holographic
+export type HolographicGuide = typeof holographicGuides.$inferSelect;
+export type InsertHolographicGuide = typeof holographicGuides.$inferInsert;
+export const insertHolographicGuideSchema = createInsertSchema(holographicGuides).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type HolographicSession = typeof holographicSessions.$inferSelect;
+export type InsertHolographicSession = typeof holographicSessions.$inferInsert;
+export const insertHolographicSessionSchema = createInsertSchema(holographicSessions).omit({
+  id: true,
+  createdAt: true,
+});
+
+// 7. Spatial Computing
+export type SpatialWorkstation = typeof spatialWorkstations.$inferSelect;
+export type InsertSpatialWorkstation = typeof spatialWorkstations.$inferInsert;
+export const insertSpatialWorkstationSchema = createInsertSchema(spatialWorkstations).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type SpatialDiagnosticSession = typeof spatialDiagnosticSessions.$inferSelect;
+export type InsertSpatialDiagnosticSession = typeof spatialDiagnosticSessions.$inferInsert;
+export const insertSpatialDiagnosticSessionSchema = createInsertSchema(spatialDiagnosticSessions).omit({
+  id: true,
+  createdAt: true,
+});
+
+// 8. Autonomous Robots
+export type AutonomousRobot = typeof autonomousRobots.$inferSelect;
+export type InsertAutonomousRobot = typeof autonomousRobots.$inferInsert;
+export const insertAutonomousRobotSchema = createInsertSchema(autonomousRobots).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type RobotTask = typeof robotTasks.$inferSelect;
+export type InsertRobotTask = typeof robotTasks.$inferInsert;
+export const insertRobotTaskSchema = createInsertSchema(robotTasks).omit({
+  id: true,
+  createdAt: true,
+});
+
+// 9. Drone Fleet
+export type DroneFleet = typeof droneFleets.$inferSelect;
+export type InsertDroneFleet = typeof droneFleets.$inferInsert;
+export const insertDroneFleetSchema = createInsertSchema(droneFleets).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type DroneMission = typeof droneMissions.$inferSelect;
+export type InsertDroneMission = typeof droneMissions.$inferInsert;
+export const insertDroneMissionSchema = createInsertSchema(droneMissions).omit({
+  id: true,
+  createdAt: true,
+});
+
+// 10. Smart Contracts
+export type SmartContract = typeof smartContracts.$inferSelect;
+export type InsertSmartContract = typeof smartContracts.$inferInsert;
+export const insertSmartContractSchema = createInsertSchema(smartContracts).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type ContractEvent = typeof contractEvents.$inferSelect;
+export type InsertContractEvent = typeof contractEvents.$inferInsert;
+export const insertContractEventSchema = createInsertSchema(contractEvents).omit({
+  id: true,
+  createdAt: true,
+});
+
+// 11. Carbon Credits
+export type CarbonCredit = typeof carbonCredits.$inferSelect;
+export type InsertCarbonCredit = typeof carbonCredits.$inferInsert;
+export const insertCarbonCreditSchema = createInsertSchema(carbonCredits).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type CarbonEmission = typeof carbonEmissions.$inferSelect;
+export type InsertCarbonEmission = typeof carbonEmissions.$inferInsert;
+export const insertCarbonEmissionSchema = createInsertSchema(carbonEmissions).omit({
+  id: true,
+  createdAt: true,
+});
+
+// 12. Green Energy
+export type GreenEnergyAsset = typeof greenEnergyAssets.$inferSelect;
+export type InsertGreenEnergyAsset = typeof greenEnergyAssets.$inferInsert;
+export const insertGreenEnergyAssetSchema = createInsertSchema(greenEnergyAssets).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type EVChargingStation = typeof evChargingStations.$inferSelect;
+export type InsertEVChargingStation = typeof evChargingStations.$inferInsert;
+export const insertEVChargingStationSchema = createInsertSchema(evChargingStations).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+// 13. Circular Economy
+export type RecycledPart = typeof recycledParts.$inferSelect;
+export type InsertRecycledPart = typeof recycledParts.$inferInsert;
+export const insertRecycledPartSchema = createInsertSchema(recycledParts).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type SustainabilityMetric = typeof sustainabilityMetrics.$inferSelect;
+export type InsertSustainabilityMetric = typeof sustainabilityMetrics.$inferInsert;
+export const insertSustainabilityMetricSchema = createInsertSchema(sustainabilityMetrics).omit({
+  id: true,
+  createdAt: true,
+});
+
+// 14. Satellite
+export type SatelliteConnection = typeof satelliteConnections.$inferSelect;
+export type InsertSatelliteConnection = typeof satelliteConnections.$inferInsert;
+export const insertSatelliteConnectionSchema = createInsertSchema(satelliteConnections).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type SatelliteUsageLog = typeof satelliteUsageLogs.$inferSelect;
+export type InsertSatelliteUsageLog = typeof satelliteUsageLogs.$inferInsert;
+export const insertSatelliteUsageLogSchema = createInsertSchema(satelliteUsageLogs).omit({
+  id: true,
+  createdAt: true,
+});
+
+// 15. Quantum Encryption
+export type QuantumEncryptionKey = typeof quantumEncryptionKeys.$inferSelect;
+export type InsertQuantumEncryptionKey = typeof quantumEncryptionKeys.$inferInsert;
+export const insertQuantumEncryptionKeySchema = createInsertSchema(quantumEncryptionKeys).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type QuantumSecureMessage = typeof quantumSecureMessages.$inferSelect;
+export type InsertQuantumSecureMessage = typeof quantumSecureMessages.$inferInsert;
+export const insertQuantumSecureMessageSchema = createInsertSchema(quantumSecureMessages).omit({
+  id: true,
+  createdAt: true,
+});
