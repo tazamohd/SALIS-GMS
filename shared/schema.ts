@@ -6025,7 +6025,7 @@ export const visionDefects = pgTable("vision_defects", {
 export const nlpServiceRequests = pgTable("nlp_service_requests", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
   garageId: uuid("garage_id").references(() => garages.id).notNull(),
-  customerId: uuid("customer_id").references(() => customers.id).notNull(),
+  customerId: varchar("customer_id").references(() => customerProfiles.userId).notNull(),
   vehicleId: uuid("vehicle_id").references(() => vehicles.id),
   originalComplaint: text("original_complaint").notNull(),
   processedComplaint: text("processed_complaint").notNull(),
@@ -6058,7 +6058,7 @@ export const nlpTrainingData = pgTable("nlp_training_data", {
 export const rlPartsOptimizations = pgTable("rl_parts_optimizations", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
   garageId: uuid("garage_id").references(() => garages.id).notNull(),
-  partId: uuid("part_id").references(() => parts.id).notNull(),
+  partId: uuid("part_id").references(() => spareParts.id).notNull(),
   currentStockLevel: integer("current_stock_level").notNull(),
   recommendedStockLevel: integer("recommended_stock_level").notNull(),
   reorderPoint: integer("reorder_point").notNull(),
@@ -6111,7 +6111,7 @@ export const metaverseShowrooms = pgTable("metaverse_showrooms", {
 export const metaverseVisits = pgTable("metaverse_visits", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
   showroomId: uuid("showroom_id").references(() => metaverseShowrooms.id).notNull(),
-  customerId: uuid("customer_id").references(() => customers.id),
+  customerId: varchar("customer_id").references(() => customerProfiles.userId),
   sessionId: varchar("session_id", { length: 255 }).notNull(),
   duration: integer("duration"),
   vehiclesViewed: text("vehicles_viewed").array(),
@@ -6127,7 +6127,7 @@ export const metaverseVisits = pgTable("metaverse_visits", {
 export const holographicGuides = pgTable("holographic_guides", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
   garageId: uuid("garage_id").references(() => garages.id).notNull(),
-  serviceId: uuid("service_id").references(() => services.id),
+  serviceId: uuid("service_id").references(() => serviceTemplates.id),
   title: varchar("title", { length: 255 }).notNull(),
   description: text("description"),
   hologramModelUrl: varchar("hologram_model_url", { length: 500 }).notNull(),
@@ -6397,7 +6397,7 @@ export const evChargingStations = pgTable("ev_charging_stations", {
 export const recycledParts = pgTable("recycled_parts", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
   garageId: uuid("garage_id").references(() => garages.id).notNull(),
-  originalPartId: uuid("original_part_id").references(() => parts.id),
+  originalPartId: uuid("original_part_id").references(() => spareParts.id),
   partName: varchar("part_name", { length: 255 }).notNull(),
   condition: varchar("condition", { length: 50 }).notNull(),
   recyclingMethod: varchar("recycling_method", { length: 100 }).notNull(),
@@ -6407,7 +6407,7 @@ export const recycledParts = pgTable("recycled_parts", {
   qualityGrade: varchar("quality_grade", { length: 50 }),
   sellingPrice: decimal("selling_price", { precision: 10, scale: 2 }),
   environmentalSavings: jsonb("environmental_savings"),
-  soldTo: uuid("sold_to").references(() => customers.id),
+  soldTo: varchar("sold_to").references(() => customerProfiles.userId),
   soldDate: timestamp("sold_date"),
   status: varchar("status", { length: 50 }).default("available"),
   createdAt: timestamp("created_at").defaultNow(),
