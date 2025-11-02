@@ -59,7 +59,37 @@ import {
   insertOemProductSchema,
   insertSubscriptionLicenseSchema,
   insertLicenseAuditLogSchema,
-  insertEntitlementAssignmentSchema
+  insertEntitlementAssignmentSchema,
+  insertNeuralDiagnosticSchema,
+  insertNeuralTrainingSessionSchema,
+  insertVisionQualityCheckSchema,
+  insertVisionDefectSchema,
+  insertNLPServiceRequestSchema,
+  insertNLPTrainingDataSchema,
+  insertRLPartsOptimizationSchema,
+  insertRLLearningEpisodeSchema,
+  insertMetaverseShowroomSchema,
+  insertMetaverseVisitSchema,
+  insertHolographicGuideSchema,
+  insertHolographicSessionSchema,
+  insertSpatialWorkstationSchema,
+  insertSpatialDiagnosticSessionSchema,
+  insertAutonomousRobotSchema,
+  insertRobotTaskSchema,
+  insertDroneFleetSchema,
+  insertDroneMissionSchema,
+  insertSmartContractSchema,
+  insertContractEventSchema,
+  insertCarbonCreditSchema,
+  insertCarbonEmissionSchema,
+  insertGreenEnergyAssetSchema,
+  insertEVChargingStationSchema,
+  insertRecycledPartSchema,
+  insertSustainabilityMetricSchema,
+  insertSatelliteConnectionSchema,
+  insertSatelliteUsageLogSchema,
+  insertQuantumEncryptionKeySchema,
+  insertQuantumSecureMessageSchema
 } from "@shared/schema";
 import Stripe from "stripe";
 import { createPaypalOrder, capturePaypalOrder, loadPaypalDefault } from "./paypal";
@@ -13489,6 +13519,715 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error seeding emerging tech data:", error);
       res.status(500).json({ message: "Failed to seed data", error: String(error) });
+    }
+  });
+
+  // ==========================================
+  // NEXT-GENERATION TECHNOLOGY MODULE ROUTES
+  // ==========================================
+
+  // 1. Neural Diagnostics
+  app.get("/api/nextgen/neural-diagnostics", isAuthenticated, async (req, res) => {
+    try {
+      const diagnostics = await storage.getNeuralDiagnostics(req.user!.garageId!);
+      res.json({ data: diagnostics });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch neural diagnostics" });
+    }
+  });
+
+  app.post("/api/nextgen/neural-diagnostics", isAuthenticated, async (req, res) => {
+    try {
+      const validated = insertNeuralDiagnosticSchema.parse({ ...req.body, garageId: req.user!.garageId });
+      const diagnostic = await storage.createNeuralDiagnostic(validated);
+      res.json({ data: diagnostic });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json(sanitizeZodError(error));
+      } else {
+        res.status(500).json({ error: "Failed to create neural diagnostic" });
+      }
+    }
+  });
+
+  app.get("/api/nextgen/neural-training-sessions", isAuthenticated, async (req, res) => {
+    try {
+      const sessions = await storage.getNeuralTrainingSessions(req.user!.garageId!);
+      res.json({ data: sessions });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch neural training sessions" });
+    }
+  });
+
+  app.post("/api/nextgen/neural-training-sessions", isAuthenticated, async (req, res) => {
+    try {
+      const validated = insertNeuralTrainingSessionSchema.parse({ ...req.body, garageId: req.user!.garageId });
+      const session = await storage.createNeuralTrainingSession(validated);
+      res.json({ data: session });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json(sanitizeZodError(error));
+      } else {
+        res.status(500).json({ error: "Failed to create neural training session" });
+      }
+    }
+  });
+
+  // 2. Computer Vision
+  app.get("/api/nextgen/vision-quality-checks", isAuthenticated, async (req, res) => {
+    try {
+      const checks = await storage.getVisionQualityChecks(req.user!.garageId!);
+      res.json({ data: checks });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch vision quality checks" });
+    }
+  });
+
+  app.post("/api/nextgen/vision-quality-checks", isAuthenticated, async (req, res) => {
+    try {
+      const validated = insertVisionQualityCheckSchema.parse({ ...req.body, garageId: req.user!.garageId });
+      const check = await storage.createVisionQualityCheck(validated);
+      res.json({ data: check });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json(sanitizeZodError(error));
+      } else {
+        res.status(500).json({ error: "Failed to create vision quality check" });
+      }
+    }
+  });
+
+  app.get("/api/nextgen/vision-defects", isAuthenticated, async (req, res) => {
+    try {
+      const defects = await storage.getVisionDefects(req.user!.garageId!);
+      res.json({ data: defects });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch vision defects" });
+    }
+  });
+
+  app.post("/api/nextgen/vision-defects", isAuthenticated, async (req, res) => {
+    try {
+      const validated = insertVisionDefectSchema.parse({ ...req.body, garageId: req.user!.garageId });
+      const defect = await storage.createVisionDefect(validated);
+      res.json({ data: defect });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json(sanitizeZodError(error));
+      } else {
+        res.status(500).json({ error: "Failed to create vision defect" });
+      }
+    }
+  });
+
+  // 3. NLP Service Writer
+  app.get("/api/nextgen/nlp-service-requests", isAuthenticated, async (req, res) => {
+    try {
+      const requests = await storage.getNLPServiceRequests(req.user!.garageId!);
+      res.json({ data: requests });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch NLP service requests" });
+    }
+  });
+
+  app.post("/api/nextgen/nlp-service-requests", isAuthenticated, async (req, res) => {
+    try {
+      const validated = insertNLPServiceRequestSchema.parse({ ...req.body, garageId: req.user!.garageId });
+      const request = await storage.createNLPServiceRequest(validated);
+      res.json({ data: request });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json(sanitizeZodError(error));
+      } else {
+        res.status(500).json({ error: "Failed to create NLP service request" });
+      }
+    }
+  });
+
+  app.get("/api/nextgen/nlp-training-data", isAuthenticated, async (req, res) => {
+    try {
+      const data = await storage.getNLPTrainingData(req.user!.garageId!);
+      res.json({ data });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch NLP training data" });
+    }
+  });
+
+  app.post("/api/nextgen/nlp-training-data", isAuthenticated, async (req, res) => {
+    try {
+      const validated = insertNLPTrainingDataSchema.parse({ ...req.body, garageId: req.user!.garageId });
+      const data = await storage.createNLPTrainingData(validated);
+      res.json({ data });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json(sanitizeZodError(error));
+      } else {
+        res.status(500).json({ error: "Failed to create NLP training data" });
+      }
+    }
+  });
+
+  // 4. RL Parts Optimizer
+  app.get("/api/nextgen/rl-parts-optimizations", isAuthenticated, async (req, res) => {
+    try {
+      const optimizations = await storage.getRLPartsOptimizations(req.user!.garageId!);
+      res.json({ data: optimizations });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch RL parts optimizations" });
+    }
+  });
+
+  app.post("/api/nextgen/rl-parts-optimizations", isAuthenticated, async (req, res) => {
+    try {
+      const validated = insertRLPartsOptimizationSchema.parse({ ...req.body, garageId: req.user!.garageId });
+      const optimization = await storage.createRLPartsOptimization(validated);
+      res.json({ data: optimization });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json(sanitizeZodError(error));
+      } else {
+        res.status(500).json({ error: "Failed to create RL parts optimization" });
+      }
+    }
+  });
+
+  app.get("/api/nextgen/rl-learning-episodes", isAuthenticated, async (req, res) => {
+    try {
+      const episodes = await storage.getRLLearningEpisodes(req.user!.garageId!);
+      res.json({ data: episodes });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch RL learning episodes" });
+    }
+  });
+
+  app.post("/api/nextgen/rl-learning-episodes", isAuthenticated, async (req, res) => {
+    try {
+      const validated = insertRLLearningEpisodeSchema.parse({ ...req.body, garageId: req.user!.garageId });
+      const episode = await storage.createRLLearningEpisode(validated);
+      res.json({ data: episode });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json(sanitizeZodError(error));
+      } else {
+        res.status(500).json({ error: "Failed to create RL learning episode" });
+      }
+    }
+  });
+
+  // 5. Metaverse Showroom
+  app.get("/api/nextgen/metaverse-showrooms", isAuthenticated, async (req, res) => {
+    try {
+      const showrooms = await storage.getMetaverseShowrooms(req.user!.garageId!);
+      res.json({ data: showrooms });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch metaverse showrooms" });
+    }
+  });
+
+  app.post("/api/nextgen/metaverse-showrooms", isAuthenticated, async (req, res) => {
+    try {
+      const validated = insertMetaverseShowroomSchema.parse({ ...req.body, garageId: req.user!.garageId });
+      const showroom = await storage.createMetaverseShowroom(validated);
+      res.json({ data: showroom });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json(sanitizeZodError(error));
+      } else {
+        res.status(500).json({ error: "Failed to create metaverse showroom" });
+      }
+    }
+  });
+
+  app.get("/api/nextgen/metaverse-visits", isAuthenticated, async (req, res) => {
+    try {
+      const visits = await storage.getMetaverseVisits(req.user!.garageId!);
+      res.json({ data: visits });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch metaverse visits" });
+    }
+  });
+
+  app.post("/api/nextgen/metaverse-visits", isAuthenticated, async (req, res) => {
+    try {
+      const validated = insertMetaverseVisitSchema.parse({ ...req.body, garageId: req.user!.garageId });
+      const visit = await storage.createMetaverseVisit(validated);
+      res.json({ data: visit });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json(sanitizeZodError(error));
+      } else {
+        res.status(500).json({ error: "Failed to create metaverse visit" });
+      }
+    }
+  });
+
+  // 6. Holographic Guides
+  app.get("/api/nextgen/holographic-guides", isAuthenticated, async (req, res) => {
+    try {
+      const guides = await storage.getHolographicGuides(req.user!.garageId!);
+      res.json({ data: guides });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch holographic guides" });
+    }
+  });
+
+  app.post("/api/nextgen/holographic-guides", isAuthenticated, async (req, res) => {
+    try {
+      const validated = insertHolographicGuideSchema.parse({ ...req.body, garageId: req.user!.garageId });
+      const guide = await storage.createHolographicGuide(validated);
+      res.json({ data: guide });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json(sanitizeZodError(error));
+      } else {
+        res.status(500).json({ error: "Failed to create holographic guide" });
+      }
+    }
+  });
+
+  app.get("/api/nextgen/holographic-sessions", isAuthenticated, async (req, res) => {
+    try {
+      const sessions = await storage.getHolographicSessions(req.user!.garageId!);
+      res.json({ data: sessions });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch holographic sessions" });
+    }
+  });
+
+  app.post("/api/nextgen/holographic-sessions", isAuthenticated, async (req, res) => {
+    try {
+      const validated = insertHolographicSessionSchema.parse({ ...req.body, garageId: req.user!.garageId });
+      const session = await storage.createHolographicSession(validated);
+      res.json({ data: session });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json(sanitizeZodError(error));
+      } else {
+        res.status(500).json({ error: "Failed to create holographic session" });
+      }
+    }
+  });
+
+  // 7. Spatial Computing
+  app.get("/api/nextgen/spatial-workstations", isAuthenticated, async (req, res) => {
+    try {
+      const workstations = await storage.getSpatialWorkstations(req.user!.garageId!);
+      res.json({ data: workstations });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch spatial workstations" });
+    }
+  });
+
+  app.post("/api/nextgen/spatial-workstations", isAuthenticated, async (req, res) => {
+    try {
+      const validated = insertSpatialWorkstationSchema.parse({ ...req.body, garageId: req.user!.garageId });
+      const workstation = await storage.createSpatialWorkstation(validated);
+      res.json({ data: workstation });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json(sanitizeZodError(error));
+      } else {
+        res.status(500).json({ error: "Failed to create spatial workstation" });
+      }
+    }
+  });
+
+  app.get("/api/nextgen/spatial-diagnostic-sessions", isAuthenticated, async (req, res) => {
+    try {
+      const sessions = await storage.getSpatialDiagnosticSessions(req.user!.garageId!);
+      res.json({ data: sessions });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch spatial diagnostic sessions" });
+    }
+  });
+
+  app.post("/api/nextgen/spatial-diagnostic-sessions", isAuthenticated, async (req, res) => {
+    try {
+      const validated = insertSpatialDiagnosticSessionSchema.parse({ ...req.body, garageId: req.user!.garageId });
+      const session = await storage.createSpatialDiagnosticSession(validated);
+      res.json({ data: session });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json(sanitizeZodError(error));
+      } else {
+        res.status(500).json({ error: "Failed to create spatial diagnostic session" });
+      }
+    }
+  });
+
+  // 8. Autonomous Robots
+  app.get("/api/nextgen/autonomous-robots", isAuthenticated, async (req, res) => {
+    try {
+      const robots = await storage.getAutonomousRobots(req.user!.garageId!);
+      res.json({ data: robots });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch autonomous robots" });
+    }
+  });
+
+  app.post("/api/nextgen/autonomous-robots", isAuthenticated, async (req, res) => {
+    try {
+      const validated = insertAutonomousRobotSchema.parse({ ...req.body, garageId: req.user!.garageId });
+      const robot = await storage.createAutonomousRobot(validated);
+      res.json({ data: robot });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json(sanitizeZodError(error));
+      } else {
+        res.status(500).json({ error: "Failed to create autonomous robot" });
+      }
+    }
+  });
+
+  app.get("/api/nextgen/robot-tasks", isAuthenticated, async (req, res) => {
+    try {
+      const tasks = await storage.getRobotTasks(req.user!.garageId!);
+      res.json({ data: tasks });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch robot tasks" });
+    }
+  });
+
+  app.post("/api/nextgen/robot-tasks", isAuthenticated, async (req, res) => {
+    try {
+      const validated = insertRobotTaskSchema.parse({ ...req.body, garageId: req.user!.garageId });
+      const task = await storage.createRobotTask(validated);
+      res.json({ data: task });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json(sanitizeZodError(error));
+      } else {
+        res.status(500).json({ error: "Failed to create robot task" });
+      }
+    }
+  });
+
+  // 9. Drone Fleet
+  app.get("/api/nextgen/drone-fleets", isAuthenticated, async (req, res) => {
+    try {
+      const fleets = await storage.getDroneFleets(req.user!.garageId!);
+      res.json({ data: fleets });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch drone fleets" });
+    }
+  });
+
+  app.post("/api/nextgen/drone-fleets", isAuthenticated, async (req, res) => {
+    try {
+      const validated = insertDroneFleetSchema.parse({ ...req.body, garageId: req.user!.garageId });
+      const fleet = await storage.createDroneFleet(validated);
+      res.json({ data: fleet });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json(sanitizeZodError(error));
+      } else {
+        res.status(500).json({ error: "Failed to create drone fleet" });
+      }
+    }
+  });
+
+  app.get("/api/nextgen/drone-missions", isAuthenticated, async (req, res) => {
+    try {
+      const missions = await storage.getDroneMissions(req.user!.garageId!);
+      res.json({ data: missions });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch drone missions" });
+    }
+  });
+
+  app.post("/api/nextgen/drone-missions", isAuthenticated, async (req, res) => {
+    try {
+      const validated = insertDroneMissionSchema.parse({ ...req.body, garageId: req.user!.garageId });
+      const mission = await storage.createDroneMission(validated);
+      res.json({ data: mission });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json(sanitizeZodError(error));
+      } else {
+        res.status(500).json({ error: "Failed to create drone mission" });
+      }
+    }
+  });
+
+  // 10. Smart Contracts
+  app.get("/api/nextgen/smart-contracts", isAuthenticated, async (req, res) => {
+    try {
+      const contracts = await storage.getSmartContracts(req.user!.garageId!);
+      res.json({ data: contracts });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch smart contracts" });
+    }
+  });
+
+  app.post("/api/nextgen/smart-contracts", isAuthenticated, async (req, res) => {
+    try {
+      const validated = insertSmartContractSchema.parse({ ...req.body, garageId: req.user!.garageId });
+      const contract = await storage.createSmartContract(validated);
+      res.json({ data: contract });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json(sanitizeZodError(error));
+      } else {
+        res.status(500).json({ error: "Failed to create smart contract" });
+      }
+    }
+  });
+
+  app.get("/api/nextgen/contract-events", isAuthenticated, async (req, res) => {
+    try {
+      const events = await storage.getContractEvents(req.user!.garageId!);
+      res.json({ data: events });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch contract events" });
+    }
+  });
+
+  app.post("/api/nextgen/contract-events", isAuthenticated, async (req, res) => {
+    try {
+      const validated = insertContractEventSchema.parse({ ...req.body, garageId: req.user!.garageId });
+      const event = await storage.createContractEvent(validated);
+      res.json({ data: event });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json(sanitizeZodError(error));
+      } else {
+        res.status(500).json({ error: "Failed to create contract event" });
+      }
+    }
+  });
+
+  // 11. Carbon Credits
+  app.get("/api/nextgen/carbon-credits", isAuthenticated, async (req, res) => {
+    try {
+      const credits = await storage.getCarbonCredits(req.user!.garageId!);
+      res.json({ data: credits });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch carbon credits" });
+    }
+  });
+
+  app.post("/api/nextgen/carbon-credits", isAuthenticated, async (req, res) => {
+    try {
+      const validated = insertCarbonCreditSchema.parse({ ...req.body, garageId: req.user!.garageId });
+      const credit = await storage.createCarbonCredit(validated);
+      res.json({ data: credit });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json(sanitizeZodError(error));
+      } else {
+        res.status(500).json({ error: "Failed to create carbon credit" });
+      }
+    }
+  });
+
+  app.get("/api/nextgen/carbon-emissions", isAuthenticated, async (req, res) => {
+    try {
+      const emissions = await storage.getCarbonEmissions(req.user!.garageId!);
+      res.json({ data: emissions });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch carbon emissions" });
+    }
+  });
+
+  app.post("/api/nextgen/carbon-emissions", isAuthenticated, async (req, res) => {
+    try {
+      const validated = insertCarbonEmissionSchema.parse({ ...req.body, garageId: req.user!.garageId });
+      const emission = await storage.createCarbonEmission(validated);
+      res.json({ data: emission });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json(sanitizeZodError(error));
+      } else {
+        res.status(500).json({ error: "Failed to create carbon emission" });
+      }
+    }
+  });
+
+  // 12. Green Energy
+  app.get("/api/nextgen/green-energy-assets", isAuthenticated, async (req, res) => {
+    try {
+      const assets = await storage.getGreenEnergyAssets(req.user!.garageId!);
+      res.json({ data: assets });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch green energy assets" });
+    }
+  });
+
+  app.post("/api/nextgen/green-energy-assets", isAuthenticated, async (req, res) => {
+    try {
+      const validated = insertGreenEnergyAssetSchema.parse({ ...req.body, garageId: req.user!.garageId });
+      const asset = await storage.createGreenEnergyAsset(validated);
+      res.json({ data: asset });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json(sanitizeZodError(error));
+      } else {
+        res.status(500).json({ error: "Failed to create green energy asset" });
+      }
+    }
+  });
+
+  app.get("/api/nextgen/ev-charging-stations", isAuthenticated, async (req, res) => {
+    try {
+      const stations = await storage.getEVChargingStations(req.user!.garageId!);
+      res.json({ data: stations });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch EV charging stations" });
+    }
+  });
+
+  app.post("/api/nextgen/ev-charging-stations", isAuthenticated, async (req, res) => {
+    try {
+      const validated = insertEVChargingStationSchema.parse({ ...req.body, garageId: req.user!.garageId });
+      const station = await storage.createEVChargingStation(validated);
+      res.json({ data: station });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json(sanitizeZodError(error));
+      } else {
+        res.status(500).json({ error: "Failed to create EV charging station" });
+      }
+    }
+  });
+
+  // 13. Circular Economy
+  app.get("/api/nextgen/recycled-parts", isAuthenticated, async (req, res) => {
+    try {
+      const parts = await storage.getRecycledParts(req.user!.garageId!);
+      res.json({ data: parts });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch recycled parts" });
+    }
+  });
+
+  app.post("/api/nextgen/recycled-parts", isAuthenticated, async (req, res) => {
+    try {
+      const validated = insertRecycledPartSchema.parse({ ...req.body, garageId: req.user!.garageId });
+      const part = await storage.createRecycledPart(validated);
+      res.json({ data: part });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json(sanitizeZodError(error));
+      } else {
+        res.status(500).json({ error: "Failed to create recycled part" });
+      }
+    }
+  });
+
+  app.get("/api/nextgen/sustainability-metrics", isAuthenticated, async (req, res) => {
+    try {
+      const metrics = await storage.getSustainabilityMetrics(req.user!.garageId!);
+      res.json({ data: metrics });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch sustainability metrics" });
+    }
+  });
+
+  app.post("/api/nextgen/sustainability-metrics", isAuthenticated, async (req, res) => {
+    try {
+      const validated = insertSustainabilityMetricSchema.parse({ ...req.body, garageId: req.user!.garageId });
+      const metric = await storage.createSustainabilityMetric(validated);
+      res.json({ data: metric });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json(sanitizeZodError(error));
+      } else {
+        res.status(500).json({ error: "Failed to create sustainability metric" });
+      }
+    }
+  });
+
+  // 14. Satellite
+  app.get("/api/nextgen/satellite-connections", isAuthenticated, async (req, res) => {
+    try {
+      const connections = await storage.getSatelliteConnections(req.user!.garageId!);
+      res.json({ data: connections });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch satellite connections" });
+    }
+  });
+
+  app.post("/api/nextgen/satellite-connections", isAuthenticated, async (req, res) => {
+    try {
+      const validated = insertSatelliteConnectionSchema.parse({ ...req.body, garageId: req.user!.garageId });
+      const connection = await storage.createSatelliteConnection(validated);
+      res.json({ data: connection });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json(sanitizeZodError(error));
+      } else {
+        res.status(500).json({ error: "Failed to create satellite connection" });
+      }
+    }
+  });
+
+  app.get("/api/nextgen/satellite-usage-logs", isAuthenticated, async (req, res) => {
+    try {
+      const logs = await storage.getSatelliteUsageLogs(req.user!.garageId!);
+      res.json({ data: logs });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch satellite usage logs" });
+    }
+  });
+
+  app.post("/api/nextgen/satellite-usage-logs", isAuthenticated, async (req, res) => {
+    try {
+      const validated = insertSatelliteUsageLogSchema.parse({ ...req.body, garageId: req.user!.garageId });
+      const log = await storage.createSatelliteUsageLog(validated);
+      res.json({ data: log });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json(sanitizeZodError(error));
+      } else {
+        res.status(500).json({ error: "Failed to create satellite usage log" });
+      }
+    }
+  });
+
+  // 15. Quantum Encryption
+  app.get("/api/nextgen/quantum-encryption-keys", isAuthenticated, async (req, res) => {
+    try {
+      const keys = await storage.getQuantumEncryptionKeys(req.user!.garageId!);
+      res.json({ data: keys });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch quantum encryption keys" });
+    }
+  });
+
+  app.post("/api/nextgen/quantum-encryption-keys", isAuthenticated, async (req, res) => {
+    try {
+      const validated = insertQuantumEncryptionKeySchema.parse({ ...req.body, garageId: req.user!.garageId });
+      const key = await storage.createQuantumEncryptionKey(validated);
+      res.json({ data: key });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json(sanitizeZodError(error));
+      } else {
+        res.status(500).json({ error: "Failed to create quantum encryption key" });
+      }
+    }
+  });
+
+  app.get("/api/nextgen/quantum-secure-messages", isAuthenticated, async (req, res) => {
+    try {
+      const messages = await storage.getQuantumSecureMessages(req.user!.garageId!);
+      res.json({ data: messages });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch quantum secure messages" });
+    }
+  });
+
+  app.post("/api/nextgen/quantum-secure-messages", isAuthenticated, async (req, res) => {
+    try {
+      const validated = insertQuantumSecureMessageSchema.parse({ ...req.body, garageId: req.user!.garageId });
+      const message = await storage.createQuantumSecureMessage(validated);
+      res.json({ data: message });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json(sanitizeZodError(error));
+      } else {
+        res.status(500).json({ error: "Failed to create quantum secure message" });
+      }
     }
   });
 
