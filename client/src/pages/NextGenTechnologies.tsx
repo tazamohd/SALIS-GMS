@@ -1,7 +1,7 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, Brain, Eye, MessageSquare, Package, VrIcon, Glasses, Network, Bot, Plane, FileCode, Leaf, Zap, Recycle, Satellite, Shield } from "lucide-react";
+import { Loader2, Brain, Eye, MessageSquare, Package, MonitorPlay, Glasses, Network, Bot, Plane, FileCode, Leaf, Zap, Recycle, Satellite, Shield } from "lucide-react";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
@@ -204,7 +204,7 @@ export default function NextGenTechnologies() {
     },
     {
       name: "Metaverse Showroom",
-      icon: VrIcon,
+      icon: MonitorPlay,
       color: "text-pink-500 dark:text-pink-400",
       data: [
         { label: "Showrooms", count: metaverseShowrooms?.data?.length || 0, loading: loadingMetaverse },
