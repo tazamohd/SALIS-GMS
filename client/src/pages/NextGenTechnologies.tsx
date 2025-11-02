@@ -153,8 +153,13 @@ export default function NextGenTechnologies() {
         title: "Sample Data Seeded",
         description: "Successfully populated all 15 next-gen technology modules with realistic data",
       });
-      // Invalidate all queries to refetch
-      queryClient.invalidateQueries({ queryKey: ["/api/nextgen/"] });
+      // Invalidate all next-gen queries to refetch
+      queryClient.invalidateQueries({ 
+        predicate: (query) => {
+          const key = query.queryKey[0];
+          return typeof key === 'string' && key.startsWith('/api/nextgen/');
+        }
+      });
     },
     onError: (error: any) => {
       toast({
