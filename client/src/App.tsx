@@ -89,6 +89,7 @@ import SecurityCameras from "@/pages/SecurityCameras";
 import LicensePlateRecognition from "@/pages/LicensePlateRecognition";
 import EmergingTechnologies from "@/pages/EmergingTechnologies";
 import NextGenTechnologies from "@/pages/NextGenTechnologies";
+import IoTDashboard from "@/pages/IoTDashboard";
 import { CustomerDashboard } from "@/pages/customer/CustomerDashboard";
 import { CustomerMobileLayout } from "@/components/CustomerMobileLayout";
 import { TechnicianMobileLayout } from "@/components/TechnicianMobileLayout";
@@ -580,6 +581,11 @@ function Router() {
       <Route path="/nextgen-technologies">
         <Layout>
           <NextGenTechnologies />
+        </Layout>
+      </Route>
+      <Route path="/iot-dashboard">
+        <Layout>
+          <IoTDashboard />
         </Layout>
       </Route>
       
