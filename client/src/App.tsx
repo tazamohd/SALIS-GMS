@@ -100,6 +100,9 @@ import EdgeComputingDiagnostics from "@/pages/EdgeComputingDiagnostics";
 import TireManagement from "@/pages/TireManagement";
 import KPIDashboard from "@/pages/KPIDashboard";
 import AppointmentReminders from "@/pages/AppointmentReminders";
+import CustomReportBuilder from "@/pages/CustomReportBuilder";
+import VINDecoder from "@/pages/VINDecoder";
+import TechnicianLeaderboards from "@/pages/TechnicianLeaderboards";
 import { CustomerDashboard } from "@/pages/customer/CustomerDashboard";
 import { CustomerMobileLayout } from "@/components/CustomerMobileLayout";
 import { TechnicianMobileLayout } from "@/components/TechnicianMobileLayout";
@@ -256,6 +259,21 @@ function Router() {
       <Route path="/appointment-reminders">
         <Layout>
           <AppointmentReminders />
+        </Layout>
+      </Route>
+      <Route path="/custom-reports">
+        <Layout>
+          <CustomReportBuilder />
+        </Layout>
+      </Route>
+      <Route path="/vin-decoder">
+        <Layout>
+          <VINDecoder />
+        </Layout>
+      </Route>
+      <Route path="/technician-leaderboards">
+        <Layout>
+          <TechnicianLeaderboards />
         </Layout>
       </Route>
       <Route path="/vendor-supplier-portal">
