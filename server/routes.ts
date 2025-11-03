@@ -8544,6 +8544,112 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Contract Management - Enhanced endpoints with utilization, SLA, and renewals
+  app.get('/api/contracts/enhanced', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId;
+      
+      // Fetch all contracts for the garage
+      const contracts = await db.select().from(fleetContracts).where(eq(fleetContracts.garageId, garageId));
+      
+      // Fetch related data for each contract
+      const enhancedContracts = await Promise.all(contracts.map(async (contract) => {
+        const [utilization, slaMetrics, renewals] = await Promise.all([
+          db.select().from(contractUtilization).where(eq(contractUtilization.contractId, contract.id)),
+          db.select().from(contractSlaMetrics).where(eq(contractSlaMetrics.contractId, contract.id)),
+          db.select().from(contractRenewals).where(eq(contractRenewals.contractId, contract.id)).orderBy(desc(contractRenewals.createdAt)),
+        ]);
+
+        return {
+          ...contract,
+          utilization,
+          slaMetrics,
+          renewals,
+        };
+      }));
+
+      res.json(enhancedContracts);
+    } catch (error) {
+      console.error("Error fetching enhanced contracts:", error);
+      res.status(500).json({ message: "Failed to fetch enhanced contracts" });
+    }
+  });
+
+  app.post('/api/contracts/:id/trigger-renewal', isAuthenticated, async (req: any, res) => {
+    try {
+      const contractId = req.params.id;
+      
+      // Fetch the contract
+      const [contract] = await db.select().from(fleetContracts).where(eq(fleetContracts.id, contractId));
+      
+      if (!contract) {
+        return res.status(404).json({ message: "Contract not found" });
+      }
+
+      // Create a new renewal record
+      const newEndDate = new Date(contract.endDate);
+      newEndDate.setFullYear(newEndDate.getFullYear() + 1);
+
+      const [renewal] = await db.insert(contractRenewals).values({
+        contractId,
+        renewalStatus: 'pending',
+        proposedStartDate: contract.endDate,
+        proposedEndDate: newEndDate.toISOString(),
+        proposedValue: contract.monthlyValue ? contract.monthlyValue * 12 : contract.totalValue,
+        proposedTerms: contract.terms,
+        notificationSentAt: new Date().toISOString(),
+      }).returning();
+
+      res.status(201).json(renewal);
+    } catch (error) {
+      console.error("Error triggering contract renewal:", error);
+      res.status(500).json({ message: "Failed to trigger contract renewal" });
+    }
+  });
+
+  app.post('/api/contracts/:id/accept-renewal', isAuthenticated, async (req: any, res) => {
+    try {
+      const contractId = req.params.id;
+      const { renewalId } = req.body;
+
+      if (!renewalId) {
+        return res.status(400).json({ message: "Renewal ID is required" });
+      }
+
+      // Update renewal status
+      await db.update(contractRenewals)
+        .set({
+          renewalStatus: 'accepted',
+          acceptedAt: new Date().toISOString(),
+        })
+        .where(eq(contractRenewals.id, renewalId));
+
+      // Fetch the renewal to get proposed dates and values
+      const [renewal] = await db.select().from(contractRenewals).where(eq(contractRenewals.id, renewalId));
+
+      if (!renewal) {
+        return res.status(404).json({ message: "Renewal not found" });
+      }
+
+      // Update the contract with new dates and values
+      const [updatedContract] = await db.update(fleetContracts)
+        .set({
+          startDate: renewal.proposedStartDate,
+          endDate: renewal.proposedEndDate,
+          totalValue: renewal.proposedValue,
+          terms: renewal.proposedTerms,
+          status: 'active',
+        })
+        .where(eq(fleetContracts.id, contractId))
+        .returning();
+
+      res.json(updatedContract);
+    } catch (error) {
+      console.error("Error accepting contract renewal:", error);
+      res.status(500).json({ message: "Failed to accept contract renewal" });
+    }
+  });
+
   // Fleet Pricing Tiers
   app.post('/api/fleet/pricing-tiers', isAuthenticated, async (req: any, res) => {
     try {

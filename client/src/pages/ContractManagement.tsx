@@ -63,7 +63,7 @@ export default function ContractManagement() {
   // Accept renewal
   const acceptRenewalMutation = useMutation({
     mutationFn: async ({ renewalId, contractId }: { renewalId: string; contractId: string }) => 
-      apiRequest(`/api/contracts/${contractId}/renewals/${renewalId}/accept`, "POST"),
+      apiRequest(`/api/contracts/${contractId}/accept-renewal`, "POST", { renewalId }),
     onSuccess: () => {
       toast({
         title: "Renewal Accepted",
