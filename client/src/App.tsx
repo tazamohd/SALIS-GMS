@@ -90,6 +90,18 @@ import LicensePlateRecognition from "@/pages/LicensePlateRecognition";
 import EmergingTechnologies from "@/pages/EmergingTechnologies";
 import NextGenTechnologies from "@/pages/NextGenTechnologies";
 import { CustomerDashboard } from "@/pages/customer/CustomerDashboard";
+import { CustomerMobileLayout } from "@/components/CustomerMobileLayout";
+import { TechnicianMobileLayout } from "@/components/TechnicianMobileLayout";
+import CustomerMobileHome from "@/pages/mobile/CustomerMobileHome";
+import CustomerMobileBooking from "@/pages/mobile/CustomerMobileBooking";
+import CustomerMobileVehicles from "@/pages/mobile/CustomerMobileVehicles";
+import CustomerMobilePayments from "@/pages/mobile/CustomerMobilePayments";
+import CustomerMobileProfile from "@/pages/mobile/CustomerMobileProfile";
+import TechnicianMobileHome from "@/pages/mobile/TechnicianMobileHome";
+import TechnicianMobileJobs from "@/pages/mobile/TechnicianMobileJobs";
+import TechnicianMobileClock from "@/pages/mobile/TechnicianMobileClock";
+import TechnicianMobileLookup from "@/pages/mobile/TechnicianMobileLookup";
+import TechnicianMobileProfile from "@/pages/mobile/TechnicianMobileProfile";
 import { CustomerAppointments } from "@/pages/customer/CustomerAppointments";
 import { CustomerInvoices } from "@/pages/customer/CustomerInvoices";
 import { CustomerVehicles } from "@/pages/customer/CustomerVehicles";
@@ -570,6 +582,61 @@ function Router() {
           <NextGenTechnologies />
         </Layout>
       </Route>
+      
+      {/* Customer Mobile App Routes */}
+      <Route path="/customer-app">
+        <CustomerMobileLayout>
+          <CustomerMobileHome />
+        </CustomerMobileLayout>
+      </Route>
+      <Route path="/customer-app/booking">
+        <CustomerMobileLayout>
+          <CustomerMobileBooking />
+        </CustomerMobileLayout>
+      </Route>
+      <Route path="/customer-app/vehicles">
+        <CustomerMobileLayout>
+          <CustomerMobileVehicles />
+        </CustomerMobileLayout>
+      </Route>
+      <Route path="/customer-app/payments">
+        <CustomerMobileLayout>
+          <CustomerMobilePayments />
+        </CustomerMobileLayout>
+      </Route>
+      <Route path="/customer-app/profile">
+        <CustomerMobileLayout>
+          <CustomerMobileProfile />
+        </CustomerMobileLayout>
+      </Route>
+      
+      {/* Technician Mobile App Routes */}
+      <Route path="/technician-app">
+        <TechnicianMobileLayout>
+          <TechnicianMobileHome />
+        </TechnicianMobileLayout>
+      </Route>
+      <Route path="/technician-app/jobs">
+        <TechnicianMobileLayout>
+          <TechnicianMobileJobs />
+        </TechnicianMobileLayout>
+      </Route>
+      <Route path="/technician-app/clock">
+        <TechnicianMobileLayout>
+          <TechnicianMobileClock />
+        </TechnicianMobileLayout>
+      </Route>
+      <Route path="/technician-app/lookup">
+        <TechnicianMobileLayout>
+          <TechnicianMobileLookup />
+        </TechnicianMobileLayout>
+      </Route>
+      <Route path="/technician-app/profile">
+        <TechnicianMobileLayout>
+          <TechnicianMobileProfile />
+        </TechnicianMobileLayout>
+      </Route>
+      
       <Route component={NotFound} />
     </Switch>
   );
