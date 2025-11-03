@@ -123,168 +123,87 @@ export function Layout({ children }: LayoutProps) {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  // Streamlined and reorganized navigation groups with translations
+  // Reorganized navigation groups by business relationships
   const navGroups = [
     {
       label: t("nav.dashboard"),
       items: [{ path: "/dashboard", icon: Home, label: t("nav.dashboard") }],
     },
     {
-      label: t("nav.operations"),
+      label: "Daily Operations",
       items: [
         { path: "/job-cards", icon: Wrench, label: t("nav.jobCards") },
-        { path: "/calendar", icon: Calendar, label: t("nav.calendar") },
         { path: "/appointments", icon: Calendar, label: t("nav.appointments") },
+        { path: "/calendar", icon: Calendar, label: t("nav.calendar") },
         { path: "/tasks", icon: ClipboardCheck, label: t("nav.tasks") },
-        {
-          path: "/service-templates",
-          icon: ClipboardList,
-          label: t("nav.serviceTemplates"),
-        },
-        {
-          path: "/technician-portal",
-          icon: HardHat,
-          label: t("nav.technicianPortal"),
-        },
+        { path: "/service-templates", icon: ClipboardList, label: t("nav.serviceTemplates") },
+        { path: "/technician-portal", icon: HardHat, label: t("nav.technicianPortal") },
+        { path: "/ai-scheduling", icon: Calendar, label: "AI Scheduling" },
       ],
     },
     {
-      label: t("nav.customersFleet"),
+      label: "Customers & Vehicles",
       items: [
         { path: "/customers", icon: Users, label: t("nav.customers") },
         { path: "/vehicles", icon: Car, label: t("nav.vehicles") },
-        { path: "/fleet-management", icon: Truck, label: "Fleet Management" },
-        { path: "/contract-management", icon: FileText, label: "Contract Management" },
-        {
-          path: "/warranty-management",
-          icon: Shield,
-          label: "Warranty Management",
-        },
-        {
-          path: "/vehicle-inspections",
-          icon: FileCheck,
-          label: "Vehicle Inspections",
-        },
-        { path: "/towing-assistance", icon: Radio, label: "Towing & Roadside" },
-        { path: "/loaner-vehicles", icon: Key, label: "Loaner Vehicles" },
-        { path: "/tire-management", icon: CircleDot, label: "Tire Management" },
         { path: "/vin-decoder", icon: Fingerprint, label: "VIN Decoder" },
+        { path: "/fleet-management", icon: Truck, label: "Fleet Management" },
+        { path: "/contract-management", icon: FileCheck, label: "Contract Management" },
+        { path: "/warranty-management", icon: Shield, label: "Warranty Management" },
+        { path: "/vehicle-inspections", icon: FileCheck, label: "Vehicle Inspections" },
+        { path: "/loaner-vehicles", icon: Key, label: "Loaner Vehicles" },
+        { path: "/towing-assistance", icon: Radio, label: "Towing & Roadside" },
+        { path: "/tire-management", icon: CircleDot, label: "Tire Management" },
       ],
     },
     {
-      label: "Marketing & Sales",
+      label: "Inventory & Parts",
       items: [
-        {
-          path: "/marketing-automation",
-          icon: Mail,
-          label: "Marketing Automation",
-        },
-        { path: "/customer-loyalty", icon: Award, label: "Customer Loyalty" },
-        { path: "/appointment-reminders", icon: Bell, label: "Appointment Reminders" },
-      ],
-    },
-    {
-      label: t("nav.inventoryOrders"),
-      items: [
-        {
-          path: "/inventory-management",
-          icon: Warehouse,
-          label: t("nav.inventory"),
-        },
+        { path: "/inventory-management", icon: Warehouse, label: t("nav.inventory") },
         { path: "/spare-parts", icon: Package, label: t("nav.spareParts") },
         { path: "/tools", icon: Hammer, label: t("nav.tools") },
+        { path: "/parts-auto-reorder", icon: RefreshCw, label: "Auto Reordering" },
         { path: "/suppliers", icon: Building2, label: t("nav.suppliers") },
-        {
-          path: "/vendor-supplier-portal",
-          icon: Store,
-          label: "Vendor/Supplier Portal",
-        },
-        {
-          path: "/purchase-orders",
-          icon: ShoppingCart,
-          label: t("nav.purchaseOrders"),
-        },
-        { path: "/estimates", icon: Receipt, label: t("nav.estimates") },
+        { path: "/vendor-supplier-portal", icon: Store, label: "Vendor/Supplier Portal" },
+        { path: "/purchase-orders", icon: ShoppingCart, label: t("nav.purchaseOrders") },
+        { path: "/parts-marketplace", icon: ShoppingCart, label: "Parts Marketplace" },
       ],
     },
     {
-      label: t("nav.teamStaff"),
-      items: [
-        {
-          path: "/technician-management",
-          icon: UserCog,
-          label: t("nav.technicianManagement"),
-        },
-        {
-          path: "/hr-management",
-          icon: UserCheck,
-          label: t("nav.hrManagement"),
-        },
-        { path: "/chat", icon: MessageCircle, label: "Chat" },
-        { path: "/technician-leaderboards", icon: Trophy, label: "Technician Leaderboards" },
-      ],
-    },
-    {
-      label: t("nav.finance"),
+      label: "Financial Management",
       items: [
         { path: "/invoices", icon: FileText, label: t("nav.invoices") },
-        {
-          path: "/financial-settings",
-          icon: DollarSign,
-          label: t("nav.financialSettings"),
-        },
-        {
-          path: "/refund-management",
-          icon: RotateCcw,
-          label: t("nav.refunds"),
-        },
+        { path: "/estimates", icon: Receipt, label: t("nav.estimates") },
+        { path: "/financial-settings", icon: DollarSign, label: t("nav.financialSettings") },
+        { path: "/refund-management", icon: RotateCcw, label: t("nav.refunds") },
+        { path: "/accounting-integration", icon: DollarSign, label: "Accounting Sync" },
       ],
     },
     {
-      label: t("nav.analytics"),
+      label: "Analytics & Reports",
       items: [
-        { path: "/reports", icon: BarChart3, label: t("nav.reports") },
-        {
-          path: "/business-intelligence",
-          icon: TrendingUp,
-          label: t("nav.businessIntelligence"),
-        },
         { path: "/kpi-dashboard", icon: Target, label: "KPI Dashboard" },
+        { path: "/reports", icon: BarChart3, label: t("nav.reports") },
         { path: "/custom-reports", icon: FileText, label: "Custom Reports" },
+        { path: "/business-intelligence", icon: TrendingUp, label: t("nav.businessIntelligence") },
+        { path: "/business-intelligence-dashboard", icon: BarChart3, label: "BI Dashboard" },
+        { path: "/profit-analysis", icon: DollarSign, label: "Profit Analysis" },
+        { path: "/customer-ltv-analysis", icon: TrendingUp, label: "Customer LTV" },
+        { path: "/business-heatmaps", icon: Map, label: "Heat Maps" },
       ],
     },
     {
-      label: "Enterprise",
+      label: "Franchise & Enterprise",
       items: [
-        {
-          path: "/franchise-management",
-          icon: Building2,
-          label: "Franchise Management",
-        },
-        {
-          path: "/diagnostics-obd",
-          icon: Cpu,
-          label: "Diagnostics & OBD",
-        },
-        {
-          path: "/oem-software",
-          icon: Key,
-          label: "OEM Software",
-        },
-        {
-          path: "/globalization",
-          icon: Globe,
-          label: "Globalization",
-        },
-        {
-          path: "/parts-supply-network",
-          icon: Network,
-          label: "Parts Network",
-        },
+        { path: "/franchise-management", icon: Building2, label: "Franchise Management" },
+        { path: "/diagnostics-obd", icon: Cpu, label: "Diagnostics & OBD" },
+        { path: "/oem-software", icon: Key, label: "OEM Software" },
+        { path: "/parts-supply-network", icon: Network, label: "Parts Network" },
+        { path: "/globalization", icon: Globe, label: "Globalization" },
       ],
     },
     {
-      label: t("nav.automationTools"),
+      label: "AI & Automation",
       items: [
         { path: "/ai-automation", icon: Brain, label: t("nav.aiAutomation") },
         { path: "/ai-chatbot", icon: MessageCircle, label: "AI Chatbot" },
@@ -295,61 +214,43 @@ export function Layout({ children }: LayoutProps) {
       ],
     },
     {
-      group: "📊 Advanced Analytics",
+      label: "Marketing & CX",
       items: [
-        { path: "/business-intelligence-dashboard", icon: BarChart3, label: "BI Dashboard" },
-        { path: "/profit-analysis", icon: DollarSign, label: "Profit Analysis" },
-        { path: "/customer-ltv-analysis", icon: TrendingUp, label: "Customer LTV" },
-        { path: "/business-heatmaps", icon: Map, label: "Heat Maps" },
-      ],
-    },
-    {
-      group: "🔌 Enhanced Integrations",
-      items: [
-        { path: "/accounting-integration", icon: DollarSign, label: "Accounting Sync" },
+        { path: "/marketing-automation", icon: Mail, label: "Marketing Automation" },
         { path: "/email-marketing-campaigns", icon: Mail, label: "Email Marketing" },
-        { path: "/social-media-integration", icon: MessageCircle, label: "Social Media" },
-        { path: "/video-consultations", icon: FileText, label: "Video Calls" },
-        { path: "/parts-marketplace", icon: ShoppingCart, label: "Parts Marketplace" },
-        { path: "/integrations", icon: Plug2, label: t("nav.integrations") },
-      ],
-    },
-    {
-      group: "💝 Customer Experience",
-      items: [
+        { path: "/customer-loyalty", icon: Award, label: "Customer Loyalty" },
+        { path: "/referral-program", icon: Users, label: "Referral Program" },
+        { path: "/customer-reviews-ratings", icon: Star, label: "Reviews & Ratings" },
+        { path: "/appointment-reminders", icon: Bell, label: "Appointment Reminders" },
         { path: "/live-service-tracking", icon: Radio, label: "Live Tracking" },
         { path: "/video-estimates", icon: FileText, label: "Video Estimates" },
         { path: "/digital-vehicle-walkaround", icon: Camera, label: "Vehicle Walkaround" },
-        { path: "/customer-reviews-ratings", icon: Star, label: "Reviews & Ratings" },
-        { path: "/referral-program", icon: Users, label: "Referral Program" },
-        {
-          path: "/data-import-export",
-          icon: DatabaseBackup,
-          label: t("nav.dataImportExport"),
-        },
+        { path: "/video-consultations", icon: FileText, label: "Video Calls" },
+        { path: "/social-media-integration", icon: MessageCircle, label: "Social Media" },
       ],
     },
     {
-      group: "⚙️ Operations & Efficiency",
+      label: "Team Management",
       items: [
-        { path: "/ai-scheduling", icon: Calendar, label: "AI Scheduling" },
-        { path: "/parts-auto-reorder", icon: RefreshCw, label: "Auto Reordering" },
-        { path: "/routing-optimizer", icon: MapPin, label: "Route Optimizer" },
+        { path: "/technician-management", icon: UserCog, label: t("nav.technicianManagement") },
+        { path: "/technician-leaderboards", icon: Trophy, label: "Technician Leaderboards" },
+        { path: "/hr-management", icon: UserCheck, label: t("nav.hrManagement") },
         { path: "/timeclock-payroll", icon: Clock, label: "Time & Payroll" },
+        { path: "/chat", icon: MessageCircle, label: "Chat" },
+      ],
+    },
+    {
+      label: "Compliance & Safety",
+      items: [
+        { path: "/iso-quality", icon: Award, label: "ISO 9001 QMS" },
+        { path: "/environmental-compliance", icon: Leaf, label: "Environmental" },
+        { path: "/safety-incidents", icon: AlertTriangle, label: "Safety Incidents" },
+        { path: "/insurance-claims", icon: Shield, label: "Insurance Claims" },
         { path: "/equipment-calibration", icon: Tool, label: "Calibration" },
       ],
     },
     {
-      group: "📋 Compliance & Quality",
-      items: [
-        { path: "/environmental-compliance", icon: Leaf, label: "Environmental" },
-        { path: "/iso-quality", icon: Award, label: "ISO 9001 QMS" },
-        { path: "/safety-incidents", icon: AlertTriangle, label: "Safety Incidents" },
-        { path: "/insurance-claims", icon: Shield, label: "Insurance Claims" },
-      ],
-    },
-    {
-      group: "🔧 Hardware Integration",
+      label: "Hardware & IoT",
       items: [
         { path: "/barcode-scanner", icon: Scan, label: "Barcode Scanner" },
         { path: "/digital-signage", icon: Monitor, label: "Digital Signage" },
@@ -359,23 +260,22 @@ export function Layout({ children }: LayoutProps) {
       ],
     },
     {
-      label: t("nav.settings"),
+      label: "System & Settings",
       items: [
         { path: "/settings", icon: SettingsIcon, label: t("nav.settings") },
         { path: "/security", icon: Shield, label: t("nav.security") },
         { path: "/profile", icon: UserIcon, label: t("nav.profile") },
-        {
-          path: "/document-management",
-          icon: FileText,
-          label: "Document Management",
-        },
+        { path: "/document-management", icon: FileText, label: "Document Management" },
+        { path: "/data-import-export", icon: DatabaseBackup, label: t("nav.dataImportExport") },
+        { path: "/integrations", icon: Plug2, label: t("nav.integrations") },
+        { path: "/routing-optimizer", icon: MapPin, label: "Route Optimizer" },
       ],
     },
   ];
 
   // Track which groups are expanded
   const [expandedGroups, setExpandedGroups] = useState<string[]>(
-    navGroups.map((group) => group.label || group.group || ''), // All groups expanded by default
+    navGroups.map((group) => group.label || ''), // All groups expanded by default
   );
 
   const toggleGroup = (groupLabel: string) => {
@@ -427,7 +327,7 @@ export function Layout({ children }: LayoutProps) {
           <nav className="flex-1 p-3 overflow-y-auto">
             <div className="space-y-0.5">
               {navGroups.map((group) => {
-                const groupLabel = group.label || group.group || '';
+                const groupLabel = group.label || '';
                 const isExpanded = expandedGroups.includes(groupLabel);
                 const hasActiveItem = group.items.some(
                   (item) => location === item.path,
