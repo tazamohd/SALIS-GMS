@@ -123,37 +123,37 @@ export default function VINDecoder() {
                   <div className="grid grid-cols-2 gap-4">
                     <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                       <p className="text-sm text-gray-600 dark:text-gray-400">Make</p>
-                      <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                      <p className="text-lg font-semibold text-gray-900 dark:text-white" data-testid="text-make">
                         {extractValue(results, "Make")}
                       </p>
                     </div>
                     <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                       <p className="text-sm text-gray-600 dark:text-gray-400">Model</p>
-                      <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                      <p className="text-lg font-semibold text-gray-900 dark:text-white" data-testid="text-model">
                         {extractValue(results, "Model")}
                       </p>
                     </div>
                     <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
                       <p className="text-sm text-gray-600 dark:text-gray-400">Year</p>
-                      <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                      <p className="text-lg font-semibold text-gray-900 dark:text-white" data-testid="text-year">
                         {extractValue(results, "Model Year")}
                       </p>
                     </div>
                     <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
                       <p className="text-sm text-gray-600 dark:text-gray-400">Body Type</p>
-                      <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                      <p className="text-lg font-semibold text-gray-900 dark:text-white" data-testid="text-body-type">
                         {extractValue(results, "Body Class")}
                       </p>
                     </div>
                     <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
                       <p className="text-sm text-gray-600 dark:text-gray-400">Engine</p>
-                      <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                      <p className="text-lg font-semibold text-gray-900 dark:text-white" data-testid="text-engine">
                         {extractValue(results, "Engine Number of Cylinders")} Cyl
                       </p>
                     </div>
                     <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
                       <p className="text-sm text-gray-600 dark:text-gray-400">Fuel Type</p>
-                      <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                      <p className="text-lg font-semibold text-gray-900 dark:text-white" data-testid="text-fuel-type">
                         {extractValue(results, "Fuel Type - Primary")}
                       </p>
                     </div>

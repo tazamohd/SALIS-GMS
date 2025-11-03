@@ -102,15 +102,15 @@ export default function TechnicianLeaderboards() {
                           <div className="grid grid-cols-3 gap-4 text-sm">
                             <div>
                               <p className="text-gray-600 dark:text-gray-400">Points</p>
-                              <p className="font-semibold text-gray-900 dark:text-white">{tech.points}</p>
+                              <p className="font-semibold text-gray-900 dark:text-white" data-testid={`text-points-${tech.id}`}>{tech.points}</p>
                             </div>
                             <div>
                               <p className="text-gray-600 dark:text-gray-400">Jobs</p>
-                              <p className="font-semibold text-gray-900 dark:text-white">{tech.jobsCompleted}</p>
+                              <p className="font-semibold text-gray-900 dark:text-white" data-testid={`text-jobs-${tech.id}`}>{tech.jobsCompleted}</p>
                             </div>
                             <div>
                               <p className="text-gray-600 dark:text-gray-400">Revenue</p>
-                              <p className="font-semibold text-green-600">${tech.revenue.toLocaleString()}</p>
+                              <p className="font-semibold text-green-600" data-testid={`text-revenue-${tech.id}`}>${tech.revenue.toLocaleString()}</p>
                             </div>
                           </div>
                         </div>

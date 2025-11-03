@@ -163,13 +163,13 @@ export default function KPIDashboard() {
 
       {/* Primary KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <Card className="bg-white dark:bg-salis-black border-l-4 border-l-blue-600">
+        <Card className="bg-white dark:bg-salis-black border-l-4 border-l-blue-600" data-testid="card-revenue">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-2">
               <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Revenue</p>
               <DollarSign className="h-5 w-5 text-blue-600" />
             </div>
-            <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">
+            <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1" data-testid="text-total-revenue">
               ${totalRevenue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </p>
             <div className="flex items-center gap-1 text-sm">
@@ -180,13 +180,13 @@ export default function KPIDashboard() {
           </CardContent>
         </Card>
 
-        <Card className="bg-white dark:bg-salis-black border-l-4 border-l-green-600">
+        <Card className="bg-white dark:bg-salis-black border-l-4 border-l-green-600" data-testid="card-jobs-completed">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-2">
               <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Jobs Completed</p>
               <CheckCircle className="h-5 w-5 text-green-600" />
             </div>
-            <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">
+            <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1" data-testid="text-jobs-completed">
               {completedJobs}
             </p>
             <div className="flex items-center gap-1 text-sm">
@@ -197,13 +197,13 @@ export default function KPIDashboard() {
           </CardContent>
         </Card>
 
-        <Card className="bg-white dark:bg-salis-black border-l-4 border-l-purple-600">
+        <Card className="bg-white dark:bg-salis-black border-l-4 border-l-purple-600" data-testid="card-avg-job-value">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-2">
               <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Avg Job Value</p>
               <Target className="h-5 w-5 text-purple-600" />
             </div>
-            <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">
+            <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1" data-testid="text-avg-job-value">
               ${avgJobValue.toFixed(2)}
             </p>
             <div className="flex items-center gap-1 text-sm">
@@ -214,13 +214,13 @@ export default function KPIDashboard() {
           </CardContent>
         </Card>
 
-        <Card className="bg-white dark:bg-salis-black border-l-4 border-l-orange-600">
+        <Card className="bg-white dark:bg-salis-black border-l-4 border-l-orange-600" data-testid="card-active-customers">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-2">
               <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Active Customers</p>
               <Users className="h-5 w-5 text-orange-600" />
             </div>
-            <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">
+            <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1" data-testid="text-active-customers">
               {activeCustomers}
             </p>
             <div className="flex items-center gap-1 text-sm">
@@ -272,12 +272,12 @@ export default function KPIDashboard() {
       </div>
 
       {/* Charts and Analytics */}
-      <Tabs defaultValue="revenue" className="space-y-6">
+      <Tabs defaultValue="revenue" className="space-y-6" data-testid="tabs-analytics">
         <TabsList className="bg-white dark:bg-salis-black">
-          <TabsTrigger value="revenue">Revenue Trends</TabsTrigger>
-          <TabsTrigger value="services">Service Mix</TabsTrigger>
-          <TabsTrigger value="technicians">Technician Performance</TabsTrigger>
-          <TabsTrigger value="efficiency">Operational Efficiency</TabsTrigger>
+          <TabsTrigger value="revenue" data-testid="tab-revenue">Revenue Trends</TabsTrigger>
+          <TabsTrigger value="services" data-testid="tab-services">Service Mix</TabsTrigger>
+          <TabsTrigger value="technicians" data-testid="tab-technicians">Technician Performance</TabsTrigger>
+          <TabsTrigger value="efficiency" data-testid="tab-efficiency">Operational Efficiency</TabsTrigger>
         </TabsList>
 
         {/* Revenue Trends Tab */}
