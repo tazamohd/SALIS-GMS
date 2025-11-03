@@ -56,6 +56,11 @@ import {
   Scan,
   Monitor,
   TabletSmartphone,
+  CircleDot,
+  Target,
+  Bell,
+  Trophy,
+  Fingerprint,
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -161,6 +166,8 @@ export function Layout({ children }: LayoutProps) {
         },
         { path: "/towing-assistance", icon: Radio, label: "Towing & Roadside" },
         { path: "/loaner-vehicles", icon: Key, label: "Loaner Vehicles" },
+        { path: "/tire-management", icon: CircleDot, label: "Tire Management" },
+        { path: "/vin-decoder", icon: Fingerprint, label: "VIN Decoder" },
       ],
     },
     {
@@ -172,6 +179,7 @@ export function Layout({ children }: LayoutProps) {
           label: "Marketing Automation",
         },
         { path: "/customer-loyalty", icon: Award, label: "Customer Loyalty" },
+        { path: "/appointment-reminders", icon: Bell, label: "Appointment Reminders" },
       ],
     },
     {
@@ -212,6 +220,7 @@ export function Layout({ children }: LayoutProps) {
           label: t("nav.hrManagement"),
         },
         { path: "/chat", icon: MessageCircle, label: "Chat" },
+        { path: "/technician-leaderboards", icon: Trophy, label: "Technician Leaderboards" },
       ],
     },
     {
@@ -239,6 +248,8 @@ export function Layout({ children }: LayoutProps) {
           icon: TrendingUp,
           label: t("nav.businessIntelligence"),
         },
+        { path: "/kpi-dashboard", icon: Target, label: "KPI Dashboard" },
+        { path: "/custom-reports", icon: FileText, label: "Custom Reports" },
       ],
     },
     {

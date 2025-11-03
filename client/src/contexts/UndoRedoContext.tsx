@@ -1,6 +1,5 @@
-import { createContext, useContext, useState, useCallback, ReactNode } from "react";
+import { createContext, useContext, useState, useCallback, useEffect, useRef, ReactNode } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
 
 interface Action {
   id: string;
@@ -29,6 +28,14 @@ export function UndoRedoProvider({ children }: { children: ReactNode }) {
   const [history, setHistory] = useState<Action[]>([]);
   const [currentIndex, setCurrentIndex] = useState(-1);
   const { toast } = useToast();
+  const abortControllerRef = useRef(new AbortController());
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      abortControllerRef.current.abort();
+    };
+  }, []);
 
   const addAction = useCallback((action: Omit<Action, "id" | "timestamp">) => {
     const newAction: Action = {
@@ -57,7 +64,7 @@ export function UndoRedoProvider({ children }: { children: ReactNode }) {
       return newIndex >= MAX_HISTORY_SIZE ? MAX_HISTORY_SIZE - 1 : newIndex;
     });
 
-    // Save to backend
+    // Save to backend with abort signal
     fetch('/api/action-history', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -65,8 +72,12 @@ export function UndoRedoProvider({ children }: { children: ReactNode }) {
         actionType: action.type,
         actionDescription: action.description,
       }),
+      signal: abortControllerRef.current.signal,
     }).catch((error) => {
-      console.error('Failed to save action to history:', error);
+      // Ignore abort errors
+      if (error.name !== 'AbortError') {
+        console.error('Failed to save action to history:', error);
+      }
     });
   }, [currentIndex]);
 
