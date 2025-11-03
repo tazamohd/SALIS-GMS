@@ -90,6 +90,8 @@ import LicensePlateRecognition from "@/pages/LicensePlateRecognition";
 import EmergingTechnologies from "@/pages/EmergingTechnologies";
 import NextGenTechnologies from "@/pages/NextGenTechnologies";
 import IoTDashboard from "@/pages/IoTDashboard";
+import ComputerVisionQC from "@/pages/ComputerVisionQC";
+import SmartPartsRecommender from "@/pages/SmartPartsRecommender";
 import { CustomerDashboard } from "@/pages/customer/CustomerDashboard";
 import { CustomerMobileLayout } from "@/components/CustomerMobileLayout";
 import { TechnicianMobileLayout } from "@/components/TechnicianMobileLayout";
@@ -586,6 +588,16 @@ function Router() {
       <Route path="/iot-dashboard">
         <Layout>
           <IoTDashboard />
+        </Layout>
+      </Route>
+      <Route path="/computer-vision-qc">
+        <Layout>
+          <ComputerVisionQC />
+        </Layout>
+      </Route>
+      <Route path="/smart-parts-recommender">
+        <Layout>
+          <SmartPartsRecommender />
         </Layout>
       </Route>
       
