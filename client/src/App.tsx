@@ -92,6 +92,11 @@ import NextGenTechnologies from "@/pages/NextGenTechnologies";
 import IoTDashboard from "@/pages/IoTDashboard";
 import ComputerVisionQC from "@/pages/ComputerVisionQC";
 import SmartPartsRecommender from "@/pages/SmartPartsRecommender";
+import DigitalTwinViewer from "@/pages/DigitalTwinViewer";
+import DroneInspection from "@/pages/DroneInspection";
+import ARRepairGuide from "@/pages/ARRepairGuide";
+import MLFraudDetection from "@/pages/MLFraudDetection";
+import EdgeComputingDiagnostics from "@/pages/EdgeComputingDiagnostics";
 import { CustomerDashboard } from "@/pages/customer/CustomerDashboard";
 import { CustomerMobileLayout } from "@/components/CustomerMobileLayout";
 import { TechnicianMobileLayout } from "@/components/TechnicianMobileLayout";
@@ -598,6 +603,31 @@ function Router() {
       <Route path="/smart-parts-recommender">
         <Layout>
           <SmartPartsRecommender />
+        </Layout>
+      </Route>
+      <Route path="/digital-twin-viewer">
+        <Layout>
+          <DigitalTwinViewer />
+        </Layout>
+      </Route>
+      <Route path="/drone-inspection">
+        <Layout>
+          <DroneInspection />
+        </Layout>
+      </Route>
+      <Route path="/ar-repair-guide">
+        <Layout>
+          <ARRepairGuide />
+        </Layout>
+      </Route>
+      <Route path="/ml-fraud-detection">
+        <Layout>
+          <MLFraudDetection />
+        </Layout>
+      </Route>
+      <Route path="/edge-computing">
+        <Layout>
+          <EdgeComputingDiagnostics />
         </Layout>
       </Route>
       

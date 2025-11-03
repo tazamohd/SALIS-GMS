@@ -1,0 +1,170 @@
+import { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Eye, Layers, CheckCircle, ArrowRight, Play } from 'lucide-react';
+
+export default function ARRepairGuide() {
+  const [activeStep, setActiveStep] = useState(0);
+  const [isARActive, setIsARActive] = useState(false);
+
+  const repairSteps = [
+    { id: 1, title: 'Safety Check', description: 'Ensure vehicle is on level ground and parking brake engaged', completed: true },
+    { id: 2, title: 'Locate Oil Filter', description: 'Find oil filter under vehicle near engine block', completed: true },
+    { id: 3, title: 'Remove Filter', description: 'Use filter wrench to loosen and remove old filter', completed: false },
+    { id: 4, title: 'Install New Filter', description: 'Apply oil to gasket and hand-tighten new filter', completed: false },
+    { id: 5, title: 'Add Fresh Oil', description: 'Pour specified amount of oil into engine', completed: false },
+  ];
+
+  return (
+    <div className="flex-1 p-6 bg-gray-50 dark:bg-salis-black min-h-screen">
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold font-['Montserrat'] text-gray-900 dark:text-white mb-2 flex items-center gap-3">
+          <Layers className="h-8 w-8 text-indigo-600" />
+          AR Repair Guide Viewer
+        </h1>
+        <p className="text-gray-600 dark:text-gray-400 font-['Poppins']">
+          Augmented reality step-by-step repair instructions with overlay annotations
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* AR Viewer */}
+        <Card className="lg:col-span-2 bg-white dark:bg-salis-black">
+          <CardHeader>
+            <CardTitle className="flex items-center justify-between">
+              <span className="flex items-center gap-2">
+                <Eye className="h-5 w-5 text-indigo-600" />
+                AR Camera View
+              </span>
+              <Button
+                onClick={() => setIsARActive(!isARActive)}
+                className={isARActive ? 'bg-red-600 hover:bg-red-700' : 'bg-indigo-600 hover:bg-indigo-700'}
+                data-testid="button-toggle-ar"
+              >
+                {isARActive ? 'Stop AR' : 'Start AR'}
+              </Button>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="relative bg-gradient-to-br from-gray-800 to-gray-900 rounded-lg h-[500px] overflow-hidden">
+              {/* Simulated AR View */}
+              {isARActive ? (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  {/* Camera feed simulation */}
+                  <div className="relative w-full h-full bg-gradient-to-br from-gray-700 to-gray-600">
+                    {/* AR Overlay Annotations */}
+                    <div className="absolute top-1/3 left-1/4 w-32 h-32 border-4 border-indigo-500 rounded-lg animate-pulse">
+                      <div className="absolute -top-8 left-0 bg-indigo-600 text-white px-3 py-1 rounded text-sm font-semibold">
+                        Oil Filter
+                      </div>
+                      <div className="absolute top-full left-0 mt-2 bg-white dark:bg-gray-800 px-3 py-2 rounded shadow-lg max-w-xs">
+                        <p className="text-xs text-gray-700 dark:text-gray-300">
+                          {repairSteps[activeStep]?.description}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* AR Markers */}
+                    <div className="absolute top-1/2 right-1/4 w-4 h-4 bg-green-500 rounded-full animate-ping" />
+                    <div className="absolute bottom-1/3 left-1/2 w-4 h-4 bg-yellow-500 rounded-full animate-ping" />
+
+                    {/* Step Progress */}
+                    <div className="absolute top-4 right-4 bg-black/70 text-white px-4 py-2 rounded-lg">
+                      <p className="text-sm">Step {activeStep + 1} of {repairSteps.length}</p>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                  <Play className="h-20 w-20 text-gray-600 mb-4" />
+                  <p className="text-gray-400">Click 'Start AR' to begin guided repair</p>
+                </div>
+              )}
+            </div>
+
+            {/* Step Navigation */}
+            <div className="flex gap-2 mt-4">
+              <Button
+                variant="outline"
+                onClick={() => setActiveStep(Math.max(0, activeStep - 1))}
+                disabled={activeStep === 0}
+                data-testid="button-prev-step"
+              >
+                Previous Step
+              </Button>
+              <Button
+                variant="outline"
+                className="flex-1"
+                onClick={() => setActiveStep(Math.min(repairSteps.length - 1, activeStep + 1))}
+                disabled={activeStep === repairSteps.length - 1}
+                data-testid="button-next-step"
+              >
+                Next Step
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Repair Steps */}
+        <Card className="bg-white dark:bg-salis-black">
+          <CardHeader>
+            <CardTitle>Repair Steps</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {repairSteps.map((step, index) => (
+              <div
+                key={step.id}
+                className={`p-3 border rounded-lg cursor-pointer transition-all ${
+                  index === activeStep
+                    ? 'border-indigo-600 bg-indigo-50 dark:bg-indigo-900/20'
+                    : 'border-gray-200 dark:border-gray-700 hover:border-indigo-400'
+                }`}
+                onClick={() => setActiveStep(index)}
+                data-testid={`step-${index}`}
+              >
+                <div className="flex items-start gap-3">
+                  {step.completed ? (
+                    <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
+                  ) : (
+                    <div className="w-5 h-5 rounded-full border-2 border-gray-300 flex-shrink-0 mt-0.5" />
+                  )}
+                  <div className="flex-1">
+                    <h4 className="font-semibold text-sm text-gray-900 dark:text-white">
+                      {step.title}
+                    </h4>
+                    <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                      {step.description}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Guide Selection */}
+      <Card className="mt-6 bg-white dark:bg-salis-black">
+        <CardHeader>
+          <CardTitle>Available AR Guides</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-3 gap-4">
+            {['Oil Change', 'Brake Replacement', 'Air Filter Replacement', 'Battery Replacement', 'Tire Rotation', 'Spark Plug Replacement'].map((guide, index) => (
+              <div
+                key={index}
+                className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:shadow-md transition-shadow cursor-pointer"
+                data-testid={`guide-${index}`}
+              >
+                <h4 className="font-semibold text-gray-900 dark:text-white mb-2">{guide}</h4>
+                <Badge variant="outline" className="text-xs">{Math.floor(Math.random() * 8) + 3} steps</Badge>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
