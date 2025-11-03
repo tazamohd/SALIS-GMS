@@ -6747,3 +6747,93 @@ export const insertQuantumSecureMessageSchema = createInsertSchema(quantumSecure
   id: true,
   createdAt: true,
 });
+
+// ============================================================================
+// Phase 11: Mobile Web Apps (Customer & Technician)
+// ============================================================================
+
+// Push Notification Tokens
+export const pushNotificationTokens = pgTable("push_notification_tokens", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  userId: varchar("user_id")
+    .notNull()
+    .references(() => users.id),
+  garageId: uuid("garage_id").references(() => garages.id),
+  token: text("token").notNull().unique(),
+  platform: varchar("platform", { length: 20 }).notNull(), // "ios", "android", "web"
+  deviceInfo: jsonb("device_info"), // Device model, OS version, app version
+  isActive: boolean("is_active").default(true),
+  lastUsedAt: timestamp("last_used_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Mobile App Sessions (for offline sync tracking)
+export const mobileAppSessions = pgTable("mobile_app_sessions", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  userId: varchar("user_id")
+    .notNull()
+    .references(() => users.id),
+  garageId: uuid("garage_id").references(() => garages.id),
+  appType: varchar("app_type", { length: 20 }).notNull(), // "customer", "technician"
+  sessionToken: varchar("session_token", { length: 500 }).notNull().unique(),
+  deviceId: varchar("device_id", { length: 255 }),
+  platform: varchar("platform", { length: 20 }), // "ios", "android", "web"
+  appVersion: varchar("app_version", { length: 20 }),
+  lastSyncedAt: timestamp("last_synced_at"),
+  syncStatus: varchar("sync_status", { length: 20 }).default("synced"), // "synced", "pending", "error"
+  offlineChanges: jsonb("offline_changes").default([]), // Queue of changes made offline
+  isActive: boolean("is_active").default(true),
+  expiresAt: timestamp("expires_at").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Quick Actions (customizable shortcuts for mobile apps)
+export const mobileQuickActions = pgTable("mobile_quick_actions", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  userId: varchar("user_id")
+    .notNull()
+    .references(() => users.id),
+  appType: varchar("app_type", { length: 20 }).notNull(), // "customer", "technician"
+  actionType: varchar("action_type", { length: 50 }).notNull(), // "book_appointment", "clock_in", "scan_part", "view_schedule"
+  label: varchar("label", { length: 100 }).notNull(),
+  icon: varchar("icon", { length: 50 }),
+  route: varchar("route", { length: 255 }),
+  metadata: jsonb("metadata"), // Additional config for the action
+  sortOrder: integer("sort_order").default(0),
+  isEnabled: boolean("is_enabled").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Type exports for Phase 11
+export type PushNotificationToken = typeof pushNotificationTokens.$inferSelect;
+export type InsertPushNotificationToken = typeof pushNotificationTokens.$inferInsert;
+export const insertPushNotificationTokenSchema = createInsertSchema(pushNotificationTokens).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type MobileAppSession = typeof mobileAppSessions.$inferSelect;
+export type InsertMobileAppSession = typeof mobileAppSessions.$inferInsert;
+export const insertMobileAppSessionSchema = createInsertSchema(mobileAppSessions).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type MobileQuickAction = typeof mobileQuickActions.$inferSelect;
+export type InsertMobileQuickAction = typeof mobileQuickActions.$inferInsert;
+export const insertMobileQuickActionSchema = createInsertSchema(mobileQuickActions).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
