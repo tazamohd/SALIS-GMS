@@ -99,6 +99,7 @@ import MLFraudDetection from "@/pages/MLFraudDetection";
 import EdgeComputingDiagnostics from "@/pages/EdgeComputingDiagnostics";
 import TireManagement from "@/pages/TireManagement";
 import KPIDashboard from "@/pages/KPIDashboard";
+import AppointmentReminders from "@/pages/AppointmentReminders";
 import { CustomerDashboard } from "@/pages/customer/CustomerDashboard";
 import { CustomerMobileLayout } from "@/components/CustomerMobileLayout";
 import { TechnicianMobileLayout } from "@/components/TechnicianMobileLayout";
@@ -250,6 +251,11 @@ function Router() {
       <Route path="/kpi-dashboard">
         <Layout>
           <KPIDashboard />
+        </Layout>
+      </Route>
+      <Route path="/appointment-reminders">
+        <Layout>
+          <AppointmentReminders />
         </Layout>
       </Route>
       <Route path="/vendor-supplier-portal">

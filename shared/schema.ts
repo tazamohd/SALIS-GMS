@@ -7006,6 +7006,219 @@ export const insertTireRecommendationSchema = createInsertSchema(tireRecommendat
 });
 
 // ============================================================================
+// Phase 12: Advanced Business Features - Appointment Reminders
+// ============================================================================
+
+// Appointment Reminder Settings - Garage-wide reminder configurations
+export const appointmentReminderSettings = pgTable("appointment_reminder_settings", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id")
+    .references(() => garages.id)
+    .notNull()
+    .unique(),
+  
+  // SMS Settings
+  smsEnabled: boolean("sms_enabled").default(true),
+  smsReminderHours: jsonb("sms_reminder_hours").default([24, 2]), // Hours before appointment
+  smsTemplate: text("sms_template").default("Hi {customerName}, reminder: Your appointment at {garageName} is scheduled for {appointmentTime}. Reply CONFIRM or CANCEL."),
+  
+  // Email Settings
+  emailEnabled: boolean("email_enabled").default(true),
+  emailReminderHours: jsonb("email_reminder_hours").default([72, 24]),
+  emailSubject: varchar("email_subject", { length: 255 }).default("Appointment Reminder - {garageName}"),
+  emailTemplate: text("email_template"),
+  
+  // WhatsApp Settings
+  whatsappEnabled: boolean("whatsapp_enabled").default(false),
+  whatsappReminderHours: jsonb("whatsapp_reminder_hours").default([24]),
+  whatsappTemplate: text("whatsapp_template"),
+  
+  // Follow-up Settings
+  postAppointmentFollowup: boolean("post_appointment_followup").default(true),
+  followupHours: integer("followup_hours").default(24),
+  requestReview: boolean("request_review").default(true),
+  
+  // No-show Settings
+  noShowAutoMarkMinutes: integer("no_show_auto_mark_minutes").default(30),
+  noShowRescheduleEnabled: boolean("no_show_reschedule_enabled").default(true),
+  noShowFeeAmount: decimal("no_show_fee_amount", { precision: 10, scale: 2 }),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Appointment Reminder Logs - Track all sent reminders
+export const appointmentReminderLogs = pgTable("appointment_reminder_logs", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  appointmentId: uuid("appointment_id")
+    .references(() => appointments.id, { onDelete: "cascade" })
+    .notNull(),
+  customerId: varchar("customer_id")
+    .references(() => users.id)
+    .notNull(),
+  garageId: uuid("garage_id")
+    .references(() => garages.id)
+    .notNull(),
+  
+  // Reminder details
+  reminderType: varchar("reminder_type", { length: 20 }).notNull(), // "sms", "email", "whatsapp"
+  reminderTiming: varchar("reminder_timing", { length: 20 }).notNull(), // "72h", "24h", "2h", "followup"
+  
+  // Message content
+  recipientPhone: varchar("recipient_phone", { length: 50 }),
+  recipientEmail: varchar("recipient_email", { length: 255 }),
+  messageContent: text("message_content").notNull(),
+  messageSubject: varchar("message_subject", { length: 255 }),
+  
+  // Delivery tracking
+  sentAt: timestamp("sent_at").defaultNow(),
+  deliveryStatus: varchar("delivery_status", { length: 20 }).default("sent"), // "sent", "delivered", "failed", "bounced"
+  deliveredAt: timestamp("delivered_at"),
+  failureReason: text("failure_reason"),
+  
+  // Customer interaction
+  openedAt: timestamp("opened_at"),
+  clickedAt: timestamp("clicked_at"),
+  respondedAt: timestamp("responded_at"),
+  responseText: text("response_text"),
+  responseAction: varchar("response_action", { length: 20 }), // "confirm", "cancel", "reschedule"
+  
+  // Provider details (Twilio, SendGrid, etc.)
+  providerMessageId: varchar("provider_message_id", { length: 255 }),
+  providerStatus: varchar("provider_status", { length: 50 }),
+  providerCost: decimal("provider_cost", { precision: 10, scale: 4 }),
+  
+  metadata: jsonb("metadata"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// No-Show Tracking - Track appointment no-shows and patterns
+export const noShowTracking = pgTable("no_show_tracking", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  appointmentId: uuid("appointment_id")
+    .references(() => appointments.id)
+    .notNull()
+    .unique(),
+  customerId: varchar("customer_id")
+    .references(() => users.id)
+    .notNull(),
+  garageId: uuid("garage_id")
+    .references(() => garages.id)
+    .notNull(),
+  
+  // No-show details
+  scheduledTime: timestamp("scheduled_time").notNull(),
+  markedNoShowAt: timestamp("marked_no_show_at").notNull().defaultNow(),
+  markedBy: varchar("marked_by").references(() => users.id),
+  autoMarked: boolean("auto_marked").default(false),
+  
+  // Customer contact attempts
+  contactAttempts: integer("contact_attempts").default(0),
+  lastContactAt: timestamp("last_contact_at"),
+  customerReached: boolean("customer_reached").default(false),
+  customerReason: text("customer_reason"),
+  
+  // Follow-up actions
+  rescheduled: boolean("rescheduled").default(false),
+  rescheduledAppointmentId: uuid("rescheduled_appointment_id").references(() => appointments.id),
+  rescheduledAt: timestamp("rescheduled_at"),
+  
+  // Financial impact
+  noShowFeeCharged: boolean("no_show_fee_charged").default(false),
+  feeAmount: decimal("fee_amount", { precision: 10, scale: 2 }),
+  feePaid: boolean("fee_paid").default(false),
+  feeWaived: boolean("fee_waived").default(false),
+  waivedReason: text("waived_reason"),
+  estimatedRevenueLoss: decimal("estimated_revenue_loss", { precision: 10, scale: 2 }),
+  
+  // Administrative notes
+  internalNotes: text("internal_notes"),
+  customerBlacklisted: boolean("customer_blacklisted").default(false),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Customer Communication Preferences
+export const customerCommunicationPreferences = pgTable("customer_communication_preferences", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  customerId: varchar("customer_id")
+    .references(() => users.id)
+    .notNull()
+    .unique(),
+  
+  // Channel preferences
+  preferredChannel: varchar("preferred_channel", { length: 20 }).default("sms"), // "sms", "email", "whatsapp", "phone"
+  smsOptIn: boolean("sms_opt_in").default(true),
+  emailOptIn: boolean("email_opt_in").default(true),
+  whatsappOptIn: boolean("whatsapp_opt_in").default(false),
+  phoneOptIn: boolean("phone_opt_in").default(true),
+  
+  // Reminder preferences
+  appointmentReminders: boolean("appointment_reminders").default(true),
+  marketingMessages: boolean("marketing_messages").default(false),
+  serviceReminders: boolean("service_reminders").default(true),
+  promotionalOffers: boolean("promotional_offers").default(false),
+  
+  // Timing preferences
+  preferredContactTime: varchar("preferred_contact_time", { length: 20 }).default("business_hours"), // "morning", "afternoon", "evening", "business_hours", "any"
+  doNotDisturbStart: varchar("do_not_disturb_start", { length: 5 }), // "22:00"
+  doNotDisturbEnd: varchar("do_not_disturb_end", { length: 5 }), // "08:00"
+  
+  // Language preference
+  languagePreference: varchar("language_preference", { length: 10 }).default("en"), // "en", "ar", "es"
+  
+  // Contact information
+  primaryPhone: varchar("primary_phone", { length: 50 }),
+  secondaryPhone: varchar("secondary_phone", { length: 50 }),
+  primaryEmail: varchar("primary_email", { length: 255 }),
+  whatsappNumber: varchar("whatsapp_number", { length: 50 }),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Type exports for Appointment Reminders
+export type AppointmentReminderSettings = typeof appointmentReminderSettings.$inferSelect;
+export type InsertAppointmentReminderSettings = typeof appointmentReminderSettings.$inferInsert;
+export const insertAppointmentReminderSettingsSchema = createInsertSchema(appointmentReminderSettings).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type AppointmentReminderLog = typeof appointmentReminderLogs.$inferSelect;
+export type InsertAppointmentReminderLog = typeof appointmentReminderLogs.$inferInsert;
+export const insertAppointmentReminderLogSchema = createInsertSchema(appointmentReminderLogs).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type NoShowTracking = typeof noShowTracking.$inferSelect;
+export type InsertNoShowTracking = typeof noShowTracking.$inferInsert;
+export const insertNoShowTrackingSchema = createInsertSchema(noShowTracking).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type CustomerCommunicationPreferences = typeof customerCommunicationPreferences.$inferSelect;
+export type InsertCustomerCommunicationPreferences = typeof customerCommunicationPreferences.$inferInsert;
+export const insertCustomerCommunicationPreferencesSchema = createInsertSchema(customerCommunicationPreferences).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+// ============================================================================
 // Phase 11: Mobile Web Apps (Customer & Technician)
 // ============================================================================
 
