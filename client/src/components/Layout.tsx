@@ -154,6 +154,7 @@ export function Layout({ children }: LayoutProps) {
         { path: "/customers", icon: Users, label: t("nav.customers") },
         { path: "/vehicles", icon: Car, label: t("nav.vehicles") },
         { path: "/fleet-management", icon: Truck, label: "Fleet Management" },
+        { path: "/contract-management", icon: FileText, label: "Contract Management" },
         {
           path: "/warranty-management",
           icon: Shield,

@@ -8658,6 +8658,163 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Contract Management API Routes
+  // Get all contracts with enhanced data (utilization, SLA metrics, renewals)
+  app.get('/api/contracts/enhanced', isAuthenticated, async (req: any, res) => {
+    try {
+      const { db } = await import('./storage');
+      const { fleetContracts, fleetGroups, contractUtilization, contractSLAMetrics, contractRenewals } = await import('@shared/schema');
+      const { eq, desc } = await import('drizzle-orm');
+
+      const contracts = await db
+        .select()
+        .from(fleetContracts)
+        .orderBy(desc(fleetContracts.createdAt));
+
+      const enrichedContracts = await Promise.all(contracts.map(async (contract) => {
+        const [fleetGroup] = await db
+          .select()
+          .from(fleetGroups)
+          .where(eq(fleetGroups.id, contract.fleetGroupId));
+
+        const utilization = await db
+          .select()
+          .from(contractUtilization)
+          .where(eq(contractUtilization.contractId, contract.id))
+          .orderBy(desc(contractUtilization.serviceDate));
+
+        const slaMetrics = await db
+          .select()
+          .from(contractSLAMetrics)
+          .where(eq(contractSLAMetrics.contractId, contract.id))
+          .orderBy(desc(contractSLAMetrics.incidentDate));
+
+        const renewals = await db
+          .select()
+          .from(contractRenewals)
+          .where(eq(contractRenewals.contractId, contract.id))
+          .orderBy(desc(contractRenewals.createdAt));
+
+        return {
+          ...contract,
+          fleetGroup,
+          utilization,
+          slaMetrics,
+          renewals,
+        };
+      }));
+
+      res.json(enrichedContracts);
+    } catch (error) {
+      console.error("Error fetching enhanced contracts:", error);
+      res.status(500).json({ message: "Failed to fetch contracts" });
+    }
+  });
+
+  // Trigger renewal workflow for a contract
+  app.post('/api/contracts/:contractId/trigger-renewal', isAuthenticated, async (req: any, res) => {
+    try {
+      const { db } = await import('./storage');
+      const { fleetContracts, contractRenewals } = await import('@shared/schema');
+      const { eq } = await import('drizzle-orm');
+      const { addMonths, addDays } = await import('date-fns');
+
+      const [contract] = await db
+        .select()
+        .from(fleetContracts)
+        .where(eq(fleetContracts.id, req.params.contractId));
+
+      if (!contract) {
+        return res.status(404).json({ message: "Contract not found" });
+      }
+
+      // Calculate new dates
+      const currentEnd = new Date(contract.endDate);
+      const proposedStart = addDays(currentEnd, 1);
+      const proposedEnd = addMonths(proposedStart, 12);
+
+      // Create renewal record
+      const [renewal] = await db.insert(contractRenewals).values({
+        contractId: contract.id,
+        renewalType: contract.autoRenew ? 'automatic' : 'manual',
+        proposedStartDate: proposedStart,
+        proposedEndDate: proposedEnd,
+        proposedMonthlyFee: contract.monthlyFee,
+        notificationSentAt: new Date(),
+        status: 'notified',
+        createdBy: req.user.id,
+      }).returning();
+
+      // Update contract status
+      await db
+        .update(fleetContracts)
+        .set({ status: 'pending_renewal' })
+        .where(eq(fleetContracts.id, contract.id));
+
+      res.json(renewal);
+    } catch (error) {
+      console.error("Error triggering renewal:", error);
+      res.status(500).json({ message: "Failed to trigger renewal" });
+    }
+  });
+
+  // Accept a renewal
+  app.post('/api/contracts/:contractId/renewals/:renewalId/accept', isAuthenticated, async (req: any, res) => {
+    try {
+      const { db } = await import('./storage');
+      const { fleetContracts, contractRenewals } = await import('@shared/schema');
+      const { eq } = await import('drizzle-orm');
+
+      const [renewal] = await db
+        .select()
+        .from(contractRenewals)
+        .where(eq(contractRenewals.id, req.params.renewalId));
+
+      if (!renewal) {
+        return res.status(404).json({ message: "Renewal not found" });
+      }
+
+      const [oldContract] = await db
+        .select()
+        .from(fleetContracts)
+        .where(eq(fleetContracts.id, renewal.contractId));
+
+      // Create new contract
+      const [newContract] = await db.insert(fleetContracts).values({
+        ...oldContract,
+        id: undefined,
+        contractNumber: `${oldContract.contractNumber}-R`,
+        startDate: renewal.proposedStartDate,
+        endDate: renewal.proposedEndDate,
+        monthlyFee: renewal.proposedMonthlyFee || oldContract.monthlyFee,
+        status: 'active',
+        createdBy: req.user.id,
+      }).returning();
+
+      // Update renewal record
+      await db
+        .update(contractRenewals)
+        .set({
+          status: 'completed',
+          customerResponse: 'accepted',
+          customerResponseDate: new Date(),
+          renewedContractId: newContract.id,
+        })
+        .where(eq(contractRenewals.id, renewal.id));
+
+      // Update old contract
+      await db
+        .update(fleetContracts)
+        .set({ status: 'expired' })
+        .where(eq(fleetContracts.id, oldContract.id));
+
+      res.json({ renewal, newContract });
+    } catch (error) {
+      console.error("Error accepting renewal:", error);
+      res.status(500).json({ message: "Failed to accept renewal" });
+    }
+  });
+
   // Module 41: Warranty Tracking
 
   // Warranties

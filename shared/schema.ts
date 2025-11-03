@@ -2678,14 +2678,86 @@ export const fleetContracts = pgTable("fleet_contracts", {
   startDate: timestamp("start_date").notNull(),
   endDate: timestamp("end_date").notNull(),
   monthlyFee: decimal("monthly_fee", { precision: 10, scale: 2 }),
+  contractValue: decimal("contract_value", { precision: 12, scale: 2 }), // Total contract value
+  serviceCap: decimal("service_cap", { precision: 12, scale: 2 }), // Service spending limit
   discountPercentage: decimal("discount_percentage", { precision: 5, scale: 2 }).default("0.00"),
   includedServices: jsonb("included_services").default([]),
   excludedServices: jsonb("excluded_services").default([]),
   maxVehicles: integer("max_vehicles"),
   billingCycle: varchar("billing_cycle", { length: 50 }).default("monthly"), // "monthly", "quarterly", "annual"
   autoRenew: boolean("auto_renew").default(false),
-  status: varchar("status", { length: 50 }).default("active"), // "draft", "active", "expired", "cancelled"
+  renewalNoticeDays: integer("renewal_notice_days").default(30), // Days before expiry to send renewal notice
+  slaResponseTime: integer("sla_response_time"), // Response time in minutes
+  slaCompletionTime: integer("sla_completion_time"), // Job completion time in hours
+  slaUptimePercentage: decimal("sla_uptime_percentage", { precision: 5, scale: 2 }), // Expected service availability
+  penaltyRate: decimal("penalty_rate", { precision: 5, scale: 2 }), // Penalty % for SLA breaches
+  status: varchar("status", { length: 50 }).default("active"), // "draft", "active", "expired", "cancelled", "pending_renewal"
   terms: text("terms"),
+  createdBy: varchar("created_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Contract Utilization Tracking
+export const contractUtilization = pgTable("contract_utilization", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  contractId: uuid("contract_id")
+    .references(() => fleetContracts.id, { onDelete: "cascade" })
+    .notNull(),
+  jobCardId: uuid("job_card_id").references(() => jobCards.id),
+  serviceDate: timestamp("service_date").notNull(),
+  serviceType: varchar("service_type", { length: 100 }).notNull(),
+  vehicleId: uuid("vehicle_id").references(() => vehicles.id),
+  laborCost: decimal("labor_cost", { precision: 10, scale: 2 }).default("0"),
+  partsCost: decimal("parts_cost", { precision: 10, scale: 2 }).default("0"),
+  totalCost: decimal("total_cost", { precision: 10, scale: 2 }).notNull(),
+  isCoveredByContract: boolean("is_covered_by_contract").default(true),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// SLA Compliance Tracking
+export const contractSLAMetrics = pgTable("contract_sla_metrics", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  contractId: uuid("contract_id")
+    .references(() => fleetContracts.id, { onDelete: "cascade" })
+    .notNull(),
+  jobCardId: uuid("job_card_id").references(() => jobCards.id),
+  metricType: varchar("metric_type", { length: 50 }).notNull(), // "response_time", "completion_time", "uptime"
+  targetValue: decimal("target_value", { precision: 10, scale: 2 }).notNull(),
+  actualValue: decimal("actual_value", { precision: 10, scale: 2 }).notNull(),
+  complianceStatus: varchar("compliance_status", { length: 50 }).notNull(), // "met", "breached", "warning"
+  breachSeverity: varchar("breach_severity", { length: 50 }), // "minor", "moderate", "critical"
+  penaltyApplied: decimal("penalty_applied", { precision: 10, scale: 2 }).default("0"),
+  incidentDate: timestamp("incident_date").notNull(),
+  resolutionDate: timestamp("resolution_date"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Contract Renewal Workflow
+export const contractRenewals = pgTable("contract_renewals", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  contractId: uuid("contract_id")
+    .references(() => fleetContracts.id, { onDelete: "cascade" })
+    .notNull(),
+  renewalType: varchar("renewal_type", { length: 50 }).notNull(), // "automatic", "manual", "renegotiation"
+  proposedStartDate: timestamp("proposed_start_date").notNull(),
+  proposedEndDate: timestamp("proposed_end_date").notNull(),
+  proposedMonthlyFee: decimal("proposed_monthly_fee", { precision: 10, scale: 2 }),
+  proposedChanges: jsonb("proposed_changes"), // JSON of proposed changes
+  notificationSentAt: timestamp("notification_sent_at"),
+  customerResponse: varchar("customer_response", { length: 50 }), // "accepted", "rejected", "pending", "negotiating"
+  customerResponseDate: timestamp("customer_response_date"),
+  renewedContractId: uuid("renewed_contract_id").references(() => fleetContracts.id),
+  status: varchar("status", { length: 50 }).default("pending"), // "pending", "notified", "accepted", "rejected", "completed"
+  notes: text("notes"),
   createdBy: varchar("created_by").references(() => users.id),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
@@ -3281,6 +3353,28 @@ export const insertFleetVehicleSchema = createInsertSchema(fleetVehicles).omit({
 export type FleetContract = typeof fleetContracts.$inferSelect;
 export type InsertFleetContract = typeof fleetContracts.$inferInsert;
 export const insertFleetContractSchema = createInsertSchema(fleetContracts).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type ContractUtilization = typeof contractUtilization.$inferSelect;
+export type InsertContractUtilization = typeof contractUtilization.$inferInsert;
+export const insertContractUtilizationSchema = createInsertSchema(contractUtilization).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type ContractSLAMetric = typeof contractSLAMetrics.$inferSelect;
+export type InsertContractSLAMetric = typeof contractSLAMetrics.$inferInsert;
+export const insertContractSLAMetricSchema = createInsertSchema(contractSLAMetrics).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type ContractRenewal = typeof contractRenewals.$inferSelect;
+export type InsertContractRenewal = typeof contractRenewals.$inferInsert;
+export const insertContractRenewalSchema = createInsertSchema(contractRenewals).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
