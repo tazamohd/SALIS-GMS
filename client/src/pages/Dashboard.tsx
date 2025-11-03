@@ -42,8 +42,11 @@ export function Dashboard() {
     retry: false,
   });
 
+  const garageId = (user as any)?.garageId;
+  const inventoryUrl = garageId ? `/api/spare-part-inventories?garage_id=${garageId}` : '/api/spare-part-inventories?garage_id=all';
+  
   const { data: sparePartInventories = [] } = useQuery<any[]>({
-    queryKey: ['/api/spare-part-inventories'],
+    queryKey: [inventoryUrl],
     retry: false,
   });
 

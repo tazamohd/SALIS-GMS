@@ -58,8 +58,9 @@ export function UndoRedoProvider({ children }: { children: ReactNode }) {
     });
 
     // Save to backend
-    apiRequest('/api/action-history', {
+    fetch('/api/action-history', {
       method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         actionType: action.type,
         actionDescription: action.description,
