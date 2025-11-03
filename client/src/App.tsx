@@ -97,6 +97,7 @@ import DroneInspection from "@/pages/DroneInspection";
 import ARRepairGuide from "@/pages/ARRepairGuide";
 import MLFraudDetection from "@/pages/MLFraudDetection";
 import EdgeComputingDiagnostics from "@/pages/EdgeComputingDiagnostics";
+import TireManagement from "@/pages/TireManagement";
 import { CustomerDashboard } from "@/pages/customer/CustomerDashboard";
 import { CustomerMobileLayout } from "@/components/CustomerMobileLayout";
 import { TechnicianMobileLayout } from "@/components/TechnicianMobileLayout";
@@ -238,6 +239,11 @@ function Router() {
       <Route path="/loaner-vehicles">
         <Layout>
           <LoanerVehicles />
+        </Layout>
+      </Route>
+      <Route path="/tire-management">
+        <Layout>
+          <TireManagement />
         </Layout>
       </Route>
       <Route path="/vendor-supplier-portal">

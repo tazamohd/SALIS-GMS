@@ -6749,6 +6749,263 @@ export const insertQuantumSecureMessageSchema = createInsertSchema(quantumSecure
 });
 
 // ============================================================================
+// Phase 12: Advanced Vehicle Services - Tire Management
+// ============================================================================
+
+// Tire Inventory - Tire products in stock
+export const tireInventory = pgTable("tire_inventory", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id")
+    .references(() => garages.id)
+    .notNull(),
+  brand: varchar("brand", { length: 100 }).notNull(),
+  model: varchar("model", { length: 100 }).notNull(),
+  size: varchar("size", { length: 50 }).notNull(), // e.g., "225/45R17"
+  season: varchar("season", { length: 20 }).notNull(), // "summer", "winter", "all_season"
+  speedRating: varchar("speed_rating", { length: 10 }), // "H", "V", "W", "Y"
+  loadIndex: varchar("load_index", { length: 10 }),
+  dotCode: varchar("dot_code", { length: 50 }), // DOT manufacturing date code
+  quantityInStock: integer("quantity_in_stock").default(0),
+  reorderPoint: integer("reorder_point").default(4),
+  costPrice: decimal("cost_price", { precision: 10, scale: 2 }),
+  retailPrice: decimal("retail_price", { precision: 10, scale: 2 }),
+  warrantyMonths: integer("warranty_months"),
+  supplierName: varchar("supplier_name", { length: 255 }),
+  supplierSku: varchar("supplier_sku", { length: 100 }),
+  features: jsonb("features"), // run_flat, noise_reduction, eco, performance
+  suitableVehicleTypes: jsonb("suitable_vehicle_types"), // ["sedan", "suv", "truck"]
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Tire Service Records - All tire services performed
+export const tireServiceRecords = pgTable("tire_service_records", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id")
+    .references(() => garages.id)
+    .notNull(),
+  vehicleId: uuid("vehicle_id")
+    .references(() => vehicles.id)
+    .notNull(),
+  customerId: varchar("customer_id")
+    .references(() => users.id)
+    .notNull(),
+  jobCardId: uuid("job_card_id").references(() => jobCards.id),
+  serviceType: varchar("service_type", { length: 50 }).notNull(), // "installation", "rotation", "balance", "repair", "replacement"
+  serviceDate: timestamp("service_date").notNull(),
+  mileageAtService: integer("mileage_at_service"),
+  technicianId: varchar("technician_id").references(() => users.id),
+  
+  // Tire details
+  tireInventoryId: uuid("tire_inventory_id").references(() => tireInventory.id),
+  tirePosition: varchar("tire_position", { length: 50 }), // "front_left", "front_right", "rear_left", "rear_right", "spare"
+  tireBrand: varchar("tire_brand", { length: 100 }),
+  tireModel: varchar("tireModel", { length: 100 }),
+  tireSize: varchar("tire_size", { length: 50 }),
+  
+  // Measurements
+  treadDepthFL: decimal("tread_depth_fl", { precision: 4, scale: 2 }), // mm
+  treadDepthFR: decimal("tread_depth_fr", { precision: 4, scale: 2 }),
+  treadDepthRL: decimal("tread_depth_rl", { precision: 4, scale: 2 }),
+  treadDepthRR: decimal("tread_depth_rr", { precision: 4, scale: 2 }),
+  
+  tirePressureFL: decimal("tire_pressure_fl", { precision: 4, scale: 1 }), // PSI
+  tirePressureFR: decimal("tire_pressure_fr", { precision: 4, scale: 1 }),
+  tirePressureRL: decimal("tire_pressure_rl", { precision: 4, scale: 1 }),
+  tirePressureRR: decimal("tire_pressure_rr", { precision: 4, scale: 1 }),
+  
+  // Service details
+  laborCost: decimal("labor_cost", { precision: 10, scale: 2 }),
+  partsCost: decimal("parts_cost", { precision: 10, scale: 2 }),
+  totalCost: decimal("total_cost", { precision: 10, scale: 2 }),
+  warrantyExpiresAt: timestamp("warranty_expires_at"),
+  nextRotationDue: timestamp("next_rotation_due"),
+  nextRotationMileage: integer("next_rotation_mileage"),
+  
+  notes: text("notes"),
+  photos: jsonb("photos"), // Array of photo URLs
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Seasonal Tire Storage - For customers storing winter/summer tires
+export const seasonalTireStorage = pgTable("seasonal_tire_storage", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id")
+    .references(() => garages.id)
+    .notNull(),
+  customerId: varchar("customer_id")
+    .references(() => users.id)
+    .notNull(),
+  vehicleId: uuid("vehicle_id")
+    .references(() => vehicles.id)
+    .notNull(),
+  storageNumber: varchar("storage_number", { length: 50 }).unique(),
+  
+  // Tire set details
+  numberOfTires: integer("number_of_tires").default(4),
+  tireBrand: varchar("tire_brand", { length: 100 }),
+  tireModel: varchar("tire_model", { length: 100 }),
+  tireSize: varchar("tire_size", { length: 50 }),
+  season: varchar("season", { length: 20 }), // "winter", "summer"
+  rimIncluded: boolean("rim_included").default(false),
+  
+  // Storage period
+  storedDate: timestamp("stored_date").notNull(),
+  expectedRetrievalDate: timestamp("expected_retrieval_date"),
+  actualRetrievalDate: timestamp("actual_retrieval_date"),
+  status: varchar("status", { length: 20 }).default("stored"), // "stored", "retrieved", "disposed"
+  
+  // Storage location
+  storageLocation: varchar("storage_location", { length: 100 }), // Shelf/rack location
+  binNumber: varchar("bin_number", { length: 50 }),
+  
+  // Condition tracking
+  conditionAtStorage: varchar("condition_at_storage", { length: 20 }), // "excellent", "good", "fair", "poor"
+  treadDepthAtStorage: jsonb("tread_depth_at_storage"), // {fl, fr, rl, rr}
+  conditionAtRetrieval: varchar("condition_at_retrieval", { length: 20 }),
+  treadDepthAtRetrieval: jsonb("tread_depth_at_retrieval"),
+  damageNotes: text("damage_notes"),
+  
+  // Billing
+  monthlyStorageFee: decimal("monthly_storage_fee", { precision: 10, scale: 2 }),
+  totalStorageFees: decimal("total_storage_fees", { precision: 10, scale: 2 }),
+  depositPaid: decimal("deposit_paid", { precision: 10, scale: 2 }),
+  depositRefunded: decimal("deposit_refunded", { precision: 10, scale: 2 }),
+  paymentStatus: varchar("payment_status", { length: 20 }).default("unpaid"), // "unpaid", "partial", "paid"
+  
+  photos: jsonb("photos"), // Storage photos
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Tire Rotation Schedules - Automatic rotation reminders
+export const tireRotationSchedules = pgTable("tire_rotation_schedules", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  vehicleId: uuid("vehicle_id")
+    .references(() => vehicles.id)
+    .notNull(),
+  customerId: varchar("customer_id")
+    .references(() => users.id)
+    .notNull(),
+  garageId: uuid("garage_id")
+    .references(() => garages.id)
+    .notNull(),
+  
+  // Rotation pattern
+  rotationPattern: varchar("rotation_pattern", { length: 50 }), // "forward_cross", "rearward_cross", "x_pattern", "side_to_side"
+  recommendedInterval: integer("recommended_interval").default(8000), // Miles
+  
+  // Last rotation
+  lastRotationDate: timestamp("last_rotation_date"),
+  lastRotationMileage: integer("last_rotation_mileage"),
+  lastServiceRecordId: uuid("last_service_record_id").references(() => tireServiceRecords.id),
+  
+  // Next rotation
+  nextRotationDue: timestamp("next_rotation_due"),
+  nextRotationMileage: integer("next_rotation_mileage"),
+  
+  // Reminder settings
+  reminderEnabled: boolean("reminder_enabled").default(true),
+  reminderSentAt: timestamp("reminder_sent_at"),
+  reminderMethod: varchar("reminder_method", { length: 20 }).default("sms"), // "sms", "email", "both"
+  
+  status: varchar("status", { length: 20 }).default("active"), // "active", "completed", "overdue"
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Tire Recommendations - AI-powered tire suggestions
+export const tireRecommendations = pgTable("tire_recommendations", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  vehicleId: uuid("vehicle_id")
+    .references(() => vehicles.id)
+    .notNull(),
+  customerId: varchar("customer_id")
+    .references(() => users.id)
+    .notNull(),
+  garageId: uuid("garage_id")
+    .references(() => garages.id)
+    .notNull(),
+  
+  // Recommendation details
+  recommendedTireIds: jsonb("recommended_tire_ids"), // Array of tire inventory IDs
+  recommendationReason: text("recommendation_reason"), // Why these tires were recommended
+  drivingConditions: jsonb("driving_conditions"), // {climate, terrain, usage}
+  budget: varchar("budget", { length: 20 }), // "economy", "mid_range", "premium"
+  
+  // Customer preferences
+  preferredBrands: jsonb("preferred_brands"),
+  priorityFactors: jsonb("priority_factors"), // ["longevity", "performance", "fuel_efficiency", "noise"]
+  
+  // Recommendation metadata
+  generatedBy: varchar("generated_by", { length: 20 }).default("ai"), // "ai", "technician"
+  technicianId: varchar("technician_id").references(() => users.id),
+  confidenceScore: decimal("confidence_score", { precision: 3, scale: 2 }), // 0.00-1.00
+  
+  // Customer response
+  status: varchar("status", { length: 20 }).default("pending"), // "pending", "accepted", "rejected", "modified"
+  customerFeedback: text("customer_feedback"),
+  acceptedAt: timestamp("accepted_at"),
+  convertedToJobCardId: uuid("converted_to_job_card_id").references(() => jobCards.id),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Type exports for Tire Management
+export type TireInventory = typeof tireInventory.$inferSelect;
+export type InsertTireInventory = typeof tireInventory.$inferInsert;
+export const insertTireInventorySchema = createInsertSchema(tireInventory).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type TireServiceRecord = typeof tireServiceRecords.$inferSelect;
+export type InsertTireServiceRecord = typeof tireServiceRecords.$inferInsert;
+export const insertTireServiceRecordSchema = createInsertSchema(tireServiceRecords).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type SeasonalTireStorage = typeof seasonalTireStorage.$inferSelect;
+export type InsertSeasonalTireStorage = typeof seasonalTireStorage.$inferInsert;
+export const insertSeasonalTireStorageSchema = createInsertSchema(seasonalTireStorage).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type TireRotationSchedule = typeof tireRotationSchedules.$inferSelect;
+export type InsertTireRotationSchedule = typeof tireRotationSchedules.$inferInsert;
+export const insertTireRotationScheduleSchema = createInsertSchema(tireRotationSchedules).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type TireRecommendation = typeof tireRecommendations.$inferSelect;
+export type InsertTireRecommendation = typeof tireRecommendations.$inferInsert;
+export const insertTireRecommendationSchema = createInsertSchema(tireRecommendations).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+// ============================================================================
 // Phase 11: Mobile Web Apps (Customer & Technician)
 // ============================================================================
 
