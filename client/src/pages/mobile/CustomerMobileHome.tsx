@@ -45,7 +45,7 @@ export default function CustomerMobileHome() {
     { 
       icon: Clock, 
       label: "History", 
-      route: "/customer-app/history", 
+      route: "/invoices", 
       color: "bg-purple-500",
       testId: "quick-action-history"
     },
