@@ -61,6 +61,7 @@ import {
   Bell,
   Trophy,
   Fingerprint,
+  Activity,
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -207,6 +208,11 @@ export function Layout({ children }: LayoutProps) {
       items: [
         { path: "/ai-automation", icon: Brain, label: t("nav.aiAutomation") },
         { path: "/ai-chatbot", icon: MessageCircle, label: "AI Chatbot" },
+        { path: "/ai-service-advisor", icon: MessageCircle, label: "AI Service Advisor" },
+        { path: "/smart-damage-assessment", icon: Camera, label: "Smart Damage Assessment" },
+        { path: "/intelligent-price-optimizer", icon: Target, label: "Intelligent Price Optimizer" },
+        { path: "/smart-inventory-forecasting", icon: TrendingUp, label: "Smart Inventory Forecasting" },
+        { path: "/vehicle-health-monitoring", icon: Activity, label: "Vehicle Health Monitoring" },
         { path: "/predictive-maintenance", icon: TrendingUp, label: "Predictive Maintenance" },
         { path: "/smart-parts-recommendations", icon: Package, label: "Smart Parts" },
         { path: "/voice-commands", icon: Radio, label: "Voice Commands" },

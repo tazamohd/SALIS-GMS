@@ -59,6 +59,11 @@ import PredictiveMaintenance from "@/pages/PredictiveMaintenance";
 import SmartPartsRecommendations from "@/pages/SmartPartsRecommendations";
 import VoiceCommands from "@/pages/VoiceCommands";
 import DocumentOCR from "@/pages/DocumentOCR";
+import SmartDamageAssessment from "@/pages/SmartDamageAssessment";
+import IntelligentPriceOptimizer from "@/pages/IntelligentPriceOptimizer";
+import SmartInventoryForecasting from "@/pages/SmartInventoryForecasting";
+import AIServiceAdvisor from "@/pages/AIServiceAdvisor";
+import VehicleHealthMonitoring from "@/pages/VehicleHealthMonitoring";
 import BusinessIntelligenceDashboard from "@/pages/BusinessIntelligenceDashboard";
 import ProfitAnalysis from "@/pages/ProfitAnalysis";
 import CustomerLTVAnalysis from "@/pages/CustomerLTVAnalysis";
@@ -475,6 +480,31 @@ function Router() {
       <Route path="/document-ocr">
         <Layout>
           <DocumentOCR />
+        </Layout>
+      </Route>
+      <Route path="/smart-damage-assessment">
+        <Layout>
+          <SmartDamageAssessment />
+        </Layout>
+      </Route>
+      <Route path="/intelligent-price-optimizer">
+        <Layout>
+          <IntelligentPriceOptimizer />
+        </Layout>
+      </Route>
+      <Route path="/smart-inventory-forecasting">
+        <Layout>
+          <SmartInventoryForecasting />
+        </Layout>
+      </Route>
+      <Route path="/ai-service-advisor">
+        <Layout>
+          <AIServiceAdvisor />
+        </Layout>
+      </Route>
+      <Route path="/vehicle-health-monitoring">
+        <Layout>
+          <VehicleHealthMonitoring />
         </Layout>
       </Route>
       <Route path="/business-intelligence-dashboard">
