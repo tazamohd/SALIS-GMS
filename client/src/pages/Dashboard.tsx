@@ -43,10 +43,16 @@ export function Dashboard() {
   });
 
   const garageId = (user as any)?.garageId;
-  const inventoryUrl = garageId ? `/api/spare-part-inventories?garage_id=${garageId}` : '/api/spare-part-inventories?garage_id=all';
   
   const { data: sparePartInventories = [] } = useQuery<any[]>({
-    queryKey: [inventoryUrl],
+    queryKey: ['/api/spare-part-inventories', garageId],
+    queryFn: async () => {
+      if (!garageId) return [];
+      const response = await fetch(`/api/spare-part-inventories?garage_id=${garageId}`);
+      if (!response.ok) throw new Error('Failed to fetch inventories');
+      return response.json();
+    },
+    enabled: !!garageId,
     retry: false,
   });
 
