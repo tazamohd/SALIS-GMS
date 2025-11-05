@@ -43,7 +43,7 @@ const taskSchema = z.object({
   assignedTo: z.string().optional(),
   dueDate: z.string(),
   priority: z.enum(["low", "medium", "high", "critical"]).default("medium"),
-  status: z.enum(["pending", "in_progress", "completed", "overdue"}).default("pending"),
+  status: z.enum(["pending", "in_progress", "completed", "overdue"]).default("pending"),
 });
 
 type PolicyFormData = z.infer<typeof policySchema>;
