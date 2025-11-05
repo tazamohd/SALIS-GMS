@@ -109,6 +109,15 @@ import AppointmentReminders from "@/pages/AppointmentReminders";
 import CustomReportBuilder from "@/pages/CustomReportBuilder";
 import VINDecoder from "@/pages/VINDecoder";
 import TechnicianLeaderboards from "@/pages/TechnicianLeaderboards";
+import PayrollManagement from "@/pages/PayrollManagement";
+import ExpenseTracking from "@/pages/ExpenseTracking";
+import TowingServices from "@/pages/TowingServices";
+import VehicleStorage from "@/pages/VehicleStorage";
+import TelematicsIntegration from "@/pages/TelematicsIntegration";
+import KnowledgeBase from "@/pages/KnowledgeBase";
+import TrainingLMS from "@/pages/TrainingLMS";
+import GoogleMyBusiness from "@/pages/GoogleMyBusiness";
+import ComplianceManagement from "@/pages/ComplianceManagement";
 import { CustomerDashboard } from "@/pages/customer/CustomerDashboard";
 import { CustomerMobileLayout } from "@/components/CustomerMobileLayout";
 import { TechnicianMobileLayout } from "@/components/TechnicianMobileLayout";
@@ -700,6 +709,51 @@ function Router() {
       <Route path="/edge-computing">
         <Layout>
           <EdgeComputingDiagnostics />
+        </Layout>
+      </Route>
+      <Route path="/payroll-management">
+        <Layout>
+          <PayrollManagement />
+        </Layout>
+      </Route>
+      <Route path="/expense-tracking">
+        <Layout>
+          <ExpenseTracking />
+        </Layout>
+      </Route>
+      <Route path="/towing-services">
+        <Layout>
+          <TowingServices />
+        </Layout>
+      </Route>
+      <Route path="/vehicle-storage">
+        <Layout>
+          <VehicleStorage />
+        </Layout>
+      </Route>
+      <Route path="/telematics-integration">
+        <Layout>
+          <TelematicsIntegration />
+        </Layout>
+      </Route>
+      <Route path="/knowledge-base">
+        <Layout>
+          <KnowledgeBase />
+        </Layout>
+      </Route>
+      <Route path="/training-lms">
+        <Layout>
+          <TrainingLMS />
+        </Layout>
+      </Route>
+      <Route path="/google-my-business">
+        <Layout>
+          <GoogleMyBusiness />
+        </Layout>
+      </Route>
+      <Route path="/compliance-management">
+        <Layout>
+          <ComplianceManagement />
         </Layout>
       </Route>
       

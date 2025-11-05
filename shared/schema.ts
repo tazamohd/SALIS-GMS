@@ -7401,3 +7401,388 @@ export const insertMobileQuickActionSchema = createInsertSchema(mobileQuickActio
   createdAt: true,
   updatedAt: true,
 });
+
+// ==================== PAYROLL MANAGEMENT MODULE ====================
+export const payrollEmployees = pgTable("payroll_employees", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  garageId: uuid("garage_id").references(() => garages.id),
+  employeeNumber: varchar("employee_number", { length: 50 }),
+  hourlyRate: decimal("hourly_rate", { precision: 10, scale: 2 }),
+  salary: decimal("salary", { precision: 10, scale: 2 }),
+  payType: varchar("pay_type", { length: 20 }).notNull(), // "hourly", "salary", "commission"
+  taxId: varchar("tax_id", { length: 50 }),
+  bankAccount: varchar("bank_account", { length: 100 }),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const payPeriods = pgTable("pay_periods", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").notNull().references(() => garages.id),
+  startDate: timestamp("start_date").notNull(),
+  endDate: timestamp("end_date").notNull(),
+  payDate: timestamp("pay_date").notNull(),
+  status: varchar("status", { length: 20 }).default("draft"), // "draft", "processing", "approved", "paid"
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const payrollRuns = pgTable("payroll_runs", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  payPeriodId: uuid("pay_period_id").notNull().references(() => payPeriods.id),
+  employeeId: uuid("employee_id").notNull().references(() => payrollEmployees.id),
+  regularHours: decimal("regular_hours", { precision: 8, scale: 2 }).default("0"),
+  overtimeHours: decimal("overtime_hours", { precision: 8, scale: 2 }).default("0"),
+  grossPay: decimal("gross_pay", { precision: 10, scale: 2 }).notNull(),
+  netPay: decimal("net_pay", { precision: 10, scale: 2 }).notNull(),
+  taxWithheld: decimal("tax_withheld", { precision: 10, scale: 2 }).default("0"),
+  otherDeductions: decimal("other_deductions", { precision: 10, scale: 2 }).default("0"),
+  bonuses: decimal("bonuses", { precision: 10, scale: 2 }).default("0"),
+  status: varchar("status", { length: 20 }).default("pending"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// ==================== EXPENSE TRACKING MODULE ====================
+export const expenseCategories = pgTable("expense_categories", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id),
+  name: varchar("name", { length: 100 }).notNull(),
+  description: text("description"),
+  budgetLimit: decimal("budget_limit", { precision: 10, scale: 2 }),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const expenses = pgTable("expenses", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").notNull().references(() => garages.id),
+  categoryId: uuid("category_id").references(() => expenseCategories.id),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+  date: timestamp("date").notNull(),
+  vendor: varchar("vendor", { length: 255 }),
+  description: text("description"),
+  receiptUrl: varchar("receipt_url", { length: 500 }),
+  paymentMethod: varchar("payment_method", { length: 50 }),
+  status: varchar("status", { length: 20 }).default("pending"), // "pending", "approved", "rejected"
+  approvedBy: varchar("approved_by").references(() => users.id),
+  approvedAt: timestamp("approved_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// ==================== TOWING & RECOVERY SERVICES MODULE ====================
+export const towingJobs = pgTable("towing_jobs", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").notNull().references(() => garages.id),
+  customerId: varchar("customer_id").references(() => users.id),
+  vehicleId: uuid("vehicle_id").references(() => vehicles.id),
+  pickupLocation: text("pickup_location").notNull(),
+  dropoffLocation: text("dropoff_location").notNull(),
+  towTruckId: uuid("tow_truck_id"),
+  assignedDriverId: varchar("assigned_driver_id").references(() => users.id),
+  status: varchar("status", { length: 20 }).default("requested"), // "requested", "dispatched", "in_progress", "completed", "cancelled"
+  requestedAt: timestamp("requested_at").defaultNow(),
+  dispatchedAt: timestamp("dispatched_at"),
+  completedAt: timestamp("completed_at"),
+  distance: decimal("distance", { precision: 8, scale: 2 }),
+  cost: decimal("cost", { precision: 10, scale: 2 }),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// ==================== VEHICLE STORAGE SERVICES MODULE ====================
+export const storageFacilities = pgTable("storage_facilities", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").notNull().references(() => garages.id),
+  name: varchar("name", { length: 255 }).notNull(),
+  location: text("location"),
+  totalSlots: integer("total_slots").notNull(),
+  availableSlots: integer("available_slots").notNull(),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const vehicleStorageAssignments = pgTable("vehicle_storage_assignments", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  facilityId: uuid("facility_id").notNull().references(() => storageFacilities.id),
+  vehicleId: uuid("vehicle_id").notNull().references(() => vehicles.id),
+  customerId: varchar("customer_id").notNull().references(() => users.id),
+  slotNumber: varchar("slot_number", { length: 20 }),
+  startDate: timestamp("start_date").notNull(),
+  endDate: timestamp("end_date"),
+  monthlyRate: decimal("monthly_rate", { precision: 10, scale: 2 }).notNull(),
+  status: varchar("status", { length: 20 }).default("active"), // "active", "expired", "cancelled"
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// ==================== TELEMATICS INTEGRATION MODULE ====================
+export const telematicsFeeds = pgTable("telematics_feeds", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  deviceId: uuid("device_id").references(() => obdDevices.id),
+  vehicleId: uuid("vehicle_id").references(() => vehicles.id),
+  latitude: decimal("latitude", { precision: 10, scale: 7 }),
+  longitude: decimal("longitude", { precision: 10, scale: 7 }),
+  speed: decimal("speed", { precision: 6, scale: 2 }),
+  fuelLevel: decimal("fuel_level", { precision: 5, scale: 2 }),
+  engineStatus: varchar("engine_status", { length: 20 }),
+  odometer: decimal("odometer", { precision: 10, scale: 2 }),
+  timestamp: timestamp("timestamp").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const telematicsAlerts = pgTable("telematics_alerts", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  vehicleId: uuid("vehicle_id").notNull().references(() => vehicles.id),
+  alertType: varchar("alert_type", { length: 50 }).notNull(), // "speeding", "harsh_braking", "geofence_breach", "maintenance_due"
+  severity: varchar("severity", { length: 20 }).notNull(), // "info", "warning", "critical"
+  message: text("message").notNull(),
+  isResolved: boolean("is_resolved").default(false),
+  resolvedBy: varchar("resolved_by").references(() => users.id),
+  resolvedAt: timestamp("resolved_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// ==================== KNOWLEDGE BASE MODULE ====================
+export const articleCategories = pgTable("article_categories", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: varchar("name", { length: 100 }).notNull(),
+  description: text("description"),
+  icon: varchar("icon", { length: 50 }),
+  sortOrder: integer("sort_order").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const knowledgeArticles = pgTable("knowledge_articles", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  categoryId: uuid("category_id").references(() => articleCategories.id),
+  title: varchar("title", { length: 500 }).notNull(),
+  content: text("content").notNull(),
+  summary: text("summary"),
+  author: varchar("author").references(() => users.id),
+  isPublished: boolean("is_published").default(false),
+  views: integer("views").default(0),
+  helpfulCount: integer("helpful_count").default(0),
+  unhelpfulCount: integer("unhelpful_count").default(0),
+  tags: text("tags").array(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// ==================== TRAINING & CERTIFICATION LMS MODULE ====================
+export const trainingModules = pgTable("training_modules", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description"),
+  duration: integer("duration"), // in minutes
+  content: text("content"),
+  videoUrl: varchar("video_url", { length: 500 }),
+  quizQuestions: jsonb("quiz_questions"),
+  passingScore: integer("passing_score").default(70),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const certifications = pgTable("certifications", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: varchar("name", { length: 255 }).notNull(),
+  description: text("description"),
+  validityPeriod: integer("validity_period"), // in months
+  requiredModules: text("required_modules").array(),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const certificationAttempts = pgTable("certification_attempts", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  certificationId: uuid("certification_id").notNull().references(() => certifications.id),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  moduleId: uuid("module_id").references(() => trainingModules.id),
+  score: integer("score"),
+  passed: boolean("passed").default(false),
+  completedAt: timestamp("completed_at"),
+  expiresAt: timestamp("expires_at"),
+  certificateUrl: varchar("certificate_url", { length: 500 }),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// ==================== GOOGLE MY BUSINESS INTEGRATION MODULE ====================
+export const googleBusinessProfiles = pgTable("google_business_profiles", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").notNull().references(() => garages.id),
+  accountId: varchar("account_id", { length: 255 }).notNull(),
+  locationId: varchar("location_id", { length: 255 }).notNull(),
+  businessName: varchar("business_name", { length: 255 }),
+  isActive: boolean("is_active").default(true),
+  lastSyncedAt: timestamp("last_synced_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const gmbPosts = pgTable("gmb_posts", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  profileId: uuid("profile_id").notNull().references(() => googleBusinessProfiles.id),
+  postType: varchar("post_type", { length: 50 }).notNull(), // "update", "event", "offer"
+  message: text("message").notNull(),
+  imageUrls: text("image_urls").array(),
+  callToAction: varchar("call_to_action", { length: 50 }),
+  actionUrl: varchar("action_url", { length: 500 }),
+  eventStartDate: timestamp("event_start_date"),
+  eventEndDate: timestamp("event_end_date"),
+  status: varchar("status", { length: 20 }).default("draft"), // "draft", "published", "deleted"
+  publishedAt: timestamp("published_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const gmbReviews = pgTable("gmb_reviews", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  profileId: uuid("profile_id").notNull().references(() => googleBusinessProfiles.id),
+  reviewId: varchar("review_id", { length: 255 }).notNull().unique(),
+  reviewerName: varchar("reviewer_name", { length: 255 }),
+  rating: integer("rating").notNull(),
+  comment: text("comment"),
+  reviewDate: timestamp("review_date").notNull(),
+  responseText: text("response_text"),
+  respondedAt: timestamp("responded_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// ==================== ENHANCED COMPLIANCE MANAGEMENT MODULE ====================
+export const compliancePolicies = pgTable("compliance_policies", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id),
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description"),
+  category: varchar("category", { length: 100 }), // "safety", "environmental", "regulatory", "quality"
+  regulatoryBody: varchar("regulatory_body", { length: 255 }),
+  effectiveDate: timestamp("effective_date").notNull(),
+  reviewDate: timestamp("review_date"),
+  status: varchar("status", { length: 20 }).default("active"),
+  documentIds: text("document_ids").array(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const complianceAudits = pgTable("compliance_audits", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").notNull().references(() => garages.id),
+  policyId: uuid("policy_id").references(() => compliancePolicies.id),
+  auditor: varchar("auditor").references(() => users.id),
+  auditDate: timestamp("audit_date").notNull(),
+  auditType: varchar("audit_type", { length: 50 }), // "internal", "external", "self-assessment"
+  findings: text("findings"),
+  score: integer("score"),
+  status: varchar("status", { length: 20 }).default("pending"), // "pending", "in_progress", "completed"
+  correctiveActions: jsonb("corrective_actions"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const complianceTasks = pgTable("compliance_tasks", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").notNull().references(() => garages.id),
+  policyId: uuid("policy_id").references(() => compliancePolicies.id),
+  auditId: uuid("audit_id").references(() => complianceAudits.id),
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description"),
+  assignedTo: varchar("assigned_to").references(() => users.id),
+  dueDate: timestamp("due_date").notNull(),
+  priority: varchar("priority", { length: 20 }).default("medium"),
+  status: varchar("status", { length: 20 }).default("pending"),
+  completedAt: timestamp("completed_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Type exports for all new modules
+export type PayrollEmployee = typeof payrollEmployees.$inferSelect;
+export type InsertPayrollEmployee = typeof payrollEmployees.$inferInsert;
+export const insertPayrollEmployeeSchema = createInsertSchema(payrollEmployees).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type PayPeriod = typeof payPeriods.$inferSelect;
+export type InsertPayPeriod = typeof payPeriods.$inferInsert;
+export const insertPayPeriodSchema = createInsertSchema(payPeriods).omit({ id: true, createdAt: true });
+
+export type PayrollRun = typeof payrollRuns.$inferSelect;
+export type InsertPayrollRun = typeof payrollRuns.$inferInsert;
+export const insertPayrollRunSchema = createInsertSchema(payrollRuns).omit({ id: true, createdAt: true });
+
+export type ExpenseCategory = typeof expenseCategories.$inferSelect;
+export type InsertExpenseCategory = typeof expenseCategories.$inferInsert;
+export const insertExpenseCategorySchema = createInsertSchema(expenseCategories).omit({ id: true, createdAt: true });
+
+export type Expense = typeof expenses.$inferSelect;
+export type InsertExpense = typeof expenses.$inferInsert;
+export const insertExpenseSchema = createInsertSchema(expenses).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type TowingJob = typeof towingJobs.$inferSelect;
+export type InsertTowingJob = typeof towingJobs.$inferInsert;
+export const insertTowingJobSchema = createInsertSchema(towingJobs).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type StorageFacility = typeof storageFacilities.$inferSelect;
+export type InsertStorageFacility = typeof storageFacilities.$inferInsert;
+export const insertStorageFacilitySchema = createInsertSchema(storageFacilities).omit({ id: true, createdAt: true });
+
+export type VehicleStorageAssignment = typeof vehicleStorageAssignments.$inferSelect;
+export type InsertVehicleStorageAssignment = typeof vehicleStorageAssignments.$inferInsert;
+export const insertVehicleStorageAssignmentSchema = createInsertSchema(vehicleStorageAssignments).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type TelematicsFeed = typeof telematicsFeeds.$inferSelect;
+export type InsertTelematicsFeed = typeof telematicsFeeds.$inferInsert;
+export const insertTelematicsFeedSchema = createInsertSchema(telematicsFeeds).omit({ id: true, createdAt: true });
+
+export type TelematicsAlert = typeof telematicsAlerts.$inferSelect;
+export type InsertTelematicsAlert = typeof telematicsAlerts.$inferInsert;
+export const insertTelematicsAlertSchema = createInsertSchema(telematicsAlerts).omit({ id: true, createdAt: true });
+
+export type ArticleCategory = typeof articleCategories.$inferSelect;
+export type InsertArticleCategory = typeof articleCategories.$inferInsert;
+export const insertArticleCategorySchema = createInsertSchema(articleCategories).omit({ id: true, createdAt: true });
+
+export type KnowledgeArticle = typeof knowledgeArticles.$inferSelect;
+export type InsertKnowledgeArticle = typeof knowledgeArticles.$inferInsert;
+export const insertKnowledgeArticleSchema = createInsertSchema(knowledgeArticles).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type TrainingModule = typeof trainingModules.$inferSelect;
+export type InsertTrainingModule = typeof trainingModules.$inferInsert;
+export const insertTrainingModuleSchema = createInsertSchema(trainingModules).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type Certification = typeof certifications.$inferSelect;
+export type InsertCertification = typeof certifications.$inferInsert;
+export const insertCertificationSchema = createInsertSchema(certifications).omit({ id: true, createdAt: true });
+
+export type CertificationAttempt = typeof certificationAttempts.$inferSelect;
+export type InsertCertificationAttempt = typeof certificationAttempts.$inferInsert;
+export const insertCertificationAttemptSchema = createInsertSchema(certificationAttempts).omit({ id: true, createdAt: true });
+
+export type GoogleBusinessProfile = typeof googleBusinessProfiles.$inferSelect;
+export type InsertGoogleBusinessProfile = typeof googleBusinessProfiles.$inferInsert;
+export const insertGoogleBusinessProfileSchema = createInsertSchema(googleBusinessProfiles).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type GmbPost = typeof gmbPosts.$inferSelect;
+export type InsertGmbPost = typeof gmbPosts.$inferInsert;
+export const insertGmbPostSchema = createInsertSchema(gmbPosts).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type GmbReview = typeof gmbReviews.$inferSelect;
+export type InsertGmbReview = typeof gmbReviews.$inferInsert;
+export const insertGmbReviewSchema = createInsertSchema(gmbReviews).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type CompliancePolicy = typeof compliancePolicies.$inferSelect;
+export type InsertCompliancePolicy = typeof compliancePolicies.$inferInsert;
+export const insertCompliancePolicySchema = createInsertSchema(compliancePolicies).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type ComplianceAudit = typeof complianceAudits.$inferSelect;
+export type InsertComplianceAudit = typeof complianceAudits.$inferInsert;
+export const insertComplianceAuditSchema = createInsertSchema(complianceAudits).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type ComplianceTask = typeof complianceTasks.$inferSelect;
+export type InsertComplianceTask = typeof complianceTasks.$inferInsert;
+export const insertComplianceTaskSchema = createInsertSchema(complianceTasks).omit({ id: true, createdAt: true, updatedAt: true });

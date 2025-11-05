@@ -62,6 +62,11 @@ import {
   Trophy,
   Fingerprint,
   Activity,
+  GraduationCap,
+  BookOpen,
+  Building,
+  Satellite,
+  Wallet,
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -140,6 +145,8 @@ export function Layout({ children }: LayoutProps) {
         { path: "/service-templates", icon: ClipboardList, label: t("nav.serviceTemplates") },
         { path: "/technician-portal", icon: HardHat, label: t("nav.technicianPortal") },
         { path: "/ai-scheduling", icon: Calendar, label: "AI Scheduling" },
+        { path: "/towing-services", icon: Truck, label: "Towing Services" },
+        { path: "/vehicle-storage", icon: Warehouse, label: "Vehicle Storage" },
       ],
     },
     {
@@ -178,6 +185,7 @@ export function Layout({ children }: LayoutProps) {
         { path: "/financial-settings", icon: DollarSign, label: t("nav.financialSettings") },
         { path: "/refund-management", icon: RotateCcw, label: t("nav.refunds") },
         { path: "/accounting-integration", icon: DollarSign, label: "Accounting Sync" },
+        { path: "/expense-tracking", icon: Receipt, label: "Expense Tracking" },
       ],
     },
     {
@@ -233,6 +241,7 @@ export function Layout({ children }: LayoutProps) {
         { path: "/digital-vehicle-walkaround", icon: Camera, label: "Vehicle Walkaround" },
         { path: "/video-consultations", icon: FileText, label: "Video Calls" },
         { path: "/social-media-integration", icon: MessageCircle, label: "Social Media" },
+        { path: "/google-my-business", icon: Building, label: "Google My Business" },
       ],
     },
     {
@@ -243,6 +252,8 @@ export function Layout({ children }: LayoutProps) {
         { path: "/hr-management", icon: UserCheck, label: t("nav.hrManagement") },
         { path: "/timeclock-payroll", icon: Clock, label: "Time & Payroll" },
         { path: "/chat", icon: MessageCircle, label: "Chat" },
+        { path: "/payroll-management", icon: DollarSign, label: "Payroll Management" },
+        { path: "/training-lms", icon: GraduationCap, label: "Training & Certifications" },
       ],
     },
     {
@@ -253,6 +264,7 @@ export function Layout({ children }: LayoutProps) {
         { path: "/safety-incidents", icon: AlertTriangle, label: "Safety Incidents" },
         { path: "/insurance-claims", icon: Shield, label: "Insurance Claims" },
         { path: "/equipment-calibration", icon: Tool, label: "Calibration" },
+        { path: "/compliance-management", icon: Shield, label: "Compliance Management" },
       ],
     },
     {
@@ -263,6 +275,7 @@ export function Layout({ children }: LayoutProps) {
         { path: "/kiosk-checkin", icon: TabletSmartphone, label: "Kiosk Check-In" },
         { path: "/security-cameras", icon: Camera, label: "Security Cameras" },
         { path: "/license-plate", icon: Car, label: "Plate Recognition" },
+        { path: "/telematics-integration", icon: Radio, label: "Telematics Integration" },
       ],
     },
     {
@@ -275,6 +288,7 @@ export function Layout({ children }: LayoutProps) {
         { path: "/data-import-export", icon: DatabaseBackup, label: t("nav.dataImportExport") },
         { path: "/integrations", icon: Plug2, label: t("nav.integrations") },
         { path: "/routing-optimizer", icon: MapPin, label: "Route Optimizer" },
+        { path: "/knowledge-base", icon: BookOpen, label: "Knowledge Base" },
       ],
     },
   ];

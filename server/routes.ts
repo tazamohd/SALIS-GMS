@@ -89,7 +89,28 @@ import {
   insertSatelliteConnectionSchema,
   insertSatelliteUsageLogSchema,
   insertQuantumEncryptionKeySchema,
-  insertQuantumSecureMessageSchema
+  insertQuantumSecureMessageSchema,
+  insertPayrollEmployeeSchema,
+  insertPayPeriodSchema,
+  insertPayrollRunSchema,
+  insertExpenseCategorySchema,
+  insertExpenseSchema,
+  insertTowingJobSchema,
+  insertStorageFacilitySchema,
+  insertVehicleStorageAssignmentSchema,
+  insertTelematicsFeedSchema,
+  insertTelematicsAlertSchema,
+  insertArticleCategorySchema,
+  insertKnowledgeArticleSchema,
+  insertTrainingModuleSchema,
+  insertCertificationSchema,
+  insertCertificationAttemptSchema,
+  insertGoogleBusinessProfileSchema,
+  insertGmbPostSchema,
+  insertGmbReviewSchema,
+  insertCompliancePolicySchema,
+  insertComplianceAuditSchema,
+  insertComplianceTaskSchema
 } from "@shared/schema";
 import Stripe from "stripe";
 import { createPaypalOrder, capturePaypalOrder, loadPaypalDefault } from "./paypal";
@@ -15101,6 +15122,579 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error('Error seeding next-gen data:', error);
       res.status(500).json({ error: error.message || "Failed to seed next-gen technology data" });
+    }
+  });
+
+  // ==================== PAYROLL MANAGEMENT ROUTES ====================
+  app.get('/api/payroll/employees', isAuthenticated, async (req: any, res) => {
+    try {
+      const employees = await storage.getPayrollEmployees(req.user.garageId);
+      res.json({ data: employees });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.post('/api/payroll/employees', isAuthenticated, async (req: any, res) => {
+    try {
+      const validatedData = insertPayrollEmployeeSchema.parse(req.body);
+      const employee = await storage.createPayrollEmployee(validatedData);
+      res.json({ data: employee });
+    } catch (error: any) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json(sanitizeZodError(error));
+      }
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.patch('/api/payroll/employees/:id', isAuthenticated, async (req, res) => {
+    try {
+      const employee = await storage.updatePayrollEmployee(req.params.id, req.body);
+      res.json({ data: employee });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.delete('/api/payroll/employees/:id', isAuthenticated, async (req, res) => {
+    try {
+      await storage.deletePayrollEmployee(req.params.id);
+      res.json({ success: true });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.get('/api/payroll/periods', isAuthenticated, async (req: any, res) => {
+    try {
+      const periods = await storage.getPayPeriods(req.user.garageId, req.query.status);
+      res.json({ data: periods });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.post('/api/payroll/periods', isAuthenticated, async (req: any, res) => {
+    try {
+      const validatedData = insertPayPeriodSchema.parse(req.body);
+      const period = await storage.createPayPeriod(validatedData);
+      res.json({ data: period });
+    } catch (error: any) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json(sanitizeZodError(error));
+      }
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.get('/api/payroll/runs/:periodId', isAuthenticated, async (req, res) => {
+    try {
+      const runs = await storage.getPayrollRuns(req.params.periodId);
+      res.json({ data: runs });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.post('/api/payroll/runs', isAuthenticated, async (req: any, res) => {
+    try {
+      const validatedData = insertPayrollRunSchema.parse(req.body);
+      const run = await storage.createPayrollRun(validatedData);
+      res.json({ data: run });
+    } catch (error: any) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json(sanitizeZodError(error));
+      }
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // ==================== EXPENSE TRACKING ROUTES ====================
+  app.get('/api/expense-categories', isAuthenticated, async (req: any, res) => {
+    try {
+      const categories = await storage.getExpenseCategories(req.user.garageId);
+      res.json({ data: categories });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.post('/api/expense-categories', isAuthenticated, async (req: any, res) => {
+    try {
+      const validatedData = insertExpenseCategorySchema.parse(req.body);
+      const category = await storage.createExpenseCategory(validatedData);
+      res.json({ data: category });
+    } catch (error: any) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json(sanitizeZodError(error));
+      }
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.get('/api/expenses', isAuthenticated, async (req: any, res) => {
+    try {
+      const expenses = await storage.getExpenses(req.user.garageId, req.query.status, req.query.categoryId);
+      res.json({ data: expenses });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.post('/api/expenses', isAuthenticated, async (req: any, res) => {
+    try {
+      const validatedData = insertExpenseSchema.parse(req.body);
+      const expense = await storage.createExpense(validatedData);
+      res.json({ data: expense });
+    } catch (error: any) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json(sanitizeZodError(error));
+      }
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.patch('/api/expenses/:id/approve', isAuthenticated, async (req: any, res) => {
+    try {
+      const expense = await storage.approveExpense(req.params.id, req.user.id);
+      res.json({ data: expense });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.patch('/api/expenses/:id/reject', isAuthenticated, async (req: any, res) => {
+    try {
+      const expense = await storage.rejectExpense(req.params.id, req.user.id);
+      res.json({ data: expense });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // ==================== TOWING SERVICES ROUTES ====================
+  app.get('/api/towing-jobs', isAuthenticated, async (req: any, res) => {
+    try {
+      const jobs = await storage.getTowingJobs(req.user.garageId, req.query.status);
+      res.json({ data: jobs });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.post('/api/towing-jobs', isAuthenticated, async (req: any, res) => {
+    try {
+      const validatedData = insertTowingJobSchema.parse(req.body);
+      const job = await storage.createTowingJob(validatedData);
+      res.json({ data: job });
+    } catch (error: any) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json(sanitizeZodError(error));
+      }
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.patch('/api/towing-jobs/:id', isAuthenticated, async (req, res) => {
+    try {
+      const job = await storage.updateTowingJob(req.params.id, req.body);
+      res.json({ data: job });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // ==================== VEHICLE STORAGE ROUTES ====================
+  app.get('/api/storage-facilities', isAuthenticated, async (req: any, res) => {
+    try {
+      const facilities = await storage.getStorageFacilities(req.user.garageId);
+      res.json({ data: facilities });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.post('/api/storage-facilities', isAuthenticated, async (req: any, res) => {
+    try {
+      const validatedData = insertStorageFacilitySchema.parse(req.body);
+      const facility = await storage.createStorageFacility(validatedData);
+      res.json({ data: facility });
+    } catch (error: any) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json(sanitizeZodError(error));
+      }
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.get('/api/vehicle-storage-assignments', isAuthenticated, async (req, res) => {
+    try {
+      const assignments = await storage.getVehicleStorageAssignments(req.query.facilityId as string, req.query.vehicleId as string);
+      res.json({ data: assignments });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.post('/api/vehicle-storage-assignments', isAuthenticated, async (req: any, res) => {
+    try {
+      const validatedData = insertVehicleStorageAssignmentSchema.parse(req.body);
+      const assignment = await storage.createVehicleStorageAssignment(validatedData);
+      res.json({ data: assignment });
+    } catch (error: any) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json(sanitizeZodError(error));
+      }
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // ==================== TELEMATICS INTEGRATION ROUTES ====================
+  app.get('/api/telematics/feeds', isAuthenticated, async (req, res) => {
+    try {
+      const feeds = await storage.getTelematicsFeeds(req.query.vehicleId as string, req.query.deviceId as string);
+      res.json({ data: feeds });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.post('/api/telematics/feeds', isAuthenticated, async (req: any, res) => {
+    try {
+      const validatedData = insertTelematicsFeedSchema.parse(req.body);
+      const feed = await storage.createTelematicsFeed(validatedData);
+      res.json({ data: feed });
+    } catch (error: any) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json(sanitizeZodError(error));
+      }
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.get('/api/telematics/alerts', isAuthenticated, async (req, res) => {
+    try {
+      const alerts = await storage.getTelematicsAlerts(req.query.vehicleId as string, req.query.isResolved === 'true');
+      res.json({ data: alerts });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.post('/api/telematics/alerts', isAuthenticated, async (req: any, res) => {
+    try {
+      const validatedData = insertTelematicsAlertSchema.parse(req.body);
+      const alert = await storage.createTelematicsAlert(validatedData);
+      res.json({ data: alert });
+    } catch (error: any) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json(sanitizeZodError(error));
+      }
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.patch('/api/telematics/alerts/:id/resolve', isAuthenticated, async (req: any, res) => {
+    try {
+      const alert = await storage.resolveTelematicsAlert(req.params.id, req.user.id);
+      res.json({ data: alert });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // ==================== KNOWLEDGE BASE ROUTES ====================
+  app.get('/api/knowledge-base/categories', isAuthenticated, async (req, res) => {
+    try {
+      const categories = await storage.getArticleCategories();
+      res.json({ data: categories });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.post('/api/knowledge-base/categories', isAuthenticated, async (req: any, res) => {
+    try {
+      const validatedData = insertArticleCategorySchema.parse(req.body);
+      const category = await storage.createArticleCategory(validatedData);
+      res.json({ data: category });
+    } catch (error: any) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json(sanitizeZodError(error));
+      }
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.get('/api/knowledge-base/articles', isAuthenticated, async (req, res) => {
+    try {
+      const articles = await storage.getKnowledgeArticles(req.query.categoryId as string, req.query.isPublished === 'true');
+      res.json({ data: articles });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.get('/api/knowledge-base/articles/:id', isAuthenticated, async (req, res) => {
+    try {
+      const article = await storage.getKnowledgeArticle(req.params.id);
+      if (article) {
+        await storage.incrementArticleViews(req.params.id);
+      }
+      res.json({ data: article });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.post('/api/knowledge-base/articles', isAuthenticated, async (req: any, res) => {
+    try {
+      const validatedData = insertKnowledgeArticleSchema.parse(req.body);
+      const article = await storage.createKnowledgeArticle(validatedData);
+      res.json({ data: article });
+    } catch (error: any) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json(sanitizeZodError(error));
+      }
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.patch('/api/knowledge-base/articles/:id', isAuthenticated, async (req, res) => {
+    try {
+      const article = await storage.updateKnowledgeArticle(req.params.id, req.body);
+      res.json({ data: article });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // ==================== TRAINING LMS ROUTES ====================
+  app.get('/api/training/modules', isAuthenticated, async (req, res) => {
+    try {
+      const modules = await storage.getTrainingModules(req.query.isActive === 'true');
+      res.json({ data: modules });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.post('/api/training/modules', isAuthenticated, async (req: any, res) => {
+    try {
+      const validatedData = insertTrainingModuleSchema.parse(req.body);
+      const module = await storage.createTrainingModule(validatedData);
+      res.json({ data: module });
+    } catch (error: any) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json(sanitizeZodError(error));
+      }
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.get('/api/training/certifications', isAuthenticated, async (req, res) => {
+    try {
+      const certifications = await storage.getCertifications(req.query.isActive === 'true');
+      res.json({ data: certifications });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.post('/api/training/certifications', isAuthenticated, async (req: any, res) => {
+    try {
+      const validatedData = insertCertificationSchema.parse(req.body);
+      const certification = await storage.createCertification(validatedData);
+      res.json({ data: certification });
+    } catch (error: any) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json(sanitizeZodError(error));
+      }
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.get('/api/training/attempts', isAuthenticated, async (req, res) => {
+    try {
+      const attempts = await storage.getCertificationAttempts(req.query.userId as string, req.query.certificationId as string);
+      res.json({ data: attempts });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.post('/api/training/attempts', isAuthenticated, async (req: any, res) => {
+    try {
+      const validatedData = insertCertificationAttemptSchema.parse(req.body);
+      const attempt = await storage.createCertificationAttempt(validatedData);
+      res.json({ data: attempt });
+    } catch (error: any) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json(sanitizeZodError(error));
+      }
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // ==================== GOOGLE MY BUSINESS ROUTES ====================
+  app.get('/api/gmb/profiles', isAuthenticated, async (req: any, res) => {
+    try {
+      const profiles = await storage.getGoogleBusinessProfiles(req.user.garageId);
+      res.json({ data: profiles });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.post('/api/gmb/profiles', isAuthenticated, async (req: any, res) => {
+    try {
+      const validatedData = insertGoogleBusinessProfileSchema.parse(req.body);
+      const profile = await storage.createGoogleBusinessProfile(validatedData);
+      res.json({ data: profile });
+    } catch (error: any) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json(sanitizeZodError(error));
+      }
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.get('/api/gmb/posts', isAuthenticated, async (req, res) => {
+    try {
+      const posts = await storage.getGmbPosts(req.query.profileId as string, req.query.status as string);
+      res.json({ data: posts });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.post('/api/gmb/posts', isAuthenticated, async (req: any, res) => {
+    try {
+      const validatedData = insertGmbPostSchema.parse(req.body);
+      const post = await storage.createGmbPost(validatedData);
+      res.json({ data: post });
+    } catch (error: any) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json(sanitizeZodError(error));
+      }
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.patch('/api/gmb/posts/:id/publish', isAuthenticated, async (req, res) => {
+    try {
+      const post = await storage.publishGmbPost(req.params.id);
+      res.json({ data: post });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.get('/api/gmb/reviews', isAuthenticated, async (req, res) => {
+    try {
+      const reviews = await storage.getGmbReviews(req.query.profileId as string);
+      res.json({ data: reviews });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.post('/api/gmb/reviews', isAuthenticated, async (req: any, res) => {
+    try {
+      const validatedData = insertGmbReviewSchema.parse(req.body);
+      const review = await storage.createGmbReview(validatedData);
+      res.json({ data: review });
+    } catch (error: any) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json(sanitizeZodError(error));
+      }
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.patch('/api/gmb/reviews/:id/respond', isAuthenticated, async (req, res) => {
+    try {
+      const review = await storage.respondToGmbReview(req.params.id, req.body.responseText);
+      res.json({ data: review });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // ==================== COMPLIANCE MANAGEMENT ROUTES ====================
+  app.get('/api/compliance/policies', isAuthenticated, async (req: any, res) => {
+    try {
+      const policies = await storage.getCompliancePolicies(req.user.garageId, req.query.status);
+      res.json({ data: policies });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.post('/api/compliance/policies', isAuthenticated, async (req: any, res) => {
+    try {
+      const validatedData = insertCompliancePolicySchema.parse(req.body);
+      const policy = await storage.createCompliancePolicy(validatedData);
+      res.json({ data: policy });
+    } catch (error: any) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json(sanitizeZodError(error));
+      }
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.get('/api/compliance/audits', isAuthenticated, async (req: any, res) => {
+    try {
+      const audits = await storage.getComplianceAudits(req.user.garageId, req.query.policyId, req.query.status);
+      res.json({ data: audits });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.post('/api/compliance/audits', isAuthenticated, async (req: any, res) => {
+    try {
+      const validatedData = insertComplianceAuditSchema.parse(req.body);
+      const audit = await storage.createComplianceAudit(validatedData);
+      res.json({ data: audit });
+    } catch (error: any) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json(sanitizeZodError(error));
+      }
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.get('/api/compliance/tasks', isAuthenticated, async (req: any, res) => {
+    try {
+      const tasks = await storage.getComplianceTasks(req.user.garageId, req.query.policyId, req.query.status);
+      res.json({ data: tasks });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.post('/api/compliance/tasks', isAuthenticated, async (req: any, res) => {
+    try {
+      const validatedData = insertComplianceTaskSchema.parse(req.body);
+      const task = await storage.createComplianceTask(validatedData);
+      res.json({ data: task });
+    } catch (error: any) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json(sanitizeZodError(error));
+      }
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.patch('/api/compliance/tasks/:id/complete', isAuthenticated, async (req, res) => {
+    try {
+      const task = await storage.completeComplianceTask(req.params.id);
+      res.json({ data: task });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
     }
   });
 

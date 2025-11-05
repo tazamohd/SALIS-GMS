@@ -518,6 +518,69 @@ import {
   type InsertQuantumEncryptionKey,
   type QuantumSecureMessage,
   type InsertQuantumSecureMessage,
+  payrollEmployees,
+  payPeriods,
+  payrollRuns,
+  type PayrollEmployee,
+  type InsertPayrollEmployee,
+  type PayPeriod,
+  type InsertPayPeriod,
+  type PayrollRun,
+  type InsertPayrollRun,
+  expenseCategories,
+  expenses,
+  type ExpenseCategory,
+  type InsertExpenseCategory,
+  type Expense,
+  type InsertExpense,
+  towingJobs,
+  type TowingJob,
+  type InsertTowingJob,
+  storageFacilities,
+  vehicleStorageAssignments,
+  type StorageFacility,
+  type InsertStorageFacility,
+  type VehicleStorageAssignment,
+  type InsertVehicleStorageAssignment,
+  telematicsFeeds,
+  telematicsAlerts,
+  type TelematicsFeed,
+  type InsertTelematicsFeed,
+  type TelematicsAlert,
+  type InsertTelematicsAlert,
+  articleCategories,
+  knowledgeArticles,
+  type ArticleCategory,
+  type InsertArticleCategory,
+  type KnowledgeArticle,
+  type InsertKnowledgeArticle,
+  trainingModules,
+  certifications,
+  certificationAttempts,
+  type TrainingModule,
+  type InsertTrainingModule,
+  type Certification,
+  type InsertCertification,
+  type CertificationAttempt,
+  type InsertCertificationAttempt,
+  googleBusinessProfiles,
+  gmbPosts,
+  gmbReviews,
+  type GoogleBusinessProfile,
+  type InsertGoogleBusinessProfile,
+  type GmbPost,
+  type InsertGmbPost,
+  type GmbReview,
+  type InsertGmbReview,
+  compliancePolicies,
+  complianceAudits,
+  complianceTasks,
+  type CompliancePolicy,
+  type InsertCompliancePolicy,
+  type ComplianceAudit,
+  type InsertComplianceAudit,
+  type ComplianceTask,
+  type InsertComplianceTask,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, or, inArray, and, gte, lte, ilike, sql, isNull, gt } from "drizzle-orm";
@@ -1504,6 +1567,132 @@ export interface IStorage {
   createQuantumEncryptionKey(data: InsertQuantumEncryptionKey): Promise<QuantumEncryptionKey>;
   getQuantumSecureMessages(garageId: string): Promise<QuantumSecureMessage[]>;
   createQuantumSecureMessage(data: InsertQuantumSecureMessage): Promise<QuantumSecureMessage>;
+
+  // Payroll Management Module
+  getPayrollEmployees(garageId: string): Promise<PayrollEmployee[]>;
+  getPayrollEmployee(id: string): Promise<PayrollEmployee | undefined>;
+  createPayrollEmployee(data: InsertPayrollEmployee): Promise<PayrollEmployee>;
+  updatePayrollEmployee(id: string, data: Partial<PayrollEmployee>): Promise<PayrollEmployee>;
+  deletePayrollEmployee(id: string): Promise<void>;
+  getPayPeriods(garageId: string, status?: string): Promise<PayPeriod[]>;
+  getPayPeriod(id: string): Promise<PayPeriod | undefined>;
+  createPayPeriod(data: InsertPayPeriod): Promise<PayPeriod>;
+  updatePayPeriod(id: string, data: Partial<PayPeriod>): Promise<PayPeriod>;
+  deletePayPeriod(id: string): Promise<void>;
+  getPayrollRuns(payPeriodId: string): Promise<PayrollRun[]>;
+  getPayrollRun(id: string): Promise<PayrollRun | undefined>;
+  createPayrollRun(data: InsertPayrollRun): Promise<PayrollRun>;
+  updatePayrollRun(id: string, data: Partial<PayrollRun>): Promise<PayrollRun>;
+  deletePayrollRun(id: string): Promise<void>;
+
+  // Expense Tracking Module
+  getExpenseCategories(garageId: string): Promise<ExpenseCategory[]>;
+  getExpenseCategory(id: string): Promise<ExpenseCategory | undefined>;
+  createExpenseCategory(data: InsertExpenseCategory): Promise<ExpenseCategory>;
+  updateExpenseCategory(id: string, data: Partial<ExpenseCategory>): Promise<ExpenseCategory>;
+  deleteExpenseCategory(id: string): Promise<void>;
+  getExpenses(garageId: string, status?: string, categoryId?: string): Promise<Expense[]>;
+  getExpense(id: string): Promise<Expense | undefined>;
+  createExpense(data: InsertExpense): Promise<Expense>;
+  updateExpense(id: string, data: Partial<Expense>): Promise<Expense>;
+  deleteExpense(id: string): Promise<void>;
+  approveExpense(id: string, approverId: string): Promise<Expense>;
+  rejectExpense(id: string, approverId: string): Promise<Expense>;
+
+  // Towing Services Module
+  getTowingJobs(garageId: string, status?: string): Promise<TowingJob[]>;
+  getTowingJob(id: string): Promise<TowingJob | undefined>;
+  createTowingJob(data: InsertTowingJob): Promise<TowingJob>;
+  updateTowingJob(id: string, data: Partial<TowingJob>): Promise<TowingJob>;
+  deleteTowingJob(id: string): Promise<void>;
+
+  // Vehicle Storage Module
+  getStorageFacilities(garageId: string): Promise<StorageFacility[]>;
+  getStorageFacility(id: string): Promise<StorageFacility | undefined>;
+  createStorageFacility(data: InsertStorageFacility): Promise<StorageFacility>;
+  updateStorageFacility(id: string, data: Partial<StorageFacility>): Promise<StorageFacility>;
+  deleteStorageFacility(id: string): Promise<void>;
+  getVehicleStorageAssignments(facilityId?: string, vehicleId?: string): Promise<VehicleStorageAssignment[]>;
+  getVehicleStorageAssignment(id: string): Promise<VehicleStorageAssignment | undefined>;
+  createVehicleStorageAssignment(data: InsertVehicleStorageAssignment): Promise<VehicleStorageAssignment>;
+  updateVehicleStorageAssignment(id: string, data: Partial<VehicleStorageAssignment>): Promise<VehicleStorageAssignment>;
+  deleteVehicleStorageAssignment(id: string): Promise<void>;
+
+  // Telematics Integration Module
+  getTelematicsFeeds(vehicleId?: string, deviceId?: string): Promise<TelematicsFeed[]>;
+  getTelematicsFeed(id: string): Promise<TelematicsFeed | undefined>;
+  createTelematicsFeed(data: InsertTelematicsFeed): Promise<TelematicsFeed>;
+  getTelematicsAlerts(vehicleId?: string, isResolved?: boolean): Promise<TelematicsAlert[]>;
+  getTelematicsAlert(id: string): Promise<TelematicsAlert | undefined>;
+  createTelematicsAlert(data: InsertTelematicsAlert): Promise<TelematicsAlert>;
+  updateTelematicsAlert(id: string, data: Partial<TelematicsAlert>): Promise<TelematicsAlert>;
+  resolveTelematicsAlert(id: string, userId: string): Promise<TelematicsAlert>;
+
+  // Knowledge Base Module
+  getArticleCategories(): Promise<ArticleCategory[]>;
+  getArticleCategory(id: string): Promise<ArticleCategory | undefined>;
+  createArticleCategory(data: InsertArticleCategory): Promise<ArticleCategory>;
+  updateArticleCategory(id: string, data: Partial<ArticleCategory>): Promise<ArticleCategory>;
+  deleteArticleCategory(id: string): Promise<void>;
+  getKnowledgeArticles(categoryId?: string, isPublished?: boolean): Promise<KnowledgeArticle[]>;
+  getKnowledgeArticle(id: string): Promise<KnowledgeArticle | undefined>;
+  createKnowledgeArticle(data: InsertKnowledgeArticle): Promise<KnowledgeArticle>;
+  updateKnowledgeArticle(id: string, data: Partial<KnowledgeArticle>): Promise<KnowledgeArticle>;
+  deleteKnowledgeArticle(id: string): Promise<void>;
+  incrementArticleViews(id: string): Promise<void>;
+  markArticleHelpful(id: string, isHelpful: boolean): Promise<void>;
+
+  // Training & Certification LMS Module
+  getTrainingModules(isActive?: boolean): Promise<TrainingModule[]>;
+  getTrainingModule(id: string): Promise<TrainingModule | undefined>;
+  createTrainingModule(data: InsertTrainingModule): Promise<TrainingModule>;
+  updateTrainingModule(id: string, data: Partial<TrainingModule>): Promise<TrainingModule>;
+  deleteTrainingModule(id: string): Promise<void>;
+  getCertifications(isActive?: boolean): Promise<Certification[]>;
+  getCertification(id: string): Promise<Certification | undefined>;
+  createCertification(data: InsertCertification): Promise<Certification>;
+  updateCertification(id: string, data: Partial<Certification>): Promise<Certification>;
+  deleteCertification(id: string): Promise<void>;
+  getCertificationAttempts(userId?: string, certificationId?: string): Promise<CertificationAttempt[]>;
+  getCertificationAttempt(id: string): Promise<CertificationAttempt | undefined>;
+  createCertificationAttempt(data: InsertCertificationAttempt): Promise<CertificationAttempt>;
+  updateCertificationAttempt(id: string, data: Partial<CertificationAttempt>): Promise<CertificationAttempt>;
+
+  // Google My Business Module
+  getGoogleBusinessProfiles(garageId: string): Promise<GoogleBusinessProfile[]>;
+  getGoogleBusinessProfile(id: string): Promise<GoogleBusinessProfile | undefined>;
+  createGoogleBusinessProfile(data: InsertGoogleBusinessProfile): Promise<GoogleBusinessProfile>;
+  updateGoogleBusinessProfile(id: string, data: Partial<GoogleBusinessProfile>): Promise<GoogleBusinessProfile>;
+  deleteGoogleBusinessProfile(id: string): Promise<void>;
+  getGmbPosts(profileId?: string, status?: string): Promise<GmbPost[]>;
+  getGmbPost(id: string): Promise<GmbPost | undefined>;
+  createGmbPost(data: InsertGmbPost): Promise<GmbPost>;
+  updateGmbPost(id: string, data: Partial<GmbPost>): Promise<GmbPost>;
+  deleteGmbPost(id: string): Promise<void>;
+  publishGmbPost(id: string): Promise<GmbPost>;
+  getGmbReviews(profileId?: string): Promise<GmbReview[]>;
+  getGmbReview(id: string): Promise<GmbReview | undefined>;
+  createGmbReview(data: InsertGmbReview): Promise<GmbReview>;
+  updateGmbReview(id: string, data: Partial<GmbReview>): Promise<GmbReview>;
+  respondToGmbReview(id: string, responseText: string): Promise<GmbReview>;
+
+  // Compliance Management Module
+  getCompliancePolicies(garageId: string, status?: string): Promise<CompliancePolicy[]>;
+  getCompliancePolicy(id: string): Promise<CompliancePolicy | undefined>;
+  createCompliancePolicy(data: InsertCompliancePolicy): Promise<CompliancePolicy>;
+  updateCompliancePolicy(id: string, data: Partial<CompliancePolicy>): Promise<CompliancePolicy>;
+  deleteCompliancePolicy(id: string): Promise<void>;
+  getComplianceAudits(garageId: string, policyId?: string, status?: string): Promise<ComplianceAudit[]>;
+  getComplianceAudit(id: string): Promise<ComplianceAudit | undefined>;
+  createComplianceAudit(data: InsertComplianceAudit): Promise<ComplianceAudit>;
+  updateComplianceAudit(id: string, data: Partial<ComplianceAudit>): Promise<ComplianceAudit>;
+  deleteComplianceAudit(id: string): Promise<void>;
+  getComplianceTasks(garageId: string, policyId?: string, status?: string): Promise<ComplianceTask[]>;
+  getComplianceTask(id: string): Promise<ComplianceTask | undefined>;
+  createComplianceTask(data: InsertComplianceTask): Promise<ComplianceTask>;
+  updateComplianceTask(id: string, data: Partial<ComplianceTask>): Promise<ComplianceTask>;
+  deleteComplianceTask(id: string): Promise<void>;
+  completeComplianceTask(id: string): Promise<ComplianceTask>;
 }
 
 export class DatabaseStorage implements IStorage {
