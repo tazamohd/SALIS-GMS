@@ -119,6 +119,12 @@ import TrainingLMS from "@/pages/TrainingLMS";
 import GoogleMyBusiness from "@/pages/GoogleMyBusiness";
 import ComplianceManagement from "@/pages/ComplianceManagement";
 import { CustomerDashboard } from "@/pages/customer/CustomerDashboard";
+import { ClientLayout } from "@/components/ClientLayout";
+import ClientDashboard from "@/pages/client/Dashboard";
+import ClientVehicles from "@/pages/client/Vehicles";
+import ClientAppointments from "@/pages/client/Appointments";
+import ClientInvoices from "@/pages/client/Invoices";
+import ClientProfile from "@/pages/client/Profile";
 import { CustomerMobileLayout } from "@/components/CustomerMobileLayout";
 import { TechnicianMobileLayout } from "@/components/TechnicianMobileLayout";
 import CustomerMobileHome from "@/pages/mobile/CustomerMobileHome";
@@ -755,6 +761,33 @@ function Router() {
         <Layout>
           <ComplianceManagement />
         </Layout>
+      </Route>
+      
+      {/* Client Portal Routes */}
+      <Route path="/client">
+        <ClientLayout>
+          <ClientDashboard />
+        </ClientLayout>
+      </Route>
+      <Route path="/client/vehicles">
+        <ClientLayout>
+          <ClientVehicles />
+        </ClientLayout>
+      </Route>
+      <Route path="/client/appointments">
+        <ClientLayout>
+          <ClientAppointments />
+        </ClientLayout>
+      </Route>
+      <Route path="/client/invoices">
+        <ClientLayout>
+          <ClientInvoices />
+        </ClientLayout>
+      </Route>
+      <Route path="/client/profile">
+        <ClientLayout>
+          <ClientProfile />
+        </ClientLayout>
       </Route>
       
       {/* Customer Mobile App Routes */}
