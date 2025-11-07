@@ -636,6 +636,59 @@ export const customerNotes = pgTable("customer_notes", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Service Signatures - digital signatures for service approvals
+export const serviceSignatures = pgTable("service_signatures", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  jobCardId: uuid("job_card_id")
+    .notNull()
+    .references(() => jobCards.id),
+  customerId: varchar("customer_id")
+    .notNull()
+    .references(() => users.id),
+  signatureData: text("signature_data").notNull(),
+  signedAt: timestamp("signed_at").defaultNow(),
+  documentType: varchar("document_type", { length: 50 }).notNull(),
+  ipAddress: varchar("ip_address", { length: 50 }),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Service Chat Messages - chat between customers and garage during service
+export const serviceChatMessages = pgTable("service_chat_messages", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  jobCardId: uuid("job_card_id")
+    .notNull()
+    .references(() => jobCards.id),
+  senderId: varchar("sender_id")
+    .notNull()
+    .references(() => users.id),
+  senderType: varchar("sender_type", { length: 20 }).notNull(), // "customer" or "garage"
+  message: text("message").notNull(),
+  attachments: text("attachments").array(),
+  isRead: boolean("is_read").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Service Reviews - customer reviews for completed services
+export const serviceReviews = pgTable("service_reviews", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  jobCardId: uuid("job_card_id")
+    .notNull()
+    .references(() => jobCards.id),
+  customerId: varchar("customer_id")
+    .notNull()
+    .references(() => users.id),
+  rating: integer("rating").notNull(), // 1-5
+  comment: text("comment"),
+  categories: jsonb("categories"), // {service_quality, communication, pricing, etc}
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Module 9: Appointments & Scheduling
 export const appointments = pgTable("appointments", {
   id: uuid("id")
@@ -1043,6 +1096,28 @@ export type InsertCustomerNote = typeof customerNotes.$inferInsert;
 export const insertCustomerNoteSchema = createInsertSchema(customerNotes).omit({
   id: true,
   createdBy: true,
+  createdAt: true,
+});
+
+export type ServiceSignature = typeof serviceSignatures.$inferSelect;
+export type InsertServiceSignature = typeof serviceSignatures.$inferInsert;
+export const insertServiceSignatureSchema = createInsertSchema(serviceSignatures).omit({
+  id: true,
+  createdAt: true,
+  signedAt: true,
+});
+
+export type ServiceChatMessage = typeof serviceChatMessages.$inferSelect;
+export type InsertServiceChatMessage = typeof serviceChatMessages.$inferInsert;
+export const insertServiceChatMessageSchema = createInsertSchema(serviceChatMessages).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type ServiceReview = typeof serviceReviews.$inferSelect;
+export type InsertServiceReview = typeof serviceReviews.$inferInsert;
+export const insertServiceReviewSchema = createInsertSchema(serviceReviews).omit({
+  id: true,
   createdAt: true,
 });
 

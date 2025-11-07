@@ -22,6 +22,9 @@ import {
   maintenanceSchedules,
   serviceReminders,
   customerNotes,
+  serviceSignatures,
+  serviceChatMessages,
+  serviceReviews,
   suppliers,
   supplierPriceList,
   supplierPerformance,
@@ -59,6 +62,12 @@ import {
   type InsertServiceReminder,
   type CustomerNote,
   type InsertCustomerNote,
+  type ServiceSignature,
+  type InsertServiceSignature,
+  type ServiceChatMessage,
+  type InsertServiceChatMessage,
+  type ServiceReview,
+  type InsertServiceReview,
   type Supplier,
   type InsertSupplier,
   type SupplierPriceList,
@@ -680,6 +689,16 @@ export interface IStorage {
   getCustomerNotes(customerId: string): Promise<CustomerNote[]>;
   createCustomerNote(data: InsertCustomerNote): Promise<CustomerNote>;
   deleteCustomerNote(id: string): Promise<void>;
+  
+  // Client Portal - Service Features
+  getCustomerServiceReminders(customerId: string): Promise<ServiceReminder[]>;
+  createServiceReminder(data: InsertServiceReminder): Promise<ServiceReminder>;
+  getServiceChatMessages(jobCardId: string): Promise<ServiceChatMessage[]>;
+  createServiceChatMessage(data: InsertServiceChatMessage): Promise<ServiceChatMessage>;
+  getCustomerServiceReviews(customerId: string): Promise<ServiceReview[]>;
+  createServiceReview(data: InsertServiceReview): Promise<ServiceReview>;
+  getCustomerServiceSignatures(customerId: string): Promise<ServiceSignature[]>;
+  createServiceSignature(data: InsertServiceSignature): Promise<ServiceSignature>;
   
   // Purchase Orders & Supplier Integration - Module 11
   getSuppliers(garageId?: string): Promise<Supplier[]>;

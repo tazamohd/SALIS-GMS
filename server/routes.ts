@@ -110,7 +110,10 @@ import {
   insertGmbReviewSchema,
   insertCompliancePolicySchema,
   insertComplianceAuditSchema,
-  insertComplianceTaskSchema
+  insertComplianceTaskSchema,
+  insertServiceSignatureSchema,
+  insertServiceChatMessageSchema,
+  insertServiceReviewSchema
 } from "@shared/schema";
 import Stripe from "stripe";
 import { createPaypalOrder, capturePaypalOrder, loadPaypalDefault } from "./paypal";
@@ -15695,6 +15698,149 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ data: task });
     } catch (error: any) {
       res.status(500).json({ error: error.message });
+    }
+  });
+
+  // ==================== CLIENT PORTAL - CUSTOMER-SCOPED ROUTES ====================
+  
+  // Service Reminders - Customer-scoped
+  app.get('/api/customers/:customerId/service-reminders', isAuthenticated, async (req, res) => {
+    try {
+      const { customerId } = req.params;
+      const reminders = await storage.getCustomerServiceReminders(customerId);
+      res.json(reminders);
+    } catch (error: any) {
+      console.error("Error fetching service reminders:", error);
+      res.status(500).json({ message: "Failed to fetch service reminders" });
+    }
+  });
+
+  app.post('/api/customers/:customerId/service-reminders', isAuthenticated, async (req, res) => {
+    try {
+      const { customerId } = req.params;
+      const { insertServiceReminderSchema } = await import("@shared/schema");
+      const validationResult = insertServiceReminderSchema.safeParse({
+        ...req.body,
+        customerId,
+      });
+      
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          message: "Validation error", 
+          ...sanitizeZodError(validationResult.error) 
+        });
+      }
+      
+      const reminder = await storage.createServiceReminder(validationResult.data);
+      res.status(201).json(reminder);
+    } catch (error: any) {
+      console.error("Error creating service reminder:", error);
+      res.status(500).json({ message: "Failed to create service reminder" });
+    }
+  });
+
+  // Service Chat Messages - Customer-scoped by job card
+  app.get('/api/job-cards/:jobCardId/chat', isAuthenticated, async (req, res) => {
+    try {
+      const { jobCardId } = req.params;
+      const messages = await storage.getServiceChatMessages(jobCardId);
+      res.json(messages);
+    } catch (error: any) {
+      console.error("Error fetching chat messages:", error);
+      res.status(500).json({ message: "Failed to fetch chat messages" });
+    }
+  });
+
+  app.post('/api/job-cards/:jobCardId/chat', isAuthenticated, async (req, res) => {
+    try {
+      const { jobCardId } = req.params;
+      const validationResult = insertServiceChatMessageSchema.safeParse({
+        ...req.body,
+        jobCardId,
+      });
+      
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          message: "Validation error", 
+          ...sanitizeZodError(validationResult.error) 
+        });
+      }
+      
+      const message = await storage.createServiceChatMessage(validationResult.data);
+      res.status(201).json(message);
+    } catch (error: any) {
+      console.error("Error creating chat message:", error);
+      res.status(500).json({ message: "Failed to create chat message" });
+    }
+  });
+
+  // Service Reviews - Customer-scoped
+  app.get('/api/customers/:customerId/reviews', isAuthenticated, async (req, res) => {
+    try {
+      const { customerId } = req.params;
+      const reviews = await storage.getCustomerServiceReviews(customerId);
+      res.json(reviews);
+    } catch (error: any) {
+      console.error("Error fetching service reviews:", error);
+      res.status(500).json({ message: "Failed to fetch service reviews" });
+    }
+  });
+
+  app.post('/api/customers/:customerId/reviews', isAuthenticated, async (req, res) => {
+    try {
+      const { customerId } = req.params;
+      const validationResult = insertServiceReviewSchema.safeParse({
+        ...req.body,
+        customerId,
+      });
+      
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          message: "Validation error", 
+          ...sanitizeZodError(validationResult.error) 
+        });
+      }
+      
+      const review = await storage.createServiceReview(validationResult.data);
+      res.status(201).json(review);
+    } catch (error: any) {
+      console.error("Error creating service review:", error);
+      res.status(500).json({ message: "Failed to create service review" });
+    }
+  });
+
+  // Service Signatures - Customer-scoped
+  app.get('/api/customers/:customerId/signatures', isAuthenticated, async (req, res) => {
+    try {
+      const { customerId } = req.params;
+      const signatures = await storage.getCustomerServiceSignatures(customerId);
+      res.json(signatures);
+    } catch (error: any) {
+      console.error("Error fetching service signatures:", error);
+      res.status(500).json({ message: "Failed to fetch service signatures" });
+    }
+  });
+
+  app.post('/api/customers/:customerId/signatures', isAuthenticated, async (req, res) => {
+    try {
+      const { customerId } = req.params;
+      const validationResult = insertServiceSignatureSchema.safeParse({
+        ...req.body,
+        customerId,
+      });
+      
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          message: "Validation error", 
+          ...sanitizeZodError(validationResult.error) 
+        });
+      }
+      
+      const signature = await storage.createServiceSignature(validationResult.data);
+      res.status(201).json(signature);
+    } catch (error: any) {
+      console.error("Error creating service signature:", error);
+      res.status(500).json({ message: "Failed to create service signature" });
     }
   });
 
