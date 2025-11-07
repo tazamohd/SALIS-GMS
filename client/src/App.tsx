@@ -125,6 +125,10 @@ import ClientVehicles from "@/pages/client/Vehicles";
 import ClientAppointments from "@/pages/client/Appointments";
 import ClientInvoices from "@/pages/client/Invoices";
 import ClientProfile from "@/pages/client/Profile";
+import ClientServiceHistory from "@/pages/client/ServiceHistory";
+import ClientLiveTracking from "@/pages/client/LiveTracking";
+import ClientReminders from "@/pages/client/ServiceReminders";
+import ClientReviewChat from "@/pages/client/ReviewChat";
 import { CustomerMobileLayout } from "@/components/CustomerMobileLayout";
 import { TechnicianMobileLayout } from "@/components/TechnicianMobileLayout";
 import CustomerMobileHome from "@/pages/mobile/CustomerMobileHome";
@@ -787,6 +791,26 @@ function Router() {
       <Route path="/client/profile">
         <ClientLayout>
           <ClientProfile />
+        </ClientLayout>
+      </Route>
+      <Route path="/client/service-history">
+        <ClientLayout>
+          <ClientServiceHistory />
+        </ClientLayout>
+      </Route>
+      <Route path="/client/live-tracking">
+        <ClientLayout>
+          <ClientLiveTracking />
+        </ClientLayout>
+      </Route>
+      <Route path="/client/reminders">
+        <ClientLayout>
+          <ClientReminders />
+        </ClientLayout>
+      </Route>
+      <Route path="/client/review-chat">
+        <ClientLayout>
+          <ClientReviewChat />
         </ClientLayout>
       </Route>
       

@@ -1,0 +1,255 @@
+import { useQuery } from "@tanstack/react-query";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { FileText, Download, Calendar, DollarSign, Wrench, Filter } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { useState } from "react";
+
+export default function ServiceHistory() {
+  const { user } = useAuth();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [selectedVehicle, setSelectedVehicle] = useState("all");
+
+  const { data: vehicles } = useQuery({
+    queryKey: ["/api/vehicles", user?.id],
+    enabled: !!user?.id,
+  });
+
+  const { data: jobCards, isLoading } = useQuery({
+    queryKey: ["/api/job-cards"],
+    enabled: !!user?.id,
+  });
+
+  const { data: invoices } = useQuery({
+    queryKey: ["/api/invoices"],
+    enabled: !!user?.id,
+  });
+
+  const myVehicles = Array.isArray(vehicles)
+    ? vehicles.filter((v: any) => v.customerId === user?.id)
+    : [];
+
+  const myJobCards = Array.isArray(jobCards)
+    ? jobCards.filter((jc: any) => {
+        const vehicle = myVehicles.find((v: any) => v.id === jc.vehicleId);
+        return !!vehicle;
+      })
+    : [];
+
+  const filteredJobCards = myJobCards.filter((jc: any) => {
+    const matchesSearch = searchTerm === "" || 
+      jc.jobNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      jc.description?.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesStatus = statusFilter === "all" || jc.status === statusFilter;
+    const matchesVehicle = selectedVehicle === "all" || jc.vehicleId === selectedVehicle;
+    
+    return matchesSearch && matchesStatus && matchesVehicle;
+  });
+
+  const getVehicleInfo = (vehicleId: string) => {
+    const vehicle = myVehicles.find((v: any) => v.id === vehicleId);
+    return vehicle ? `${vehicle.make} ${vehicle.model} - ${vehicle.licensePlate}` : "Unknown Vehicle";
+  };
+
+  const getInvoiceForJob = (jobId: string) => {
+    if (!Array.isArray(invoices)) return null;
+    return invoices.find((inv: any) => inv.jobCardId === jobId);
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "completed": return "default";
+      case "in_progress": return "secondary";
+      case "pending": return "outline";
+      default: return "outline";
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold" data-testid="text-page-title">
+          Service History
+        </h1>
+        <p className="text-muted-foreground mt-1">
+          Complete history of all your vehicle services
+        </p>
+      </div>
+
+      {/* Filters */}
+      <Card data-testid="card-filters">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Filter className="h-5 w-5" />
+            Filters
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="grid gap-4 md:grid-cols-3">
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Search</label>
+            <Input
+              placeholder="Search by job number or description..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              data-testid="input-search"
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Status</label>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger data-testid="select-status">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Status</SelectItem>
+                <SelectItem value="completed">Completed</SelectItem>
+                <SelectItem value="in_progress">In Progress</SelectItem>
+                <SelectItem value="pending">Pending</SelectItem>
+                <SelectItem value="cancelled">Cancelled</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Vehicle</label>
+            <Select value={selectedVehicle} onValueChange={setSelectedVehicle}>
+              <SelectTrigger data-testid="select-vehicle">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Vehicles</SelectItem>
+                {myVehicles.map((vehicle: any) => (
+                  <SelectItem key={vehicle.id} value={vehicle.id}>
+                    {vehicle.make} {vehicle.model} - {vehicle.licensePlate}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Service Records */}
+      <Card data-testid="card-service-records">
+        <CardHeader>
+          <CardTitle>Service Records ({filteredJobCards.length})</CardTitle>
+          <CardDescription>Detailed history of all completed and ongoing services</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {isLoading ? (
+            <div className="space-y-4">
+              <Skeleton className="h-32" />
+              <Skeleton className="h-32" />
+              <Skeleton className="h-32" />
+            </div>
+          ) : filteredJobCards.length === 0 ? (
+            <div className="text-center py-12 text-muted-foreground">
+              <FileText className="h-12 w-12 mx-auto mb-2 opacity-50" />
+              <p>No service records found</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {filteredJobCards
+                .sort((a: any, b: any) => 
+                  new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+                )
+                .map((job: any) => {
+                  const invoice = getInvoiceForJob(job.id);
+                  return (
+                    <div
+                      key={job.id}
+                      className="p-4 rounded-lg border"
+                      data-testid={`job-card-${job.id}`}
+                    >
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex items-center gap-3">
+                          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                            <Wrench className="h-5 w-5 text-primary" />
+                          </div>
+                          <div>
+                            <p className="font-medium">Job #{job.jobNumber}</p>
+                            <p className="text-sm text-muted-foreground">
+                              {getVehicleInfo(job.vehicleId)}
+                            </p>
+                          </div>
+                        </div>
+                        <Badge variant={getStatusColor(job.status)}>
+                          {job.status}
+                        </Badge>
+                      </div>
+
+                      {job.description && (
+                        <p className="text-sm mb-3">{job.description}</p>
+                      )}
+
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-3">
+                        <div className="flex items-center gap-2 text-sm">
+                          <Calendar className="h-4 w-4 text-muted-foreground" />
+                          <div>
+                            <p className="text-muted-foreground">Created</p>
+                            <p className="font-medium">
+                              {new Date(job.createdAt).toLocaleDateString()}
+                            </p>
+                          </div>
+                        </div>
+
+                        {job.completedAt && (
+                          <div className="flex items-center gap-2 text-sm">
+                            <Calendar className="h-4 w-4 text-muted-foreground" />
+                            <div>
+                              <p className="text-muted-foreground">Completed</p>
+                              <p className="font-medium">
+                                {new Date(job.completedAt).toLocaleDateString()}
+                              </p>
+                            </div>
+                          </div>
+                        )}
+
+                        {invoice && (
+                          <div className="flex items-center gap-2 text-sm">
+                            <DollarSign className="h-4 w-4 text-muted-foreground" />
+                            <div>
+                              <p className="text-muted-foreground">Total</p>
+                              <p className="font-medium">
+                                ${parseFloat(invoice.totalAmount || "0").toFixed(2)}
+                              </p>
+                            </div>
+                          </div>
+                        )}
+
+                        <div className="flex items-center gap-2 text-sm">
+                          <FileText className="h-4 w-4 text-muted-foreground" />
+                          <div>
+                            <p className="text-muted-foreground">Priority</p>
+                            <p className="font-medium capitalize">{job.priority || "Normal"}</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex gap-2">
+                        <Button variant="outline" size="sm" data-testid={`button-view-${job.id}`}>
+                          <FileText className="h-4 w-4 mr-2" />
+                          View Details
+                        </Button>
+                        {invoice && (
+                          <Button variant="outline" size="sm" data-testid={`button-invoice-${job.id}`}>
+                            <Download className="h-4 w-4 mr-2" />
+                            Download Invoice
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+}

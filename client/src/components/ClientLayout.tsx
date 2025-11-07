@@ -13,7 +13,8 @@ import {
   Menu,
   X,
   Bell,
-  MessageSquare
+  MessageSquare,
+  Clock
 } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
@@ -26,6 +27,10 @@ const navigation = [
   { name: "Dashboard", href: "/client", icon: Home },
   { name: "My Vehicles", href: "/client/vehicles", icon: Car },
   { name: "Appointments", href: "/client/appointments", icon: Calendar },
+  { name: "Service History", href: "/client/service-history", icon: FileText },
+  { name: "Live Tracking", href: "/client/live-tracking", icon: Clock },
+  { name: "Reminders", href: "/client/reminders", icon: Bell },
+  { name: "Review & Chat", href: "/client/review-chat", icon: MessageSquare },
   { name: "Invoices", href: "/client/invoices", icon: FileText },
   { name: "Profile", href: "/client/profile", icon: User },
 ];
