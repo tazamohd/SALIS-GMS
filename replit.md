@@ -17,6 +17,8 @@ This project is a world-class automotive ERP platform (SALIS AUTO) designed to m
 
 **Components**: TechnicianLayout with sidebar navigation, mobile-responsive bottom nav. **Security**: Production-ready with server-side technician-scoped API routes (`/api/technicians/:id/job-cards`, `/api/technicians/:id/time-clock`), authorization middleware, and database-level filtering. See `TECHNICIAN_PORTAL_SECURITY.md` for complete security documentation.
 
+**Latest Update (November 12, 2025) - AI-Powered Predictive Diagnostics**: Built comprehensive predictive diagnostics system at `/predictive-diagnostics` using GPT-5 via Replit AI Integrations. The feature analyzes detailed vehicle parameters (mileage, engine temperature, oil pressure, brake wear, battery voltage, tire condition, check engine light status, unusual noises) to predict potential failures and maintenance needs. **Backend**: `server/services/predictiveDiagnostics.ts` service generates AI predictions with severity levels (low/medium/high/critical), risk assessments, recommended actions, and confidence scores. **API**: POST `/api/ai/predictive-diagnostics` endpoint integrates OpenAI GPT-5, saves predictions to `aiMaintenancePredictions` table with JSONB metadata. **Frontend**: Comprehensive input form with 13+ vehicle parameters, real-time AI prediction display with severity badges, recent predictions history, and React Query integration for cache management. **Technology**: Uses OpenAI GPT-5 model with JSON mode for structured predictions, no API key required (billed to Replit credits).
+
 ## User Preferences
 - Modern React patterns with hooks
 - TypeScript throughout
