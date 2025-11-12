@@ -847,6 +847,61 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Technician Portal routes - Server-side scoped access
+  // Authorization middleware for technician-scoped routes
+  const authorizeTechnician = (req: any, res: any, next: any) => {
+    const { technicianId } = req.params;
+    
+    // Allow access if:
+    // 1. User is requesting their own data
+    // 2. User is an admin/manager
+    if (req.user.id !== technicianId && !['admin', 'manager'].includes(req.user.userType)) {
+      return res.status(403).json({ message: "Access denied - you can only view your own data" });
+    }
+    
+    next();
+  };
+
+  // GET technician's assigned job cards
+  app.get('/api/technicians/:technicianId/job-cards', isAuthenticated, authorizeTechnician, async (req, res) => {
+    try {
+      const { technicianId } = req.params;
+      const jobCards = await storage.getTechnicianJobCards(technicianId);
+      res.json(jobCards);
+    } catch (error) {
+      console.error("Error fetching technician job cards:", error);
+      res.status(500).json({ message: "Failed to fetch job cards" });
+    }
+  });
+
+  // GET technician's time clock entries
+  app.get('/api/technicians/:technicianId/time-clock', isAuthenticated, authorizeTechnician, async (req, res) => {
+    try {
+      const { technicianId } = req.params;
+      const entries = await storage.getTechnicianTimeClockEntries(technicianId);
+      res.json(entries);
+    } catch (error) {
+      console.error("Error fetching time clock entries:", error);
+      res.status(500).json({ message: "Failed to fetch time clock entries" });
+    }
+  });
+
+  // POST clock in/out
+  app.post('/api/technicians/:technicianId/time-clock', isAuthenticated, authorizeTechnician, async (req, res) => {
+    try {
+      const { technicianId } = req.params;
+      const entryData = {
+        ...req.body,
+        technicianId,
+      };
+      const entry = await storage.createTimeClockEntry(entryData);
+      res.status(201).json(entry);
+    } catch (error) {
+      console.error("Error creating time clock entry:", error);
+      res.status(500).json({ message: "Failed to create time clock entry" });
+    }
+  });
+
   // Service Templates routes
   app.get('/api/service-templates/all', isAuthenticated, async (req, res) => {
     try {

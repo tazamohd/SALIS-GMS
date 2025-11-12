@@ -630,6 +630,11 @@ export interface IStorage {
   createJobCard(data: any): Promise<JobCard>;
   updateJobCard(id: string, data: any): Promise<JobCard>;
   
+  // Technician-scoped operations
+  getTechnicianJobCards(technicianId: string): Promise<JobCard[]>;
+  getTechnicianTimeClockEntries(technicianId: string): Promise<any[]>;
+  createTimeClockEntry(data: any): Promise<any>;
+  
   // Task Assignment operations
   getTaskAssignments(jobCardId: string): Promise<TaskAssignment[]>;
   createTaskAssignment(data: any): Promise<TaskAssignment>;
@@ -1873,6 +1878,25 @@ export class DatabaseStorage implements IStorage {
   async updateJobCard(id: string, data: any): Promise<JobCard> {
     const [jobCard] = await db.update(jobCards).set(data).where(eq(jobCards.id, id)).returning();
     return jobCard;
+  }
+
+  // Technician-scoped operations
+  async getTechnicianJobCards(technicianId: string): Promise<JobCard[]> {
+    return await db.select()
+      .from(jobCards)
+      .where(eq(jobCards.assignedTechnicianId, technicianId))
+      .orderBy(desc(jobCards.createdAt));
+  }
+
+  async getTechnicianTimeClockEntries(technicianId: string): Promise<any[]> {
+    // TODO: Create timeClockEntries table in schema
+    // For now, return empty array
+    return [];
+  }
+
+  async createTimeClockEntry(data: any): Promise<any> {
+    // TODO: Implement after timeClockEntries table is created
+    return data;
   }
 
   // Task Assignment operations
