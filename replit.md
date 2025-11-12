@@ -44,6 +44,9 @@ The application utilizes a full-stack architecture with clear client-server sepa
 - **Smart Contracts**: Automated service agreements with digital signatures and payment triggers, managed via `smartContracts` and `contractEvents` tables.
 - **Operational Modules (Phase 13)**: Includes Payroll Management (`payroll_employees`, `pay_periods`, `payroll_runs`), Expense Tracking (`expense_categories`, `expenses`), Towing & Recovery Services (`towing_jobs`), Vehicle Storage Services (`storage_facilities`, `vehicle_storage_assignments`), Telematics Integration (`telematics_feeds`, `telematics_alerts`), Knowledge Base (`article_categories`, `knowledge_articles`), Training & Certification LMS (`training_modules`, `certifications`, `certification_attempts`), Google My Business Integration (`google_business_profiles`, `gmb_posts`, `gmb_reviews`), and Enhanced Compliance Management (`compliance_policies`, `compliance_audits`, `compliance_tasks`).
 
+**Wave 2: Customer Experience Features (In Progress)**:
+- **Feature #4 - Automated Push Notifications MVP**: Production-ready in-app notification bell component with unread badge, dropdown list, and mark-as-read functionality. Integrated with existing notification API routes (GET, POST, PATCH, DELETE, unread-count). Manual test notification endpoint (POST /api/notifications/test) for admin testing. Foundation infrastructure includes `notification_schedules` table and storage CRUD methods for future automation. Existing SMS (Twilio) and email (GetResponse) services functional. **Backlog**: Event-triggered automation service deferred pending data model enhancements (appointments.scheduledDate, storage.getGarage method).
+
 ## External Dependencies
 - Replit Auth
 - PostgreSQL
