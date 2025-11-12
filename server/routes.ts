@@ -16841,6 +16841,293 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Fleet Tracking & GPS Management Routes
+  // Record vehicle GPS location (with authorization)
+  app.post('/api/fleet/locations', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.garageId;
+      const { vehicleId, latitude, longitude, altitude, speed, heading, accuracy, source, driverId, jobCardId, mileage, engineStatus, fuelLevel, batteryVoltage } = req.body;
+      
+      // Validate required fields
+      if (!vehicleId || latitude === undefined || longitude === undefined) {
+        return res.status(400).json({ message: "Vehicle ID, latitude, and longitude are required" });
+      }
+      
+      // Verify vehicle ownership
+      const vehicle = await storage.getVehicle(vehicleId);
+      if (!vehicle || vehicle.garageId !== userGarageId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      const location = await storage.recordVehicleLocation({
+        vehicleId,
+        latitude,
+        longitude,
+        altitude,
+        speed,
+        heading,
+        accuracy,
+        source,
+        driverId,
+        jobCardId,
+        mileage,
+        engineStatus,
+        fuelLevel,
+        batteryVoltage,
+      });
+      
+      res.json(location);
+    } catch (error: any) {
+      console.error("Error recording location:", error);
+      res.status(500).json({ message: "Failed to record location" });
+    }
+  });
+
+  // Get vehicle location history (with authorization)
+  app.get('/api/fleet/vehicles/:vehicleId/locations', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.garageId;
+      const vehicle = await storage.getVehicle(req.params.vehicleId);
+      
+      if (!vehicle || vehicle.garageId !== userGarageId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      const startDate = req.query.startDate ? new Date(req.query.startDate as string) : undefined;
+      const endDate = req.query.endDate ? new Date(req.query.endDate as string) : undefined;
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 100;
+      
+      const locations = await storage.getVehicleLocationHistory(req.params.vehicleId, startDate, endDate, limit);
+      res.json(locations);
+    } catch (error: any) {
+      console.error("Error fetching location history:", error);
+      res.status(500).json({ message: "Failed to fetch location history" });
+    }
+  });
+
+  // Get latest vehicle location (with authorization)
+  app.get('/api/fleet/vehicles/:vehicleId/location/latest', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.garageId;
+      const vehicle = await storage.getVehicle(req.params.vehicleId);
+      
+      if (!vehicle || vehicle.garageId !== userGarageId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      const location = await storage.getLatestVehicleLocation(req.params.vehicleId);
+      res.json(location || null);
+    } catch (error: any) {
+      console.error("Error fetching latest location:", error);
+      res.status(500).json({ message: "Failed to fetch latest location" });
+    }
+  });
+
+  // Get all geofence zones for garage
+  app.get('/api/fleet/geofences', isAuthenticated, async (req: any, res) => {
+    try {
+      const zones = await storage.getGeofenceZones(req.user.garageId);
+      res.json(zones);
+    } catch (error: any) {
+      console.error("Error fetching geofence zones:", error);
+      res.status(500).json({ message: "Failed to fetch geofence zones" });
+    }
+  });
+
+  // Create geofence zone (with validation)
+  app.post('/api/fleet/geofences', isAuthenticated, async (req: any, res) => {
+    try {
+      const { name, description, zoneType, geometry, centerLatitude, centerLongitude, radius, alertOnEntry, alertOnExit, color } = req.body;
+      
+      if (!name || !zoneType || !geometry) {
+        return res.status(400).json({ message: "Name, zone type, and geometry are required" });
+      }
+      
+      const zone = await storage.createGeofenceZone({
+        garageId: req.user.garageId,
+        name,
+        description,
+        zoneType,
+        geometry,
+        centerLatitude,
+        centerLongitude,
+        radius,
+        alertOnEntry,
+        alertOnExit,
+        color,
+        createdBy: req.user.id,
+      });
+      
+      res.json(zone);
+    } catch (error: any) {
+      console.error("Error creating geofence zone:", error);
+      res.status(500).json({ message: "Failed to create geofence zone" });
+    }
+  });
+
+  // Update geofence zone (with ownership check)
+  app.patch('/api/fleet/geofences/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const zone = await storage.getGeofenceZone(req.params.id);
+      if (!zone) {
+        return res.status(404).json({ message: "Geofence zone not found" });
+      }
+      
+      if (zone.garageId !== req.user.garageId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      const updatedZone = await storage.updateGeofenceZone(req.params.id, req.body);
+      res.json(updatedZone);
+    } catch (error: any) {
+      console.error("Error updating geofence zone:", error);
+      res.status(500).json({ message: "Failed to update geofence zone" });
+    }
+  });
+
+  // Delete geofence zone (with ownership check)
+  app.delete('/api/fleet/geofences/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const zone = await storage.getGeofenceZone(req.params.id);
+      if (!zone) {
+        return res.status(404).json({ message: "Geofence zone not found" });
+      }
+      
+      if (zone.garageId !== req.user.garageId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      await storage.deleteGeofenceZone(req.params.id);
+      res.json({ message: "Geofence zone deleted successfully" });
+    } catch (error: any) {
+      console.error("Error deleting geofence zone:", error);
+      res.status(500).json({ message: "Failed to delete geofence zone" });
+    }
+  });
+
+  // Get geofence events (with authorization)
+  app.get('/api/fleet/geofence-events', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.garageId;
+      const zoneId = req.query.zoneId as string;
+      const vehicleId = req.query.vehicleId as string;
+      const startDate = req.query.startDate ? new Date(req.query.startDate as string) : undefined;
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 100;
+      
+      // If zoneId provided, verify ownership
+      if (zoneId) {
+        const zone = await storage.getGeofenceZone(zoneId);
+        if (!zone || zone.garageId !== userGarageId) {
+          return res.status(403).json({ message: "Access denied" });
+        }
+      }
+      
+      // If vehicleId provided, verify ownership
+      if (vehicleId) {
+        const vehicle = await storage.getVehicle(vehicleId);
+        if (!vehicle || vehicle.garageId !== userGarageId) {
+          return res.status(403).json({ message: "Access denied" });
+        }
+      }
+      
+      const events = await storage.getGeofenceEvents(zoneId, vehicleId, startDate, limit);
+      res.json(events);
+    } catch (error: any) {
+      console.error("Error fetching geofence events:", error);
+      res.status(500).json({ message: "Failed to fetch geofence events" });
+    }
+  });
+
+  // Get fleet routes for garage
+  app.get('/api/fleet/routes', isAuthenticated, async (req: any, res) => {
+    try {
+      const status = req.query.status as string;
+      const routes = await storage.getFleetRoutes(req.user.garageId, status);
+      res.json(routes);
+    } catch (error: any) {
+      console.error("Error fetching fleet routes:", error);
+      res.status(500).json({ message: "Failed to fetch fleet routes" });
+    }
+  });
+
+  // Create fleet route (with validation)
+  app.post('/api/fleet/routes', isAuthenticated, async (req: any, res) => {
+    try {
+      const { routeName, description, vehicleId, driverId, jobCardIds, startLocation, endLocation, waypoints, scheduledStartTime } = req.body;
+      
+      if (!routeName || !startLocation) {
+        return res.status(400).json({ message: "Route name and start location are required" });
+      }
+      
+      // Verify vehicle ownership if provided
+      if (vehicleId) {
+        const vehicle = await storage.getVehicle(vehicleId);
+        if (!vehicle || vehicle.garageId !== req.user.garageId) {
+          return res.status(403).json({ message: "Invalid vehicle" });
+        }
+      }
+      
+      const route = await storage.createFleetRoute({
+        garageId: req.user.garageId,
+        routeName,
+        description,
+        vehicleId,
+        driverId,
+        jobCardIds,
+        startLocation,
+        endLocation,
+        waypoints,
+        scheduledStartTime,
+        createdBy: req.user.id,
+      });
+      
+      res.json(route);
+    } catch (error: any) {
+      console.error("Error creating fleet route:", error);
+      res.status(500).json({ message: "Failed to create fleet route" });
+    }
+  });
+
+  // Get route with checkpoints (with ownership check)
+  app.get('/api/fleet/routes/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const route = await storage.getFleetRoute(req.params.id);
+      if (!route) {
+        return res.status(404).json({ message: "Route not found" });
+      }
+      
+      if (route.garageId !== req.user.garageId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      const checkpoints = await storage.getRouteCheckpoints(req.params.id);
+      res.json({ ...route, checkpoints });
+    } catch (error: any) {
+      console.error("Error fetching route:", error);
+      res.status(500).json({ message: "Failed to fetch route" });
+    }
+  });
+
+  // Update route status (with ownership check)
+  app.patch('/api/fleet/routes/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const route = await storage.getFleetRoute(req.params.id);
+      if (!route) {
+        return res.status(404).json({ message: "Route not found" });
+      }
+      
+      if (route.garageId !== req.user.garageId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      const updatedRoute = await storage.updateFleetRoute(req.params.id, req.body);
+      res.json(updatedRoute);
+    } catch (error: any) {
+      console.error("Error updating route:", error);
+      res.status(500).json({ message: "Failed to update route" });
+    }
+  });
+
   const httpServer = createServer(app);
   
   // Initialize WebSocket server for chat

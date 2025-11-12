@@ -9130,6 +9130,146 @@ export class DatabaseStorage implements IStorage {
     
     return alerts;
   }
+
+  // Fleet Tracking & GPS Management
+  async recordVehicleLocation(data: any): Promise<any> {
+    const [location] = await db.insert(vehicleLocationHistory).values(data).returning();
+    return location;
+  }
+
+  async getVehicleLocationHistory(vehicleId: string, startDate?: Date, endDate?: Date, limit: number = 100): Promise<any[]> {
+    const conditions = [eq(vehicleLocationHistory.vehicleId, vehicleId)];
+    
+    if (startDate) {
+      conditions.push(gte(vehicleLocationHistory.timestamp, startDate));
+    }
+    if (endDate) {
+      conditions.push(lte(vehicleLocationHistory.timestamp, endDate));
+    }
+    
+    return await db.select()
+      .from(vehicleLocationHistory)
+      .where(and(...conditions))
+      .orderBy(desc(vehicleLocationHistory.timestamp))
+      .limit(limit);
+  }
+
+  async getLatestVehicleLocation(vehicleId: string): Promise<any | undefined> {
+    const [location] = await db.select()
+      .from(vehicleLocationHistory)
+      .where(eq(vehicleLocationHistory.vehicleId, vehicleId))
+      .orderBy(desc(vehicleLocationHistory.timestamp))
+      .limit(1);
+    return location;
+  }
+
+  async getGeofenceZones(garageId: string): Promise<any[]> {
+    return await db.select()
+      .from(geofenceZones)
+      .where(and(
+        eq(geofenceZones.garageId, garageId),
+        eq(geofenceZones.isActive, true)
+      ))
+      .orderBy(desc(geofenceZones.createdAt));
+  }
+
+  async getGeofenceZone(id: string): Promise<any | undefined> {
+    const [zone] = await db.select().from(geofenceZones).where(eq(geofenceZones.id, id));
+    return zone;
+  }
+
+  async createGeofenceZone(data: any): Promise<any> {
+    const [zone] = await db.insert(geofenceZones).values(data).returning();
+    return zone;
+  }
+
+  async updateGeofenceZone(id: string, data: any): Promise<any> {
+    const [zone] = await db.update(geofenceZones)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(geofenceZones.id, id))
+      .returning();
+    return zone;
+  }
+
+  async deleteGeofenceZone(id: string): Promise<void> {
+    await db.delete(geofenceZones).where(eq(geofenceZones.id, id));
+  }
+
+  async recordGeofenceEvent(data: any): Promise<any> {
+    const [event] = await db.insert(geofenceEvents).values(data).returning();
+    return event;
+  }
+
+  async getGeofenceEvents(zoneId?: string, vehicleId?: string, startDate?: Date, limit: number = 100): Promise<any[]> {
+    const conditions = [];
+    
+    if (zoneId) {
+      conditions.push(eq(geofenceEvents.geofenceZoneId, zoneId));
+    }
+    if (vehicleId) {
+      conditions.push(eq(geofenceEvents.vehicleId, vehicleId));
+    }
+    if (startDate) {
+      conditions.push(gte(geofenceEvents.timestamp, startDate));
+    }
+    
+    const query = conditions.length > 0
+      ? db.select().from(geofenceEvents).where(and(...conditions))
+      : db.select().from(geofenceEvents);
+    
+    return await query.orderBy(desc(geofenceEvents.timestamp)).limit(limit);
+  }
+
+  async getFleetRoutes(garageId: string, status?: string): Promise<any[]> {
+    const conditions = [eq(fleetRoutes.garageId, garageId)];
+    
+    if (status) {
+      conditions.push(eq(fleetRoutes.status, status));
+    }
+    
+    return await db.select()
+      .from(fleetRoutes)
+      .where(and(...conditions))
+      .orderBy(desc(fleetRoutes.createdAt));
+  }
+
+  async getFleetRoute(id: string): Promise<any | undefined> {
+    const [route] = await db.select().from(fleetRoutes).where(eq(fleetRoutes.id, id));
+    return route;
+  }
+
+  async createFleetRoute(data: any): Promise<any> {
+    const [route] = await db.insert(fleetRoutes).values(data).returning();
+    return route;
+  }
+
+  async updateFleetRoute(id: string, data: any): Promise<any> {
+    const [route] = await db.update(fleetRoutes)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(fleetRoutes.id, id))
+      .returning();
+    return route;
+  }
+
+  async getRouteCheckpoints(routeId: string): Promise<any[]> {
+    return await db.select()
+      .from(routeCheckpoints)
+      .where(eq(routeCheckpoints.routeId, routeId))
+      .orderBy(routeCheckpoints.sequenceNumber);
+  }
+
+  async createRouteCheckpoint(data: any): Promise<any> {
+    const [checkpoint] = await db.insert(routeCheckpoints).values(data).returning();
+    return checkpoint;
+  }
+
+  async updateRouteCheckpoint(id: string, data: any): Promise<any> {
+    const [checkpoint] = await db.update(routeCheckpoints)
+      .set(data)
+      .where(eq(routeCheckpoints.id, id))
+      .returning();
+    return checkpoint;
+  }
 }
 
 export const storage = new DatabaseStorage();

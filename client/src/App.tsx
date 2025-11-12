@@ -47,6 +47,7 @@ import Security from "@/pages/Security";
 import Settings from "@/pages/Settings";
 import Chat from "@/pages/Chat";
 import FleetManagement from "@/pages/FleetManagement";
+import FleetTracking from "@/pages/FleetTracking";
 import ContractManagement from "@/pages/ContractManagement";
 import WarrantyManagement from "@/pages/WarrantyManagement";
 import VehicleInspections from "@/pages/VehicleInspections";
@@ -260,6 +261,11 @@ function Router() {
       <Route path="/fleet-management">
         <Layout>
           <FleetManagement />
+        </Layout>
+      </Route>
+      <Route path="/fleet-tracking">
+        <Layout>
+          <FleetTracking />
         </Layout>
       </Route>
       <Route path="/contract-management">
