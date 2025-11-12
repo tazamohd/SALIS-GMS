@@ -32,9 +32,10 @@ class ChatWebSocketClient {
           this.reconnectTimer = null;
         }
 
+        // Send auth message (session-based, no need to send userId/garageId)
         this.send({
           type: 'auth',
-          data: { userId, garageId },
+          data: {},
         });
       };
 

@@ -1,19 +1,13 @@
 import { WebSocketServer, WebSocket } from 'ws';
 import type { Server, IncomingMessage } from 'http';
 import { parse as parseCookie } from 'cookie';
-import type { SessionStore } from 'express-session';
+import { unsign } from 'cookie-signature';
 
 interface AuthenticatedWebSocket extends WebSocket {
   userId?: string;
   garageId?: string;
   isAlive?: boolean;
-}
-
-interface SessionData {
-  passport?: {
-    user: string;
-  };
-  cookie: any;
+  req?: IncomingMessage;
 }
 
 interface WebSocketMessage {
@@ -31,10 +25,11 @@ export class ChatWebSocketServer {
   }
 
   private initialize() {
-    this.wss.on('connection', (ws: AuthenticatedWebSocket, req) => {
+    this.wss.on('connection', (ws: AuthenticatedWebSocket, req: IncomingMessage) => {
       console.log('New WebSocket connection');
 
       ws.isAlive = true;
+      ws.req = req; // Store upgrade request for session validation
 
       ws.on('pong', () => {
         ws.isAlive = true;
@@ -168,79 +163,106 @@ export class ChatWebSocketServer {
     });
   }
 
-  private async handleAuth(ws: AuthenticatedWebSocket, data: { sessionId?: string; userId?: string; garageId?: string }) {
-    // ⚠️ SECURITY WARNING - DEVELOPMENT MODE ONLY ⚠️
-    // 
-    // This WebSocket authentication method is NOT suitable for production use.
-    // It validates that userId/garageId exist in the database but does NOT verify 
-    // the caller's actual identity, allowing user impersonation attacks.
-    //
-    // PRODUCTION REQUIREMENTS:
-    // 1. Implement session-based or JWT authentication
-    // 2. Derive userId/garageId from verified session/token on server-side
-    // 3. Never trust client-supplied identity claims
-    // 
-    // IMPLEMENTATION GUIDE FOR PRODUCTION:
-    // - Pass HTTP session cookie or JWT in WebSocket connection URL/headers
-    // - Verify session/token signature server-side
-    // - Extract userId/garageId from verified session data
-    // - Reject connections with invalid/expired sessions
-    //
-    // Example production flow:
-    //   const sessionId = extractSessionFromWsRequest(req);
-    //   const session = await verifySession(sessionId);
-    //   if (!session || session.isExpired()) return reject();
-    //   ws.userId = session.userId;  // Derived from verified session
-    //   ws.garageId = session.garageId;  // Not from client claim
-    
+  private async handleAuth(ws: AuthenticatedWebSocket, data: any) {
     try {
-      let userId: string;
-      let garageId: string;
-
-      if (data.sessionId) {
-        // Production path: verify session and derive user info
-        const { storage } = await import('./storage');
-        // TODO: Implement session verification
-        // const session = await storage.getSessionById(data.sessionId);
-        // if (!session || session.isExpired()) {
-        //   this.sendError(ws, 'Invalid or expired session');
-        //   return;
-        // }
-        // userId = session.userId;
-        // garageId = session.garageId;
-        this.sendError(ws, 'Session-based auth not yet implemented');
-        return;
-      } else if (data.userId && data.garageId) {
-        // ⚠️ DEVELOPMENT ONLY: Validates user exists but doesn't verify caller identity
-        const { storage } = await import('./storage');
-        const user = await storage.getUser(data.userId);
-        
-        if (!user || user.garageId !== data.garageId) {
-          this.sendError(ws, 'Invalid user credentials');
-          return;
-        }
-        
-        userId = data.userId;
-        garageId = data.garageId;
-      } else {
-        this.sendError(ws, 'Authentication requires either sessionId or userId+garageId');
+      // Extract session cookie from WebSocket upgrade request
+      if (!ws.req || !ws.req.headers.cookie) {
+        this.sendError(ws, 'No session cookie found');
+        console.log('WebSocket auth failed: No cookie header');
+        ws.close(4001, 'Authentication required');
         return;
       }
 
-      // Set authenticated user info
-      ws.userId = userId;
-      ws.garageId = garageId;
+      const cookies = parseCookie(ws.req.headers.cookie);
+      const sessionCookie = cookies['connect.sid'];
+      
+      if (!sessionCookie) {
+        this.sendError(ws, 'No session ID found in cookies');
+        console.log('WebSocket auth failed: No connect.sid cookie');
+        ws.close(4001, 'Authentication required');
+        return;
+      }
+
+      // Unsign and validate the session cookie
+      const sessionSecret = process.env.SESSION_SECRET;
+      if (!sessionSecret) {
+        console.error('SESSION_SECRET not configured');
+        this.sendError(ws, 'Server configuration error');
+        ws.close(4002, 'Server error');
+        return;
+      }
+
+      // Unsign the cookie (format is "s:sessionId.signature")
+      let sessionId: string | false;
+      if (sessionCookie.startsWith('s:')) {
+        const cookieValue = sessionCookie.slice(2); // Remove 's:' prefix
+        sessionId = unsign(cookieValue, sessionSecret);
+      } else {
+        sessionId = unsign(sessionCookie, sessionSecret);
+      }
+
+      if (sessionId === false) {
+        this.sendError(ws, 'Invalid session signature');
+        console.log('WebSocket auth failed: Cookie signature invalid');
+        ws.close(4003, 'Invalid session');
+        return;
+      }
+
+      console.log(`Validating session: ${sessionId.substring(0, 8)}...`);
+
+      // Query session from database using pool.query for raw SQL
+      const { pool } = await import('./db');
+      const sessionData = await pool.query(
+        `SELECT sess FROM sessions WHERE sid = $1 AND expire > NOW()`,
+        [sessionId]
+      );
+
+      if (!sessionData.rows || sessionData.rows.length === 0) {
+        this.sendError(ws, 'Invalid or expired session');
+        console.log('WebSocket auth failed: Session not found or expired');
+        ws.close(4003, 'Invalid session');
+        return;
+      }
+
+      const session = sessionData.rows[0].sess as any;
+      
+      // Extract user ID from Passport session
+      if (!session.passport || !session.passport.user) {
+        this.sendError(ws, 'No user in session');
+        console.log('WebSocket auth failed: No passport user in session');
+        ws.close(4004, 'Invalid session data');
+        return;
+      }
+
+      const userId = session.passport.user;
+      console.log(`Session validated for user: ${userId}`);
+
+      // Get user from storage to derive garageId
+      const { storage } = await import('./storage');
+      const user = await storage.getUser(userId);
+
+      if (!user || !user.isActive || !user.garageId) {
+        this.sendError(ws, 'User not found, inactive, or missing garage');
+        console.log(`WebSocket auth failed: User ${userId} invalid state`);
+        ws.close(4005, 'User invalid');
+        return;
+      }
+
+      // Set authenticated user info (server-derived, never from client)
+      ws.userId = user.id;
+      ws.garageId = user.garageId; // Now guaranteed to be non-null
 
       if (!this.clients.has(userId)) {
         this.clients.set(userId, new Set());
       }
       this.clients.get(userId)!.add(ws);
 
-      this.send(ws, { type: 'auth_success', data: { userId, garageId } });
-      console.log(`User ${userId} authenticated via WebSocket`);
+      this.send(ws, { type: 'auth_success', data: { userId: user.id, garageId: user.garageId } });
+      console.log(`✅ User ${user.id} authenticated via WebSocket (session-based)`);
     } catch (error) {
       console.error('WebSocket authentication error:', error);
       this.sendError(ws, 'Authentication failed');
+      ws.close(4000, 'Authentication failed');
     }
   }
 
