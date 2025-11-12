@@ -7,6 +7,16 @@ This project is a world-class automotive ERP platform (SALIS AUTO) designed to m
 
 **Latest Update (November 12, 2025) - Client Portal Advanced Features**: Added 5 comprehensive features to the customer-facing client portal including Service History with filtering, canvas-based E-Signature component, Service Reminders with custom notifications, Live Tracking with real-time updates, and Review & Chat system for customer-garage communication. Includes new database tables (`serviceSignatures`, `serviceChatMessages`, `serviceReviews`) and customer-scoped API routes. Security documentation created in `CLIENT_PORTAL_SECURITY.md` for production deployment requirements.
 
+**Latest Update (November 12, 2025) - Technician Portal**: Created comprehensive desktop technician portal at `/technician-portal` with dedicated layout and 6 pages:
+1. Dashboard - Today's jobs, active jobs, completion stats
+2. My Jobs - Job card management with tabs (assigned/in progress/completed), status updates
+3. Time Clock - Clock in/out interface (backend API pending)
+4. Parts Lookup - Real-time inventory search
+5. Job Documentation - Photo/video upload interface (backend API pending)
+6. Profile - Skills, certifications, experience display
+
+**Components**: TechnicianLayout with sidebar navigation, mobile-responsive bottom nav. **Security Note**: Prototype uses client-side filtering (documented in `TECHNICIAN_PORTAL_SECURITY.md`). Production requires technician-scoped backend routes similar to customer portal pattern.
+
 ## User Preferences
 - Modern React patterns with hooks
 - TypeScript throughout

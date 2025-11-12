@@ -26,6 +26,13 @@ import Suppliers from "@/pages/Suppliers";
 import InventoryManagement from "@/pages/InventoryManagement";
 import { TechnicianPortal } from "@/pages/TechnicianPortal";
 import TechnicianManagement from "@/pages/TechnicianManagement";
+import { TechnicianLayout } from "@/components/TechnicianLayout";
+import TechnicianDashboard from "@/pages/technician/Dashboard";
+import TechnicianMyJobs from "@/pages/technician/MyJobs";
+import TechnicianTimeClock from "@/pages/technician/TimeClock";
+import TechnicianPartsLookup from "@/pages/technician/PartsLookup";
+import TechnicianJobDocumentation from "@/pages/technician/JobDocumentation";
+import TechnicianProfile from "@/pages/technician/Profile";
 import Notifications from "@/pages/Notifications";
 import Landing from "@/pages/Landing";
 import Calendar from "@/pages/Calendar";
@@ -377,6 +384,36 @@ function Router() {
         </Layout>
       </Route>
       <Route path="/technician-portal">
+        <TechnicianLayout>
+          <TechnicianDashboard />
+        </TechnicianLayout>
+      </Route>
+      <Route path="/technician-portal/my-jobs">
+        <TechnicianLayout>
+          <TechnicianMyJobs />
+        </TechnicianLayout>
+      </Route>
+      <Route path="/technician-portal/time-clock">
+        <TechnicianLayout>
+          <TechnicianTimeClock />
+        </TechnicianLayout>
+      </Route>
+      <Route path="/technician-portal/parts">
+        <TechnicianLayout>
+          <TechnicianPartsLookup />
+        </TechnicianLayout>
+      </Route>
+      <Route path="/technician-portal/documentation">
+        <TechnicianLayout>
+          <TechnicianJobDocumentation />
+        </TechnicianLayout>
+      </Route>
+      <Route path="/technician-portal/profile">
+        <TechnicianLayout>
+          <TechnicianProfile />
+        </TechnicianLayout>
+      </Route>
+      <Route path="/technician-portal-old">
         <Layout>
           <TechnicianPortal />
         </Layout>
