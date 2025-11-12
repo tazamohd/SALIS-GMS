@@ -62,6 +62,7 @@ import PartsSupplyNetwork from "@/pages/PartsSupplyNetwork";
 import DiagnosticsOBDHub from "@/pages/DiagnosticsOBDHub";
 import OEMSoftwareSubscriptions from "@/pages/OEMSoftwareSubscriptions";
 import AIChatbot from "@/pages/AIChatbot";
+import AIChatbotAssistant from "@/pages/AIChatbotAssistant";
 import PredictiveMaintenance from "@/pages/PredictiveMaintenance";
 import PredictiveDiagnostics from "@/pages/PredictiveDiagnostics";
 import SmartPartsRecommendations from "@/pages/SmartPartsRecommendations";
@@ -517,6 +518,11 @@ function Router() {
       <Route path="/ai-chatbot">
         <Layout>
           <AIChatbot />
+        </Layout>
+      </Route>
+      <Route path="/ai-chatbot-assistant">
+        <Layout>
+          <AIChatbotAssistant />
         </Layout>
       </Route>
       <Route path="/predictive-maintenance">

@@ -15980,6 +15980,135 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ==================== AI-POWERED CHATBOT ====================
+  
+  // Create or get conversation
+  app.post('/api/chatbot/conversation', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.garageId;
+      const { customerId, sessionId } = req.body;
+      
+      // Create new conversation
+      const conversation = await storage.createAIChatConversation({
+        garageId: userGarageId,
+        customerId: customerId || req.user.id,
+        sessionId: sessionId || `session-${Date.now()}`,
+        messages: [],
+        status: 'active',
+      });
+      
+      res.json(conversation);
+    } catch (error: any) {
+      console.error("Error creating chatbot conversation:", error);
+      res.status(500).json({ message: "Failed to create conversation", error: error.message });
+    }
+  });
+
+  // Send message and get AI response
+  app.post('/api/chatbot/message', isAuthenticated, async (req: any, res) => {
+    try {
+      const { conversationId, message, vehicleInfo } = req.body;
+      
+      if (!message || !conversationId) {
+        return res.status(400).json({ message: "Message and conversationId required" });
+      }
+
+      // Get conversation
+      const conversation = await storage.getAIChatConversation(conversationId);
+      if (!conversation) {
+        return res.status(404).json({ message: "Conversation not found" });
+      }
+
+      // Import chatbot service
+      const { generateChatbotResponse } = await import('./services/aiChatbot');
+      
+      // Generate AI response
+      const aiResponse = await generateChatbotResponse({
+        garageId: conversation.garageId,
+        customerId: conversation.customerId,
+        vehicleInfo,
+        conversationHistory: conversation.messages || [],
+      }, message);
+
+      // Update conversation with new messages
+      const updatedMessages = [
+        ...(conversation.messages || []),
+        { role: "user", content: message },
+        { role: "assistant", content: aiResponse },
+      ];
+      
+      await storage.updateAIChatConversation(conversationId, {
+        messages: updatedMessages,
+      });
+
+      res.json({
+        userMessage: message,
+        aiResponse,
+        conversationId,
+      });
+    } catch (error: any) {
+      console.error("Error processing chatbot message:", error);
+      res.status(500).json({ message: "Failed to process message", error: error.message });
+    }
+  });
+
+  // Extract booking intent from message
+  app.post('/api/chatbot/booking-intent', isAuthenticated, async (req: any, res) => {
+    try {
+      const { message } = req.body;
+      
+      if (!message) {
+        return res.status(400).json({ message: "Message required" });
+      }
+
+      const { extractBookingIntent } = await import('./services/aiChatbot');
+      const intent = await extractBookingIntent(message);
+      
+      res.json(intent);
+    } catch (error: any) {
+      console.error("Error extracting booking intent:", error);
+      res.status(500).json({ message: "Failed to extract intent", error: error.message });
+    }
+  });
+
+  // Diagnose vehicle problem
+  app.post('/api/chatbot/diagnose', isAuthenticated, async (req: any, res) => {
+    try {
+      const { symptoms, vehicleInfo } = req.body;
+      
+      if (!symptoms) {
+        return res.status(400).json({ message: "Symptoms required" });
+      }
+
+      const { diagnoseProblem } = await import('./services/aiChatbot');
+      const diagnosis = await diagnoseProblem(symptoms, vehicleInfo);
+      
+      res.json(diagnosis);
+    } catch (error: any) {
+      console.error("Error diagnosing problem:", error);
+      res.status(500).json({ message: "Failed to diagnose problem", error: error.message });
+    }
+  });
+
+  // Get conversations
+  app.get('/api/chatbot/conversations', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.garageId;
+      const { customerId, status } = req.query;
+      
+      const conversations = await storage.getAIChatConversations(
+        userGarageId,
+        customerId as string,
+        status as string
+      );
+      
+      res.json(conversations);
+    } catch (error: any) {
+      console.error("Error fetching conversations:", error);
+      res.status(500).json({ message: "Failed to fetch conversations" });
+    }
+  });
+
   const httpServer = createServer(app);
   
   // Initialize WebSocket server for chat

@@ -19,6 +19,14 @@ This project is a world-class automotive ERP platform (SALIS AUTO) designed to m
 
 **Latest Update (November 12, 2025) - AI-Powered Predictive Diagnostics**: Built comprehensive predictive diagnostics system at `/predictive-diagnostics` using GPT-5 via Replit AI Integrations. The feature analyzes detailed vehicle parameters (mileage, engine temperature, oil pressure, brake wear, battery voltage, tire condition, check engine light status, unusual noises) to predict potential failures and maintenance needs. **Backend**: `server/services/predictiveDiagnostics.ts` service generates AI predictions with severity levels (low/medium/high/critical), risk assessments, recommended actions, and confidence scores. **API**: POST `/api/ai/predictive-diagnostics` endpoint integrates OpenAI GPT-5, saves predictions to `aiMaintenancePredictions` table with JSONB metadata. **Frontend**: Comprehensive input form with 13+ vehicle parameters, real-time AI prediction display with severity badges, recent predictions history, and React Query integration for cache management. **Technology**: Uses OpenAI GPT-5 model with JSON mode for structured predictions, no API key required (billed to Replit credits).
 
+**Latest Update (November 12, 2025) - AI Chatbot Assistant + Blockchain + Smart Contracts**: Built three cutting-edge features:
+
+1. **AI-Powered Chatbot** (`/ai-chatbot-assistant`) - GPT-5-powered conversational assistant for customer queries, service bookings, and vehicle diagnostics. **Backend**: `server/services/aiChatbot.ts` service handles natural language understanding, booking intent extraction, and problem diagnosis. **API**: POST `/api/chatbot/message`, `/api/chatbot/booking-intent`, `/api/chatbot/diagnose` endpoints for real-time AI conversations. **Frontend**: Chat UI with message history, quick actions, and context-aware responses. **Database**: Uses `aiChatConversations` and `aiChatMessages` tables for persistent chat history.
+
+2. **Blockchain Service History** - Immutable ledger system using cryptographic hashing (SHA-256) for tamper-proof vehicle service records. **Backend**: `server/services/blockchain.ts` implements hash chain validation, genesis blocks, and blockchain proof certificates. **Database**: `blockchainRecords` table stores linked service history with previous hash references. **Features**: Chain verification, immutable records, and transparent service history.
+
+3. **Smart Contracts** - Automated service agreements with digital signatures and payment triggers. **Backend**: `server/services/smartContracts.ts` implements contract execution engine, signature validation, and automated payment processing. **Database**: `smartContracts` and `contractEvents` tables track agreements and execution history. **Features**: Digital signing, automatic payment triggers (on_start/on_completion/on_approval), and contract integrity verification.
+
 ## User Preferences
 - Modern React patterns with hooks
 - TypeScript throughout
