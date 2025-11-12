@@ -38,7 +38,7 @@ export default function ServiceReminders() {
   });
 
   const { data: reminders, isLoading } = useQuery({
-    queryKey: ["/api/service-reminders", user?.id],
+    queryKey: ["/api/customers", user?.id, "service-reminders"],
     enabled: !!user?.id,
   });
 
@@ -55,23 +55,19 @@ export default function ServiceReminders() {
 
   const createMutation = useMutation({
     mutationFn: async (data: ReminderFormValues) => {
-      return fetch("/api/service-reminders", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          customerId: user?.id,
-          vehicleId: data.vehicleId,
-          reminderType: data.reminderType,
-          dueDate: new Date(data.dueDate).toISOString(),
-          mileageDue: data.mileageDue ? parseInt(data.mileageDue) : null,
-          description: data.description,
-          isCompleted: false,
-          notificationSent: false,
-        }),
-      }).then(res => res.json());
+      const { apiRequest } = await import("@/lib/queryClient");
+      return apiRequest("POST", `/api/customers/${user?.id}/service-reminders`, {
+        vehicleId: data.vehicleId,
+        reminderType: data.reminderType,
+        dueDate: new Date(data.dueDate).toISOString(),
+        mileageDue: data.mileageDue ? parseInt(data.mileageDue) : null,
+        description: data.description,
+        isCompleted: false,
+        notificationSent: false,
+      });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/service-reminders"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/customers", user?.id, "service-reminders"] });
       setDialogOpen(false);
       form.reset();
       toast({

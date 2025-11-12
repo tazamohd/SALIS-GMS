@@ -597,6 +597,7 @@ export const serviceReminders = pgTable("service_reminders", {
   id: uuid("id")
     .primaryKey()
     .default(sql`gen_random_uuid()`),
+  customerId: varchar("customer_id").references(() => users.id), // Customer-scoped for client portal
   vehicleId: uuid("vehicle_id")
     .notNull()
     .references(() => vehicles.id, { onDelete: "cascade" }),

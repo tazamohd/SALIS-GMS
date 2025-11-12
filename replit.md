@@ -5,6 +5,8 @@ This project is a world-class automotive ERP platform (SALIS AUTO) designed to m
 
 **Latest Enhancement (Phase 13 - November 2025)**: Complete implementation of 9 missing planned modules including Payroll Management, Expense Tracking, Towing Services, Vehicle Storage, Telematics Integration, Knowledge Base, Training LMS, Google My Business Integration, and Enhanced Compliance Management.
 
+**Latest Update (November 12, 2025) - Client Portal Advanced Features**: Added 5 comprehensive features to the customer-facing client portal including Service History with filtering, canvas-based E-Signature component, Service Reminders with custom notifications, Live Tracking with real-time updates, and Review & Chat system for customer-garage communication. Includes new database tables (`serviceSignatures`, `serviceChatMessages`, `serviceReviews`) and customer-scoped API routes. Security documentation created in `CLIENT_PORTAL_SECURITY.md` for production deployment requirements.
+
 ## User Preferences
 - Modern React patterns with hooks
 - TypeScript throughout

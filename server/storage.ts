@@ -2307,6 +2307,51 @@ export class DatabaseStorage implements IStorage {
     await db.delete(customerNotes).where(eq(customerNotes.id, id));
   }
 
+  // Client Portal - Service Features
+  async getCustomerServiceReminders(customerId: string): Promise<ServiceReminder[]> {
+    return await db.select().from(serviceReminders)
+      .where(eq(serviceReminders.customerId, customerId))
+      .orderBy(desc(serviceReminders.createdAt));
+  }
+
+  async createServiceReminder(data: InsertServiceReminder): Promise<ServiceReminder> {
+    const [reminder] = await db.insert(serviceReminders).values(data).returning();
+    return reminder;
+  }
+
+  async getServiceChatMessages(jobCardId: string): Promise<ServiceChatMessage[]> {
+    return await db.select().from(serviceChatMessages)
+      .where(eq(serviceChatMessages.jobCardId, jobCardId))
+      .orderBy(serviceChatMessages.createdAt);
+  }
+
+  async createServiceChatMessage(data: InsertServiceChatMessage): Promise<ServiceChatMessage> {
+    const [message] = await db.insert(serviceChatMessages).values(data).returning();
+    return message;
+  }
+
+  async getCustomerServiceReviews(customerId: string): Promise<ServiceReview[]> {
+    return await db.select().from(serviceReviews)
+      .where(eq(serviceReviews.customerId, customerId))
+      .orderBy(desc(serviceReviews.createdAt));
+  }
+
+  async createServiceReview(data: InsertServiceReview): Promise<ServiceReview> {
+    const [review] = await db.insert(serviceReviews).values(data).returning();
+    return review;
+  }
+
+  async getCustomerServiceSignatures(customerId: string): Promise<ServiceSignature[]> {
+    return await db.select().from(serviceSignatures)
+      .where(eq(serviceSignatures.customerId, customerId))
+      .orderBy(desc(serviceSignatures.createdAt));
+  }
+
+  async createServiceSignature(data: InsertServiceSignature): Promise<ServiceSignature> {
+    const [signature] = await db.insert(serviceSignatures).values(data).returning();
+    return signature;
+  }
+
   // Purchase Orders & Supplier Integration - Module 11
   async getSuppliers(garageId?: string): Promise<Supplier[]> {
     if (garageId) {

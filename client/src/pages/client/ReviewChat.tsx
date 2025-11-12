@@ -32,7 +32,7 @@ export default function ReviewChat() {
   });
 
   const { data: chatMessages } = useQuery({
-    queryKey: ["/api/service-chat", selectedJob],
+    queryKey: ["/api/job-cards", selectedJob, "chat"],
     enabled: !!selectedJob,
     refetchInterval: 5000, // Refresh every 5 seconds
   });
@@ -57,35 +57,27 @@ export default function ReviewChat() {
 
   const sendMessageMutation = useMutation({
     mutationFn: async (data: { jobCardId: string; message: string }) => {
-      return fetch("/api/service-chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          jobCardId: data.jobCardId,
-          senderId: user?.id,
-          senderType: "customer",
-          message: data.message,
-        }),
-      }).then(res => res.json());
+      const { apiRequest } = await import("@/lib/queryClient");
+      return apiRequest("POST", `/api/job-cards/${data.jobCardId}/chat`, {
+        senderId: user?.id,
+        senderType: "customer",
+        message: data.message,
+      });
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/service-chat"] });
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/job-cards", variables.jobCardId, "chat"] });
       setMessage("");
     },
   });
 
   const submitReviewMutation = useMutation({
     mutationFn: async (data: { jobCardId: string; rating: number; comment: string }) => {
-      return fetch("/api/service-reviews", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          jobCardId: data.jobCardId,
-          customerId: user?.id,
-          rating: data.rating,
-          comment: data.comment,
-        }),
-      }).then(res => res.json());
+      const { apiRequest } = await import("@/lib/queryClient");
+      return apiRequest("POST", `/api/customers/${user?.id}/reviews`, {
+        jobCardId: data.jobCardId,
+        rating: data.rating,
+        comment: data.comment,
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/job-cards"] });
