@@ -5641,14 +5641,18 @@ export const iotSensorReadings = pgTable("iot_sensor_readings", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
   sensorId: uuid("sensor_id").references(() => iotSensors.id).notNull(),
   readingType: varchar("reading_type", { length: 50 }).notNull(), // dtc, rpm, speed, temp, pressure
-  value: decimal("value", { precision: 10, scale: 2 }).notNull(),
+  value: decimal("value", { precision: 12, scale: 4 }).notNull(), // Increased precision for accurate sensor data
   unit: varchar("unit", { length: 20 }), // rpm, celsius, psi, volts
-  threshold: decimal("threshold", { precision: 10, scale: 2 }), // Alert threshold
+  threshold: decimal("threshold", { precision: 12, scale: 4 }), // Alert threshold with increased precision
   isAbnormal: boolean("is_abnormal").default(false),
   rawData: jsonb("raw_data"),
   timestamp: timestamp("timestamp").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
-});
+}, (table) => [
+  // Performance indexes for time-series queries
+  index("idx_iot_readings_sensor_timestamp").on(table.sensorId, table.timestamp),
+  index("idx_iot_readings_timestamp").on(table.timestamp),
+]);
 
 export const iotAlerts = pgTable("iot_alerts", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -5657,14 +5661,20 @@ export const iotAlerts = pgTable("iot_alerts", {
   alertType: varchar("alert_type", { length: 50 }).notNull(), // critical, warning, info
   severity: varchar("severity", { length: 20 }).default("medium"), // low, medium, high, critical
   message: text("message").notNull(),
-  triggerValue: decimal("trigger_value", { precision: 10, scale: 2 }),
+  triggerValue: decimal("trigger_value", { precision: 12, scale: 4 }), // Increased precision
   recommendedAction: text("recommended_action"),
   status: varchar("status", { length: 20 }).default("active"), // active, acknowledged, resolved
   acknowledgedBy: varchar("acknowledged_by").references(() => users.id),
   acknowledgedAt: timestamp("acknowledged_at"),
   resolvedAt: timestamp("resolved_at"),
+  jobCardId: uuid("job_card_id").references(() => jobCards.id), // Link to auto-created job cards
   createdAt: timestamp("created_at").defaultNow(),
-});
+}, (table) => [
+  // Performance indexes for alert queries
+  index("idx_iot_alerts_sensor_status").on(table.sensorId, table.status),
+  index("idx_iot_alerts_vehicle").on(table.vehicleId),
+  index("idx_iot_alerts_status").on(table.status),
+]);
 
 // 4. 3D PARTS VISUALIZATION
 export const parts3DModels = pgTable("parts_3d_models", {
