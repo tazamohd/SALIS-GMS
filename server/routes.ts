@@ -7912,6 +7912,364 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Chat Support Enhancements - Support Tickets
+  app.get('/api/support/tickets', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.garageId;
+      const { status, priority, assignedTo, category } = req.query;
+      
+      const tickets = await storage.getSupportTickets(userGarageId, {
+        status: status as string,
+        priority: priority as string,
+        assignedTo: assignedTo as string,
+        category: category as string,
+      });
+      
+      res.json(tickets);
+    } catch (error) {
+      console.error("Error fetching support tickets:", error);
+      res.status(500).json({ message: "Failed to fetch support tickets" });
+    }
+  });
+
+  app.get('/api/support/tickets/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const ticket = await storage.getSupportTicket(id);
+      
+      if (!ticket) {
+        return res.status(404).json({ message: "Ticket not found" });
+      }
+      
+      res.json(ticket);
+    } catch (error) {
+      console.error("Error fetching ticket:", error);
+      res.status(500).json({ message: "Failed to fetch ticket" });
+    }
+  });
+
+  app.post('/api/support/tickets', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.garageId;
+      const userId = req.user.id;
+      const { 
+        conversationId, 
+        category, 
+        priority, 
+        subject,
+        createConversation,
+        participantIds
+      } = req.body;
+      
+      // Validate required fields
+      if (!subject || !category) {
+        return res.status(400).json({ message: "Subject and category are required" });
+      }
+      
+      // Validate conversation source - must provide either existing conversationId or createConversation flag
+      if (!conversationId && !createConversation) {
+        return res.status(400).json({ 
+          message: "Either conversationId or createConversation must be provided" 
+        });
+      }
+      
+      // Validate category and priority values
+      const validCategories = ['technical', 'billing', 'general', 'feature_request'];
+      const validPriorities = ['low', 'medium', 'high', 'urgent'];
+      
+      if (!validCategories.includes(category)) {
+        return res.status(400).json({ 
+          message: `Invalid category. Must be one of: ${validCategories.join(', ')}` 
+        });
+      }
+      
+      if (priority && !validPriorities.includes(priority)) {
+        return res.status(400).json({ 
+          message: `Invalid priority. Must be one of: ${validPriorities.join(', ')}` 
+        });
+      }
+      
+      let finalConversationId = conversationId;
+      
+      // Create new conversation if needed
+      if (createConversation && !conversationId) {
+        const conversation = await storage.createChatConversation({
+          garageId: userGarageId,
+          title: subject,
+          type: 'support',
+          createdBy: userId,
+        });
+        
+        // Add creator as participant
+        await storage.addChatParticipant({
+          conversationId: conversation.id,
+          userId,
+          role: 'member',
+        });
+        
+        // Add other participants (support agents)
+        if (participantIds && Array.isArray(participantIds)) {
+          for (const participantId of participantIds) {
+            if (participantId !== userId) {
+              await storage.addChatParticipant({
+                conversationId: conversation.id,
+                userId: participantId,
+                role: 'admin',
+              });
+            }
+          }
+        }
+        
+        finalConversationId = conversation.id;
+      }
+      
+      // Create support ticket
+      const ticket = await storage.createSupportTicket({
+        garageId: userGarageId,
+        conversationId: finalConversationId!,
+        category,
+        priority: priority || 'medium',
+        subject,
+        status: 'open',
+        createdBy: userId,
+      });
+      
+      res.json(ticket);
+    } catch (error) {
+      console.error("Error creating support ticket:", error);
+      res.status(500).json({ message: "Failed to create support ticket" });
+    }
+  });
+
+  app.patch('/api/support/tickets/:id/status', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const userId = req.user.id;
+      const { status, notes } = req.body;
+      
+      // Validate status value
+      const validStatuses = ['open', 'in_progress', 'waiting_customer', 'resolved', 'closed'];
+      if (!status || !validStatuses.includes(status)) {
+        return res.status(400).json({ 
+          message: `Invalid status. Must be one of: ${validStatuses.join(', ')}` 
+        });
+      }
+      
+      const ticket = await storage.updateTicketStatus(id, status, userId, notes);
+      
+      // Broadcast status change via WebSocket
+      const wsServer = getChatWebSocketServer();
+      if (wsServer && ticket.conversationId) {
+        const participants = await storage.getChatParticipants(ticket.conversationId);
+        const participantIds = participants.map(p => p.userId);
+        wsServer.broadcastNewMessage(ticket.conversationId, {
+          type: 'ticket_status_changed',
+          ticketId: id,
+          status,
+          updatedBy: userId,
+        } as any, participantIds);
+      }
+      
+      res.json(ticket);
+    } catch (error) {
+      console.error("Error updating ticket status:", error);
+      res.status(500).json({ message: "Failed to update ticket status" });
+    }
+  });
+
+  app.post('/api/support/tickets/:id/assign', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const userId = req.user.id;
+      const { assignTo } = req.body;
+      
+      const ticket = await storage.assignTicket(id, assignTo, userId);
+      
+      // Broadcast assignment via WebSocket
+      const wsServer = getChatWebSocketServer();
+      if (wsServer && ticket.conversationId) {
+        const participants = await storage.getChatParticipants(ticket.conversationId);
+        const participantIds = participants.map(p => p.userId);
+        wsServer.broadcastNewMessage(ticket.conversationId, {
+          type: 'ticket_assigned',
+          ticketId: id,
+          assignedTo: assignTo,
+          assignedBy: userId,
+        } as any, participantIds);
+      }
+      
+      res.json(ticket);
+    } catch (error) {
+      console.error("Error assigning ticket:", error);
+      res.status(500).json({ message: "Failed to assign ticket" });
+    }
+  });
+
+  app.get('/api/support/tickets/:id/events', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const events = await storage.getSupportTicketEvents(id);
+      res.json(events);
+    } catch (error) {
+      console.error("Error fetching ticket events:", error);
+      res.status(500).json({ message: "Failed to fetch ticket events" });
+    }
+  });
+
+  // Chat Attachments
+  app.post('/api/chat/messages/:id/attachments', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const userId = req.user.id;
+      const { fileName, fileUrl, fileSize, fileType, thumbnailUrl } = req.body;
+      
+      // Validate required fields
+      if (!fileName || !fileUrl || !fileSize || !fileType) {
+        return res.status(400).json({ message: "Missing required fields: fileName, fileUrl, fileSize, fileType" });
+      }
+      
+      // Validate file size (max 50MB)
+      const maxFileSize = 50 * 1024 * 1024; // 50MB in bytes
+      if (fileSize > maxFileSize) {
+        return res.status(400).json({ message: "File size exceeds maximum limit of 50MB" });
+      }
+      
+      // Validate file type
+      const allowedTypes = [
+        'image/jpeg', 'image/png', 'image/gif', 'image/webp',
+        'application/pdf', 
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'text/plain', 'text/csv',
+        'video/mp4', 'video/quicktime',
+        'application/zip'
+      ];
+      
+      if (!allowedTypes.includes(fileType)) {
+        return res.status(400).json({ 
+          message: "File type not allowed. Supported types: images, PDF, documents, videos, and ZIP files" 
+        });
+      }
+      
+      const attachment = await storage.createChatAttachment({
+        messageId: id,
+        fileName,
+        fileUrl,
+        fileSize,
+        fileType,
+        thumbnailUrl,
+        uploadedBy: userId,
+      });
+      
+      res.json(attachment);
+    } catch (error) {
+      console.error("Error creating attachment:", error);
+      res.status(500).json({ message: "Failed to create attachment" });
+    }
+  });
+
+  app.get('/api/chat/messages/:id/attachments', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const attachments = await storage.getChatAttachments(id);
+      res.json(attachments);
+    } catch (error) {
+      console.error("Error fetching attachments:", error);
+      res.status(500).json({ message: "Failed to fetch attachments" });
+    }
+  });
+
+  app.delete('/api/chat/attachments/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteChatAttachment(id);
+      res.json({ message: "Attachment deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting attachment:", error);
+      res.status(500).json({ message: "Failed to delete attachment" });
+    }
+  });
+
+  // Chat Reactions
+  app.post('/api/chat/messages/:id/reactions', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const userId = req.user.id;
+      const { reaction } = req.body;
+      
+      if (!reaction) {
+        return res.status(400).json({ message: "Reaction is required" });
+      }
+      
+      const reactionObj = await storage.addMessageReaction({
+        messageId: id,
+        userId,
+        reaction,
+      });
+      
+      // Broadcast reaction via WebSocket
+      const message = await storage.getChatMessage(id);
+      if (message) {
+        const wsServer = getChatWebSocketServer();
+        if (wsServer) {
+          const participants = await storage.getChatParticipants(message.conversationId);
+          const participantIds = participants.map(p => p.userId);
+          wsServer.broadcastNewMessage(message.conversationId, {
+            type: 'message_reaction_added',
+            messageId: id,
+            userId,
+            reaction,
+          } as any, participantIds);
+        }
+      }
+      
+      res.json(reactionObj);
+    } catch (error) {
+      console.error("Error adding reaction:", error);
+      res.status(500).json({ message: "Failed to add reaction" });
+    }
+  });
+
+  app.delete('/api/chat/messages/:id/reactions', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const userId = req.user.id;
+      
+      await storage.removeMessageReaction(id, userId);
+      
+      // Broadcast reaction removal via WebSocket
+      const message = await storage.getChatMessage(id);
+      if (message) {
+        const wsServer = getChatWebSocketServer();
+        if (wsServer) {
+          const participants = await storage.getChatParticipants(message.conversationId);
+          const participantIds = participants.map(p => p.userId);
+          wsServer.broadcastNewMessage(message.conversationId, {
+            type: 'message_reaction_removed',
+            messageId: id,
+            userId,
+          } as any, participantIds);
+        }
+      }
+      
+      res.json({ message: "Reaction removed successfully" });
+    } catch (error) {
+      console.error("Error removing reaction:", error);
+      res.status(500).json({ message: "Failed to remove reaction" });
+    }
+  });
+
+  app.get('/api/chat/messages/:id/reactions', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const reactions = await storage.getMessageReactions(id);
+      res.json(reactions);
+    } catch (error) {
+      console.error("Error fetching reactions:", error);
+      res.status(500).json({ message: "Failed to fetch reactions" });
+    }
+  });
+
   // Module 37: Customer Self-Service Portal API Routes
   app.post('/api/customer-portal/login', async (req, res) => {
     try {
