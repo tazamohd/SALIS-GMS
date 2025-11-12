@@ -3321,6 +3321,49 @@ export const supplierPerformance = pgTable("supplier_performance", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+export const supplierPartsAvailability = pgTable(
+  "supplier_parts_availability",
+  {
+    id: uuid("id")
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    garageId: uuid("garage_id")
+      .references(() => garages.id)
+      .notNull(),
+    sparePartId: uuid("spare_part_id").references(() => spareParts.id),
+    supplierId: uuid("supplier_id")
+      .references(() => suppliers.id)
+      .notNull(),
+    
+    quantityAvailable: integer("quantity_available").default(0),
+    leadTimeDays: integer("lead_time_days"),
+    pricePerUnit: decimal("price_per_unit", { precision: 10, scale: 2 }),
+    currency: varchar("currency", { length: 3 }).default("SAR"),
+    
+    externalPartNumber: varchar("external_part_number", { length: 255 }),
+    externalSku: varchar("external_sku", { length: 255 }),
+    supplierSource: varchar("supplier_source", { length: 50 }), // "tecdoc", "manual", "api"
+    
+    lastSyncedAt: timestamp("last_synced_at").defaultNow(),
+    status: varchar("status", { length: 20 }).default("active"), // active, discontinued, backordered
+    notes: text("notes"),
+    
+    createdAt: timestamp("created_at").defaultNow(),
+    updatedAt: timestamp("updated_at").defaultNow(),
+  },
+  (table) => ({
+    garagePartSupplierIdx: index("spa_garage_part_supplier_idx").on(
+      table.garageId,
+      table.sparePartId,
+      table.supplierId,
+    ),
+    supplierSyncIdx: index("spa_supplier_sync_idx").on(
+      table.supplierId,
+      table.lastSyncedAt,
+    ),
+  }),
+);
+
 // Module 44: Customer Loyalty Program
 export const loyaltyProgram = pgTable("loyalty_program", {
   id: uuid("id")
@@ -3861,6 +3904,14 @@ export const insertSupplierPriceListSchema = createInsertSchema(supplierPriceLis
 export type SupplierPerformance = typeof supplierPerformance.$inferSelect;
 export type InsertSupplierPerformance = typeof supplierPerformance.$inferInsert;
 export const insertSupplierPerformanceSchema = createInsertSchema(supplierPerformance).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type SupplierPartsAvailability = typeof supplierPartsAvailability.$inferSelect;
+export type InsertSupplierPartsAvailability = typeof supplierPartsAvailability.$inferInsert;
+export const insertSupplierPartsAvailabilitySchema = createInsertSchema(supplierPartsAvailability).omit({
   id: true,
   createdAt: true,
   updatedAt: true,

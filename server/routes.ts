@@ -2164,6 +2164,158 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Supplier Parts Availability - Feature #5
+  app.get('/api/supplier-availability/search', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.garageId;
+      if (!userGarageId) {
+        return res.status(400).json({ message: "User garage ID is required" });
+      }
+
+      const { spare_part_id, supplier_id, part_name } = req.query;
+      
+      const filters = {
+        sparePartId: spare_part_id as string | undefined,
+        supplierId: supplier_id as string | undefined,
+        partName: part_name as string | undefined,
+      };
+
+      const availability = await storage.getSupplierPartsAvailability(userGarageId, filters);
+      res.json(availability);
+    } catch (error) {
+      console.error("Error searching supplier availability:", error);
+      res.status(500).json({ message: "Failed to search supplier availability" });
+    }
+  });
+
+  app.post('/api/supplier-availability/sync', isAuthenticated, async (req: any, res) => {
+    try {
+      const { insertSupplierPartsAvailabilitySchema } = await import("@shared/schema");
+      const userGarageId = req.user.garageId;
+      
+      if (!userGarageId) {
+        return res.status(400).json({ message: "User garage ID is required" });
+      }
+
+      const { availabilityData } = req.body;
+      
+      if (!Array.isArray(availabilityData)) {
+        return res.status(400).json({ message: "availabilityData must be an array" });
+      }
+
+      const validatedData = availabilityData.map(item => {
+        const result = insertSupplierPartsAvailabilitySchema.safeParse({
+          ...item,
+          garageId: userGarageId,
+        });
+        
+        if (!result.success) {
+          throw new Error(`Validation error: ${result.error.message}`);
+        }
+        
+        return result.data;
+      });
+
+      const synced = await storage.syncSupplierAvailability(userGarageId, validatedData);
+      res.status(201).json({ 
+        message: `Successfully synced ${synced.length} availability records`,
+        data: synced 
+      });
+    } catch (error) {
+      console.error("Error syncing supplier availability:", error);
+      res.status(500).json({ message: error instanceof Error ? error.message : "Failed to sync supplier availability" });
+    }
+  });
+
+  app.get('/api/supplier-availability/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const userGarageId = req.user.garageId;
+      
+      if (!userGarageId) {
+        return res.status(400).json({ message: "User garage ID is required" });
+      }
+      
+      const availability = await storage.getSupplierPartAvailability(id, userGarageId);
+      if (!availability) {
+        return res.status(404).json({ message: "Availability record not found" });
+      }
+      res.json(availability);
+    } catch (error) {
+      console.error("Error fetching availability:", error);
+      res.status(500).json({ message: "Failed to fetch availability" });
+    }
+  });
+
+  app.post('/api/supplier-availability', isAuthenticated, async (req: any, res) => {
+    try {
+      const { insertSupplierPartsAvailabilitySchema } = await import("@shared/schema");
+      const userGarageId = req.user.garageId;
+      
+      const validationResult = insertSupplierPartsAvailabilitySchema.safeParse({
+        ...req.body,
+        garageId: userGarageId,
+      });
+      
+      if (!validationResult.success) {
+        return res.status(400).json(sanitizeZodError(validationResult.error));
+      }
+
+      const availability = await storage.createSupplierPartAvailability(validationResult.data);
+      res.status(201).json(availability);
+    } catch (error) {
+      console.error("Error creating availability:", error);
+      res.status(500).json({ message: "Failed to create availability" });
+    }
+  });
+
+  app.patch('/api/supplier-availability/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { insertSupplierPartsAvailabilitySchema } = await import("@shared/schema");
+      const { id } = req.params;
+      const userGarageId = req.user.garageId;
+      
+      if (!userGarageId) {
+        return res.status(400).json({ message: "User garage ID is required" });
+      }
+      
+      const validationResult = insertSupplierPartsAvailabilitySchema.partial().safeParse(req.body);
+      
+      if (!validationResult.success) {
+        return res.status(400).json(sanitizeZodError(validationResult.error));
+      }
+
+      const availability = await storage.updateSupplierPartAvailability(id, userGarageId, validationResult.data);
+      if (!availability) {
+        return res.status(404).json({ message: "Availability record not found" });
+      }
+      res.json(availability);
+    } catch (error) {
+      console.error("Error updating availability:", error);
+      res.status(500).json({ message: "Failed to update availability" });
+    }
+  });
+
+  app.delete('/api/supplier-availability/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const userGarageId = req.user.garageId;
+      
+      if (!userGarageId) {
+        return res.status(400).json({ message: "User garage ID is required" });
+      }
+      
+      const deleted = await storage.deleteSupplierPartAvailability(id, userGarageId);
+      if (!deleted) {
+        return res.status(404).json({ message: "Availability record not found" });
+      }
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting availability:", error);
+      res.status(500).json({ message: "Failed to delete availability" });
+    }
+  });
+
   app.get('/api/purchase-orders', isAuthenticated, async (req, res) => {
     try {
       const { garage_id, status } = req.query;

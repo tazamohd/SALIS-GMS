@@ -24,6 +24,7 @@ import Tools from "@/pages/Tools";
 import SpareParts from "@/pages/SpareParts";
 import Suppliers from "@/pages/Suppliers";
 import InventoryManagement from "@/pages/InventoryManagement";
+import { PartsAvailability } from "@/pages/PartsAvailability";
 import { TechnicianPortal } from "@/pages/TechnicianPortal";
 import TechnicianManagement from "@/pages/TechnicianManagement";
 import { TechnicianLayout } from "@/components/TechnicianLayout";
@@ -388,6 +389,11 @@ function Router() {
       <Route path="/inventory-management">
         <Layout>
           <InventoryManagement />
+        </Layout>
+      </Route>
+      <Route path="/parts-availability">
+        <Layout>
+          <PartsAvailability />
         </Layout>
       </Route>
       <Route path="/suppliers">

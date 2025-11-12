@@ -29,6 +29,7 @@ import {
   suppliers,
   supplierPriceList,
   supplierPerformance,
+  supplierPartsAvailability,
   purchaseOrders,
   purchaseOrderItems,
   invoices,
@@ -77,6 +78,8 @@ import {
   type InsertSupplierPriceList,
   type SupplierPerformance,
   type InsertSupplierPerformance,
+  type SupplierPartsAvailability,
+  type InsertSupplierPartsAvailability,
   type PurchaseOrder,
   type InsertPurchaseOrder,
   type PurchaseOrderItem,
@@ -748,6 +751,14 @@ export interface IStorage {
   createSupplierPerformance(data: InsertSupplierPerformance): Promise<SupplierPerformance>;
   updateSupplierPerformance(id: string, data: Partial<SupplierPerformance>): Promise<SupplierPerformance>;
   deleteSupplierPerformance(id: string): Promise<void>;
+  
+  // Supplier Parts Availability - Feature #5
+  getSupplierPartsAvailability(garageId: string, filters?: {sparePartId?: string, supplierId?: string, partName?: string}): Promise<SupplierPartsAvailability[]>;
+  getSupplierPartAvailability(id: string, garageId: string): Promise<SupplierPartsAvailability | undefined>;
+  createSupplierPartAvailability(data: InsertSupplierPartsAvailability): Promise<SupplierPartsAvailability>;
+  updateSupplierPartAvailability(id: string, garageId: string, data: Partial<SupplierPartsAvailability>): Promise<SupplierPartsAvailability | null>;
+  deleteSupplierPartAvailability(id: string, garageId: string): Promise<boolean>;
+  syncSupplierAvailability(garageId: string, availabilityData: InsertSupplierPartsAvailability[]): Promise<SupplierPartsAvailability[]>;
   
   getPurchaseOrders(garageId?: string, status?: string): Promise<PurchaseOrder[]>;
   getPurchaseOrder(id: string): Promise<PurchaseOrder | undefined>;
@@ -2640,6 +2651,99 @@ export class DatabaseStorage implements IStorage {
   async deleteSupplierPerformance(id: string): Promise<void> {
     await db.delete(supplierPerformance)
       .where(eq(supplierPerformance.id, id));
+  }
+
+  // Supplier Parts Availability - Feature #5
+  async getSupplierPartsAvailability(
+    garageId: string, 
+    filters?: {sparePartId?: string, supplierId?: string, partName?: string}
+  ): Promise<SupplierPartsAvailability[]> {
+    const conditions = [eq(supplierPartsAvailability.garageId, garageId)];
+    
+    if (filters?.sparePartId) {
+      conditions.push(eq(supplierPartsAvailability.sparePartId, filters.sparePartId));
+    }
+    
+    if (filters?.supplierId) {
+      conditions.push(eq(supplierPartsAvailability.supplierId, filters.supplierId));
+    }
+    
+    if (filters?.partName) {
+      conditions.push(or(
+        ilike(supplierPartsAvailability.externalPartNumber, `%${filters.partName}%`),
+        ilike(supplierPartsAvailability.externalSku, `%${filters.partName}%`)
+      ));
+    }
+    
+    return await db.select().from(supplierPartsAvailability)
+      .where(and(...conditions))
+      .orderBy(desc(supplierPartsAvailability.lastSyncedAt));
+  }
+
+  async getSupplierPartAvailability(id: string, garageId: string): Promise<SupplierPartsAvailability | undefined> {
+    const [availability] = await db.select().from(supplierPartsAvailability)
+      .where(and(
+        eq(supplierPartsAvailability.id, id),
+        eq(supplierPartsAvailability.garageId, garageId)
+      ));
+    return availability;
+  }
+
+  async createSupplierPartAvailability(data: InsertSupplierPartsAvailability): Promise<SupplierPartsAvailability> {
+    const [availability] = await db.insert(supplierPartsAvailability)
+      .values(data)
+      .returning();
+    return availability;
+  }
+
+  async updateSupplierPartAvailability(id: string, garageId: string, data: Partial<SupplierPartsAvailability>): Promise<SupplierPartsAvailability | null> {
+    const [availability] = await db.update(supplierPartsAvailability)
+      .set({ ...data, updatedAt: new Date() })
+      .where(and(
+        eq(supplierPartsAvailability.id, id),
+        eq(supplierPartsAvailability.garageId, garageId)
+      ))
+      .returning();
+    return availability || null;
+  }
+
+  async deleteSupplierPartAvailability(id: string, garageId: string): Promise<boolean> {
+    const result = await db.delete(supplierPartsAvailability)
+      .where(and(
+        eq(supplierPartsAvailability.id, id),
+        eq(supplierPartsAvailability.garageId, garageId)
+      ))
+      .returning();
+    return result.length > 0;
+  }
+
+  async syncSupplierAvailability(garageId: string, availabilityData: InsertSupplierPartsAvailability[]): Promise<SupplierPartsAvailability[]> {
+    const results: SupplierPartsAvailability[] = [];
+    
+    for (const data of availabilityData) {
+      const existing = await db.select().from(supplierPartsAvailability)
+        .where(and(
+          eq(supplierPartsAvailability.garageId, data.garageId),
+          eq(supplierPartsAvailability.supplierId, data.supplierId),
+          data.sparePartId ? eq(supplierPartsAvailability.sparePartId, data.sparePartId) : isNull(supplierPartsAvailability.sparePartId),
+          data.externalSku ? eq(supplierPartsAvailability.externalSku, data.externalSku) : sql`true`
+        ));
+      
+      if (existing.length > 0) {
+        const [updated] = await db.update(supplierPartsAvailability)
+          .set({ ...data, lastSyncedAt: new Date(), updatedAt: new Date() })
+          .where(eq(supplierPartsAvailability.id, existing[0].id))
+          .returning();
+        results.push(updated);
+      } else {
+        const [created] = await db.insert(supplierPartsAvailability)
+          .values({ ...data, lastSyncedAt: new Date() })
+          .returning();
+        results.push(created);
+      }
+    }
+    
+    return results;
   }
 
   async getPurchaseOrders(garageId?: string, status?: string): Promise<PurchaseOrder[]> {
