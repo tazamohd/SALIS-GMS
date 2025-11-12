@@ -5500,6 +5500,87 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Enhanced predictive diagnostics endpoint with detailed vehicle parameters
+  app.post('/api/ai/predictive-diagnostics', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.garageId;
+      const {
+        vehicleId,
+        mileage,
+        engineTemperature,
+        oilPressure,
+        brakePadWear,
+        batteryVoltage,
+        tireCondition,
+        lastServiceDate,
+        vehicleMake,
+        vehicleModel,
+        vehicleYear,
+        fuelLevel,
+        checkEngineLightOn,
+        unusualNoises,
+        additionalSymptoms,
+      } = req.body;
+
+      // Import the predictive diagnostics service
+      const { generatePredictiveDiagnostic } = await import('./services/predictiveDiagnostics');
+
+      const aiResult = await generatePredictiveDiagnostic({
+        vehicleId,
+        mileage,
+        engineTemperature,
+        oilPressure,
+        brakePadWear,
+        batteryVoltage,
+        tireCondition,
+        lastServiceDate,
+        vehicleMake,
+        vehicleModel,
+        vehicleYear,
+        fuelLevel,
+        checkEngineLightOn,
+        unusualNoises,
+        additionalSymptoms,
+      });
+
+      // Save prediction to database
+      const predictionData = {
+        garageId: userGarageId,
+        vehicleId,
+        predictedIssue: aiResult.predictedIssue,
+        severity: aiResult.severity,
+        recommendedAction: aiResult.recommendedAction,
+        estimatedTimeframe: aiResult.estimatedTimeframe,
+        confidence: aiResult.confidence,
+        basedOnData: {
+          mileage,
+          engineTemperature,
+          oilPressure,
+          brakePadWear,
+          batteryVoltage,
+          tireCondition,
+          vehicleInfo: `${vehicleYear} ${vehicleMake} ${vehicleModel}`,
+          checkEngineLightOn,
+          unusualNoises,
+          additionalSymptoms,
+          riskLevel: aiResult.riskLevel,
+        },
+        status: 'pending'
+      };
+
+      const prediction = await storage.createAIMaintenancePrediction(predictionData);
+      
+      res.json({
+        ...prediction,
+        riskLevel: aiResult.riskLevel,
+        additionalDetails: aiResult.additionalDetails,
+      });
+    } catch (error: any) {
+      console.error("Error creating predictive diagnostic:", error);
+      res.status(500).json({ message: "Failed to create predictive diagnostic", error: error.message });
+    }
+  });
+
   app.get('/api/ai/maintenance-predictions', isAuthenticated, async (req: any, res) => {
     try {
       const userGarageId = req.user.garageId;
