@@ -1,41 +1,45 @@
-import { useState, useEffect } from 'react';
 import { useRoute } from 'wouter';
+import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Clock, CheckCircle2, Calendar, Car, AlertCircle, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
 
+interface TrackingData {
+  jobCard: {
+    jobNumber: string;
+    status: string;
+    vehicleInfo: any;
+    description: string;
+    scheduledDate?: string;
+    startedAt?: string;
+    estimatedCompletionAt?: string;
+    completedAt?: string;
+  };
+  events: Array<{
+    id: string;
+    eventType: string;
+    title: string;
+    description?: string;
+    createdAt: string;
+  }>;
+}
+
 export default function PublicTracking() {
   const [, params] = useRoute('/track/:token');
-  const [data, setData] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (params?.token) {
-      fetchTrackingData(params.token);
-    }
-  }, [params?.token]);
-
-  const fetchTrackingData = async (token: string) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const response = await fetch(`/api/public/track/${token}`);
-      
+  const { data, isLoading: loading, error } = useQuery<TrackingData>({
+    queryKey: ['/api/public/track', params?.token],
+    enabled: !!params?.token,
+    queryFn: async () => {
+      const response = await fetch(`/api/public/track/${params?.token}`);
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || 'Failed to load tracking data');
       }
-      
-      const result = await response.json();
-      setData(result);
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+      return response.json();
+    },
+  });
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -90,7 +94,9 @@ export default function PublicTracking() {
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
                 Unable to Load Tracking
               </h2>
-              <p className="text-gray-600 dark:text-gray-400 mb-4">{error}</p>
+              <p className="text-gray-600 dark:text-gray-400 mb-4">
+                {error instanceof Error ? error.message : 'Failed to load tracking information'}
+              </p>
               <p className="text-sm text-gray-500 dark:text-gray-500">
                 This tracking link may have expired or is invalid. Please contact the service center for assistance.
               </p>

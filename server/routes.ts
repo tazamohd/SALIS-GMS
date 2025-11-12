@@ -116,7 +116,8 @@ import {
   insertServiceReviewSchema,
   insertIoTSensorSchema,
   insertIoTSensorReadingSchema,
-  insertIoTAlertSchema
+  insertIoTAlertSchema,
+  insertJobTrackingEventSchema
 } from "@shared/schema";
 import Stripe from "stripe";
 import { createPaypalOrder, capturePaypalOrder, loadPaypalDefault } from "./paypal";
@@ -932,6 +933,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/job-cards/:id/tracking/events', isAuthenticated, async (req: any, res) => {
     try {
       const { id } = req.params;
+      
+      // Validate request body
+      const validationResult = insertJobTrackingEventSchema.safeParse({
+        ...req.body,
+        jobCardId: id,
+        createdBy: req.user.id,
+      });
+      
+      if (!validationResult.success) {
+        return res.status(400).json(sanitizeZodError(validationResult.error));
+      }
+      
       const jobCard = await storage.getJobCard(id);
       
       if (!jobCard) {
@@ -946,13 +959,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Access denied" });
       }
       
-      const eventData = {
-        ...req.body,
-        jobCardId: id,
-        createdBy: req.user.id,
-      };
-      
-      const event = await storage.createJobTrackingEvent(eventData);
+      const event = await storage.createJobTrackingEvent(validationResult.data);
       res.status(201).json(event);
     } catch (error) {
       console.error("Error creating tracking event:", error);
@@ -994,11 +1001,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch('/api/job-cards/:id/eta', isAuthenticated, async (req: any, res) => {
     try {
       const { id } = req.params;
-      const { estimatedCompletionAt, manualOverride } = req.body;
       
-      if (!estimatedCompletionAt) {
-        return res.status(400).json({ message: "estimatedCompletionAt is required" });
+      // Validate request body
+      const etaUpdateSchema = z.object({
+        estimatedCompletionAt: z.string().datetime(),
+        manualOverride: z.boolean().optional(),
+      });
+      
+      const validationResult = etaUpdateSchema.safeParse(req.body);
+      
+      if (!validationResult.success) {
+        return res.status(400).json(sanitizeZodError(validationResult.error));
       }
+      
+      const { estimatedCompletionAt, manualOverride } = validationResult.data;
       
       const jobCard = await storage.getJobCard(id);
       if (!jobCard) {
