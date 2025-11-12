@@ -850,6 +850,197 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Dynamic Service Tracking routes - Feature #3
+  // Generate public tracking token for a job card
+  app.post('/api/job-cards/:id/tracking/generate', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      
+      // Verify job card exists and user has access
+      const jobCard = await storage.getJobCard(id);
+      if (!jobCard) {
+        return res.status(404).json({ message: "Job card not found" });
+      }
+      
+      // Verify garage ownership
+      const userGarages = await storage.getUserRoles(req.user.id);
+      const hasAccess = userGarages.some((ur: any) => ur.garage?.id === jobCard.garageId);
+      
+      if (!hasAccess && req.user.userType !== 'admin') {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      const { rawToken, hashedToken, expiresAt } = await storage.generatePublicTrackingToken(id);
+      
+      // Create tracking event
+      await storage.createJobTrackingEvent({
+        jobCardId: id,
+        eventType: 'message',
+        title: 'Tracking Link Generated',
+        description: 'Customer tracking link has been generated and can be shared',
+        isVisibleToCustomer: false,
+        createdBy: req.user.id,
+      });
+      
+      res.json({ 
+        trackingToken: rawToken,
+        trackingUrl: `/track/${rawToken}`,
+        expiresAt 
+      });
+    } catch (error) {
+      console.error("Error generating tracking token:", error);
+      res.status(500).json({ message: "Failed to generate tracking token" });
+    }
+  });
+
+  // Public route - Get job status by tracking token (no auth required)
+  app.get('/api/public/track/:token', async (req, res) => {
+    try {
+      const { token } = req.params;
+      
+      // Hash the token to compare with stored hash
+      const hashedToken = require('crypto').createHash('sha256').update(token).digest('hex');
+      
+      const jobCard = await storage.getJobByTrackingToken(hashedToken);
+      if (!jobCard) {
+        return res.status(404).json({ message: "Invalid or expired tracking link" });
+      }
+      
+      // Get customer-visible tracking events
+      const events = await storage.getJobTrackingEvents(jobCard.id, true);
+      
+      res.json({
+        jobCard: {
+          jobNumber: jobCard.jobNumber,
+          status: jobCard.status,
+          vehicleInfo: jobCard.vehicleInfo,
+          description: jobCard.description,
+          scheduledDate: jobCard.scheduledDate,
+          startedAt: jobCard.startedAt,
+          estimatedCompletionAt: jobCard.estimatedCompletionAt,
+          completedAt: jobCard.completedAt,
+        },
+        events,
+      });
+    } catch (error) {
+      console.error("Error fetching tracking data:", error);
+      res.status(500).json({ message: "Failed to fetch tracking data" });
+    }
+  });
+
+  // Create job tracking event
+  app.post('/api/job-cards/:id/tracking/events', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const jobCard = await storage.getJobCard(id);
+      
+      if (!jobCard) {
+        return res.status(404).json({ message: "Job card not found" });
+      }
+      
+      // Verify garage ownership
+      const userGarages = await storage.getUserRoles(req.user.id);
+      const hasAccess = userGarages.some((ur: any) => ur.garage?.id === jobCard.garageId);
+      
+      if (!hasAccess && req.user.userType !== 'admin') {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      const eventData = {
+        ...req.body,
+        jobCardId: id,
+        createdBy: req.user.id,
+      };
+      
+      const event = await storage.createJobTrackingEvent(eventData);
+      res.status(201).json(event);
+    } catch (error) {
+      console.error("Error creating tracking event:", error);
+      res.status(500).json({ message: "Failed to create tracking event" });
+    }
+  });
+
+  // Get job tracking events
+  app.get('/api/job-cards/:id/tracking/events', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const { visibleToCustomer } = req.query;
+      
+      const jobCard = await storage.getJobCard(id);
+      if (!jobCard) {
+        return res.status(404).json({ message: "Job card not found" });
+      }
+      
+      // Verify garage ownership
+      const userGarages = await storage.getUserRoles(req.user.id);
+      const hasAccess = userGarages.some((ur: any) => ur.garage?.id === jobCard.garageId);
+      
+      if (!hasAccess && req.user.userType !== 'admin') {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      const events = await storage.getJobTrackingEvents(
+        id, 
+        visibleToCustomer === 'true' ? true : visibleToCustomer === 'false' ? false : undefined
+      );
+      res.json(events);
+    } catch (error) {
+      console.error("Error fetching tracking events:", error);
+      res.status(500).json({ message: "Failed to fetch tracking events" });
+    }
+  });
+
+  // Update job ETA
+  app.patch('/api/job-cards/:id/eta', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const { estimatedCompletionAt, manualOverride } = req.body;
+      
+      if (!estimatedCompletionAt) {
+        return res.status(400).json({ message: "estimatedCompletionAt is required" });
+      }
+      
+      const jobCard = await storage.getJobCard(id);
+      if (!jobCard) {
+        return res.status(404).json({ message: "Job card not found" });
+      }
+      
+      // Verify garage ownership
+      const userGarages = await storage.getUserRoles(req.user.id);
+      const hasAccess = userGarages.some((ur: any) => ur.garage?.id === jobCard.garageId);
+      
+      if (!hasAccess && req.user.userType !== 'admin') {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      const updatedJobCard = await storage.updateJobETA(
+        id,
+        new Date(estimatedCompletionAt),
+        manualOverride || false
+      );
+      
+      // Create tracking event for ETA update
+      await storage.createJobTrackingEvent({
+        jobCardId: id,
+        eventType: 'eta_update',
+        title: 'Estimated Completion Updated',
+        description: `New estimated completion: ${new Date(estimatedCompletionAt).toLocaleString()}`,
+        metadata: { 
+          previousETA: jobCard.estimatedCompletionAt,
+          newETA: estimatedCompletionAt,
+          manualOverride 
+        },
+        isVisibleToCustomer: true,
+        createdBy: req.user.id,
+      });
+      
+      res.json(updatedJobCard);
+    } catch (error) {
+      console.error("Error updating job ETA:", error);
+      res.status(500).json({ message: "Failed to update job ETA" });
+    }
+  });
+
   // Technician Portal routes - Server-side scoped access
   // Authorization middleware for technician-scoped routes
   const authorizeTechnician = (req: any, res: any, next: any) => {

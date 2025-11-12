@@ -8,6 +8,7 @@ import {
   customerProfiles,
   assistantProfiles,
   jobCards,
+  jobTrackingEvents,
   taskAssignments,
   serviceTemplates,
   tools,
@@ -39,6 +40,8 @@ import {
   type Branch,
   type Role,
   type JobCard,
+  type JobTrackingEvent,
+  type InsertJobTrackingEvent,
   type TaskAssignment,
   type ServiceTemplate,
   type InsertServiceTemplate,
@@ -604,6 +607,7 @@ import {
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, or, inArray, and, gte, lte, ilike, sql, isNull, gt } from "drizzle-orm";
+import { createHash, randomUUID } from "crypto";
 
 // Interface for storage operations
 export interface IStorage {
@@ -640,6 +644,13 @@ export interface IStorage {
   getJobCard(id: string): Promise<JobCard | undefined>;
   createJobCard(data: any): Promise<JobCard>;
   updateJobCard(id: string, data: any): Promise<JobCard>;
+  
+  // Dynamic Service Tracking - Feature #3
+  generatePublicTrackingToken(jobCardId: string): Promise<{ rawToken: string, hashedToken: string, expiresAt: Date }>;
+  getJobByTrackingToken(hashedToken: string): Promise<JobCard | undefined>;
+  createJobTrackingEvent(data: InsertJobTrackingEvent): Promise<JobTrackingEvent>;
+  getJobTrackingEvents(jobCardId: string, visibleToCustomer?: boolean): Promise<JobTrackingEvent[]>;
+  updateJobETA(jobCardId: string, estimatedCompletionAt: Date, manualOverride?: boolean): Promise<JobCard>;
   
   // Technician-scoped operations
   getTechnicianJobCards(technicianId: string): Promise<JobCard[]>;
@@ -1924,6 +1935,65 @@ export class DatabaseStorage implements IStorage {
 
   async updateJobCard(id: string, data: any): Promise<JobCard> {
     const [jobCard] = await db.update(jobCards).set(data).where(eq(jobCards.id, id)).returning();
+    return jobCard;
+  }
+
+  // Dynamic Service Tracking - Feature #3
+  async generatePublicTrackingToken(jobCardId: string): Promise<{ rawToken: string, hashedToken: string, expiresAt: Date }> {
+    const rawToken = randomUUID();
+    const hashedToken = createHash('sha256').update(rawToken).digest('hex');
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + 7); // 7-day expiration
+
+    await db.update(jobCards)
+      .set({ 
+        publicTrackingToken: hashedToken,
+        publicTrackingTokenExpiresAt: expiresAt 
+      })
+      .where(eq(jobCards.id, jobCardId));
+
+    return { rawToken, hashedToken, expiresAt };
+  }
+
+  async getJobByTrackingToken(hashedToken: string): Promise<JobCard | undefined> {
+    const [jobCard] = await db.select()
+      .from(jobCards)
+      .where(
+        and(
+          eq(jobCards.publicTrackingToken, hashedToken),
+          gt(jobCards.publicTrackingTokenExpiresAt, new Date())
+        )
+      );
+    return jobCard;
+  }
+
+  async createJobTrackingEvent(data: InsertJobTrackingEvent): Promise<JobTrackingEvent> {
+    const [event] = await db.insert(jobTrackingEvents).values(data).returning();
+    return event;
+  }
+
+  async getJobTrackingEvents(jobCardId: string, visibleToCustomer?: boolean): Promise<JobTrackingEvent[]> {
+    const conditions = [eq(jobTrackingEvents.jobCardId, jobCardId)];
+    
+    if (visibleToCustomer !== undefined) {
+      conditions.push(eq(jobTrackingEvents.isVisibleToCustomer, visibleToCustomer));
+    }
+
+    return await db.select()
+      .from(jobTrackingEvents)
+      .where(and(...conditions))
+      .orderBy(desc(jobTrackingEvents.createdAt));
+  }
+
+  async updateJobETA(jobCardId: string, estimatedCompletionAt: Date, manualOverride: boolean = false): Promise<JobCard> {
+    const [jobCard] = await db.update(jobCards)
+      .set({
+        estimatedCompletionAt,
+        etaLastCalculatedAt: new Date(),
+        etaManualOverride: manualOverride,
+      })
+      .where(eq(jobCards.id, jobCardId))
+      .returning();
     return jobCard;
   }
 

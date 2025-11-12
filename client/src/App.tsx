@@ -35,6 +35,7 @@ import TechnicianJobDocumentation from "@/pages/technician/JobDocumentation";
 import TechnicianProfile from "@/pages/technician/Profile";
 import Notifications from "@/pages/Notifications";
 import Landing from "@/pages/Landing";
+import PublicTracking from "@/pages/PublicTracking";
 import Calendar from "@/pages/Calendar";
 import FinancialSettings from "@/pages/FinancialSettings";
 import RefundManagement from "@/pages/RefundManagement";
@@ -189,6 +190,7 @@ function Router() {
         <Route path="/login" component={Login} />
         <Route path="/register" component={Register} />
         <Route path="/customer-portal" component={CustomerPortal} />
+        <Route path="/track/:token" component={PublicTracking} />
         <Route component={Landing} />
       </Switch>
     );

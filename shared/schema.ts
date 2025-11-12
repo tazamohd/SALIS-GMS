@@ -311,10 +311,17 @@ export const jobCards = pgTable("job_cards", {
   scheduledDate: timestamp("scheduled_date"),
   startedAt: timestamp("started_at"),
   completedAt: timestamp("completed_at"),
+  estimatedCompletionAt: timestamp("estimated_completion_at"),
+  etaLastCalculatedAt: timestamp("eta_last_calculated_at"),
+  etaManualOverride: boolean("eta_manual_override").default(false),
+  publicTrackingToken: varchar("public_tracking_token", { length: 64 }).unique(), // SHA-256 hash of UUID
+  publicTrackingTokenExpiresAt: timestamp("public_tracking_token_expires_at"),
   notes: text("notes"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
-});
+}, (table) => ({
+  publicTrackingTokenIdx: index("job_cards_public_tracking_token_idx").on(table.publicTrackingToken),
+}));
 
 // Task Assignment Schema
 export const taskAssignments = pgTable("task_assignments", {
@@ -363,6 +370,27 @@ export const taskProgressLogs = pgTable("task_progress_logs", {
   notes: text("notes"),
   createdAt: timestamp("created_at").defaultNow(),
 });
+
+// Job Tracking Events - Customer-facing status updates
+export const jobTrackingEvents = pgTable("job_tracking_events", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  jobCardId: uuid("job_card_id")
+    .notNull()
+    .references(() => jobCards.id, { onDelete: "cascade" }),
+  taskId: uuid("task_id").references(() => taskAssignments.id, { onDelete: "set null" }), // Optional task link
+  eventType: varchar("event_type").notNull(), // "status_change", "eta_update", "message", "completed_task"
+  title: varchar("title").notNull(),
+  description: text("description"),
+  metadata: jsonb("metadata"), // Additional structured data (e.g., old/new status, task details)
+  isVisibleToCustomer: boolean("is_visible_to_customer").default(true),
+  createdBy: varchar("created_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => ({
+  jobCardIdCreatedAtIdx: index("job_tracking_events_job_card_created_idx").on(table.jobCardId, table.createdAt),
+  visibleEventsIdx: index("job_tracking_events_visible_idx").on(table.jobCardId).where(sql`${table.isVisibleToCustomer} = true`),
+}));
 
 // Service Templates - for common service types
 export const serviceTemplates = pgTable("service_templates", {
@@ -1019,6 +1047,12 @@ export type TaskAssignment = typeof taskAssignments.$inferSelect;
 export type InsertTaskAssignment = typeof taskAssignments.$inferInsert;
 export type TaskProgressLog = typeof taskProgressLogs.$inferSelect;
 export type InsertTaskProgressLog = typeof taskProgressLogs.$inferInsert;
+export type JobTrackingEvent = typeof jobTrackingEvents.$inferSelect;
+export type InsertJobTrackingEvent = typeof jobTrackingEvents.$inferInsert;
+export const insertJobTrackingEventSchema = createInsertSchema(jobTrackingEvents).omit({
+  id: true,
+  createdAt: true,
+});
 export type ServiceTemplate = typeof serviceTemplates.$inferSelect;
 export type InsertServiceTemplate = typeof serviceTemplates.$inferInsert;
 export const insertServiceTemplateSchema = createInsertSchema(
