@@ -31,7 +31,7 @@ export async function getAIAssignmentRecommendations(
   storage: IStorage,
   garageId: string,
   jobCardId: string
-): Promise<TechnicianRecommendation[]> {
+): Promise<any[]> {
   const startTime = Date.now();
 
   const context = await buildAssignmentContext(storage, garageId, jobCardId);
@@ -41,9 +41,18 @@ export async function getAIAssignmentRecommendations(
 
   const recommendations = await callOpenAIForRecommendations(context);
 
-  await persistRecommendations(storage, garageId, jobCardId, recommendations, Date.now() - startTime);
+  const persisted = await persistRecommendations(storage, garageId, jobCardId, recommendations, context.availableTechnicians, Date.now() - startTime);
 
-  return recommendations.slice(0, 3); // Return top 3
+  return persisted.slice(0, 3).map(p => ({
+    id: p.id,
+    technicianId: p.recommendedTechnicianId,
+    technicianName: (p.technicianContext as any)?.technicianName || 'Unknown',
+    confidence: parseFloat(p.confidenceScore),
+    rationale: (p.reasoning as any)?.rationale || '',
+    matchedSkills: (p.reasoning as any)?.matchedSkills || [],
+    estimatedWorkload: (p.reasoning as any)?.estimatedWorkload || 'medium',
+    availability: (p.reasoning as any)?.availability || 'unknown'
+  }));
 }
 
 async function buildAssignmentContext(
@@ -138,36 +147,51 @@ async function persistRecommendations(
   garageId: string,
   jobCardId: string,
   recommendations: TechnicianRecommendation[],
+  availableTechnicians: Array<{ technician: User & { profile: TechnicianProfile }; activeJobCount: number }>,
   processingTimeMs: number
-): Promise<void> {
+): Promise<any[]> {
   const jobCardContext = await storage.getJobCardWithContext(jobCardId, garageId);
-  if (!jobCardContext) return;
+  if (!jobCardContext) return [];
 
-  const aiRecommendations = recommendations.map(rec => ({
-    jobCardId,
-    garageId,
-    recommendedTechnicianId: rec.technicianId,
-    confidenceScore: rec.confidence.toString(),
-    reasoning: {
-      rationale: rec.rationale,
-      matchedSkills: rec.matchedSkills,
-      estimatedWorkload: rec.estimatedWorkload,
-      availability: rec.availability
-    },
-    jobContext: {
-      serviceType: jobCardContext.jobCard.serviceType,
-      description: jobCardContext.jobCard.description,
-      priority: jobCardContext.jobCard.priority,
-      estimatedHours: jobCardContext.jobCard.estimatedHours
-    },
-    technicianContext: {
-      technicianId: rec.technicianId,
-      technicianName: rec.technicianName
-    },
-    modelUsed: "gpt-5",
-    wasAccepted: false,
-    processingTimeMs
-  }));
+  const technicianMap = new Map(
+    availableTechnicians.map(t => [t.technician.id, t])
+  );
 
-  await storage.saveAIRecommendations(aiRecommendations);
+  const aiRecommendations = recommendations.map(rec => {
+    const techData = technicianMap.get(rec.technicianId);
+    const technicianName = techData?.technician.fullName || rec.technicianName || 'Unknown';
+    const technicianEmail = techData?.technician.email || '';
+    const technicianLevel = techData?.technician.profile.level || '';
+    
+    return {
+      jobCardId,
+      garageId,
+      recommendedTechnicianId: rec.technicianId,
+      confidenceScore: rec.confidence.toString(),
+      reasoning: {
+        rationale: rec.rationale,
+        matchedSkills: rec.matchedSkills,
+        estimatedWorkload: rec.estimatedWorkload,
+        availability: rec.availability
+      },
+      jobContext: {
+        serviceType: jobCardContext.jobCard.serviceType,
+        description: jobCardContext.jobCard.description,
+        priority: jobCardContext.jobCard.priority,
+        estimatedHours: jobCardContext.jobCard.estimatedHours
+      },
+      technicianContext: {
+        technicianId: rec.technicianId,
+        technicianName,
+        technicianEmail,
+        technicianLevel,
+        activeJobCount: techData?.activeJobCount || 0
+      },
+      modelUsed: "gpt-5",
+      wasAccepted: false,
+      processingTimeMs
+    };
+  });
+
+  return await storage.saveAIRecommendations(aiRecommendations);
 }

@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Brain, User, TrendingUp, Clock, Award, CheckCircle } from "lucide-react";
 
 interface Recommendation {
+  id?: string;
   technicianId: string;
   technicianName: string;
   confidence: number;
@@ -20,15 +21,28 @@ interface Recommendation {
 
 export function SmartAssignment() {
   const [selectedJobId, setSelectedJobId] = useState<string>("");
+  const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
   const { toast } = useToast();
 
   const { data: jobs, isLoading: jobsLoading } = useQuery({
     queryKey: ["/api/job-cards"],
   });
 
-  const { data: recommendationsData, isLoading: recommendationsLoading, refetch: refetchRecommendations } = useQuery({
-    queryKey: ["/api/assignments/recommend", selectedJobId],
-    enabled: !!selectedJobId,
+  const recommendationsMutation = useMutation({
+    mutationFn: async (jobId: string) => {
+      return await apiRequest("POST", `/api/assignments/recommend/${jobId}`, {});
+    },
+    onSuccess: (data) => {
+      setRecommendations(data.recommendations || []);
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to get AI recommendations",
+        variant: "destructive",
+      });
+      setRecommendations([]);
+    },
   });
 
   const assignMutation = useMutation({
@@ -41,7 +55,8 @@ export function SmartAssignment() {
         description: "Technician assigned successfully",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/job-cards"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/assignments/recommend", selectedJobId] });
+      setRecommendations([]);
+      setSelectedJobId("");
     },
     onError: (error: Error) => {
       toast({
@@ -52,17 +67,16 @@ export function SmartAssignment() {
     },
   });
 
-  const recommendations: Recommendation[] = recommendationsData?.recommendations || [];
   const unassignedJobs = jobs?.filter((job: any) => !job.assignedTo && job.status === "pending") || [];
 
   const handleGetRecommendations = async (jobId: string) => {
     setSelectedJobId(jobId);
-    setTimeout(() => refetchRecommendations(), 100);
+    recommendationsMutation.mutate(jobId);
   };
 
-  const handleAssign = (technicianId: string) => {
+  const handleAssign = (technicianId: string, aiRecommendationId?: string) => {
     if (!selectedJobId) return;
-    assignMutation.mutate({ jobCardId: selectedJobId, technicianId });
+    assignMutation.mutate({ jobCardId: selectedJobId, technicianId, aiRecommendationId });
   };
 
   const getConfidenceBadge = (confidence: number) => {
@@ -145,7 +159,7 @@ export function SmartAssignment() {
               <p className="text-muted-foreground text-center py-8" data-testid="text-select-job">
                 Select a job to see AI recommendations
               </p>
-            ) : recommendationsLoading ? (
+            ) : recommendationsMutation.isPending ? (
               <div className="space-y-3">
                 {[1, 2, 3].map((i) => <Skeleton key={i} className="h-32 w-full" />)}
               </div>
@@ -198,7 +212,7 @@ export function SmartAssignment() {
                       </p>
 
                       <Button
-                        onClick={() => handleAssign(rec.technicianId)}
+                        onClick={() => handleAssign(rec.technicianId, rec.id)}
                         disabled={assignMutation.isPending}
                         className="w-full"
                         data-testid={`button-assign-${rec.technicianId}`}
