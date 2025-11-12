@@ -142,12 +142,23 @@ import {
   chatParticipants,
   chatMessages,
   chatMessageReactions,
+  supportTickets,
+  supportTicketEvents,
+  chatAttachments,
   type ChatConversation,
   type InsertChatConversation,
   type ChatParticipant,
   type InsertChatParticipant,
   type ChatMessage,
   type InsertChatMessage,
+  type SupportTicket,
+  type InsertSupportTicket,
+  type SupportTicketEvent,
+  type InsertSupportTicketEvent,
+  type ChatAttachment,
+  type InsertChatAttachment,
+  type ChatMessageReaction,
+  type InsertChatMessageReaction,
   type DiscountUsage,
   type InsertDiscountUsage,
   savedFilterPresets,
@@ -6103,6 +6114,192 @@ export class DatabaseStorage implements IStorage {
     }
     
     return totalUnread;
+  }
+
+  // Chat Support Enhancements - Support Tickets
+  async getSupportTickets(
+    garageId: string, 
+    filters?: {status?: string, priority?: string, assignedTo?: string, category?: string}
+  ): Promise<SupportTicket[]> {
+    const conditions = [eq(supportTickets.garageId, garageId)];
+    
+    if (filters?.status) {
+      conditions.push(eq(supportTickets.status, filters.status));
+    }
+    if (filters?.priority) {
+      conditions.push(eq(supportTickets.priority, filters.priority));
+    }
+    if (filters?.assignedTo) {
+      conditions.push(eq(supportTickets.assignedTo, filters.assignedTo));
+    }
+    if (filters?.category) {
+      conditions.push(eq(supportTickets.category, filters.category));
+    }
+    
+    return await db.select().from(supportTickets)
+      .where(and(...conditions))
+      .orderBy(desc(supportTickets.createdAt));
+  }
+
+  async getSupportTicket(id: string): Promise<SupportTicket | undefined> {
+    const [ticket] = await db.select().from(supportTickets).where(eq(supportTickets.id, id));
+    return ticket;
+  }
+
+  async getSupportTicketByConversation(conversationId: string): Promise<SupportTicket | undefined> {
+    const [ticket] = await db.select().from(supportTickets)
+      .where(eq(supportTickets.conversationId, conversationId));
+    return ticket;
+  }
+
+  async createSupportTicket(data: InsertSupportTicket): Promise<SupportTicket> {
+    const year = new Date().getFullYear();
+    const garageIdSuffix = data.garageId.substring(0, 4).toUpperCase();
+    
+    const [lastTicket] = await db.select().from(supportTickets)
+      .where(eq(supportTickets.garageId, data.garageId))
+      .orderBy(desc(supportTickets.createdAt))
+      .limit(1);
+    
+    let sequence = 1;
+    if (lastTicket?.ticketNumber) {
+      const match = lastTicket.ticketNumber.match(/\d+$/);
+      if (match) {
+        sequence = parseInt(match[0]) + 1;
+      }
+    }
+    
+    const ticketNumber = `TKT-${year}-${garageIdSuffix}-${sequence.toString().padStart(4, '0')}`;
+    
+    const [ticket] = await db.insert(supportTickets)
+      .values({ ...data, ticketNumber })
+      .returning();
+    
+    await this.createSupportTicketEvent({
+      ticketId: ticket.id,
+      userId: data.createdBy,
+      eventType: 'created',
+      newValue: ticket.status,
+      notes: 'Ticket created',
+    });
+    
+    return ticket;
+  }
+
+  async updateSupportTicket(id: string, data: Partial<SupportTicket>): Promise<SupportTicket> {
+    const [ticket] = await db.update(supportTickets)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(supportTickets.id, id))
+      .returning();
+    return ticket;
+  }
+
+  async createSupportTicketEvent(data: InsertSupportTicketEvent): Promise<SupportTicketEvent> {
+    const [event] = await db.insert(supportTicketEvents).values(data).returning();
+    return event;
+  }
+
+  async getSupportTicketEvents(ticketId: string): Promise<SupportTicketEvent[]> {
+    return await db.select().from(supportTicketEvents)
+      .where(eq(supportTicketEvents.ticketId, ticketId))
+      .orderBy(desc(supportTicketEvents.createdAt));
+  }
+
+  async assignTicket(ticketId: string, userId: string, assignedBy: string): Promise<SupportTicket> {
+    const ticket = await this.getSupportTicket(ticketId);
+    if (!ticket) {
+      throw new Error('Ticket not found');
+    }
+    
+    const [updated] = await db.update(supportTickets)
+      .set({ assignedTo: userId, updatedAt: new Date() })
+      .where(eq(supportTickets.id, ticketId))
+      .returning();
+    
+    await this.createSupportTicketEvent({
+      ticketId,
+      userId: assignedBy,
+      eventType: 'assigned',
+      previousValue: ticket.assignedTo || '',
+      newValue: userId,
+      notes: `Ticket assigned to user ${userId}`,
+    });
+    
+    return updated;
+  }
+
+  async updateTicketStatus(
+    ticketId: string, 
+    status: string, 
+    userId: string, 
+    notes?: string
+  ): Promise<SupportTicket> {
+    const ticket = await this.getSupportTicket(ticketId);
+    if (!ticket) {
+      throw new Error('Ticket not found');
+    }
+    
+    const updateData: any = { status, updatedAt: new Date() };
+    
+    if (status === 'resolved') {
+      updateData.resolvedAt = new Date();
+    } else if (status === 'closed') {
+      updateData.closedAt = new Date();
+    }
+    
+    const [updated] = await db.update(supportTickets)
+      .set(updateData)
+      .where(eq(supportTickets.id, ticketId))
+      .returning();
+    
+    await this.createSupportTicketEvent({
+      ticketId,
+      userId,
+      eventType: 'status_changed',
+      previousValue: ticket.status,
+      newValue: status,
+      notes: notes || `Status changed from ${ticket.status} to ${status}`,
+    });
+    
+    return updated;
+  }
+
+  // Chat Attachments
+  async createChatAttachment(data: InsertChatAttachment): Promise<ChatAttachment> {
+    const [attachment] = await db.insert(chatAttachments).values(data).returning();
+    return attachment;
+  }
+
+  async getChatAttachments(messageId: string): Promise<ChatAttachment[]> {
+    return await db.select().from(chatAttachments)
+      .where(eq(chatAttachments.messageId, messageId))
+      .orderBy(desc(chatAttachments.createdAt));
+  }
+
+  async deleteChatAttachment(id: string): Promise<void> {
+    await db.delete(chatAttachments).where(eq(chatAttachments.id, id));
+  }
+
+  // Chat Reactions
+  async addMessageReaction(data: InsertChatMessageReaction): Promise<ChatMessageReaction> {
+    const [reaction] = await db.insert(chatMessageReactions).values(data).returning();
+    return reaction;
+  }
+
+  async removeMessageReaction(messageId: string, userId: string): Promise<void> {
+    await db.delete(chatMessageReactions)
+      .where(
+        and(
+          eq(chatMessageReactions.messageId, messageId),
+          eq(chatMessageReactions.userId, userId)
+        )
+      );
+  }
+
+  async getMessageReactions(messageId: string): Promise<ChatMessageReaction[]> {
+    return await db.select().from(chatMessageReactions)
+      .where(eq(chatMessageReactions.messageId, messageId))
+      .orderBy(desc(chatMessageReactions.createdAt));
   }
 
   // Module 37: Customer Self-Service Portal
