@@ -63,6 +63,8 @@ import DiagnosticsOBDHub from "@/pages/DiagnosticsOBDHub";
 import OEMSoftwareSubscriptions from "@/pages/OEMSoftwareSubscriptions";
 import AIChatbot from "@/pages/AIChatbot";
 import AIChatbotAssistant from "@/pages/AIChatbotAssistant";
+import BlockchainServiceHistory from "@/pages/BlockchainServiceHistory";
+import SmartContracts from "@/pages/SmartContracts";
 import PredictiveMaintenance from "@/pages/PredictiveMaintenance";
 import PredictiveDiagnostics from "@/pages/PredictiveDiagnostics";
 import SmartPartsRecommendations from "@/pages/SmartPartsRecommendations";
@@ -523,6 +525,16 @@ function Router() {
       <Route path="/ai-chatbot-assistant">
         <Layout>
           <AIChatbotAssistant />
+        </Layout>
+      </Route>
+      <Route path="/blockchain-service-history">
+        <Layout>
+          <BlockchainServiceHistory />
+        </Layout>
+      </Route>
+      <Route path="/smart-contracts">
+        <Layout>
+          <SmartContracts />
         </Layout>
       </Route>
       <Route path="/predictive-maintenance">
