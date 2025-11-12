@@ -3057,6 +3057,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Test notification endpoint - Feature #4
+  app.post('/api/notifications/test', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const userGarageId = req.user.garageId;
+      
+      const testNotification: InsertNotification = {
+        type: 'in-app',
+        category: 'general',
+        status: 'delivered',
+        recipientId: userId,
+        garageId: userGarageId || undefined,
+        title: 'Test Notification',
+        message: `This is a test notification sent at ${new Date().toLocaleString()}`,
+        metadata: { test: true, timestamp: new Date().toISOString() },
+        sentAt: new Date(),
+      };
+
+      const notification = await storage.createNotification(testNotification);
+      res.status(201).json(notification);
+    } catch (error) {
+      console.error("Error creating test notification:", error);
+      res.status(500).json({ message: "Failed to create test notification" });
+    }
+  });
+
   // Email notification routes - Module 21
   app.post('/api/notifications/email/appointment-confirmation', isAuthenticated, async (req, res) => {
     try {

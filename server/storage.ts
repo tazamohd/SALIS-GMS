@@ -867,6 +867,13 @@ export interface IStorage {
   deleteNotification(id: string): Promise<void>;
   getUnreadCount(recipientId: string, garageId?: string): Promise<number>;
   
+  // Notification schedules - Automated notifications
+  getNotificationSchedules(garageId: string): Promise<NotificationSchedule[]>;
+  getNotificationSchedule(id: string): Promise<NotificationSchedule | undefined>;
+  createNotificationSchedule(data: InsertNotificationSchedule): Promise<NotificationSchedule>;
+  updateNotificationSchedule(id: string, data: Partial<NotificationSchedule>): Promise<NotificationSchedule>;
+  deleteNotificationSchedule(id: string): Promise<void>;
+  
   // Notification preferences - Module 24
   getNotificationPreferences(userId: string): Promise<any | undefined>;
   upsertNotificationPreferences(userId: string, eventMap: string): Promise<any>;
@@ -3643,6 +3650,49 @@ export class DatabaseStorage implements IStorage {
       .where(and(...conditions));
 
     return result.length;
+  }
+
+  // Notification Schedules - Automated notifications
+  async getNotificationSchedules(garageId: string): Promise<NotificationSchedule[]> {
+    const { notificationSchedules } = await import("@shared/schema");
+    return db
+      .select()
+      .from(notificationSchedules)
+      .where(eq(notificationSchedules.garageId, garageId))
+      .orderBy(notificationSchedules.triggerType);
+  }
+
+  async getNotificationSchedule(id: string): Promise<NotificationSchedule | undefined> {
+    const { notificationSchedules } = await import("@shared/schema");
+    const [schedule] = await db
+      .select()
+      .from(notificationSchedules)
+      .where(eq(notificationSchedules.id, id));
+    return schedule;
+  }
+
+  async createNotificationSchedule(data: InsertNotificationSchedule): Promise<NotificationSchedule> {
+    const { notificationSchedules } = await import("@shared/schema");
+    const [schedule] = await db
+      .insert(notificationSchedules)
+      .values(data)
+      .returning();
+    return schedule;
+  }
+
+  async updateNotificationSchedule(id: string, data: Partial<NotificationSchedule>): Promise<NotificationSchedule> {
+    const { notificationSchedules } = await import("@shared/schema");
+    const [schedule] = await db
+      .update(notificationSchedules)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(notificationSchedules.id, id))
+      .returning();
+    return schedule;
+  }
+
+  async deleteNotificationSchedule(id: string): Promise<void> {
+    const { notificationSchedules } = await import("@shared/schema");
+    await db.delete(notificationSchedules).where(eq(notificationSchedules.id, id));
   }
 
   // Notification Preferences - Module 24

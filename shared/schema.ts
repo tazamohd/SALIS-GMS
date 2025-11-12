@@ -1040,6 +1040,22 @@ export const notifications = pgTable("notifications", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Notification Schedules - For automated/scheduled notifications
+export const notificationSchedules = pgTable("notification_schedules", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id")
+    .notNull()
+    .references(() => garages.id),
+  triggerType: varchar("trigger_type").notNull(), // "appointment_24h_before", "appointment_1h_before", "job_completed", "invoice_created", etc.
+  channels: jsonb("channels").notNull(), // ["email", "sms", "in-app"] - which channels to use
+  isEnabled: boolean("is_enabled").default(true),
+  templateData: jsonb("template_data"), // Template customization per garage
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 export type JobCard = typeof jobCards.$inferSelect;
 export type InsertJobCard = typeof jobCards.$inferInsert;
 export const insertJobCardSchema = createInsertSchema(jobCards);
@@ -1220,6 +1236,13 @@ export type AssistantProfile = typeof assistantProfiles.$inferSelect;
 export type Notification = typeof notifications.$inferSelect;
 export type InsertNotification = typeof notifications.$inferInsert;
 export const insertNotificationSchema = createInsertSchema(notifications).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+export type NotificationSchedule = typeof notificationSchedules.$inferSelect;
+export type InsertNotificationSchedule = typeof notificationSchedules.$inferInsert;
+export const insertNotificationScheduleSchema = createInsertSchema(notificationSchedules).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
