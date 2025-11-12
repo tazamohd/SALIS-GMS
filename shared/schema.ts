@@ -8268,3 +8268,60 @@ export const insertComplianceAuditSchema = createInsertSchema(complianceAudits).
 export type ComplianceTask = typeof complianceTasks.$inferSelect;
 export type InsertComplianceTask = typeof complianceTasks.$inferInsert;
 export const insertComplianceTaskSchema = createInsertSchema(complianceTasks).omit({ id: true, createdAt: true, updatedAt: true });
+
+// Wave 2 Feature #6: Smart Job Assignment System
+export const assignmentRules = pgTable("assignment_rules", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").notNull().references(() => garages.id),
+  ruleName: varchar("rule_name", { length: 255 }).notNull(),
+  ruleType: varchar("rule_type", { length: 50 }).notNull(), // "skill_match", "workload_balance", "proximity", "priority_based", "custom"
+  priority: integer("priority").default(0), // Higher number = higher priority
+  isActive: boolean("is_active").default(true),
+  conditions: jsonb("conditions").notNull(), // Flexible JSON for rule conditions
+  createdBy: varchar("created_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const assignmentHistory = pgTable("assignment_history", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  jobCardId: uuid("job_card_id").notNull().references(() => jobCards.id),
+  garageId: uuid("garage_id").notNull().references(() => garages.id),
+  previousTechnicianId: varchar("previous_technician_id").references(() => users.id), // Null for initial assignment
+  newTechnicianId: varchar("new_technician_id").notNull().references(() => users.id),
+  assignmentMethod: varchar("assignment_method", { length: 50 }).notNull(), // "manual", "ai_auto", "ai_recommended", "rule_based"
+  assignedBy: varchar("assigned_by").notNull().references(() => users.id), // User who made the assignment
+  reason: text("reason"), // Reason for assignment or reassignment
+  aiRecommendationId: uuid("ai_recommendation_id").references(() => aiAssignmentRecommendations.id),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const aiAssignmentRecommendations = pgTable("ai_assignment_recommendations", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  jobCardId: uuid("job_card_id").notNull().references(() => jobCards.id),
+  garageId: uuid("garage_id").notNull().references(() => garages.id),
+  recommendedTechnicianId: varchar("recommended_technician_id").notNull().references(() => users.id),
+  confidenceScore: decimal("confidence_score", { precision: 5, scale: 2 }).notNull(), // 0-100
+  reasoning: jsonb("reasoning").notNull(), // AI explanation of recommendation
+  jobContext: jsonb("job_context").notNull(), // Job details used for recommendation
+  technicianContext: jsonb("technician_context").notNull(), // Technician profile used
+  modelUsed: varchar("model_used", { length: 100 }).notNull(), // "gpt-5", etc.
+  wasAccepted: boolean("was_accepted").default(false),
+  processingTimeMs: integer("processing_time_ms"), // For performance monitoring
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => ({
+  jobCardIdx: index("ai_recommendations_job_card_idx").on(table.jobCardId),
+  garageIdx: index("ai_recommendations_garage_idx").on(table.garageId),
+}));
+
+export type AssignmentRule = typeof assignmentRules.$inferSelect;
+export type InsertAssignmentRule = typeof assignmentRules.$inferInsert;
+export const insertAssignmentRuleSchema = createInsertSchema(assignmentRules).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type AssignmentHistory = typeof assignmentHistory.$inferSelect;
+export type InsertAssignmentHistory = typeof assignmentHistory.$inferInsert;
+export const insertAssignmentHistorySchema = createInsertSchema(assignmentHistory).omit({ id: true, createdAt: true });
+
+export type AiAssignmentRecommendation = typeof aiAssignmentRecommendations.$inferSelect;
+export type InsertAiAssignmentRecommendation = typeof aiAssignmentRecommendations.$inferInsert;
+export const insertAiAssignmentRecommendationSchema = createInsertSchema(aiAssignmentRecommendations).omit({ id: true, createdAt: true });
