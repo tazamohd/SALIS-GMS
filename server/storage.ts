@@ -32,6 +32,9 @@ import {
   supplierPartsAvailability,
   purchaseOrders,
   purchaseOrderItems,
+  assignmentRules,
+  assignmentHistory,
+  aiAssignmentRecommendations,
   invoices,
   invoiceItems,
   payments,
@@ -80,6 +83,12 @@ import {
   type InsertSupplierPerformance,
   type SupplierPartsAvailability,
   type InsertSupplierPartsAvailability,
+  type AssignmentRule,
+  type InsertAssignmentRule,
+  type AssignmentHistory,
+  type InsertAssignmentHistory,
+  type AiAssignmentRecommendation,
+  type InsertAiAssignmentRecommendation,
   type PurchaseOrder,
   type InsertPurchaseOrder,
   type PurchaseOrderItem,
@@ -759,6 +768,18 @@ export interface IStorage {
   updateSupplierPartAvailability(id: string, garageId: string, data: Partial<SupplierPartsAvailability>): Promise<SupplierPartsAvailability | null>;
   deleteSupplierPartAvailability(id: string, garageId: string): Promise<boolean>;
   syncSupplierAvailability(garageId: string, availabilityData: InsertSupplierPartsAvailability[]): Promise<SupplierPartsAvailability[]>;
+  
+  // Smart Job Assignment - Feature #6
+  listAssignmentRules(garageId: string, isActive?: boolean): Promise<AssignmentRule[]>;
+  upsertAssignmentRule(data: InsertAssignmentRule): Promise<AssignmentRule>;
+  deleteAssignmentRule(id: string, garageId: string): Promise<boolean>;
+  recordAssignmentEvent(data: InsertAssignmentHistory): Promise<AssignmentHistory>;
+  listAssignmentHistory(garageId: string, jobCardId?: string, limit?: number): Promise<AssignmentHistory[]>;
+  saveAIRecommendations(recommendations: InsertAiAssignmentRecommendation[]): Promise<AiAssignmentRecommendation[]>;
+  listAIRecommendations(jobCardId: string, garageId: string, limit?: number): Promise<AiAssignmentRecommendation[]>;
+  getJobCardWithContext(jobCardId: string, garageId: string): Promise<{jobCard: JobCard, technician: User | null} | null>;
+  getTechniciansWithLoad(garageId: string, skillFilters?: string[]): Promise<Array<{technician: User & {profile: TechnicianProfile}, activeJobCount: number}>>;
+  assignTechnicianToJob(params: {garageId: string, jobCardId: string, technicianId: string, assignedBy: string, reason?: string, aiRecommendationId?: string}): Promise<JobCard>;
   
   getPurchaseOrders(garageId?: string, status?: string): Promise<PurchaseOrder[]>;
   getPurchaseOrder(id: string): Promise<PurchaseOrder | undefined>;
@@ -2744,6 +2765,193 @@ export class DatabaseStorage implements IStorage {
     }
     
     return results;
+  }
+
+  // Smart Job Assignment - Feature #6
+  async listAssignmentRules(garageId: string, isActive?: boolean): Promise<AssignmentRule[]> {
+    const conditions = [eq(assignmentRules.garageId, garageId)];
+    if (isActive !== undefined) {
+      conditions.push(eq(assignmentRules.isActive, isActive));
+    }
+    return await db.select().from(assignmentRules)
+      .where(and(...conditions))
+      .orderBy(desc(assignmentRules.priority));
+  }
+
+  async upsertAssignmentRule(data: InsertAssignmentRule): Promise<AssignmentRule> {
+    const existing = await db.select().from(assignmentRules)
+      .where(and(
+        eq(assignmentRules.garageId, data.garageId),
+        eq(assignmentRules.ruleName, data.ruleName)
+      ));
+    
+    if (existing.length > 0) {
+      const [updated] = await db.update(assignmentRules)
+        .set({ ...data, updatedAt: new Date() })
+        .where(eq(assignmentRules.id, existing[0].id))
+        .returning();
+      return updated;
+    }
+    
+    const [created] = await db.insert(assignmentRules)
+      .values(data)
+      .returning();
+    return created;
+  }
+
+  async deleteAssignmentRule(id: string, garageId: string): Promise<boolean> {
+    const result = await db.delete(assignmentRules)
+      .where(and(
+        eq(assignmentRules.id, id),
+        eq(assignmentRules.garageId, garageId)
+      ))
+      .returning();
+    return result.length > 0;
+  }
+
+  async recordAssignmentEvent(data: InsertAssignmentHistory): Promise<AssignmentHistory> {
+    const [event] = await db.insert(assignmentHistory)
+      .values(data)
+      .returning();
+    return event;
+  }
+
+  async listAssignmentHistory(garageId: string, jobCardId?: string, limit: number = 50): Promise<AssignmentHistory[]> {
+    const conditions = [eq(assignmentHistory.garageId, garageId)];
+    if (jobCardId) {
+      conditions.push(eq(assignmentHistory.jobCardId, jobCardId));
+    }
+    
+    const query = db.select().from(assignmentHistory)
+      .where(and(...conditions))
+      .orderBy(desc(assignmentHistory.createdAt));
+    
+    if (limit > 0) {
+      return await query.limit(limit);
+    }
+    return await query;
+  }
+
+  async saveAIRecommendations(recommendations: InsertAiAssignmentRecommendation[]): Promise<AiAssignmentRecommendation[]> {
+    if (recommendations.length === 0) return [];
+    const results = await db.insert(aiAssignmentRecommendations)
+      .values(recommendations)
+      .returning();
+    return results;
+  }
+
+  async listAIRecommendations(jobCardId: string, garageId: string, limit: number = 10): Promise<AiAssignmentRecommendation[]> {
+    const query = db.select().from(aiAssignmentRecommendations)
+      .where(and(
+        eq(aiAssignmentRecommendations.jobCardId, jobCardId),
+        eq(aiAssignmentRecommendations.garageId, garageId)
+      ))
+      .orderBy(desc(aiAssignmentRecommendations.createdAt));
+    
+    if (limit > 0) {
+      return await query.limit(limit);
+    }
+    return await query;
+  }
+
+  async getJobCardWithContext(jobCardId: string, garageId: string): Promise<{jobCard: JobCard, technician: User | null} | null> {
+    const [jobCard] = await db.select().from(jobCards)
+      .where(and(
+        eq(jobCards.id, jobCardId),
+        eq(jobCards.garageId, garageId)
+      ));
+    
+    if (!jobCard) return null;
+    
+    let technician: User | null = null;
+    if (jobCard.assignedTo) {
+      const [tech] = await db.select().from(users)
+        .where(eq(users.id, jobCard.assignedTo));
+      technician = tech || null;
+    }
+    
+    return { jobCard, technician };
+  }
+
+  async getTechniciansWithLoad(garageId: string, skillFilters?: string[]): Promise<Array<{technician: User & {profile: TechnicianProfile}, activeJobCount: number}>> {
+    const technicians = await db.select({
+      user: users,
+      profile: technicianProfiles
+    })
+    .from(users)
+    .innerJoin(technicianProfiles, eq(users.id, technicianProfiles.userId))
+    .where(and(
+      eq(users.garageId, garageId),
+      eq(users.isActive, true)
+    ));
+    
+    const results = [];
+    for (const { user, profile } of technicians) {
+      if (skillFilters && skillFilters.length > 0 && profile.skills) {
+        const hasSkill = skillFilters.some(skill => 
+          profile.skills?.toLowerCase().includes(skill.toLowerCase())
+        );
+        if (!hasSkill) continue;
+      }
+      
+      const activeJobs = await db.select().from(jobCards)
+        .where(and(
+          eq(jobCards.assignedTo, user.id),
+          or(
+            eq(jobCards.status, 'assigned'),
+            eq(jobCards.status, 'in_progress')
+          )
+        ));
+      
+      results.push({
+        technician: { ...user, profile },
+        activeJobCount: activeJobs.length
+      });
+    }
+    
+    return results;
+  }
+
+  async assignTechnicianToJob(params: {garageId: string, jobCardId: string, technicianId: string, assignedBy: string, reason?: string, aiRecommendationId?: string}): Promise<JobCard> {
+    const { garageId, jobCardId, technicianId, assignedBy, reason, aiRecommendationId } = params;
+    
+    return await db.transaction(async (tx) => {
+      const [jobCard] = await tx.select().from(jobCards)
+        .where(and(
+          eq(jobCards.id, jobCardId),
+          eq(jobCards.garageId, garageId)
+        ));
+      
+      if (!jobCard) {
+        throw new Error("Job card not found");
+      }
+      
+      const previousTechnicianId = jobCard.assignedTo;
+      
+      const [updated] = await tx.update(jobCards)
+        .set({ assignedTo: technicianId, updatedAt: new Date() })
+        .where(eq(jobCards.id, jobCardId))
+        .returning();
+      
+      await tx.insert(assignmentHistory).values({
+        jobCardId,
+        garageId,
+        previousTechnicianId: previousTechnicianId || null,
+        newTechnicianId: technicianId,
+        assignmentMethod: aiRecommendationId ? 'ai_recommended' : 'manual',
+        assignedBy,
+        reason: reason || null,
+        aiRecommendationId: aiRecommendationId || null
+      });
+      
+      if (aiRecommendationId) {
+        await tx.update(aiAssignmentRecommendations)
+          .set({ wasAccepted: true })
+          .where(eq(aiAssignmentRecommendations.id, aiRecommendationId));
+      }
+      
+      return updated;
+    });
   }
 
   async getPurchaseOrders(garageId?: string, status?: string): Promise<PurchaseOrder[]> {
