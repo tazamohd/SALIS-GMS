@@ -2,12 +2,14 @@ import { sql } from "drizzle-orm";
 import {
   boolean,
   decimal,
+  doublePrecision,
   index,
   integer,
   jsonb,
   pgTable,
   text,
   timestamp,
+  uniqueIndex,
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
@@ -2945,6 +2947,175 @@ export const fleetMaintenanceSchedules = pgTable("fleet_maintenance_schedules", 
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// GPS Tracking & Fleet Management Enhancement
+// Note: Using double precision for GPS coordinates to enable efficient geospatial queries
+// Consider PostGIS extension for production deployment with heavy geospatial operations
+export const vehicleLocationHistory = pgTable("vehicle_location_history", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  vehicleId: uuid("vehicle_id")
+    .references(() => vehicles.id, { onDelete: "cascade" })
+    .notNull(),
+  latitude: doublePrecision("latitude").notNull(),
+  longitude: doublePrecision("longitude").notNull(),
+  altitude: doublePrecision("altitude"),
+  speed: doublePrecision("speed"), // km/h
+  heading: doublePrecision("heading"), // degrees (0-360)
+  accuracy: doublePrecision("accuracy"), // meters
+  timestamp: timestamp("timestamp").notNull().defaultNow(),
+  source: varchar("source", { length: 50 }).default("gps"), // "gps", "manual", "estimated"
+  driverId: varchar("driver_id").references(() => users.id),
+  jobCardId: uuid("job_card_id").references(() => jobCards.id),
+  mileage: integer("mileage"), // Odometer reading at this location
+  engineStatus: varchar("engine_status", { length: 20 }), // "running", "idle", "off"
+  fuelLevel: doublePrecision("fuel_level"), // percentage
+  batteryVoltage: doublePrecision("battery_voltage"),
+}, (table) => ({
+  vehicleTimestampIdx: index("vehicle_location_history_vehicle_timestamp_idx").on(table.vehicleId, table.timestamp.desc()),
+  timestampIdx: index("vehicle_location_history_timestamp_idx").on(table.timestamp.desc()),
+  vehicleLatestIdx: uniqueIndex("vehicle_location_history_vehicle_latest_idx").on(table.vehicleId, table.timestamp.desc()).where(sql`timestamp >= NOW() - INTERVAL '1 hour'`),
+}));
+
+export const geofenceZones = pgTable("geofence_zones", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id")
+    .references(() => garages.id)
+    .notNull(),
+  name: varchar("name", { length: 255 }).notNull(),
+  description: text("description"),
+  zoneType: varchar("zone_type", { length: 50 }).notNull(), // "service_area", "restricted", "preferred_route", "customer_location"
+  geometry: jsonb("geometry").notNull(), // GeoJSON polygon or circle {type: "Point"/"Polygon", coordinates: [...]}
+  centerLatitude: doublePrecision("center_latitude"),
+  centerLongitude: doublePrecision("center_longitude"),
+  radius: doublePrecision("radius"), // meters for circular zones
+  alertOnEntry: boolean("alert_on_entry").default(false),
+  alertOnExit: boolean("alert_on_exit").default(false),
+  isActive: boolean("is_active").default(true),
+  color: varchar("color", { length: 20 }).default("#3B82F6"), // Hex color for map display
+  createdBy: varchar("created_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => ({
+  garageActiveIdx: index("geofence_zones_garage_active_idx").on(table.garageId, table.isActive),
+}));
+
+// Normalized link table for geofence zone vehicle access
+export const geofenceZoneVehicles = pgTable("geofence_zone_vehicles", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  geofenceZoneId: uuid("geofence_zone_id")
+    .references(() => geofenceZones.id, { onDelete: "cascade" })
+    .notNull(),
+  vehicleId: uuid("vehicle_id")
+    .references(() => vehicles.id, { onDelete: "cascade" })
+    .notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => ({
+  zoneVehicleIdx: uniqueIndex("geofence_zone_vehicles_zone_vehicle_idx").on(table.geofenceZoneId, table.vehicleId),
+}));
+
+// Normalized link table for geofence alert recipients
+export const geofenceAlertRecipients = pgTable("geofence_alert_recipients", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  geofenceZoneId: uuid("geofence_zone_id")
+    .references(() => geofenceZones.id, { onDelete: "cascade" })
+    .notNull(),
+  userId: varchar("user_id")
+    .references(() => users.id, { onDelete: "cascade" })
+    .notNull(),
+  notificationMethod: varchar("notification_method", { length: 50 }).default("email"), // "email", "sms", "push", "all"
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => ({
+  zoneUserIdx: uniqueIndex("geofence_alert_recipients_zone_user_idx").on(table.geofenceZoneId, table.userId),
+}));
+
+export const geofenceEvents = pgTable("geofence_events", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  geofenceZoneId: uuid("geofence_zone_id")
+    .references(() => geofenceZones.id, { onDelete: "cascade" })
+    .notNull(),
+  vehicleId: uuid("vehicle_id")
+    .references(() => vehicles.id, { onDelete: "cascade" })
+    .notNull(),
+  eventType: varchar("event_type", { length: 20 }).notNull(), // "entry", "exit", "dwell"
+  latitude: doublePrecision("latitude").notNull(),
+  longitude: doublePrecision("longitude").notNull(),
+  timestamp: timestamp("timestamp").notNull().defaultNow(),
+  driverId: varchar("driver_id").references(() => users.id),
+  notificationSent: boolean("notification_sent").default(false),
+  notificationSentAt: timestamp("notification_sent_at"),
+  dwellDurationMinutes: integer("dwell_duration_minutes"), // For dwell events
+  metadata: jsonb("metadata"), // Additional context
+}, (table) => ({
+  geofenceTimestampIdx: index("geofence_events_geofence_timestamp_idx").on(table.geofenceZoneId, table.timestamp.desc()),
+  vehicleTimestampIdx: index("geofence_events_vehicle_timestamp_idx").on(table.vehicleId, table.timestamp.desc()),
+  timestampIdx: index("geofence_events_timestamp_idx").on(table.timestamp.desc()),
+  pendingNotificationIdx: index("geofence_events_pending_notification_idx").on(table.notificationSent).where(sql`notification_sent = false AND timestamp >= NOW() - INTERVAL '1 hour'`),
+}));
+
+export const fleetRoutes = pgTable("fleet_routes", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id")
+    .references(() => garages.id)
+    .notNull(),
+  routeName: varchar("route_name", { length: 255 }).notNull(),
+  description: text("description"),
+  vehicleId: uuid("vehicle_id").references(() => vehicles.id),
+  driverId: varchar("driver_id").references(() => users.id),
+  jobCardIds: text("job_card_ids").array(), // Array of job card IDs in order
+  startLocation: jsonb("start_location").notNull(), // {lat, lng, address}
+  endLocation: jsonb("end_location"), // {lat, lng, address}
+  waypoints: jsonb("waypoints"), // Array of {lat, lng, address, jobCardId}
+  optimizedRoute: jsonb("optimized_route"), // Optimized waypoint order
+  totalDistance: decimal("total_distance", { precision: 10, scale: 2 }), // km
+  estimatedDuration: integer("estimated_duration"), // minutes
+  actualDuration: integer("actual_duration"), // minutes
+  status: varchar("status", { length: 50 }).default("planned"), // "planned", "in_progress", "completed", "cancelled"
+  scheduledStartTime: timestamp("scheduled_start_time"),
+  actualStartTime: timestamp("actual_start_time"),
+  actualEndTime: timestamp("actual_end_time"),
+  routePolyline: text("route_polyline"), // Encoded polyline for map display
+  trafficConditions: varchar("traffic_conditions", { length: 50 }), // "light", "moderate", "heavy"
+  fuelEstimate: decimal("fuel_estimate", { precision: 8, scale: 2 }), // liters
+  createdBy: varchar("created_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const routeCheckpoints = pgTable("route_checkpoints", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  routeId: uuid("route_id")
+    .references(() => fleetRoutes.id, { onDelete: "cascade" })
+    .notNull(),
+  sequenceNumber: integer("sequence_number").notNull(),
+  checkpointType: varchar("checkpoint_type", { length: 50 }).notNull(), // "pickup", "delivery", "service", "break"
+  location: jsonb("location").notNull(), // {lat, lng, address}
+  jobCardId: uuid("job_card_id").references(() => jobCards.id),
+  customerId: varchar("customer_id").references(() => users.id),
+  estimatedArrival: timestamp("estimated_arrival"),
+  actualArrival: timestamp("actual_arrival"),
+  estimatedDeparture: timestamp("estimated_departure"),
+  actualDeparture: timestamp("actual_departure"),
+  status: varchar("status", { length: 50 }).default("pending"), // "pending", "in_transit", "arrived", "completed", "skipped"
+  notes: text("notes"),
+  completedBy: varchar("completed_by").references(() => users.id),
+  metadata: jsonb("metadata"),
+}, (table) => ({
+  routeSequenceIdx: index("route_checkpoints_route_sequence_idx").on(table.routeId, table.sequenceNumber),
+}));
+
 // Module 41: Warranty Tracking
 export const warranties = pgTable("warranties", {
   id: uuid("id")
@@ -3538,6 +3709,55 @@ export const insertFleetMaintenanceScheduleSchema = createInsertSchema(fleetMain
   id: true,
   createdAt: true,
   updatedAt: true,
+});
+
+// GPS Tracking & Fleet Management Enhancement
+export type VehicleLocationHistory = typeof vehicleLocationHistory.$inferSelect;
+export type InsertVehicleLocationHistory = typeof vehicleLocationHistory.$inferInsert;
+export const insertVehicleLocationHistorySchema = createInsertSchema(vehicleLocationHistory).omit({
+  id: true,
+});
+
+export type GeofenceZone = typeof geofenceZones.$inferSelect;
+export type InsertGeofenceZone = typeof geofenceZones.$inferInsert;
+export const insertGeofenceZoneSchema = createInsertSchema(geofenceZones).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type GeofenceZoneVehicle = typeof geofenceZoneVehicles.$inferSelect;
+export type InsertGeofenceZoneVehicle = typeof geofenceZoneVehicles.$inferInsert;
+export const insertGeofenceZoneVehicleSchema = createInsertSchema(geofenceZoneVehicles).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type GeofenceAlertRecipient = typeof geofenceAlertRecipients.$inferSelect;
+export type InsertGeofenceAlertRecipient = typeof geofenceAlertRecipients.$inferInsert;
+export const insertGeofenceAlertRecipientSchema = createInsertSchema(geofenceAlertRecipients).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type GeofenceEvent = typeof geofenceEvents.$inferSelect;
+export type InsertGeofenceEvent = typeof geofenceEvents.$inferInsert;
+export const insertGeofenceEventSchema = createInsertSchema(geofenceEvents).omit({
+  id: true,
+});
+
+export type FleetRoute = typeof fleetRoutes.$inferSelect;
+export type InsertFleetRoute = typeof fleetRoutes.$inferInsert;
+export const insertFleetRouteSchema = createInsertSchema(fleetRoutes).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type RouteCheckpoint = typeof routeCheckpoints.$inferSelect;
+export type InsertRouteCheckpoint = typeof routeCheckpoints.$inferInsert;
+export const insertRouteCheckpointSchema = createInsertSchema(routeCheckpoints).omit({
+  id: true,
 });
 
 // Module 41: Warranty Tracking
