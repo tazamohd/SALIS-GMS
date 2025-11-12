@@ -28,23 +28,35 @@ export default function AIChatbotAssistant() {
   }, [messages]);
 
   // Fetch existing conversations on mount
-  const { data: existingConversations } = useQuery<any[]>({
+  const { data: existingConversations, isLoading: loadingConversations } = useQuery<any[]>({
     queryKey: ["/api/chatbot/conversations"],
     enabled: !!user?.garageId,
   });
 
+  // Fetch messages for active conversation
+  const { data: conversationMessages } = useQuery<any>({
+    queryKey: ["/api/chatbot/conversations", conversationId],
+    enabled: !!conversationId,
+  });
+
+  // Update messages when conversation data loads
+  useEffect(() => {
+    if (conversationMessages?.messages) {
+      setMessages(conversationMessages.messages);
+    }
+  }, [conversationMessages]);
+
   // Create conversation on mount or load existing one
   useEffect(() => {
-    if (user && !conversationId && existingConversations) {
+    if (user && !conversationId && !loadingConversations && existingConversations) {
       const activeConv = existingConversations.find((c) => c.status === "active");
       if (activeConv) {
         setConversationId(activeConv.id);
-        setMessages(activeConv.messages || []);
       } else {
         createConversationMutation.mutate({});
       }
     }
-  }, [user, existingConversations]);
+  }, [user, conversationId, loadingConversations, existingConversations]);
 
   const createConversationMutation = useMutation({
     mutationFn: async (data: any) => {
@@ -66,6 +78,8 @@ export default function AIChatbotAssistant() {
         { role: "assistant", content: data.aiResponse },
       ]);
       setInputMessage("");
+      // Invalidate conversation query to keep cache in sync
+      queryClient.invalidateQueries({ queryKey: ["/api/chatbot/conversations", conversationId] });
     },
     onError: () => {
       toast({
