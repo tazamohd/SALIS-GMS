@@ -1,31 +1,7 @@
 # Login Dashboard Project
 
 ## Overview
-This project is a world-class automotive ERP platform (SALIS AUTO) designed to manage efficient garage operations at scale. It offers enterprise-grade features including franchise management, OBD diagnostics integration, OEM software licensing, global multi-currency/multi-language support, and a B2B spare parts supply network. The platform has expanded to **141+ comprehensive modules** across 13 phases, supporting multi-tenant franchise networks, advanced hardware integrations, cutting-edge technologies including AI, blockchain, AR/VR, quantum computing, sustainable energy management, and dedicated mobile web applications for customers and technicians. The platform includes comprehensive compliance and localization features for the Saudi Arabian market, such as VAT compliance, ZATCA E-Invoicing, Hijri calendar support, Zakat calculations, TRN validation, Arabic language support, and localized PDF/Excel exports and SMS notifications.
-
-**Latest Enhancement (Phase 13 - November 2025)**: Complete implementation of 9 missing planned modules including Payroll Management, Expense Tracking, Towing Services, Vehicle Storage, Telematics Integration, Knowledge Base, Training LMS, Google My Business Integration, and Enhanced Compliance Management.
-
-**Latest Update (November 12, 2025) - Client Portal Advanced Features**: Added 5 comprehensive features to the customer-facing client portal including Service History with filtering, canvas-based E-Signature component, Service Reminders with custom notifications, Live Tracking with real-time updates, and Review & Chat system for customer-garage communication. Includes new database tables (`serviceSignatures`, `serviceChatMessages`, `serviceReviews`) and customer-scoped API routes. Security documentation created in `CLIENT_PORTAL_SECURITY.md` for production deployment requirements.
-
-**Latest Update (November 12, 2025) - Technician Portal**: Created comprehensive desktop technician portal at `/technician-portal` with dedicated layout and 6 pages:
-1. Dashboard - Today's jobs, active jobs, completion stats
-2. My Jobs - Job card management with tabs (assigned/in progress/completed), status updates
-3. Time Clock - Clock in/out interface (backend API pending)
-4. Parts Lookup - Real-time inventory search
-5. Job Documentation - Photo/video upload interface (backend API pending)
-6. Profile - Skills, certifications, experience display
-
-**Components**: TechnicianLayout with sidebar navigation, mobile-responsive bottom nav. **Security**: Production-ready with server-side technician-scoped API routes (`/api/technicians/:id/job-cards`, `/api/technicians/:id/time-clock`), authorization middleware, and database-level filtering. See `TECHNICIAN_PORTAL_SECURITY.md` for complete security documentation.
-
-**Latest Update (November 12, 2025) - AI-Powered Predictive Diagnostics**: Built comprehensive predictive diagnostics system at `/predictive-diagnostics` using GPT-5 via Replit AI Integrations. The feature analyzes detailed vehicle parameters (mileage, engine temperature, oil pressure, brake wear, battery voltage, tire condition, check engine light status, unusual noises) to predict potential failures and maintenance needs. **Backend**: `server/services/predictiveDiagnostics.ts` service generates AI predictions with severity levels (low/medium/high/critical), risk assessments, recommended actions, and confidence scores. **API**: POST `/api/ai/predictive-diagnostics` endpoint integrates OpenAI GPT-5, saves predictions to `aiMaintenancePredictions` table with JSONB metadata. **Frontend**: Comprehensive input form with 13+ vehicle parameters, real-time AI prediction display with severity badges, recent predictions history, and React Query integration for cache management. **Technology**: Uses OpenAI GPT-5 model with JSON mode for structured predictions, no API key required (billed to Replit credits).
-
-**Latest Update (November 12, 2025) - AI Chatbot Assistant + Blockchain + Smart Contracts**: Built three cutting-edge features:
-
-1. **AI-Powered Chatbot** (`/ai-chatbot-assistant`) - GPT-5-powered conversational assistant for customer queries, service bookings, and vehicle diagnostics. **Backend**: `server/services/aiChatbot.ts` service handles natural language understanding, booking intent extraction, and problem diagnosis. **API**: POST `/api/chatbot/message`, `/api/chatbot/booking-intent`, `/api/chatbot/diagnose` endpoints for real-time AI conversations. **Frontend**: Chat UI with message history, quick actions, and context-aware responses. **Database**: Uses `aiChatConversations` and `aiChatMessages` tables for persistent chat history.
-
-2. **Blockchain Service History** - Immutable ledger system using cryptographic hashing (SHA-256) for tamper-proof vehicle service records. **Backend**: `server/services/blockchain.ts` implements hash chain validation, genesis blocks, and blockchain proof certificates. **Database**: `blockchainRecords` table stores linked service history with previous hash references. **Features**: Chain verification, immutable records, and transparent service history.
-
-3. **Smart Contracts** - Automated service agreements with digital signatures and payment triggers. **Backend**: `server/services/smartContracts.ts` implements contract execution engine, signature validation, and automated payment processing. **Database**: `smartContracts` and `contractEvents` tables track agreements and execution history. **Features**: Digital signing, automatic payment triggers (on_start/on_completion/on_approval), and contract integrity verification.
+This project is SALIS AUTO, a world-class automotive ERP platform managing efficient garage operations at scale. It offers enterprise-grade features including franchise management, OBD diagnostics integration, OEM software licensing, global multi-currency/multi-language support, and a B2B spare parts supply network. The platform has expanded to **141+ comprehensive modules** across 13 phases, supporting multi-tenant franchise networks, advanced hardware integrations, cutting-edge technologies (AI, blockchain, AR/VR, quantum computing, sustainable energy management), and dedicated mobile web applications. It includes comprehensive compliance and localization features for the Saudi Arabian market (VAT, ZATCA E-Invoicing, Hijri calendar, Zakat, TRN validation, Arabic language, localized exports, SMS). Recent enhancements include an in-app chat support system, a comprehensive technician portal, AI-powered predictive diagnostics, an AI chatbot assistant, blockchain service history, and smart contracts. The latest phase (Phase 13) completes the implementation of 9 operational modules including Payroll Management, Expense Tracking, Towing Services, Vehicle Storage, Telematics Integration, Knowledge Base, Training LMS, Google My Business Integration, and Enhanced Compliance Management.
 
 ## User Preferences
 - Modern React patterns with hooks
@@ -46,35 +22,27 @@ The application utilizes a full-stack architecture with clear client-server sepa
 **Database**: PostgreSQL with Drizzle ORM, comprising **141+ comprehensive modules with 290+ tables**.
 **Real-Time Features**: WebSocket server for in-app chat support and live notifications.
 
+**UI/UX Decisions**: The design preserves the Figma aesthetic, ensures responsiveness, and uses a consistent component-based approach with a monochrome design system based on the SALIS AUTO brand. It supports PWA, mobile-responsive navigation, and WCAG 2.1 AA accessibility features, including an offline mode. A pure grayscale design is enforced with distinct light and dark modes.
+
+**Technical Implementations**: Form validation uses Zod schemas shared between frontend and backend. Features include comprehensive user settings, print system, undo/redo, keyboard shortcuts, robust currency system, and action history tracking for audit trails. The database is seeded with realistic sample data.
+
 **Core Modules**: The system includes 60+ modules covering comprehensive garage operations, including SaaS & Multi-Tenant Management, User & Role Management, Customer Profiles, Vehicle Management, Job Cards, Inventory, Invoicing, Analytics, and advanced enterprise modules such as Franchise Command Center, Diagnostics & OBD Hub, OEM Software Subscriptions, Globalization Layer, Parts Supply Network, and Contract Management with SLA Tracking.
 
 **Enterprise Expansion**: The platform incorporates AI & Automation (AI Chatbot, Predictive Maintenance, Smart Parts Recommendations), Advanced Analytics (Business Intelligence, Profit Margin Analysis, Customer Lifetime Value), Enhanced Integrations (Accounting, Email Marketing, Stripe Payments), Customer Experience features, Operational Efficiency tools, Compliance & Quality management, and Advanced Hardware integrations (Barcode/QR Scanner, Digital Signage, Kiosk Check-In, LPR).
 
 **Mobile Apps**: Dedicated backend API and documentation for three cross-platform React Native apps: Technician, Customer, and Manager Dashboard, with PWA-ready mobile interfaces for customers and technicians.
 
-**UI/UX Decisions**: The design preserves the Figma aesthetic, ensures responsiveness, and uses a consistent component-based approach with a monochrome design system based on the SALIS AUTO brand. It supports PWA, mobile-responsive navigation, and WCAG 2.1 AA accessibility features, including an offline mode. A pure grayscale design is enforced with distinct light and dark modes.
+**Saudi Arabia Compliance Stack**: Includes database tables for VAT registration, ZATCA certification, Zakat settings, Arabic company details, and utilities for VAT calculations, TRN validation, ZATCA QR code generation, Hijri calendar conversion, and localized PDF/Excel export services, and Twilio SMS integration with Saudi phone formatting.
 
-**Technical Implementations**: Form validation uses Zod schemas shared between frontend and backend. Features include comprehensive user settings, print system, undo/redo, keyboard shortcuts, robust currency system, and action history tracking for audit trails. The database is seeded with realistic sample data.
-
-**Saudi Arabia Compliance Stack**: This includes database tables for VAT registration, ZATCA certification, Zakat settings, Arabic company details, and utilities for VAT calculations, TRN validation, ZATCA QR code generation, Hijri calendar conversion, and localized PDF/Excel export services, and Twilio SMS integration with Saudi phone formatting. A persistent dark/light/system theme toggle is also included.
-
-**Contract Management (Phase 12 Enhancement)**: Comprehensive contract utilization tracking, SLA compliance monitoring, and automated renewal workflows with:
-- Contract Utilization Dashboard: Real-time tracking of service spending vs. contract caps with visual progress indicators
-- SLA Compliance Tracking: Response time, completion time, and uptime monitoring with breach severity tracking and automatic penalty calculations
-- Automated Renewal Workflows: Configurable renewal notice periods, automated notification system, and one-click renewal acceptance
-- Performance Analytics: Service type breakdown, utilization trends, compliance rates, and expiring contract alerts
-- Database Tables: `contract_utilization`, `contract_sla_metrics`, `contract_renewals` with complete audit trails
-
-**Phase 13 Expansion - Complete Suite of Operational Modules**: All previously planned features now fully implemented:
-1. **Payroll Management** (`/payroll-management`) - Complete payroll processing system with employee management, pay periods, payroll runs, tax withholding, and direct deposit. Database tables: `payroll_employees`, `pay_periods`, `payroll_runs`
-2. **Expense Tracking** (`/expense-tracking`) - Business expense management with categories, approval workflows, receipt uploads, and budget monitoring. Database tables: `expense_categories`, `expenses`
-3. **Towing & Recovery Services** (`/towing-services`) - Complete towing dispatch and tracking system with job management, driver assignment, and cost calculation. Database table: `towing_jobs`
-4. **Vehicle Storage Services** (`/vehicle-storage`) - Long-term vehicle storage management with facility management, slot assignments, and billing integration. Database tables: `storage_facilities`, `vehicle_storage_assignments`
-5. **Telematics Integration** (`/telematics-integration`) - Real-time vehicle tracking with GPS feeds, speed monitoring, fuel level tracking, and automated alerts. Database tables: `telematics_feeds`, `telematics_alerts`
-6. **Knowledge Base** (`/knowledge-base`) - Comprehensive documentation system with article categories, search functionality, and helpful/unhelpful ratings. Database tables: `article_categories`, `knowledge_articles`
-7. **Training & Certification LMS** (`/training-lms`) - Complete learning management system with training modules, certifications, quiz assessments, and certificate generation. Database tables: `training_modules`, `certifications`, `certification_attempts`
-8. **Google My Business Integration** (`/google-my-business`) - Full GMB integration with post publishing, review management, and sync automation. Database tables: `google_business_profiles`, `gmb_posts`, `gmb_reviews`
-9. **Enhanced Compliance Management** (`/compliance-management`) - Standalone compliance module with policies, audits, and task management for regulatory compliance. Database tables: `compliance_policies`, `compliance_audits`, `compliance_tasks`
+**Recent Features**:
+- **In-App Chat Support System**: Real-time chat with support tickets, file attachments, message reactions, typing indicators, and presence tracking. Includes `supportTickets`, `supportTicketEvents`, `chatAttachments` tables and dedicated API routes.
+- **Client Portal Advanced Features**: Service History, E-Signature, Service Reminders, Live Tracking, and Review & Chat system with new database tables (`serviceSignatures`, `serviceChatMessages`, `serviceReviews`).
+- **Technician Portal**: Desktop portal at `/technician-portal` with Dashboard, My Jobs, Time Clock, Parts Lookup, Job Documentation, and Profile pages, with technician-scoped API routes.
+- **AI-Powered Predictive Diagnostics**: Analyzes vehicle parameters to predict failures using GPT-5, saving predictions to `aiMaintenancePredictions` table.
+- **AI Chatbot Assistant**: GPT-5-powered conversational assistant for customer queries, service bookings, and vehicle diagnostics, using `aiChatConversations` and `aiChatMessages` tables.
+- **Blockchain Service History**: Immutable ledger system using cryptographic hashing for tamper-proof vehicle service records, stored in `blockchainRecords`.
+- **Smart Contracts**: Automated service agreements with digital signatures and payment triggers, managed via `smartContracts` and `contractEvents` tables.
+- **Operational Modules (Phase 13)**: Includes Payroll Management (`payroll_employees`, `pay_periods`, `payroll_runs`), Expense Tracking (`expense_categories`, `expenses`), Towing & Recovery Services (`towing_jobs`), Vehicle Storage Services (`storage_facilities`, `vehicle_storage_assignments`), Telematics Integration (`telematics_feeds`, `telematics_alerts`), Knowledge Base (`article_categories`, `knowledge_articles`), Training & Certification LMS (`training_modules`, `certifications`, `certification_attempts`), Google My Business Integration (`google_business_profiles`, `gmb_posts`, `gmb_reviews`), and Enhanced Compliance Management (`compliance_policies`, `compliance_audits`, `compliance_tasks`).
 
 ## External Dependencies
 - Replit Auth
@@ -89,7 +57,7 @@ The application utilizes a full-stack architecture with clear client-server sepa
 - Drizzle ORM
 - Zod
 - recharts
-- Twilio (SMS notifications)
+- Twilio
 - NHTSA API
 - TecDoc API
 - Stripe
@@ -102,4 +70,4 @@ The application utilizes a full-stack architecture with clear client-server sepa
 - Gmail
 - speakeasy
 - qrcode
-- jspdf + jspdf-autotable (PDF generation)
+- jspdf

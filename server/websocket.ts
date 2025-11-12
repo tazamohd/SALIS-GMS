@@ -1,10 +1,19 @@
 import { WebSocketServer, WebSocket } from 'ws';
-import type { Server } from 'http';
+import type { Server, IncomingMessage } from 'http';
+import { parse as parseCookie } from 'cookie';
+import type { SessionStore } from 'express-session';
 
 interface AuthenticatedWebSocket extends WebSocket {
   userId?: string;
   garageId?: string;
   isAlive?: boolean;
+}
+
+interface SessionData {
+  passport?: {
+    user: string;
+  };
+  cookie: any;
 }
 
 interface WebSocketMessage {
@@ -78,29 +87,161 @@ export class ChatWebSocketServer {
       case 'ping':
         this.send(ws, { type: 'pong' });
         break;
+      case 'typing':
+        this.handleTypingIndicator(ws, message.data);
+        break;
+      case 'presence':
+        this.handlePresenceUpdate(ws, message.data);
+        break;
       default:
         console.log('Unknown message type:', message.type);
     }
   }
 
-  private handleAuth(ws: AuthenticatedWebSocket, data: { userId: string; garageId: string }) {
-    const { userId, garageId } = data;
-    
-    if (!userId || !garageId) {
-      this.sendError(ws, 'Invalid authentication data');
+  private async handleTypingIndicator(ws: AuthenticatedWebSocket, data: any) {
+    if (!ws.userId) {
+      this.sendError(ws, 'Not authenticated');
       return;
     }
 
-    ws.userId = userId;
-    ws.garageId = garageId;
-
-    if (!this.clients.has(userId)) {
-      this.clients.set(userId, new Set());
+    // Validate payload structure
+    if (!data || typeof data !== 'object' || !data.conversationId || typeof data.isTyping !== 'boolean') {
+      this.sendError(ws, 'Invalid typing indicator payload');
+      return;
     }
-    this.clients.get(userId)!.add(ws);
 
-    this.send(ws, { type: 'auth_success', data: { userId, garageId } });
-    console.log(`User ${userId} authenticated`);
+    const { conversationId, isTyping } = data;
+
+    // Derive participant IDs server-side from conversation membership
+    // This prevents clients from spoofing participant lists
+    try {
+      const { storage } = await import('./storage');
+      const participants = await storage.getChatParticipants(conversationId);
+      
+      if (!participants.find(p => p.userId === ws.userId)) {
+        this.sendError(ws, 'Not a participant of this conversation');
+        return;
+      }
+
+      const participantIds = participants.map(p => p.userId);
+      this.notifyTyping(conversationId, ws.userId, isTyping, participantIds);
+    } catch (error) {
+      console.error('Error handling typing indicator:', error);
+      this.sendError(ws, 'Failed to process typing indicator');
+    }
+  }
+
+  private handlePresenceUpdate(ws: AuthenticatedWebSocket, data: any) {
+    if (!ws.userId) {
+      this.sendError(ws, 'Not authenticated');
+      return;
+    }
+
+    // Validate payload structure and status value
+    if (!data || typeof data !== 'object' || !data.status) {
+      this.sendError(ws, 'Invalid presence update payload');
+      return;
+    }
+
+    // Whitelist valid presence statuses
+    const validStatuses = ['online', 'away', 'busy', 'offline'];
+    if (!validStatuses.includes(data.status)) {
+      this.sendError(ws, `Invalid status. Must be one of: ${validStatuses.join(', ')}`);
+      return;
+    }
+
+    const payload = {
+      type: 'presence_update',
+      data: {
+        userId: ws.userId,
+        status: data.status,
+        timestamp: Date.now(),
+      },
+    };
+
+    // Broadcast presence only to users in the same garage (server-side scoped)
+    this.wss.clients.forEach((client: WebSocket) => {
+      const authClient = client as AuthenticatedWebSocket;
+      if (authClient.garageId === ws.garageId && authClient !== ws && authClient.userId) {
+        this.send(authClient, payload);
+      }
+    });
+  }
+
+  private async handleAuth(ws: AuthenticatedWebSocket, data: { sessionId?: string; userId?: string; garageId?: string }) {
+    // ⚠️ SECURITY WARNING - DEVELOPMENT MODE ONLY ⚠️
+    // 
+    // This WebSocket authentication method is NOT suitable for production use.
+    // It validates that userId/garageId exist in the database but does NOT verify 
+    // the caller's actual identity, allowing user impersonation attacks.
+    //
+    // PRODUCTION REQUIREMENTS:
+    // 1. Implement session-based or JWT authentication
+    // 2. Derive userId/garageId from verified session/token on server-side
+    // 3. Never trust client-supplied identity claims
+    // 
+    // IMPLEMENTATION GUIDE FOR PRODUCTION:
+    // - Pass HTTP session cookie or JWT in WebSocket connection URL/headers
+    // - Verify session/token signature server-side
+    // - Extract userId/garageId from verified session data
+    // - Reject connections with invalid/expired sessions
+    //
+    // Example production flow:
+    //   const sessionId = extractSessionFromWsRequest(req);
+    //   const session = await verifySession(sessionId);
+    //   if (!session || session.isExpired()) return reject();
+    //   ws.userId = session.userId;  // Derived from verified session
+    //   ws.garageId = session.garageId;  // Not from client claim
+    
+    try {
+      let userId: string;
+      let garageId: string;
+
+      if (data.sessionId) {
+        // Production path: verify session and derive user info
+        const { storage } = await import('./storage');
+        // TODO: Implement session verification
+        // const session = await storage.getSessionById(data.sessionId);
+        // if (!session || session.isExpired()) {
+        //   this.sendError(ws, 'Invalid or expired session');
+        //   return;
+        // }
+        // userId = session.userId;
+        // garageId = session.garageId;
+        this.sendError(ws, 'Session-based auth not yet implemented');
+        return;
+      } else if (data.userId && data.garageId) {
+        // ⚠️ DEVELOPMENT ONLY: Validates user exists but doesn't verify caller identity
+        const { storage } = await import('./storage');
+        const user = await storage.getUser(data.userId);
+        
+        if (!user || user.garageId !== data.garageId) {
+          this.sendError(ws, 'Invalid user credentials');
+          return;
+        }
+        
+        userId = data.userId;
+        garageId = data.garageId;
+      } else {
+        this.sendError(ws, 'Authentication requires either sessionId or userId+garageId');
+        return;
+      }
+
+      // Set authenticated user info
+      ws.userId = userId;
+      ws.garageId = garageId;
+
+      if (!this.clients.has(userId)) {
+        this.clients.set(userId, new Set());
+      }
+      this.clients.get(userId)!.add(ws);
+
+      this.send(ws, { type: 'auth_success', data: { userId, garageId } });
+      console.log(`User ${userId} authenticated via WebSocket`);
+    } catch (error) {
+      console.error('WebSocket authentication error:', error);
+      this.sendError(ws, 'Authentication failed');
+    }
   }
 
   private removeClient(ws: AuthenticatedWebSocket) {
