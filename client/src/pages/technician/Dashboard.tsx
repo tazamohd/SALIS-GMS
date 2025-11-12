@@ -18,14 +18,10 @@ import { format } from "date-fns";
 export default function TechnicianDashboard() {
   const { user } = useAuth();
 
-  const { data: allJobCards, isLoading } = useQuery<JobCard[]>({
-    queryKey: ["/api/job-cards"],
+  const { data: jobCards, isLoading } = useQuery<JobCard[]>({
+    queryKey: ["/api/technicians", user?.id, "job-cards"],
     enabled: !!user?.id,
   });
-
-  // TODO: Replace with technician-scoped API endpoint /api/technicians/:id/job-cards
-  // Current implementation uses client-side filtering (security risk)
-  const jobCards = allJobCards?.filter((job) => job.assignedTechnicianId === user?.id) || [];
 
   const todayJobs = jobCards?.filter((job) => {
     if (!job.scheduledDate) return false;

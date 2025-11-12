@@ -11,11 +11,9 @@ export default function TechnicianTimeClock() {
   const [clockedIn, setClockedIn] = useState(false);
   const [clockInTime, setClockInTime] = useState<Date | null>(null);
 
-  // TODO: Implement /api/technicians/:id/time-clock endpoint
-  // Disabled for now to prevent errors
   const { data: timeEntries } = useQuery<any[]>({
-    queryKey: ["/api/time-clock", user?.id],
-    enabled: false, // Disabled until backend endpoint is implemented
+    queryKey: ["/api/technicians", user?.id, "time-clock"],
+    enabled: !!user?.id,
   });
 
   const handleClockIn = () => {

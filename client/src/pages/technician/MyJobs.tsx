@@ -25,21 +25,17 @@ export default function TechnicianMyJobs() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
 
-  const { data: allJobCards, isLoading } = useQuery<JobCard[]>({
-    queryKey: ["/api/job-cards"],
+  const { data: jobCards, isLoading } = useQuery<JobCard[]>({
+    queryKey: ["/api/technicians", user?.id, "job-cards"],
     enabled: !!user?.id,
   });
-
-  // TODO: Replace with technician-scoped API endpoint /api/technicians/:id/job-cards
-  // Current implementation uses client-side filtering (security risk)
-  const jobCards = allJobCards?.filter((job) => job.assignedTechnicianId === user?.id) || [];
 
   const updateStatusMutation = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: string }) => {
       return await apiRequest("PATCH", `/api/job-cards/${id}`, { status });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/job-cards"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/technicians", user?.id, "job-cards"] });
       toast({
         title: "Status Updated",
         description: "Job status has been updated successfully.",

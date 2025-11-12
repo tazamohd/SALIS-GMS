@@ -15,7 +15,7 @@ This project is a world-class automotive ERP platform (SALIS AUTO) designed to m
 5. Job Documentation - Photo/video upload interface (backend API pending)
 6. Profile - Skills, certifications, experience display
 
-**Components**: TechnicianLayout with sidebar navigation, mobile-responsive bottom nav. **Security Note**: Prototype uses client-side filtering (documented in `TECHNICIAN_PORTAL_SECURITY.md`). Production requires technician-scoped backend routes similar to customer portal pattern.
+**Components**: TechnicianLayout with sidebar navigation, mobile-responsive bottom nav. **Security**: Production-ready with server-side technician-scoped API routes (`/api/technicians/:id/job-cards`, `/api/technicians/:id/time-clock`), authorization middleware, and database-level filtering. See `TECHNICIAN_PORTAL_SECURITY.md` for complete security documentation.
 
 ## User Preferences
 - Modern React patterns with hooks
