@@ -63,6 +63,7 @@ import DiagnosticsOBDHub from "@/pages/DiagnosticsOBDHub";
 import OEMSoftwareSubscriptions from "@/pages/OEMSoftwareSubscriptions";
 import AIChatbot from "@/pages/AIChatbot";
 import PredictiveMaintenance from "@/pages/PredictiveMaintenance";
+import PredictiveDiagnostics from "@/pages/PredictiveDiagnostics";
 import SmartPartsRecommendations from "@/pages/SmartPartsRecommendations";
 import VoiceCommands from "@/pages/VoiceCommands";
 import DocumentOCR from "@/pages/DocumentOCR";
@@ -521,6 +522,11 @@ function Router() {
       <Route path="/predictive-maintenance">
         <Layout>
           <PredictiveMaintenance />
+        </Layout>
+      </Route>
+      <Route path="/predictive-diagnostics">
+        <Layout>
+          <PredictiveDiagnostics />
         </Layout>
       </Route>
       <Route path="/smart-parts-recommendations">
