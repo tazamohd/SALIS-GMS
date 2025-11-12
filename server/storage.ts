@@ -1121,6 +1121,27 @@ export interface IStorage {
   markMessagesAsRead(conversationId: string, userId: string): Promise<void>;
   getUnreadMessageCount(userId: string, conversationId?: string): Promise<number>;
   
+  // Chat Support Enhancements - Support Tickets
+  getSupportTickets(garageId: string, filters?: {status?: string, priority?: string, assignedTo?: string, category?: string}): Promise<any[]>;
+  getSupportTicket(id: string): Promise<any | undefined>;
+  getSupportTicketByConversation(conversationId: string): Promise<any | undefined>;
+  createSupportTicket(data: any): Promise<any>;
+  updateSupportTicket(id: string, data: any): Promise<any>;
+  createSupportTicketEvent(data: any): Promise<any>;
+  getSupportTicketEvents(ticketId: string): Promise<any[]>;
+  assignTicket(ticketId: string, userId: string, assignedBy: string): Promise<any>;
+  updateTicketStatus(ticketId: string, status: string, userId: string, notes?: string): Promise<any>;
+  
+  // Chat Attachments
+  createChatAttachment(data: any): Promise<any>;
+  getChatAttachments(messageId: string): Promise<any[]>;
+  deleteChatAttachment(id: string): Promise<void>;
+  
+  // Chat Reactions
+  addMessageReaction(data: any): Promise<any>;
+  removeMessageReaction(messageId: string, userId: string): Promise<void>;
+  getMessageReactions(messageId: string): Promise<any[]>;
+  
   // Module 37: Customer Self-Service Portal
   createPortalSession(customerId: string): Promise<any>;
   validatePortalSession(token: string): Promise<any | null>;

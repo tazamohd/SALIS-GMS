@@ -2580,6 +2580,74 @@ export const insertChatMessageReactionSchema = createInsertSchema(chatMessageRea
   createdAt: true,
 });
 
+// Support Tickets - extends chat conversations for support use cases
+export const supportTickets = pgTable("support_tickets", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  conversationId: uuid("conversation_id").references(() => chatConversations.id).notNull().unique(),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  ticketNumber: varchar("ticket_number", { length: 50 }).notNull().unique(),
+  subject: varchar("subject", { length: 255 }).notNull(),
+  category: varchar("category", { length: 100 }).notNull(), // technical, billing, general, feature_request
+  priority: varchar("priority", { length: 50 }).default("medium"), // low, medium, high, urgent
+  status: varchar("status", { length: 50 }).default("open"), // open, in_progress, waiting_customer, resolved, closed
+  assignedTo: varchar("assigned_to").references(() => users.id),
+  createdBy: varchar("created_by").references(() => users.id).notNull(),
+  resolvedAt: timestamp("resolved_at"),
+  closedAt: timestamp("closed_at"),
+  resolutionNotes: text("resolution_notes"),
+  slaDeadline: timestamp("sla_deadline"),
+  tags: jsonb("tags").default([]),
+  metadata: jsonb("metadata").default({}),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const supportTicketEvents = pgTable("support_ticket_events", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  ticketId: uuid("ticket_id").references(() => supportTickets.id).notNull(),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  eventType: varchar("event_type", { length: 100 }).notNull(), // created, assigned, status_changed, priority_changed, resolved, closed
+  previousValue: text("previous_value"),
+  newValue: text("new_value"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Chat Attachments - metadata for file uploads in chat
+export const chatAttachments = pgTable("chat_attachments", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  messageId: uuid("message_id").references(() => chatMessages.id).notNull(),
+  fileName: varchar("file_name", { length: 255 }).notNull(),
+  fileType: varchar("file_type", { length: 100 }).notNull(),
+  fileSize: integer("file_size").notNull(),
+  fileUrl: varchar("file_url", { length: 500 }).notNull(),
+  thumbnailUrl: varchar("thumbnail_url", { length: 500 }),
+  uploadedBy: varchar("uploaded_by").references(() => users.id).notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export type SupportTicket = typeof supportTickets.$inferSelect;
+export type InsertSupportTicket = typeof supportTickets.$inferInsert;
+export const insertSupportTicketSchema = createInsertSchema(supportTickets).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type SupportTicketEvent = typeof supportTicketEvents.$inferSelect;
+export type InsertSupportTicketEvent = typeof supportTicketEvents.$inferInsert;
+export const insertSupportTicketEventSchema = createInsertSchema(supportTicketEvents).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type ChatAttachment = typeof chatAttachments.$inferSelect;
+export type InsertChatAttachment = typeof chatAttachments.$inferInsert;
+export const insertChatAttachmentSchema = createInsertSchema(chatAttachments).omit({
+  id: true,
+  createdAt: true,
+});
+
 // Module 37: Customer Self-Service Portal
 export const customerPortalSessions = pgTable("customer_portal_sessions", {
   id: uuid("id")
