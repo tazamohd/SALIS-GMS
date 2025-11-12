@@ -2316,6 +2316,146 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Smart Job Assignment Routes - Feature #6
+  app.post('/api/assignments/recommend/:jobCardId', isAuthenticated, async (req: any, res) => {
+    try {
+      const { getAIAssignmentRecommendations } = await import("./services/assignmentAI");
+      const { jobCardId } = req.params;
+      const userGarageId = req.user.garageId;
+      
+      if (!userGarageId) {
+        return res.status(400).json({ message: "User garage ID is required" });
+      }
+      
+      const recommendations = await getAIAssignmentRecommendations(storage, userGarageId, jobCardId);
+      res.json({ recommendations });
+    } catch (error) {
+      console.error("Error getting AI recommendations:", error);
+      res.status(500).json({ message: error instanceof Error ? error.message : "Failed to get AI recommendations" });
+    }
+  });
+
+  app.post('/api/assignments/assign', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.garageId;
+      const userId = req.user.id;
+      
+      if (!userGarageId) {
+        return res.status(400).json({ message: "User garage ID is required" });
+      }
+      
+      const { jobCardId, technicianId, reason, aiRecommendationId } = req.body;
+      
+      if (!jobCardId || !technicianId) {
+        return res.status(400).json({ message: "jobCardId and technicianId are required" });
+      }
+      
+      const updatedJob = await storage.assignTechnicianToJob({
+        garageId: userGarageId,
+        jobCardId,
+        technicianId,
+        assignedBy: userId,
+        reason,
+        aiRecommendationId
+      });
+      
+      res.json(updatedJob);
+    } catch (error) {
+      console.error("Error assigning technician:", error);
+      res.status(500).json({ message: error instanceof Error ? error.message : "Failed to assign technician" });
+    }
+  });
+
+  app.get('/api/assignments/history/:jobCardId', isAuthenticated, async (req: any, res) => {
+    try {
+      const { jobCardId } = req.params;
+      const { limit } = req.query;
+      const userGarageId = req.user.garageId;
+      
+      if (!userGarageId) {
+        return res.status(400).json({ message: "User garage ID is required" });
+      }
+      
+      const history = await storage.listAssignmentHistory(
+        userGarageId,
+        jobCardId,
+        limit ? parseInt(limit as string) : 50
+      );
+      res.json(history);
+    } catch (error) {
+      console.error("Error fetching assignment history:", error);
+      res.status(500).json({ message: "Failed to fetch assignment history" });
+    }
+  });
+
+  app.get('/api/assignments/rules', isAuthenticated, async (req: any, res) => {
+    try {
+      const { active } = req.query;
+      const userGarageId = req.user.garageId;
+      
+      if (!userGarageId) {
+        return res.status(400).json({ message: "User garage ID is required" });
+      }
+      
+      const rules = await storage.listAssignmentRules(
+        userGarageId,
+        active === 'true' ? true : active === 'false' ? false : undefined
+      );
+      res.json(rules);
+    } catch (error) {
+      console.error("Error fetching assignment rules:", error);
+      res.status(500).json({ message: "Failed to fetch assignment rules" });
+    }
+  });
+
+  app.post('/api/assignments/rules', isAuthenticated, async (req: any, res) => {
+    try {
+      const { insertAssignmentRuleSchema } = await import("@shared/schema");
+      const userGarageId = req.user.garageId;
+      const userId = req.user.id;
+      
+      if (!userGarageId) {
+        return res.status(400).json({ message: "User garage ID is required" });
+      }
+      
+      const validationResult = insertAssignmentRuleSchema.safeParse({
+        ...req.body,
+        garageId: userGarageId,
+        createdBy: userId
+      });
+      
+      if (!validationResult.success) {
+        return res.status(400).json(sanitizeZodError(validationResult.error));
+      }
+      
+      const rule = await storage.upsertAssignmentRule(validationResult.data);
+      res.status(201).json(rule);
+    } catch (error) {
+      console.error("Error creating assignment rule:", error);
+      res.status(500).json({ message: "Failed to create assignment rule" });
+    }
+  });
+
+  app.delete('/api/assignments/rules/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const userGarageId = req.user.garageId;
+      
+      if (!userGarageId) {
+        return res.status(400).json({ message: "User garage ID is required" });
+      }
+      
+      const deleted = await storage.deleteAssignmentRule(id, userGarageId);
+      if (!deleted) {
+        return res.status(404).json({ message: "Assignment rule not found" });
+      }
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting assignment rule:", error);
+      res.status(500).json({ message: "Failed to delete assignment rule" });
+    }
+  });
+
   app.get('/api/purchase-orders', isAuthenticated, async (req, res) => {
     try {
       const { garage_id, status } = req.query;

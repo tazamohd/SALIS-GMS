@@ -25,6 +25,7 @@ import SpareParts from "@/pages/SpareParts";
 import Suppliers from "@/pages/Suppliers";
 import InventoryManagement from "@/pages/InventoryManagement";
 import { PartsAvailability } from "@/pages/PartsAvailability";
+import { SmartAssignment } from "@/pages/SmartAssignment";
 import { TechnicianPortal } from "@/pages/TechnicianPortal";
 import TechnicianManagement from "@/pages/TechnicianManagement";
 import { TechnicianLayout } from "@/components/TechnicianLayout";
@@ -394,6 +395,11 @@ function Router() {
       <Route path="/parts-availability">
         <Layout>
           <PartsAvailability />
+        </Layout>
+      </Route>
+      <Route path="/smart-assignment">
+        <Layout>
+          <SmartAssignment />
         </Layout>
       </Route>
       <Route path="/suppliers">
