@@ -1749,6 +1749,21 @@ export interface IStorage {
   updateComplianceTask(id: string, data: Partial<ComplianceTask>): Promise<ComplianceTask>;
   deleteComplianceTask(id: string): Promise<void>;
   completeComplianceTask(id: string): Promise<ComplianceTask>;
+
+  // IoT Vehicle Health Monitoring Module
+  getIotSensors(vehicleId?: string, status?: string): Promise<any[]>;
+  getIotSensor(id: string): Promise<any | undefined>;
+  createIotSensor(data: any): Promise<any>;
+  updateIotSensor(id: string, data: any): Promise<any>;
+  deleteIotSensor(id: string): Promise<void>;
+  recordSensorReading(data: any): Promise<any>;
+  getSensorReadings(sensorId: string, startDate?: Date, endDate?: Date): Promise<any[]>;
+  getRecentAnomalies(vehicleId: string, limit?: number): Promise<any[]>;
+  getIotAlerts(vehicleId?: string, status?: string, severity?: string): Promise<any[]>;
+  getIotAlert(id: string): Promise<any | undefined>;
+  acknowledgeIotAlert(id: string, userId: string): Promise<any>;
+  resolveIotAlert(id: string, userId: string, resolution: string, jobCardId?: string): Promise<any>;
+  processAlertRules(sensorId: string, readingValue: number): Promise<any[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -8959,6 +8974,161 @@ export class DatabaseStorage implements IStorage {
   async createQuantumSecureMessage(data: InsertQuantumSecureMessage): Promise<QuantumSecureMessage> {
     const [record] = await db.insert(quantumSecureMessages).values(data).returning();
     return record;
+  }
+
+  // IoT Vehicle Health Monitoring Implementation
+  async getIotSensors(vehicleId?: string, status?: string): Promise<any[]> {
+    const conditions = [];
+    
+    if (vehicleId) {
+      conditions.push(eq(iotSensors.vehicleId, vehicleId));
+    }
+    if (status) {
+      conditions.push(eq(iotSensors.status, status));
+    }
+    
+    const query = conditions.length > 0
+      ? db.select().from(iotSensors).where(and(...conditions))
+      : db.select().from(iotSensors);
+    
+    return await query.orderBy(desc(iotSensors.lastCommunication));
+  }
+
+  async getIotSensor(id: string): Promise<any | undefined> {
+    const [sensor] = await db.select().from(iotSensors).where(eq(iotSensors.id, id));
+    return sensor;
+  }
+
+  async createIotSensor(data: any): Promise<any> {
+    const [sensor] = await db.insert(iotSensors).values(data).returning();
+    await db.update(iotSensors).set({ lastCommunication: new Date() }).where(eq(iotSensors.id, sensor.id));
+    return sensor;
+  }
+
+  async updateIotSensor(id: string, data: any): Promise<any> {
+    const [sensor] = await db.update(iotSensors).set({ ...data, updatedAt: new Date() }).where(eq(iotSensors.id, id)).returning();
+    return sensor;
+  }
+
+  async deleteIotSensor(id: string): Promise<void> {
+    await db.delete(iotSensors).where(eq(iotSensors.id, id));
+  }
+
+  async recordSensorReading(data: any): Promise<any> {
+    const [reading] = await db.insert(iotSensorReadings).values({
+      ...data,
+      timestamp: new Date(),
+    }).returning();
+
+    // Update sensor last communication
+    await db.update(iotSensors).set({ lastCommunication: new Date() }).where(eq(iotSensors.id, data.sensorId));
+
+    // Process alert rules
+    if (data.value !== null && data.value !== undefined) {
+      await this.processAlertRules(data.sensorId, parseFloat(data.value));
+    }
+
+    return reading;
+  }
+
+  async getSensorReadings(sensorId: string, startDate?: Date, endDate?: Date): Promise<any[]> {
+    let query = db.select().from(iotSensorReadings).where(eq(iotSensorReadings.sensorId, sensorId));
+    
+    if (startDate && endDate) {
+      query = query.where(and(
+        gte(iotSensorReadings.timestamp, startDate),
+        lte(iotSensorReadings.timestamp, endDate)
+      )) as any;
+    }
+    
+    return await query.orderBy(desc(iotSensorReadings.timestamp)).limit(1000);
+  }
+
+  async getRecentAnomalies(vehicleId: string, limit: number = 10): Promise<any[]> {
+    return await db.select()
+      .from(iotSensorReadings)
+      .where(and(
+        eq(iotSensorReadings.vehicleId, vehicleId),
+        eq(iotSensorReadings.isAbnormal, true)
+      ))
+      .orderBy(desc(iotSensorReadings.timestamp))
+      .limit(limit);
+  }
+
+  async getIotAlerts(vehicleId?: string, status?: string, severity?: string): Promise<any[]> {
+    let conditions = [];
+    
+    if (vehicleId) {
+      conditions.push(eq(iotAlerts.vehicleId, vehicleId));
+    }
+    if (status) {
+      conditions.push(eq(iotAlerts.status, status));
+    }
+    if (severity) {
+      conditions.push(eq(iotAlerts.severity, severity));
+    }
+    
+    const query = conditions.length > 0 
+      ? db.select().from(iotAlerts).where(and(...conditions))
+      : db.select().from(iotAlerts);
+    
+    return await query.orderBy(desc(iotAlerts.createdAt));
+  }
+
+  async getIotAlert(id: string): Promise<any | undefined> {
+    const [alert] = await db.select().from(iotAlerts).where(eq(iotAlerts.id, id));
+    return alert;
+  }
+
+  async acknowledgeIotAlert(id: string, userId: string): Promise<any> {
+    const [alert] = await db.update(iotAlerts).set({
+      status: 'acknowledged',
+      acknowledgedBy: userId,
+      acknowledgedAt: new Date(),
+    }).where(eq(iotAlerts.id, id)).returning();
+    return alert;
+  }
+
+  async resolveIotAlert(id: string, userId: string, resolution: string, jobCardId?: string): Promise<any> {
+    const updateData: any = {
+      status: 'resolved',
+      resolvedBy: userId,
+      resolvedAt: new Date(),
+      recommendedAction: resolution,
+    };
+    
+    if (jobCardId) {
+      updateData.jobCardId = jobCardId;
+    }
+    
+    const [alert] = await db.update(iotAlerts).set(updateData).where(eq(iotAlerts.id, id)).returning();
+    return alert;
+  }
+
+  async processAlertRules(sensorId: string, readingValue: number): Promise<any[]> {
+    const sensor = await this.getIotSensor(sensorId);
+    if (!sensor) return [];
+
+    // Get all active alert rules for this sensor type (placeholder - needs alert rules table)
+    // For now, use basic threshold logic
+    const alerts: any[] = [];
+    
+    // Check if reading is abnormal (placeholder logic)
+    if (readingValue > 100 || readingValue < 0) {
+      const [alert] = await db.insert(iotAlerts).values({
+        sensorId: sensor.id,
+        vehicleId: sensor.vehicleId,
+        alertType: sensor.sensorType,
+        severity: readingValue > 120 ? 'critical' : 'high',
+        message: `${sensor.sensorType} reading of ${readingValue} exceeds normal range`,
+        triggerValue: readingValue,
+        status: 'active',
+      }).returning();
+      
+      alerts.push(alert);
+    }
+    
+    return alerts;
   }
 }
 
