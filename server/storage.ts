@@ -35,6 +35,14 @@ import {
   assignmentRules,
   assignmentHistory,
   aiAssignmentRecommendations,
+  callQueues,
+  callQueueMembers,
+  callSessions,
+  callEvents,
+  callNotes,
+  callRecordings,
+  callDispositionCodes,
+  agentPerformanceSnapshots,
   invoices,
   invoiceItems,
   payments,
@@ -89,6 +97,22 @@ import {
   type InsertAssignmentHistory,
   type AiAssignmentRecommendation,
   type InsertAiAssignmentRecommendation,
+  type CallQueue,
+  type InsertCallQueue,
+  type CallQueueMember,
+  type InsertCallQueueMember,
+  type CallSession,
+  type InsertCallSession,
+  type CallEvent,
+  type InsertCallEvent,
+  type CallNote,
+  type InsertCallNote,
+  type CallRecording,
+  type InsertCallRecording,
+  type CallDispositionCode,
+  type InsertCallDispositionCode,
+  type AgentPerformanceSnapshot,
+  type InsertAgentPerformanceSnapshot,
   type PurchaseOrder,
   type InsertPurchaseOrder,
   type PurchaseOrderItem,
@@ -780,6 +804,42 @@ export interface IStorage {
   getJobCardWithContext(jobCardId: string, garageId: string): Promise<{jobCard: JobCard, technician: User | null} | null>;
   getTechniciansWithLoad(garageId: string, skillFilters?: string[]): Promise<Array<{technician: User & {profile: TechnicianProfile}, activeJobCount: number}>>;
   assignTechnicianToJob(params: {garageId: string, jobCardId: string, technicianId: string, assignedBy: string, reason?: string, aiRecommendationId?: string}): Promise<JobCard>;
+  
+  // Call Center Module - Wave 2
+  createCallQueue(data: InsertCallQueue): Promise<CallQueue>;
+  listCallQueues(garageId: string, isActive?: boolean): Promise<CallQueue[]>;
+  getCallQueue(id: string, garageId: string): Promise<CallQueue | null>;
+  updateCallQueue(id: string, garageId: string, data: Partial<CallQueue>): Promise<CallQueue | null>;
+  deleteCallQueue(id: string, garageId: string): Promise<boolean>;
+  getCallQueueWithMembers(queueId: string, garageId: string): Promise<{queue: CallQueue, members: CallQueueMember[]} | null>;
+  
+  addQueueMember(data: InsertCallQueueMember): Promise<CallQueueMember>;
+  removeQueueMember(id: string, garageId: string): Promise<boolean>;
+  listQueueMembers(queueId: string, garageId: string, isActive?: boolean): Promise<CallQueueMember[]>;
+  updateQueueMember(id: string, garageId: string, data: Partial<CallQueueMember>): Promise<CallQueueMember | null>;
+  
+  createCallSession(data: InsertCallSession): Promise<CallSession>;
+  getCallSession(id: string, garageId: string): Promise<CallSession | null>;
+  listCallSessions(garageId: string, filters?: {status?: string, agentId?: string, queueId?: string}): Promise<CallSession[]>;
+  updateCallSession(id: string, garageId: string, data: Partial<CallSession>): Promise<CallSession | null>;
+  assignCallToAgent(params: {garageId: string, sessionId: string, agentId: string, assignedBy: string}): Promise<CallSession>;
+  
+  createCallEvent(data: InsertCallEvent): Promise<CallEvent>;
+  listCallEvents(sessionId: string): Promise<CallEvent[]>;
+  
+  createCallNote(data: InsertCallNote): Promise<CallNote>;
+  listCallNotes(sessionId: string): Promise<CallNote[]>;
+  
+  createCallRecording(data: InsertCallRecording): Promise<CallRecording>;
+  listCallRecordings(sessionId: string): Promise<CallRecording[]>;
+  
+  createDispositionCode(data: InsertCallDispositionCode): Promise<CallDispositionCode>;
+  listDispositionCodes(garageId: string, isActive?: boolean): Promise<CallDispositionCode[]>;
+  updateDispositionCode(id: string, garageId: string, data: Partial<CallDispositionCode>): Promise<CallDispositionCode | null>;
+  deleteDispositionCode(id: string, garageId: string): Promise<boolean>;
+  
+  createPerformanceSnapshot(data: InsertAgentPerformanceSnapshot): Promise<AgentPerformanceSnapshot>;
+  listAgentPerformance(garageId: string, agentId?: string, dateRange?: {start: Date, end: Date}): Promise<AgentPerformanceSnapshot[]>;
   
   getPurchaseOrders(garageId?: string, status?: string): Promise<PurchaseOrder[]>;
   getPurchaseOrder(id: string): Promise<PurchaseOrder | undefined>;
@@ -2952,6 +3012,280 @@ export class DatabaseStorage implements IStorage {
       
       return updated;
     });
+  }
+
+  // Call Center Module - Wave 2 Implementation
+  async createCallQueue(data: InsertCallQueue): Promise<CallQueue> {
+    const [queue] = await db.insert(callQueues)
+      .values(data)
+      .returning();
+    return queue;
+  }
+
+  async listCallQueues(garageId: string, isActive?: boolean): Promise<CallQueue[]> {
+    const conditions = [eq(callQueues.garageId, garageId)];
+    if (isActive !== undefined) {
+      conditions.push(eq(callQueues.isActive, isActive));
+    }
+    return await db.select().from(callQueues)
+      .where(and(...conditions))
+      .orderBy(desc(callQueues.priority));
+  }
+
+  async getCallQueue(id: string, garageId: string): Promise<CallQueue | null> {
+    const [queue] = await db.select().from(callQueues)
+      .where(and(
+        eq(callQueues.id, id),
+        eq(callQueues.garageId, garageId)
+      ));
+    return queue || null;
+  }
+
+  async updateCallQueue(id: string, garageId: string, data: Partial<CallQueue>): Promise<CallQueue | null> {
+    const [updated] = await db.update(callQueues)
+      .set({ ...data, updatedAt: new Date() })
+      .where(and(
+        eq(callQueues.id, id),
+        eq(callQueues.garageId, garageId)
+      ))
+      .returning();
+    return updated || null;
+  }
+
+  async deleteCallQueue(id: string, garageId: string): Promise<boolean> {
+    const result = await db.delete(callQueues)
+      .where(and(
+        eq(callQueues.id, id),
+        eq(callQueues.garageId, garageId)
+      ))
+      .returning();
+    return result.length > 0;
+  }
+
+  async getCallQueueWithMembers(queueId: string, garageId: string): Promise<{queue: CallQueue, members: CallQueueMember[]} | null> {
+    const queue = await this.getCallQueue(queueId, garageId);
+    if (!queue) return null;
+    
+    const members = await this.listQueueMembers(queueId, garageId);
+    return { queue, members };
+  }
+
+  async addQueueMember(data: InsertCallQueueMember): Promise<CallQueueMember> {
+    const [member] = await db.insert(callQueueMembers)
+      .values(data)
+      .returning();
+    return member;
+  }
+
+  async removeQueueMember(id: string, garageId: string): Promise<boolean> {
+    const result = await db.delete(callQueueMembers)
+      .where(and(
+        eq(callQueueMembers.id, id),
+        eq(callQueueMembers.garageId, garageId)
+      ))
+      .returning();
+    return result.length > 0;
+  }
+
+  async listQueueMembers(queueId: string, garageId: string, isActive?: boolean): Promise<CallQueueMember[]> {
+    const conditions = [
+      eq(callQueueMembers.queueId, queueId),
+      eq(callQueueMembers.garageId, garageId)
+    ];
+    if (isActive !== undefined) {
+      conditions.push(eq(callQueueMembers.isActive, isActive));
+    }
+    return await db.select().from(callQueueMembers)
+      .where(and(...conditions));
+  }
+
+  async updateQueueMember(id: string, garageId: string, data: Partial<CallQueueMember>): Promise<CallQueueMember | null> {
+    const [updated] = await db.update(callQueueMembers)
+      .set(data)
+      .where(and(
+        eq(callQueueMembers.id, id),
+        eq(callQueueMembers.garageId, garageId)
+      ))
+      .returning();
+    return updated || null;
+  }
+
+  async createCallSession(data: InsertCallSession): Promise<CallSession> {
+    const [session] = await db.insert(callSessions)
+      .values(data)
+      .returning();
+    return session;
+  }
+
+  async getCallSession(id: string, garageId: string): Promise<CallSession | null> {
+    const [session] = await db.select().from(callSessions)
+      .where(and(
+        eq(callSessions.id, id),
+        eq(callSessions.garageId, garageId)
+      ));
+    return session || null;
+  }
+
+  async listCallSessions(garageId: string, filters?: {status?: string, agentId?: string, queueId?: string}): Promise<CallSession[]> {
+    const conditions = [eq(callSessions.garageId, garageId)];
+    
+    if (filters?.status) {
+      conditions.push(eq(callSessions.status, filters.status));
+    }
+    if (filters?.agentId) {
+      conditions.push(eq(callSessions.assignedAgentId, filters.agentId));
+    }
+    if (filters?.queueId) {
+      conditions.push(eq(callSessions.queueId, filters.queueId));
+    }
+    
+    return await db.select().from(callSessions)
+      .where(and(...conditions))
+      .orderBy(desc(callSessions.createdAt));
+  }
+
+  async updateCallSession(id: string, garageId: string, data: Partial<CallSession>): Promise<CallSession | null> {
+    const [updated] = await db.update(callSessions)
+      .set({ ...data, updatedAt: new Date() })
+      .where(and(
+        eq(callSessions.id, id),
+        eq(callSessions.garageId, garageId)
+      ))
+      .returning();
+    return updated || null;
+  }
+
+  async assignCallToAgent(params: {garageId: string, sessionId: string, agentId: string, assignedBy: string}): Promise<CallSession> {
+    const { garageId, sessionId, agentId, assignedBy } = params;
+    
+    return await db.transaction(async (tx) => {
+      const [session] = await tx.select().from(callSessions)
+        .where(and(
+          eq(callSessions.id, sessionId),
+          eq(callSessions.garageId, garageId)
+        ));
+      
+      if (!session) {
+        throw new Error("Call session not found");
+      }
+      
+      const [updated] = await tx.update(callSessions)
+        .set({ 
+          assignedAgentId: agentId,
+          status: 'assigned',
+          updatedAt: new Date() 
+        })
+        .where(eq(callSessions.id, sessionId))
+        .returning();
+      
+      await tx.insert(callEvents).values({
+        sessionId,
+        eventType: 'agent_assigned',
+        payload: { agentId, assignedBy }
+      });
+      
+      return updated;
+    });
+  }
+
+  async createCallEvent(data: InsertCallEvent): Promise<CallEvent> {
+    const [event] = await db.insert(callEvents)
+      .values(data)
+      .returning();
+    return event;
+  }
+
+  async listCallEvents(sessionId: string): Promise<CallEvent[]> {
+    return await db.select().from(callEvents)
+      .where(eq(callEvents.sessionId, sessionId))
+      .orderBy(desc(callEvents.occurredAt));
+  }
+
+  async createCallNote(data: InsertCallNote): Promise<CallNote> {
+    const [note] = await db.insert(callNotes)
+      .values(data)
+      .returning();
+    return note;
+  }
+
+  async listCallNotes(sessionId: string): Promise<CallNote[]> {
+    return await db.select().from(callNotes)
+      .where(eq(callNotes.sessionId, sessionId))
+      .orderBy(desc(callNotes.createdAt));
+  }
+
+  async createCallRecording(data: InsertCallRecording): Promise<CallRecording> {
+    const [recording] = await db.insert(callRecordings)
+      .values(data)
+      .returning();
+    return recording;
+  }
+
+  async listCallRecordings(sessionId: string): Promise<CallRecording[]> {
+    return await db.select().from(callRecordings)
+      .where(eq(callRecordings.sessionId, sessionId))
+      .orderBy(desc(callRecordings.createdAt));
+  }
+
+  async createDispositionCode(data: InsertCallDispositionCode): Promise<CallDispositionCode> {
+    const [code] = await db.insert(callDispositionCodes)
+      .values(data)
+      .returning();
+    return code;
+  }
+
+  async listDispositionCodes(garageId: string, isActive?: boolean): Promise<CallDispositionCode[]> {
+    const conditions = [eq(callDispositionCodes.garageId, garageId)];
+    if (isActive !== undefined) {
+      conditions.push(eq(callDispositionCodes.isActive, isActive));
+    }
+    return await db.select().from(callDispositionCodes)
+      .where(and(...conditions))
+      .orderBy(callDispositionCodes.label);
+  }
+
+  async updateDispositionCode(id: string, garageId: string, data: Partial<CallDispositionCode>): Promise<CallDispositionCode | null> {
+    const [updated] = await db.update(callDispositionCodes)
+      .set({ ...data, updatedAt: new Date() })
+      .where(and(
+        eq(callDispositionCodes.id, id),
+        eq(callDispositionCodes.garageId, garageId)
+      ))
+      .returning();
+    return updated || null;
+  }
+
+  async deleteDispositionCode(id: string, garageId: string): Promise<boolean> {
+    const result = await db.delete(callDispositionCodes)
+      .where(and(
+        eq(callDispositionCodes.id, id),
+        eq(callDispositionCodes.garageId, garageId)
+      ))
+      .returning();
+    return result.length > 0;
+  }
+
+  async createPerformanceSnapshot(data: InsertAgentPerformanceSnapshot): Promise<AgentPerformanceSnapshot> {
+    const [snapshot] = await db.insert(agentPerformanceSnapshots)
+      .values(data)
+      .returning();
+    return snapshot;
+  }
+
+  async listAgentPerformance(garageId: string, agentId?: string, dateRange?: {start: Date, end: Date}): Promise<AgentPerformanceSnapshot[]> {
+    const conditions = [eq(agentPerformanceSnapshots.garageId, garageId)];
+    
+    if (agentId) {
+      conditions.push(eq(agentPerformanceSnapshots.agentUserId, agentId));
+    }
+    if (dateRange) {
+      conditions.push(gte(agentPerformanceSnapshots.intervalStart, dateRange.start));
+      conditions.push(lte(agentPerformanceSnapshots.intervalEnd, dateRange.end));
+    }
+    
+    return await db.select().from(agentPerformanceSnapshots)
+      .where(and(...conditions))
+      .orderBy(desc(agentPerformanceSnapshots.intervalStart));
   }
 
   async getPurchaseOrders(garageId?: string, status?: string): Promise<PurchaseOrder[]> {
