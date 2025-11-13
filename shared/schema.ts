@@ -8325,3 +8325,179 @@ export const insertAssignmentHistorySchema = createInsertSchema(assignmentHistor
 export type AiAssignmentRecommendation = typeof aiAssignmentRecommendations.$inferSelect;
 export type InsertAiAssignmentRecommendation = typeof aiAssignmentRecommendations.$inferInsert;
 export const insertAiAssignmentRecommendationSchema = createInsertSchema(aiAssignmentRecommendations).omit({ id: true, createdAt: true });
+
+// ========================================
+// CALL CENTER MODULE
+// ========================================
+
+// Call Queues - Define call routing and priority rules
+export const callQueues = pgTable("call_queues", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").notNull().references(() => garages.id),
+  name: varchar("name", { length: 255 }).notNull(),
+  description: text("description"),
+  priority: integer("priority").default(5), // 1-10 scale
+  routingStrategy: varchar("routing_strategy", { length: 50 }).default("round_robin"), // round_robin, least_active, skill_based
+  maxQueueSize: integer("max_queue_size").default(50),
+  maxWaitTimeSeconds: integer("max_wait_time_seconds").default(600), // 10 minutes
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => ({
+  garageIdx: index("call_queues_garage_idx").on(table.garageId),
+}));
+
+// Call Queue Members - Agents assigned to queues
+export const callQueueMembers = pgTable("call_queue_members", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  queueId: uuid("queue_id").notNull().references(() => callQueues.id, { onDelete: "cascade" }),
+  garageId: uuid("garage_id").notNull().references(() => garages.id),
+  agentUserId: varchar("agent_user_id").notNull().references(() => users.id),
+  skillTags: jsonb("skill_tags"), // Array of skill strings
+  isPrimary: boolean("is_primary").default(false),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => ({
+  queueIdx: index("queue_members_queue_idx").on(table.queueId),
+  garageIdx: index("queue_members_garage_idx").on(table.garageId),
+  agentIdx: index("queue_members_agent_idx").on(table.agentUserId),
+  uniqueAgentQueue: uniqueIndex("queue_members_unique_agent_queue").on(table.queueId, table.agentUserId),
+}));
+
+// Call Sessions - Individual call records
+export const callSessions = pgTable("call_sessions", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").notNull().references(() => garages.id),
+  queueId: uuid("queue_id").references(() => callQueues.id),
+  customerId: varchar("customer_id").references(() => customerProfiles.userId),
+  vehicleId: uuid("vehicle_id").references(() => vehicles.id),
+  direction: varchar("direction", { length: 20 }).notNull(), // inbound, outbound
+  phoneNumber: varchar("phone_number", { length: 20 }).notNull(),
+  status: varchar("status", { length: 50 }).default("queued"), // queued, ringing, active, completed, missed, failed
+  priority: integer("priority").default(5),
+  assignedAgentId: varchar("assigned_agent_id").references(() => users.id),
+  twilioCallSid: varchar("twilio_call_sid", { length: 100 }), // Twilio call identifier
+  startedAt: timestamp("started_at"),
+  answeredAt: timestamp("answered_at"),
+  endedAt: timestamp("ended_at"),
+  durationSeconds: integer("duration_seconds"),
+  waitTimeSeconds: integer("wait_time_seconds"),
+  talkTimeSeconds: integer("talk_time_seconds"),
+  holdTimeSeconds: integer("hold_time_seconds"),
+  outcomeCodeId: uuid("outcome_code_id").references(() => callDispositionCodes.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => ({
+  garageIdx: index("call_sessions_garage_idx").on(table.garageId),
+  queueIdx: index("call_sessions_queue_idx").on(table.queueId),
+  customerIdx: index("call_sessions_customer_idx").on(table.customerId),
+  agentIdx: index("call_sessions_agent_idx").on(table.assignedAgentId),
+  statusIdx: index("call_sessions_status_idx").on(table.status),
+  twilioIdx: index("call_sessions_twilio_idx").on(table.twilioCallSid),
+}));
+
+// Call Events - Timeline of events during a call
+export const callEvents = pgTable("call_events", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  sessionId: uuid("session_id").notNull().references(() => callSessions.id, { onDelete: "cascade" }),
+  eventType: varchar("event_type", { length: 50 }).notNull(), // queued, ringing, answered, hold, transfer, ended
+  payload: jsonb("payload"), // Event-specific data
+  occurredAt: timestamp("occurred_at").defaultNow(),
+}, (table) => ({
+  sessionIdx: index("call_events_session_idx").on(table.sessionId),
+}));
+
+// Call Notes - Agent notes during/after calls
+export const callNotes = pgTable("call_notes", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  sessionId: uuid("session_id").notNull().references(() => callSessions.id, { onDelete: "cascade" }),
+  authorUserId: varchar("author_user_id").notNull().references(() => users.id),
+  note: text("note").notNull(),
+  visibility: varchar("visibility", { length: 20 }).default("internal"), // internal, customer_visible
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => ({
+  sessionIdx: index("call_notes_session_idx").on(table.sessionId),
+}));
+
+// Call Recordings - Metadata for call recordings
+export const callRecordings = pgTable("call_recordings", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  sessionId: uuid("session_id").notNull().references(() => callSessions.id, { onDelete: "cascade" }),
+  twilioRecordingSid: varchar("twilio_recording_sid", { length: 100 }),
+  storageUrl: text("storage_url"), // S3/cloud storage URL
+  transcriptionUrl: text("transcription_url"),
+  durationSeconds: integer("duration_seconds"),
+  fileSize: integer("file_size"), // bytes
+  startedAt: timestamp("started_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => ({
+  sessionIdx: index("call_recordings_session_idx").on(table.sessionId),
+}));
+
+// Call Disposition Codes - Predefined call outcomes
+export const callDispositionCodes = pgTable("call_disposition_codes", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").notNull().references(() => garages.id),
+  code: varchar("code", { length: 50 }).notNull(),
+  label: varchar("label", { length: 255 }).notNull(),
+  category: varchar("category", { length: 50 }), // resolved, follow_up, escalated, missed, no_answer
+  followUpRequired: boolean("follow_up_required").default(false),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => ({
+  garageIdx: index("disposition_codes_garage_idx").on(table.garageId),
+}));
+
+// Agent Performance Snapshots - Aggregated metrics per agent
+export const agentPerformanceSnapshots = pgTable("agent_performance_snapshots", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  agentUserId: varchar("agent_user_id").notNull().references(() => users.id),
+  garageId: uuid("garage_id").notNull().references(() => garages.id),
+  intervalStart: timestamp("interval_start").notNull(),
+  intervalEnd: timestamp("interval_end").notNull(),
+  callsHandled: integer("calls_handled").default(0),
+  callsMissed: integer("calls_missed").default(0),
+  avgHandleTimeSeconds: integer("avg_handle_time_seconds"),
+  avgWaitTimeSeconds: integer("avg_wait_time_seconds"),
+  firstCallResolutionRate: decimal("first_call_resolution_rate", { precision: 5, scale: 2 }), // percentage
+  csatScore: decimal("csat_score", { precision: 3, scale: 2 }), // Customer satisfaction 1-5
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => ({
+  agentIdx: index("agent_performance_agent_idx").on(table.agentUserId),
+  garageIdx: index("agent_performance_garage_idx").on(table.garageId),
+}));
+
+// Type exports for Call Center
+export type CallQueue = typeof callQueues.$inferSelect;
+export type InsertCallQueue = typeof callQueues.$inferInsert;
+export const insertCallQueueSchema = createInsertSchema(callQueues).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type CallQueueMember = typeof callQueueMembers.$inferSelect;
+export type InsertCallQueueMember = typeof callQueueMembers.$inferInsert;
+export const insertCallQueueMemberSchema = createInsertSchema(callQueueMembers).omit({ id: true, createdAt: true });
+
+export type CallSession = typeof callSessions.$inferSelect;
+export type InsertCallSession = typeof callSessions.$inferInsert;
+export const insertCallSessionSchema = createInsertSchema(callSessions).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type CallEvent = typeof callEvents.$inferSelect;
+export type InsertCallEvent = typeof callEvents.$inferInsert;
+export const insertCallEventSchema = createInsertSchema(callEvents).omit({ id: true, occurredAt: true });
+
+export type CallNote = typeof callNotes.$inferSelect;
+export type InsertCallNote = typeof callNotes.$inferInsert;
+export const insertCallNoteSchema = createInsertSchema(callNotes).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type CallRecording = typeof callRecordings.$inferSelect;
+export type InsertCallRecording = typeof callRecordings.$inferInsert;
+export const insertCallRecordingSchema = createInsertSchema(callRecordings).omit({ id: true, createdAt: true });
+
+export type CallDispositionCode = typeof callDispositionCodes.$inferSelect;
+export type InsertCallDispositionCode = typeof callDispositionCodes.$inferInsert;
+export const insertCallDispositionCodeSchema = createInsertSchema(callDispositionCodes).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type AgentPerformanceSnapshot = typeof agentPerformanceSnapshots.$inferSelect;
+export type InsertAgentPerformanceSnapshot = typeof agentPerformanceSnapshots.$inferInsert;
+export const insertAgentPerformanceSnapshotSchema = createInsertSchema(agentPerformanceSnapshots).omit({ id: true, createdAt: true });
