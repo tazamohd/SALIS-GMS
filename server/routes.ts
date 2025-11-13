@@ -2456,6 +2456,563 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Call Center Module API Routes - Wave 2
+  
+  // Call Queues
+  app.get('/api/call-center/queues', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.garageId;
+      if (!userGarageId) {
+        return res.status(400).json({ message: "User garage ID is required" });
+      }
+      
+      const { active } = req.query;
+      const queues = await storage.listCallQueues(
+        userGarageId,
+        active === 'true' ? true : active === 'false' ? false : undefined
+      );
+      res.json(queues);
+    } catch (error) {
+      console.error("Error fetching call queues:", error);
+      res.status(500).json({ message: "Failed to fetch call queues" });
+    }
+  });
+
+  app.post('/api/call-center/queues', isAuthenticated, async (req: any, res) => {
+    try {
+      const { insertCallQueueSchema } = await import("@shared/schema");
+      const userGarageId = req.user.garageId;
+      
+      if (!userGarageId) {
+        return res.status(400).json({ message: "User garage ID is required" });
+      }
+      
+      const validationResult = insertCallQueueSchema.safeParse({
+        ...req.body,
+        garageId: userGarageId
+      });
+      
+      if (!validationResult.success) {
+        return res.status(400).json(sanitizeZodError(validationResult.error));
+      }
+      
+      const queue = await storage.createCallQueue(validationResult.data);
+      res.status(201).json(queue);
+    } catch (error) {
+      console.error("Error creating call queue:", error);
+      res.status(500).json({ message: "Failed to create call queue" });
+    }
+  });
+
+  app.get('/api/call-center/queues/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const userGarageId = req.user.garageId;
+      
+      if (!userGarageId) {
+        return res.status(400).json({ message: "User garage ID is required" });
+      }
+      
+      const queue = await storage.getCallQueue(id, userGarageId);
+      if (!queue) {
+        return res.status(404).json({ message: "Call queue not found" });
+      }
+      res.json(queue);
+    } catch (error) {
+      console.error("Error fetching call queue:", error);
+      res.status(500).json({ message: "Failed to fetch call queue" });
+    }
+  });
+
+  app.patch('/api/call-center/queues/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const userGarageId = req.user.garageId;
+      
+      if (!userGarageId) {
+        return res.status(400).json({ message: "User garage ID is required" });
+      }
+      
+      const { garageId: _, ...safeBody } = req.body;
+      
+      const updated = await storage.updateCallQueue(id, userGarageId, safeBody);
+      if (!updated) {
+        return res.status(404).json({ message: "Call queue not found" });
+      }
+      res.json(updated);
+    } catch (error) {
+      console.error("Error updating call queue:", error);
+      res.status(500).json({ message: "Failed to update call queue" });
+    }
+  });
+
+  app.delete('/api/call-center/queues/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const userGarageId = req.user.garageId;
+      
+      if (!userGarageId) {
+        return res.status(400).json({ message: "User garage ID is required" });
+      }
+      
+      const deleted = await storage.deleteCallQueue(id, userGarageId);
+      if (!deleted) {
+        return res.status(404).json({ message: "Call queue not found" });
+      }
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting call queue:", error);
+      res.status(500).json({ message: "Failed to delete call queue" });
+    }
+  });
+
+  app.get('/api/call-center/queues/:id/with-members', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const userGarageId = req.user.garageId;
+      
+      if (!userGarageId) {
+        return res.status(400).json({ message: "User garage ID is required" });
+      }
+      
+      const result = await storage.getCallQueueWithMembers(id, userGarageId);
+      if (!result) {
+        return res.status(404).json({ message: "Call queue not found" });
+      }
+      res.json(result);
+    } catch (error) {
+      console.error("Error fetching queue with members:", error);
+      res.status(500).json({ message: "Failed to fetch queue with members" });
+    }
+  });
+
+  // Queue Members
+  app.post('/api/call-center/queues/:queueId/members', isAuthenticated, async (req: any, res) => {
+    try {
+      const { insertCallQueueMemberSchema } = await import("@shared/schema");
+      const { queueId } = req.params;
+      const userGarageId = req.user.garageId;
+      
+      if (!userGarageId) {
+        return res.status(400).json({ message: "User garage ID is required" });
+      }
+      
+      const validationResult = insertCallQueueMemberSchema.safeParse({
+        ...req.body,
+        queueId,
+        garageId: userGarageId
+      });
+      
+      if (!validationResult.success) {
+        return res.status(400).json(sanitizeZodError(validationResult.error));
+      }
+      
+      const member = await storage.addQueueMember(validationResult.data);
+      res.status(201).json(member);
+    } catch (error) {
+      console.error("Error adding queue member:", error);
+      res.status(500).json({ message: error instanceof Error ? error.message : "Failed to add queue member" });
+    }
+  });
+
+  app.get('/api/call-center/queues/:queueId/members', isAuthenticated, async (req: any, res) => {
+    try {
+      const { queueId } = req.params;
+      const { active } = req.query;
+      const userGarageId = req.user.garageId;
+      
+      if (!userGarageId) {
+        return res.status(400).json({ message: "User garage ID is required" });
+      }
+      
+      const members = await storage.listQueueMembers(
+        queueId,
+        userGarageId,
+        active === 'true' ? true : active === 'false' ? false : undefined
+      );
+      res.json(members);
+    } catch (error) {
+      console.error("Error fetching queue members:", error);
+      res.status(500).json({ message: "Failed to fetch queue members" });
+    }
+  });
+
+  app.patch('/api/call-center/queue-members/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const userGarageId = req.user.garageId;
+      
+      if (!userGarageId) {
+        return res.status(400).json({ message: "User garage ID is required" });
+      }
+      
+      const { garageId: _, queueId: __, ...safeBody } = req.body;
+      
+      const updated = await storage.updateQueueMember(id, userGarageId, safeBody);
+      if (!updated) {
+        return res.status(404).json({ message: "Queue member not found" });
+      }
+      res.json(updated);
+    } catch (error) {
+      console.error("Error updating queue member:", error);
+      res.status(500).json({ message: "Failed to update queue member" });
+    }
+  });
+
+  app.delete('/api/call-center/queue-members/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const userGarageId = req.user.garageId;
+      
+      if (!userGarageId) {
+        return res.status(400).json({ message: "User garage ID is required" });
+      }
+      
+      const deleted = await storage.removeQueueMember(id, userGarageId);
+      if (!deleted) {
+        return res.status(404).json({ message: "Queue member not found" });
+      }
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error removing queue member:", error);
+      res.status(500).json({ message: "Failed to remove queue member" });
+    }
+  });
+
+  // Call Sessions
+  app.get('/api/call-center/sessions', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.garageId;
+      if (!userGarageId) {
+        return res.status(400).json({ message: "User garage ID is required" });
+      }
+      
+      const { status, agent_id, queue_id } = req.query;
+      const filters = {
+        status: status as string | undefined,
+        agentId: agent_id as string | undefined,
+        queueId: queue_id as string | undefined
+      };
+      
+      const sessions = await storage.listCallSessions(userGarageId, filters);
+      res.json(sessions);
+    } catch (error) {
+      console.error("Error fetching call sessions:", error);
+      res.status(500).json({ message: "Failed to fetch call sessions" });
+    }
+  });
+
+  app.post('/api/call-center/sessions', isAuthenticated, async (req: any, res) => {
+    try {
+      const { insertCallSessionSchema } = await import("@shared/schema");
+      const userGarageId = req.user.garageId;
+      
+      if (!userGarageId) {
+        return res.status(400).json({ message: "User garage ID is required" });
+      }
+      
+      const validationResult = insertCallSessionSchema.safeParse({
+        ...req.body,
+        garageId: userGarageId
+      });
+      
+      if (!validationResult.success) {
+        return res.status(400).json(sanitizeZodError(validationResult.error));
+      }
+      
+      const session = await storage.createCallSession(validationResult.data);
+      res.status(201).json(session);
+    } catch (error) {
+      console.error("Error creating call session:", error);
+      res.status(500).json({ message: "Failed to create call session" });
+    }
+  });
+
+  app.get('/api/call-center/sessions/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const userGarageId = req.user.garageId;
+      
+      if (!userGarageId) {
+        return res.status(400).json({ message: "User garage ID is required" });
+      }
+      
+      const session = await storage.getCallSession(id, userGarageId);
+      if (!session) {
+        return res.status(404).json({ message: "Call session not found" });
+      }
+      res.json(session);
+    } catch (error) {
+      console.error("Error fetching call session:", error);
+      res.status(500).json({ message: "Failed to fetch call session" });
+    }
+  });
+
+  app.patch('/api/call-center/sessions/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const userGarageId = req.user.garageId;
+      
+      if (!userGarageId) {
+        return res.status(400).json({ message: "User garage ID is required" });
+      }
+      
+      const { garageId: _, queueId: __, customerId: ___, vehicleId: ____, assignedAgentId: _____, ...safeBody } = req.body;
+      
+      const updated = await storage.updateCallSession(id, userGarageId, safeBody);
+      if (!updated) {
+        return res.status(404).json({ message: "Call session not found" });
+      }
+      res.json(updated);
+    } catch (error) {
+      console.error("Error updating call session:", error);
+      res.status(500).json({ message: "Failed to update call session" });
+    }
+  });
+
+  app.post('/api/call-center/sessions/:id/assign', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const userGarageId = req.user.garageId;
+      const userId = req.user.id;
+      
+      if (!userGarageId) {
+        return res.status(400).json({ message: "User garage ID is required" });
+      }
+      
+      const { agentId } = req.body;
+      if (!agentId) {
+        return res.status(400).json({ message: "agentId is required" });
+      }
+      
+      const session = await storage.assignCallToAgent({
+        garageId: userGarageId,
+        sessionId: id,
+        agentId,
+        assignedBy: userId
+      });
+      
+      res.json(session);
+    } catch (error) {
+      console.error("Error assigning call to agent:", error);
+      res.status(500).json({ message: error instanceof Error ? error.message : "Failed to assign call to agent" });
+    }
+  });
+
+  // Call Notes
+  app.post('/api/call-center/sessions/:sessionId/notes', isAuthenticated, async (req: any, res) => {
+    try {
+      const { insertCallNoteSchema } = await import("@shared/schema");
+      const { sessionId } = req.params;
+      const userId = req.user.id;
+      
+      const validationResult = insertCallNoteSchema.safeParse({
+        ...req.body,
+        sessionId,
+        authorUserId: userId
+      });
+      
+      if (!validationResult.success) {
+        return res.status(400).json(sanitizeZodError(validationResult.error));
+      }
+      
+      const note = await storage.createCallNote(validationResult.data);
+      res.status(201).json(note);
+    } catch (error) {
+      console.error("Error creating call note:", error);
+      res.status(500).json({ message: "Failed to create call note" });
+    }
+  });
+
+  app.get('/api/call-center/sessions/:sessionId/notes', isAuthenticated, async (req: any, res) => {
+    try {
+      const { sessionId } = req.params;
+      const notes = await storage.listCallNotes(sessionId);
+      res.json(notes);
+    } catch (error) {
+      console.error("Error fetching call notes:", error);
+      res.status(500).json({ message: "Failed to fetch call notes" });
+    }
+  });
+
+  // Call Recordings
+  app.post('/api/call-center/sessions/:sessionId/recordings', isAuthenticated, async (req: any, res) => {
+    try {
+      const { insertCallRecordingSchema } = await import("@shared/schema");
+      const { sessionId } = req.params;
+      
+      const validationResult = insertCallRecordingSchema.safeParse({
+        ...req.body,
+        sessionId
+      });
+      
+      if (!validationResult.success) {
+        return res.status(400).json(sanitizeZodError(validationResult.error));
+      }
+      
+      const recording = await storage.createCallRecording(validationResult.data);
+      res.status(201).json(recording);
+    } catch (error) {
+      console.error("Error creating call recording:", error);
+      res.status(500).json({ message: "Failed to create call recording" });
+    }
+  });
+
+  app.get('/api/call-center/sessions/:sessionId/recordings', isAuthenticated, async (req: any, res) => {
+    try {
+      const { sessionId } = req.params;
+      const recordings = await storage.listCallRecordings(sessionId);
+      res.json(recordings);
+    } catch (error) {
+      console.error("Error fetching call recordings:", error);
+      res.status(500).json({ message: "Failed to fetch call recordings" });
+    }
+  });
+
+  // Disposition Codes
+  app.get('/api/call-center/disposition-codes', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.garageId;
+      if (!userGarageId) {
+        return res.status(400).json({ message: "User garage ID is required" });
+      }
+      
+      const { active } = req.query;
+      const codes = await storage.listDispositionCodes(
+        userGarageId,
+        active === 'true' ? true : active === 'false' ? false : undefined
+      );
+      res.json(codes);
+    } catch (error) {
+      console.error("Error fetching disposition codes:", error);
+      res.status(500).json({ message: "Failed to fetch disposition codes" });
+    }
+  });
+
+  app.post('/api/call-center/disposition-codes', isAuthenticated, async (req: any, res) => {
+    try {
+      const { insertCallDispositionCodeSchema } = await import("@shared/schema");
+      const userGarageId = req.user.garageId;
+      
+      if (!userGarageId) {
+        return res.status(400).json({ message: "User garage ID is required" });
+      }
+      
+      const validationResult = insertCallDispositionCodeSchema.safeParse({
+        ...req.body,
+        garageId: userGarageId
+      });
+      
+      if (!validationResult.success) {
+        return res.status(400).json(sanitizeZodError(validationResult.error));
+      }
+      
+      const code = await storage.createDispositionCode(validationResult.data);
+      res.status(201).json(code);
+    } catch (error) {
+      console.error("Error creating disposition code:", error);
+      res.status(500).json({ message: "Failed to create disposition code" });
+    }
+  });
+
+  app.patch('/api/call-center/disposition-codes/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const userGarageId = req.user.garageId;
+      
+      if (!userGarageId) {
+        return res.status(400).json({ message: "User garage ID is required" });
+      }
+      
+      const { garageId: _, ...safeBody } = req.body;
+      
+      const updated = await storage.updateDispositionCode(id, userGarageId, safeBody);
+      if (!updated) {
+        return res.status(404).json({ message: "Disposition code not found" });
+      }
+      res.json(updated);
+    } catch (error) {
+      console.error("Error updating disposition code:", error);
+      res.status(500).json({ message: "Failed to update disposition code" });
+    }
+  });
+
+  app.delete('/api/call-center/disposition-codes/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const userGarageId = req.user.garageId;
+      
+      if (!userGarageId) {
+        return res.status(400).json({ message: "User garage ID is required" });
+      }
+      
+      const deleted = await storage.deleteDispositionCode(id, userGarageId);
+      if (!deleted) {
+        return res.status(404).json({ message: "Disposition code not found" });
+      }
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting disposition code:", error);
+      res.status(500).json({ message: "Failed to delete disposition code" });
+    }
+  });
+
+  // Agent Performance
+  app.post('/api/call-center/performance', isAuthenticated, async (req: any, res) => {
+    try {
+      const { insertAgentPerformanceSnapshotSchema } = await import("@shared/schema");
+      const userGarageId = req.user.garageId;
+      
+      if (!userGarageId) {
+        return res.status(400).json({ message: "User garage ID is required" });
+      }
+      
+      const validationResult = insertAgentPerformanceSnapshotSchema.safeParse({
+        ...req.body,
+        garageId: userGarageId
+      });
+      
+      if (!validationResult.success) {
+        return res.status(400).json(sanitizeZodError(validationResult.error));
+      }
+      
+      const snapshot = await storage.createPerformanceSnapshot(validationResult.data);
+      res.status(201).json(snapshot);
+    } catch (error) {
+      console.error("Error creating performance snapshot:", error);
+      res.status(500).json({ message: "Failed to create performance snapshot" });
+    }
+  });
+
+  app.get('/api/call-center/performance', isAuthenticated, async (req: any, res) => {
+    try {
+      const userGarageId = req.user.garageId;
+      if (!userGarageId) {
+        return res.status(400).json({ message: "User garage ID is required" });
+      }
+      
+      const { agent_id, start_date, end_date } = req.query;
+      let dateRange: {start: Date, end: Date} | undefined;
+      
+      if (start_date && end_date) {
+        dateRange = {
+          start: new Date(start_date as string),
+          end: new Date(end_date as string)
+        };
+      }
+      
+      const performance = await storage.listAgentPerformance(
+        userGarageId,
+        agent_id as string | undefined,
+        dateRange
+      );
+      res.json(performance);
+    } catch (error) {
+      console.error("Error fetching agent performance:", error);
+      res.status(500).json({ message: "Failed to fetch agent performance" });
+    }
+  });
+
   app.get('/api/purchase-orders', isAuthenticated, async (req, res) => {
     try {
       const { garage_id, status } = req.query;
