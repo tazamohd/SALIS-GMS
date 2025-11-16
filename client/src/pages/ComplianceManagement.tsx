@@ -8,7 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { TabsPageLayout, TabConfig } from "@/components/layouts/TabsPageLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -154,99 +154,72 @@ export default function ComplianceManagement() {
     },
   });
 
-  return (
-    <div className="container mx-auto py-6 space-y-6 bg-white dark:bg-[#010101] min-h-screen">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-montserrat font-semibold text-salis-black dark:text-white" data-testid="heading-compliance">
-            Compliance Management
-          </h1>
-          <p className="text-salis-gray dark:text-salis-gray-light font-poppins mt-1" data-testid="text-subtitle">
-            Manage compliance policies, audits, and tasks
-          </p>
-        </div>
-        <Button
-          onClick={() => setIsPolicyDialogOpen(true)}
-          className="bg-salis-black hover:bg-salis-gray-dark text-white font-poppins"
-          data-testid="button-create-policy"
-        >
-          <Shield className="mr-2 h-4 w-4" />
-          Create Policy
-        </Button>
-      </div>
-
-      <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full">
-        <TabsList className="bg-salis-gray-light dark:bg-salis-gray-dark" data-testid="tabs-compliance">
-          <TabsTrigger value="policies" className="font-poppins" data-testid="tab-policies">
-            <Shield className="mr-2 h-4 w-4" />
-            Policies
-          </TabsTrigger>
-          <TabsTrigger value="audits" className="font-poppins" data-testid="tab-audits">
-            <ClipboardCheck className="mr-2 h-4 w-4" />
-            Audits
-          </TabsTrigger>
-          <TabsTrigger value="tasks" className="font-poppins" data-testid="tab-tasks">
-            <FileText className="mr-2 h-4 w-4" />
-            Tasks
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="policies" className="space-y-4">
-          <Card className="border-salis-gray-light dark:border-salis-gray-dark bg-white dark:bg-[#010101]">
-            <CardHeader>
-              <CardTitle className="font-montserrat text-salis-black dark:text-white">Compliance Policies</CardTitle>
-              <CardDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
-                Regulatory and internal compliance policies
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {policiesLoading ? (
-                <p className="text-salis-gray font-poppins" data-testid="text-loading">Loading policies...</p>
-              ) : policies.length === 0 ? (
-                <p className="text-salis-gray font-poppins" data-testid="text-no-policies">No policies found</p>
-              ) : (
-                <div className="grid gap-4">
-                  {policies.map((policy: any) => (
-                    <Card key={policy.id} className="border-salis-gray-light dark:border-salis-gray-dark" data-testid={`card-policy-${policy.id}`}>
-                      <CardContent className="p-6">
-                        <div className="flex justify-between items-start">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-3 mb-2">
-                              <h3 className="text-lg font-montserrat font-medium text-salis-black dark:text-white" data-testid={`text-policy-name-${policy.id}`}>
-                                {policy.policyName}
-                              </h3>
-                              <Badge className={policy.status === "active" ? "bg-green-500 text-white" : policy.status === "draft" ? "bg-yellow-500 text-white" : "bg-salis-gray text-white"} data-testid={`badge-policy-status-${policy.id}`}>
-                                {policy.status}
-                              </Badge>
-                            </div>
-                            <p className="text-sm text-salis-gray dark:text-salis-gray-light font-poppins mb-2" data-testid={`text-policy-category-${policy.id}`}>
-                              Category: {policy.category}
-                            </p>
-                            <p className="text-sm text-salis-gray dark:text-salis-gray-light font-poppins mb-2" data-testid={`text-policy-description-${policy.id}`}>
-                              {policy.description || "No description"}
-                            </p>
-                            <div className="flex gap-4 text-sm text-salis-gray dark:text-salis-gray-light">
-                              <span data-testid={`text-effective-date-${policy.id}`}>
-                                Effective: {new Date(policy.effectiveDate).toLocaleDateString()}
+  const tabs: TabConfig[] = [
+    {
+      id: "policies",
+      label: "Policies",
+      icon: Shield,
+      content: (
+        <Card className="border-salis-gray-light dark:border-salis-gray-dark bg-white dark:bg-[#010101]">
+          <CardHeader>
+            <CardTitle className="font-montserrat text-salis-black dark:text-white">Compliance Policies</CardTitle>
+            <CardDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
+              Regulatory and internal compliance policies
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {policiesLoading ? (
+              <p className="text-salis-gray font-poppins" data-testid="text-loading">Loading policies...</p>
+            ) : policies.length === 0 ? (
+              <p className="text-salis-gray font-poppins" data-testid="text-no-policies">No policies found</p>
+            ) : (
+              <div className="grid gap-4">
+                {policies.map((policy: any) => (
+                  <Card key={policy.id} className="border-salis-gray-light dark:border-salis-gray-dark" data-testid={`card-policy-${policy.id}`}>
+                    <CardContent className="p-6">
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-2">
+                            <h3 className="text-lg font-montserrat font-medium text-salis-black dark:text-white" data-testid={`text-policy-name-${policy.id}`}>
+                              {policy.policyName}
+                            </h3>
+                            <Badge className={policy.status === "active" ? "bg-green-500 text-white" : policy.status === "draft" ? "bg-yellow-500 text-white" : "bg-salis-gray text-white"} data-testid={`badge-policy-status-${policy.id}`}>
+                              {policy.status}
+                            </Badge>
+                          </div>
+                          <p className="text-sm text-salis-gray dark:text-salis-gray-light font-poppins mb-2" data-testid={`text-policy-category-${policy.id}`}>
+                            Category: {policy.category}
+                          </p>
+                          <p className="text-sm text-salis-gray dark:text-salis-gray-light font-poppins mb-2" data-testid={`text-policy-description-${policy.id}`}>
+                            {policy.description || "No description"}
+                          </p>
+                          <div className="flex gap-4 text-sm text-salis-gray dark:text-salis-gray-light">
+                            <span data-testid={`text-effective-date-${policy.id}`}>
+                              Effective: {new Date(policy.effectiveDate).toLocaleDateString()}
+                            </span>
+                            {policy.expirationDate && (
+                              <span data-testid={`text-expiration-date-${policy.id}`}>
+                                Expires: {new Date(policy.expirationDate).toLocaleDateString()}
                               </span>
-                              {policy.expirationDate && (
-                                <span data-testid={`text-expiration-date-${policy.id}`}>
-                                  Expires: {new Date(policy.expirationDate).toLocaleDateString()}
-                                </span>
-                              )}
-                            </div>
+                            )}
                           </div>
                         </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="audits" className="space-y-4">
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )
+    },
+    {
+      id: "audits",
+      label: "Audits",
+      icon: ClipboardCheck,
+      content: (
+        <div className="space-y-4">
           <div className="flex justify-end mb-4">
             <Button
               onClick={() => setIsAuditDialogOpen(true)}
@@ -305,9 +278,15 @@ export default function ComplianceManagement() {
               )}
             </CardContent>
           </Card>
-        </TabsContent>
-
-        <TabsContent value="tasks" className="space-y-4">
+        </div>
+      )
+    },
+    {
+      id: "tasks",
+      label: "Tasks",
+      icon: FileText,
+      content: (
+        <div className="space-y-4">
           <div className="flex justify-end mb-4">
             <Button
               onClick={() => setIsTaskDialogOpen(true)}
@@ -379,8 +358,27 @@ export default function ComplianceManagement() {
               )}
             </CardContent>
           </Card>
-        </TabsContent>
-      </Tabs>
+        </div>
+      )
+    }
+  ];
+
+  return (
+    <>
+      <TabsPageLayout
+        title="Compliance Management"
+        description="Manage compliance policies, audits, and tasks"
+        icon={Shield}
+        primaryAction={{
+          label: "Create Policy",
+          icon: Shield,
+          onClick: () => setIsPolicyDialogOpen(true),
+          testId: "button-create-policy"
+        }}
+        tabs={tabs}
+        activeTab={selectedTab}
+        onTabChange={setSelectedTab}
+      />
 
       <Dialog open={isPolicyDialogOpen} onOpenChange={setIsPolicyDialogOpen}>
         <DialogContent className="bg-white dark:bg-salis-black">
@@ -580,7 +578,7 @@ export default function ComplianceManagement() {
                   <FormItem>
                     <FormLabel>Task Name</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="Review safety protocols" data-testid="input-task-name" />
+                      <Input {...field} placeholder="Review policy" data-testid="input-task-name" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -588,55 +586,17 @@ export default function ComplianceManagement() {
               />
               <FormField
                 control={taskForm.control}
-                name="assignedTo"
+                name="dueDate"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Assigned To</FormLabel>
+                    <FormLabel>Due Date</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="User ID" data-testid="input-assigned-to" />
+                      <Input {...field} type="date" data-testid="input-due-date" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={taskForm.control}
-                  name="priority"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Priority</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger data-testid="select-task-priority">
-                            <SelectValue placeholder="Select priority" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="low">Low</SelectItem>
-                          <SelectItem value="medium">Medium</SelectItem>
-                          <SelectItem value="high">High</SelectItem>
-                          <SelectItem value="critical">Critical</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={taskForm.control}
-                  name="dueDate"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Due Date</FormLabel>
-                      <FormControl>
-                        <Input {...field} type="date" data-testid="input-task-due-date" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
               <DialogFooter>
                 <Button type="submit" disabled={createTaskMutation.isPending} data-testid="button-submit-task">
                   {createTaskMutation.isPending ? "Creating..." : "Create Task"}
@@ -646,6 +606,6 @@ export default function ComplianceManagement() {
           </Form>
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 }

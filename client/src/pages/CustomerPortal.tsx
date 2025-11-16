@@ -3,7 +3,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -11,6 +10,7 @@ import {
   Car, Calendar, FileText, CreditCard, History, LogOut, 
   CheckCircle, Clock, AlertCircle 
 } from "lucide-react";
+import { TabsPageLayout } from "@/components/layouts/TabsPageLayout";
 
 interface Customer {
   id: string;
@@ -278,322 +278,322 @@ export default function CustomerPortal() {
     );
   }
 
-  return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-6 flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-montserrat font-bold text-salis-black dark:text-white">
-              Welcome, {customer?.fullName}
-            </h1>
-            <p className="text-salis-gray dark:text-salis-gray-light">
-              {customer?.email}
-            </p>
+  const appointmentsTab = (
+    <Card>
+      <CardHeader>
+        <CardTitle>Your Appointments</CardTitle>
+        <CardDescription>View and manage your service appointments</CardDescription>
+      </CardHeader>
+      <CardContent>
+        {appointments.length === 0 ? (
+          <p className="text-center text-salis-gray py-8">No appointments found</p>
+        ) : (
+          <div className="space-y-4">
+            {appointments.map((appt: any) => (
+              <div 
+                key={appt.id} 
+                className="border rounded-lg p-4 space-y-2"
+                data-testid={`appointment-${appt.id}`}
+              >
+                <div className="flex justify-between items-start">
+                  <div>
+                    <p className="font-semibold">{appt.serviceType || 'Service Appointment'}</p>
+                    <p className="text-sm text-salis-gray">
+                      {new Date(appt.appointmentDate).toLocaleDateString()} at{' '}
+                      {appt.appointmentTime}
+                    </p>
+                  </div>
+                  {getStatusBadge(appt.status)}
+                </div>
+                {appt.notes && (
+                  <p className="text-sm text-salis-gray">{appt.notes}</p>
+                )}
+              </div>
+            ))}
           </div>
-          <Button
-            variant="outline"
-            onClick={handleLogout}
-            data-testid="button-logout"
-          >
-            <LogOut className="w-4 h-4 mr-2" />
-            Logout
-          </Button>
-        </div>
+        )}
+      </CardContent>
+    </Card>
+  );
 
-        <Tabs defaultValue="appointments" className="space-y-4">
-          <TabsList className="grid grid-cols-6 w-full">
-            <TabsTrigger value="appointments" data-testid="tab-appointments">
-              <Calendar className="w-4 h-4 mr-2" />
-              Appointments
-            </TabsTrigger>
-            <TabsTrigger value="vehicles" data-testid="tab-vehicles">
-              <Car className="w-4 h-4 mr-2" />
-              Vehicles
-            </TabsTrigger>
-            <TabsTrigger value="history" data-testid="tab-history">
-              <History className="w-4 h-4 mr-2" />
-              History
-            </TabsTrigger>
-            <TabsTrigger value="estimates" data-testid="tab-estimates">
-              <FileText className="w-4 h-4 mr-2" />
-              Estimates
-            </TabsTrigger>
-            <TabsTrigger value="invoices" data-testid="tab-invoices">
-              <FileText className="w-4 h-4 mr-2" />
-              Invoices
-            </TabsTrigger>
-            <TabsTrigger value="payments" data-testid="tab-payments">
-              <CreditCard className="w-4 h-4 mr-2" />
-              Payments
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="appointments" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Your Appointments</CardTitle>
-                <CardDescription>View and manage your service appointments</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {appointments.length === 0 ? (
-                  <p className="text-center text-salis-gray py-8">No appointments found</p>
-                ) : (
-                  <div className="space-y-4">
-                    {appointments.map((appt: any) => (
-                      <div 
-                        key={appt.id} 
-                        className="border rounded-lg p-4 space-y-2"
-                        data-testid={`appointment-${appt.id}`}
-                      >
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <p className="font-semibold">{appt.serviceType || 'Service Appointment'}</p>
-                            <p className="text-sm text-salis-gray">
-                              {new Date(appt.appointmentDate).toLocaleDateString()} at{' '}
-                              {appt.appointmentTime}
-                            </p>
-                          </div>
-                          {getStatusBadge(appt.status)}
-                        </div>
-                        {appt.notes && (
-                          <p className="text-sm text-salis-gray">{appt.notes}</p>
-                        )}
-                      </div>
-                    ))}
+  const vehiclesTab = (
+    <Card>
+      <CardHeader>
+        <CardTitle>Your Vehicles</CardTitle>
+        <CardDescription>Manage your registered vehicles</CardDescription>
+      </CardHeader>
+      <CardContent>
+        {vehicles.length === 0 ? (
+          <p className="text-center text-salis-gray py-8">No vehicles found</p>
+        ) : (
+          <div className="grid gap-4 md:grid-cols-2">
+            {vehicles.map((vehicle: any) => (
+              <div 
+                key={vehicle.id} 
+                className="border rounded-lg p-4 space-y-2"
+                data-testid={`vehicle-${vehicle.id}`}
+              >
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="font-semibold">
+                      {vehicle.year} {vehicle.make} {vehicle.model}
+                    </p>
+                    <p className="text-sm text-salis-gray">{vehicle.licensePlate}</p>
+                    <p className="text-xs text-salis-gray">VIN: {vehicle.vin}</p>
                   </div>
+                  <Car className="w-8 h-8 text-salis-gray" />
+                </div>
+                {vehicle.currentMileage && (
+                  <p className="text-sm text-salis-gray">
+                    {vehicle.currentMileage.toLocaleString()} miles
+                  </p>
                 )}
-              </CardContent>
-            </Card>
-          </TabsContent>
+              </div>
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
 
-          <TabsContent value="vehicles" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Your Vehicles</CardTitle>
-                <CardDescription>Manage your registered vehicles</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {vehicles.length === 0 ? (
-                  <p className="text-center text-salis-gray py-8">No vehicles found</p>
-                ) : (
-                  <div className="grid gap-4 md:grid-cols-2">
-                    {vehicles.map((vehicle: any) => (
-                      <div 
-                        key={vehicle.id} 
-                        className="border rounded-lg p-4 space-y-2"
-                        data-testid={`vehicle-${vehicle.id}`}
-                      >
-                        <div className="flex items-start justify-between">
-                          <div>
-                            <p className="font-semibold">
-                              {vehicle.year} {vehicle.make} {vehicle.model}
-                            </p>
-                            <p className="text-sm text-salis-gray">{vehicle.licensePlate}</p>
-                            <p className="text-xs text-salis-gray">VIN: {vehicle.vin}</p>
-                          </div>
-                          <Car className="w-8 h-8 text-salis-gray" />
-                        </div>
-                        {vehicle.currentMileage && (
-                          <p className="text-sm text-salis-gray">
-                            {vehicle.currentMileage.toLocaleString()} miles
-                          </p>
-                        )}
-                      </div>
-                    ))}
+  const historyTab = (
+    <Card>
+      <CardHeader>
+        <CardTitle>Service History</CardTitle>
+        <CardDescription>View your complete service records</CardDescription>
+      </CardHeader>
+      <CardContent>
+        {serviceHistory.length === 0 ? (
+          <p className="text-center text-salis-gray py-8">No service history found</p>
+        ) : (
+          <div className="space-y-4">
+            {serviceHistory.map((record: any) => (
+              <div 
+                key={record.history.id} 
+                className="border rounded-lg p-4 space-y-2"
+                data-testid={`history-${record.history.id}`}
+              >
+                <div className="flex justify-between items-start">
+                  <div>
+                    <p className="font-semibold">{record.history.serviceType}</p>
+                    <p className="text-sm text-salis-gray">
+                      {new Date(record.history.serviceDate).toLocaleDateString()}
+                    </p>
+                    {record.vehicle && (
+                      <p className="text-sm text-salis-gray">
+                        {record.vehicle.make} {record.vehicle.model}
+                      </p>
+                    )}
                   </div>
+                  {record.history.cost && (
+                    <p className="font-semibold">${record.history.cost}</p>
+                  )}
+                </div>
+                {record.history.description && (
+                  <p className="text-sm text-salis-gray">{record.history.description}</p>
                 )}
-              </CardContent>
-            </Card>
-          </TabsContent>
+              </div>
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
 
-          <TabsContent value="history" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Service History</CardTitle>
-                <CardDescription>View your complete service records</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {serviceHistory.length === 0 ? (
-                  <p className="text-center text-salis-gray py-8">No service history found</p>
-                ) : (
-                  <div className="space-y-4">
-                    {serviceHistory.map((record: any) => (
-                      <div 
-                        key={record.history.id} 
-                        className="border rounded-lg p-4 space-y-2"
-                        data-testid={`history-${record.history.id}`}
-                      >
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <p className="font-semibold">{record.history.serviceType}</p>
-                            <p className="text-sm text-salis-gray">
-                              {new Date(record.history.serviceDate).toLocaleDateString()}
-                            </p>
-                            {record.vehicle && (
-                              <p className="text-sm text-salis-gray">
-                                {record.vehicle.make} {record.vehicle.model}
-                              </p>
-                            )}
-                          </div>
-                          {record.history.cost && (
-                            <p className="font-semibold">${record.history.cost}</p>
-                          )}
-                        </div>
-                        {record.history.description && (
-                          <p className="text-sm text-salis-gray">{record.history.description}</p>
-                        )}
-                      </div>
-                    ))}
+  const estimatesTab = (
+    <Card>
+      <CardHeader>
+        <CardTitle>Estimates</CardTitle>
+        <CardDescription>Review and approve service estimates</CardDescription>
+      </CardHeader>
+      <CardContent>
+        {estimates.length === 0 ? (
+          <p className="text-center text-salis-gray py-8">No estimates found</p>
+        ) : (
+          <div className="space-y-4">
+            {estimates.map((est: any) => (
+              <div 
+                key={est.estimate.id} 
+                className="border rounded-lg p-4 space-y-3"
+                data-testid={`estimate-${est.estimate.id}`}
+              >
+                <div className="flex justify-between items-start">
+                  <div>
+                    <p className="font-semibold">Estimate #{est.estimate.estimateNumber}</p>
+                    <p className="text-sm text-salis-gray">
+                      {new Date(est.estimate.createdAt).toLocaleDateString()}
+                    </p>
+                    {est.vehicle && (
+                      <p className="text-sm text-salis-gray">
+                        {est.vehicle.make} {est.vehicle.model}
+                      </p>
+                    )}
                   </div>
+                  <div className="text-right">
+                    <p className="text-2xl font-bold text-salis-black dark:text-white">
+                      ${est.estimate.totalAmount}
+                    </p>
+                    {getStatusBadge(est.estimate.status)}
+                  </div>
+                </div>
+                {est.estimate.notes && (
+                  <p className="text-sm text-salis-gray">{est.estimate.notes}</p>
                 )}
-              </CardContent>
-            </Card>
-          </TabsContent>
+                {est.estimate.status === 'pending' && (
+                  <>
+                    <Separator />
+                    <Button
+                      onClick={() => approveEstimate(est.estimate.id)}
+                      className="w-full bg-salis-black hover:bg-salis-gray text-white"
+                      data-testid={`button-approve-${est.estimate.id}`}
+                    >
+                      <CheckCircle className="w-4 h-4 mr-2" />
+                      Approve Estimate
+                    </Button>
+                  </>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
 
-          <TabsContent value="estimates" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Estimates</CardTitle>
-                <CardDescription>Review and approve service estimates</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {estimates.length === 0 ? (
-                  <p className="text-center text-salis-gray py-8">No estimates found</p>
-                ) : (
-                  <div className="space-y-4">
-                    {estimates.map((est: any) => (
-                      <div 
-                        key={est.estimate.id} 
-                        className="border rounded-lg p-4 space-y-3"
-                        data-testid={`estimate-${est.estimate.id}`}
-                      >
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <p className="font-semibold">Estimate #{est.estimate.estimateNumber}</p>
-                            <p className="text-sm text-salis-gray">
-                              {new Date(est.estimate.createdAt).toLocaleDateString()}
-                            </p>
-                            {est.vehicle && (
-                              <p className="text-sm text-salis-gray">
-                                {est.vehicle.make} {est.vehicle.model}
-                              </p>
-                            )}
-                          </div>
-                          <div className="text-right">
-                            <p className="text-2xl font-bold text-salis-black dark:text-white">
-                              ${est.estimate.totalAmount}
-                            </p>
-                            {getStatusBadge(est.estimate.status)}
-                          </div>
-                        </div>
-                        {est.estimate.notes && (
-                          <p className="text-sm text-salis-gray">{est.estimate.notes}</p>
-                        )}
-                        {est.estimate.status === 'pending' && (
-                          <>
-                            <Separator />
-                            <Button
-                              onClick={() => approveEstimate(est.estimate.id)}
-                              className="w-full bg-salis-black hover:bg-salis-gray text-white"
-                              data-testid={`button-approve-${est.estimate.id}`}
-                            >
-                              <CheckCircle className="w-4 h-4 mr-2" />
-                              Approve Estimate
-                            </Button>
-                          </>
-                        )}
-                      </div>
-                    ))}
+  const invoicesTab = (
+    <Card>
+      <CardHeader>
+        <CardTitle>Invoices</CardTitle>
+        <CardDescription>View your service invoices</CardDescription>
+      </CardHeader>
+      <CardContent>
+        {invoices.length === 0 ? (
+          <p className="text-center text-salis-gray py-8">No invoices found</p>
+        ) : (
+          <div className="space-y-4">
+            {invoices.map((inv: any) => (
+              <div 
+                key={inv.id} 
+                className="border rounded-lg p-4 space-y-2"
+                data-testid={`invoice-${inv.id}`}
+              >
+                <div className="flex justify-between items-start">
+                  <div>
+                    <p className="font-semibold">Invoice #{inv.invoiceNumber}</p>
+                    <p className="text-sm text-salis-gray">
+                      {new Date(inv.invoiceDate).toLocaleDateString()}
+                    </p>
+                    <p className="text-xs text-salis-gray">Due: {new Date(inv.dueDate).toLocaleDateString()}</p>
                   </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
+                  <div className="text-right">
+                    <p className="text-xl font-bold text-salis-black dark:text-white">
+                      ${inv.totalAmount}
+                    </p>
+                    {getStatusBadge(inv.status)}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
 
-          <TabsContent value="invoices" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Invoices</CardTitle>
-                <CardDescription>View your service invoices</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {invoices.length === 0 ? (
-                  <p className="text-center text-salis-gray py-8">No invoices found</p>
-                ) : (
-                  <div className="space-y-4">
-                    {invoices.map((inv: any) => (
-                      <div 
-                        key={inv.id} 
-                        className="border rounded-lg p-4 space-y-2"
-                        data-testid={`invoice-${inv.id}`}
-                      >
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <p className="font-semibold">Invoice #{inv.invoiceNumber}</p>
-                            <p className="text-sm text-salis-gray">
-                              {new Date(inv.invoiceDate).toLocaleDateString()}
-                            </p>
-                            <p className="text-xs text-salis-gray">Due: {new Date(inv.dueDate).toLocaleDateString()}</p>
-                          </div>
-                          <div className="text-right">
-                            <p className="text-xl font-bold text-salis-black dark:text-white">
-                              ${inv.totalAmount}
-                            </p>
-                            {getStatusBadge(inv.status)}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
+  const paymentsTab = (
+    <Card>
+      <CardHeader>
+        <CardTitle>Payment History</CardTitle>
+        <CardDescription>View all your payment transactions</CardDescription>
+      </CardHeader>
+      <CardContent>
+        {payments.length === 0 ? (
+          <p className="text-center text-salis-gray py-8">No payments found</p>
+        ) : (
+          <div className="space-y-4">
+            {payments.map((payment: any) => (
+              <div 
+                key={payment.payment.id} 
+                className="border rounded-lg p-4 space-y-2"
+                data-testid={`payment-${payment.payment.id}`}
+              >
+                <div className="flex justify-between items-start">
+                  <div>
+                    <p className="font-semibold">
+                      Payment - {payment.payment.paymentMethod}
+                    </p>
+                    <p className="text-sm text-salis-gray">
+                      {new Date(payment.payment.paymentDate).toLocaleDateString()}
+                    </p>
+                    {payment.invoice && (
+                      <p className="text-xs text-salis-gray">
+                        Invoice: {payment.invoice.invoiceNumber}
+                      </p>
+                    )}
                   </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
+                  <p className="text-xl font-bold text-green-600">
+                    ${payment.payment.amount}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
 
-          <TabsContent value="payments" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Payment History</CardTitle>
-                <CardDescription>View all your payment transactions</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {payments.length === 0 ? (
-                  <p className="text-center text-salis-gray py-8">No payments found</p>
-                ) : (
-                  <div className="space-y-4">
-                    {payments.map((payment: any) => (
-                      <div 
-                        key={payment.payment.id} 
-                        className="border rounded-lg p-4 space-y-2"
-                        data-testid={`payment-${payment.payment.id}`}
-                      >
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <p className="font-semibold">
-                              Payment - {payment.payment.paymentMethod}
-                            </p>
-                            <p className="text-sm text-salis-gray">
-                              {new Date(payment.payment.paymentDate).toLocaleDateString()}
-                            </p>
-                            {payment.invoice && (
-                              <p className="text-xs text-salis-gray">
-                                Invoice: {payment.invoice.invoiceNumber}
-                              </p>
-                            )}
-                          </div>
-                          <p className="text-xl font-bold text-green-600">
-                            ${payment.payment.amount}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
-      </div>
-    </div>
+  return (
+    <TabsPageLayout
+      title={`Welcome, ${customer?.fullName}`}
+      description={customer?.email || "Customer Portal"}
+      icon={Car}
+      primaryAction={{
+        label: "Logout",
+        icon: LogOut,
+        onClick: handleLogout,
+        variant: "outline",
+        testId: "button-logout",
+      }}
+      tabs={[
+        {
+          id: "appointments",
+          label: "Appointments",
+          icon: Calendar,
+          content: appointmentsTab,
+        },
+        {
+          id: "vehicles",
+          label: "Vehicles",
+          icon: Car,
+          content: vehiclesTab,
+        },
+        {
+          id: "history",
+          label: "History",
+          icon: History,
+          content: historyTab,
+        },
+        {
+          id: "estimates",
+          label: "Estimates",
+          icon: FileText,
+          content: estimatesTab,
+        },
+        {
+          id: "invoices",
+          label: "Invoices",
+          icon: FileText,
+          content: invoicesTab,
+        },
+        {
+          id: "payments",
+          label: "Payments",
+          icon: CreditCard,
+          content: paymentsTab,
+        },
+      ]}
+      defaultTab="appointments"
+    />
   );
 }

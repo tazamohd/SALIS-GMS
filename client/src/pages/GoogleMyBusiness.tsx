@@ -8,7 +8,6 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -16,6 +15,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Building, MessageCircle, Star, Send } from "lucide-react";
+import { TabsPageLayout } from "@/components/layouts/TabsPageLayout";
 
 const profileSchema = z.object({
   locationName: z.string().min(1, "Location name is required"),
@@ -131,229 +131,229 @@ export default function GoogleMyBusiness() {
     },
   });
 
-  return (
-    <div className="container mx-auto py-6 space-y-6 bg-white dark:bg-[#010101] min-h-screen">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-montserrat font-semibold text-salis-black dark:text-white" data-testid="heading-gmb">
-            Google My Business
-          </h1>
-          <p className="text-salis-gray dark:text-salis-gray-light font-poppins mt-1" data-testid="text-subtitle">
-            Manage GMB profiles, posts, and customer reviews
-          </p>
-        </div>
+  const profilesContent = (
+    <Card className="border-salis-gray-light dark:border-salis-gray-dark bg-white dark:bg-[#010101]">
+      <CardHeader>
+        <CardTitle className="font-montserrat text-salis-black dark:text-white">Business Profiles</CardTitle>
+        <CardDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
+          Connected Google My Business locations
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        {profilesLoading ? (
+          <p className="text-salis-gray font-poppins" data-testid="text-loading">Loading profiles...</p>
+        ) : profiles.length === 0 ? (
+          <p className="text-salis-gray font-poppins" data-testid="text-no-profiles">No GMB profiles found</p>
+        ) : (
+          <div className="grid gap-4">
+            {profiles.map((profile: any) => (
+              <Card key={profile.id} className="border-salis-gray-light dark:border-salis-gray-dark" data-testid={`card-profile-${profile.id}`}>
+                <CardContent className="p-6">
+                  <div className="flex justify-between items-start">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <Building className="h-5 w-5 text-salis-gray dark:text-salis-gray-light" />
+                        <h3 className="text-lg font-montserrat font-medium text-salis-black dark:text-white" data-testid={`text-location-name-${profile.id}`}>
+                          {profile.locationName}
+                        </h3>
+                        {profile.isVerified && (
+                          <Badge className="bg-green-500 text-white" data-testid={`badge-verified-${profile.id}`}>
+                            Verified
+                          </Badge>
+                        )}
+                        {profile.isConnected && (
+                          <Badge className="bg-salis-black text-white" data-testid={`badge-connected-${profile.id}`}>
+                            Connected
+                          </Badge>
+                        )}
+                      </div>
+                      <div className="text-sm text-salis-gray dark:text-salis-gray-light space-y-1">
+                        {profile.address && <p data-testid={`text-address-${profile.id}`}>Address: {profile.address}</p>}
+                        {profile.phone && <p data-testid={`text-phone-${profile.id}`}>Phone: {profile.phone}</p>}
+                        {profile.website && <p data-testid={`text-website-${profile.id}`}>Website: {profile.website}</p>}
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+
+  const postsContent = (
+    <>
+      <div className="flex justify-end mb-4">
         <Button
-          onClick={() => setIsProfileDialogOpen(true)}
+          onClick={() => setIsPostDialogOpen(true)}
           className="bg-salis-black hover:bg-salis-gray-dark text-white font-poppins"
-          data-testid="button-add-profile"
+          data-testid="button-create-post"
         >
-          <Building className="mr-2 h-4 w-4" />
-          Add Profile
+          <MessageCircle className="mr-2 h-4 w-4" />
+          Create Post
         </Button>
       </div>
-
-      <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full">
-        <TabsList className="bg-salis-gray-light dark:bg-salis-gray-dark" data-testid="tabs-gmb">
-          <TabsTrigger value="profiles" className="font-poppins" data-testid="tab-profiles">
-            <Building className="mr-2 h-4 w-4" />
-            Profiles
-          </TabsTrigger>
-          <TabsTrigger value="posts" className="font-poppins" data-testid="tab-posts">
-            <MessageCircle className="mr-2 h-4 w-4" />
-            Posts
-          </TabsTrigger>
-          <TabsTrigger value="reviews" className="font-poppins" data-testid="tab-reviews">
-            <Star className="mr-2 h-4 w-4" />
-            Reviews
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="profiles" className="space-y-4">
-          <Card className="border-salis-gray-light dark:border-salis-gray-dark bg-white dark:bg-[#010101]">
-            <CardHeader>
-              <CardTitle className="font-montserrat text-salis-black dark:text-white">Business Profiles</CardTitle>
-              <CardDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
-                Connected Google My Business locations
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {profilesLoading ? (
-                <p className="text-salis-gray font-poppins" data-testid="text-loading">Loading profiles...</p>
-              ) : profiles.length === 0 ? (
-                <p className="text-salis-gray font-poppins" data-testid="text-no-profiles">No GMB profiles found</p>
-              ) : (
-                <div className="grid gap-4">
-                  {profiles.map((profile: any) => (
-                    <Card key={profile.id} className="border-salis-gray-light dark:border-salis-gray-dark" data-testid={`card-profile-${profile.id}`}>
-                      <CardContent className="p-6">
-                        <div className="flex justify-between items-start">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-3 mb-2">
-                              <Building className="h-5 w-5 text-salis-gray dark:text-salis-gray-light" />
-                              <h3 className="text-lg font-montserrat font-medium text-salis-black dark:text-white" data-testid={`text-location-name-${profile.id}`}>
-                                {profile.locationName}
-                              </h3>
-                              {profile.isVerified && (
-                                <Badge className="bg-green-500 text-white" data-testid={`badge-verified-${profile.id}`}>
-                                  Verified
-                                </Badge>
-                              )}
-                              {profile.isConnected && (
-                                <Badge className="bg-salis-black text-white" data-testid={`badge-connected-${profile.id}`}>
-                                  Connected
-                                </Badge>
-                              )}
-                            </div>
-                            <div className="text-sm text-salis-gray dark:text-salis-gray-light space-y-1">
-                              {profile.address && <p data-testid={`text-address-${profile.id}`}>Address: {profile.address}</p>}
-                              {profile.phone && <p data-testid={`text-phone-${profile.id}`}>Phone: {profile.phone}</p>}
-                              {profile.website && <p data-testid={`text-website-${profile.id}`}>Website: {profile.website}</p>}
-                            </div>
-                          </div>
+      <Card className="border-salis-gray-light dark:border-salis-gray-dark bg-white dark:bg-[#010101]">
+        <CardHeader>
+          <CardTitle className="font-montserrat text-salis-black dark:text-white">GMB Posts</CardTitle>
+          <CardDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
+            Updates, offers, and events posted to Google
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {postsLoading ? (
+            <p className="text-salis-gray font-poppins" data-testid="text-loading-posts">Loading posts...</p>
+          ) : posts.length === 0 ? (
+            <p className="text-salis-gray font-poppins" data-testid="text-no-posts">No posts found</p>
+          ) : (
+            <div className="grid gap-4">
+              {posts.map((post: any) => (
+                <Card key={post.id} className="border-salis-gray-light dark:border-salis-gray-dark" data-testid={`card-post-${post.id}`}>
+                  <CardContent className="p-6">
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-2">
+                          <Badge className="bg-salis-black text-white" data-testid={`badge-post-type-${post.id}`}>
+                            {post.postType}
+                          </Badge>
+                          <Badge className={post.status === "published" ? "bg-green-500 text-white" : "bg-yellow-500 text-white"} data-testid={`badge-post-status-${post.id}`}>
+                            {post.status}
+                          </Badge>
                         </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
+                        <p className="text-sm text-salis-gray dark:text-salis-gray-light font-poppins mb-2" data-testid={`text-post-content-${post.id}`}>
+                          {post.content}
+                        </p>
+                        {post.createdAt && (
+                          <p className="text-xs text-salis-gray dark:text-salis-gray-light" data-testid={`text-post-date-${post.id}`}>
+                            {new Date(post.createdAt).toLocaleDateString()}
+                          </p>
+                        )}
+                      </div>
+                      {post.status === "draft" && (
+                        <Button
+                          size="sm"
+                          onClick={() => publishPostMutation.mutate(post.id)}
+                          className="bg-green-500 hover:bg-green-600 text-white"
+                          data-testid={`button-publish-${post.id}`}
+                        >
+                          <Send className="h-4 w-4 mr-1" />
+                          Publish
+                        </Button>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </>
+  );
 
-        <TabsContent value="posts" className="space-y-4">
-          <div className="flex justify-end mb-4">
-            <Button
-              onClick={() => setIsPostDialogOpen(true)}
-              className="bg-salis-black hover:bg-salis-gray-dark text-white font-poppins"
-              data-testid="button-create-post"
-            >
-              <MessageCircle className="mr-2 h-4 w-4" />
-              Create Post
-            </Button>
-          </div>
-          <Card className="border-salis-gray-light dark:border-salis-gray-dark bg-white dark:bg-[#010101]">
-            <CardHeader>
-              <CardTitle className="font-montserrat text-salis-black dark:text-white">GMB Posts</CardTitle>
-              <CardDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
-                Updates, offers, and events posted to Google
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {postsLoading ? (
-                <p className="text-salis-gray font-poppins" data-testid="text-loading-posts">Loading posts...</p>
-              ) : posts.length === 0 ? (
-                <p className="text-salis-gray font-poppins" data-testid="text-no-posts">No posts found</p>
-              ) : (
-                <div className="grid gap-4">
-                  {posts.map((post: any) => (
-                    <Card key={post.id} className="border-salis-gray-light dark:border-salis-gray-dark" data-testid={`card-post-${post.id}`}>
-                      <CardContent className="p-6">
-                        <div className="flex justify-between items-start">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-3 mb-2">
-                              <Badge className="bg-salis-black text-white" data-testid={`badge-post-type-${post.id}`}>
-                                {post.postType}
-                              </Badge>
-                              <Badge className={post.status === "published" ? "bg-green-500 text-white" : "bg-yellow-500 text-white"} data-testid={`badge-post-status-${post.id}`}>
-                                {post.status}
-                              </Badge>
-                            </div>
-                            <p className="text-sm text-salis-gray dark:text-salis-gray-light font-poppins mb-2" data-testid={`text-post-content-${post.id}`}>
-                              {post.content}
-                            </p>
-                            {post.createdAt && (
-                              <p className="text-xs text-salis-gray dark:text-salis-gray-light" data-testid={`text-post-date-${post.id}`}>
-                                {new Date(post.createdAt).toLocaleDateString()}
-                              </p>
-                            )}
-                          </div>
-                          {post.status === "draft" && (
-                            <Button
-                              size="sm"
-                              onClick={() => publishPostMutation.mutate(post.id)}
-                              className="bg-green-500 hover:bg-green-600 text-white"
-                              data-testid={`button-publish-${post.id}`}
-                            >
-                              <Send className="h-4 w-4 mr-1" />
-                              Publish
-                            </Button>
-                          )}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
+  const reviewsContent = (
+    <Card className="border-salis-gray-light dark:border-salis-gray-dark bg-white dark:bg-[#010101]">
+      <CardHeader>
+        <CardTitle className="font-montserrat text-salis-black dark:text-white">Customer Reviews</CardTitle>
+        <CardDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
+          Reviews from Google My Business
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        {reviewsLoading ? (
+          <p className="text-salis-gray font-poppins" data-testid="text-loading-reviews">Loading reviews...</p>
+        ) : reviews.length === 0 ? (
+          <p className="text-salis-gray font-poppins" data-testid="text-no-reviews">No reviews found</p>
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Reviewer</TableHead>
+                <TableHead>Rating</TableHead>
+                <TableHead>Comment</TableHead>
+                <TableHead>Date</TableHead>
+                <TableHead>Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {reviews.map((review: any) => (
+                <TableRow key={review.id} data-testid={`row-review-${review.id}`}>
+                  <TableCell className="font-medium" data-testid={`text-reviewer-${review.id}`}>{review.reviewerName}</TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-1">
+                      {Array.from({ length: review.starRating || 0 }).map((_, i) => (
+                        <Star key={i} className="h-4 w-4 fill-yellow-500 text-yellow-500" />
+                      ))}
+                    </div>
+                  </TableCell>
+                  <TableCell className="max-w-xs truncate" data-testid={`text-comment-${review.id}`}>
+                    {review.comment || "No comment"}
+                  </TableCell>
+                  <TableCell data-testid={`text-review-date-${review.id}`}>
+                    {review.reviewDate ? new Date(review.reviewDate).toLocaleDateString() : "N/A"}
+                  </TableCell>
+                  <TableCell>
+                    {!review.ownerResponse && (
+                      <Button
+                        size="sm"
+                        onClick={() => {
+                          const response = prompt("Enter your response:");
+                          if (response) {
+                            respondToReviewMutation.mutate({ id: review.id, responseText: response });
+                          }
+                        }}
+                        data-testid={`button-respond-${review.id}`}
+                      >
+                        Respond
+                      </Button>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
+      </CardContent>
+    </Card>
+  );
 
-        <TabsContent value="reviews" className="space-y-4">
-          <Card className="border-salis-gray-light dark:border-salis-gray-dark bg-white dark:bg-[#010101]">
-            <CardHeader>
-              <CardTitle className="font-montserrat text-salis-black dark:text-white">Customer Reviews</CardTitle>
-              <CardDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
-                Reviews from Google My Business
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {reviewsLoading ? (
-                <p className="text-salis-gray font-poppins" data-testid="text-loading-reviews">Loading reviews...</p>
-              ) : reviews.length === 0 ? (
-                <p className="text-salis-gray font-poppins" data-testid="text-no-reviews">No reviews found</p>
-              ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Reviewer</TableHead>
-                      <TableHead>Rating</TableHead>
-                      <TableHead>Comment</TableHead>
-                      <TableHead>Date</TableHead>
-                      <TableHead>Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {reviews.map((review: any) => (
-                      <TableRow key={review.id} data-testid={`row-review-${review.id}`}>
-                        <TableCell className="font-medium" data-testid={`text-reviewer-${review.id}`}>{review.reviewerName}</TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-1">
-                            {Array.from({ length: review.starRating || 0 }).map((_, i) => (
-                              <Star key={i} className="h-4 w-4 fill-yellow-500 text-yellow-500" />
-                            ))}
-                          </div>
-                        </TableCell>
-                        <TableCell className="max-w-xs truncate" data-testid={`text-comment-${review.id}`}>
-                          {review.comment || "No comment"}
-                        </TableCell>
-                        <TableCell data-testid={`text-review-date-${review.id}`}>
-                          {review.reviewDate ? new Date(review.reviewDate).toLocaleDateString() : "N/A"}
-                        </TableCell>
-                        <TableCell>
-                          {!review.ownerResponse && (
-                            <Button
-                              size="sm"
-                              onClick={() => {
-                                const response = prompt("Enter your response:");
-                                if (response) {
-                                  respondToReviewMutation.mutate({ id: review.id, responseText: response });
-                                }
-                              }}
-                              data-testid={`button-respond-${review.id}`}
-                            >
-                              Respond
-                            </Button>
-                          )}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+  return (
+    <>
+      <TabsPageLayout
+        title="Google My Business"
+        description="Manage GMB profiles, posts, and customer reviews"
+        icon={Building}
+        primaryAction={{
+          label: "Add Profile",
+          icon: Building,
+          onClick: () => setIsProfileDialogOpen(true),
+          testId: "button-add-profile",
+        }}
+        activeTab={selectedTab}
+        onTabChange={setSelectedTab}
+        tabs={[
+          {
+            id: "profiles",
+            label: "Profiles",
+            icon: Building,
+            content: profilesContent,
+          },
+          {
+            id: "posts",
+            label: "Posts",
+            icon: MessageCircle,
+            content: postsContent,
+          },
+          {
+            id: "reviews",
+            label: "Reviews",
+            icon: Star,
+            content: reviewsContent,
+          },
+        ]}
+      />
 
       <Dialog open={isProfileDialogOpen} onOpenChange={setIsProfileDialogOpen}>
         <DialogContent className="bg-white dark:bg-salis-black">
@@ -521,6 +521,6 @@ export default function GoogleMyBusiness() {
           </Form>
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 }

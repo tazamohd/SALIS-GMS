@@ -12,7 +12,7 @@ export default function KioskCheckIn() {
   const { toast } = useToast();
 
   // Fetch kiosk check-in sessions
-  const { data: sessions = [], isLoading } = useQuery({
+  const { data: sessions = [], isLoading } = useQuery<any[]>({
     queryKey: ["/api/kiosk/sessions"],
   });
 
@@ -25,10 +25,7 @@ export default function KioskCheckIn() {
       phoneNumber: string;
       checkInMethod: string;
     }) => {
-      return await apiRequest("/api/kiosk/checkin", {
-        method: "POST",
-        body: JSON.stringify(checkInData),
-      });
+      return await apiRequest("POST", "/api/kiosk/checkin", checkInData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/kiosk/sessions"] });

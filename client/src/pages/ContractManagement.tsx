@@ -4,26 +4,20 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   FileText, 
   TrendingUp, 
-  AlertCircle, 
   CheckCircle, 
-  XCircle, 
-  Clock, 
   DollarSign, 
-  Bell, 
   RefreshCcw,
-  BarChart3,
-  Calendar,
   AlertTriangle
 } from "lucide-react";
-import { format, differenceInDays, addDays } from "date-fns";
-import { AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { format, differenceInDays } from "date-fns";
+import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { useToast } from "@/hooks/use-toast";
 import type { FleetContract, ContractUtilization, ContractSLAMetric, ContractRenewal } from "@shared/schema";
 import { apiRequest, queryClient } from "@/lib/queryClient";
+import { TabsPageLayout, TabConfig } from "@/components/layouts/TabsPageLayout";
 
 const COLORS = {
   success: "#10b981",
@@ -37,7 +31,6 @@ export default function ContractManagement() {
   const [selectedContractId, setSelectedContractId] = useState<string | null>(null);
   const { toast } = useToast();
 
-  // Fetch all contracts with related data
   const { data: contracts = [], isLoading: contractsLoading } = useQuery<(FleetContract & { 
     fleetGroup: any;
     utilization: ContractUtilization[];
@@ -47,7 +40,6 @@ export default function ContractManagement() {
     queryKey: ["/api/contracts/enhanced"],
   });
 
-  // Trigger renewal workflow
   const triggerRenewalMutation = useMutation({
     mutationFn: async (contractId: string) => 
       apiRequest(`/api/contracts/${contractId}/trigger-renewal`, "POST"),
@@ -60,7 +52,6 @@ export default function ContractManagement() {
     },
   });
 
-  // Accept renewal
   const acceptRenewalMutation = useMutation({
     mutationFn: async ({ renewalId, contractId }: { renewalId: string; contractId: string }) => 
       apiRequest(`/api/contracts/${contractId}/accept-renewal`, "POST", { renewalId }),
@@ -75,13 +66,11 @@ export default function ContractManagement() {
 
   const selectedContract = contracts.find(c => c.id === selectedContractId);
 
-  // Calculate aggregated metrics
   const dashboardMetrics = contracts.reduce((acc, contract) => {
     const utilization = contract.utilization || [];
     const slaMetrics = contract.slaMetrics || [];
     const totalUtilized = utilization.reduce((sum, u) => sum + parseFloat(u.totalCost || "0"), 0);
     const serviceCap = parseFloat(contract.serviceCap || "0");
-    const utilizationPercentage = serviceCap > 0 ? (totalUtilized / serviceCap) * 100 : 0;
 
     const slaBreach = slaMetrics.filter(m => m.complianceStatus === "breached").length;
     const slaTotal = slaMetrics.length;
@@ -95,7 +84,7 @@ export default function ContractManagement() {
       activeContracts: acc.activeContracts + (contract.status === "active" ? 1 : 0),
       totalValue: acc.totalValue + parseFloat(contract.contractValue || "0"),
       totalUtilized: acc.totalUtilized + totalUtilized,
-      avgUtilization: 0, // calculated after
+      avgUtilization: 0,
       slaCompliance: acc.slaCompliance + slaCompliance,
       expiringContracts: acc.expiringContracts + (needsRenewal ? 1 : 0),
       totalBreach: acc.totalBreach + slaBreach,
@@ -118,7 +107,6 @@ export default function ContractManagement() {
     ? dashboardMetrics.slaCompliance / contracts.length 
     : 100;
 
-  // Prepare chart data
   const utilizationChartData = contracts.map(contract => {
     const utilization = contract.utilization || [];
     const totalUtilized = utilization.reduce((sum, u) => sum + parseFloat(u.totalCost || "0"), 0);
@@ -166,22 +154,8 @@ export default function ContractManagement() {
     );
   }
 
-  return (
-    <div className="p-6 space-y-6" data-testid="contract-management-page">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold" data-testid="page-title">Contract Management & SLA Tracking</h1>
-          <p className="text-muted-foreground" data-testid="page-description">
-            Monitor contract utilization, SLA compliance, and automated renewal workflows
-          </p>
-        </div>
-        <Button onClick={() => window.location.href = "/fleet-management"} data-testid="button-back-fleet">
-          <FileText className="mr-2 h-4 w-4" />
-          Back to Fleet
-        </Button>
-      </div>
-
-      {/* Dashboard Metrics */}
+  const headerContent = (
+    <>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card data-testid="card-total-contracts">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -240,7 +214,6 @@ export default function ContractManagement() {
         </Card>
       </div>
 
-      {/* Expiring Contracts Alert */}
       {dashboardMetrics.expiringContracts > 0 && (
         <Card className="border-orange-500" data-testid="card-expiring-alert">
           <CardHeader>
@@ -278,16 +251,15 @@ export default function ContractManagement() {
           </CardContent>
         </Card>
       )}
+    </>
+  );
 
-      <Tabs defaultValue="overview" className="space-y-4">
-        <TabsList data-testid="tabs-list">
-          <TabsTrigger value="overview" data-testid="tab-overview">Overview</TabsTrigger>
-          <TabsTrigger value="utilization" data-testid="tab-utilization">Utilization</TabsTrigger>
-          <TabsTrigger value="sla" data-testid="tab-sla">SLA Compliance</TabsTrigger>
-          <TabsTrigger value="renewals" data-testid="tab-renewals">Renewals</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="overview" className="space-y-4">
+  const tabs: TabConfig[] = [
+    {
+      id: "overview",
+      label: "Overview",
+      content: (
+        <div className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2">
             <Card data-testid="card-utilization-chart">
               <CardHeader>
@@ -331,7 +303,6 @@ export default function ContractManagement() {
             </Card>
           </div>
 
-          {/* Contracts List */}
           <Card data-testid="card-contracts-list">
             <CardHeader>
               <CardTitle>All Contracts</CardTitle>
@@ -397,45 +368,67 @@ export default function ContractManagement() {
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
+        </div>
+      ),
+    },
+    {
+      id: "utilization",
+      label: "Utilization",
+      content: selectedContract ? (
+        <ContractUtilizationDetail contract={selectedContract} />
+      ) : (
+        <Card>
+          <CardContent className="py-8">
+            <p className="text-center text-muted-foreground">
+              Select a contract from the Overview tab to view detailed utilization
+            </p>
+          </CardContent>
+        </Card>
+      ),
+    },
+    {
+      id: "sla",
+      label: "SLA Compliance",
+      content: selectedContract ? (
+        <ContractSLADetail contract={selectedContract} />
+      ) : (
+        <Card>
+          <CardContent className="py-8">
+            <p className="text-center text-muted-foreground">
+              Select a contract from the Overview tab to view SLA compliance details
+            </p>
+          </CardContent>
+        </Card>
+      ),
+    },
+    {
+      id: "renewals",
+      label: "Renewals",
+      content: <ContractRenewalsTab contracts={contracts} onAcceptRenewal={acceptRenewalMutation.mutate} />,
+    },
+  ];
 
-        <TabsContent value="utilization" className="space-y-4">
-          {selectedContract ? (
-            <ContractUtilizationDetail contract={selectedContract} />
-          ) : (
-            <Card>
-              <CardContent className="py-8">
-                <p className="text-center text-muted-foreground">
-                  Select a contract from the Overview tab to view detailed utilization
-                </p>
-              </CardContent>
-            </Card>
-          )}
-        </TabsContent>
-
-        <TabsContent value="sla" className="space-y-4">
-          {selectedContract ? (
-            <ContractSLADetail contract={selectedContract} />
-          ) : (
-            <Card>
-              <CardContent className="py-8">
-                <p className="text-center text-muted-foreground">
-                  Select a contract from the Overview tab to view SLA compliance details
-                </p>
-              </CardContent>
-            </Card>
-          )}
-        </TabsContent>
-
-        <TabsContent value="renewals" className="space-y-4">
-          <ContractRenewalsTab contracts={contracts} onAcceptRenewal={acceptRenewalMutation.mutate} />
-        </TabsContent>
-      </Tabs>
-    </div>
+  return (
+    <TabsPageLayout
+      title="Contract Management & SLA Tracking"
+      description="Monitor contract utilization, SLA compliance, and automated renewal workflows"
+      icon={FileText}
+      secondaryActions={[
+        {
+          label: "Back to Fleet",
+          icon: FileText,
+          onClick: () => window.location.href = "/fleet-management",
+          variant: "outline",
+          testId: "button-back-fleet",
+        },
+      ]}
+      tabs={tabs}
+      defaultTab="overview"
+      headerContent={headerContent}
+    />
   );
 }
 
-// Contract Utilization Detail Component
 function ContractUtilizationDetail({ contract }: { contract: any }) {
   const utilization = contract.utilization || [];
   const totalUtilized = utilization.reduce((sum: number, u: any) => sum + parseFloat(u.totalCost || "0"), 0);
@@ -443,7 +436,6 @@ function ContractUtilizationDetail({ contract }: { contract: any }) {
   const remaining = serviceCap - totalUtilized;
   const utilizationPercentage = serviceCap > 0 ? (totalUtilized / serviceCap) * 100 : 0;
 
-  // Group by service type
   const byServiceType = utilization.reduce((acc: any, u: any) => {
     const type = u.serviceType || "Other";
     if (!acc[type]) {
@@ -553,12 +545,10 @@ function ContractUtilizationDetail({ contract }: { contract: any }) {
   );
 }
 
-// Contract SLA Detail Component
 function ContractSLADetail({ contract }: { contract: any }) {
   const slaMetrics = contract.slaMetrics || [];
   const metCount = slaMetrics.filter((m: any) => m.complianceStatus === "met").length;
   const breachCount = slaMetrics.filter((m: any) => m.complianceStatus === "breached").length;
-  const warningCount = slaMetrics.filter((m: any) => m.complianceStatus === "warning").length;
   const complianceRate = slaMetrics.length > 0 ? (metCount / slaMetrics.length) * 100 : 100;
 
   const totalPenalties = slaMetrics.reduce((sum: number, m: any) => 
@@ -699,7 +689,6 @@ function ContractSLADetail({ contract }: { contract: any }) {
   );
 }
 
-// Contract Renewals Tab Component
 function ContractRenewalsTab({ contracts, onAcceptRenewal }: { 
   contracts: any[]; 
   onAcceptRenewal: (data: { renewalId: string; contractId: string }) => void;

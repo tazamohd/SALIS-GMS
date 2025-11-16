@@ -28,11 +28,9 @@ type InsertRevenueSharingRule = z.infer<typeof insertRevenueSharingRuleSchema>;
 type FranchiseGroup = {
   id: string;
   name: string;
-  parentGroupId: string | null;
   description: string | null;
-  contactEmail: string | null;
-  contactPhone: string | null;
-  logoUrl: string | null;
+  headquarters: string | null;
+  totalBranches: number | null;
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -45,14 +43,10 @@ type FranchiseContract = {
   contractNumber: string;
   startDate: Date;
   endDate: Date | null;
-  status: string;
-  signedByFranchisor: string | null;
-  signedByFranchisee: string | null;
-  terms: any;
+  status: string | null;
+  terms: string | null;
   royaltyPercentage: string | null;
   marketingFeePercentage: string | null;
-  territoryDescription: string | null;
-  documentUrl: string | null;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -61,31 +55,20 @@ type FranchiseKpi = {
   id: string;
   branchId: string;
   month: string;
-  revenueTarget: string;
-  revenueActual: string | null;
-  customerSatisfactionTarget: string;
-  customerSatisfactionActual: string | null;
-  vehiclesServicedTarget: number;
-  vehiclesServicedActual: number | null;
-  averageRepairTimeTarget: string;
-  averageRepairTimeActual: string | null;
-  employeeTurnoverRate: string | null;
-  complianceScore: string | null;
-  notes: string | null;
+  totalRevenue: string | null;
+  totalJobCards: number | null;
+  customerSatisfaction: string | null;
+  royaltyPaid: string | null;
+  marketingFeePaid: string | null;
   createdAt: Date;
 };
 
 type RevenueSharingRule = {
   id: string;
   franchiseGroupId: string;
-  ruleName: string;
-  sharePercentageFranchisor: string;
-  sharePercentageFranchisee: string;
   revenueType: string;
-  minRevenueThreshold: string | null;
-  maxRevenueThreshold: string | null;
-  effectiveDate: Date;
-  expirationDate: Date | null;
+  franchisePercentage: string;
+  corporatePercentage: string;
   isActive: boolean;
   createdAt: Date;
 };
@@ -118,11 +101,9 @@ export default function FranchiseManagement() {
     resolver: zodResolver(insertFranchiseGroupSchema),
     defaultValues: {
       name: "",
-      parentGroupId: undefined,
       description: undefined,
-      contactEmail: undefined,
-      contactPhone: undefined,
-      logoUrl: undefined,
+      headquarters: undefined,
+      totalBranches: undefined,
       isActive: true,
     },
   });
@@ -135,14 +116,10 @@ export default function FranchiseManagement() {
       contractNumber: "",
       startDate: new Date(),
       endDate: undefined,
-      status: "draft",
-      signedByFranchisor: undefined,
-      signedByFranchisee: undefined,
-      terms: {},
+      status: "active",
+      terms: undefined,
       royaltyPercentage: undefined,
       marketingFeePercentage: undefined,
-      territoryDescription: undefined,
-      documentUrl: undefined,
     },
   });
 
@@ -151,17 +128,11 @@ export default function FranchiseManagement() {
     defaultValues: {
       branchId: "",
       month: new Date().toISOString().slice(0, 7),
-      revenueTarget: "0",
-      revenueActual: undefined,
-      customerSatisfactionTarget: "4.5",
-      customerSatisfactionActual: undefined,
-      vehiclesServicedTarget: 0,
-      vehiclesServicedActual: undefined,
-      averageRepairTimeTarget: "0",
-      averageRepairTimeActual: undefined,
-      employeeTurnoverRate: undefined,
-      complianceScore: undefined,
-      notes: undefined,
+      totalRevenue: undefined,
+      totalJobCards: undefined,
+      customerSatisfaction: undefined,
+      royaltyPaid: undefined,
+      marketingFeePaid: undefined,
     },
   });
 
@@ -169,14 +140,9 @@ export default function FranchiseManagement() {
     resolver: zodResolver(insertRevenueSharingRuleSchema),
     defaultValues: {
       franchiseGroupId: "",
-      ruleName: "",
-      sharePercentageFranchisor: "0",
-      sharePercentageFranchisee: "100",
       revenueType: "all",
-      minRevenueThreshold: undefined,
-      maxRevenueThreshold: undefined,
-      effectiveDate: new Date(),
-      expirationDate: undefined,
+      franchisePercentage: "0",
+      corporatePercentage: "100",
       isActive: true,
     },
   });
@@ -299,11 +265,9 @@ export default function FranchiseManagement() {
     setEditingGroup(group);
     groupForm.reset({
       name: group.name,
-      parentGroupId: group.parentGroupId || undefined,
       description: group.description || undefined,
-      contactEmail: group.contactEmail || undefined,
-      contactPhone: group.contactPhone || undefined,
-      logoUrl: group.logoUrl || undefined,
+      headquarters: group.headquarters || undefined,
+      totalBranches: group.totalBranches || undefined,
       isActive: group.isActive,
     });
     setShowGroupDialog(true);
@@ -317,14 +281,10 @@ export default function FranchiseManagement() {
       contractNumber: contract.contractNumber,
       startDate: new Date(contract.startDate),
       endDate: contract.endDate ? new Date(contract.endDate) : undefined,
-      status: contract.status,
-      signedByFranchisor: contract.signedByFranchisor || undefined,
-      signedByFranchisee: contract.signedByFranchisee || undefined,
-      terms: contract.terms,
+      status: contract.status || undefined,
+      terms: contract.terms || undefined,
       royaltyPercentage: contract.royaltyPercentage || undefined,
       marketingFeePercentage: contract.marketingFeePercentage || undefined,
-      territoryDescription: contract.territoryDescription || undefined,
-      documentUrl: contract.documentUrl || undefined,
     });
     setShowContractDialog(true);
   };
@@ -390,7 +350,7 @@ export default function FranchiseManagement() {
                 <TableHeader>
                   <TableRow className="border-border dark:border-border">
                     <TableHead className="text-foreground dark:text-foreground">Name</TableHead>
-                    <TableHead className="text-foreground dark:text-foreground">Contact</TableHead>
+                    <TableHead className="text-foreground dark:text-foreground">Headquarters</TableHead>
                     <TableHead className="text-foreground dark:text-foreground">Status</TableHead>
                     <TableHead className="text-foreground dark:text-foreground text-right">Actions</TableHead>
                   </TableRow>
@@ -416,8 +376,11 @@ export default function FranchiseManagement() {
                           </div>
                         </TableCell>
                         <TableCell className="text-foreground dark:text-foreground">
-                          {group.contactEmail && <div className="text-sm">{group.contactEmail}</div>}
-                          {group.contactPhone && <div className="text-sm text-muted-foreground dark:text-muted-foreground">{group.contactPhone}</div>}
+                          {group.headquarters ? (
+                            <div className="text-sm">{group.headquarters}</div>
+                          ) : (
+                            <div className="text-sm text-muted-foreground dark:text-muted-foreground">-</div>
+                          )}
                         </TableCell>
                         <TableCell>
                           {group.isActive ? (
@@ -488,7 +451,7 @@ export default function FranchiseManagement() {
                             {contract.marketingFeePercentage && <div className="text-muted-foreground dark:text-muted-foreground">Marketing: {contract.marketingFeePercentage}%</div>}
                           </div>
                         </TableCell>
-                        <TableCell>{getStatusBadge(contract.status)}</TableCell>
+                        <TableCell>{getStatusBadge(contract.status || "active")}</TableCell>
                         <TableCell className="text-right space-x-2">
                           <Button variant="ghost" size="sm" onClick={() => handleEditContract(contract)} data-testid={`button-edit-${contract.id}`}>
                             <Edit className="h-4 w-4" />
@@ -583,12 +546,12 @@ export default function FranchiseManagement() {
               <div className="grid grid-cols-2 gap-4">
                 <FormField
                   control={groupForm.control}
-                  name="contactEmail"
+                  name="headquarters"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-foreground dark:text-foreground">Contact Email</FormLabel>
+                      <FormLabel className="text-foreground dark:text-foreground">Headquarters</FormLabel>
                       <FormControl>
-                        <Input {...field} value={field.value || ""} type="email" placeholder="contact@example.com" data-testid="input-group-email" className="bg-background dark:bg-background text-foreground dark:text-foreground border-input dark:border-input" />
+                        <Input {...field} value={field.value || ""} placeholder="Enter headquarters location" data-testid="input-group-headquarters" className="bg-background dark:bg-background text-foreground dark:text-foreground border-input dark:border-input" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -596,12 +559,12 @@ export default function FranchiseManagement() {
                 />
                 <FormField
                   control={groupForm.control}
-                  name="contactPhone"
+                  name="totalBranches"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-foreground dark:text-foreground">Contact Phone</FormLabel>
+                      <FormLabel className="text-foreground dark:text-foreground">Total Branches</FormLabel>
                       <FormControl>
-                        <Input {...field} value={field.value || ""} type="tel" placeholder="+1234567890" data-testid="input-group-phone" className="bg-background dark:bg-background text-foreground dark:text-foreground border-input dark:border-input" />
+                        <Input {...field} value={field.value ?? ""} type="number" placeholder="0" data-testid="input-group-branches" className="bg-background dark:bg-background text-foreground dark:text-foreground border-input dark:border-input" onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -678,7 +641,7 @@ export default function FranchiseManagement() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-foreground dark:text-foreground">Status</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
+                    <Select onValueChange={field.onChange} value={field.value || undefined}>
                       <FormControl>
                         <SelectTrigger data-testid="select-contract-status" className="bg-background dark:bg-background text-foreground dark:text-foreground border-input dark:border-input">
                           <SelectValue placeholder="Select status" />

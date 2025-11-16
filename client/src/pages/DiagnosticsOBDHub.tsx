@@ -3,7 +3,6 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { Cpu, Activity, FileText, Wifi, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
@@ -16,10 +15,10 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { ObdDevice, DeviceAssignment, ObdSession, DiagnosticReport, InsertObdDevice, InsertObdSession } from "@shared/schema";
 import { insertObdDeviceSchema, insertObdSessionSchema } from "@shared/schema";
+import { TabsPageLayout } from "@/components/layouts/TabsPageLayout";
 
 export default function DiagnosticsOBDHub() {
   const { toast } = useToast();
-  const [activeTab, setActiveTab] = useState("devices");
   const [showDeviceDialog, setShowDeviceDialog] = useState(false);
   const [showSessionDialog, setShowSessionDialog] = useState(false);
 
@@ -92,181 +91,193 @@ export default function DiagnosticsOBDHub() {
     );
   };
 
-  return (
-    <div className="flex-1 p-6 bg-gray-50 dark:bg-salis-black min-h-screen">
-      <div className="mb-6">
-        <h1 className="font-montserrat font-semibold text-2xl text-gray-900 dark:text-white" data-testid="text-page-title">Diagnostics & OBD Hub</h1>
-        <p className="font-poppins text-sm text-gray-600 dark:text-gray-400 mt-1" data-testid="text-page-description">
-          Manage OBD diagnostic devices, real-time vehicle monitoring, and diagnostic reports
-        </p>
+  const devicesTab = (
+    <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">OBD Devices</h2>
+        <Button onClick={() => { deviceForm.reset(); setShowDeviceDialog(true); }} data-testid="button-add-device">
+          <Plus className="h-4 w-4 mr-2" />
+          Register Device
+        </Button>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="bg-white dark:bg-salis-black/50 border border-gray-200 dark:border-salis-gray-dark" data-testid="tabs-navigation">
-          <TabsTrigger value="devices" data-testid="tab-devices" className="gap-2">
-            <Cpu className="h-4 w-4" />
-            OBD Devices
-          </TabsTrigger>
-          <TabsTrigger value="sessions" data-testid="tab-sessions" className="gap-2">
-            <Activity className="h-4 w-4" />
-            Live Sessions
-          </TabsTrigger>
-          <TabsTrigger value="reports" data-testid="tab-reports" className="gap-2">
-            <FileText className="h-4 w-4" />
-            Diagnostic Reports
-          </TabsTrigger>
-          <TabsTrigger value="assignments" data-testid="tab-assignments" className="gap-2">
-            <Wifi className="h-4 w-4" />
-            Device Assignments
-          </TabsTrigger>
-        </TabsList>
+      <Card className="border border-gray-200 dark:border-salis-gray-dark bg-white dark:bg-salis-black">
+        <CardContent className="p-0">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Serial #</TableHead>
+                <TableHead>Manufacturer</TableHead>
+                <TableHead>Model</TableHead>
+                <TableHead>Firmware</TableHead>
+                <TableHead>Status</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {devices.map((device) => (
+                <TableRow key={device.id}>
+                  <TableCell className="font-mono font-semibold">{device.deviceId}</TableCell>
+                  <TableCell>{getManufacturerBadge(device.manufacturer || '')}</TableCell>
+                  <TableCell>{device.model || 'N/A'}</TableCell>
+                  <TableCell className="font-mono text-xs">{device.firmwareVersion || 'N/A'}</TableCell>
+                  <TableCell>
+                    <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${device.status === 'active' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'}`}>
+                      {device.status === 'active' ? '🟢 Online' : '○ Offline'}
+                    </span>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+    </div>
+  );
 
-        <TabsContent value="devices" className="space-y-4">
-          <div className="flex justify-between items-center">
-            <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">OBD Devices</h2>
-            <Button onClick={() => { deviceForm.reset(); setShowDeviceDialog(true); }} data-testid="button-add-device">
-              <Plus className="h-4 w-4 mr-2" />
-              Register Device
-            </Button>
-          </div>
+  const sessionsTab = (
+    <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">Active Diagnostic Sessions</h2>
+        <Button onClick={() => { sessionForm.reset(); setShowSessionDialog(true); }} data-testid="button-start-session">
+          <Plus className="h-4 w-4 mr-2" />
+          Start Session
+        </Button>
+      </div>
 
-          <Card className="border border-gray-200 dark:border-salis-gray-dark bg-white dark:bg-salis-black">
-            <CardContent className="p-0">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Serial #</TableHead>
-                    <TableHead>Manufacturer</TableHead>
-                    <TableHead>Model</TableHead>
-                    <TableHead>Firmware</TableHead>
-                    <TableHead>Status</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {devices.map((device) => (
-                    <TableRow key={device.id}>
-                      <TableCell className="font-mono font-semibold">{device.deviceId}</TableCell>
-                      <TableCell>{getManufacturerBadge(device.manufacturer || '')}</TableCell>
-                      <TableCell>{device.model || 'N/A'}</TableCell>
-                      <TableCell className="font-mono text-xs">{device.firmwareVersion || 'N/A'}</TableCell>
-                      <TableCell>
-                        <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${device.status === 'active' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'}`}>
-                          {device.status === 'active' ? '🟢 Online' : '○ Offline'}
-                        </span>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        </TabsContent>
+      <Card className="border border-gray-200 dark:border-salis-gray-dark bg-white dark:bg-salis-black">
+        <CardContent className="p-0">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Session ID</TableHead>
+                <TableHead>Device</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Started</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {sessions.map((session) => (
+                <TableRow key={session.id}>
+                  <TableCell className="font-mono text-xs">{session.id.substring(0, 8)}</TableCell>
+                  <TableCell>{devices.find(d => d.id === session.deviceId)?.deviceId || 'N/A'}</TableCell>
+                  <TableCell>{getSessionStatusBadge(session.status || '')}</TableCell>
+                  <TableCell>{session.startTime ? new Date(session.startTime).toLocaleString() : 'N/A'}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+    </div>
+  );
 
-        <TabsContent value="sessions" className="space-y-4">
-          <div className="flex justify-between items-center">
-            <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">Active Diagnostic Sessions</h2>
-            <Button onClick={() => { sessionForm.reset(); setShowSessionDialog(true); }} data-testid="button-start-session">
-              <Plus className="h-4 w-4 mr-2" />
-              Start Session
-            </Button>
-          </div>
+  const reportsTab = (
+    <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">Diagnostic Reports</h2>
+      </div>
 
-          <Card className="border border-gray-200 dark:border-salis-gray-dark bg-white dark:bg-salis-black">
-            <CardContent className="p-0">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Session ID</TableHead>
-                    <TableHead>Device</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Started</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {sessions.map((session) => (
-                    <TableRow key={session.id}>
-                      <TableCell className="font-mono text-xs">{session.id.substring(0, 8)}</TableCell>
-                      <TableCell>{devices.find(d => d.id === session.deviceId)?.deviceId || 'N/A'}</TableCell>
-                      <TableCell>{getSessionStatusBadge(session.status || '')}</TableCell>
-                      <TableCell>{session.startTime ? new Date(session.startTime).toLocaleString() : 'N/A'}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        </TabsContent>
+      <Card className="border border-gray-200 dark:border-salis-gray-dark bg-white dark:bg-salis-black">
+        <CardContent className="p-0">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Report ID</TableHead>
+                <TableHead>Session</TableHead>
+                <TableHead>Severity</TableHead>
+                <TableHead>DTC Codes</TableHead>
+                <TableHead>Generated</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {reports.map((report) => (
+                <TableRow key={report.id}>
+                  <TableCell className="font-mono text-xs">{report.id.substring(0, 8)}</TableCell>
+                  <TableCell className="font-mono text-xs">{report.sessionId.substring(0, 8)}</TableCell>
+                  <TableCell>{getSeverityBadge(report.severity || '')}</TableCell>
+                  <TableCell className="font-mono text-xs">{Array.isArray(report.faultCodes) ? report.faultCodes.join(', ') : 'None'}</TableCell>
+                  <TableCell>{report.generatedAt ? new Date(report.generatedAt).toLocaleString() : 'N/A'}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+    </div>
+  );
 
-        <TabsContent value="reports" className="space-y-4">
-          <div className="flex justify-between items-center">
-            <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">Diagnostic Reports</h2>
-          </div>
+  const assignmentsTab = (
+    <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">Device Assignments</h2>
+      </div>
 
-          <Card className="border border-gray-200 dark:border-salis-gray-dark bg-white dark:bg-salis-black">
-            <CardContent className="p-0">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Report ID</TableHead>
-                    <TableHead>Session</TableHead>
-                    <TableHead>Severity</TableHead>
-                    <TableHead>DTC Codes</TableHead>
-                    <TableHead>Generated</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {reports.map((report) => (
-                    <TableRow key={report.id}>
-                      <TableCell className="font-mono text-xs">{report.id.substring(0, 8)}</TableCell>
-                      <TableCell className="font-mono text-xs">{report.sessionId.substring(0, 8)}</TableCell>
-                      <TableCell>{getSeverityBadge(report.severity || '')}</TableCell>
-                      <TableCell className="font-mono text-xs">{Array.isArray(report.faultCodes) ? report.faultCodes.join(', ') : 'None'}</TableCell>
-                      <TableCell>{report.generatedAt ? new Date(report.generatedAt).toLocaleString() : 'N/A'}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        </TabsContent>
+      <Card className="border border-gray-200 dark:border-salis-gray-dark bg-white dark:bg-salis-black">
+        <CardContent className="p-0">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Device</TableHead>
+                <TableHead>Branch</TableHead>
+                <TableHead>Assigned Date</TableHead>
+                <TableHead>Status</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {assignments.map((assignment) => (
+                <TableRow key={assignment.id}>
+                  <TableCell>{devices.find(d => d.id === assignment.deviceId)?.deviceId || 'N/A'}</TableCell>
+                  <TableCell>{assignment.technicianId || 'Unassigned'}</TableCell>
+                  <TableCell>{assignment.assignedAt ? new Date(assignment.assignedAt).toLocaleDateString() : 'N/A'}</TableCell>
+                  <TableCell>
+                    <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${assignment.status === 'active' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'}`}>
+                      {assignment.status === 'active' ? '✅ Active' : '○ Inactive'}
+                    </span>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+    </div>
+  );
 
-        <TabsContent value="assignments" className="space-y-4">
-          <div className="flex justify-between items-center">
-            <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">Device Assignments</h2>
-          </div>
+  return (
+    <>
+      <TabsPageLayout
+        title="Diagnostics & OBD Hub"
+        description="Manage OBD diagnostic devices, real-time vehicle monitoring, and diagnostic reports"
+        icon={Cpu}
+        tabs={[
+          {
+            id: "devices",
+            label: "OBD Devices",
+            icon: Cpu,
+            content: devicesTab,
+          },
+          {
+            id: "sessions",
+            label: "Live Sessions",
+            icon: Activity,
+            content: sessionsTab,
+          },
+          {
+            id: "reports",
+            label: "Diagnostic Reports",
+            icon: FileText,
+            content: reportsTab,
+          },
+          {
+            id: "assignments",
+            label: "Device Assignments",
+            icon: Wifi,
+            content: assignmentsTab,
+          },
+        ]}
+        defaultTab="devices"
+      />
 
-          <Card className="border border-gray-200 dark:border-salis-gray-dark bg-white dark:bg-salis-black">
-            <CardContent className="p-0">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Device</TableHead>
-                    <TableHead>Branch</TableHead>
-                    <TableHead>Assigned Date</TableHead>
-                    <TableHead>Status</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {assignments.map((assignment) => (
-                    <TableRow key={assignment.id}>
-                      <TableCell>{devices.find(d => d.id === assignment.deviceId)?.deviceId || 'N/A'}</TableCell>
-                      <TableCell>{assignment.technicianId || 'Unassigned'}</TableCell>
-                      <TableCell>{assignment.assignedAt ? new Date(assignment.assignedAt).toLocaleDateString() : 'N/A'}</TableCell>
-                      <TableCell>
-                        <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${assignment.status === 'active' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'}`}>
-                          {assignment.status === 'active' ? '✅ Active' : '○ Inactive'}
-                        </span>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
-
-      {/* Device Dialog */}
       <Dialog open={showDeviceDialog} onOpenChange={setShowDeviceDialog}>
         <DialogContent>
           <DialogHeader>
@@ -318,6 +329,6 @@ export default function DiagnosticsOBDHub() {
           </Form>
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 }

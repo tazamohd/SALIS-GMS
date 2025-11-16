@@ -8,7 +8,6 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -16,6 +15,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { DollarSign, FolderPlus, Receipt, CheckCircle, XCircle } from "lucide-react";
+import { TabsPageLayout } from "@/components/layouts/TabsPageLayout";
 
 const categorySchema = z.object({
   categoryName: z.string().min(1, "Category name is required"),
@@ -129,176 +129,174 @@ export default function ExpenseTracking() {
     return colors[status] || "bg-salis-gray text-white";
   };
 
-  return (
-    <div className="container mx-auto py-6 space-y-6 bg-white dark:bg-[#010101] min-h-screen">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-montserrat font-semibold text-salis-black dark:text-white" data-testid="heading-expenses">
-            Expense Tracking
-          </h1>
-          <p className="text-salis-gray dark:text-salis-gray-light font-poppins mt-1" data-testid="text-subtitle">
-            Manage business expenses, categories, and approvals
-          </p>
-        </div>
+  const expensesTab = (
+    <Card className="border-salis-gray-light dark:border-salis-gray-dark bg-white dark:bg-[#010101]">
+      <CardHeader>
+        <CardTitle className="font-montserrat text-salis-black dark:text-white">All Expenses</CardTitle>
+        <CardDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
+          View and manage all business expenses
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        {expensesLoading ? (
+          <p className="text-salis-gray font-poppins" data-testid="text-loading">Loading expenses...</p>
+        ) : expenses.length === 0 ? (
+          <p className="text-salis-gray font-poppins" data-testid="text-no-expenses">No expenses found</p>
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Vendor</TableHead>
+                <TableHead>Amount</TableHead>
+                <TableHead>Date</TableHead>
+                <TableHead>Payment Method</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {expenses.map((expense: any) => (
+                <TableRow key={expense.id} data-testid={`row-expense-${expense.id}`}>
+                  <TableCell className="font-medium" data-testid={`text-vendor-${expense.id}`}>{expense.vendorName}</TableCell>
+                  <TableCell data-testid={`text-amount-${expense.id}`}>
+                    {expense.currency} ${expense.amount.toFixed(2)}
+                  </TableCell>
+                  <TableCell data-testid={`text-date-${expense.id}`}>
+                    {new Date(expense.expenseDate).toLocaleDateString()}
+                  </TableCell>
+                  <TableCell data-testid={`text-payment-${expense.id}`}>{expense.paymentMethod}</TableCell>
+                  <TableCell>
+                    <Badge className={getStatusBadge(expense.status)} data-testid={`badge-status-${expense.id}`}>
+                      {expense.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    {expense.status === "pending" && (
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          onClick={() => approveExpenseMutation.mutate(expense.id)}
+                          className="bg-green-500 hover:bg-green-600 text-white"
+                          data-testid={`button-approve-${expense.id}`}
+                        >
+                          <CheckCircle className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => rejectExpenseMutation.mutate(expense.id)}
+                          data-testid={`button-reject-${expense.id}`}
+                        >
+                          <XCircle className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
+      </CardContent>
+    </Card>
+  );
+
+  const categoriesTab = (
+    <>
+      <div className="flex justify-end mb-4">
         <Button
-          onClick={() => setIsExpenseDialogOpen(true)}
+          onClick={() => setIsCategoryDialogOpen(true)}
           className="bg-salis-black hover:bg-salis-gray-dark text-white font-poppins"
-          data-testid="button-create-expense"
+          data-testid="button-create-category"
         >
-          <Receipt className="mr-2 h-4 w-4" />
-          Create Expense
+          <FolderPlus className="mr-2 h-4 w-4" />
+          Create Category
         </Button>
       </div>
-
-      <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full">
-        <TabsList className="bg-salis-gray-light dark:bg-salis-gray-dark" data-testid="tabs-expenses">
-          <TabsTrigger value="expenses" className="font-poppins" data-testid="tab-expenses">
-            <Receipt className="mr-2 h-4 w-4" />
-            Expenses
-          </TabsTrigger>
-          <TabsTrigger value="categories" className="font-poppins" data-testid="tab-categories">
-            <FolderPlus className="mr-2 h-4 w-4" />
-            Categories
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="expenses" className="space-y-4">
-          <Card className="border-salis-gray-light dark:border-salis-gray-dark bg-white dark:bg-[#010101]">
-            <CardHeader>
-              <CardTitle className="font-montserrat text-salis-black dark:text-white">All Expenses</CardTitle>
-              <CardDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
-                View and manage all business expenses
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {expensesLoading ? (
-                <p className="text-salis-gray font-poppins" data-testid="text-loading">Loading expenses...</p>
-              ) : expenses.length === 0 ? (
-                <p className="text-salis-gray font-poppins" data-testid="text-no-expenses">No expenses found</p>
-              ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Vendor</TableHead>
-                      <TableHead>Amount</TableHead>
-                      <TableHead>Date</TableHead>
-                      <TableHead>Payment Method</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {expenses.map((expense: any) => (
-                      <TableRow key={expense.id} data-testid={`row-expense-${expense.id}`}>
-                        <TableCell className="font-medium" data-testid={`text-vendor-${expense.id}`}>{expense.vendorName}</TableCell>
-                        <TableCell data-testid={`text-amount-${expense.id}`}>
-                          {expense.currency} ${expense.amount.toFixed(2)}
-                        </TableCell>
-                        <TableCell data-testid={`text-date-${expense.id}`}>
-                          {new Date(expense.expenseDate).toLocaleDateString()}
-                        </TableCell>
-                        <TableCell data-testid={`text-payment-${expense.id}`}>{expense.paymentMethod}</TableCell>
-                        <TableCell>
-                          <Badge className={getStatusBadge(expense.status)} data-testid={`badge-status-${expense.id}`}>
-                            {expense.status}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          {expense.status === "pending" && (
-                            <div className="flex gap-2">
-                              <Button
-                                size="sm"
-                                onClick={() => approveExpenseMutation.mutate(expense.id)}
-                                className="bg-green-500 hover:bg-green-600 text-white"
-                                data-testid={`button-approve-${expense.id}`}
-                              >
-                                <CheckCircle className="h-4 w-4" />
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="destructive"
-                                onClick={() => rejectExpenseMutation.mutate(expense.id)}
-                                data-testid={`button-reject-${expense.id}`}
-                              >
-                                <XCircle className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          )}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="categories" className="space-y-4">
-          <div className="flex justify-end mb-4">
-            <Button
-              onClick={() => setIsCategoryDialogOpen(true)}
-              className="bg-salis-black hover:bg-salis-gray-dark text-white font-poppins"
-              data-testid="button-create-category"
-            >
-              <FolderPlus className="mr-2 h-4 w-4" />
-              Create Category
-            </Button>
-          </div>
-          <Card className="border-salis-gray-light dark:border-salis-gray-dark bg-white dark:bg-[#010101]">
-            <CardHeader>
-              <CardTitle className="font-montserrat text-salis-black dark:text-white">Expense Categories</CardTitle>
-              <CardDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
-                Manage expense categories and budgets
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {categoriesLoading ? (
-                <p className="text-salis-gray font-poppins" data-testid="text-loading-categories">Loading categories...</p>
-              ) : categories.length === 0 ? (
-                <p className="text-salis-gray font-poppins" data-testid="text-no-categories">No categories found</p>
-              ) : (
-                <div className="grid gap-4">
-                  {categories.map((category: any) => (
-                    <Card key={category.id} className="border-salis-gray-light dark:border-salis-gray-dark" data-testid={`card-category-${category.id}`}>
-                      <CardContent className="p-6">
-                        <div className="flex justify-between items-start">
+      <Card className="border-salis-gray-light dark:border-salis-gray-dark bg-white dark:bg-[#010101]">
+        <CardHeader>
+          <CardTitle className="font-montserrat text-salis-black dark:text-white">Expense Categories</CardTitle>
+          <CardDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
+            Manage expense categories and budgets
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {categoriesLoading ? (
+            <p className="text-salis-gray font-poppins" data-testid="text-loading-categories">Loading categories...</p>
+          ) : categories.length === 0 ? (
+            <p className="text-salis-gray font-poppins" data-testid="text-no-categories">No categories found</p>
+          ) : (
+            <div className="grid gap-4">
+              {categories.map((category: any) => (
+                <Card key={category.id} className="border-salis-gray-light dark:border-salis-gray-dark" data-testid={`card-category-${category.id}`}>
+                  <CardContent className="p-6">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h3 className="text-lg font-montserrat font-medium text-salis-black dark:text-white" data-testid={`text-category-name-${category.id}`}>
+                          {category.categoryName}
+                        </h3>
+                        <p className="text-sm text-salis-gray dark:text-salis-gray-light font-poppins" data-testid={`text-category-code-${category.id}`}>
+                          Code: {category.categoryCode}
+                        </p>
+                        <p className="text-sm text-salis-gray dark:text-salis-gray-light font-poppins mt-1" data-testid={`text-category-description-${category.id}`}>
+                          {category.description || "No description"}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        {category.budgetLimit && (
                           <div>
-                            <h3 className="text-lg font-montserrat font-medium text-salis-black dark:text-white" data-testid={`text-category-name-${category.id}`}>
-                              {category.categoryName}
-                            </h3>
-                            <p className="text-sm text-salis-gray dark:text-salis-gray-light font-poppins" data-testid={`text-category-code-${category.id}`}>
-                              Code: {category.categoryCode}
-                            </p>
-                            <p className="text-sm text-salis-gray dark:text-salis-gray-light font-poppins mt-1" data-testid={`text-category-description-${category.id}`}>
-                              {category.description || "No description"}
+                            <p className="text-sm text-salis-gray dark:text-salis-gray-light font-poppins">Budget Limit</p>
+                            <p className="font-semibold text-salis-black dark:text-white" data-testid={`text-budget-${category.id}`}>
+                              ${category.budgetLimit.toFixed(2)}
                             </p>
                           </div>
-                          <div className="text-right">
-                            {category.budgetLimit && (
-                              <div>
-                                <p className="text-sm text-salis-gray dark:text-salis-gray-light font-poppins">Budget Limit</p>
-                                <p className="font-semibold text-salis-black dark:text-white" data-testid={`text-budget-${category.id}`}>
-                                  ${category.budgetLimit.toFixed(2)}
-                                </p>
-                              </div>
-                            )}
-                            {category.requiresApproval && (
-                              <Badge className="mt-2 bg-salis-black text-white" data-testid={`badge-approval-${category.id}`}>
-                                Requires Approval
-                              </Badge>
-                            )}
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+                        )}
+                        {category.requiresApproval && (
+                          <Badge className="mt-2 bg-salis-black text-white" data-testid={`badge-approval-${category.id}`}>
+                            Requires Approval
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </>
+  );
+
+  return (
+    <>
+      <TabsPageLayout
+        title="Expense Tracking"
+        description="Manage business expenses, categories, and approvals"
+        icon={DollarSign}
+        primaryAction={{
+          label: "Create Expense",
+          icon: Receipt,
+          onClick: () => setIsExpenseDialogOpen(true),
+          testId: "button-create-expense",
+        }}
+        tabs={[
+          {
+            id: "expenses",
+            label: "Expenses",
+            icon: Receipt,
+            content: expensesTab,
+          },
+          {
+            id: "categories",
+            label: "Categories",
+            icon: FolderPlus,
+            content: categoriesTab,
+          },
+        ]}
+        activeTab={selectedTab}
+        onTabChange={setSelectedTab}
+      />
 
       <Dialog open={isCategoryDialogOpen} onOpenChange={setIsCategoryDialogOpen}>
         <DialogContent className="bg-white dark:bg-salis-black">
@@ -505,6 +503,6 @@ export default function ExpenseTracking() {
           </Form>
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 }

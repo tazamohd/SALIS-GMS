@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { TabsPageLayout } from "@/components/layouts/TabsPageLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -235,184 +235,170 @@ export default function FinancialSettings() {
     setDiscountDialogOpen(true);
   };
 
-  return (
-    <div className="p-8 bg-gray-50 dark:bg-salis-black min-h-screen space-y-6">
-      <div className="flex items-center justify-between">
+  const garageSelector = (
+    <Select value={selectedGarageId} onValueChange={setSelectedGarageId}>
+      <SelectTrigger className="w-[200px]" data-testid="select-garage">
+        <SelectValue placeholder="Select garage" />
+      </SelectTrigger>
+      <SelectContent>
+        {garages.map((garage) => (
+          <SelectItem key={garage.id} value={garage.id} data-testid={`select-garage-${garage.id}`}>
+            {garage.name}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
+
+  const taxesTabContent = (
+    <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+      <CardHeader className="flex flex-row items-center justify-between">
         <div>
-          <h1 className="font-['Poppins',Helvetica] font-bold text-3xl text-gray-900 dark:text-white" data-testid="text-page-title">Financial Settings</h1>
-          <p className="text-gray-900 dark:text-white/60" data-testid="text-page-description">
-            Manage tax configurations, discounts, and promotions
-          </p>
+          <CardTitle className="text-gray-900 dark:text-white">Tax Configurations</CardTitle>
+          <CardDescription className="text-gray-900 dark:text-white/60">Configure automatic tax calculations for your garage</CardDescription>
         </div>
-        <Select value={selectedGarageId} onValueChange={setSelectedGarageId}>
-          <SelectTrigger className="w-[200px]" data-testid="select-garage">
-            <SelectValue placeholder="Select garage" />
-          </SelectTrigger>
-          <SelectContent>
-            {garages.map((garage) => (
-              <SelectItem key={garage.id} value={garage.id} data-testid={`select-garage-${garage.id}`}>
-                {garage.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
-      <Tabs defaultValue="taxes" className="space-y-4">
-        <TabsList data-testid="tabs-financial-settings">
-          <TabsTrigger value="taxes" data-testid="tab-taxes">Tax Configurations</TabsTrigger>
-          <TabsTrigger value="discounts" data-testid="tab-discounts">Discounts & Promotions</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="taxes" className="space-y-4">
-          <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
-            <CardHeader className="flex flex-row items-center justify-between">
-              <div>
-                <CardTitle className="text-gray-900 dark:text-white">Tax Configurations</CardTitle>
-                <CardDescription className="text-gray-900 dark:text-white/60">Configure automatic tax calculations for your garage</CardDescription>
-              </div>
-              <Dialog open={taxDialogOpen} onOpenChange={setTaxDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button onClick={() => { setEditingTax(null); taxForm.reset({ garageId: selectedGarageId }); }} data-testid="button-add-tax">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add Tax
+        <Dialog open={taxDialogOpen} onOpenChange={setTaxDialogOpen}>
+          <DialogTrigger asChild>
+            <Button onClick={() => { setEditingTax(null); taxForm.reset({ garageId: selectedGarageId }); }} data-testid="button-add-tax">
+              <Plus className="h-4 w-4 mr-2" />
+              Add Tax
+            </Button>
+          </DialogTrigger>
+          <DialogContent data-testid="dialog-tax-form">
+            <DialogHeader>
+              <DialogTitle>{editingTax ? "Edit Tax Configuration" : "Add Tax Configuration"}</DialogTitle>
+              <DialogDescription>Configure tax rates for automatic calculation</DialogDescription>
+            </DialogHeader>
+            <Form {...taxForm}>
+              <form onSubmit={taxForm.handleSubmit((data) => taxMutation.mutate(data))} className="space-y-4">
+                <FormField
+                  control={taxForm.control}
+                  name="taxName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Tax Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="e.g., VAT, Sales Tax" {...field} data-testid="input-tax-name" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={taxForm.control}
+                  name="taxRate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Tax Rate (%)</FormLabel>
+                      <FormControl>
+                        <Input type="number" step="0.01" placeholder="e.g., 15" {...field} data-testid="input-tax-rate" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={taxForm.control}
+                  name="category"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Category (Optional)</FormLabel>
+                      <FormControl>
+                        <Input placeholder="e.g., parts, labor" {...field} data-testid="input-tax-category" />
+                      </FormControl>
+                      <FormDescription>Leave empty to apply to all categories</FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={taxForm.control}
+                  name="isActive"
+                  render={({ field }) => (
+                    <FormItem className="flex items-center justify-between rounded-lg border p-3">
+                      <div className="space-y-0.5">
+                        <FormLabel>Active</FormLabel>
+                        <FormDescription>Enable this tax configuration</FormDescription>
+                      </div>
+                      <FormControl>
+                        <Switch checked={field.value} onCheckedChange={field.onChange} data-testid="switch-tax-active" />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <DialogFooter>
+                  <Button type="submit" disabled={taxMutation.isPending} data-testid="button-save-tax">
+                    {taxMutation.isPending ? "Saving..." : editingTax ? "Update" : "Create"}
                   </Button>
-                </DialogTrigger>
-                <DialogContent data-testid="dialog-tax-form">
-                  <DialogHeader>
-                    <DialogTitle>{editingTax ? "Edit Tax Configuration" : "Add Tax Configuration"}</DialogTitle>
-                    <DialogDescription>Configure tax rates for automatic calculation</DialogDescription>
-                  </DialogHeader>
-                  <Form {...taxForm}>
-                    <form onSubmit={taxForm.handleSubmit((data) => taxMutation.mutate(data))} className="space-y-4">
-                      <FormField
-                        control={taxForm.control}
-                        name="taxName"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Tax Name</FormLabel>
-                            <FormControl>
-                              <Input placeholder="e.g., VAT, Sales Tax" {...field} data-testid="input-tax-name" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={taxForm.control}
-                        name="taxRate"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Tax Rate (%)</FormLabel>
-                            <FormControl>
-                              <Input type="number" step="0.01" placeholder="e.g., 15" {...field} data-testid="input-tax-rate" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={taxForm.control}
-                        name="category"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Category (Optional)</FormLabel>
-                            <FormControl>
-                              <Input placeholder="e.g., parts, labor" {...field} data-testid="input-tax-category" />
-                            </FormControl>
-                            <FormDescription>Leave empty to apply to all categories</FormDescription>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={taxForm.control}
-                        name="isActive"
-                        render={({ field }) => (
-                          <FormItem className="flex items-center justify-between rounded-lg border p-3">
-                            <div className="space-y-0.5">
-                              <FormLabel>Active</FormLabel>
-                              <FormDescription>Enable this tax configuration</FormDescription>
-                            </div>
-                            <FormControl>
-                              <Switch checked={field.value} onCheckedChange={field.onChange} data-testid="switch-tax-active" />
-                            </FormControl>
-                          </FormItem>
-                        )}
-                      />
-                      <DialogFooter>
-                        <Button type="submit" disabled={taxMutation.isPending} data-testid="button-save-tax">
-                          {taxMutation.isPending ? "Saving..." : editingTax ? "Update" : "Create"}
-                        </Button>
-                      </DialogFooter>
-                    </form>
-                  </Form>
-                </DialogContent>
-              </Dialog>
-            </CardHeader>
-            <CardContent>
-              {taxLoading ? (
-                <div className="text-center py-8 text-gray-900 dark:text-white/60">Loading...</div>
-              ) : taxConfigs.length === 0 ? (
-                <div className="text-center py-8 text-gray-900 dark:text-white/60" data-testid="text-no-taxes">
-                  No tax configurations found. Add one to get started.
-                </div>
-              ) : (
-                <Table>
-                  <TableHeader className="bg-gray-100 dark:bg-salis-gray-dark">
-                    <TableRow className="border-b border-gray-200 dark:border-salis-gray-dark hover:bg-gray-100 dark:hover:bg-salis-gray-dark">
-                      <TableHead className="text-gray-900 dark:text-white">Tax Name</TableHead>
-                      <TableHead className="text-gray-900 dark:text-white">Rate</TableHead>
-                      <TableHead className="text-gray-900 dark:text-white">Category</TableHead>
-                      <TableHead className="text-gray-900 dark:text-white">Status</TableHead>
-                      <TableHead className="text-gray-900 dark:text-white">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {taxConfigs.map((tax) => (
-                      <TableRow key={tax.id} data-testid={`row-tax-${tax.id}`}>
-                        <TableCell className="font-medium" data-testid={`text-tax-name-${tax.id}`}>{tax.taxName}</TableCell>
-                        <TableCell data-testid={`text-tax-rate-${tax.id}`}>{tax.taxRate}%</TableCell>
-                        <TableCell data-testid={`text-tax-category-${tax.id}`}>{tax.category || "All"}</TableCell>
-                        <TableCell className="text-gray-900 dark:text-white">
-                          <Badge variant={tax.isActive ? "default" : "secondary"} data-testid={`badge-tax-status-${tax.id}`}>
-                            {tax.isActive ? "Active" : "Inactive"}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="text-gray-900 dark:text-white">
-                          <div className="flex gap-2">
-                            <Button variant="ghost" size="sm" onClick={() => handleEditTax(tax)} data-testid={`button-edit-tax-${tax.id}`}>
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            <Button variant="ghost" size="sm" onClick={() => deleteTaxMutation.mutate(tax.id)} data-testid={`button-delete-tax-${tax.id}`}>
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
+                </DialogFooter>
+              </form>
+            </Form>
+          </DialogContent>
+        </Dialog>
+      </CardHeader>
+      <CardContent>
+        {taxLoading ? (
+          <div className="text-center py-8 text-gray-900 dark:text-white/60">Loading...</div>
+        ) : taxConfigs.length === 0 ? (
+          <div className="text-center py-8 text-gray-900 dark:text-white/60" data-testid="text-no-taxes">
+            No tax configurations found. Add one to get started.
+          </div>
+        ) : (
+          <Table>
+            <TableHeader className="bg-gray-100 dark:bg-salis-gray-dark">
+              <TableRow className="border-b border-gray-200 dark:border-salis-gray-dark hover:bg-gray-100 dark:hover:bg-salis-gray-dark">
+                <TableHead className="text-gray-900 dark:text-white">Tax Name</TableHead>
+                <TableHead className="text-gray-900 dark:text-white">Rate</TableHead>
+                <TableHead className="text-gray-900 dark:text-white">Category</TableHead>
+                <TableHead className="text-gray-900 dark:text-white">Status</TableHead>
+                <TableHead className="text-gray-900 dark:text-white">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {taxConfigs.map((tax) => (
+                <TableRow key={tax.id} data-testid={`row-tax-${tax.id}`}>
+                  <TableCell className="font-medium" data-testid={`text-tax-name-${tax.id}`}>{tax.taxName}</TableCell>
+                  <TableCell data-testid={`text-tax-rate-${tax.id}`}>{tax.taxRate}%</TableCell>
+                  <TableCell data-testid={`text-tax-category-${tax.id}`}>{tax.category || "All"}</TableCell>
+                  <TableCell className="text-gray-900 dark:text-white">
+                    <Badge variant={tax.isActive ? "default" : "secondary"} data-testid={`badge-tax-status-${tax.id}`}>
+                      {tax.isActive ? "Active" : "Inactive"}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-gray-900 dark:text-white">
+                    <div className="flex gap-2">
+                      <Button variant="ghost" size="sm" onClick={() => handleEditTax(tax)} data-testid={`button-edit-tax-${tax.id}`}>
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="sm" onClick={() => deleteTaxMutation.mutate(tax.id)} data-testid={`button-delete-tax-${tax.id}`}>
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
+      </CardContent>
+    </Card>
+  );
 
-        <TabsContent value="discounts" className="space-y-4">
-          <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
-            <CardHeader className="flex flex-row items-center justify-between">
-              <div>
-                <CardTitle className="text-gray-900 dark:text-white">Discounts & Promotions</CardTitle>
-                <CardDescription className="text-gray-900 dark:text-white/60">Create and manage discount codes and promotional campaigns</CardDescription>
-              </div>
-              <Dialog open={discountDialogOpen} onOpenChange={setDiscountDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button onClick={() => { setEditingDiscount(null); discountForm.reset({ garageId: selectedGarageId }); }} data-testid="button-add-discount">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add Discount
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" data-testid="dialog-discount-form">
+  const discountsTabContent = (
+    <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+      <CardHeader className="flex flex-row items-center justify-between">
+        <div>
+          <CardTitle className="text-gray-900 dark:text-white">Discounts & Promotions</CardTitle>
+          <CardDescription className="text-gray-900 dark:text-white/60">Create and manage discount codes and promotional campaigns</CardDescription>
+        </div>
+        <Dialog open={discountDialogOpen} onOpenChange={setDiscountDialogOpen}>
+          <DialogTrigger asChild>
+            <Button onClick={() => { setEditingDiscount(null); discountForm.reset({ garageId: selectedGarageId }); }} data-testid="button-add-discount">
+              <Plus className="h-4 w-4 mr-2" />
+              Add Discount
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" data-testid="dialog-discount-form">
                   <DialogHeader>
                     <DialogTitle>{editingDiscount ? "Edit Discount" : "Create Discount"}</DialogTitle>
                     <DialogDescription>Set up discount codes and promotional offers</DialogDescription>
@@ -696,10 +682,28 @@ export default function FinancialSettings() {
                   </TableBody>
                 </Table>
               )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
-    </div>
+      </CardContent>
+    </Card>
+  );
+
+  return (
+    <TabsPageLayout
+      title="Financial Settings"
+      description="Manage tax configurations, discounts, and promotions"
+      tabs={[
+        {
+          id: "taxes",
+          label: "Tax Configurations",
+          content: taxesTabContent,
+        },
+        {
+          id: "discounts",
+          label: "Discounts & Promotions",
+          content: discountsTabContent,
+        },
+      ]}
+      defaultTab="taxes"
+      headerContent={garageSelector}
+    />
   );
 }
