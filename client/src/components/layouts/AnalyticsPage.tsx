@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 interface FilterControl {
   id: string;
   label: string;
-  type: "select" | "date" | "daterange";
+  type: "select" | "date";
   options?: Array<{ value: string; label: string }>;
   value: string;
   onChange: (value: string) => void;
