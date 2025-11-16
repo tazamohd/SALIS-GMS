@@ -1,11 +1,14 @@
 import { useState } from "react";
-import { BarChart3, Clock, AlertCircle, CheckCircle, Wrench, TrendingUp, Users, DollarSign, Package } from "lucide-react";
+import { BarChart3, Clock, AlertCircle, CheckCircle, Wrench, TrendingUp, Users, DollarSign, Package, FileText } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { TaskDetailsDialog } from "@/components/TaskDetailsDialog";
+import { PageHeader } from "@/components/PageHeader";
+import { DataTable, Column } from "@/components/DataTable";
+import { EmptyState } from "@/components/EmptyState";
 import { useAuth } from "@/hooks/useAuth";
 import type { JobCard, User, Invoice, SparePart } from "@shared/schema";
 
@@ -149,13 +152,87 @@ export function Dashboard() {
     }
   };
 
+  // Columns for DataTable
+  const columns: Column<JobCard>[] = [
+    {
+      key: "id",
+      label: "ID",
+      render: (task) => (
+        <span className="font-mono text-xs font-semibold">
+          #{shortenId(task.id)}
+        </span>
+      ),
+    },
+    {
+      key: "serviceType",
+      label: "Service",
+      render: (task) => {
+        const config = getServiceTypeBadge(task.serviceType);
+        return (
+          <Badge className={`${config.bg} ${config.text} border-0 text-xs font-medium`}>
+            {config.icon} {config.label}
+          </Badge>
+        );
+      },
+    },
+    {
+      key: "customer",
+      label: "Customer",
+      render: (task) => {
+        const vehicleInfo = task.vehicleInfo as any;
+        return vehicleInfo?.customerName || vehicleInfo?.owner || 'N/A';
+      },
+    },
+    {
+      key: "vehicle",
+      label: "Vehicle",
+      render: (task) => {
+        const vehicleInfo = task.vehicleInfo as any;
+        return `${vehicleInfo?.make || ''} ${vehicleInfo?.model || ''}`.trim() || 'N/A';
+      },
+    },
+    {
+      key: "status",
+      label: "Status",
+      render: (task) => {
+        const config = getStatusBadge(task.status);
+        return (
+          <Badge className={`${config.bg} ${config.text} border-0 text-xs font-medium`}>
+            {config.icon} {config.label}
+          </Badge>
+        );
+      },
+    },
+    {
+      key: "priority",
+      label: "Priority",
+      render: (task) => {
+        const config = getPriorityBadge(task.priority);
+        return (
+          <Badge className={`${config.bg} ${config.text} border-0 text-xs font-medium shadow-sm`}>
+            {config.icon} {config.label.toUpperCase()}
+          </Badge>
+        );
+      },
+    },
+    {
+      key: "createdAt",
+      label: "Date",
+      render: (task) => 
+        task.createdAt
+          ? new Date(task.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+          : 'N/A',
+    },
+  ];
+
   return (
-    <div className="flex-1 p-6 bg-gray-50 dark:bg-salis-black min-h-screen">
-      {/* Compact Header */}
-      <div className="mb-6">
-        <h1 className="font-montserrat font-semibold text-2xl text-gray-900 dark:text-white">{t('dashboard.title')}</h1>
-        <p className="font-poppins text-sm text-gray-600 dark:text-gray-400 mt-1">{t('common.welcome')} {(user as User | undefined)?.fullName || (user as any)?.name}</p>
-      </div>
+    <div className="flex-1 p-4 sm:p-6 lg:p-8 bg-background min-h-screen">
+      {/* Page Header with Actions */}
+      <PageHeader
+        title={t('dashboard.title')}
+        description={`${t('common.welcome')} ${(user as User | undefined)?.fullName || (user as any)?.name}`}
+        icon={BarChart3}
+      />
 
       {/* Role-based Quick Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
