@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Star, ThumbsUp, TrendingUp, MessageCircle, Plus, AlertCircle } from "lucide-react";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { StandardPageLayout } from "@/components/layouts/StandardPageLayout";
 
 export default function CustomerReviewsRatings() {
   const [isRespondDialogOpen, setIsRespondDialogOpen] = useState(false);
@@ -63,27 +64,25 @@ export default function CustomerReviewsRatings() {
 
   if (isLoading) {
     return (
-      <div className="p-8">
+      <StandardPageLayout
+        title="Customer Reviews & Ratings"
+        description="Manage and respond to customer feedback"
+        icon={Star}
+      >
         <div className="animate-pulse space-y-4">
           <div className="h-8 bg-gray-200 dark:bg-gray-800 rounded w-96"></div>
           <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded w-128"></div>
         </div>
-      </div>
+      </StandardPageLayout>
     );
   }
 
   return (
-    <div className="p-8 space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold font-montserrat text-gray-900 dark:text-white">
-            ⭐ Customer Reviews & Ratings
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">
-            Manage and respond to customer feedback
-          </p>
-        </div>
-      </div>
+    <StandardPageLayout
+      title="Customer Reviews & Ratings"
+      description="Manage and respond to customer feedback"
+      icon={Star}
+    >
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -311,6 +310,6 @@ export default function CustomerReviewsRatings() {
           </div>
         </DialogContent>
       </Dialog>
-    </div>
+    </StandardPageLayout>
   );
 }

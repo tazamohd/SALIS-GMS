@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Settings as SettingsIcon, Globe, DollarSign, Palette, Printer, Keyboard, RotateCcw } from "lucide-react";
 import type { UserSettings } from "@shared/schema";
+import { TabsPageLayout } from "@/components/layouts";
 
 export default function Settings() {
   const { toast } = useToast();
@@ -67,69 +67,54 @@ export default function Settings() {
     return null;
   }
 
+  const tabs = [
+    {
+      id: "general",
+      label: "General",
+      icon: SettingsIcon,
+      content: <GeneralSettingsTab settings={settings} onUpdate={handleUpdateSettings} />,
+    },
+    {
+      id: "language",
+      label: "Language",
+      icon: Globe,
+      content: <LanguageSettingsTab settings={settings} onUpdate={handleUpdateSettings} />,
+    },
+    {
+      id: "currency",
+      label: "Currency",
+      icon: DollarSign,
+      content: <CurrencySettingsTab settings={settings} onUpdate={handleUpdateSettings} />,
+    },
+    {
+      id: "appearance",
+      label: "Appearance",
+      icon: Palette,
+      content: <AppearanceSettingsTab settings={settings} onUpdate={handleUpdateSettings} />,
+    },
+    {
+      id: "print",
+      label: "Print",
+      icon: Printer,
+      content: <PrintSettingsTab settings={settings} onUpdate={handleUpdateSettings} />,
+    },
+    {
+      id: "shortcuts",
+      label: "Shortcuts",
+      icon: Keyboard,
+      content: <KeyboardShortcutsTab settings={settings} onUpdate={handleUpdateSettings} />,
+    },
+  ];
+
   return (
-    <div className="p-6 space-y-6" data-testid="page-settings">
-      <div className="flex items-center gap-3">
-        <SettingsIcon className="h-8 w-8 text-primary" />
-        <div>
-          <h1 className="font-['Poppins',Helvetica] font-bold text-3xl text-gray-900 dark:text-white" data-testid="text-page-title">Settings & Preferences</h1>
-          <p className="text-gray-900 dark:text-white/60">Customize your experience</p>
-        </div>
-      </div>
-
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="grid w-full grid-cols-6">
-          <TabsTrigger value="general" data-testid="tab-general">
-            <SettingsIcon className="h-4 w-4 mr-2" />
-            General
-          </TabsTrigger>
-          <TabsTrigger value="language" data-testid="tab-language">
-            <Globe className="h-4 w-4 mr-2" />
-            Language
-          </TabsTrigger>
-          <TabsTrigger value="currency" data-testid="tab-currency">
-            <DollarSign className="h-4 w-4 mr-2" />
-            Currency
-          </TabsTrigger>
-          <TabsTrigger value="appearance" data-testid="tab-appearance">
-            <Palette className="h-4 w-4 mr-2" />
-            Appearance
-          </TabsTrigger>
-          <TabsTrigger value="print" data-testid="tab-print">
-            <Printer className="h-4 w-4 mr-2" />
-            Print
-          </TabsTrigger>
-          <TabsTrigger value="shortcuts" data-testid="tab-shortcuts">
-            <Keyboard className="h-4 w-4 mr-2" />
-            Shortcuts
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="general" className="space-y-4">
-          <GeneralSettingsTab settings={settings} onUpdate={handleUpdateSettings} />
-        </TabsContent>
-
-        <TabsContent value="language" className="space-y-4">
-          <LanguageSettingsTab settings={settings} onUpdate={handleUpdateSettings} />
-        </TabsContent>
-
-        <TabsContent value="currency" className="space-y-4">
-          <CurrencySettingsTab settings={settings} onUpdate={handleUpdateSettings} />
-        </TabsContent>
-
-        <TabsContent value="appearance" className="space-y-4">
-          <AppearanceSettingsTab settings={settings} onUpdate={handleUpdateSettings} />
-        </TabsContent>
-
-        <TabsContent value="print" className="space-y-4">
-          <PrintSettingsTab settings={settings} onUpdate={handleUpdateSettings} />
-        </TabsContent>
-
-        <TabsContent value="shortcuts" className="space-y-4">
-          <KeyboardShortcutsTab settings={settings} onUpdate={handleUpdateSettings} />
-        </TabsContent>
-      </Tabs>
-    </div>
+    <TabsPageLayout
+      title="Settings & Preferences"
+      description="Customize your experience"
+      icon={SettingsIcon}
+      tabs={tabs}
+      activeTab={activeTab}
+      onTabChange={setActiveTab}
+    />
   );
 }
 

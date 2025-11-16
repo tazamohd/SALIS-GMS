@@ -1,4 +1,4 @@
-import { Clock, AlertCircle, CheckCircle, Wrench, Search } from "lucide-react";
+import { Clock, AlertCircle, CheckCircle, Wrench, Search, ClipboardList } from "lucide-react";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { TaskDetailsDialog } from "@/components/TaskDetailsDialog";
+import { DashboardPage } from "@/components/layouts";
 import type { JobCard } from "@shared/schema";
 
 export function TasksManagement() {
@@ -85,58 +86,20 @@ export function TasksManagement() {
     return priorityColors[priority] || 'bg-gray-100 dark:bg-salis-gray-dark text-gray-700 dark:text-gray-300';
   };
 
+  const metrics = [
+    { label: "check-in", value: checkInCount.toString(), icon: Clock, color: "text-gray-700 dark:text-gray-300" },
+    { label: "Repair", value: repairCount.toString(), icon: Wrench, color: "text-gray-900 dark:text-white" },
+    { label: "Quality Check", value: qualityCheckCount.toString(), icon: AlertCircle, color: "text-gray-900 dark:text-white" },
+    { label: "Completion", value: completionCount.toString(), icon: CheckCircle, color: "text-gray-800 dark:text-gray-200" },
+  ];
+
   return (
-    <div className="flex-1 p-8">
-      <div className="mb-8">
-        <h1 className="font-['Poppins',Helvetica] font-semibold text-2xl text-gray-900 dark:text-white">Tasks Management</h1>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark border">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white/60">check-in</h3>
-              <Clock className="w-5 h-5 text-gray-700 dark:text-gray-300" />
-            </div>
-            <p className="font-['Poppins',Helvetica] font-bold text-3xl text-gray-900 dark:text-white mb-1">{checkInCount}</p>
-            <p className="font-['Poppins',Helvetica] font-normal text-xs text-gray-900 dark:text-white/60">in the last 2 hours</p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark border">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white/60">Repair</h3>
-              <Wrench className="w-5 h-5 text-gray-900 dark:text-white" />
-            </div>
-            <p className="font-['Poppins',Helvetica] font-bold text-3xl text-gray-900 dark:text-white mb-1">{repairCount}</p>
-            <p className="font-['Poppins',Helvetica] font-normal text-xs text-gray-900 dark:text-white/60">in the last 2 hours</p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark border">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white/60">Quality Check</h3>
-              <AlertCircle className="w-5 h-5 text-gray-900 dark:text-white" />
-            </div>
-            <p className="font-['Poppins',Helvetica] font-bold text-3xl text-gray-900 dark:text-white mb-1">{qualityCheckCount}</p>
-            <p className="font-['Poppins',Helvetica] font-normal text-xs text-gray-900 dark:text-white/60">in the last 2 hours</p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark border">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white/60">Completion</h3>
-              <CheckCircle className="w-5 h-5 text-gray-800 dark:text-gray-200" />
-            </div>
-            <p className="font-['Poppins',Helvetica] font-bold text-3xl text-gray-900 dark:text-white mb-1">{completionCount}</p>
-            <p className="font-['Poppins',Helvetica] font-normal text-xs text-gray-900 dark:text-white/60">in the last 2 hours</p>
-          </CardContent>
-        </Card>
-      </div>
+    <DashboardPage
+      title="Tasks Management"
+      description="Manage and track all service tasks"
+      icon={ClipboardList}
+      metrics={metrics}
+    >
 
       {/* Filters */}
       <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark border mb-6">
@@ -297,6 +260,6 @@ export function TasksManagement() {
         onOpenChange={setTaskDetailsOpen}
         task={selectedTask}
       />
-    </div>
+    </DashboardPage>
   );
 }

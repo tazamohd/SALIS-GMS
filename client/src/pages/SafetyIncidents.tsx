@@ -5,21 +5,19 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { AlertTriangle, Shield, Activity, Users } from "lucide-react";
+import { StandardPageLayout } from "@/components/layouts";
 
 export default function SafetyIncidents() {
   const { toast } = useToast();
 
-  // Fetch safety incidents from backend
   const { data: incidents = [], isLoading: incidentsLoading } = useQuery<any[]>({
     queryKey: ['/api/safety/incidents'],
   });
 
-  // Fetch analytics for KPIs
   const { data: analytics } = useQuery<any>({
     queryKey: ['/api/safety/analytics'],
   });
 
-  // Calculate KPIs from real data
   const stats = {
     totalIncidents: incidents.length,
     openInvestigations: incidents.filter((i: any) => i.status === 'investigating').length,
@@ -27,7 +25,6 @@ export default function SafetyIncidents() {
     daysWithoutIncident: analytics?.daysWithoutIncident || 0,
   };
 
-  // Create safety incident mutation
   const createIncidentMutation = useMutation({
     mutationFn: async (data: any) => {
       return apiRequest('POST', '/api/safety/incidents', data);
@@ -54,16 +51,14 @@ export default function SafetyIncidents() {
   };
 
   return (
-    <div className="p-8 space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold font-montserrat text-gray-900 dark:text-white">
-            ⚠️ Safety Incident Reporting
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">Track and investigate workplace safety incidents</p>
-        </div>
-        <Button 
-          onClick={() => {
+    <StandardPageLayout
+      title="⚠️ Safety Incident Reporting"
+      description="Track and investigate workplace safety incidents"
+      icon={AlertTriangle}
+      actions={[
+        {
+          label: createIncidentMutation.isPending ? "Reporting..." : "Report Incident",
+          onClick: () => {
             createIncidentMutation.mutate({
               incidentNumber: `SI-${Date.now()}`,
               incidentDate: new Date().toISOString(),
@@ -75,14 +70,10 @@ export default function SafetyIncidents() {
               witnesses: [],
               immediateActions: 'Area secured and cleaned',
             });
-          }}
-          disabled={createIncidentMutation.isPending}
-          data-testid="button-report-incident"
-        >
-          {createIncidentMutation.isPending ? "Reporting..." : "Report Incident"}
-        </Button>
-      </div>
-
+          },
+        },
+      ]}
+    >
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
           <CardContent className="p-6">
@@ -161,6 +152,6 @@ export default function SafetyIncidents() {
           )}
         </CardContent>
       </Card>
-    </div>
+    </StandardPageLayout>
   );
 }

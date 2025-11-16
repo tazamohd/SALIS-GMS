@@ -17,6 +17,7 @@ import { Plus, CheckCircle, XCircle, DollarSign, AlertTriangle } from "lucide-re
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
+import { StandardPageLayout } from "@/components/layouts";
 
 const refundSchema = z.object({
   invoiceId: z.string().min(1, "Invoice is required"),
@@ -150,30 +151,25 @@ export default function RefundManagement() {
   };
 
   return (
-    <div className="p-8 bg-gray-50 dark:bg-salis-black min-h-screen space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="font-['Poppins',Helvetica] font-bold text-3xl text-gray-900 dark:text-white" data-testid="text-page-title">
-            Refund Management
-          </h1>
-          <p className="text-gray-900 dark:text-white/60" data-testid="text-page-description">
-            Manage customer refunds with approval workflow
-          </p>
-        </div>
-        <div className="flex gap-2 items-center">
-          <Select value={selectedGarageId} onValueChange={setSelectedGarageId}>
-            <SelectTrigger className="w-[200px]" data-testid="select-garage">
-              <SelectValue placeholder="Select garage" />
-            </SelectTrigger>
-            <SelectContent>
-              {garages.map((garage) => (
-                <SelectItem key={garage.id} value={garage.id} data-testid={`select-garage-${garage.id}`}>
-                  {garage.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Dialog open={refundDialogOpen} onOpenChange={setRefundDialogOpen}>
+    <StandardPageLayout
+      title="Refund Management"
+      description="Manage customer refunds with approval workflow"
+      icon={DollarSign}
+    >
+      <div className="flex gap-2 items-center mb-6">
+        <Select value={selectedGarageId} onValueChange={setSelectedGarageId}>
+          <SelectTrigger className="w-[200px]" data-testid="select-garage">
+            <SelectValue placeholder="Select garage" />
+          </SelectTrigger>
+          <SelectContent>
+            {garages.map((garage) => (
+              <SelectItem key={garage.id} value={garage.id} data-testid={`select-garage-${garage.id}`}>
+                {garage.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Dialog open={refundDialogOpen} onOpenChange={setRefundDialogOpen}>
             <DialogTrigger asChild>
               <Button onClick={() => refundForm.reset()} data-testid="button-create-refund">
                 <Plus className="h-4 w-4 mr-2" />
@@ -282,7 +278,6 @@ export default function RefundManagement() {
               </Form>
             </DialogContent>
           </Dialog>
-        </div>
       </div>
 
       <div className="flex gap-4">
@@ -381,6 +376,6 @@ export default function RefundManagement() {
           )}
         </CardContent>
       </Card>
-    </div>
+    </StandardPageLayout>
   );
 }

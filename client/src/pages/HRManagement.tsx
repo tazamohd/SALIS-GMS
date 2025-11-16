@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,13 +30,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Clock, Calendar, DollarSign, Star, GraduationCap, Plus, Play, Pause, StopCircle } from "lucide-react";
+import { Clock, Calendar, DollarSign, Star, GraduationCap, Plus, Play, Pause, StopCircle, Users } from "lucide-react";
 import { format } from "date-fns";
+import { TabsPageLayout, TabConfig } from "@/components/layouts";
 
 export default function HRManagement() {
   const { user } = useAuth();
   const garageId = user?.garageId;
-  const [selectedTab, setSelectedTab] = useState("attendance");
 
   if (!garageId) {
     return (
@@ -47,58 +46,47 @@ export default function HRManagement() {
     );
   }
 
+  const tabs: TabConfig[] = [
+    {
+      id: 'attendance',
+      label: 'Attendance',
+      icon: Clock,
+      content: <AttendanceTab garageId={garageId} />,
+    },
+    {
+      id: 'shifts',
+      label: 'Shifts',
+      icon: Calendar,
+      content: <ShiftsTab garageId={garageId} />,
+    },
+    {
+      id: 'commissions',
+      label: 'Commissions',
+      icon: DollarSign,
+      content: <CommissionsTab garageId={garageId} />,
+    },
+    {
+      id: 'reviews',
+      label: 'Reviews',
+      icon: Star,
+      content: <ReviewsTab garageId={garageId} />,
+    },
+    {
+      id: 'training',
+      label: 'Training',
+      icon: GraduationCap,
+      content: <TrainingTab garageId={garageId} />,
+    },
+  ];
+
   return (
-    <div className="p-6 space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold" data-testid="heading-hr">HR Management</h1>
-        <p className="text-muted-foreground">Manage employees, attendance, shifts, commissions, reviews, and training</p>
-      </div>
-
-      <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-5">
-          <TabsTrigger value="attendance" data-testid="tab-attendance">
-            <Clock className="h-4 w-4 mr-2" />
-            Attendance
-          </TabsTrigger>
-          <TabsTrigger value="shifts" data-testid="tab-shifts">
-            <Calendar className="h-4 w-4 mr-2" />
-            Shifts
-          </TabsTrigger>
-          <TabsTrigger value="commissions" data-testid="tab-commissions">
-            <DollarSign className="h-4 w-4 mr-2" />
-            Commissions
-          </TabsTrigger>
-          <TabsTrigger value="reviews" data-testid="tab-reviews">
-            <Star className="h-4 w-4 mr-2" />
-            Reviews
-          </TabsTrigger>
-          <TabsTrigger value="training" data-testid="tab-training">
-            <GraduationCap className="h-4 w-4 mr-2" />
-            Training
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="attendance" className="space-y-4">
-          <AttendanceTab garageId={garageId} />
-        </TabsContent>
-
-        <TabsContent value="shifts" className="space-y-4">
-          <ShiftsTab garageId={garageId} />
-        </TabsContent>
-
-        <TabsContent value="commissions" className="space-y-4">
-          <CommissionsTab garageId={garageId} />
-        </TabsContent>
-
-        <TabsContent value="reviews" className="space-y-4">
-          <ReviewsTab garageId={garageId} />
-        </TabsContent>
-
-        <TabsContent value="training" className="space-y-4">
-          <TrainingTab garageId={garageId} />
-        </TabsContent>
-      </Tabs>
-    </div>
+    <TabsPageLayout
+      title="HR Management"
+      description="Manage employees, attendance, shifts, commissions, reviews, and training"
+      icon={Users}
+      tabs={tabs}
+      defaultTab="attendance"
+    />
   );
 }
 

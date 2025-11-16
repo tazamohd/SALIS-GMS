@@ -3,7 +3,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/hooks/useAuth";
 import type { User } from "@shared/schema";
-import { LogOut, Shield, User as UserIcon } from "lucide-react";
+import { LogOut, Shield, User as UserIcon, Home as HomeIcon } from "lucide-react";
+import { StandardPageLayout } from "@/components/layouts";
 
 export default function Home() {
   const { user } = useAuth() as { user: User | undefined };
@@ -15,25 +16,20 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-salis-black p-4">
+    <StandardPageLayout
+      title="Dashboard"
+      description="Manage your account and settings"
+      icon={HomeIcon}
+      actions={[
+        {
+          label: "Sign Out",
+          onClick: () => window.location.href = '/api/logout',
+          icon: LogOut,
+          variant: "outline",
+        },
+      ]}
+    >
       <div className="max-w-4xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            Dashboard
-          </h1>
-          <Button 
-            variant="outline"
-            onClick={() => window.location.href = '/api/logout'}
-            className="flex items-center gap-2"
-            data-testid="button-sign-out"
-          >
-            <LogOut className="h-4 w-4" />
-            Sign Out
-          </Button>
-        </div>
-
-        {/* Welcome Card */}
         <Card>
           <CardHeader>
             <div className="flex items-center gap-4">
@@ -55,7 +51,6 @@ export default function Home() {
           </CardHeader>
         </Card>
 
-        {/* Dashboard Cards */}
         <div className="grid md:grid-cols-2 gap-6">
           <Card>
             <CardHeader>
@@ -111,7 +106,6 @@ export default function Home() {
           </Card>
         </div>
 
-        {/* Quick Actions */}
         <Card>
           <CardHeader>
             <CardTitle>Quick Actions</CardTitle>
@@ -137,6 +131,6 @@ export default function Home() {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </StandardPageLayout>
   );
 }

@@ -4,146 +4,131 @@ import { Button } from "@/components/ui/button";
 import { Loader2, Brain, Eye, MessageSquare, Package, MonitorPlay, Glasses, Network, Bot, Plane, FileCode, Leaf, Zap, Recycle, Satellite, Shield } from "lucide-react";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { StandardPageLayout } from "@/components/layouts";
 
 export default function NextGenTechnologies() {
   const { toast } = useToast();
 
-  // Neural Diagnostics
-  const { data: neuralDiagnostics, isLoading: loadingNeural } = useQuery({
+  const { data: neuralDiagnostics, isLoading: loadingNeural } = useQuery<{ data: any[] }>({
     queryKey: ["/api/nextgen/neural-diagnostics"],
   });
 
-  const { data: neuralTrainingSessions, isLoading: loadingTraining } = useQuery({
+  const { data: neuralTrainingSessions, isLoading: loadingTraining } = useQuery<{ data: any[] }>({
     queryKey: ["/api/nextgen/neural-training-sessions"],
   });
 
-  // Computer Vision
-  const { data: visionQualityChecks, isLoading: loadingVision } = useQuery({
+  const { data: visionQualityChecks, isLoading: loadingVision } = useQuery<{ data: any[] }>({
     queryKey: ["/api/nextgen/vision-quality-checks"],
   });
 
-  const { data: visionDefects, isLoading: loadingDefects } = useQuery({
+  const { data: visionDefects, isLoading: loadingDefects } = useQuery<{ data: any[] }>({
     queryKey: ["/api/nextgen/vision-defects"],
   });
 
-  // NLP Service Writer
-  const { data: nlpServiceRequests, isLoading: loadingNLP } = useQuery({
+  const { data: nlpServiceRequests, isLoading: loadingNLP } = useQuery<{ data: any[] }>({
     queryKey: ["/api/nextgen/nlp-service-requests"],
   });
 
-  const { data: nlpTrainingData, isLoading: loadingNLPData } = useQuery({
+  const { data: nlpTrainingData, isLoading: loadingNLPData } = useQuery<{ data: any[] }>({
     queryKey: ["/api/nextgen/nlp-training-data"],
   });
 
-  // Reinforcement Learning
-  const { data: rlPartsOptimizations, isLoading: loadingRL } = useQuery({
+  const { data: rlPartsOptimizations, isLoading: loadingRL } = useQuery<{ data: any[] }>({
     queryKey: ["/api/nextgen/rl-parts-optimizations"],
   });
 
-  const { data: rlLearningEpisodes, isLoading: loadingRLEpisodes } = useQuery({
+  const { data: rlLearningEpisodes, isLoading: loadingRLEpisodes } = useQuery<{ data: any[] }>({
     queryKey: ["/api/nextgen/rl-learning-episodes"],
   });
 
-  // Metaverse Showroom
-  const { data: metaverseShowrooms, isLoading: loadingMetaverse } = useQuery({
+  const { data: metaverseShowrooms, isLoading: loadingMetaverse } = useQuery<{ data: any[] }>({
     queryKey: ["/api/nextgen/metaverse-showrooms"],
   });
 
-  const { data: metaverseVisits, isLoading: loadingVisits } = useQuery({
+  const { data: metaverseVisits, isLoading: loadingVisits } = useQuery<{ data: any[] }>({
     queryKey: ["/api/nextgen/metaverse-visits"],
   });
 
-  // Holographic Guides
-  const { data: holographicGuides, isLoading: loadingHolo } = useQuery({
+  const { data: holographicGuides, isLoading: loadingHolo } = useQuery<{ data: any[] }>({
     queryKey: ["/api/nextgen/holographic-guides"],
   });
 
-  const { data: holographicSessions, isLoading: loadingHoloSessions } = useQuery({
+  const { data: holographicSessions, isLoading: loadingHoloSessions } = useQuery<{ data: any[] }>({
     queryKey: ["/api/nextgen/holographic-sessions"],
   });
 
-  // Spatial Computing
-  const { data: spatialWorkstations, isLoading: loadingSpatial } = useQuery({
+  const { data: spatialWorkstations, isLoading: loadingSpatial } = useQuery<{ data: any[] }>({
     queryKey: ["/api/nextgen/spatial-workstations"],
   });
 
-  const { data: spatialDiagnosticSessions, isLoading: loadingSpatialSessions } = useQuery({
+  const { data: spatialDiagnosticSessions, isLoading: loadingSpatialSessions } = useQuery<{ data: any[] }>({
     queryKey: ["/api/nextgen/spatial-diagnostic-sessions"],
   });
 
-  // Autonomous Robots
-  const { data: autonomousRobots, isLoading: loadingRobots } = useQuery({
+  const { data: autonomousRobots, isLoading: loadingRobots } = useQuery<{ data: any[] }>({
     queryKey: ["/api/nextgen/autonomous-robots"],
   });
 
-  const { data: robotTasks, isLoading: loadingTasks } = useQuery({
+  const { data: robotTasks, isLoading: loadingTasks } = useQuery<{ data: any[] }>({
     queryKey: ["/api/nextgen/robot-tasks"],
   });
 
-  // Drone Fleet
-  const { data: droneFleets, isLoading: loadingDrones } = useQuery({
+  const { data: droneFleets, isLoading: loadingDrones } = useQuery<{ data: any[] }>({
     queryKey: ["/api/nextgen/drone-fleets"],
   });
 
-  const { data: droneMissions, isLoading: loadingMissions } = useQuery({
+  const { data: droneMissions, isLoading: loadingMissions } = useQuery<{ data: any[] }>({
     queryKey: ["/api/nextgen/drone-missions"],
   });
 
-  // Smart Contracts
-  const { data: smartContracts, isLoading: loadingContracts } = useQuery({
+  const { data: smartContracts, isLoading: loadingContracts } = useQuery<{ data: any[] }>({
     queryKey: ["/api/nextgen/smart-contracts"],
   });
 
-  const { data: contractEvents, isLoading: loadingEvents } = useQuery({
+  const { data: contractEvents, isLoading: loadingEvents } = useQuery<{ data: any[] }>({
     queryKey: ["/api/nextgen/contract-events"],
   });
 
-  // Carbon Credits
-  const { data: carbonCredits, isLoading: loadingCarbon } = useQuery({
+  const { data: carbonCredits, isLoading: loadingCarbon } = useQuery<{ data: any[] }>({
     queryKey: ["/api/nextgen/carbon-credits"],
   });
 
-  const { data: carbonEmissions, isLoading: loadingEmissions } = useQuery({
+  const { data: carbonEmissions, isLoading: loadingEmissions } = useQuery<{ data: any[] }>({
     queryKey: ["/api/nextgen/carbon-emissions"],
   });
 
-  // Green Energy
-  const { data: greenEnergyAssets, isLoading: loadingEnergy } = useQuery({
+  const { data: greenEnergyAssets, isLoading: loadingEnergy } = useQuery<{ data: any[] }>({
     queryKey: ["/api/nextgen/green-energy-assets"],
   });
 
-  const { data: evChargingStations, isLoading: loadingEV } = useQuery({
+  const { data: evChargingStations, isLoading: loadingEV } = useQuery<{ data: any[] }>({
     queryKey: ["/api/nextgen/ev-charging-stations"],
   });
 
-  // Circular Economy
-  const { data: recycledParts, isLoading: loadingRecycled } = useQuery({
+  const { data: recycledParts, isLoading: loadingRecycled } = useQuery<{ data: any[] }>({
     queryKey: ["/api/nextgen/recycled-parts"],
   });
 
-  const { data: sustainabilityMetrics, isLoading: loadingSustainability } = useQuery({
+  const { data: sustainabilityMetrics, isLoading: loadingSustainability } = useQuery<{ data: any[] }>({
     queryKey: ["/api/nextgen/sustainability-metrics"],
   });
 
-  // Satellite Connectivity
-  const { data: satelliteConnections, isLoading: loadingSatellite } = useQuery({
+  const { data: satelliteConnections, isLoading: loadingSatellite } = useQuery<{ data: any[] }>({
     queryKey: ["/api/nextgen/satellite-connections"],
   });
 
-  const { data: satelliteUsageLogs, isLoading: loadingSatelliteUsage } = useQuery({
+  const { data: satelliteUsageLogs, isLoading: loadingSatelliteUsage } = useQuery<{ data: any[] }>({
     queryKey: ["/api/nextgen/satellite-usage-logs"],
   });
 
-  // Quantum Encryption
-  const { data: quantumEncryptionKeys, isLoading: loadingQuantum } = useQuery({
+  const { data: quantumEncryptionKeys, isLoading: loadingQuantum } = useQuery<{ data: any[] }>({
     queryKey: ["/api/nextgen/quantum-encryption-keys"],
   });
 
-  const { data: quantumSecureMessages, isLoading: loadingQuantumMessages } = useQuery({
+  const { data: quantumSecureMessages, isLoading: loadingQuantumMessages } = useQuery<{ data: any[] }>({
     queryKey: ["/api/nextgen/quantum-secure-messages"],
   });
 
-  // Seed data mutation
   const seedMutation = useMutation({
     mutationFn: async () => {
       return apiRequest("/api/nextgen/seed", "POST", {});
@@ -153,7 +138,6 @@ export default function NextGenTechnologies() {
         title: "Sample Data Seeded",
         description: "Successfully populated all 15 next-gen technology modules with realistic data",
       });
-      // Invalidate all next-gen queries to refetch
       queryClient.invalidateQueries({ 
         predicate: (query) => {
           const key = query.queryKey[0];
@@ -309,27 +293,17 @@ export default function NextGenTechnologies() {
   ];
 
   return (
-    <div className="p-6 space-y-6 bg-background dark:bg-gray-950">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight text-foreground dark:text-white">
-            Next-Generation Technologies
-          </h1>
-          <p className="text-muted-foreground dark:text-gray-400 mt-2">
-            Cutting-edge automotive ERP features powered by AI, XR, blockchain, and quantum computing
-          </p>
-        </div>
-        <Button
-          onClick={() => seedMutation.mutate()}
-          disabled={seedMutation.isPending}
-          className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
-          data-testid="button-seed-nextgen"
-        >
-          {seedMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          Seed Sample Data
-        </Button>
-      </div>
-
+    <StandardPageLayout
+      title="Next-Generation Technologies"
+      description="Cutting-edge automotive ERP features powered by AI, XR, blockchain, and quantum computing"
+      icon={Brain}
+      actions={[
+        {
+          label: seedMutation.isPending ? "Seeding..." : "Seed Sample Data",
+          onClick: () => seedMutation.mutate(),
+        },
+      ]}
+    >
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {modules.map((module) => (
           <Card
@@ -410,6 +384,6 @@ export default function NextGenTechnologies() {
           </div>
         </CardContent>
       </Card>
-    </div>
+    </StandardPageLayout>
   );
 }

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
+import { StandardPageLayout } from "@/components/layouts/StandardPageLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -10,7 +11,6 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
   DialogFooter,
 } from "@/components/ui/dialog";
 import {
@@ -34,7 +34,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertToolSchema, type Tool } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Wrench, Eye, CheckCircle, XCircle } from "lucide-react";
+import { Plus, Wrench, CheckCircle, XCircle } from "lucide-react";
 import { z } from "zod";
 
 const formSchema = insertToolSchema.extend({
@@ -50,10 +50,6 @@ export default function Tools() {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
   const [selectedTool, setSelectedTool] = useState<Tool | null>(null);
-
-  const { data: garages } = useQuery<any[]>({
-    queryKey: ["/api/garages"],
-  });
 
   const { data: tools, isLoading, isError, error } = useQuery<Tool[]>({
     queryKey: ["/api/tools"],
@@ -123,149 +119,19 @@ export default function Tools() {
   };
 
   return (
-    <div className="space-y-6 p-8">
-      <div className="flex justify-between items-center">
-        <h1 className="font-['Poppins',Helvetica] font-bold text-3xl text-gray-900 dark:text-white">Tools Management</h1>
-        <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
-          <DialogTrigger asChild>
-            <Button data-testid="button-create-tool">
-              <Plus className="mr-2 h-4 w-4" /> Add Tool
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Add New Tool</DialogTitle>
-              <DialogDescription>
-                Add a new tool or equipment to the inventory
-              </DialogDescription>
-            </DialogHeader>
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Tool Name</FormLabel>
-                      <FormControl>
-                        <Input {...field} placeholder="e.g., OBD-II Scanner" data-testid="input-name" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="toolType"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Tool Type</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger data-testid="select-tool-type">
-                            <SelectValue placeholder="Select tool type" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="diagnostic">Diagnostic</SelectItem>
-                          <SelectItem value="mechanical">Mechanical</SelectItem>
-                          <SelectItem value="electrical">Electrical</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="description"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Description</FormLabel>
-                      <FormControl>
-                        <Textarea {...field} value={field.value || ""} placeholder="Describe the tool..." data-testid="input-description" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="brand"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Brand</FormLabel>
-                        <FormControl>
-                          <Input {...field} value={field.value || ""} placeholder="e.g., Bosch" data-testid="input-brand" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="manufacturer"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Manufacturer</FormLabel>
-                        <FormControl>
-                          <Input {...field} value={field.value || ""} placeholder="Manufacturer name" data-testid="input-manufacturer" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <FormField
-                  control={form.control}
-                  name="visibility"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Visibility</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value || undefined}>
-                        <FormControl>
-                          <SelectTrigger data-testid="select-visibility">
-                            <SelectValue placeholder="Select visibility" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="private">Private</SelectItem>
-                          <SelectItem value="public">Public</SelectItem>
-                          <SelectItem value="shared">Shared</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <DialogFooter>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setCreateDialogOpen(false)}
-                    data-testid="button-cancel-create"
-                  >
-                    Cancel
-                  </Button>
-                  <Button type="submit" disabled={createMutation.isPending} data-testid="button-submit-create">
-                    {createMutation.isPending ? "Adding..." : "Add Tool"}
-                  </Button>
-                </DialogFooter>
-              </form>
-            </Form>
-          </DialogContent>
-        </Dialog>
-      </div>
-
-      {/* Filters */}
-      <div className="flex gap-4">
+    <StandardPageLayout
+      title="Tools Management"
+      description="Manage tools and equipment inventory"
+      icon={Wrench}
+      actions={[
+        {
+          label: "Add Tool",
+          icon: Plus,
+          onClick: () => setCreateDialogOpen(true),
+        },
+      ]}
+    >
+      <div className="flex gap-4 mb-6">
         <Select value={selectedToolType} onValueChange={setSelectedToolType}>
           <SelectTrigger className="w-[200px]" data-testid="filter-tool-type">
             <SelectValue placeholder="All Tool Types" />
@@ -279,7 +145,6 @@ export default function Tools() {
         </Select>
       </div>
 
-      {/* Tools Grid */}
       {isLoading ? (
         <div className="text-center py-12" data-testid="loading-state">
           <p className="text-gray-900 dark:text-white/60">Loading tools...</p>
@@ -349,7 +214,138 @@ export default function Tools() {
         </div>
       )}
 
-      {/* Details Dialog */}
+      <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Add New Tool</DialogTitle>
+            <DialogDescription>
+              Add a new tool or equipment to the inventory
+            </DialogDescription>
+          </DialogHeader>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tool Name</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="e.g., OBD-II Scanner" data-testid="input-name" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="toolType"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tool Type</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger data-testid="select-tool-type">
+                          <SelectValue placeholder="Select tool type" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="diagnostic">Diagnostic</SelectItem>
+                        <SelectItem value="mechanical">Mechanical</SelectItem>
+                        <SelectItem value="electrical">Electrical</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Description</FormLabel>
+                    <FormControl>
+                      <Textarea {...field} value={field.value || ""} placeholder="Describe the tool..." data-testid="input-description" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="brand"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Brand</FormLabel>
+                      <FormControl>
+                        <Input {...field} value={field.value || ""} placeholder="e.g., Bosch" data-testid="input-brand" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="manufacturer"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Manufacturer</FormLabel>
+                      <FormControl>
+                        <Input {...field} value={field.value || ""} placeholder="Manufacturer name" data-testid="input-manufacturer" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <FormField
+                control={form.control}
+                name="visibility"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Visibility</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value || undefined}>
+                      <FormControl>
+                        <SelectTrigger data-testid="select-visibility">
+                          <SelectValue placeholder="Select visibility" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="private">Private</SelectItem>
+                        <SelectItem value="public">Public</SelectItem>
+                        <SelectItem value="shared">Shared</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <DialogFooter>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setCreateDialogOpen(false)}
+                  data-testid="button-cancel-create"
+                >
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={createMutation.isPending} data-testid="button-submit-create">
+                  {createMutation.isPending ? "Adding..." : "Add Tool"}
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+
       <Dialog open={detailsDialogOpen} onOpenChange={setDetailsDialogOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
@@ -406,6 +402,6 @@ export default function Tools() {
           )}
         </DialogContent>
       </Dialog>
-    </div>
+    </StandardPageLayout>
   );
 }

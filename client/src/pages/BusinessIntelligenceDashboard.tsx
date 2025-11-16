@@ -3,7 +3,6 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -40,6 +39,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart as RechartsLineChart, Line, PieChart as RechartsPieChart, Pie, Cell } from "recharts";
+import { TabsPageLayout, TabConfig } from "@/components/layouts/TabsPageLayout";
 
 const COLORS = ['#000000', '#4B5563', '#6B7280', '#9CA3AF'];
 
@@ -89,7 +89,6 @@ export default function BusinessIntelligenceDashboard() {
     },
   });
 
-  // Mock data for demonstration
   const revenueData = [
     { month: "Jan", revenue: 45000, expenses: 32000 },
     { month: "Feb", revenue: 52000, expenses: 35000 },
@@ -142,48 +141,12 @@ export default function BusinessIntelligenceDashboard() {
     },
   ];
 
-  return (
-    <div className="p-8 space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold font-montserrat text-gray-900 dark:text-white">
-            📊 Business Intelligence
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">
-            Advanced analytics and custom reporting
-          </p>
-        </div>
-        <div className="flex gap-3">
-          <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
-            <SelectTrigger className="w-40" data-testid="select-period">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="week">Last 7 Days</SelectItem>
-              <SelectItem value="month">Last 30 Days</SelectItem>
-              <SelectItem value="quarter">Last Quarter</SelectItem>
-              <SelectItem value="year">Last Year</SelectItem>
-            </SelectContent>
-          </Select>
-          <Button
-            onClick={() => setCreateReportOpen(true)}
-            data-testid="button-create-report"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Create Report
-          </Button>
-        </div>
-      </div>
-
-      <Tabs defaultValue="overview" className="space-y-6">
-        <TabsList className="bg-gray-100 dark:bg-salis-gray-dark">
-          <TabsTrigger value="overview" data-testid="tab-overview">Overview</TabsTrigger>
-          <TabsTrigger value="reports" data-testid="tab-reports">Custom Reports</TabsTrigger>
-          <TabsTrigger value="widgets" data-testid="tab-widgets">Widgets</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="overview" className="space-y-6">
-          {/* KPI Cards */}
+  const tabs: TabConfig[] = [
+    {
+      id: "overview",
+      label: "Overview",
+      content: (
+        <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {kpiCards.map((kpi, index) => (
               <Card
@@ -222,7 +185,6 @@ export default function BusinessIntelligenceDashboard() {
             ))}
           </div>
 
-          {/* Revenue & Expenses Chart */}
           <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -245,7 +207,6 @@ export default function BusinessIntelligenceDashboard() {
             </CardContent>
           </Card>
 
-          {/* Service Type Distribution */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
               <CardHeader>
@@ -344,117 +305,164 @@ export default function BusinessIntelligenceDashboard() {
               </CardContent>
             </Card>
           </div>
-        </TabsContent>
-
-        <TabsContent value="reports" className="space-y-4">
-          <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <FileText className="h-5 w-5" />
-                Custom Reports
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {customReports.length === 0 ? (
-                <div className="text-center py-12 text-gray-500">
-                  <FileText className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-                  <p>No custom reports created yet.</p>
-                  <Button
-                    onClick={() => setCreateReportOpen(true)}
-                    className="mt-4"
-                    data-testid="button-create-first-report"
+        </div>
+      ),
+    },
+    {
+      id: "reports",
+      label: "Custom Reports",
+      icon: FileText,
+      content: (
+        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <FileText className="h-5 w-5" />
+              Custom Reports
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {customReports.length === 0 ? (
+              <div className="text-center py-12 text-gray-500">
+                <FileText className="h-12 w-12 mx-auto mb-4 text-gray-400" />
+                <p>No custom reports created yet.</p>
+                <Button
+                  onClick={() => setCreateReportOpen(true)}
+                  className="mt-4"
+                  data-testid="button-create-first-report"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Create Your First Report
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {customReports.map((report: any) => (
+                  <div
+                    key={report.id}
+                    className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-800 rounded-lg"
+                    data-testid={`card-report-${report.id}`}
                   >
-                    <Plus className="h-4 w-4 mr-2" />
-                    Create Your First Report
-                  </Button>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {customReports.map((report: any) => (
-                    <div
-                      key={report.id}
-                      className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-800 rounded-lg"
-                      data-testid={`card-report-${report.id}`}
-                    >
-                      <div>
-                        <h3 className="font-semibold text-gray-900 dark:text-white">
-                          {report.name}
-                        </h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                          {report.description}
-                        </p>
-                        <div className="flex gap-2 mt-2">
-                          <Badge variant="secondary" className="capitalize">
-                            {report.reportType}
+                    <div>
+                      <h3 className="font-semibold text-gray-900 dark:text-white">
+                        {report.name}
+                      </h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        {report.description}
+                      </p>
+                      <div className="flex gap-2 mt-2">
+                        <Badge variant="secondary" className="capitalize">
+                          {report.reportType}
+                        </Badge>
+                        {report.schedule && report.schedule !== "manual" && (
+                          <Badge variant="outline">
+                            <Calendar className="h-3 w-3 mr-1" />
+                            {report.schedule}
                           </Badge>
-                          {report.schedule && report.schedule !== "manual" && (
-                            <Badge variant="outline">
-                              <Calendar className="h-3 w-3 mr-1" />
-                              {report.schedule}
-                            </Badge>
-                          )}
-                        </div>
-                      </div>
-                      <div className="flex gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => runReportMutation.mutate(report.id)}
-                          disabled={runReportMutation.isPending}
-                          data-testid={`button-run-${report.id}`}
-                        >
-                          <Play className="h-4 w-4 mr-2" />
-                          Run
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          data-testid={`button-download-${report.id}`}
-                        >
-                          <Download className="h-4 w-4" />
-                        </Button>
+                        )}
                       </div>
                     </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="widgets" className="space-y-4">
-          <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Settings className="h-5 w-5" />
-                Dashboard Widgets
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600 dark:text-gray-400 mb-4">
-                Customize your dashboard by adding, removing, and rearranging widgets to display the metrics that matter most to you.
-              </p>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {["Revenue Tracker", "Appointment Calendar", "Top Customers", "Inventory Alerts", "Technician Performance", "Service Queue"].map((widget, index) => (
-                  <div
-                    key={index}
-                    className="p-4 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg text-center"
-                    data-testid={`widget-${index}`}
-                  >
-                    <p className="font-medium text-gray-900 dark:text-white">{widget}</p>
-                    <Button variant="outline" size="sm" className="mt-2">
-                      <Plus className="h-4 w-4 mr-2" />
-                      Add Widget
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => runReportMutation.mutate(report.id)}
+                        disabled={runReportMutation.isPending}
+                        data-testid={`button-run-${report.id}`}
+                      >
+                        <Play className="h-4 w-4 mr-2" />
+                        Run
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        data-testid={`button-download-${report.id}`}
+                      >
+                        <Download className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
                 ))}
               </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+            )}
+          </CardContent>
+        </Card>
+      ),
+    },
+    {
+      id: "widgets",
+      label: "Widgets",
+      icon: Settings,
+      content: (
+        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Settings className="h-5 w-5" />
+              Dashboard Widgets
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-gray-600 dark:text-gray-400 mb-4">
+              Customize your dashboard by adding, removing, and rearranging widgets to display the metrics that matter most to you.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {["Revenue Tracker", "Appointment Calendar", "Top Customers", "Inventory Alerts", "Technician Performance", "Service Queue"].map((widget, index) => (
+                <div
+                  key={index}
+                  className="p-4 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg text-center"
+                  data-testid={`widget-${index}`}
+                >
+                  <p className="font-medium text-gray-900 dark:text-white">{widget}</p>
+                  <Button variant="outline" size="sm" className="mt-2">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Widget
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      ),
+    },
+  ];
 
-      {/* Create Report Dialog */}
+  return (
+    <>
+      <TabsPageLayout
+        title="📊 Business Intelligence"
+        description="Advanced analytics and custom reporting"
+        icon={BarChart3}
+        tabs={tabs}
+        defaultTab="overview"
+        secondaryActions={[
+          {
+            label: selectedPeriod,
+            onClick: () => {},
+            variant: "outline",
+          },
+        ]}
+        primaryAction={{
+          label: "Create Report",
+          onClick: () => setCreateReportOpen(true),
+          icon: Plus,
+          variant: "default",
+        }}
+        headerContent={
+          <div className="flex justify-end mb-4">
+            <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
+              <SelectTrigger className="w-40" data-testid="select-period">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="week">Last 7 Days</SelectItem>
+                <SelectItem value="month">Last 30 Days</SelectItem>
+                <SelectItem value="quarter">Last Quarter</SelectItem>
+                <SelectItem value="year">Last Year</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        }
+      />
+
       <Dialog open={createReportOpen} onOpenChange={setCreateReportOpen}>
         <DialogContent>
           <DialogHeader>
@@ -544,6 +552,6 @@ export default function BusinessIntelligenceDashboard() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 }

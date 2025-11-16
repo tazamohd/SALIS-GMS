@@ -8,6 +8,7 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { PaymentDialog } from "@/components/customer/PaymentDialog";
 import type { Invoice } from "@shared/schema";
+import { StandardPageLayout } from "@/components/layouts";
 
 export function CustomerInvoices() {
   const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -76,19 +77,12 @@ export function CustomerInvoices() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white" data-testid="text-page-title">
-            My Invoices
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">
-            View and pay your service invoices
-          </p>
-        </div>
-      </div>
-
-      <div className="flex items-center gap-4">
+    <StandardPageLayout
+      title="My Invoices"
+      description="View and pay your service invoices"
+      icon={FileText}
+    >
+      <div className="flex items-center gap-4 mb-6">
         <Filter className="h-4 w-4 text-gray-500" />
         <div className="flex gap-2">
           {statusOptions.map(option => (
@@ -216,6 +210,6 @@ export function CustomerInvoices() {
           onSuccess={handlePaymentSuccess}
         />
       )}
-    </div>
+    </StandardPageLayout>
   );
 }

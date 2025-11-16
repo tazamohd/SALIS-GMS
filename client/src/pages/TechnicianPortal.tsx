@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Calendar, Clock, Wrench, CheckCircle, AlertCircle, User as UserIcon, Award, Briefcase, GraduationCap } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
+import { StandardPageLayout } from "@/components/layouts/StandardPageLayout";
 import type { JobCard, User, TechnicianProfile } from "@shared/schema";
 
 export function TechnicianPortal() {
@@ -111,12 +112,11 @@ export function TechnicianPortal() {
   };
 
   return (
-    <div className="p-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Technician Portal</h1>
-        <p className="text-gray-600">Welcome back, {currentUser?.fullName || 'Technician'}! Here are your assigned tasks.</p>
-      </div>
-
+    <StandardPageLayout
+      title="Technician Portal"
+      description={`Welcome back, ${currentUser?.fullName || 'Technician'}! Here are your assigned tasks.`}
+      icon={Wrench}
+    >
       {/* Profile Card */}
       {technicianProfile && (
         <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark mb-8" data-testid="card-profile">
@@ -349,6 +349,6 @@ export function TechnicianPortal() {
           </div>
         )}
       </div>
-    </div>
+    </StandardPageLayout>
   );
 }

@@ -8,7 +8,6 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -16,6 +15,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { GraduationCap, BookMarked, Award, Users } from "lucide-react";
+import { TabsPageLayout } from "@/components/layouts/TabsPageLayout";
 
 const moduleSchema = z.object({
   moduleName: z.string().min(1, "Module name is required"),
@@ -144,44 +144,8 @@ export default function TrainingLMS() {
     }
   });
 
-  return (
-    <div className="container mx-auto py-6 space-y-6 bg-white dark:bg-[#010101] min-h-screen">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-montserrat font-semibold text-salis-black dark:text-white" data-testid="heading-training-lms">
-            Training & Certification LMS
-          </h1>
-          <p className="text-salis-gray dark:text-salis-gray-light font-poppins mt-1" data-testid="text-subtitle">
-            Manage training modules, certifications, and employee progress
-          </p>
-        </div>
-        <Button
-          onClick={() => setIsModuleDialogOpen(true)}
-          className="bg-salis-black hover:bg-salis-gray-dark text-white font-poppins"
-          data-testid="button-create-module"
-        >
-          <BookMarked className="mr-2 h-4 w-4" />
-          Create Module
-        </Button>
-      </div>
-
-      <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full">
-        <TabsList className="bg-salis-gray-light dark:bg-salis-gray-dark" data-testid="tabs-training">
-          <TabsTrigger value="modules" className="font-poppins" data-testid="tab-modules">
-            <BookMarked className="mr-2 h-4 w-4" />
-            Modules
-          </TabsTrigger>
-          <TabsTrigger value="certifications" className="font-poppins" data-testid="tab-certifications">
-            <Award className="mr-2 h-4 w-4" />
-            Certifications
-          </TabsTrigger>
-          <TabsTrigger value="attempts" className="font-poppins" data-testid="tab-attempts">
-            <Users className="mr-2 h-4 w-4" />
-            Attempts
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="modules" className="space-y-4">
+  const modulesContent = (
+    <div className="space-y-4">
           <Card className="border-salis-gray-light dark:border-salis-gray-dark bg-white dark:bg-[#010101]">
             <CardHeader>
               <CardTitle className="font-montserrat text-salis-black dark:text-white">Training Modules</CardTitle>
@@ -230,19 +194,21 @@ export default function TrainingLMS() {
               )}
             </CardContent>
           </Card>
-        </TabsContent>
+    </div>
+  );
 
-        <TabsContent value="certifications" className="space-y-4">
-          <div className="flex justify-end mb-4">
-            <Button
-              onClick={() => setIsCertDialogOpen(true)}
-              className="bg-salis-black hover:bg-salis-gray-dark text-white font-poppins"
-              data-testid="button-create-certification"
-            >
-              <Award className="mr-2 h-4 w-4" />
-              Create Certification
-            </Button>
-          </div>
+  const certificationsContent = (
+    <div className="space-y-4">
+      <div className="flex justify-end mb-4">
+        <Button
+          onClick={() => setIsCertDialogOpen(true)}
+          className="bg-salis-black hover:bg-salis-gray-dark text-white font-poppins"
+          data-testid="button-create-certification"
+        >
+          <Award className="mr-2 h-4 w-4" />
+          Create Certification
+        </Button>
+      </div>
           <Card className="border-salis-gray-light dark:border-salis-gray-dark bg-white dark:bg-[#010101]">
             <CardHeader>
               <CardTitle className="font-montserrat text-salis-black dark:text-white">Certifications</CardTitle>
@@ -285,19 +251,21 @@ export default function TrainingLMS() {
               )}
             </CardContent>
           </Card>
-        </TabsContent>
+    </div>
+  );
 
-        <TabsContent value="attempts" className="space-y-4">
-          <div className="flex justify-end mb-4">
-            <Button
-              onClick={() => setIsAttemptDialogOpen(true)}
-              className="bg-salis-black hover:bg-salis-gray-dark text-white font-poppins"
-              data-testid="button-record-attempt"
-            >
-              <Users className="mr-2 h-4 w-4" />
-              Record Attempt
-            </Button>
-          </div>
+  const attemptsContent = (
+    <div className="space-y-4">
+      <div className="flex justify-end mb-4">
+        <Button
+          onClick={() => setIsAttemptDialogOpen(true)}
+          className="bg-salis-black hover:bg-salis-gray-dark text-white font-poppins"
+          data-testid="button-record-attempt"
+        >
+          <Users className="mr-2 h-4 w-4" />
+          Record Attempt
+        </Button>
+      </div>
           <Card className="border-salis-gray-light dark:border-salis-gray-dark bg-white dark:bg-[#010101]">
             <CardHeader>
               <CardTitle className="font-montserrat text-salis-black dark:text-white">Certification Attempts</CardTitle>
@@ -342,9 +310,45 @@ export default function TrainingLMS() {
               )}
             </CardContent>
           </Card>
-        </TabsContent>
-      </Tabs>
+    </div>
+  );
 
+  return (
+    <>
+      <TabsPageLayout
+        title="Training & Certification LMS"
+        description="Manage training modules, certifications, and employee progress"
+        icon={GraduationCap}
+        primaryAction={{
+          label: "Create Module",
+          icon: BookMarked,
+          onClick: () => setIsModuleDialogOpen(true),
+          testId: "button-create-module"
+        }}
+        tabs={[
+          {
+            id: "modules",
+            label: "Modules",
+            icon: BookMarked,
+            content: modulesContent
+          },
+          {
+            id: "certifications",
+            label: "Certifications",
+            icon: Award,
+            content: certificationsContent
+          },
+          {
+            id: "attempts",
+            label: "Attempts",
+            icon: Users,
+            content: attemptsContent
+          }
+        ]}
+        activeTab={selectedTab}
+        onTabChange={setSelectedTab}
+      />
+      
       <Dialog open={isModuleDialogOpen} onOpenChange={setIsModuleDialogOpen}>
         <DialogContent className="bg-white dark:bg-salis-black">
           <DialogHeader>
@@ -591,6 +595,6 @@ export default function TrainingLMS() {
           </Form>
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 }

@@ -64,6 +64,7 @@ import {
   type User,
 } from "@shared/schema";
 import { useAuth } from "@/hooks/useAuth";
+import { TabsPageLayout } from "@/components/layouts/TabsPageLayout";
 
 // Interface for warranty claims with warranty data
 interface WarrantyClaimWithWarranty {

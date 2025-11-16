@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { DashboardPage } from "@/components/layouts";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -11,17 +12,23 @@ export default function DroneInspection() {
   const { data: inspectionsResponse, isLoading } = useQuery({ queryKey: ['/api/nextgen/drone-inspections'] });
   const inspections = inspectionsResponse?.data || [];
 
-  // Use actual backend data, fall back to mock if empty
   const flights = inspections.length > 0 ? inspections.map((insp: any) => ({
     id: insp.id,
     location: insp.location || 'Unknown Location',
     status: insp.status || 'completed',
     images: insp.mediaCount || 0,
-    battery: 100 - (Math.random() * 40), // Simulated battery (would come from real drone)
+    battery: 100 - (Math.random() * 40),
     duration: insp.duration || 'N/A',
   })) : [
     { id: 'demo-1', location: 'Service Bay 1 (Demo)', status: 'completed', images: 12, battery: 85, duration: '8 min' },
     { id: 'demo-2', location: 'Parking Lot (Demo)', status: 'in_progress', images: 6, battery: 62, duration: '4 min' },
+  ];
+
+  const metrics = [
+    { label: "Total Flights", value: flights.length, icon: Plane, color: "text-sky-600" },
+    { label: "Active Flights", value: flights.filter(f => f.status === 'in_progress').length, icon: MapPin, color: "text-blue-600" },
+    { label: "Total Images", value: flights.reduce((sum, f) => sum + f.images, 0), icon: Camera, color: "text-purple-600" },
+    { label: "Avg Battery", value: `${Math.round(flights.reduce((sum, f) => sum + f.battery, 0) / flights.length)}%`, icon: Battery, color: "text-green-600" },
   ];
 
   if (isLoading) {
@@ -36,19 +43,13 @@ export default function DroneInspection() {
   }
 
   return (
-    <div className="flex-1 p-6 bg-gray-50 dark:bg-salis-black min-h-screen">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold font-['Montserrat'] text-gray-900 dark:text-white mb-2 flex items-center gap-3">
-          <Plane className="h-8 w-8 text-sky-600" />
-          Drone Inspection Interface
-        </h1>
-        <p className="text-gray-600 dark:text-gray-400 font-['Poppins']">
-          Autonomous drone fleet management for vehicle and facility inspections
-        </p>
-      </div>
-
+    <DashboardPage
+      title="Drone Inspection Interface"
+      description="Autonomous drone fleet management for vehicle and facility inspections"
+      icon={Plane}
+      metrics={metrics}
+    >
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Flight Control */}
         <Card className="lg:col-span-2 bg-white dark:bg-salis-black">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -85,7 +86,7 @@ export default function DroneInspection() {
                     </div>
                     <div className="flex items-center gap-2">
                       <Battery className="h-4 w-4 text-gray-500" />
-                      <span>{flight.battery}%</span>
+                      <span>{Math.round(flight.battery)}%</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Wind className="h-4 w-4 text-gray-500" />
@@ -103,7 +104,6 @@ export default function DroneInspection() {
           </CardContent>
         </Card>
 
-        {/* Selected Flight Details */}
         <Card className="bg-white dark:bg-salis-black">
           <CardHeader>
             <CardTitle>Flight Details</CardTitle>
@@ -161,7 +161,6 @@ export default function DroneInspection() {
         </Card>
       </div>
 
-      {/* Media Gallery */}
       <Card className="mt-6 bg-white dark:bg-salis-black">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -175,7 +174,7 @@ export default function DroneInspection() {
               {Array.from({ length: flights.find(f => f.id === selectedFlight)?.images || 8 }).map((_, i) => (
                 <div
                   key={i}
-                  className="aspect-square bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800 rounded-lg flex items-center justify-center hover:shadow-lg transition-shadow cursor-pointer"
+                  className="aspect-square bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800 rounded-lg flex items-center justify-center hover:shadow-lg transition-shadow cursor-pointer relative"
                   data-testid={`media-${i}`}
                 >
                   <Camera className="h-8 w-8 text-gray-400" />
@@ -195,6 +194,6 @@ export default function DroneInspection() {
           )}
         </CardContent>
       </Card>
-    </div>
+    </DashboardPage>
   );
 }

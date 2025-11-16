@@ -18,6 +18,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertAppointmentSchema, type InsertAppointment } from "@shared/schema";
 import type { Appointment, User, Customer, Vehicle } from "@shared/schema";
+import { StandardPageLayout } from "@/components/layouts";
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.css';
 
@@ -108,7 +109,6 @@ export default function Calendar() {
     enabled: !!selectedGarageId,
   });
 
-  // Update appointment mutation
   const updateAppointmentMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: Partial<InsertAppointment> }) => {
       return await apiRequest(`/api/appointments/${id}`, {
@@ -132,7 +132,6 @@ export default function Calendar() {
     },
   });
 
-  // Create appointment mutation
   const createAppointmentMutation = useMutation({
     mutationFn: async (data: InsertAppointment & { syncToCalendar?: boolean; sendEmail?: boolean }) => {
       const appointment = await apiRequest('/api/appointments', {
@@ -140,7 +139,6 @@ export default function Calendar() {
         body: JSON.stringify(data),
       });
 
-      // Sync to Google Calendar if enabled
       if (data.syncToCalendar) {
         try {
           await apiRequest('/api/integrations/google-calendar/sync-appointment', {
@@ -157,7 +155,6 @@ export default function Calendar() {
         }
       }
 
-      // Send email confirmation if enabled
       if (data.sendEmail && data.customerEmail) {
         try {
           await apiRequest('/api/integrations/gmail/send-appointment-confirmation', {
@@ -199,11 +196,9 @@ export default function Calendar() {
     },
   });
 
-  // Transform appointments and events for calendar display
   const events = useMemo<CalendarEvent[]>(() => {
     const result: CalendarEvent[] = [];
 
-    // Add appointments
     appointments
       .filter(apt => selectedTechnicianId === 'all' || apt.assignedTo === selectedTechnicianId)
       .forEach(apt => {
@@ -220,7 +215,6 @@ export default function Calendar() {
         });
       });
 
-    // Add calendar events
     calendarEvents.forEach((event: any) => {
       result.push({
         id: event.id,
@@ -325,17 +319,12 @@ export default function Calendar() {
   };
 
   return (
-    <div className="p-8 bg-gray-50 dark:bg-salis-black min-h-screen space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="font-['Poppins',Helvetica] font-bold text-3xl text-gray-900 dark:text-white" data-testid="text-calendar-title">Scheduling & Calendar</h1>
-          <p className="text-gray-900 dark:text-white/70">
-            Visual calendar view with drag-and-drop scheduling
-          </p>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <StandardPageLayout
+      title="Scheduling & Calendar"
+      description="Visual calendar view with drag-and-drop scheduling"
+      icon={CalendarIcon}
+    >
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark p-4">
           <div className="flex items-center gap-2 mb-2">
             <CalendarIcon className="h-5 w-5 text-gray-700 dark:text-gray-300" />
@@ -435,7 +424,6 @@ export default function Calendar() {
         </Card>
       )}
 
-      {/* Event Details Dialog */}
       <Dialog open={eventDialogOpen} onOpenChange={setEventDialogOpen}>
         <DialogContent>
           <DialogHeader>
@@ -484,7 +472,6 @@ export default function Calendar() {
         </DialogContent>
       </Dialog>
 
-      {/* Create Appointment Dialog */}
       <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
@@ -670,6 +657,6 @@ export default function Calendar() {
           </Form>
         </DialogContent>
       </Dialog>
-    </div>
+    </StandardPageLayout>
   );
 }

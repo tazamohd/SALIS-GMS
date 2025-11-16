@@ -26,6 +26,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { Car, Plus, Edit, Trash2, Search, Clock, Wrench, Bell, Shield, Image, Download } from "lucide-react";
 import { format } from "date-fns";
+import { StandardPageLayout } from "@/components/layouts";
 
 export default function VehiclesEnhanced() {
   const { toast } = useToast();
@@ -219,16 +220,14 @@ export default function VehiclesEnhanced() {
   };
 
   return (
-    <div className="p-8 min-h-screen space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="font-['Poppins',Helvetica] font-bold text-3xl text-gray-900 dark:text-white" data-testid="text-vehicles-title">Vehicle Management</h1>
-          <p className="text-gray-900 dark:text-white/70">
-            Track vehicles, service history, maintenance schedules, and more
-          </p>
-        </div>
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <Button onClick={() => {
+    <StandardPageLayout
+      title="Vehicle Management"
+      description="Track vehicles, service history, maintenance schedules, and more"
+      icon={Car}
+    >
+      <>
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <Button onClick={() => {
             setSelectedVehicle(null);
             form.reset({
               customerId: "",
@@ -582,7 +581,6 @@ export default function VehiclesEnhanced() {
             </Form>
           </DialogContent>
         </Dialog>
-      </div>
 
       <div className="grid grid-cols-12 gap-6">
         {/* Vehicle List */}
@@ -888,6 +886,7 @@ export default function VehiclesEnhanced() {
           )}
         </div>
       </div>
-    </div>
+      </>
+    </StandardPageLayout>
   );
 }

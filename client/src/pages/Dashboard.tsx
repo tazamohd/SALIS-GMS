@@ -3,12 +3,10 @@ import { BarChart3, Clock, AlertCircle, CheckCircle, Wrench, TrendingUp, Users, 
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { TaskDetailsDialog } from "@/components/TaskDetailsDialog";
-import { PageHeader } from "@/components/PageHeader";
-import { DataTable, Column } from "@/components/DataTable";
-import { EmptyState } from "@/components/EmptyState";
+import { DashboardPage } from "@/components/layouts";
+import { Card, CardContent } from "@/components/ui/card";
 import { useAuth } from "@/hooks/useAuth";
 import type { JobCard, User, Invoice, SparePart } from "@shared/schema";
 
@@ -59,13 +57,11 @@ export function Dashboard() {
     retry: false,
   });
 
-  // Calculate stats
   const checkInCount = (jobCards?.filter(jc => jc.status === 'pending') ?? []).length;
   const repairCount = (jobCards?.filter(jc => jc.status === 'in_progress') ?? []).length;
   const qualityCheckCount = (jobCards?.filter(jc => jc.status === 'completed') ?? []).length;
   const completionCount = (jobCards?.filter(jc => jc.status === 'delivered') ?? []).length;
 
-  // Pagination logic
   const totalPages = Math.ceil((jobCards?.length || 0) / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
@@ -77,7 +73,6 @@ export function Dashboard() {
     }
   };
 
-  // Enhanced colorful service type badges
   const getServiceTypeBadge = (serviceType: string) => {
     const types: { [key: string]: { bg: string; text: string; icon: string } } = {
       'maintenance': { bg: 'bg-blue-100 dark:bg-blue-900/30', text: 'text-blue-700 dark:text-blue-300', icon: '🔧' },
@@ -91,7 +86,6 @@ export function Dashboard() {
     return { ...config, label: serviceType };
   };
 
-  // Enhanced colorful status badges
   const getStatusBadge = (status: string) => {
     const statusColors: { [key: string]: { bg: string; text: string; icon: string } } = {
       'pending': { bg: 'bg-yellow-100 dark:bg-yellow-900/30', text: 'text-yellow-700 dark:text-yellow-300', icon: '⏳' },
@@ -105,7 +99,6 @@ export function Dashboard() {
     return { ...config, label: status };
   };
 
-  // Enhanced colorful priority badges
   const getPriorityBadge = (priority: string) => {
     const priorityColors: { [key: string]: { bg: string; text: string; icon: string } } = {
       'urgent': { bg: 'bg-red-500 dark:bg-red-600', text: 'text-white', icon: '🔥' },
@@ -117,12 +110,10 @@ export function Dashboard() {
     return { ...config, label: priority };
   };
 
-  // Shorten task ID
   const shortenId = (id: string) => {
     return id.substring(0, 8).toUpperCase();
   };
 
-  // Calculate real metrics from backend data
   const totalRevenue = invoices
     .filter(inv => inv.status === 'paid')
     .reduce((sum, inv) => sum + (parseFloat(inv.totalAmount) || 0), 0);
@@ -133,123 +124,27 @@ export function Dashboard() {
   const totalInventoryItems = sparePartInventories.length || 1;
   const inventoryPercentage = Math.round((inStockParts / totalInventoryItems) * 100);
 
-  // Role-based metrics
-  const roleBasedMetrics = () => {
-    const role = (user as any)?.role || (user as User | undefined)?.userType || 'technician';
-    
-    if (role === 'admin' || role === 'manager') {
-      return [
-        { label: 'Total Revenue', value: `$${totalRevenue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, icon: DollarSign, color: 'text-green-600 dark:text-green-400' },
-        { label: 'Active Customers', value: activeCustomersCount.toString(), icon: Users, color: 'text-blue-600 dark:text-blue-400' },
-        { label: 'Parts Inventory', value: `${inventoryPercentage}%`, icon: Package, color: 'text-purple-600 dark:text-purple-400' },
-      ];
-    } else {
-      return [
-        { label: 'My Tasks', value: repairCount.toString(), icon: Wrench, color: 'text-orange-600 dark:text-orange-400' },
-        { label: 'Completed Today', value: qualityCheckCount.toString(), icon: CheckCircle, color: 'text-green-600 dark:text-green-400' },
-        { label: 'Pending', value: checkInCount.toString(), icon: Clock, color: 'text-yellow-600 dark:text-yellow-400' },
-      ];
-    }
-  };
-
-  // Columns for DataTable
-  const columns: Column<JobCard>[] = [
-    {
-      key: "id",
-      label: "ID",
-      render: (task) => (
-        <span className="font-mono text-xs font-semibold">
-          #{shortenId(task.id)}
-        </span>
-      ),
-    },
-    {
-      key: "serviceType",
-      label: "Service",
-      render: (task) => {
-        const config = getServiceTypeBadge(task.serviceType);
-        return (
-          <Badge className={`${config.bg} ${config.text} border-0 text-xs font-medium`}>
-            {config.icon} {config.label}
-          </Badge>
-        );
-      },
-    },
-    {
-      key: "customer",
-      label: "Customer",
-      render: (task) => {
-        const vehicleInfo = task.vehicleInfo as any;
-        return vehicleInfo?.customerName || vehicleInfo?.owner || 'N/A';
-      },
-    },
-    {
-      key: "vehicle",
-      label: "Vehicle",
-      render: (task) => {
-        const vehicleInfo = task.vehicleInfo as any;
-        return `${vehicleInfo?.make || ''} ${vehicleInfo?.model || ''}`.trim() || 'N/A';
-      },
-    },
-    {
-      key: "status",
-      label: "Status",
-      render: (task) => {
-        const config = getStatusBadge(task.status);
-        return (
-          <Badge className={`${config.bg} ${config.text} border-0 text-xs font-medium`}>
-            {config.icon} {config.label}
-          </Badge>
-        );
-      },
-    },
-    {
-      key: "priority",
-      label: "Priority",
-      render: (task) => {
-        const config = getPriorityBadge(task.priority);
-        return (
-          <Badge className={`${config.bg} ${config.text} border-0 text-xs font-medium shadow-sm`}>
-            {config.icon} {config.label.toUpperCase()}
-          </Badge>
-        );
-      },
-    },
-    {
-      key: "createdAt",
-      label: "Date",
-      render: (task) => 
-        task.createdAt
-          ? new Date(task.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-          : 'N/A',
-    },
+  const role = (user as any)?.role || (user as User | undefined)?.userType || 'technician';
+  
+  const metrics = role === 'admin' || role === 'manager' ? [
+    { label: 'Total Revenue', value: `$${totalRevenue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, icon: DollarSign, color: 'text-green-600 dark:text-green-400' },
+    { label: 'Active Customers', value: activeCustomersCount.toString(), icon: Users, color: 'text-blue-600 dark:text-blue-400' },
+    { label: 'Parts Inventory', value: `${inventoryPercentage}%`, icon: Package, color: 'text-purple-600 dark:text-purple-400' },
+    { label: 'Check-In', value: checkInCount.toString(), icon: Clock, color: 'text-yellow-600 dark:text-yellow-400' },
+  ] : [
+    { label: 'My Tasks', value: repairCount.toString(), icon: Wrench, color: 'text-orange-600 dark:text-orange-400' },
+    { label: 'Completed Today', value: qualityCheckCount.toString(), icon: CheckCircle, color: 'text-green-600 dark:text-green-400' },
+    { label: 'Pending', value: checkInCount.toString(), icon: Clock, color: 'text-yellow-600 dark:text-yellow-400' },
+    { label: 'Delivered', value: completionCount.toString(), icon: BarChart3, color: 'text-blue-600 dark:text-blue-400' },
   ];
 
   return (
-    <div className="flex-1 p-4 sm:p-6 lg:p-8 bg-background min-h-screen">
-      {/* Page Header with Actions */}
-      <PageHeader
-        title={t('dashboard.title')}
-        description={`${t('common.welcome')} ${(user as User | undefined)?.fullName || (user as any)?.name}`}
-        icon={BarChart3}
-      />
-
-      {/* Role-based Quick Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        {roleBasedMetrics().map((metric, idx) => (
-          <Card key={idx} className="border border-gray-200 dark:border-salis-gray-dark bg-white dark:bg-salis-black/50">
-            <CardContent className="p-4 flex items-center justify-between">
-              <div>
-                <p className="text-xs font-poppins text-gray-600 dark:text-gray-400 uppercase tracking-wide mb-1">{metric.label}</p>
-                <p className="text-2xl font-montserrat font-bold text-gray-900 dark:text-white">{metric.value}</p>
-              </div>
-              <metric.icon className={`w-8 h-8 ${metric.color}`} />
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {/* Compact Stats Cards */}
+    <DashboardPage
+      title={t('dashboard.title')}
+      description={`${t('common.welcome')} ${(user as User | undefined)?.fullName || (user as any)?.name}`}
+      icon={BarChart3}
+      metrics={metrics}
+    >
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         <Card className="border border-gray-200 dark:border-salis-gray-dark bg-white dark:bg-salis-black" data-testid="card-check-in">
           <CardContent className="p-4">
@@ -292,7 +187,6 @@ export function Dashboard() {
         </Card>
       </div>
 
-      {/* Task Summary Section */}
       <Card className="border border-gray-200 dark:border-salis-gray-dark mb-6 bg-white dark:bg-salis-black" data-testid="card-summary">
         <CardContent className="p-5">
           <div className="flex items-center justify-between mb-4">
@@ -321,7 +215,6 @@ export function Dashboard() {
         </CardContent>
       </Card>
 
-      {/* Minimized Tasks Table */}
       <Card className="border border-gray-200 dark:border-salis-gray-dark bg-white dark:bg-salis-black" data-testid="card-tasks">
         <CardContent className="p-5">
           <div className="flex items-center justify-between mb-4">
@@ -411,7 +304,6 @@ export function Dashboard() {
             </table>
           </div>
 
-          {/* Compact Pagination */}
           {totalPages > 1 && (
             <div className="flex items-center justify-between mt-4">
               <Button 
@@ -458,6 +350,6 @@ export function Dashboard() {
         onOpenChange={setTaskDetailsOpen}
         task={selectedTask}
       />
-    </div>
+    </DashboardPage>
   );
 }

@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { Appointment } from "@shared/schema";
 import { format } from "date-fns";
+import { StandardPageLayout } from "@/components/layouts/StandardPageLayout";
 
 export function Appointments() {
   const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -60,30 +61,22 @@ export function Appointments() {
   };
 
   return (
-    <div className="p-8 bg-gray-50 dark:bg-salis-black min-h-screen">
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="font-['Poppins',Helvetica] font-bold text-3xl text-gray-900 dark:text-white">
-            Appointments
-          </h1>
-          <p className="font-['Poppins',Helvetica] font-normal text-sm text-gray-700 dark:text-gray-300 mt-1">
-            Manage and schedule customer appointments
-          </p>
-        </div>
-        <Button 
-          className="bg-white dark:bg-salis-black hover:bg-gray-100 dark:hover:bg-salis-gray-dark text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700"
-          data-testid="button-create-appointment"
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          New Appointment
-        </Button>
-      </div>
-
-      {/* Filters */}
+    <StandardPageLayout
+      title="Appointments"
+      description="Manage and schedule customer appointments"
+      icon={Calendar}
+      actions={[
+        {
+          label: "New Appointment",
+          onClick: () => {},
+          icon: Plus,
+          variant: "default",
+        }
+      ]}
+    >
       <Card className="mb-6 bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
         <CardContent className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* Search */}
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 dark:text-gray-500" />
               <Input
@@ -99,7 +92,6 @@ export function Appointments() {
               />
             </div>
 
-            {/* Status Filter */}
             <Select value={statusFilter} onValueChange={(value) => {
               setStatusFilter(value);
               setCurrentPage(1);
@@ -118,7 +110,6 @@ export function Appointments() {
               </SelectContent>
             </Select>
 
-            {/* Stats Summary */}
             <div className="flex items-center gap-4 text-sm">
               <span className="text-gray-700 dark:text-gray-300">
                 Total: <span className="font-semibold text-gray-900 dark:text-white">{filteredAppointments.length}</span>
@@ -136,7 +127,6 @@ export function Appointments() {
         </CardContent>
       </Card>
 
-      {/* Appointments Table */}
       <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
         <CardContent className="p-0">
           {isLoading ? (
@@ -251,7 +241,6 @@ export function Appointments() {
                 </table>
               </div>
 
-              {/* Pagination */}
               {totalPages > 1 && (
                 <div className="flex items-center justify-between p-4 border-t border-gray-200 dark:border-salis-gray-dark">
                   <div className="text-sm text-gray-700 dark:text-gray-300">
@@ -286,6 +275,6 @@ export function Appointments() {
           )}
         </CardContent>
       </Card>
-    </div>
+    </StandardPageLayout>
   );
 }

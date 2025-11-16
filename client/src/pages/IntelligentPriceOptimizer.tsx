@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Slider } from "@/components/ui/slider";
 import { TrendingUp, TrendingDown, Target, Zap, DollarSign, Users, BarChart3 } from "lucide-react";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { AnalyticsPage } from "@/components/layouts";
 
 const marketData = [
   { month: "Jan", current: 125, optimized: 145, demand: 85 },
@@ -42,16 +43,83 @@ export default function IntelligentPriceOptimizer() {
     setRevenueImpact(Math.round(revenue));
   };
 
-  return (
-    <div className="p-6 space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Intelligent Price Optimizer</h1>
-        <p className="text-gray-600 dark:text-gray-400 mt-2">
-          ML-powered dynamic pricing based on demand, competition, and customer behavior
-        </p>
-      </div>
+  const sections = [
+    {
+      title: "Price Optimization Trend",
+      description: "Historical vs. AI-recommended pricing with demand correlation",
+      content: (
+        <ResponsiveContainer width="100%" height={300}>
+          <LineChart data={marketData}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+            <XAxis dataKey="month" stroke="#9CA3AF" />
+            <YAxis stroke="#9CA3AF" />
+            <Tooltip 
+              contentStyle={{ 
+                backgroundColor: '#1F2937', 
+                border: '1px solid #374151',
+                borderRadius: '8px'
+              }}
+            />
+            <Legend />
+            <Line 
+              type="monotone" 
+              dataKey="current" 
+              stroke="#6B7280" 
+              strokeWidth={2}
+              name="Current Price"
+            />
+            <Line 
+              type="monotone" 
+              dataKey="optimized" 
+              stroke="#10B981" 
+              strokeWidth={2}
+              name="AI Optimized"
+            />
+            <Line 
+              type="monotone" 
+              dataKey="demand" 
+              stroke="#3B82F6" 
+              strokeWidth={2}
+              strokeDasharray="5 5"
+              name="Demand Index"
+            />
+          </LineChart>
+        </ResponsiveContainer>
+      ),
+    },
+    {
+      title: "Competitive Market Analysis",
+      description: "Real-time pricing comparison with local competitors",
+      content: (
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart data={competitorData}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+            <XAxis dataKey="name" stroke="#9CA3AF" />
+            <YAxis stroke="#9CA3AF" />
+            <Tooltip 
+              contentStyle={{ 
+                backgroundColor: '#1F2937', 
+                border: '1px solid #374151',
+                borderRadius: '8px'
+              }}
+            />
+            <Legend />
+            <Bar dataKey="price" fill="#3B82F6" name="Price ($)" />
+            <Bar dataKey="volume" fill="#10B981" name="Monthly Volume" />
+          </BarChart>
+        </ResponsiveContainer>
+      ),
+    },
+  ];
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+  return (
+    <AnalyticsPage
+      title="Intelligent Price Optimizer"
+      description="ML-powered dynamic pricing based on demand, competition, and customer behavior"
+      icon={Target}
+      sections={sections}
+    >
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-6">
         <Card className="border-blue-200 dark:border-blue-900 bg-blue-50/50 dark:bg-blue-950/20" data-testid="card-optimized-price">
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
@@ -103,8 +171,7 @@ export default function IntelligentPriceOptimizer() {
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Configuration Panel */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
         <Card className="border-gray-200 dark:border-gray-800">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -181,98 +248,15 @@ export default function IntelligentPriceOptimizer() {
           </CardContent>
         </Card>
 
-        {/* Price Trend Chart */}
         <Card className="lg:col-span-2 border-gray-200 dark:border-gray-800">
           <CardHeader>
-            <CardTitle>Price Optimization Trend</CardTitle>
-            <CardDescription>
-              Historical vs. AI-recommended pricing with demand correlation
-            </CardDescription>
+            <CardTitle>AI Insights & Strategy</CardTitle>
           </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={marketData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                <XAxis dataKey="month" stroke="#9CA3AF" />
-                <YAxis stroke="#9CA3AF" />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: '#1F2937', 
-                    border: '1px solid #374151',
-                    borderRadius: '8px'
-                  }}
-                />
-                <Legend />
-                <Line 
-                  type="monotone" 
-                  dataKey="current" 
-                  stroke="#6B7280" 
-                  strokeWidth={2}
-                  name="Current Price"
-                />
-                <Line 
-                  type="monotone" 
-                  dataKey="optimized" 
-                  stroke="#10B981" 
-                  strokeWidth={2}
-                  name="AI Optimized"
-                />
-                <Line 
-                  type="monotone" 
-                  dataKey="demand" 
-                  stroke="#3B82F6" 
-                  strokeWidth={2}
-                  strokeDasharray="5 5"
-                  name="Demand Index"
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Competitive Analysis */}
-      <Card className="border-gray-200 dark:border-gray-800">
-        <CardHeader>
-          <CardTitle>Competitive Market Analysis</CardTitle>
-          <CardDescription>
-            Real-time pricing comparison with local competitors
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={competitorData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-              <XAxis dataKey="name" stroke="#9CA3AF" />
-              <YAxis stroke="#9CA3AF" />
-              <Tooltip 
-                contentStyle={{ 
-                  backgroundColor: '#1F2937', 
-                  border: '1px solid #374151',
-                  borderRadius: '8px'
-                }}
-              />
-              <Legend />
-              <Bar dataKey="price" fill="#3B82F6" name="Price ($)" />
-              <Bar dataKey="volume" fill="#10B981" name="Monthly Volume" />
-            </BarChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
-
-      {/* AI Recommendations */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card className="border-gray-200 dark:border-gray-800">
-          <CardHeader>
-            <CardTitle className="text-lg">AI Insights</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="space-y-4">
             <div className="flex items-start gap-3 p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
               <TrendingUp className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5" />
               <div>
-                <p className="font-medium text-gray-900 dark:text-white text-sm">
-                  Peak Demand Period
-                </p>
+                <p className="font-medium text-gray-900 dark:text-white text-sm">Peak Demand Period</p>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
                   Increase prices by 12% during summer months (May-Aug)
                 </p>
@@ -282,9 +266,7 @@ export default function IntelligentPriceOptimizer() {
             <div className="flex items-start gap-3 p-3 bg-green-50 dark:bg-green-950/20 rounded-lg">
               <DollarSign className="w-5 h-5 text-green-600 dark:text-green-400 mt-0.5" />
               <div>
-                <p className="font-medium text-gray-900 dark:text-white text-sm">
-                  Bundle Opportunity
-                </p>
+                <p className="font-medium text-gray-900 dark:text-white text-sm">Bundle Opportunity</p>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
                   Customers buying oil changes also need tire rotation (+35%)
                 </p>
@@ -294,23 +276,14 @@ export default function IntelligentPriceOptimizer() {
             <div className="flex items-start gap-3 p-3 bg-purple-50 dark:bg-purple-950/20 rounded-lg">
               <Users className="w-5 h-5 text-purple-600 dark:text-purple-400 mt-0.5" />
               <div>
-                <p className="font-medium text-gray-900 dark:text-white text-sm">
-                  Customer Segment
-                </p>
+                <p className="font-medium text-gray-900 dark:text-white text-sm">Customer Segment</p>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
                   Premium customers willing to pay 20% more for same-day service
                 </p>
               </div>
             </div>
-          </CardContent>
-        </Card>
 
-        <Card className="border-gray-200 dark:border-gray-800">
-          <CardHeader>
-            <CardTitle className="text-lg">Pricing Strategy</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="space-y-2">
+            <div className="pt-4 space-y-2">
               <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-600 dark:text-gray-400">Base Price</span>
                 <span className="font-semibold text-gray-900 dark:text-white">$125</span>
@@ -339,6 +312,6 @@ export default function IntelligentPriceOptimizer() {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </AnalyticsPage>
   );
 }

@@ -34,8 +34,9 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertServiceTemplateSchema, type ServiceTemplate } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Clock, DollarSign, CheckCircle, XCircle, Eye, Pencil, Trash2 } from "lucide-react";
+import { Plus, Clock, DollarSign, CheckCircle, XCircle, Eye, Pencil, Trash2, Wrench } from "lucide-react";
 import { z } from "zod";
+import { StandardPageLayout } from "@/components/layouts";
 
 const formSchema = insertServiceTemplateSchema.extend({
   garageId: z.string().min(1, "Garage is required"),
@@ -185,15 +186,18 @@ export default function ServiceTemplates() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="font-['Poppins',Helvetica] font-bold text-3xl text-gray-900 dark:text-white">Service Templates</h1>
-        <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
-          <DialogTrigger asChild>
-            <Button data-testid="button-create-template">
-              <Plus className="mr-2 h-4 w-4" /> Create Template
-            </Button>
-          </DialogTrigger>
+    <StandardPageLayout
+      title="Service Templates"
+      description="Create and manage reusable service templates"
+      icon={Wrench}
+    >
+      <>
+      <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
+        <DialogTrigger asChild>
+          <Button data-testid="button-create-template">
+            <Plus className="mr-2 h-4 w-4" /> Create Template
+          </Button>
+        </DialogTrigger>
           <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Create Service Template</DialogTitle>
@@ -373,7 +377,6 @@ export default function ServiceTemplates() {
             </Form>
           </DialogContent>
         </Dialog>
-      </div>
 
       {/* Filters */}
       <div className="flex gap-4">
@@ -516,6 +519,7 @@ export default function ServiceTemplates() {
           )}
         </DialogContent>
       </Dialog>
-    </div>
+      </>
+    </StandardPageLayout>
   );
 }

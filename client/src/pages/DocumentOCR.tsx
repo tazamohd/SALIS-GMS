@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { StandardPageLayout } from "@/components/layouts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import {
@@ -136,19 +136,12 @@ export default function DocumentOCR() {
   };
 
   return (
-    <div className="p-8 space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold font-montserrat text-gray-900 dark:text-white">
-            📄 Document OCR
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">
-            Automatically extract data from invoices and receipts using AI
-          </p>
-        </div>
-      </div>
-
-      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+    <StandardPageLayout
+      title="📄 Document OCR"
+      description="Automatically extract data from invoices and receipts using AI"
+      icon={FileText}
+    >
+      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800 mb-6">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Upload className="h-5 w-5" />
@@ -318,31 +311,6 @@ export default function DocumentOCR() {
                       />
                     </div>
                     <div>
-                      <Label htmlFor="edit-date">Date</Label>
-                      <Input
-                        id="edit-date"
-                        type="date"
-                        value={editedData.date || ""}
-                        onChange={(e) =>
-                          setEditedData({ ...editedData, date: e.target.value })
-                        }
-                        data-testid="input-edit-date"
-                      />
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="edit-invoice-number">Invoice/Receipt Number</Label>
-                      <Input
-                        id="edit-invoice-number"
-                        value={editedData.invoiceNumber || ""}
-                        onChange={(e) =>
-                          setEditedData({ ...editedData, invoiceNumber: e.target.value })
-                        }
-                        data-testid="input-edit-invoice-number"
-                      />
-                    </div>
-                    <div>
                       <Label htmlFor="edit-total">Total Amount</Label>
                       <Input
                         id="edit-total"
@@ -350,135 +318,43 @@ export default function DocumentOCR() {
                         step="0.01"
                         value={editedData.total || ""}
                         onChange={(e) =>
-                          setEditedData({ ...editedData, total: e.target.value })
+                          setEditedData({ ...editedData, total: parseFloat(e.target.value) })
                         }
                         data-testid="input-edit-total"
                       />
                     </div>
                   </div>
-                  <div>
-                    <Label htmlFor="edit-items">Line Items (JSON)</Label>
-                    <Textarea
-                      id="edit-items"
-                      value={JSON.stringify(editedData.items || [], null, 2)}
-                      onChange={(e) => {
-                        try {
-                          const items = JSON.parse(e.target.value);
-                          setEditedData({ ...editedData, items });
-                        } catch {}
-                      }}
-                      rows={6}
-                      data-testid="textarea-edit-items"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="edit-notes">Notes</Label>
-                    <Textarea
-                      id="edit-notes"
-                      value={editedData.notes || ""}
-                      onChange={(e) =>
-                        setEditedData({ ...editedData, notes: e.target.value })
-                      }
-                      rows={3}
-                      data-testid="textarea-edit-notes"
-                    />
-                  </div>
+                  <DialogFooter>
+                    <Button variant="outline" onClick={() => setEditMode(false)} data-testid="button-cancel-edit">
+                      <X className="h-4 w-4 mr-2" />
+                      Cancel
+                    </Button>
+                    <Button onClick={handleSaveEdits} disabled={updateMutation.isPending} data-testid="button-save-edit">
+                      <Save className="h-4 w-4 mr-2" />
+                      {updateMutation.isPending ? "Saving..." : "Save Changes"}
+                    </Button>
+                  </DialogFooter>
                 </div>
               ) : (
                 <div className="space-y-3 border-t pt-4">
-                  <div>
-                    <Label>Vendor/Supplier</Label>
-                    <p className="text-sm font-medium" data-testid="text-vendor">
-                      {selectedDoc.extractedData?.vendor || "N/A"}
-                    </p>
-                  </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <Label>Date</Label>
-                      <p className="text-sm font-medium" data-testid="text-date">
-                        {selectedDoc.extractedData?.date || "N/A"}
-                      </p>
+                      <Label>Vendor/Supplier</Label>
+                      <p className="text-sm font-medium">{editedData.vendor || "N/A"}</p>
                     </div>
                     <div>
-                      <Label>Invoice/Receipt Number</Label>
-                      <p className="text-sm font-medium" data-testid="text-invoice-number">
-                        {selectedDoc.extractedData?.invoiceNumber || "N/A"}
+                      <Label>Total Amount</Label>
+                      <p className="text-sm font-medium">
+                        {editedData.total ? `$${editedData.total}` : "N/A"}
                       </p>
                     </div>
                   </div>
-                  <div>
-                    <Label>Total Amount</Label>
-                    <p className="text-lg font-bold text-gray-900 dark:text-white" data-testid="text-total">
-                      ${selectedDoc.extractedData?.total || "0.00"}
-                    </p>
-                  </div>
-                  {selectedDoc.extractedData?.items?.length > 0 && (
-                    <div>
-                      <Label>Line Items</Label>
-                      <div className="mt-2 space-y-2">
-                        {selectedDoc.extractedData.items.map((item: any, idx: number) => (
-                          <div
-                            key={idx}
-                            className="flex justify-between text-sm border-b pb-1"
-                            data-testid={`item-${idx}`}
-                          >
-                            <span>{item.description}</span>
-                            <span className="font-medium">${item.amount}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                  {selectedDoc.extractedData?.notes && (
-                    <div>
-                      <Label>Notes</Label>
-                      <p className="text-sm text-gray-600 dark:text-gray-400" data-testid="text-notes">
-                        {selectedDoc.extractedData.notes}
-                      </p>
-                    </div>
-                  )}
-                  {selectedDoc.confidence && (
-                    <div>
-                      <Label>OCR Confidence</Label>
-                      <p className="text-sm font-medium">{selectedDoc.confidence}%</p>
-                    </div>
-                  )}
                 </div>
               )}
             </div>
           )}
-
-          <DialogFooter>
-            {editMode ? (
-              <>
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setEditMode(false);
-                    setEditedData(selectedDoc?.extractedData || {});
-                  }}
-                  data-testid="button-cancel-edit"
-                >
-                  <X className="h-4 w-4 mr-2" />
-                  Cancel
-                </Button>
-                <Button
-                  onClick={handleSaveEdits}
-                  disabled={updateMutation.isPending}
-                  data-testid="button-save-edits"
-                >
-                  <Save className="h-4 w-4 mr-2" />
-                  {updateMutation.isPending ? "Saving..." : "Save & Approve"}
-                </Button>
-              </>
-            ) : (
-              <Button variant="outline" onClick={() => setSelectedDoc(null)} data-testid="button-close">
-                Close
-              </Button>
-            )}
-          </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </StandardPageLayout>
   );
 }

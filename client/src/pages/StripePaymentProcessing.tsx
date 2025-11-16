@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
+import { StandardPageLayout } from "@/components/layouts/StandardPageLayout";
 import {
   CreditCard,
   DollarSign,
@@ -184,27 +185,26 @@ export default function StripePaymentProcessing() {
   };
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold dark:text-white">Stripe Payment Processing</h1>
-          <p className="text-gray-600 dark:text-gray-400">Manage payment intents, refunds, and transaction status</p>
-        </div>
-        <div className="flex space-x-2">
-          <Button onClick={() => setCreatePaymentOpen(true)} data-testid="button-create-payment">
-            <CreditCard className="w-4 h-4 mr-2" />
-            Create Payment
-          </Button>
-          <Button 
-            variant="outline" 
-            onClick={() => setRefundDialogOpen(true)}
-            data-testid="button-process-refund"
-          >
-            <RefreshCw className="w-4 h-4 mr-2" />
-            Process Refund
-          </Button>
-        </div>
-      </div>
+    <StandardPageLayout
+      title="Stripe Payment Processing"
+      description="Manage payment intents, refunds, and transaction status"
+      icon={CreditCard}
+      actions={[
+        {
+          label: "Create Payment",
+          onClick: () => setCreatePaymentOpen(true),
+          icon: CreditCard,
+          variant: "default",
+        },
+        {
+          label: "Process Refund",
+          onClick: () => setRefundDialogOpen(true),
+          icon: RefreshCw,
+          variant: "outline",
+        },
+      ]}
+    >
+      <div className="space-y-6">
 
       {/* Quick Actions */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -447,6 +447,7 @@ export default function StripePaymentProcessing() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+      </div>
+    </StandardPageLayout>
   );
 }

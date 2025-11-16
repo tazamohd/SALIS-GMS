@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { DashboardPage } from "@/components/layouts";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -65,6 +66,13 @@ export default function DigitalVehicleWalkaround() {
     );
   };
 
+  const metrics = [
+    { label: "Total Walkarounds", value: stats.totalWalkarounds, icon: Camera, color: "text-blue-600" },
+    { label: "Completed Today", value: stats.completedToday, icon: CheckCircle, color: "text-green-600" },
+    { label: "Pending Signature", value: stats.pendingSignature, icon: FileText, color: "text-yellow-600" },
+    { label: "Damage Reported", value: stats.damageReported, icon: AlertTriangle, color: "text-red-600" },
+  ];
+
   if (isLoading) {
     return (
       <div className="p-8">
@@ -77,183 +85,126 @@ export default function DigitalVehicleWalkaround() {
   }
 
   return (
-    <div className="p-8 space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold font-montserrat text-gray-900 dark:text-white">
-            📸 Digital Vehicle Walkaround
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">
-            Document vehicle condition with photos and annotations
-          </p>
-        </div>
-        <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-          <DialogTrigger asChild>
-            <Button data-testid="button-create-walkaround">
-              <Plus className="h-4 w-4 mr-2" />
-              New Walkaround
+    <DashboardPage
+      title="📸 Digital Vehicle Walkaround"
+      description="Document vehicle condition with photos and annotations"
+      icon={Camera}
+      metrics={metrics}
+    >
+      <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+        <DialogTrigger asChild>
+          <Button data-testid="button-create-walkaround" className="mb-6">
+            <Plus className="h-4 w-4 mr-2" />
+            New Walkaround
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Create Vehicle Walkaround</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-medium">Job Card ID</label>
+                <input
+                  type="text"
+                  className="w-full mt-1 px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md"
+                  placeholder="Enter job card ID"
+                  value={formData.jobCardId}
+                  onChange={(e) => setFormData({ ...formData, jobCardId: e.target.value })}
+                  data-testid="input-job-card"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Vehicle ID</label>
+                <input
+                  type="text"
+                  className="w-full mt-1 px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md"
+                  placeholder="Enter vehicle ID"
+                  value={formData.vehicleId}
+                  onChange={(e) => setFormData({ ...formData, vehicleId: e.target.value })}
+                  data-testid="input-vehicle-id"
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-medium">Technician ID</label>
+                <input
+                  type="text"
+                  className="w-full mt-1 px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md"
+                  placeholder="Enter technician ID"
+                  value={formData.technicianId}
+                  onChange={(e) => setFormData({ ...formData, technicianId: e.target.value })}
+                  data-testid="input-technician-id"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Type</label>
+                <select
+                  className="w-full mt-1 px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md"
+                  value={formData.walkaroundType}
+                  onChange={(e) => setFormData({ ...formData, walkaroundType: e.target.value })}
+                  data-testid="select-type"
+                >
+                  <option value="pre_service">Pre-Service</option>
+                  <option value="post_service">Post-Service</option>
+                </select>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-medium">Mileage</label>
+                <input
+                  type="number"
+                  className="w-full mt-1 px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md"
+                  placeholder="0"
+                  value={formData.mileageReading}
+                  onChange={(e) => setFormData({ ...formData, mileageReading: e.target.value })}
+                  data-testid="input-mileage"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Fuel Level</label>
+                <select
+                  className="w-full mt-1 px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md"
+                  value={formData.fuelLevel}
+                  onChange={(e) => setFormData({ ...formData, fuelLevel: e.target.value })}
+                  data-testid="select-fuel"
+                >
+                  <option value="1/4">1/4</option>
+                  <option value="1/2">1/2</option>
+                  <option value="3/4">3/4</option>
+                  <option value="full">Full</option>
+                </select>
+              </div>
+            </div>
+            <Button
+              className="w-full"
+              onClick={() => {
+                if (!formData.jobCardId || !formData.vehicleId || !formData.technicianId) {
+                  toast({ title: "Validation error", description: "Please fill in all required fields", variant: "destructive" });
+                  return;
+                }
+                createWalkaround.mutate({
+                  jobCardId: formData.jobCardId,
+                  vehicleId: formData.vehicleId,
+                  technicianId: formData.technicianId,
+                  walkaroundType: formData.walkaroundType,
+                  photos: [],
+                  mileageReading: formData.mileageReading ? parseInt(formData.mileageReading) : undefined,
+                  fuelLevel: formData.fuelLevel,
+                });
+              }}
+              disabled={createWalkaround.isPending}
+              data-testid="button-save-walkaround"
+            >
+              {createWalkaround.isPending ? "Saving..." : "Save Walkaround"}
             </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-2xl">
-            <DialogHeader>
-              <DialogTitle>Create Vehicle Walkaround</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4 py-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-sm font-medium">Job Card ID</label>
-                  <input
-                    type="text"
-                    className="w-full mt-1 px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md"
-                    placeholder="Enter job card ID"
-                    value={formData.jobCardId}
-                    onChange={(e) => setFormData({ ...formData, jobCardId: e.target.value })}
-                    data-testid="input-job-card"
-                  />
-                </div>
-                <div>
-                  <label className="text-sm font-medium">Vehicle ID</label>
-                  <input
-                    type="text"
-                    className="w-full mt-1 px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md"
-                    placeholder="Enter vehicle ID"
-                    value={formData.vehicleId}
-                    onChange={(e) => setFormData({ ...formData, vehicleId: e.target.value })}
-                    data-testid="input-vehicle-id"
-                  />
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-sm font-medium">Technician ID</label>
-                  <input
-                    type="text"
-                    className="w-full mt-1 px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md"
-                    placeholder="Enter technician ID"
-                    value={formData.technicianId}
-                    onChange={(e) => setFormData({ ...formData, technicianId: e.target.value })}
-                    data-testid="input-technician-id"
-                  />
-                </div>
-                <div>
-                  <label className="text-sm font-medium">Type</label>
-                  <select
-                    className="w-full mt-1 px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md"
-                    value={formData.walkaroundType}
-                    onChange={(e) => setFormData({ ...formData, walkaroundType: e.target.value })}
-                    data-testid="select-type"
-                  >
-                    <option value="pre_service">Pre-Service</option>
-                    <option value="post_service">Post-Service</option>
-                  </select>
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-sm font-medium">Mileage</label>
-                  <input
-                    type="number"
-                    className="w-full mt-1 px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md"
-                    placeholder="0"
-                    value={formData.mileageReading}
-                    onChange={(e) => setFormData({ ...formData, mileageReading: e.target.value })}
-                    data-testid="input-mileage"
-                  />
-                </div>
-                <div>
-                  <label className="text-sm font-medium">Fuel Level</label>
-                  <select
-                    className="w-full mt-1 px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md"
-                    value={formData.fuelLevel}
-                    onChange={(e) => setFormData({ ...formData, fuelLevel: e.target.value })}
-                    data-testid="select-fuel"
-                  >
-                    <option value="1/4">1/4</option>
-                    <option value="1/2">1/2</option>
-                    <option value="3/4">3/4</option>
-                    <option value="full">Full</option>
-                  </select>
-                </div>
-              </div>
-              <Button
-                className="w-full"
-                onClick={() => {
-                  if (!formData.jobCardId || !formData.vehicleId || !formData.technicianId) {
-                    toast({ title: "Validation error", description: "Please fill in all required fields", variant: "destructive" });
-                    return;
-                  }
-                  createWalkaround.mutate({
-                    jobCardId: formData.jobCardId,
-                    vehicleId: formData.vehicleId,
-                    technicianId: formData.technicianId,
-                    walkaroundType: formData.walkaroundType,
-                    photos: [],
-                    mileageReading: formData.mileageReading ? parseInt(formData.mileageReading) : undefined,
-                    fuelLevel: formData.fuelLevel,
-                  });
-                }}
-                disabled={createWalkaround.isPending}
-                data-testid="button-save-walkaround"
-              >
-                {createWalkaround.isPending ? "Saving..." : "Save Walkaround"}
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
-      </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800" data-testid="card-total-walkarounds">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Total Walkarounds</p>
-                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">{stats.totalWalkarounds}</h3>
-              </div>
-              <Camera className="h-12 w-12 text-blue-600" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800" data-testid="card-completed-today">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Completed Today</p>
-                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">{stats.completedToday}</h3>
-              </div>
-              <CheckCircle className="h-12 w-12 text-green-600" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800" data-testid="card-pending-signature">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Pending Signature</p>
-                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">{stats.pendingSignature}</h3>
-              </div>
-              <FileText className="h-12 w-12 text-yellow-600" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800" data-testid="card-damage-reported">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Damage Reported</p>
-                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">{stats.damageReported}</h3>
-              </div>
-              <AlertTriangle className="h-12 w-12 text-red-600" />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Empty State */}
       {walkaroundsArray.length === 0 && !isLoading && (
         <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
           <CardContent className="p-12">
@@ -274,7 +225,6 @@ export default function DigitalVehicleWalkaround() {
         </Card>
       )}
 
-      {/* Walkarounds List */}
       {walkaroundsArray.length > 0 && (
         <div className="space-y-4">
           {walkaroundsArray.map((walkaround: any, index: number) => {
@@ -430,6 +380,6 @@ export default function DigitalVehicleWalkaround() {
           })}
         </div>
       )}
-    </div>
+    </DashboardPage>
   );
 }

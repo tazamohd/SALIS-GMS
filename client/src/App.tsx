@@ -134,6 +134,17 @@ import KnowledgeBase from "@/pages/KnowledgeBase";
 import TrainingLMS from "@/pages/TrainingLMS";
 import GoogleMyBusiness from "@/pages/GoogleMyBusiness";
 import ComplianceManagement from "@/pages/ComplianceManagement";
+import SocialMediaMonitoring from "@/pages/SocialMediaMonitoring";
+import StaffPerformanceReview from "@/pages/StaffPerformanceReview";
+import SustainableEnergyMonitoring from "@/pages/SustainableEnergyMonitoring";
+import TaskManagement from "@/pages/TaskManagement";
+import TechnicianPerformance from "@/pages/TechnicianPerformance";
+import TimesheetManagement from "@/pages/TimesheetManagement";
+import VehicleHistory from "@/pages/VehicleHistory";
+import Vehicles from "@/pages/Vehicles";
+import VoiceCommandInterface from "@/pages/VoiceCommandInterface";
+import VRShowroom from "@/pages/VRShowroom";
+import WearableIntegration from "@/pages/WearableIntegration";
 import { CustomerDashboard } from "@/pages/customer/CustomerDashboard";
 import { ClientLayout } from "@/components/ClientLayout";
 import ClientDashboard from "@/pages/client/Dashboard";
@@ -851,6 +862,61 @@ function Router() {
       <Route path="/compliance-management">
         <Layout>
           <ComplianceManagement />
+        </Layout>
+      </Route>
+      <Route path="/social-media-monitoring">
+        <Layout>
+          <SocialMediaMonitoring />
+        </Layout>
+      </Route>
+      <Route path="/staff-performance-review">
+        <Layout>
+          <StaffPerformanceReview />
+        </Layout>
+      </Route>
+      <Route path="/sustainable-energy-monitoring">
+        <Layout>
+          <SustainableEnergyMonitoring />
+        </Layout>
+      </Route>
+      <Route path="/task-management">
+        <Layout>
+          <TaskManagement />
+        </Layout>
+      </Route>
+      <Route path="/technician-performance">
+        <Layout>
+          <TechnicianPerformance />
+        </Layout>
+      </Route>
+      <Route path="/timesheet-management">
+        <Layout>
+          <TimesheetManagement />
+        </Layout>
+      </Route>
+      <Route path="/vehicle-history">
+        <Layout>
+          <VehicleHistory />
+        </Layout>
+      </Route>
+      <Route path="/vehicles-list">
+        <Layout>
+          <Vehicles />
+        </Layout>
+      </Route>
+      <Route path="/voice-command-interface">
+        <Layout>
+          <VoiceCommandInterface />
+        </Layout>
+      </Route>
+      <Route path="/vr-showroom">
+        <Layout>
+          <VRShowroom />
+        </Layout>
+      </Route>
+      <Route path="/wearable-integration">
+        <Layout>
+          <WearableIntegration />
         </Layout>
       </Route>
       

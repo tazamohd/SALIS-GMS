@@ -16,6 +16,7 @@ import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/useAuth";
 import { Users, Edit, Award, Clock, DollarSign, Briefcase, GraduationCap, UserPlus, Trash2 } from "lucide-react";
 import AddTechnicianDialog from "@/components/AddTechnicianDialog";
+import { StandardPageLayout } from "@/components/layouts";
 
 export default function TechnicianManagement() {
   const { user } = useAuth();
@@ -176,19 +177,18 @@ export default function TechnicianManagement() {
   };
 
   return (
-    <div className="p-6 space-y-6" data-testid="page-technician-management">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="font-['Poppins',Helvetica] font-bold text-3xl text-gray-900 dark:text-white" data-testid="text-title">Technician Management</h1>
-          <p className="text-gray-600 dark:text-gray-400" data-testid="text-subtitle">
-            Manage technician profiles, skills, and assignments
-          </p>
-        </div>
-        <Button onClick={() => setIsAddDialogOpen(true)} data-testid="button-add-technician">
-          <UserPlus className="h-4 w-4 mr-2" />
-          Add Technician
-        </Button>
-      </div>
+    <StandardPageLayout
+      title="Technician Management"
+      description="Manage technician profiles, skills, and assignments"
+      icon={Users}
+      actions={[
+        {
+          label: "Add Technician",
+          onClick: () => setIsAddDialogOpen(true),
+          icon: UserPlus,
+        },
+      ]}
+    >
 
       {/* Filters */}
       <Card data-testid="card-filters">
@@ -530,6 +530,6 @@ export default function TechnicianManagement() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
+    </StandardPageLayout>
   );
 }

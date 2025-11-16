@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { TabsPageLayout, TabConfig } from "@/components/layouts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -7,7 +8,6 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { ShoppingCart, Package, Truck, DollarSign, Star, Search, Plus } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
@@ -31,7 +31,6 @@ export default function PartsMarketplace() {
     },
   });
 
-  // Mock data
   const mockOrders = [
     {
       id: "1",
@@ -138,242 +137,216 @@ export default function PartsMarketplace() {
     );
   };
 
-  return (
-    <div className="p-8 space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold font-montserrat text-gray-900 dark:text-white">
-            🛒 Parts Marketplace
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">
-            Order parts from eBay Motors, Amazon, and RockAuto
-          </p>
-        </div>
-        <Dialog open={isOrderDialogOpen} onOpenChange={setIsOrderDialogOpen}>
-          <DialogTrigger asChild>
-            <Button data-testid="button-place-order">
-              <Plus className="h-4 w-4 mr-2" />
-              Place Order
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-2xl">
-            <DialogHeader>
-              <DialogTitle>Search & Order Parts</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4 py-4">
-              <div className="flex gap-2">
-                <Input
-                  placeholder="Search by part number or name..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="flex-1"
-                  data-testid="input-search-parts"
-                />
-                <Button data-testid="button-search">
-                  <Search className="h-4 w-4" />
-                </Button>
-              </div>
-              <div className="space-y-2 max-h-96 overflow-y-auto">
-                {marketplaceSearch.map((result, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-800 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-900"
-                    data-testid={`search-result-${index}`}
-                  >
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h4 className="font-semibold text-gray-900 dark:text-white">{result.partName}</h4>
-                        {getMarketplaceBadge(result.marketplace)}
-                      </div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">PN: {result.partNumber}</p>
-                      <div className="flex items-center gap-3 mt-1 text-sm">
-                        <span className="text-gray-600 dark:text-gray-400">{result.sellerName}</span>
-                        <span className="flex items-center gap-1 text-yellow-600">
-                          <Star className="h-3 w-3 fill-current" /> {result.sellerRating}
-                        </span>
-                        {result.inStock && (
-                          <Badge variant="secondary" className="text-xs">In Stock</Badge>
-                        )}
-                      </div>
-                    </div>
-                    <div className="text-right ml-4">
-                      <p className="text-lg font-bold text-gray-900 dark:text-white">${result.price}</p>
-                      <Button size="sm" className="mt-2" onClick={() => {
-                        createOrder.mutate({
-                          marketplace: result.marketplace,
-                          partNumber: result.partNumber,
-                          partName: result.partName,
-                          quantity: 1,
-                          unitPrice: result.price
-                        });
-                      }} data-testid={`button-order-${index}`}>
-                        <ShoppingCart className="h-3 w-3 mr-1" />
-                        Order
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
+  const statsContent = (
+    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800" data-testid="card-total-orders">
+        <CardContent className="p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Total Orders</p>
+              <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">{stats.totalOrders}</h3>
             </div>
-          </DialogContent>
-        </Dialog>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800" data-testid="card-total-orders">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Total Orders</p>
-                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">{stats.totalOrders}</h3>
-              </div>
-              <Package className="h-12 w-12 text-blue-600" />
+            <Package className="h-12 w-12 text-blue-600" />
+          </div>
+        </CardContent>
+      </Card>
+      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800" data-testid="card-active-orders">
+        <CardContent className="p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Active Orders</p>
+              <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">{stats.activeOrders}</h3>
             </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800" data-testid="card-active-orders">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Active Orders</p>
-                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">{stats.activeOrders}</h3>
-              </div>
-              <ShoppingCart className="h-12 w-12 text-green-600" />
+            <ShoppingCart className="h-12 w-12 text-green-600" />
+          </div>
+        </CardContent>
+      </Card>
+      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800" data-testid="card-total-spent">
+        <CardContent className="p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Total Spent</p>
+              <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">${stats.totalSpent.toLocaleString()}</h3>
             </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800" data-testid="card-total-spent">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Total Spent</p>
-                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">${stats.totalSpent.toLocaleString()}</h3>
-              </div>
-              <DollarSign className="h-12 w-12 text-purple-600" />
+            <DollarSign className="h-12 w-12 text-purple-600" />
+          </div>
+        </CardContent>
+      </Card>
+      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800" data-testid="card-avg-delivery">
+        <CardContent className="p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Avg Delivery</p>
+              <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">{stats.avgDeliveryTime} days</h3>
             </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800" data-testid="card-avg-delivery">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Avg Delivery</p>
-                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">{stats.avgDeliveryTime} days</h3>
-              </div>
-              <Truck className="h-12 w-12 text-orange-600" />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Orders Tabs */}
-      <Tabs defaultValue="all" className="space-y-4">
-        <TabsList className="bg-gray-100 dark:bg-salis-gray-dark">
-          <TabsTrigger value="all" data-testid="tab-all">All Orders</TabsTrigger>
-          <TabsTrigger value="active" data-testid="tab-active">Active</TabsTrigger>
-          <TabsTrigger value="delivered" data-testid="tab-delivered">Delivered</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="all">
-          <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
-            <CardHeader>
-              <CardTitle>All Orders</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {mockOrders.map((order) => (
-                  <div
-                    key={order.id}
-                    className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-800 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors"
-                    data-testid={`order-${order.id}`}
-                  >
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <h3 className="font-semibold text-gray-900 dark:text-white">{order.partName}</h3>
-                        {getMarketplaceBadge(order.marketplace)}
-                        {getStatusBadge(order.orderStatus)}
-                      </div>
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm text-gray-600 dark:text-gray-400">
-                        <div>
-                          <span className="font-medium">PN:</span> {order.partNumber}
-                        </div>
-                        <div>
-                          <span className="font-medium">Quantity:</span> {order.quantity}
-                        </div>
-                        <div>
-                          <span className="font-medium">Seller:</span> {order.sellerName} ({order.sellerRating}★)
-                        </div>
-                        <div>
-                          <span className="font-medium">Total:</span> ${order.totalPrice}
-                        </div>
-                      </div>
-                      {order.trackingNumber && (
-                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
-                          Tracking: <code className="bg-gray-200 dark:bg-gray-800 px-1 rounded">{order.trackingNumber}</code>
-                        </p>
-                      )}
-                      {order.estimatedDelivery && order.orderStatus !== "delivered" && (
-                        <p className="text-sm text-blue-600 mt-1">
-                          Est. Delivery: {new Date(order.estimatedDelivery).toLocaleDateString()}
-                        </p>
-                      )}
-                      {order.actualDelivery && (
-                        <p className="text-sm text-green-600 mt-1">
-                          Delivered: {new Date(order.actualDelivery).toLocaleString()}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="active">
-          <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
-            <CardHeader>
-              <CardTitle>Active Orders</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {mockOrders.filter(o => o.orderStatus !== "delivered" && o.orderStatus !== "cancelled").map((order) => (
-                  <div key={order.id} className="p-4 border border-gray-200 dark:border-gray-800 rounded-lg" data-testid={`active-order-${order.id}`}>
-                    <h3 className="font-semibold text-gray-900 dark:text-white mb-2">{order.partName}</h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      Tracking: {order.trackingNumber} | Est. Delivery: {order.estimatedDelivery ? new Date(order.estimatedDelivery).toLocaleDateString() : "TBD"}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="delivered">
-          <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
-            <CardHeader>
-              <CardTitle>Delivered Orders</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {mockOrders.filter(o => o.orderStatus === "delivered").map((order) => (
-                  <div key={order.id} className="p-4 border border-gray-200 dark:border-gray-800 rounded-lg" data-testid={`delivered-order-${order.id}`}>
-                    <h3 className="font-semibold text-gray-900 dark:text-white mb-2">{order.partName}</h3>
-                    <p className="text-sm text-green-600">
-                      Delivered on {order.actualDelivery ? new Date(order.actualDelivery).toLocaleDateString() : "Unknown"}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+            <Truck className="h-12 w-12 text-orange-600" />
+          </div>
+        </CardContent>
+      </Card>
     </div>
+  );
+
+  const renderOrders = (filterFn?: (order: typeof mockOrders[0]) => boolean) => {
+    const filtered = filterFn ? mockOrders.filter(filterFn) : mockOrders;
+    return (
+      <div className="space-y-3">
+        {filtered.map((order) => (
+          <div
+            key={order.id}
+            className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-800 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors"
+            data-testid={`order-${order.id}`}
+          >
+            <div className="flex-1">
+              <div className="flex items-center gap-3 mb-2">
+                <h3 className="font-semibold text-gray-900 dark:text-white">{order.partName}</h3>
+                {getMarketplaceBadge(order.marketplace)}
+                {getStatusBadge(order.orderStatus)}
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm text-gray-600 dark:text-gray-400">
+                <div><span className="font-medium">PN:</span> {order.partNumber}</div>
+                <div><span className="font-medium">Quantity:</span> {order.quantity}</div>
+                <div><span className="font-medium">Seller:</span> {order.sellerName} ({order.sellerRating}★)</div>
+                <div><span className="font-medium">Total:</span> ${order.totalPrice}</div>
+              </div>
+              {order.trackingNumber && (
+                <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+                  Tracking: <code className="bg-gray-200 dark:bg-gray-800 px-1 rounded">{order.trackingNumber}</code>
+                </p>
+              )}
+              {order.estimatedDelivery && order.orderStatus !== "delivered" && (
+                <p className="text-sm text-blue-600 mt-1">
+                  Est. Delivery: {new Date(order.estimatedDelivery).toLocaleDateString()}
+                </p>
+              )}
+              {order.actualDelivery && (
+                <p className="text-sm text-green-600 mt-1">
+                  Delivered: {new Date(order.actualDelivery).toLocaleString()}
+                </p>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  const tabs: TabConfig[] = [
+    {
+      id: "all",
+      label: "All Orders",
+      icon: Package,
+      content: (
+        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+          <CardHeader><CardTitle>All Orders</CardTitle></CardHeader>
+          <CardContent>{renderOrders()}</CardContent>
+        </Card>
+      ),
+    },
+    {
+      id: "active",
+      label: "Active",
+      icon: Truck,
+      content: (
+        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+          <CardHeader><CardTitle>Active Orders</CardTitle></CardHeader>
+          <CardContent>
+            {renderOrders((o) => o.orderStatus !== "delivered" && o.orderStatus !== "cancelled")}
+          </CardContent>
+        </Card>
+      ),
+    },
+    {
+      id: "delivered",
+      label: "Delivered",
+      icon: Package,
+      content: (
+        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+          <CardHeader><CardTitle>Delivered Orders</CardTitle></CardHeader>
+          <CardContent>
+            {renderOrders((o) => o.orderStatus === "delivered")}
+          </CardContent>
+        </Card>
+      ),
+    },
+  ];
+
+  return (
+    <TabsPageLayout
+      title="Parts Marketplace"
+      description="Order parts from eBay Motors, Amazon, and RockAuto"
+      icon={ShoppingCart}
+      primaryAction={{
+        label: "Place Order",
+        icon: Plus,
+        onClick: () => setIsOrderDialogOpen(true),
+        testId: "button-place-order",
+      }}
+      headerContent={statsContent}
+      tabs={tabs}
+      defaultTab="all"
+    >
+      <Dialog open={isOrderDialogOpen} onOpenChange={setIsOrderDialogOpen}>
+        <DialogContent className="sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Search & Order Parts</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="flex gap-2">
+              <Input
+                placeholder="Search by part number or name..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="flex-1"
+                data-testid="input-search-parts"
+              />
+              <Button data-testid="button-search">
+                <Search className="h-4 w-4" />
+              </Button>
+            </div>
+            <div className="space-y-2 max-h-96 overflow-y-auto">
+              {marketplaceSearch.map((result, index) => (
+                <div
+                  key={index}
+                  className="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-800 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-900"
+                  data-testid={`search-result-${index}`}
+                >
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h4 className="font-semibold text-gray-900 dark:text-white">{result.partName}</h4>
+                      {getMarketplaceBadge(result.marketplace)}
+                    </div>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">PN: {result.partNumber}</p>
+                    <div className="flex items-center gap-3 mt-1 text-sm">
+                      <span className="text-gray-600 dark:text-gray-400">{result.sellerName}</span>
+                      <span className="flex items-center gap-1 text-yellow-600">
+                        <Star className="h-3 w-3 fill-current" /> {result.sellerRating}
+                      </span>
+                      {result.inStock && (
+                        <Badge variant="secondary" className="text-xs">In Stock</Badge>
+                      )}
+                    </div>
+                  </div>
+                  <div className="text-right ml-4">
+                    <p className="text-lg font-bold text-gray-900 dark:text-white">${result.price}</p>
+                    <Button size="sm" className="mt-2" onClick={() => {
+                      createOrder.mutate({
+                        marketplace: result.marketplace,
+                        partNumber: result.partNumber,
+                        partName: result.partName,
+                        quantity: 1,
+                        unitPrice: result.price
+                      });
+                    }} data-testid={`button-order-${index}`}>
+                      <ShoppingCart className="h-3 w-3 mr-1" />
+                      Order
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </TabsPageLayout>
   );
 }

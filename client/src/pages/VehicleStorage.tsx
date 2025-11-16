@@ -8,14 +8,14 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Warehouse, Car, MapPin, Calendar } from "lucide-react";
+import { Warehouse, Car, MapPin } from "lucide-react";
+import { TabsPageLayout } from "@/components/layouts/TabsPageLayout";
 
 const facilitySchema = z.object({
   facilityName: z.string().min(1, "Facility name is required"),
@@ -113,159 +113,157 @@ export default function VehicleStorage() {
     }
   });
 
-  return (
-    <div className="container mx-auto py-6 space-y-6 bg-white dark:bg-[#010101] min-h-screen">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-montserrat font-semibold text-salis-black dark:text-white" data-testid="heading-storage">
-            Vehicle Storage Management
-          </h1>
-          <p className="text-salis-gray dark:text-salis-gray-light font-poppins mt-1" data-testid="text-subtitle">
-            Manage storage facilities and vehicle assignments
-          </p>
-        </div>
+  const facilitiesTabContent = (
+    <Card className="border-salis-gray-light dark:border-salis-gray-dark bg-white dark:bg-[#010101]">
+      <CardHeader>
+        <CardTitle className="font-montserrat text-salis-black dark:text-white">Storage Facilities</CardTitle>
+        <CardDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
+          Manage storage facilities and capacity
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        {facilitiesLoading ? (
+          <p className="text-salis-gray font-poppins" data-testid="text-loading">Loading facilities...</p>
+        ) : facilities.length === 0 ? (
+          <p className="text-salis-gray font-poppins" data-testid="text-no-facilities">No storage facilities found</p>
+        ) : (
+          <div className="grid gap-4">
+            {facilities.map((facility: any) => (
+              <Card key={facility.id} className="border-salis-gray-light dark:border-salis-gray-dark" data-testid={`card-facility-${facility.id}`}>
+                <CardContent className="p-6">
+                  <div className="flex justify-between items-start">
+                    <div className="flex-1">
+                      <h3 className="text-lg font-montserrat font-medium text-salis-black dark:text-white mb-2" data-testid={`text-facility-name-${facility.id}`}>
+                        {facility.facilityName}
+                      </h3>
+                      <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <p className="text-salis-gray dark:text-salis-gray-light font-poppins flex items-center gap-2">
+                            <MapPin className="h-4 w-4" />
+                            {facility.address}
+                          </p>
+                          <p className="text-salis-gray dark:text-salis-gray-light font-poppins mt-1" data-testid={`text-contact-${facility.id}`}>
+                            Contact: {facility.contactPerson || "N/A"}
+                          </p>
+                          {facility.phone && (
+                            <p className="text-salis-gray dark:text-salis-gray-light font-poppins" data-testid={`text-phone-${facility.id}`}>
+                              Phone: {facility.phone}
+                            </p>
+                          )}
+                        </div>
+                        <div>
+                          <p className="text-salis-gray dark:text-salis-gray-light font-poppins">Capacity</p>
+                          <p className="text-lg font-semibold text-salis-black dark:text-white" data-testid={`text-capacity-${facility.id}`}>
+                            {facility.availableSpaces} / {facility.totalSpaces} available
+                          </p>
+                          <p className="text-sm text-salis-gray dark:text-salis-gray-light font-poppins mt-1" data-testid={`text-rate-${facility.id}`}>
+                            ${facility.monthlyRate.toFixed(2)}/month
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+
+  const assignmentsTabContent = (
+    <>
+      <div className="flex justify-end mb-4">
         <Button
-          onClick={() => setIsFacilityDialogOpen(true)}
+          onClick={() => setIsAssignmentDialogOpen(true)}
           className="bg-salis-black hover:bg-salis-gray-dark text-white font-poppins"
-          data-testid="button-create-facility"
+          data-testid="button-create-assignment"
         >
-          <Warehouse className="mr-2 h-4 w-4" />
-          Add Facility
+          <Car className="mr-2 h-4 w-4" />
+          Assign Vehicle
         </Button>
       </div>
+      <Card className="border-salis-gray-light dark:border-salis-gray-dark bg-white dark:bg-[#010101]">
+        <CardHeader>
+          <CardTitle className="font-montserrat text-salis-black dark:text-white">Vehicle Assignments</CardTitle>
+          <CardDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
+            Active and past vehicle storage assignments
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {assignmentsLoading ? (
+            <p className="text-salis-gray font-poppins" data-testid="text-loading-assignments">Loading assignments...</p>
+          ) : assignments.length === 0 ? (
+            <p className="text-salis-gray font-poppins" data-testid="text-no-assignments">No vehicle assignments found</p>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Space Number</TableHead>
+                  <TableHead>Vehicle</TableHead>
+                  <TableHead>Start Date</TableHead>
+                  <TableHead>End Date</TableHead>
+                  <TableHead>Monthly Rate</TableHead>
+                  <TableHead>Status</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {assignments.map((assignment: any) => (
+                  <TableRow key={assignment.id} data-testid={`row-assignment-${assignment.id}`}>
+                    <TableCell className="font-medium" data-testid={`text-space-${assignment.id}`}>{assignment.spaceNumber}</TableCell>
+                    <TableCell data-testid={`text-vehicle-${assignment.id}`}>{assignment.vehicleId || "N/A"}</TableCell>
+                    <TableCell data-testid={`text-start-${assignment.id}`}>
+                      {new Date(assignment.startDate).toLocaleDateString()}
+                    </TableCell>
+                    <TableCell data-testid={`text-end-${assignment.id}`}>
+                      {assignment.endDate ? new Date(assignment.endDate).toLocaleDateString() : "Ongoing"}
+                    </TableCell>
+                    <TableCell data-testid={`text-monthly-rate-${assignment.id}`}>${assignment.monthlyRate.toFixed(2)}</TableCell>
+                    <TableCell>
+                      <Badge className={assignment.status === "active" ? "bg-green-500 text-white" : "bg-salis-gray text-white"} data-testid={`badge-status-${assignment.id}`}>
+                        {assignment.status}
+                      </Badge>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
+    </>
+  );
 
-      <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full">
-        <TabsList className="bg-salis-gray-light dark:bg-salis-gray-dark" data-testid="tabs-storage">
-          <TabsTrigger value="facilities" className="font-poppins" data-testid="tab-facilities">
-            <Warehouse className="mr-2 h-4 w-4" />
-            Facilities
-          </TabsTrigger>
-          <TabsTrigger value="assignments" className="font-poppins" data-testid="tab-assignments">
-            <Car className="mr-2 h-4 w-4" />
-            Assignments
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="facilities" className="space-y-4">
-          <Card className="border-salis-gray-light dark:border-salis-gray-dark bg-white dark:bg-[#010101]">
-            <CardHeader>
-              <CardTitle className="font-montserrat text-salis-black dark:text-white">Storage Facilities</CardTitle>
-              <CardDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
-                Manage storage facilities and capacity
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {facilitiesLoading ? (
-                <p className="text-salis-gray font-poppins" data-testid="text-loading">Loading facilities...</p>
-              ) : facilities.length === 0 ? (
-                <p className="text-salis-gray font-poppins" data-testid="text-no-facilities">No storage facilities found</p>
-              ) : (
-                <div className="grid gap-4">
-                  {facilities.map((facility: any) => (
-                    <Card key={facility.id} className="border-salis-gray-light dark:border-salis-gray-dark" data-testid={`card-facility-${facility.id}`}>
-                      <CardContent className="p-6">
-                        <div className="flex justify-between items-start">
-                          <div className="flex-1">
-                            <h3 className="text-lg font-montserrat font-medium text-salis-black dark:text-white mb-2" data-testid={`text-facility-name-${facility.id}`}>
-                              {facility.facilityName}
-                            </h3>
-                            <div className="grid grid-cols-2 gap-4 text-sm">
-                              <div>
-                                <p className="text-salis-gray dark:text-salis-gray-light font-poppins flex items-center gap-2">
-                                  <MapPin className="h-4 w-4" />
-                                  {facility.address}
-                                </p>
-                                <p className="text-salis-gray dark:text-salis-gray-light font-poppins mt-1" data-testid={`text-contact-${facility.id}`}>
-                                  Contact: {facility.contactPerson || "N/A"}
-                                </p>
-                                {facility.phone && (
-                                  <p className="text-salis-gray dark:text-salis-gray-light font-poppins" data-testid={`text-phone-${facility.id}`}>
-                                    Phone: {facility.phone}
-                                  </p>
-                                )}
-                              </div>
-                              <div>
-                                <p className="text-salis-gray dark:text-salis-gray-light font-poppins">Capacity</p>
-                                <p className="text-lg font-semibold text-salis-black dark:text-white" data-testid={`text-capacity-${facility.id}`}>
-                                  {facility.availableSpaces} / {facility.totalSpaces} available
-                                </p>
-                                <p className="text-sm text-salis-gray dark:text-salis-gray-light font-poppins mt-1" data-testid={`text-rate-${facility.id}`}>
-                                  ${facility.monthlyRate.toFixed(2)}/month
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="assignments" className="space-y-4">
-          <div className="flex justify-end mb-4">
-            <Button
-              onClick={() => setIsAssignmentDialogOpen(true)}
-              className="bg-salis-black hover:bg-salis-gray-dark text-white font-poppins"
-              data-testid="button-create-assignment"
-            >
-              <Car className="mr-2 h-4 w-4" />
-              Assign Vehicle
-            </Button>
-          </div>
-          <Card className="border-salis-gray-light dark:border-salis-gray-dark bg-white dark:bg-[#010101]">
-            <CardHeader>
-              <CardTitle className="font-montserrat text-salis-black dark:text-white">Vehicle Assignments</CardTitle>
-              <CardDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
-                Active and past vehicle storage assignments
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {assignmentsLoading ? (
-                <p className="text-salis-gray font-poppins" data-testid="text-loading-assignments">Loading assignments...</p>
-              ) : assignments.length === 0 ? (
-                <p className="text-salis-gray font-poppins" data-testid="text-no-assignments">No vehicle assignments found</p>
-              ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Space Number</TableHead>
-                      <TableHead>Vehicle</TableHead>
-                      <TableHead>Start Date</TableHead>
-                      <TableHead>End Date</TableHead>
-                      <TableHead>Monthly Rate</TableHead>
-                      <TableHead>Status</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {assignments.map((assignment: any) => (
-                      <TableRow key={assignment.id} data-testid={`row-assignment-${assignment.id}`}>
-                        <TableCell className="font-medium" data-testid={`text-space-${assignment.id}`}>{assignment.spaceNumber}</TableCell>
-                        <TableCell data-testid={`text-vehicle-${assignment.id}`}>{assignment.vehicleId || "N/A"}</TableCell>
-                        <TableCell data-testid={`text-start-${assignment.id}`}>
-                          {new Date(assignment.startDate).toLocaleDateString()}
-                        </TableCell>
-                        <TableCell data-testid={`text-end-${assignment.id}`}>
-                          {assignment.endDate ? new Date(assignment.endDate).toLocaleDateString() : "Ongoing"}
-                        </TableCell>
-                        <TableCell data-testid={`text-monthly-rate-${assignment.id}`}>${assignment.monthlyRate.toFixed(2)}</TableCell>
-                        <TableCell>
-                          <Badge className={assignment.status === "active" ? "bg-green-500 text-white" : "bg-salis-gray text-white"} data-testid={`badge-status-${assignment.id}`}>
-                            {assignment.status}
-                          </Badge>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+  return (
+    <>
+      <TabsPageLayout
+        title="Vehicle Storage Management"
+        description="Manage storage facilities and vehicle assignments"
+        icon={Warehouse}
+        primaryAction={{
+          label: "Add Facility",
+          icon: Warehouse,
+          onClick: () => setIsFacilityDialogOpen(true),
+          testId: "button-create-facility"
+        }}
+        tabs={[
+          {
+            id: "facilities",
+            label: "Facilities",
+            icon: Warehouse,
+            content: facilitiesTabContent
+          },
+          {
+            id: "assignments",
+            label: "Assignments",
+            icon: Car,
+            content: assignmentsTabContent
+          }
+        ]}
+        activeTab={selectedTab}
+        onTabChange={setSelectedTab}
+      />
 
       <Dialog open={isFacilityDialogOpen} onOpenChange={setIsFacilityDialogOpen}>
         <DialogContent className="bg-white dark:bg-salis-black">
@@ -520,13 +518,13 @@ export default function VehicleStorage() {
               />
               <DialogFooter>
                 <Button type="submit" disabled={createAssignmentMutation.isPending} data-testid="button-submit-assignment">
-                  {createAssignmentMutation.isPending ? "Creating..." : "Create Assignment"}
+                  {createAssignmentMutation.isPending ? "Assigning..." : "Assign Vehicle"}
                 </Button>
               </DialogFooter>
             </form>
           </Form>
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 }

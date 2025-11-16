@@ -7,13 +7,13 @@ import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { TabsPageLayout, TabConfig } from "@/components/layouts/TabsPageLayout";
 import { DollarSign, Calendar, Users, PlayCircle } from "lucide-react";
 
 const employeeSchema = z.object({
@@ -149,17 +149,9 @@ export default function PayrollManagement() {
     }
   });
 
-  return (
-    <div className="container mx-auto py-6 space-y-6 bg-white dark:bg-[#010101] min-h-screen">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-montserrat font-semibold text-salis-black dark:text-white" data-testid="heading-payroll">
-            Payroll Management
-          </h1>
-          <p className="text-salis-gray dark:text-salis-gray-light font-poppins mt-1" data-testid="text-subtitle">
-            Manage employee payroll, pay periods, and payroll runs
-          </p>
-        </div>
+  const employeesTabContent = (
+    <>
+      <div className="flex justify-end mb-4">
         <Button
           onClick={() => setIsEmployeeDialogOpen(true)}
           className="bg-salis-black hover:bg-salis-gray-dark text-white font-poppins"
@@ -169,184 +161,199 @@ export default function PayrollManagement() {
           Add Employee
         </Button>
       </div>
+      <Card className="border-salis-gray-light dark:border-salis-gray-dark bg-white dark:bg-[#010101]">
+        <CardHeader>
+          <CardTitle className="font-montserrat text-salis-black dark:text-white">Payroll Employees</CardTitle>
+          <CardDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
+            Manage employee payroll information
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {employeesLoading ? (
+            <p className="text-salis-gray font-poppins" data-testid="text-loading">Loading employees...</p>
+          ) : employees.length === 0 ? (
+            <p className="text-salis-gray font-poppins" data-testid="text-no-employees">No employees found</p>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Employee #</TableHead>
+                  <TableHead>Pay Type</TableHead>
+                  <TableHead>Base Rate</TableHead>
+                  <TableHead>Frequency</TableHead>
+                  <TableHead>Status</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {employees.map((emp: any) => (
+                  <TableRow key={emp.id} data-testid={`row-employee-${emp.id}`}>
+                    <TableCell className="font-medium" data-testid={`text-empnum-${emp.id}`}>{emp.employeeNumber}</TableCell>
+                    <TableCell data-testid={`text-paytype-${emp.id}`}>{emp.payType}</TableCell>
+                    <TableCell data-testid={`text-rate-${emp.id}`}>${emp.baseRate.toFixed(2)}</TableCell>
+                    <TableCell data-testid={`text-frequency-${emp.id}`}>{emp.payFrequency}</TableCell>
+                    <TableCell>
+                      <Badge className={emp.isActive ? "bg-salis-black text-white" : "bg-salis-gray-light text-salis-black"} data-testid={`badge-status-${emp.id}`}>
+                        {emp.isActive ? "Active" : "Inactive"}
+                      </Badge>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
+    </>
+  );
 
-      <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full">
-        <TabsList className="bg-salis-gray-light dark:bg-salis-gray-dark" data-testid="tabs-payroll">
-          <TabsTrigger value="employees" className="font-poppins" data-testid="tab-employees">
-            <Users className="mr-2 h-4 w-4" />
-            Employees
-          </TabsTrigger>
-          <TabsTrigger value="periods" className="font-poppins" data-testid="tab-periods">
-            <Calendar className="mr-2 h-4 w-4" />
-            Pay Periods
-          </TabsTrigger>
-          <TabsTrigger value="runs" className="font-poppins" data-testid="tab-runs">
-            <PlayCircle className="mr-2 h-4 w-4" />
-            Payroll Runs
-          </TabsTrigger>
-        </TabsList>
+  const periodsTabContent = (
+    <>
+      <div className="flex justify-end mb-4">
+        <Button
+          onClick={() => setIsPeriodDialogOpen(true)}
+          className="bg-salis-black hover:bg-salis-gray-dark text-white font-poppins"
+          data-testid="button-create-period"
+        >
+          <Calendar className="mr-2 h-4 w-4" />
+          Create Pay Period
+        </Button>
+      </div>
+      <Card className="border-salis-gray-light dark:border-salis-gray-dark bg-white dark:bg-[#010101]">
+        <CardHeader>
+          <CardTitle className="font-montserrat text-salis-black dark:text-white">Pay Periods</CardTitle>
+          <CardDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
+            Configure pay periods and payment schedules
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {periodsLoading ? (
+            <p className="text-salis-gray font-poppins" data-testid="text-loading-periods">Loading periods...</p>
+          ) : periods.length === 0 ? (
+            <p className="text-salis-gray font-poppins" data-testid="text-no-periods">No pay periods found</p>
+          ) : (
+            <div className="grid gap-4">
+              {periods.map((period: any) => (
+                <Card
+                  key={period.id}
+                  className="border-salis-gray-light dark:border-salis-gray-dark cursor-pointer hover:border-salis-gray dark:hover:border-salis-gray transition-colors"
+                  onClick={() => setSelectedPeriod(period)}
+                  data-testid={`card-period-${period.id}`}
+                >
+                  <CardContent className="p-6">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h3 className="text-lg font-montserrat font-medium text-salis-black dark:text-white" data-testid={`text-period-name-${period.id}`}>
+                          {period.periodName}
+                        </h3>
+                        <p className="text-sm text-salis-gray dark:text-salis-gray-light font-poppins" data-testid={`text-period-dates-${period.id}`}>
+                          {new Date(period.startDate).toLocaleDateString()} - {new Date(period.endDate).toLocaleDateString()}
+                        </p>
+                        <p className="text-sm text-salis-gray dark:text-salis-gray-light font-poppins mt-1" data-testid={`text-pay-date-${period.id}`}>
+                          Pay Date: {new Date(period.payDate).toLocaleDateString()}
+                        </p>
+                      </div>
+                      <Badge className="bg-salis-black text-white" data-testid={`badge-period-status-${period.id}`}>
+                        {period.status}
+                      </Badge>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </>
+  );
 
-        {/* Employees Tab */}
-        <TabsContent value="employees" className="space-y-4">
-          <Card className="border-salis-gray-light dark:border-salis-gray-dark bg-white dark:bg-[#010101]">
-            <CardHeader>
-              <CardTitle className="font-montserrat text-salis-black dark:text-white">Payroll Employees</CardTitle>
-              <CardDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
-                Manage employee payroll information
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {employeesLoading ? (
-                <p className="text-salis-gray font-poppins" data-testid="text-loading">Loading employees...</p>
-              ) : employees.length === 0 ? (
-                <p className="text-salis-gray font-poppins" data-testid="text-no-employees">No employees found</p>
-              ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Employee #</TableHead>
-                      <TableHead>Pay Type</TableHead>
-                      <TableHead>Base Rate</TableHead>
-                      <TableHead>Frequency</TableHead>
-                      <TableHead>Status</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {employees.map((emp: any) => (
-                      <TableRow key={emp.id} data-testid={`row-employee-${emp.id}`}>
-                        <TableCell className="font-medium" data-testid={`text-empnum-${emp.id}`}>{emp.employeeNumber}</TableCell>
-                        <TableCell data-testid={`text-paytype-${emp.id}`}>{emp.payType}</TableCell>
-                        <TableCell data-testid={`text-rate-${emp.id}`}>${emp.baseRate.toFixed(2)}</TableCell>
-                        <TableCell data-testid={`text-frequency-${emp.id}`}>{emp.payFrequency}</TableCell>
-                        <TableCell>
-                          <Badge className={emp.isActive ? "bg-salis-black text-white" : "bg-salis-gray-light text-salis-black"} data-testid={`badge-status-${emp.id}`}>
-                            {emp.isActive ? "Active" : "Inactive"}
-                          </Badge>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
+  const runsTabContent = (
+    <>
+      <div className="flex justify-between items-center mb-4">
+        <p className="text-sm text-salis-gray dark:text-salis-gray-light font-poppins" data-testid="text-selected-period">
+          {selectedPeriod ? `Period: ${selectedPeriod.periodName}` : "Select a pay period to view runs"}
+        </p>
+        <Button
+          onClick={() => setIsRunDialogOpen(true)}
+          disabled={!selectedPeriod}
+          className="bg-salis-black hover:bg-salis-gray-dark text-white font-poppins"
+          data-testid="button-create-run"
+        >
+          <PlayCircle className="mr-2 h-4 w-4" />
+          Create Run
+        </Button>
+      </div>
+      <Card className="border-salis-gray-light dark:border-salis-gray-dark bg-white dark:bg-[#010101]">
+        <CardHeader>
+          <CardTitle className="font-montserrat text-salis-black dark:text-white">Payroll Runs</CardTitle>
+          <CardDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
+            Individual payroll runs for employees
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {!selectedPeriod ? (
+            <p className="text-salis-gray font-poppins" data-testid="text-select-period">Select a pay period from the Pay Periods tab</p>
+          ) : runs.length === 0 ? (
+            <p className="text-salis-gray font-poppins" data-testid="text-no-runs">No payroll runs found</p>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Employee</TableHead>
+                  <TableHead>Hours</TableHead>
+                  <TableHead>Gross Pay</TableHead>
+                  <TableHead>Deductions</TableHead>
+                  <TableHead>Net Pay</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {runs.map((run: any) => (
+                  <TableRow key={run.id} data-testid={`row-run-${run.id}`}>
+                    <TableCell className="font-medium" data-testid={`text-employee-${run.id}`}>{run.employeeId}</TableCell>
+                    <TableCell data-testid={`text-hours-${run.id}`}>{run.hoursWorked || "N/A"}</TableCell>
+                    <TableCell data-testid={`text-gross-${run.id}`}>${run.grossPay.toFixed(2)}</TableCell>
+                    <TableCell data-testid={`text-deductions-${run.id}`}>${run.deductions.toFixed(2)}</TableCell>
+                    <TableCell className="font-semibold" data-testid={`text-net-${run.id}`}>${run.netPay.toFixed(2)}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
+    </>
+  );
 
-        {/* Pay Periods Tab */}
-        <TabsContent value="periods" className="space-y-4">
-          <div className="flex justify-end mb-4">
-            <Button
-              onClick={() => setIsPeriodDialogOpen(true)}
-              className="bg-salis-black hover:bg-salis-gray-dark text-white font-poppins"
-              data-testid="button-create-period"
-            >
-              <Calendar className="mr-2 h-4 w-4" />
-              Create Pay Period
-            </Button>
-          </div>
-          <Card className="border-salis-gray-light dark:border-salis-gray-dark bg-white dark:bg-[#010101]">
-            <CardHeader>
-              <CardTitle className="font-montserrat text-salis-black dark:text-white">Pay Periods</CardTitle>
-              <CardDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
-                Configure pay periods and payment schedules
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {periodsLoading ? (
-                <p className="text-salis-gray font-poppins" data-testid="text-loading-periods">Loading periods...</p>
-              ) : periods.length === 0 ? (
-                <p className="text-salis-gray font-poppins" data-testid="text-no-periods">No pay periods found</p>
-              ) : (
-                <div className="grid gap-4">
-                  {periods.map((period: any) => (
-                    <Card
-                      key={period.id}
-                      className="border-salis-gray-light dark:border-salis-gray-dark cursor-pointer hover:border-salis-gray dark:hover:border-salis-gray transition-colors"
-                      onClick={() => setSelectedPeriod(period)}
-                      data-testid={`card-period-${period.id}`}
-                    >
-                      <CardContent className="p-6">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <h3 className="text-lg font-montserrat font-medium text-salis-black dark:text-white" data-testid={`text-period-name-${period.id}`}>
-                              {period.periodName}
-                            </h3>
-                            <p className="text-sm text-salis-gray dark:text-salis-gray-light font-poppins" data-testid={`text-period-dates-${period.id}`}>
-                              {new Date(period.startDate).toLocaleDateString()} - {new Date(period.endDate).toLocaleDateString()}
-                            </p>
-                            <p className="text-sm text-salis-gray dark:text-salis-gray-light font-poppins mt-1" data-testid={`text-pay-date-${period.id}`}>
-                              Pay Date: {new Date(period.payDate).toLocaleDateString()}
-                            </p>
-                          </div>
-                          <Badge className="bg-salis-black text-white" data-testid={`badge-period-status-${period.id}`}>
-                            {period.status}
-                          </Badge>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
+  const tabs: TabConfig[] = [
+    {
+      id: "employees",
+      label: "Employees",
+      icon: Users,
+      content: employeesTabContent,
+    },
+    {
+      id: "periods",
+      label: "Pay Periods",
+      icon: Calendar,
+      content: periodsTabContent,
+    },
+    {
+      id: "runs",
+      label: "Payroll Runs",
+      icon: PlayCircle,
+      content: runsTabContent,
+    },
+  ];
 
-        {/* Payroll Runs Tab */}
-        <TabsContent value="runs" className="space-y-4">
-          <div className="flex justify-between items-center mb-4">
-            <p className="text-sm text-salis-gray dark:text-salis-gray-light font-poppins" data-testid="text-selected-period">
-              {selectedPeriod ? `Period: ${selectedPeriod.periodName}` : "Select a pay period to view runs"}
-            </p>
-            <Button
-              onClick={() => setIsRunDialogOpen(true)}
-              disabled={!selectedPeriod}
-              className="bg-salis-black hover:bg-salis-gray-dark text-white font-poppins"
-              data-testid="button-create-run"
-            >
-              <PlayCircle className="mr-2 h-4 w-4" />
-              Create Run
-            </Button>
-          </div>
-          <Card className="border-salis-gray-light dark:border-salis-gray-dark bg-white dark:bg-[#010101]">
-            <CardHeader>
-              <CardTitle className="font-montserrat text-salis-black dark:text-white">Payroll Runs</CardTitle>
-              <CardDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
-                Individual payroll runs for employees
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {!selectedPeriod ? (
-                <p className="text-salis-gray font-poppins" data-testid="text-select-period">Select a pay period from the Pay Periods tab</p>
-              ) : runs.length === 0 ? (
-                <p className="text-salis-gray font-poppins" data-testid="text-no-runs">No payroll runs found</p>
-              ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Employee</TableHead>
-                      <TableHead>Hours</TableHead>
-                      <TableHead>Gross Pay</TableHead>
-                      <TableHead>Deductions</TableHead>
-                      <TableHead>Net Pay</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {runs.map((run: any) => (
-                      <TableRow key={run.id} data-testid={`row-run-${run.id}`}>
-                        <TableCell className="font-medium" data-testid={`text-employee-${run.id}`}>{run.employeeId}</TableCell>
-                        <TableCell data-testid={`text-hours-${run.id}`}>{run.hoursWorked || "N/A"}</TableCell>
-                        <TableCell data-testid={`text-gross-${run.id}`}>${run.grossPay.toFixed(2)}</TableCell>
-                        <TableCell data-testid={`text-deductions-${run.id}`}>${run.deductions.toFixed(2)}</TableCell>
-                        <TableCell className="font-semibold" data-testid={`text-net-${run.id}`}>${run.netPay.toFixed(2)}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+  return (
+    <>
+      <TabsPageLayout
+        title="Payroll Management"
+        description="Manage employee payroll, pay periods, and payroll runs"
+        icon={DollarSign}
+        tabs={tabs}
+        activeTab={selectedTab}
+        onTabChange={setSelectedTab}
+      />
 
       {/* Add Employee Dialog */}
       <Dialog open={isEmployeeDialogOpen} onOpenChange={setIsEmployeeDialogOpen}>
@@ -653,6 +660,6 @@ export default function PayrollManagement() {
           </Form>
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 }

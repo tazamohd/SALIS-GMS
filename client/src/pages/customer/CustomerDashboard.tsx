@@ -5,6 +5,7 @@ import { Calendar, FileText, Car, Clock, DollarSign, AlertCircle } from "lucide-
 import { Link } from "wouter";
 import { format } from "date-fns";
 import type { Appointment, Invoice, Vehicle } from "@shared/schema";
+import { DashboardPage } from "@/components/layouts";
 
 export function CustomerDashboard() {
   const { data: appointments = [], isLoading: loadingAppointments } = useQuery<Appointment[]>({
@@ -19,7 +20,6 @@ export function CustomerDashboard() {
     queryKey: ['/api/customer/vehicles'],
   });
 
-  // Get upcoming appointments (next 7 days)
   const upcomingAppointments = appointments.filter(apt => {
     const aptDate = new Date(apt.appointmentDate);
     const today = new Date();
@@ -27,7 +27,6 @@ export function CustomerDashboard() {
     return aptDate >= today && aptDate <= nextWeek && apt.status !== 'cancelled';
   }).slice(0, 3);
 
-  // Get unpaid invoices
   const unpaidInvoices = invoices.filter(inv => 
     inv.status !== 'paid' && inv.status !== 'cancelled'
   ).slice(0, 3);
@@ -36,63 +35,31 @@ export function CustomerDashboard() {
     sum + Number(inv.balanceAmount || 0), 0
   );
 
+  const metrics = [
+    {
+      label: "Total Vehicles",
+      value: loadingVehicles ? '...' : vehicles.filter(v => v.isActive).length,
+      icon: Car,
+    },
+    {
+      label: "Upcoming Appointments",
+      value: loadingAppointments ? '...' : upcomingAppointments.length,
+      icon: Clock,
+    },
+    {
+      label: "Unpaid Balance",
+      value: loadingInvoices ? '...' : `$${totalUnpaid.toFixed(2)}`,
+      icon: DollarSign,
+    },
+  ];
+
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white" data-testid="text-page-title">
-          Dashboard
-        </h1>
-        <p className="text-gray-600 dark:text-gray-400 mt-2">
-          Welcome back! Here's an overview of your account.
-        </p>
-      </div>
-
-      {/* Quick Stats */}
-      <div className="grid gap-6 md:grid-cols-3">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
-              Total Vehicles
-            </CardTitle>
-            <Car className="h-4 w-4 text-gray-400" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold" data-testid="text-vehicle-count">
-              {loadingVehicles ? '...' : vehicles.filter(v => v.isActive).length}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
-              Upcoming Appointments
-            </CardTitle>
-            <Clock className="h-4 w-4 text-gray-400" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold" data-testid="text-upcoming-appointments">
-              {loadingAppointments ? '...' : upcomingAppointments.length}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
-              Unpaid Balance
-            </CardTitle>
-            <DollarSign className="h-4 w-4 text-gray-400" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold" data-testid="text-unpaid-balance">
-              {loadingInvoices ? '...' : `$${totalUnpaid.toFixed(2)}`}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Upcoming Appointments */}
+    <DashboardPage
+      title="Dashboard"
+      description="Welcome back! Here's an overview of your account."
+      metrics={metrics}
+      metricsClassName="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+    >
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
@@ -149,7 +116,6 @@ export function CustomerDashboard() {
         </CardContent>
       </Card>
 
-      {/* Unpaid Invoices */}
       {unpaidInvoices.length > 0 && (
         <Card>
           <CardHeader>
@@ -198,7 +164,6 @@ export function CustomerDashboard() {
         </Card>
       )}
 
-      {/* My Vehicles */}
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
@@ -242,6 +207,6 @@ export function CustomerDashboard() {
           )}
         </CardContent>
       </Card>
-    </div>
+    </DashboardPage>
   );
 }

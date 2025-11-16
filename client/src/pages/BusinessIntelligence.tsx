@@ -26,6 +26,7 @@ import {
   ResponsiveContainer,
   Cell,
 } from "recharts";
+import { DashboardPage } from "@/components/layouts/DashboardPage";
 
 const COLORS = ['#1a1a1a', '#404040', '#5a5a5a', '#737373', '#8c8c8c', '#a6a6a6'];
 
@@ -34,7 +35,6 @@ export default function BusinessIntelligence() {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 
-  // Get garages
   const { data: garages } = useQuery<any[]>({
     queryKey: ['/api/garages'],
   });
@@ -45,7 +45,6 @@ export default function BusinessIntelligence() {
     }
   }, [garages, garageId]);
 
-  // Set default date range (last 30 days)
   useEffect(() => {
     const end = new Date();
     const start = new Date();
@@ -54,7 +53,6 @@ export default function BusinessIntelligence() {
     setEndDate(end.toISOString().split('T')[0]);
   }, []);
 
-  // BI Analytics Queries
   const { data: profitableServices } = useQuery({
     queryKey: ['/api/bi/profitable-services', { garageId, startDate, endDate }],
     enabled: !!garageId && !!startDate && !!endDate,
@@ -88,19 +86,41 @@ export default function BusinessIntelligence() {
     ? customerLifetime.customers.reduce((sum: number, c: any) => sum + c.lifetimeValue, 0) / customerLifetime.customers.length
     : 0;
 
-  return (
-    <div className="p-8 bg-gray-50 dark:bg-salis-black min-h-screen space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Business Intelligence</h1>
-          <p className="text-sm text-gray-900 dark:text-white/60 mt-1">
-            Track key metrics and insights for your garage business
-          </p>
-        </div>
-      </div>
+  const metrics = [
+    {
+      label: "Avg. Customer Lifetime Value",
+      value: `$${avgLifetimeValue.toFixed(2)}`,
+      icon: DollarSign,
+      color: "text-gray-900 dark:text-white",
+    },
+    {
+      label: "Customer Acquisition Cost",
+      value: `$${(acquisitionCost?.acquisitionCost || 0).toFixed(2)}`,
+      icon: Users,
+      color: "text-gray-900 dark:text-white",
+    },
+    {
+      label: "Peak Hour",
+      value: `${peakHours?.peakHour || 0}:00`,
+      icon: Clock,
+      color: "text-gray-900 dark:text-white",
+    },
+    {
+      label: "Peak Day",
+      value: peakHours?.peakDay || 'N/A',
+      icon: TrendingUp,
+      color: "text-gray-900 dark:text-white",
+    },
+  ];
 
-      {/* Filters */}
-      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+  return (
+    <DashboardPage
+      title="Business Intelligence"
+      description="Track key metrics and insights for your garage business"
+      icon={TrendingUp}
+      metrics={metrics}
+    >
+      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark mb-6">
         <CardHeader>
           <CardTitle className="text-gray-900 dark:text-white">Filters</CardTitle>
           <CardDescription className="text-gray-900 dark:text-white/60">Select garage and date range for analysis</CardDescription>
@@ -146,72 +166,7 @@ export default function BusinessIntelligence() {
         </CardContent>
       </Card>
 
-      {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Avg. Customer Lifetime Value</CardTitle>
-            <DollarSign className="h-4 w-4 text-gray-900 dark:text-white/60" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold" data-testid="text-avg-clv">
-              ${avgLifetimeValue.toFixed(2)}
-            </div>
-            <p className="text-xs text-gray-900 dark:text-white/60">
-              Total customers: {customerLifetime?.customers?.length || 0}
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Customer Acquisition Cost</CardTitle>
-            <Users className="h-4 w-4 text-gray-900 dark:text-white/60" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold" data-testid="text-cac">
-              ${(acquisitionCost?.acquisitionCost || 0).toFixed(2)}
-            </div>
-            <p className="text-xs text-gray-900 dark:text-white/60">
-              New customers: {acquisitionCost?.newCustomers || 0}
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Peak Hour</CardTitle>
-            <Clock className="h-4 w-4 text-gray-900 dark:text-white/60" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold" data-testid="text-peak-hour">
-              {peakHours?.peakHour || 0}:00
-            </div>
-            <p className="text-xs text-gray-900 dark:text-white/60">
-              Most busy time
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Peak Day</CardTitle>
-            <TrendingUp className="h-4 w-4 text-gray-900 dark:text-white/60" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold" data-testid="text-peak-day">
-              {peakHours?.peakDay || 'N/A'}
-            </div>
-            <p className="text-xs text-gray-900 dark:text-white/60">
-              Most busy day
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Charts Row 1 */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Most Profitable Services */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
           <CardHeader>
             <CardTitle className="text-gray-900 dark:text-white">Most Profitable Services</CardTitle>
@@ -233,7 +188,6 @@ export default function BusinessIntelligence() {
           </CardContent>
         </Card>
 
-        {/* Profit Margin by Service */}
         <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
           <CardHeader>
             <CardTitle className="text-gray-900 dark:text-white">Profit Margin by Service</CardTitle>
@@ -263,9 +217,7 @@ export default function BusinessIntelligence() {
         </Card>
       </div>
 
-      {/* Charts Row 2 */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Peak Hours Analysis */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
           <CardHeader>
             <CardTitle className="text-gray-900 dark:text-white">Hourly Distribution</CardTitle>
@@ -287,7 +239,6 @@ export default function BusinessIntelligence() {
           </CardContent>
         </Card>
 
-        {/* Daily Distribution */}
         <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
           <CardHeader>
             <CardTitle className="text-gray-900 dark:text-white">Daily Distribution</CardTitle>
@@ -310,9 +261,7 @@ export default function BusinessIntelligence() {
         </Card>
       </div>
 
-      {/* Charts Row 3 */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Technician Utilization */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
           <CardHeader>
             <CardTitle className="text-gray-900 dark:text-white">Technician Utilization Rates</CardTitle>
@@ -333,7 +282,6 @@ export default function BusinessIntelligence() {
           </CardContent>
         </Card>
 
-        {/* Customer Acquisition Sources */}
         <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
           <CardHeader>
             <CardTitle className="text-gray-900 dark:text-white">Customer Acquisition Sources</CardTitle>
@@ -363,8 +311,7 @@ export default function BusinessIntelligence() {
         </Card>
       </div>
 
-      {/* Top Customers by Lifetime Value */}
-      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark mb-6">
         <CardHeader>
           <CardTitle className="text-gray-900 dark:text-white">Top Customers by Lifetime Value</CardTitle>
           <CardDescription className="text-gray-900 dark:text-white/60">Top 5 customers ranked by total revenue</CardDescription>
@@ -402,7 +349,6 @@ export default function BusinessIntelligence() {
         </CardContent>
       </Card>
 
-      {/* Technician Performance Details */}
       <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
         <CardHeader>
           <CardTitle className="text-gray-900 dark:text-white">Technician Performance Details</CardTitle>
@@ -446,6 +392,6 @@ export default function BusinessIntelligence() {
           </div>
         </CardContent>
       </Card>
-    </div>
+    </DashboardPage>
   );
 }

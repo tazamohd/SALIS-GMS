@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { MessageCircle, Send, Bot, User, Wrench, DollarSign, Clock, CheckCircle } from "lucide-react";
+import { StandardPageLayout } from "@/components/layouts/StandardPageLayout";
 
 interface Message {
   role: "user" | "assistant";
@@ -54,7 +55,6 @@ export default function AIServiceAdvisor() {
     setInput("");
     setIsTyping(true);
 
-    // Simulate AI response
     await new Promise(resolve => setTimeout(resolve, 1500));
 
     const recommendations: Recommendation[] = [];
@@ -153,16 +153,12 @@ export default function AIServiceAdvisor() {
   };
 
   return (
-    <div className="p-6 space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">AI Service Advisor</h1>
-        <p className="text-gray-600 dark:text-gray-400 mt-2">
-          Natural language service recommendations powered by advanced AI
-        </p>
-      </div>
-
+    <StandardPageLayout
+      title="AI Service Advisor"
+      description="Natural language service recommendations powered by advanced AI"
+      icon={Bot}
+    >
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Chat Interface */}
         <Card className="lg:col-span-2 border-gray-200 dark:border-gray-800">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -278,7 +274,6 @@ export default function AIServiceAdvisor() {
           </CardContent>
         </Card>
 
-        {/* Quick Actions & Stats */}
         <div className="space-y-6">
           <Card className="border-gray-200 dark:border-gray-800">
             <CardHeader>
@@ -339,6 +334,6 @@ export default function AIServiceAdvisor() {
           </Card>
         </div>
       </div>
-    </div>
+    </StandardPageLayout>
   );
 }

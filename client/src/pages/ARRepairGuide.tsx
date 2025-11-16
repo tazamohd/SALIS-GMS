@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Eye, Layers, CheckCircle, ArrowRight, Play } from 'lucide-react';
+import { StandardPageLayout } from '@/components/layouts/StandardPageLayout';
 
 export default function ARRepairGuide() {
   const [activeStep, setActiveStep] = useState(0);
@@ -17,19 +18,12 @@ export default function ARRepairGuide() {
   ];
 
   return (
-    <div className="flex-1 p-6 bg-gray-50 dark:bg-salis-black min-h-screen">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold font-['Montserrat'] text-gray-900 dark:text-white mb-2 flex items-center gap-3">
-          <Layers className="h-8 w-8 text-indigo-600" />
-          AR Repair Guide Viewer
-        </h1>
-        <p className="text-gray-600 dark:text-gray-400 font-['Poppins']">
-          Augmented reality step-by-step repair instructions with overlay annotations
-        </p>
-      </div>
-
+    <StandardPageLayout
+      title="AR Repair Guide Viewer"
+      description="Augmented reality step-by-step repair instructions with overlay annotations"
+      icon={Layers}
+    >
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* AR Viewer */}
         <Card className="lg:col-span-2 bg-white dark:bg-salis-black">
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
@@ -48,12 +42,9 @@ export default function ARRepairGuide() {
           </CardHeader>
           <CardContent>
             <div className="relative bg-gradient-to-br from-gray-800 to-gray-900 rounded-lg h-[500px] overflow-hidden">
-              {/* Simulated AR View */}
               {isARActive ? (
                 <div className="absolute inset-0 flex items-center justify-center">
-                  {/* Camera feed simulation */}
                   <div className="relative w-full h-full bg-gradient-to-br from-gray-700 to-gray-600">
-                    {/* AR Overlay Annotations */}
                     <div className="absolute top-1/3 left-1/4 w-32 h-32 border-4 border-indigo-500 rounded-lg animate-pulse">
                       <div className="absolute -top-8 left-0 bg-indigo-600 text-white px-3 py-1 rounded text-sm font-semibold">
                         Oil Filter
@@ -65,11 +56,9 @@ export default function ARRepairGuide() {
                       </div>
                     </div>
 
-                    {/* AR Markers */}
                     <div className="absolute top-1/2 right-1/4 w-4 h-4 bg-green-500 rounded-full animate-ping" />
                     <div className="absolute bottom-1/3 left-1/2 w-4 h-4 bg-yellow-500 rounded-full animate-ping" />
 
-                    {/* Step Progress */}
                     <div className="absolute top-4 right-4 bg-black/70 text-white px-4 py-2 rounded-lg">
                       <p className="text-sm">Step {activeStep + 1} of {repairSteps.length}</p>
                     </div>
@@ -83,7 +72,6 @@ export default function ARRepairGuide() {
               )}
             </div>
 
-            {/* Step Navigation */}
             <div className="flex gap-2 mt-4">
               <Button
                 variant="outline"
@@ -107,7 +95,6 @@ export default function ARRepairGuide() {
           </CardContent>
         </Card>
 
-        {/* Repair Steps */}
         <Card className="bg-white dark:bg-salis-black">
           <CardHeader>
             <CardTitle>Repair Steps</CardTitle>
@@ -145,7 +132,6 @@ export default function ARRepairGuide() {
         </Card>
       </div>
 
-      {/* Guide Selection */}
       <Card className="mt-6 bg-white dark:bg-salis-black">
         <CardHeader>
           <CardTitle>Available AR Guides</CardTitle>
@@ -165,6 +151,6 @@ export default function ARRepairGuide() {
           </div>
         </CardContent>
       </Card>
-    </div>
+    </StandardPageLayout>
   );
 }

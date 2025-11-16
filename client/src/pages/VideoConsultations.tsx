@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { StandardTablePage, Column } from "@/components/layouts/StandardTablePage";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Video, Calendar, Clock, User, PlayCircle, Plus, Copy, Input as InputIcon } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Video, Copy, PlayCircle } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -14,7 +14,7 @@ export default function VideoConsultations() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const { toast } = useToast();
 
-  const { data: consultations = [] } = useQuery({
+  const { data: consultations = [], isLoading } = useQuery({
     queryKey: ["/api/video/consultations"],
   });
 
@@ -41,7 +41,6 @@ export default function VideoConsultations() {
     },
   });
 
-  // Mock data
   const mockConsultations = [
     {
       id: "1",
@@ -84,22 +83,20 @@ export default function VideoConsultations() {
     },
   ];
 
-  const stats = {
-    totalScheduled: 24,
-    completedThisWeek: 15,
-    averageDuration: 28,
-    attendanceRate: 92,
-  };
-
   const getStatusBadge = (status: string) => {
     const variants: Record<string, any> = {
       scheduled: "secondary",
       in_progress: "default",
       completed: "default",
       cancelled: "destructive",
-      no_show: "destructive",
     };
-    return <Badge variant={variants[status] || "secondary"}>{status.replace("_", " ")}</Badge>;
+    const statusColors: Record<string, string> = {
+      scheduled: "",
+      in_progress: "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300",
+      completed: "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300",
+      cancelled: "",
+    };
+    return <Badge variant={variants[status] || "secondary"} className={statusColors[status]}>{status.replace("_", " ")}</Badge>;
   };
 
   const copyMeetingLink = (url: string) => {
@@ -107,222 +104,160 @@ export default function VideoConsultations() {
     toast({ title: "Link copied", description: "Meeting link copied to clipboard." });
   };
 
-  return (
-    <div className="p-8 space-y-6">
-      <div className="flex items-center justify-between">
+  const columns: Column<typeof mockConsultations[0]>[] = [
+    {
+      header: "Customer",
+      accessorKey: "customerName",
+      cell: (row) => (
         <div>
-          <h1 className="text-3xl font-bold font-montserrat text-gray-900 dark:text-white">
-            📹 Video Consultations
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">
-            Schedule and conduct virtual meetings with customers
-          </p>
+          <div className="font-semibold text-gray-900 dark:text-white">{row.customerName}</div>
+          <div className="text-sm text-gray-600 dark:text-gray-400">{row.jobCardNumber}</div>
         </div>
-        <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-          <DialogTrigger asChild>
-            <Button data-testid="button-schedule-consultation">
-              <Plus className="h-4 w-4 mr-2" />
+      ),
+    },
+    {
+      header: "Technician",
+      accessorKey: "technicianName",
+    },
+    {
+      header: "Platform",
+      accessorKey: "platform",
+      cell: (row) => <Badge variant="outline">{row.platform}</Badge>,
+    },
+    {
+      header: "Scheduled",
+      accessorKey: "scheduledAt",
+      cell: (row) => new Date(row.scheduledAt).toLocaleString(),
+    },
+    {
+      header: "Duration",
+      accessorKey: "duration",
+      cell: (row) => `${row.duration} min`,
+    },
+    {
+      header: "Status",
+      accessorKey: "status",
+      cell: (row) => getStatusBadge(row.status),
+    },
+    {
+      header: "Actions",
+      accessorKey: "id",
+      cell: (row) => (
+        <div className="flex items-center gap-2">
+          {row.status === "scheduled" && (
+            <>
+              <Button
+                size="sm"
+                onClick={() => startMeeting.mutate(row.id)}
+                data-testid={`button-start-${row.id}`}
+              >
+                <PlayCircle className="h-3 w-3 mr-1" />
+                Start
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => copyMeetingLink(row.meetingUrl)}
+                data-testid={`button-copy-${row.id}`}
+              >
+                <Copy className="h-3 w-3" />
+              </Button>
+            </>
+          )}
+          {row.status === "in_progress" && (
+            <Button
+              size="sm"
+              variant="default"
+              onClick={() => window.open(row.meetingUrl, "_blank")}
+              data-testid={`button-join-${row.id}`}
+            >
+              Join
+            </Button>
+          )}
+          {row.status === "completed" && row.recordingUrl && (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => window.open(row.recordingUrl, "_blank")}
+              data-testid={`button-recording-${row.id}`}
+            >
+              Recording
+            </Button>
+          )}
+        </div>
+      ),
+    },
+  ];
+
+  return (
+    <>
+      <StandardTablePage
+        title="Video Consultations"
+        description="Remote vehicle diagnostics and customer consultations"
+        icon={Video}
+        actions={[
+          {
+            label: "Schedule Consultation",
+            onClick: () => setIsCreateDialogOpen(true),
+            variant: "default",
+          },
+        ]}
+        data={mockConsultations}
+        columns={columns}
+        isLoading={isLoading}
+        searchPlaceholder="Search consultations..."
+        filters={[
+          {
+            id: "status",
+            label: "Status",
+            options: [
+              { value: "all", label: "All Statuses" },
+              { value: "scheduled", label: "Scheduled" },
+              { value: "in_progress", label: "In Progress" },
+              { value: "completed", label: "Completed" },
+            ],
+          },
+        ]}
+        emptyState={{
+          icon: Video,
+          title: "No consultations",
+          description: "No video consultations scheduled yet.",
+        }}
+      />
+
+      <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Schedule Video Consultation</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div>
+              <label className="text-sm font-medium">Customer</label>
+              <Input placeholder="Select customer..." className="mt-1" data-testid="input-customer" />
+            </div>
+            <div>
+              <label className="text-sm font-medium">Platform</label>
+              <Select>
+                <SelectTrigger className="mt-1" data-testid="select-platform">
+                  <SelectValue placeholder="Select platform" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="zoom">Zoom</SelectItem>
+                  <SelectItem value="teams">Microsoft Teams</SelectItem>
+                  <SelectItem value="meet">Google Meet</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <label className="text-sm font-medium">Scheduled Time</label>
+              <Input type="datetime-local" className="mt-1" data-testid="input-scheduled-time" />
+            </div>
+            <Button className="w-full" onClick={() => createConsultation.mutate({})} data-testid="button-schedule">
               Schedule Consultation
             </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-xl">
-            <DialogHeader>
-              <DialogTitle>Schedule Video Consultation</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4 py-4">
-              <div>
-                <label className="text-sm font-medium">Customer</label>
-                <Select>
-                  <SelectTrigger className="mt-1" data-testid="select-customer">
-                    <SelectValue placeholder="Select customer" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="1">John Smith</SelectItem>
-                    <SelectItem value="2">Sarah Johnson</SelectItem>
-                    <SelectItem value="3">Mike Wilson</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <label className="text-sm font-medium">Technician</label>
-                <Select>
-                  <SelectTrigger className="mt-1" data-testid="select-technician">
-                    <SelectValue placeholder="Select technician" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="1">John Smith</SelectItem>
-                    <SelectItem value="2">Mike Davis</SelectItem>
-                    <SelectItem value="3">Emily Brown</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <label className="text-sm font-medium">Platform</label>
-                <Select defaultValue="zoom">
-                  <SelectTrigger className="mt-1" data-testid="select-platform">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="zoom">Zoom</SelectItem>
-                    <SelectItem value="teams">Microsoft Teams</SelectItem>
-                    <SelectItem value="google_meet">Google Meet</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-sm font-medium">Date & Time</label>
-                  <Input type="datetime-local" className="mt-1" data-testid="input-datetime" />
-                </div>
-                <div>
-                  <label className="text-sm font-medium">Duration (minutes)</label>
-                  <Input type="number" defaultValue={30} className="mt-1" data-testid="input-duration" />
-                </div>
-              </div>
-              <Button className="w-full" onClick={() => {
-                createConsultation.mutate({
-                  customerId: "1",
-                  technicianId: "1",
-                  platform: "zoom",
-                  duration: 30
-                });
-              }} data-testid="button-create-consultation">
-                Schedule Consultation
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800" data-testid="card-total-scheduled">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Total Scheduled</p>
-                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">{stats.totalScheduled}</h3>
-              </div>
-              <Calendar className="h-12 w-12 text-blue-600" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800" data-testid="card-completed-week">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">This Week</p>
-                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">{stats.completedThisWeek}</h3>
-              </div>
-              <Video className="h-12 w-12 text-green-600" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800" data-testid="card-avg-duration">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Avg Duration</p>
-                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">{stats.averageDuration} min</h3>
-              </div>
-              <Clock className="h-12 w-12 text-purple-600" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800" data-testid="card-attendance-rate">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Attendance Rate</p>
-                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">{stats.attendanceRate}%</h3>
-              </div>
-              <User className="h-12 w-12 text-orange-600" />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Consultations List */}
-      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
-        <CardHeader>
-          <CardTitle>Consultations</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {mockConsultations.map((consultation) => (
-              <div
-                key={consultation.id}
-                className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-800 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors"
-                data-testid={`consultation-${consultation.id}`}
-              >
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
-                    <h3 className="font-semibold text-gray-900 dark:text-white">{consultation.customerName}</h3>
-                    {getStatusBadge(consultation.status)}
-                  </div>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm text-gray-600 dark:text-gray-400">
-                    <div>
-                      <span className="font-medium">Technician:</span> {consultation.technicianName}
-                    </div>
-                    <div>
-                      <span className="font-medium">Job Card:</span> {consultation.jobCardNumber}
-                    </div>
-                    <div>
-                      <span className="font-medium">Platform:</span> {consultation.platform}
-                    </div>
-                    <div>
-                      <span className="font-medium">Duration:</span> {consultation.duration} min
-                    </div>
-                  </div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
-                    Scheduled: {new Date(consultation.scheduledAt).toLocaleString()}
-                  </p>
-                  {consultation.status === "scheduled" && (
-                    <div className="flex items-center gap-2 mt-2">
-                      <Button
-                        size="sm"
-                        variant="link"
-                        className="h-auto p-0"
-                        onClick={() => copyMeetingLink(consultation.meetingUrl)}
-                        data-testid={`button-copy-link-${consultation.id}`}
-                      >
-                        <Copy className="h-3 w-3 mr-1" />
-                        Copy Meeting Link
-                      </Button>
-                      {consultation.passcode && (
-                        <span className="text-xs text-gray-600 dark:text-gray-400">
-                          | Passcode: <code className="bg-gray-200 dark:bg-gray-800 px-1 rounded">{consultation.passcode}</code>
-                        </span>
-                      )}
-                    </div>
-                  )}
-                </div>
-                <div className="flex gap-2 ml-4">
-                  {consultation.status === "scheduled" && (
-                    <Button
-                      size="sm"
-                      onClick={() => startMeeting.mutate(consultation.id)}
-                      data-testid={`button-start-${consultation.id}`}
-                    >
-                      <PlayCircle className="h-4 w-4 mr-2" />
-                      Start Meeting
-                    </Button>
-                  )}
-                  {consultation.status === "completed" && consultation.recordingUrl && (
-                    <Button size="sm" variant="outline" data-testid={`button-recording-${consultation.id}`}>
-                      <Video className="h-4 w-4 mr-2" />
-                      View Recording
-                    </Button>
-                  )}
-                </div>
-              </div>
-            ))}
           </div>
-        </CardContent>
-      </Card>
-    </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { MessageSquare } from "lucide-react";
 import { format } from "date-fns";
 import type { CustomerNote } from "@shared/schema";
+import { StandardPageLayout } from "@/components/layouts";
 
 export function CustomerCommunications() {
   const { data: communications = [], isLoading } = useQuery<CustomerNote[]>({
@@ -25,16 +26,11 @@ export function CustomerCommunications() {
   };
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white" data-testid="text-page-title">
-          Communications
-        </h1>
-        <p className="text-gray-600 dark:text-gray-400 mt-2">
-          View your communication history and notes
-        </p>
-      </div>
-
+    <StandardPageLayout
+      title="Communications"
+      description="View your communication history and notes"
+      icon={MessageSquare}
+    >
       {isLoading ? (
         <div className="text-center py-12 text-gray-500">Loading communications...</div>
       ) : communications.length === 0 ? (
@@ -87,6 +83,6 @@ export function CustomerCommunications() {
           ))}
         </div>
       )}
-    </div>
+    </StandardPageLayout>
   );
 }

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Users, Search, Car, Plus, Phone, Mail, MessageSquare, Building2, Trash2 } from "lucide-react";
+import { Users, Search, Car, Phone, Mail, MessageSquare, Building2, Trash2 } from "lucide-react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -16,6 +16,7 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { AddVehicleDialog } from "@/components/AddVehicleDialog";
 import { AddCustomerNoteDialog } from "@/components/AddCustomerNoteDialog";
 import type { User, Vehicle, Garage, CustomerNote } from "@shared/schema";
+import { StandardPageLayout } from "@/components/layouts";
 
 export function Customers() {
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -26,7 +27,6 @@ export function Customers() {
     queryKey: ['/api/garages'],
   });
 
-  // Build query params for customers endpoint
   const customersQueryParams = new URLSearchParams();
   if (selectedGarageId !== "all") {
     customersQueryParams.append("garage_id", selectedGarageId);
@@ -109,36 +109,41 @@ export function Customers() {
   });
 
   return (
-    <div className="p-8">
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="font-['Poppins',Helvetica] font-bold text-3xl text-gray-900 dark:text-white">
-            Customer Management
-          </h1>
-          <p className="font-['Poppins',Helvetica] font-normal text-sm text-gray-900 dark:text-white/60 mt-1">
-            Manage customer profiles and vehicle information
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <Select value={selectedGarageId} onValueChange={setSelectedGarageId}>
-            <SelectTrigger className="w-[200px]" data-testid="select-garage-filter">
-              <Building2 className="w-4 h-4 mr-2" />
-              <SelectValue placeholder="All Garages" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Garages</SelectItem>
-              {(garages ?? []).map((garage) => (
-                <SelectItem key={garage.id} value={garage.id}>
-                  {garage.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-
+    <StandardPageLayout
+      title="Customer Management"
+      description="Manage customer profiles and vehicle information"
+      icon={Users}
+      actions={[
+        {
+          label: (
+            <div className="flex items-center gap-2">
+              <Building2 className="w-4 h-4" />
+              <span>{selectedGarageId === "all" ? "All Garages" : garages?.find(g => g.id === selectedGarageId)?.name || "Select Garage"}</span>
+            </div>
+          ) as any,
+          onClick: () => {},
+          variant: "outline",
+          testId: "select-garage-filter",
+          customRender: (
+            <Select value={selectedGarageId} onValueChange={setSelectedGarageId}>
+              <SelectTrigger className="w-[200px]" data-testid="select-garage-filter">
+                <Building2 className="w-4 h-4 mr-2" />
+                <SelectValue placeholder="All Garages" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Garages</SelectItem>
+                {(garages ?? []).map((garage) => (
+                  <SelectItem key={garage.id} value={garage.id}>
+                    {garage.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          ),
+        } as any,
+      ]}
+    >
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Customers List */}
         <div className="lg:col-span-1">
           <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
             <CardContent className="p-4">
@@ -198,7 +203,6 @@ export function Customers() {
           </Card>
         </div>
 
-        {/* Customer Details */}
         <div className="lg:col-span-2">
           {!selectedCustomerId ? (
             <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
@@ -214,7 +218,6 @@ export function Customers() {
             </Card>
           ) : (
             <div className="space-y-6">
-              {/* Customer Info Card */}
               <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
                 <CardContent className="p-6">
                   <div className="flex items-start justify-between mb-6">
@@ -261,7 +264,6 @@ export function Customers() {
                 </CardContent>
               </Card>
 
-              {/* Vehicles Card */}
               <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between mb-4">
@@ -331,7 +333,6 @@ export function Customers() {
                 </CardContent>
               </Card>
 
-              {/* Notes Card */}
               <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between mb-4">
@@ -390,6 +391,6 @@ export function Customers() {
           )}
         </div>
       </div>
-    </div>
+    </StandardPageLayout>
   );
 }

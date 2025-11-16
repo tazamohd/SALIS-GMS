@@ -16,6 +16,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { StandardPageLayout } from "@/components/layouts/StandardPageLayout";
 
 const reminderSchema = z.object({
   vehicleId: z.string().min(1, "Please select a vehicle"),
@@ -33,17 +34,17 @@ export default function ServiceReminders() {
   const [dialogOpen, setDialogOpen] = useState(false);
 
   const { data: vehicles } = useQuery({
-    queryKey: ["/api/vehicles", user?.id],
-    enabled: !!user?.id,
+    queryKey: ["/api/vehicles", (user as any)?.id],
+    enabled: !!(user as any)?.id,
   });
 
   const { data: reminders, isLoading } = useQuery({
-    queryKey: ["/api/customers", user?.id, "service-reminders"],
-    enabled: !!user?.id,
+    queryKey: ["/api/customers", (user as any)?.id, "service-reminders"],
+    enabled: !!(user as any)?.id,
   });
 
   const myVehicles = Array.isArray(vehicles)
-    ? vehicles.filter((v: any) => v.customerId === user?.id)
+    ? vehicles.filter((v: any) => v.customerId === (user as any)?.id)
     : [];
 
   const form = useForm<ReminderFormValues>({
@@ -56,7 +57,7 @@ export default function ServiceReminders() {
   const createMutation = useMutation({
     mutationFn: async (data: ReminderFormValues) => {
       const { apiRequest } = await import("@/lib/queryClient");
-      return apiRequest("POST", `/api/customers/${user?.id}/service-reminders`, {
+      return apiRequest("POST", `/api/customers/${(user as any)?.id}/service-reminders`, {
         vehicleId: data.vehicleId,
         reminderType: data.reminderType,
         dueDate: new Date(data.dueDate).toISOString(),
@@ -67,7 +68,7 @@ export default function ServiceReminders() {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/customers", user?.id, "service-reminders"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/customers", (user as any)?.id, "service-reminders"] });
       setDialogOpen(false);
       form.reset();
       toast({
@@ -87,32 +88,123 @@ export default function ServiceReminders() {
   };
 
   const activeReminders = Array.isArray(reminders)
-    ? reminders.filter((r: any) => !r.isCompleted && r.customerId === user?.id)
+    ? reminders.filter((r: any) => !r.isCompleted && r.customerId === (user as any)?.id)
     : [];
 
   const completedReminders = Array.isArray(reminders)
-    ? reminders.filter((r: any) => r.isCompleted && r.customerId === user?.id)
+    ? reminders.filter((r: any) => r.isCompleted && r.customerId === (user as any)?.id)
     : [];
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold" data-testid="text-page-title">
-            Service Reminders
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            Stay on top of your vehicle maintenance schedule
-          </p>
-        </div>
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogTrigger asChild>
-            <Button data-testid="button-add-reminder">
-              <Plus className="h-4 w-4 mr-2" />
-              Add Reminder
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-md">
+    <>
+      <StandardPageLayout
+        title="Service Reminders"
+        description="Stay on top of your vehicle maintenance schedule"
+        icon={Bell}
+        actions={[
+          {
+            label: "Add Reminder",
+            icon: Plus,
+            onClick: () => setDialogOpen(true),
+            variant: "default",
+          },
+        ]}
+      >
+        {/* Active Reminders */}
+        <Card data-testid="card-active-reminders">
+          <CardHeader>
+            <CardTitle>Active Reminders ({activeReminders.length})</CardTitle>
+            <CardDescription>Upcoming maintenance and service reminders</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {isLoading ? (
+              <div className="space-y-4">
+                <Skeleton className="h-24" />
+                <Skeleton className="h-24" />
+              </div>
+            ) : activeReminders.length === 0 ? (
+              <div className="text-center py-12 text-muted-foreground">
+                <Bell className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                <p>No active reminders</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {activeReminders.map((reminder: any) => (
+                  <div
+                    key={reminder.id}
+                    className="flex items-start gap-4 p-4 rounded-lg border"
+                    data-testid={`reminder-${reminder.id}`}
+                  >
+                    <AlertCircle className="h-5 w-5 text-yellow-500 mt-0.5" />
+                    <div className="flex-1 space-y-2">
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <p className="font-medium capitalize">
+                            {reminder.reminderType.replace(/_/g, " ")}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            {getVehicleInfo(reminder.vehicleId)}
+                          </p>
+                        </div>
+                        <Badge variant="outline">
+                          {new Date(reminder.dueDate).toLocaleDateString()}
+                        </Badge>
+                      </div>
+                      {reminder.description && (
+                        <p className="text-sm">{reminder.description}</p>
+                      )}
+                      {reminder.mileageDue && (
+                        <p className="text-xs text-muted-foreground">
+                          Due at: {reminder.mileageDue.toLocaleString()} km
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Completed Reminders */}
+        {completedReminders.length > 0 && (
+          <Card data-testid="card-completed-reminders">
+            <CardHeader>
+              <CardTitle>Completed</CardTitle>
+              <CardDescription>Recently completed service reminders</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {completedReminders.slice(0, 5).map((reminder: any) => (
+                  <div
+                    key={reminder.id}
+                    className="flex items-center justify-between p-3 rounded-lg border opacity-60"
+                    data-testid={`completed-reminder-${reminder.id}`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <CheckCircle className="h-4 w-4 text-green-500" />
+                      <div>
+                        <p className="text-sm font-medium capitalize">
+                          {reminder.reminderType.replace(/_/g, " ")}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {getVehicleInfo(reminder.vehicleId)}
+                        </p>
+                      </div>
+                    </div>
+                    <Badge variant="outline" className="text-xs">
+                      Completed
+                    </Badge>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+      </StandardPageLayout>
+
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="max-w-md">
             <DialogHeader>
               <DialogTitle>Create Service Reminder</DialogTitle>
               <DialogDescription>
@@ -244,101 +336,8 @@ export default function ServiceReminders() {
                 </div>
               </form>
             </Form>
-          </DialogContent>
-        </Dialog>
-      </div>
-
-      {/* Active Reminders */}
-      <Card data-testid="card-active-reminders">
-        <CardHeader>
-          <CardTitle>Active Reminders ({activeReminders.length})</CardTitle>
-          <CardDescription>Upcoming maintenance and service reminders</CardDescription>
-        </CardHeader>
-        <CardContent>
-          {isLoading ? (
-            <div className="space-y-4">
-              <Skeleton className="h-24" />
-              <Skeleton className="h-24" />
-            </div>
-          ) : activeReminders.length === 0 ? (
-            <div className="text-center py-12 text-muted-foreground">
-              <Bell className="h-12 w-12 mx-auto mb-2 opacity-50" />
-              <p>No active reminders</p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {activeReminders.map((reminder: any) => (
-                <div
-                  key={reminder.id}
-                  className="flex items-start gap-4 p-4 rounded-lg border"
-                  data-testid={`reminder-${reminder.id}`}
-                >
-                  <AlertCircle className="h-5 w-5 text-yellow-500 mt-0.5" />
-                  <div className="flex-1 space-y-2">
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <p className="font-medium capitalize">
-                          {reminder.reminderType.replace(/_/g, " ")}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          {getVehicleInfo(reminder.vehicleId)}
-                        </p>
-                      </div>
-                      <Badge variant="outline">
-                        {new Date(reminder.dueDate).toLocaleDateString()}
-                      </Badge>
-                    </div>
-                    {reminder.description && (
-                      <p className="text-sm">{reminder.description}</p>
-                    )}
-                    {reminder.mileageDue && (
-                      <p className="text-xs text-muted-foreground">
-                        Due at: {reminder.mileageDue.toLocaleString()} km
-                      </p>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Completed Reminders */}
-      {completedReminders.length > 0 && (
-        <Card data-testid="card-completed-reminders">
-          <CardHeader>
-            <CardTitle>Completed</CardTitle>
-            <CardDescription>Recently completed service reminders</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {completedReminders.slice(0, 5).map((reminder: any) => (
-                <div
-                  key={reminder.id}
-                  className="flex items-center justify-between p-3 rounded-lg border opacity-60"
-                  data-testid={`completed-reminder-${reminder.id}`}
-                >
-                  <div className="flex items-center gap-3">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    <div>
-                      <p className="text-sm font-medium capitalize">
-                        {reminder.reminderType.replace(/_/g, " ")}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {getVehicleInfo(reminder.vehicleId)}
-                      </p>
-                    </div>
-                  </div>
-                  <Badge variant="outline" className="text-xs">
-                    Completed
-                  </Badge>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-    </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

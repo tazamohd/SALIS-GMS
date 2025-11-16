@@ -5,21 +5,19 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Camera, Car, CheckCircle, Clock } from "lucide-react";
+import { StandardPageLayout } from "@/components/layouts";
 
 export default function LicensePlateRecognition() {
   const { toast } = useToast();
 
-  // Fetch license plate scans
-  const { data: scans = [], isLoading: loadingScans } = useQuery({
+  const { data: scans = [], isLoading: loadingScans } = useQuery<any[]>({
     queryKey: ["/api/license-plate/scans"],
   });
 
-  // Fetch vehicle entry logs
-  const { data: entryLogs = [], isLoading: loadingLogs } = useQuery({
+  const { data: entryLogs = [], isLoading: loadingLogs } = useQuery<any[]>({
     queryKey: ["/api/license-plate/entry-logs"],
   });
 
-  // Record scan mutation
   const recordScanMutation = useMutation({
     mutationFn: async (scanData: {
       plateNumber: string;
@@ -28,10 +26,7 @@ export default function LicensePlateRecognition() {
       vehicleId?: string;
       location?: string;
     }) => {
-      return await apiRequest("/api/license-plate/scan", {
-        method: "POST",
-        body: JSON.stringify(scanData),
-      });
+      return await apiRequest("POST", "/api/license-plate/scan", scanData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/license-plate/scans"] });
@@ -50,7 +45,6 @@ export default function LicensePlateRecognition() {
     },
   });
 
-  // Calculate stats
   const stats = {
     todayScans: scans.length || 0,
     autoMatched: scans.filter((s: any) => s.matchedAutomatically).length || 0,
@@ -60,7 +54,6 @@ export default function LicensePlateRecognition() {
       : 0,
   };
 
-  // Simulate scan for testing
   const simulateScan = () => {
     const plateNumbers = ["ABC 1234", "XYZ 5678", "DEF 9012"];
     const randomPlate = plateNumbers[Math.floor(Math.random() * plateNumbers.length)];
@@ -74,23 +67,17 @@ export default function LicensePlateRecognition() {
   };
 
   return (
-    <div className="p-8 space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold font-montserrat text-gray-900 dark:text-white">
-            🚗 License Plate Recognition
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">Automatic vehicle identification and entry tracking</p>
-        </div>
-        <Button 
-          onClick={simulateScan}
-          disabled={recordScanMutation.isPending}
-          data-testid="button-simulate-scan"
-        >
-          Simulate Scan
-        </Button>
-      </div>
-
+    <StandardPageLayout
+      title="🚗 License Plate Recognition"
+      description="Automatic vehicle identification and entry tracking"
+      icon={Camera}
+      actions={[
+        {
+          label: "Simulate Scan",
+          onClick: simulateScan,
+        },
+      ]}
+    >
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
           <CardContent className="p-6">
@@ -235,6 +222,6 @@ export default function LicensePlateRecognition() {
           )}
         </CardContent>
       </Card>
-    </div>
+    </StandardPageLayout>
   );
 }

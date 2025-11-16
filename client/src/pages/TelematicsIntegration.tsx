@@ -8,13 +8,13 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Radio, Activity, AlertTriangle, MapPin, Gauge } from "lucide-react";
+import { TabsPageLayout } from "@/components/layouts/TabsPageLayout";
 
 const alertSchema = z.object({
   vehicleId: z.string().min(1, "Vehicle ID is required"),
@@ -83,40 +83,8 @@ export default function TelematicsIntegration() {
     return colors[severity] || "bg-salis-gray text-white";
   };
 
-  return (
-    <div className="container mx-auto py-6 space-y-6 bg-white dark:bg-[#010101] min-h-screen">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-montserrat font-semibold text-salis-black dark:text-white" data-testid="heading-telematics">
-            Telematics Integration
-          </h1>
-          <p className="text-salis-gray dark:text-salis-gray-light font-poppins mt-1" data-testid="text-subtitle">
-            Real-time vehicle tracking, telemetry feeds, and alerts
-          </p>
-        </div>
-        <Button
-          onClick={() => setIsAlertDialogOpen(true)}
-          className="bg-salis-black hover:bg-salis-gray-dark text-white font-poppins"
-          data-testid="button-create-alert"
-        >
-          <AlertTriangle className="mr-2 h-4 w-4" />
-          Create Alert
-        </Button>
-      </div>
-
-      <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full">
-        <TabsList className="bg-salis-gray-light dark:bg-salis-gray-dark" data-testid="tabs-telematics">
-          <TabsTrigger value="feeds" className="font-poppins" data-testid="tab-feeds">
-            <Activity className="mr-2 h-4 w-4" />
-            Telemetry Feeds
-          </TabsTrigger>
-          <TabsTrigger value="alerts" className="font-poppins" data-testid="tab-alerts">
-            <AlertTriangle className="mr-2 h-4 w-4" />
-            Alerts
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="feeds" className="space-y-4">
+  const feedsContent = (
+    <div className="space-y-4">
           <Card className="border-salis-gray-light dark:border-salis-gray-dark bg-white dark:bg-[#010101]">
             <CardHeader>
               <CardTitle className="font-montserrat text-salis-black dark:text-white">Real-Time Telemetry Feeds</CardTitle>
@@ -165,9 +133,11 @@ export default function TelematicsIntegration() {
               )}
             </CardContent>
           </Card>
-        </TabsContent>
+    </div>
+  );
 
-        <TabsContent value="alerts" className="space-y-4">
+  const alertsContent = (
+    <div className="space-y-4">
           <Card className="border-salis-gray-light dark:border-salis-gray-dark bg-white dark:bg-[#010101]">
             <CardHeader>
               <CardTitle className="font-montserrat text-salis-black dark:text-white">Telematics Alerts</CardTitle>
@@ -229,9 +199,39 @@ export default function TelematicsIntegration() {
               )}
             </CardContent>
           </Card>
-        </TabsContent>
-      </Tabs>
+    </div>
+  );
 
+  return (
+    <>
+      <TabsPageLayout
+        title="Telematics Integration"
+        description="Real-time vehicle tracking, telemetry feeds, and alerts"
+        icon={Radio}
+        primaryAction={{
+          label: "Create Alert",
+          icon: AlertTriangle,
+          onClick: () => setIsAlertDialogOpen(true),
+          testId: "button-create-alert"
+        }}
+        tabs={[
+          {
+            id: "feeds",
+            label: "Telemetry Feeds",
+            icon: Activity,
+            content: feedsContent
+          },
+          {
+            id: "alerts",
+            label: "Alerts",
+            icon: AlertTriangle,
+            content: alertsContent
+          }
+        ]}
+        activeTab={selectedTab}
+        onTabChange={setSelectedTab}
+      />
+      
       <Dialog open={isAlertDialogOpen} onOpenChange={setIsAlertDialogOpen}>
         <DialogContent className="bg-white dark:bg-salis-black">
           <DialogHeader>
@@ -366,6 +366,6 @@ export default function TelematicsIntegration() {
           </Form>
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 }

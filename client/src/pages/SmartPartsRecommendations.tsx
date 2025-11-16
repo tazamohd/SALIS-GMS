@@ -8,6 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
+import { DashboardPage } from "@/components/layouts";
 import {
   Select,
   SelectContent,
@@ -113,22 +114,21 @@ export default function SmartPartsRecommendations() {
     ) || 0,
   };
 
+  const metrics = [
+    { label: "Total Recommendations", value: stats.total.toString(), icon: Package },
+    { label: "Pending Review", value: stats.pending.toString(), icon: Brain },
+    { label: "Applied to Jobs", value: stats.applied.toString(), icon: CheckCircle },
+    { label: "Total Value", value: `$${stats.totalValue.toFixed(2)}`, icon: DollarSign },
+  ];
+
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-salis-black p-4 sm:p-6 lg:p-8">
-      <div className="max-w-7xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white font-montserrat flex items-center gap-3">
-              <Package className="h-8 w-8 text-blue-600" />
-              Smart Parts Recommendations
-            </h1>
-            <p className="text-gray-600 dark:text-gray-400 mt-1">
-              AI-powered parts recommendations with compatibility checking
-            </p>
-          </div>
-          
-          <Dialog open={isGenerateDialogOpen} onOpenChange={setIsGenerateDialogOpen}>
+    <DashboardPage
+      title="Smart Parts Recommendations"
+      description="AI-powered parts recommendations with compatibility checking"
+      icon={Package}
+      metrics={metrics}
+    >
+      <Dialog open={isGenerateDialogOpen} onOpenChange={setIsGenerateDialogOpen}>
             <DialogTrigger asChild>
               <Button
                 className="bg-blue-600 hover:bg-blue-700 text-white"
@@ -212,62 +212,6 @@ export default function SmartPartsRecommendations() {
               </div>
             </DialogContent>
           </Dialog>
-        </div>
-
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                Total Recommendations
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-gray-900 dark:text-white">
-                {stats.total}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                Pending Review
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-orange-600">
-                {stats.pending}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                Applied to Jobs
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-green-600">
-                {stats.applied}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                Total Estimated Value
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-blue-600">
-                ${stats.totalValue.toFixed(2)}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
 
         {/* Filters */}
         <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
@@ -445,7 +389,6 @@ export default function SmartPartsRecommendations() {
             </Card>
           )}
         </div>
-      </div>
-    </div>
+    </DashboardPage>
   );
 }

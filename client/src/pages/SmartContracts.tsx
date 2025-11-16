@@ -17,6 +17,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { FileSignature, Zap, CreditCard, Shield, Clock, CheckCircle2, XCircle } from "lucide-react";
+import { StandardPageLayout } from "@/components/layouts/StandardPageLayout";
 
 interface SmartContract {
   id: string;
@@ -54,7 +55,7 @@ export default function SmartContracts() {
   // Fetch smart contracts
   const { data: contracts, isLoading } = useQuery<SmartContract[]>({
     queryKey: ["/api/smart-contracts"],
-    enabled: !!user?.garageId,
+    enabled: !!(user as any)?.garageId,
   });
 
   // Create contract mutation
@@ -102,7 +103,7 @@ export default function SmartContracts() {
 
   const handleCreateContract = () => {
     createContractMutation.mutate({
-      garageId: user?.garageId,
+      garageId: (user as any)?.garageId,
       contractType: newContract.contractType,
       blockchain: "Ethereum",
       partyA: newContract.partyA || "Garage",
@@ -141,27 +142,19 @@ export default function SmartContracts() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-8 flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
-              <FileSignature className="w-8 h-8 text-blue-600" />
-              Smart Contracts
-            </h1>
-            <p className="text-gray-600 dark:text-gray-400 mt-2">
-              Automated service agreements with digital signatures and payment triggers
-            </p>
-          </div>
-          <Button
-            onClick={() => setShowCreateForm(!showCreateForm)}
-            size="lg"
-            data-testid="button-create-contract"
-          >
-            <FileSignature className="w-5 h-5 mr-2" />
-            Create Contract
-          </Button>
-        </div>
+    <StandardPageLayout
+      title="Smart Contracts"
+      description="Automated service agreements with digital signatures and payment triggers"
+      icon={FileSignature}
+      actions={[
+        {
+          label: "Create Contract",
+          icon: FileSignature,
+          onClick: () => setShowCreateForm(!showCreateForm),
+          variant: "default",
+        },
+      ]}
+    >
 
         {showCreateForm && (
           <Card className="mb-8 border-2 border-blue-600">
@@ -335,104 +328,103 @@ export default function SmartContracts() {
           </Card>
         </div>
 
-        {/* Contracts List */}
-        {isLoading && (
-          <div className="flex items-center justify-center min-h-[400px]">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-              <p className="mt-4 text-gray-600 dark:text-gray-400">Loading contracts...</p>
-            </div>
+      {/* Contracts List */}
+      {isLoading && (
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+            <p className="mt-4 text-gray-600 dark:text-gray-400">Loading contracts...</p>
           </div>
-        )}
+        </div>
+      )}
 
-        {!isLoading && contracts && contracts.length === 0 && !showCreateForm && (
-          <Card>
-            <CardContent className="text-center py-12">
-              <FileSignature className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                No Smart Contracts
-              </h3>
-              <p className="text-gray-500 dark:text-gray-400 mb-6">
-                Create your first smart contract with automated payment processing
-              </p>
-              <Button onClick={() => setShowCreateForm(true)}>
-                <FileSignature className="w-4 h-4 mr-2" />
-                Create Contract
-              </Button>
-            </CardContent>
-          </Card>
-        )}
+      {!isLoading && contracts && contracts.length === 0 && !showCreateForm && (
+        <Card>
+          <CardContent className="text-center py-12">
+            <FileSignature className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">
+              No Smart Contracts
+            </h3>
+            <p className="text-gray-500 dark:text-gray-400 mb-6">
+              Create your first smart contract with automated payment processing
+            </p>
+            <Button onClick={() => setShowCreateForm(true)}>
+              <FileSignature className="w-4 h-4 mr-2" />
+              Create Contract
+            </Button>
+          </CardContent>
+        </Card>
+      )}
 
-        {!isLoading && contracts && contracts.length > 0 && (
-          <div className="space-y-4">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-              Contracts ({contracts.length})
-            </h2>
-            {contracts.map((contract) => (
-              <Card key={contract.id} className="border-l-4 border-l-blue-600">
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <CardTitle className="flex items-center gap-3">
-                        {contract.contractType.replace("_", " ").toUpperCase()}
-                        <Badge className={getStatusColor(contract.status)}>
-                          <span className="flex items-center gap-1">
-                            {getStatusIcon(contract.status)}
-                            {contract.status.toUpperCase()}
-                          </span>
-                        </Badge>
-                      </CardTitle>
-                      <CardDescription>
-                        Created: {new Date(contract.createdAt).toLocaleDateString()}
-                      </CardDescription>
-                    </div>
-                    <div className="flex gap-2">
-                      {contract.status === "draft" && (
-                        <Button
-                          size="sm"
-                          onClick={() => handleSignContract(contract.id)}
-                          disabled={updateContractMutation.isPending}
-                          data-testid={`button-sign-contract-${contract.id}`}
-                        >
-                          <FileSignature className="w-4 h-4 mr-2" />
-                          Sign Contract
-                        </Button>
-                      )}
-                      {contract.status === "signed" && (
-                        <Button
-                          size="sm"
-                          onClick={() => handleExecuteContract(contract.id)}
-                          disabled={updateContractMutation.isPending}
-                          data-testid={`button-execute-contract-${contract.id}`}
-                        >
-                          <Zap className="w-4 h-4 mr-2" />
-                          Execute Contract
-                        </Button>
-                      )}
-                    </div>
+      {!isLoading && contracts && contracts.length > 0 && (
+        <div className="space-y-4">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+            Contracts ({contracts.length})
+          </h2>
+          {contracts.map((contract) => (
+            <Card key={contract.id} className="border-l-4 border-l-blue-600">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center gap-3">
+                      {contract.contractType.replace("_", " ").toUpperCase()}
+                      <Badge className={getStatusColor(contract.status)}>
+                        <span className="flex items-center gap-1">
+                          {getStatusIcon(contract.status)}
+                          {contract.status.toUpperCase()}
+                        </span>
+                      </Badge>
+                    </CardTitle>
+                    <CardDescription>
+                      Created: {new Date(contract.createdAt).toLocaleDateString()}
+                    </CardDescription>
                   </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-3 gap-6">
-                    <div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Parties</p>
-                      <p className="text-sm font-semibold">{contract.partyA} ↔ {contract.partyB}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Contract Value</p>
-                      <p className="font-semibold">${contract.contractValue} {contract.currency}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Blockchain</p>
-                      <Badge variant="outline">{contract.blockchain}</Badge>
-                    </div>
+                  <div className="flex gap-2">
+                    {contract.status === "draft" && (
+                      <Button
+                        size="sm"
+                        onClick={() => handleSignContract(contract.id)}
+                        disabled={updateContractMutation.isPending}
+                        data-testid={`button-sign-contract-${contract.id}`}
+                      >
+                        <FileSignature className="w-4 h-4 mr-2" />
+                        Sign Contract
+                      </Button>
+                    )}
+                    {contract.status === "signed" && (
+                      <Button
+                        size="sm"
+                        onClick={() => handleExecuteContract(contract.id)}
+                        disabled={updateContractMutation.isPending}
+                        data-testid={`button-execute-contract-${contract.id}`}
+                      >
+                        <Zap className="w-4 h-4 mr-2" />
+                        Execute Contract
+                      </Button>
+                    )}
                   </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-3 gap-6">
+                  <div>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Parties</p>
+                    <p className="text-sm font-semibold">{contract.partyA} ↔ {contract.partyB}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Contract Value</p>
+                    <p className="font-semibold">${contract.contractValue} {contract.currency}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Blockchain</p>
+                    <Badge variant="outline">{contract.blockchain}</Badge>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+    </StandardPageLayout>
   );
 }

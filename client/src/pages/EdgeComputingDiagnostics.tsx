@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
+import { DashboardPage } from "@/components/layouts";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { Cpu, Zap, Activity, Database, TrendingUp } from 'lucide-react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { Cpu, Zap, Activity, Database } from 'lucide-react';
 
 export default function EdgeComputingDiagnostics() {
   const [liveMetrics, setLiveMetrics] = useState<any[]>([]);
@@ -36,19 +37,20 @@ export default function EdgeComputingDiagnostics() {
     { id: '3', name: 'Edge Node Gamma', status: 'idle', load: 12, latency: '5ms' },
   ];
 
-  return (
-    <div className="flex-1 p-6 bg-gray-50 dark:bg-salis-black min-h-screen">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold font-['Montserrat'] text-gray-900 dark:text-white mb-2 flex items-center gap-3">
-          <Cpu className="h-8 w-8 text-emerald-600" />
-          Edge Computing Diagnostics
-        </h1>
-        <p className="text-gray-600 dark:text-gray-400 font-['Poppins']">
-          Real-time OBD-II data processing with edge computing and low-latency analysis
-        </p>
-      </div>
+  const metrics = [
+    { label: "Data Points/sec", value: "1,248", icon: Activity, color: "text-purple-600" },
+    { label: "Avg Latency", value: "8ms", icon: Zap, color: "text-green-600" },
+    { label: "Data Processed", value: "2.4 GB", icon: Database, color: "text-blue-600" },
+    { label: "Uptime", value: "99.9%", icon: Cpu, color: "text-emerald-600" },
+  ];
 
-      {/* Edge Device Status */}
+  return (
+    <DashboardPage
+      title="Edge Computing Diagnostics"
+      description="Real-time OBD-II data processing with edge computing and low-latency analysis"
+      icon={Cpu}
+      metrics={metrics}
+    >
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         {edgeDevices.map((device) => (
           <Card key={device.id} className="bg-white dark:bg-salis-black">
@@ -77,7 +79,6 @@ export default function EdgeComputingDiagnostics() {
         ))}
       </div>
 
-      {/* Live OBD-II Data */}
       <Card className="bg-white dark:bg-salis-black mb-6">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -120,36 +121,6 @@ export default function EdgeComputingDiagnostics() {
               Processing at edge: <span className="text-emerald-600">3.2ms latency</span> (95% faster than cloud)
             </p>
           </div>
-        </CardContent>
-      </Card>
-
-      {/* Processing Statistics */}
-      <Card className="bg-white dark:bg-salis-black">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Database className="h-5 w-5 text-purple-600" />
-            Edge Processing Statistics
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-4 gap-6">
-            <div className="text-center">
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Data Points/sec</p>
-              <p className="text-3xl font-bold text-purple-600">1,248</p>
-            </div>
-            <div className="text-center">
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Avg Latency</p>
-              <p className="text-3xl font-bold text-green-600">8ms</p>
-            </div>
-            <div className="text-center">
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Data Processed</p>
-              <p className="text-3xl font-bold text-blue-600">2.4 GB</p>
-            </div>
-            <div className="text-center">
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Uptime</p>
-              <p className="text-3xl font-bold text-emerald-600">99.9%</p>
-            </div>
-          </div>
 
           <div className="mt-6 flex gap-3">
             <Button className="flex-1 bg-emerald-600 hover:bg-emerald-700" data-testid="button-start-diagnostic">
@@ -162,6 +133,6 @@ export default function EdgeComputingDiagnostics() {
           </div>
         </CardContent>
       </Card>
-    </div>
+    </DashboardPage>
   );
 }

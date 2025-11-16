@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Car, Calendar, Wrench } from "lucide-react";
 import { format } from "date-fns";
 import type { Vehicle, JobCard } from "@shared/schema";
+import { StandardPageLayout } from "@/components/layouts";
 
 export function CustomerVehicles() {
   const { data: vehicles = [], isLoading: loadingVehicles } = useQuery<Vehicle[]>({
@@ -26,16 +26,11 @@ export function CustomerVehicles() {
   };
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white" data-testid="text-page-title">
-          My Vehicles
-        </h1>
-        <p className="text-gray-600 dark:text-gray-400 mt-2">
-          View your vehicles and service history
-        </p>
-      </div>
-
+    <StandardPageLayout
+      title="My Vehicles"
+      description="View your vehicles and service history"
+      icon={Car}
+    >
       {loadingVehicles ? (
         <div className="text-center py-12 text-gray-500">Loading vehicles...</div>
       ) : activeVehicles.length === 0 ? (
@@ -77,7 +72,6 @@ export function CustomerVehicles() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-6">
-                    {/* Vehicle Details */}
                     <div className="grid gap-4 md:grid-cols-4">
                       {vehicle.vin && (
                         <div>
@@ -105,7 +99,6 @@ export function CustomerVehicles() {
                       )}
                     </div>
 
-                    {/* Service History */}
                     <div className="border-t pt-6">
                       <h3 className="text-lg font-semibold flex items-center gap-2 mb-4">
                         <Wrench className="h-5 w-5" />
@@ -164,6 +157,6 @@ export function CustomerVehicles() {
           })}
         </div>
       )}
-    </div>
+    </StandardPageLayout>
   );
 }

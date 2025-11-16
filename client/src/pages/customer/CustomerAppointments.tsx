@@ -6,6 +6,7 @@ import { Calendar, Plus, Filter } from "lucide-react";
 import { format } from "date-fns";
 import type { Appointment } from "@shared/schema";
 import { BookAppointmentDialog } from "@/components/customer/BookAppointmentDialog";
+import { StandardPageLayout } from "@/components/layouts";
 
 export function CustomerAppointments() {
   const [bookingOpen, setBookingOpen] = useState(false);
@@ -46,23 +47,19 @@ export function CustomerAppointments() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white" data-testid="text-page-title">
-            My Appointments
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">
-            View and manage your service appointments
-          </p>
-        </div>
-        <Button onClick={() => setBookingOpen(true)} data-testid="button-book-appointment">
-          <Plus className="h-4 w-4 mr-2" />
-          Book Appointment
-        </Button>
-      </div>
-
-      <div className="flex items-center gap-4">
+    <StandardPageLayout
+      title="My Appointments"
+      description="View and manage your service appointments"
+      icon={Calendar}
+      actions={[
+        {
+          label: "Book Appointment",
+          onClick: () => setBookingOpen(true),
+          icon: Plus,
+        },
+      ]}
+    >
+      <div className="flex items-center gap-4 mb-6">
         <Filter className="h-4 w-4 text-gray-500" />
         <div className="flex gap-2">
           {statusOptions.map(option => (
@@ -155,6 +152,6 @@ export function CustomerAppointments() {
       )}
 
       <BookAppointmentDialog open={bookingOpen} onOpenChange={setBookingOpen} />
-    </div>
+    </StandardPageLayout>
   );
 }

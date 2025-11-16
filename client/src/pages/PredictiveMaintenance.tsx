@@ -8,6 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
+import { StandardPageLayout } from "@/components/layouts/StandardPageLayout";
 import {
   Select,
   SelectContent,
@@ -95,29 +96,20 @@ export default function PredictiveMaintenance() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-salis-black p-4 sm:p-6 lg:p-8">
-      <div className="max-w-7xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white font-montserrat flex items-center gap-3">
-              <Brain className="h-8 w-8 text-purple-600" />
-              Predictive Maintenance
-            </h1>
-            <p className="text-gray-600 dark:text-gray-400 mt-1">
-              AI-powered maintenance predictions based on service history analysis
-            </p>
-          </div>
-          <Button
-            onClick={handleRunAnalysis}
-            className="bg-purple-600 hover:bg-purple-700 text-white"
-            data-testid="button-run-analysis"
-          >
-            <TrendingUp className="mr-2 h-4 w-4" />
-            Run Analysis
-          </Button>
-        </div>
-
+    <StandardPageLayout
+      title="Predictive Maintenance"
+      description="AI-powered maintenance predictions based on service history analysis"
+      icon={Brain}
+      actions={[
+        {
+          label: "Run Analysis",
+          onClick: handleRunAnalysis,
+          icon: TrendingUp,
+          variant: "default",
+        },
+      ]}
+    >
+      <div className="space-y-6">
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
@@ -248,22 +240,22 @@ export default function PredictiveMaintenance() {
                           {String(prediction.predictedIssue)}
                         </CardTitle>
                       </div>
-                      <CardDescription className="flex items-center gap-4 flex-wrap">
+                      <div className="flex items-center gap-4 flex-wrap mt-2">
                         <Badge className={getSeverityColor(prediction.severity || "")}>
-                          {prediction.severity}
+                          {String(prediction.severity || '')}
                         </Badge>
                         <Badge
                           variant="outline"
                           className="text-gray-600 dark:text-gray-400"
                         >
-                          {prediction.status}
+                          {String(prediction.status || '')}
                         </Badge>
                         {prediction.confidence && (
                           <span className="text-sm text-gray-600 dark:text-gray-400">
-                            Confidence: {prediction.confidence}%
+                            Confidence: {String(prediction.confidence)}%
                           </span>
                         )}
-                      </CardDescription>
+                      </div>
                     </div>
                   </div>
                 </CardHeader>
@@ -282,7 +274,7 @@ export default function PredictiveMaintenance() {
                   </div>
 
                   {/* Estimated Timeframe */}
-                  {prediction.estimatedTimeframe && (
+                  {prediction.estimatedTimeframe ? (
                     <div className="flex items-start gap-3">
                       <Clock className="h-5 w-5 text-purple-600 mt-1 flex-shrink-0" />
                       <div>
@@ -290,14 +282,14 @@ export default function PredictiveMaintenance() {
                           Estimated Timeframe
                         </p>
                         <p className="text-sm text-gray-600 dark:text-gray-400">
-                          {prediction.estimatedTimeframe}
+                          {String(prediction.estimatedTimeframe)}
                         </p>
                       </div>
                     </div>
-                  )}
+                  ) : null}
 
                   {/* Analysis Data */}
-                  {prediction.basedOnData && (
+                  {prediction.basedOnData ? (
                     <div className="flex items-start gap-3">
                       <Brain className="h-5 w-5 text-indigo-600 mt-1 flex-shrink-0" />
                       <div className="flex-1">
@@ -306,14 +298,17 @@ export default function PredictiveMaintenance() {
                         </p>
                         <div className="text-sm text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-900 p-3 rounded-md">
                           <pre className="whitespace-pre-wrap font-mono text-xs">
-                            {typeof prediction.basedOnData === 'object' 
-                              ? JSON.stringify(prediction.basedOnData, null, 2)
-                              : String(prediction.basedOnData)}
+                            {(() => {
+                              const data = prediction.basedOnData;
+                              return typeof data === 'object' && data !== null
+                                ? JSON.stringify(data, null, 2)
+                                : String(data ?? '');
+                            })()}
                           </pre>
                         </div>
                       </div>
                     </div>
-                  )}
+                  ) : null}
 
                   {/* Actions */}
                   <div className="flex gap-2 pt-2">
@@ -355,6 +350,6 @@ export default function PredictiveMaintenance() {
           )}
         </div>
       </div>
-    </div>
+    </StandardPageLayout>
   );
 }

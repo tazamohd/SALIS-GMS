@@ -6,23 +6,21 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Camera, Play, Circle, Video } from "lucide-react";
+import { StandardPageLayout } from "@/components/layouts";
 
 export default function SecurityCameras() {
   const { toast } = useToast();
   const [selectedCamera, setSelectedCamera] = useState<string | null>(null);
 
-  // Fetch cameras
-  const { data: cameras = [], isLoading: loadingCameras } = useQuery({
+  const { data: cameras = [], isLoading: loadingCameras } = useQuery<any[]>({
     queryKey: ["/api/cameras/cameras"],
   });
 
-  // Fetch recordings for selected camera
-  const { data: recordings = [] } = useQuery({
+  const { data: recordings = [] } = useQuery<any[]>({
     queryKey: ["/api/cameras/recordings", { cameraId: selectedCamera }],
     enabled: !!selectedCamera,
   });
 
-  // Create camera mutation
   const createCameraMutation = useMutation({
     mutationFn: async (cameraData: {
       name: string;
@@ -32,10 +30,7 @@ export default function SecurityCameras() {
       streamUrl?: string;
       resolution: string;
     }) => {
-      return await apiRequest("/api/cameras/cameras", {
-        method: "POST",
-        body: JSON.stringify(cameraData),
-      });
+      return await apiRequest("POST", "/api/cameras/cameras", cameraData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/cameras/cameras"] });
@@ -53,38 +48,6 @@ export default function SecurityCameras() {
     },
   });
 
-  // Create recording mutation
-  const createRecordingMutation = useMutation({
-    mutationFn: async (recordingData: {
-      cameraId: string;
-      startTime: string;
-      endTime: string;
-      eventType: string;
-      fileSize: number;
-      vehicleId?: string;
-    }) => {
-      return await apiRequest("/api/cameras/recordings", {
-        method: "POST",
-        body: JSON.stringify(recordingData),
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/cameras/recordings"] });
-      toast({
-        title: "Success",
-        description: "Recording created successfully",
-      });
-    },
-    onError: (error: any) => {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error.message || "Failed to create recording",
-      });
-    },
-  });
-
-  // Calculate stats
   const stats = {
     activeCameras: cameras.filter((c: any) => c.isActive).length || 0,
     totalRecordings: recordings.length || 0,
@@ -93,30 +56,24 @@ export default function SecurityCameras() {
   };
 
   return (
-    <div className="p-8 space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold font-montserrat text-gray-900 dark:text-white">
-            📹 Security Cameras
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">Monitor and manage security camera system</p>
-        </div>
-        <Button 
-          onClick={() => {
+    <StandardPageLayout
+      title="📹 Security Cameras"
+      description="Monitor and manage security camera system"
+      icon={Camera}
+      actions={[
+        {
+          label: "Add Camera",
+          onClick: () => {
             createCameraMutation.mutate({
               name: "New Camera",
               location: "Service Bay",
               cameraType: "indoor",
               resolution: "1920x1080",
             });
-          }}
-          disabled={createCameraMutation.isPending}
-          data-testid="button-add-camera"
-        >
-          Add Camera
-        </Button>
-      </div>
-
+          },
+        },
+      ]}
+    >
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
           <CardContent className="p-6">
@@ -256,6 +213,6 @@ export default function SecurityCameras() {
           )}
         </CardContent>
       </Card>
-    </div>
+    </StandardPageLayout>
   );
 }

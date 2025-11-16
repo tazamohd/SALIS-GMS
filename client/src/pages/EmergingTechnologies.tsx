@@ -1,6 +1,6 @@
 import { useState } from 'react';
+import { StandardPageLayout } from "@/components/layouts";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -15,7 +15,6 @@ export default function EmergingTechnologies() {
   const [activeTab, setActiveTab] = useState('blockchain');
   const { toast } = useToast();
 
-  // Mutation to seed sample data
   const seedMutation = useMutation({
     mutationFn: () => apiRequest('/api/emerging-tech/seed', 'POST', {}),
     onSuccess: (data: any) => {
@@ -23,7 +22,6 @@ export default function EmergingTechnologies() {
         title: "Sample Data Seeded!",
         description: `Successfully created sample data for all 12 modules.`,
       });
-      // Invalidate all queries to refetch data
       queryClient.invalidateQueries({ queryKey: ['/api/emerging-tech'] });
     },
     onError: (error) => {
@@ -35,70 +33,45 @@ export default function EmergingTechnologies() {
     },
   });
 
-  // Fetch data for all emerging technologies
   const { data: blockchainData, isLoading: loadingBlockchain } = useQuery<any[]>({
     queryKey: ['/api/emerging-tech/blockchain'],
   });
   const blockchainRecords = blockchainData ?? [];
 
-  const { data: arGuidesData, isLoading: loadingAR } = useQuery<any[]>({
-    queryKey: ['/api/emerging-tech/ar-guides'],
-  });
+  const { data: arGuidesData } = useQuery<any[]>({ queryKey: ['/api/emerging-tech/ar-guides'] });
   const arGuides = arGuidesData ?? [];
 
-  const { data: iotSensorsData, isLoading: loadingIoT } = useQuery<any[]>({
-    queryKey: ['/api/emerging-tech/iot-sensors'],
-  });
+  const { data: iotSensorsData } = useQuery<any[]>({ queryKey: ['/api/emerging-tech/iot-sensors'] });
   const iotSensors = iotSensorsData ?? [];
 
-  const { data: models3DData, isLoading: loading3D } = useQuery<any[]>({
-    queryKey: ['/api/emerging-tech/3d-models'],
-  });
+  const { data: models3DData } = useQuery<any[]>({ queryKey: ['/api/emerging-tech/3d-models'] });
   const models3D = models3DData ?? [];
 
-  const { data: droneInspectionsData, isLoading: loadingDrone } = useQuery<any[]>({
-    queryKey: ['/api/emerging-tech/drone-inspections'],
-  });
+  const { data: droneInspectionsData } = useQuery<any[]>({ queryKey: ['/api/emerging-tech/drone-inspections'] });
   const droneInspections = droneInspectionsData ?? [];
 
-  const { data: aiVideoAnalysesData, isLoading: loadingAIVideo } = useQuery<any[]>({
-    queryKey: ['/api/emerging-tech/ai-video'],
-  });
+  const { data: aiVideoAnalysesData } = useQuery<any[]>({ queryKey: ['/api/emerging-tech/ai-video'] });
   const aiVideoAnalyses = aiVideoAnalysesData ?? [];
 
-  const { data: digitalTwinsData, isLoading: loadingTwins } = useQuery<any[]>({
-    queryKey: ['/api/emerging-tech/digital-twins'],
-  });
+  const { data: digitalTwinsData } = useQuery<any[]>({ queryKey: ['/api/emerging-tech/digital-twins'] });
   const digitalTwins = digitalTwinsData ?? [];
 
-  const { data: fraudCasesData, isLoading: loadingFraud } = useQuery<any[]>({
-    queryKey: ['/api/emerging-tech/fraud-cases'],
-  });
+  const { data: fraudCasesData } = useQuery<any[]>({ queryKey: ['/api/emerging-tech/fraud-cases'] });
   const fraudCases = fraudCasesData ?? [];
 
-  const { data: biometricData, isLoading: loadingBiometric } = useQuery<any>({
-    queryKey: ['/api/emerging-tech/biometric-profile'],
-  });
+  const { data: biometricData } = useQuery<any>({ queryKey: ['/api/emerging-tech/biometric-profile'] });
   const biometricProfile = biometricData;
 
-  const { data: collaborationSessionsData, isLoading: loadingCollab } = useQuery<any[]>({
-    queryKey: ['/api/emerging-tech/collaboration-sessions'],
-  });
+  const { data: collaborationSessionsData } = useQuery<any[]>({ queryKey: ['/api/emerging-tech/collaboration-sessions'] });
   const collaborationSessions = collaborationSessionsData ?? [];
 
-  const { data: edgeDevicesData, isLoading: loadingEdge } = useQuery<any[]>({
-    queryKey: ['/api/emerging-tech/edge-devices'],
-  });
+  const { data: edgeDevicesData } = useQuery<any[]>({ queryKey: ['/api/emerging-tech/edge-devices'] });
   const edgeDevices = edgeDevicesData ?? [];
 
-  const { data: pricingOptimizationsData, isLoading: loadingPricing } = useQuery<any[]>({
-    queryKey: ['/api/emerging-tech/pricing-optimization'],
-  });
+  const { data: pricingOptimizationsData } = useQuery<any[]>({ queryKey: ['/api/emerging-tech/pricing-optimization'] });
   const pricingOptimizations = pricingOptimizationsData ?? [];
 
-  const isLoading = loadingBlockchain || loadingAR || loadingIoT || loading3D ||
-    loadingDrone || loadingAIVideo || loadingTwins || loadingFraud ||
-    loadingBiometric || loadingCollab || loadingEdge || loadingPricing;
+  const isLoading = loadingBlockchain;
 
   const technologies = [
     {
@@ -237,182 +210,165 @@ export default function EmergingTechnologies() {
   }
 
   return (
-    <div className="p-6 dark:bg-gray-900 min-h-screen" data-testid="page-emerging-technologies">
-      <div className="max-w-7xl mx-auto space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-              Emerging Technologies
-            </h1>
-            <p className="text-gray-600 dark:text-gray-400 mt-1">
-              Cutting-edge innovations for next-generation automotive service management
-            </p>
-          </div>
-          <div className="flex items-center gap-3">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={() => seedMutation.mutate()}
-              disabled={seedMutation.isPending}
-              data-testid="button-seed-data"
+    <StandardPageLayout
+      title="Emerging Technologies"
+      description="Cutting-edge innovations for next-generation automotive service management"
+      icon={Zap}
+      secondaryActions={[
+        {
+          label: seedMutation.isPending ? "Seeding..." : "Seed Sample Data",
+          icon: Database,
+          onClick: () => seedMutation.mutate(),
+          variant: "outline",
+          testId: "button-seed-data",
+          disabled: seedMutation.isPending,
+        }
+      ]}
+    >
+      <div className="flex items-center gap-3 mb-6">
+        <Badge variant="outline" className="text-green-600 border-green-600">
+          <CheckCircle2 className="w-4 h-4 mr-1" />
+          12 Modules Active
+        </Badge>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-6">
+        {technologies.map((tech) => {
+          const Icon = tech.icon;
+          return (
+            <Card
+              key={tech.id}
+              className={`cursor-pointer transition-all hover:shadow-lg dark:bg-gray-800 ${
+                activeTab === tech.id ? 'ring-2 ring-primary' : ''
+              }`}
+              onClick={() => setActiveTab(tech.id)}
+              data-testid={`tech-card-${tech.id}`}
             >
-              {seedMutation.isPending ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Seeding...
-                </>
-              ) : (
-                <>
-                  <Database className="w-4 h-4 mr-2" />
-                  Seed Sample Data
-                </>
-              )}
-            </Button>
-            <Badge variant="outline" className="text-green-600 border-green-600">
-              <CheckCircle2 className="w-4 h-4 mr-1" />
-              12 Modules Active
-            </Badge>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {technologies.map((tech) => {
-            const Icon = tech.icon;
-            return (
-              <Card
-                key={tech.id}
-                className={`cursor-pointer transition-all hover:shadow-lg dark:bg-gray-800 ${
-                  activeTab === tech.id ? 'ring-2 ring-primary' : ''
-                }`}
-                onClick={() => setActiveTab(tech.id)}
-                data-testid={`tech-card-${tech.id}`}
-              >
-                <CardHeader className="pb-3">
-                  <div className="flex items-center gap-3">
-                    <div className={`p-2 rounded-lg bg-gray-100 dark:bg-gray-700`}>
-                      <Icon className={`w-6 h-6 ${tech.color}`} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <CardTitle className="text-sm font-semibold truncate dark:text-white">
-                        {tech.name}
-                      </CardTitle>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                        {tech.count} {tech.count === 1 ? 'record' : 'records'}
-                      </p>
-                    </div>
+              <CardHeader className="pb-3">
+                <div className="flex items-center gap-3">
+                  <div className={`p-2 rounded-lg bg-gray-100 dark:bg-gray-700`}>
+                    <Icon className={`w-6 h-6 ${tech.color}`} />
                   </div>
-                </CardHeader>
-              </Card>
-            );
-          })}
-        </div>
-
-        {selectedTech && (
-          <Card className="dark:bg-gray-800">
-            <CardHeader>
-              <div className="flex items-center gap-4">
-                {(() => {
-                  const Icon = selectedTech.icon;
-                  return (
-                    <div className="p-3 rounded-xl bg-gray-100 dark:bg-gray-700">
-                      <Icon className={`w-8 h-8 ${selectedTech.color}`} />
-                    </div>
-                  );
-                })()}
-                <div className="flex-1">
-                  <CardTitle className="text-2xl dark:text-white">{selectedTech.name}</CardTitle>
-                  <CardDescription className="mt-1 dark:text-gray-400">
-                    {selectedTech.description}
-                  </CardDescription>
+                  <div className="flex-1 min-w-0">
+                    <CardTitle className="text-sm font-semibold truncate dark:text-white">
+                      {tech.name}
+                    </CardTitle>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      {tech.count} {tech.count === 1 ? 'record' : 'records'}
+                    </p>
+                  </div>
                 </div>
-                <Badge variant="outline" className="text-green-600 border-green-600">
-                  {selectedTech.status.toUpperCase()}
-                </Badge>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div>
-                <h3 className="text-lg font-semibold mb-3 dark:text-white">Key Features</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {selectedTech.features.map((feature, idx) => (
-                    <div
-                      key={idx}
-                      className="flex items-center gap-2 p-3 rounded-lg bg-gray-50 dark:bg-gray-700"
-                      data-testid={`feature-${idx}`}
-                    >
-                      <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0" />
-                      <span className="text-sm text-gray-700 dark:text-gray-300">{feature}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              </CardHeader>
+            </Card>
+          );
+        })}
+      </div>
 
-              <div className="flex gap-3">
-                <Button className="flex-1" data-testid="button-configure">
-                  Configure Module
-                </Button>
-                <Button variant="outline" className="flex-1" data-testid="button-view-documentation">
-                  View Documentation
-                </Button>
-                <Button variant="outline" data-testid="button-test-integration">
-                  Test Integration
-                </Button>
-              </div>
-
-              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-                <h4 className="font-semibold text-blue-900 dark:text-blue-300 mb-2">
-                  Module Status & Integration
-                </h4>
-                <p className="text-sm text-blue-800 dark:text-blue-400">
-                  This module is fully integrated with the SALIS AUTO platform. All database schemas, API routes,
-                  and storage interfaces are configured and ready for deployment. Advanced features and
-                  customization options are available through the configuration panel.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        <Card className="dark:bg-gray-800">
+      {selectedTech && (
+        <Card className="dark:bg-gray-800 mb-6">
           <CardHeader>
-            <CardTitle className="dark:text-white">Technology Stack Overview</CardTitle>
-            <CardDescription className="dark:text-gray-400">
-              Enterprise-grade infrastructure powering all 12 emerging technology modules
-            </CardDescription>
+            <div className="flex items-center gap-4">
+              {(() => {
+                const Icon = selectedTech.icon;
+                return (
+                  <div className="p-3 rounded-xl bg-gray-100 dark:bg-gray-700">
+                    <Icon className={`w-8 h-8 ${selectedTech.color}`} />
+                  </div>
+                );
+              })()}
+              <div className="flex-1">
+                <CardTitle className="text-2xl dark:text-white">{selectedTech.name}</CardTitle>
+                <CardDescription className="mt-1 dark:text-gray-400">
+                  {selectedTech.description}
+                </CardDescription>
+              </div>
+              <Badge variant="outline" className="text-green-600 border-green-600">
+                {selectedTech.status.toUpperCase()}
+              </Badge>
+            </div>
           </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="space-y-2">
-                <h4 className="font-semibold text-gray-900 dark:text-white">Blockchain & Distributed</h4>
-                <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
-                  <li>• Ethereum & Polygon Networks</li>
-                  <li>• Smart Contract Integration</li>
-                  <li>• IPFS Decentralized Storage</li>
-                  <li>• Web3 Wallet Support</li>
-                </ul>
+          <CardContent className="space-y-6">
+            <div>
+              <h3 className="text-lg font-semibold mb-3 dark:text-white">Key Features</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {selectedTech.features.map((feature, idx) => (
+                  <div
+                    key={idx}
+                    className="flex items-center gap-2 p-3 rounded-lg bg-gray-50 dark:bg-gray-700"
+                    data-testid={`feature-${idx}`}
+                  >
+                    <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0" />
+                    <span className="text-sm text-gray-700 dark:text-gray-300">{feature}</span>
+                  </div>
+                ))}
               </div>
-              <div className="space-y-2">
-                <h4 className="font-semibold text-gray-900 dark:text-white">AI & Machine Learning</h4>
-                <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
-                  <li>• OpenAI GPT-5 Integration</li>
-                  <li>• TensorFlow ML Models</li>
-                  <li>• Computer Vision APIs</li>
-                  <li>• Predictive Analytics Engine</li>
-                </ul>
-              </div>
-              <div className="space-y-2">
-                <h4 className="font-semibold text-gray-900 dark:text-white">Hardware & IoT</h4>
-                <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
-                  <li>• Industrial IoT Sensors</li>
-                  <li>• 4K Drone Systems</li>
-                  <li>• Edge Computing Devices</li>
-                  <li>• Biometric Scanners</li>
-                </ul>
-              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <Button className="flex-1" data-testid="button-configure">
+                Configure Module
+              </Button>
+              <Button variant="outline" className="flex-1" data-testid="button-view-documentation">
+                View Documentation
+              </Button>
+              <Button variant="outline" data-testid="button-test-integration">
+                Test Integration
+              </Button>
+            </div>
+
+            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+              <h4 className="font-semibold text-blue-900 dark:text-blue-300 mb-2">
+                Module Status & Integration
+              </h4>
+              <p className="text-sm text-blue-800 dark:text-blue-400">
+                This module is fully integrated with the SALIS AUTO platform. All database schemas, API routes,
+                and storage interfaces are configured and ready for deployment. Advanced features and
+                customization options are available through the configuration panel.
+              </p>
             </div>
           </CardContent>
         </Card>
-      </div>
-    </div>
+      )}
+
+      <Card className="dark:bg-gray-800">
+        <CardHeader>
+          <CardTitle className="dark:text-white">Technology Stack Overview</CardTitle>
+          <CardDescription className="dark:text-gray-400">
+            Enterprise-grade infrastructure powering all 12 emerging technology modules
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="space-y-2">
+              <h4 className="font-semibold text-gray-900 dark:text-white">Blockchain & Distributed</h4>
+              <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
+                <li>• Ethereum & Polygon Networks</li>
+                <li>• Smart Contract Integration</li>
+                <li>• IPFS Decentralized Storage</li>
+                <li>• Web3 Wallet Support</li>
+              </ul>
+            </div>
+            <div className="space-y-2">
+              <h4 className="font-semibold text-gray-900 dark:text-white">AI & Machine Learning</h4>
+              <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
+                <li>• OpenAI GPT-5 Integration</li>
+                <li>• TensorFlow ML Models</li>
+                <li>• Computer Vision APIs</li>
+                <li>• Predictive Analytics Engine</li>
+              </ul>
+            </div>
+            <div className="space-y-2">
+              <h4 className="font-semibold text-gray-900 dark:text-white">Hardware & IoT</h4>
+              <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
+                <li>• Industrial IoT Sensors</li>
+                <li>• 4K Drone Systems</li>
+                <li>• Edge Computing Devices</li>
+                <li>• Biometric Scanners</li>
+              </ul>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </StandardPageLayout>
   );
 }

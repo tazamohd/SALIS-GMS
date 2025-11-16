@@ -48,6 +48,7 @@ import {
 import { formatDistanceToNow } from "date-fns";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
+import { StandardPageLayout } from "@/components/layouts";
 
 interface ChatConversation {
   id: string;
@@ -141,7 +142,6 @@ export default function Chat() {
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Support ticket form state
   const [ticketSubject, setTicketSubject] = useState("");
   const [ticketDescription, setTicketDescription] = useState("");
   const [ticketCategory, setTicketCategory] = useState("");
@@ -243,7 +243,6 @@ export default function Chat() {
     },
   });
 
-  // WebSocket event handlers
   useEffect(() => {
     if (user?.id && user?.garageId) {
       chatWebSocket.connect(user.id, user.garageId);
@@ -451,381 +450,379 @@ export default function Chat() {
   );
 
   return (
-    <div className="h-[calc(100vh-4rem)] flex">
-      {/* Sidebar */}
-      <Card className="w-80 flex flex-col border-r rounded-none bg-white dark:bg-salis-black">
-        <div className="p-4 border-b dark:border-salis-gray-dark">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-montserrat font-semibold text-salis-black dark:text-salis-white">
-              Support & Chat
-            </h2>
-            <Dialog open={showSupportDialog} onOpenChange={setShowSupportDialog}>
-              <DialogTrigger asChild>
-                <Button size="sm" variant="ghost" data-testid="button-new-ticket">
-                  <Ticket className="h-4 w-4 mr-1" />
-                  New Ticket
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[500px]">
-                <DialogHeader>
-                  <DialogTitle>Create Support Ticket</DialogTitle>
-                  <DialogDescription>
-                    Submit a support request and our team will assist you shortly.
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="grid gap-4 py-4">
-                  <div className="grid gap-2">
-                    <Label htmlFor="subject">Subject *</Label>
-                    <Input
-                      id="subject"
-                      value={ticketSubject}
-                      onChange={(e) => setTicketSubject(e.target.value)}
-                      placeholder="Brief description of your issue"
-                      data-testid="input-ticket-subject"
-                    />
-                  </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="category">Category *</Label>
-                    <Select value={ticketCategory} onValueChange={setTicketCategory}>
-                      <SelectTrigger data-testid="select-ticket-category">
-                        <SelectValue placeholder="Select category" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="technical">Technical Support</SelectItem>
-                        <SelectItem value="billing">Billing</SelectItem>
-                        <SelectItem value="feature">Feature Request</SelectItem>
-                        <SelectItem value="bug">Bug Report</SelectItem>
-                        <SelectItem value="account">Account Issue</SelectItem>
-                        <SelectItem value="other">Other</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="priority">Priority</Label>
-                    <Select value={ticketPriority} onValueChange={setTicketPriority}>
-                      <SelectTrigger data-testid="select-ticket-priority">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="low">Low</SelectItem>
-                        <SelectItem value="medium">Medium</SelectItem>
-                        <SelectItem value="high">High</SelectItem>
-                        <SelectItem value="urgent">Urgent</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="description">Description *</Label>
-                    <Textarea
-                      id="description"
-                      value={ticketDescription}
-                      onChange={(e) => setTicketDescription(e.target.value)}
-                      placeholder="Provide detailed information about your issue"
-                      rows={4}
-                      data-testid="textarea-ticket-description"
-                    />
-                  </div>
-                </div>
-                <DialogFooter>
-                  <Button
-                    onClick={handleCreateTicket}
-                    disabled={createTicketMutation.isPending}
-                    data-testid="button-submit-ticket"
-                  >
-                    {createTicketMutation.isPending ? "Creating..." : "Create Ticket"}
+    <StandardPageLayout
+      title="Support & Chat"
+      description="Real-time messaging and support ticket management"
+      icon={MessageCircle}
+      contentClassName="!p-0 !h-[calc(100vh-4rem)]"
+    >
+      <div className="h-full flex">
+        <Card className="w-80 flex flex-col border-r rounded-none bg-white dark:bg-salis-black">
+          <div className="p-4 border-b dark:border-salis-gray-dark">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-montserrat font-semibold text-salis-black dark:text-salis-white">
+                Messages
+              </h2>
+              <Dialog open={showSupportDialog} onOpenChange={setShowSupportDialog}>
+                <DialogTrigger asChild>
+                  <Button size="sm" variant="ghost" data-testid="button-new-ticket">
+                    <Ticket className="h-4 w-4 mr-1" />
+                    New Ticket
                   </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-          </div>
-          <div className="relative">
-            <Search className="absolute left-3 top-2.5 h-4 w-4 text-salis-gray dark:text-salis-gray-light" />
-            <Input
-              placeholder="Search conversations..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9"
-              data-testid="input-search-conversations"
-            />
-          </div>
-        </div>
-
-        <ScrollArea className="flex-1">
-          {/* Support Tickets Section */}
-          {tickets.length > 0 && (
-            <div className="p-2 border-b dark:border-salis-gray-dark">
-              <h3 className="text-xs font-semibold text-salis-gray dark:text-salis-gray-light px-3 py-2 mb-1">
-                Support Tickets
-              </h3>
-              {tickets.slice(0, 3).map((ticket) => (
-                <div
-                  key={ticket.id}
-                  className="p-3 rounded-lg hover:bg-salis-gray-light/20 dark:hover:bg-salis-gray-dark/20 mb-1 cursor-pointer"
-                  data-testid={`ticket-${ticket.id}`}
-                >
-                  <div className="flex items-start justify-between mb-1">
-                    <span className="text-xs font-mono text-salis-gray dark:text-salis-gray-light">
-                      {ticket.ticketNumber}
-                    </span>
-                    <div className={cn("text-xs", getStatusColor(ticket.status))}>
-                      {getStatusIcon(ticket.status)}
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[500px]">
+                  <DialogHeader>
+                    <DialogTitle>Create Support Ticket</DialogTitle>
+                    <DialogDescription>
+                      Submit a support request and our team will assist you shortly.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="grid gap-4 py-4">
+                    <div className="grid gap-2">
+                      <Label htmlFor="subject">Subject *</Label>
+                      <Input
+                        id="subject"
+                        value={ticketSubject}
+                        onChange={(e) => setTicketSubject(e.target.value)}
+                        placeholder="Brief description of your issue"
+                        data-testid="input-ticket-subject"
+                      />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="category">Category *</Label>
+                      <Select value={ticketCategory} onValueChange={setTicketCategory}>
+                        <SelectTrigger data-testid="select-ticket-category">
+                          <SelectValue placeholder="Select category" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="technical">Technical Support</SelectItem>
+                          <SelectItem value="billing">Billing</SelectItem>
+                          <SelectItem value="feature">Feature Request</SelectItem>
+                          <SelectItem value="bug">Bug Report</SelectItem>
+                          <SelectItem value="account">Account Issue</SelectItem>
+                          <SelectItem value="other">Other</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="priority">Priority</Label>
+                      <Select value={ticketPriority} onValueChange={setTicketPriority}>
+                        <SelectTrigger data-testid="select-ticket-priority">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="low">Low</SelectItem>
+                          <SelectItem value="medium">Medium</SelectItem>
+                          <SelectItem value="high">High</SelectItem>
+                          <SelectItem value="urgent">Urgent</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="description">Description *</Label>
+                      <Textarea
+                        id="description"
+                        value={ticketDescription}
+                        onChange={(e) => setTicketDescription(e.target.value)}
+                        placeholder="Provide detailed information about your issue"
+                        rows={4}
+                        data-testid="textarea-ticket-description"
+                      />
                     </div>
                   </div>
-                  <p className="text-sm font-medium text-salis-black dark:text-salis-white truncate mb-1">
-                    {ticket.subject}
-                  </p>
-                  <div className="flex items-center gap-2">
-                    <Badge className={cn("text-xs", getPriorityColor(ticket.priority))}>
-                      {ticket.priority}
-                    </Badge>
-                    <span className="text-xs text-salis-gray dark:text-salis-gray-light">
-                      {ticket.category}
-                    </span>
-                  </div>
-                </div>
-              ))}
+                  <DialogFooter>
+                    <Button
+                      onClick={handleCreateTicket}
+                      disabled={createTicketMutation.isPending}
+                      data-testid="button-submit-ticket"
+                    >
+                      {createTicketMutation.isPending ? "Creating..." : "Create Ticket"}
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
             </div>
-          )}
+            <div className="relative">
+              <Search className="absolute left-3 top-2.5 h-4 w-4 text-salis-gray dark:text-salis-gray-light" />
+              <Input
+                placeholder="Search conversations..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-9"
+                data-testid="input-search-conversations"
+              />
+            </div>
+          </div>
 
-          {/* Conversations Section */}
-          <div className="p-2">
-            <h3 className="text-xs font-semibold text-salis-gray dark:text-salis-gray-light px-3 py-2 mb-1">
-              Conversations
-            </h3>
-            {filteredConversations.length === 0 ? (
-              <div className="text-center py-8">
-                <MessageCircle className="h-12 w-12 mx-auto text-salis-gray dark:text-salis-gray-light mb-3" />
-                <p className="text-sm text-salis-gray dark:text-salis-gray-light">No conversations yet</p>
-              </div>
-            ) : (
-              filteredConversations.map((conversation) => (
-                <button
-                  key={conversation.id}
-                  onClick={() => setSelectedConversationId(conversation.id)}
-                  className={cn(
-                    "w-full p-3 rounded-lg text-left transition-colors mb-1",
-                    selectedConversationId === conversation.id
-                      ? "bg-salis-black dark:bg-salis-white text-salis-white dark:text-salis-black"
-                      : "hover:bg-salis-gray-light/20 dark:hover:bg-salis-gray-dark/20"
-                  )}
-                  data-testid={`button-conversation-${conversation.id}`}
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-3 flex-1 min-w-0">
-                      <Avatar className="h-10 w-10 flex-shrink-0">
-                        <AvatarFallback className="bg-salis-gray dark:bg-salis-gray-dark text-salis-white font-medium">
-                          {conversation.title?.charAt(0) || '?'}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium font-poppins truncate">
-                          {conversation.title || 'Untitled Conversation'}
-                        </p>
-                        {conversation.lastMessageAt && (
-                          <p className="text-xs text-salis-gray dark:text-salis-gray-light">
-                            {formatDistanceToNow(new Date(conversation.lastMessageAt), {
-                              addSuffix: true,
-                            })}
-                          </p>
-                        )}
+          <ScrollArea className="flex-1">
+            {tickets.length > 0 && (
+              <div className="p-2 border-b dark:border-salis-gray-dark">
+                <h3 className="text-xs font-semibold text-salis-gray dark:text-salis-gray-light px-3 py-2 mb-1">
+                  Support Tickets
+                </h3>
+                {tickets.slice(0, 3).map((ticket) => (
+                  <div
+                    key={ticket.id}
+                    className="p-3 rounded-lg hover:bg-salis-gray-light/20 dark:hover:bg-salis-gray-dark/20 mb-1 cursor-pointer"
+                    data-testid={`ticket-${ticket.id}`}
+                  >
+                    <div className="flex items-start justify-between mb-1">
+                      <span className="text-xs font-mono text-salis-gray dark:text-salis-gray-light">
+                        {ticket.ticketNumber}
+                      </span>
+                      <div className={cn("text-xs", getStatusColor(ticket.status))}>
+                        {getStatusIcon(ticket.status)}
                       </div>
                     </div>
-                  </div>
-                </button>
-              ))
-            )}
-          </div>
-        </ScrollArea>
-      </Card>
-
-      {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col bg-salis-gray-light/10 dark:bg-salis-black">
-        {selectedConversation ? (
-          <>
-            {/* Chat Header */}
-            <div className="p-4 border-b bg-white dark:bg-salis-black dark:border-salis-gray-dark">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <Avatar className="h-10 w-10">
-                    <AvatarFallback className="bg-salis-black dark:bg-salis-white text-salis-white dark:text-salis-black font-medium">
-                      {selectedConversation.title?.charAt(0) || '?'}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <h3 className="font-montserrat font-semibold text-salis-black dark:text-salis-white">
-                      {selectedConversation.title || 'Untitled Conversation'}
-                    </h3>
-                    <p className="text-xs text-salis-gray dark:text-salis-gray-light">
-                      {participants.length} participant{participants.length !== 1 ? 's' : ''}
+                    <p className="text-sm font-medium text-salis-black dark:text-salis-white truncate mb-1">
+                      {ticket.subject}
                     </p>
+                    <div className="flex items-center gap-2">
+                      <Badge className={cn("text-xs", getPriorityColor(ticket.priority))}>
+                        {ticket.priority}
+                      </Badge>
+                      <span className="text-xs text-salis-gray dark:text-salis-gray-light">
+                        {ticket.category}
+                      </span>
+                    </div>
                   </div>
-                </div>
-                <Button size="sm" variant="ghost" data-testid="button-conversation-options">
-                  <MoreVertical className="h-4 w-4" />
-                </Button>
+                ))}
               </div>
-            </div>
+            )}
 
-            {/* Messages Area */}
-            <ScrollArea className="flex-1 p-4">
-              <div className="space-y-4">
-                {messages.length === 0 ? (
-                  <div className="text-center py-12">
-                    <MessageCircle className="h-16 w-16 mx-auto text-salis-gray dark:text-salis-gray-light mb-4" />
-                    <p className="text-salis-gray dark:text-salis-gray-light">No messages yet. Start the conversation!</p>
-                  </div>
-                ) : (
-                  [...messages].reverse().map((message) => {
-                    const isOwnMessage = message.senderId === user?.id;
-                    return (
-                      <div
-                        key={message.id}
-                        className={cn(
-                          "flex",
-                          isOwnMessage ? "justify-end" : "justify-start"
-                        )}
-                        data-testid={`message-${message.id}`}
-                      >
-                        <div
-                          className={cn(
-                            "max-w-[70%] rounded-lg p-3",
-                            isOwnMessage
-                              ? "bg-salis-black dark:bg-salis-white text-salis-white dark:text-salis-black"
-                              : "bg-white dark:bg-salis-gray-dark text-salis-black dark:text-salis-white"
-                          )}
-                        >
-                          <p className="font-poppins whitespace-pre-wrap break-words">
-                            {message.content}
+            <div className="p-2">
+              <h3 className="text-xs font-semibold text-salis-gray dark:text-salis-gray-light px-3 py-2 mb-1">
+                Conversations
+              </h3>
+              {filteredConversations.length === 0 ? (
+                <div className="text-center py-8">
+                  <MessageCircle className="h-12 w-12 mx-auto text-salis-gray dark:text-salis-gray-light mb-3" />
+                  <p className="text-sm text-salis-gray dark:text-salis-gray-light">No conversations yet</p>
+                </div>
+              ) : (
+                filteredConversations.map((conversation) => (
+                  <button
+                    key={conversation.id}
+                    onClick={() => setSelectedConversationId(conversation.id)}
+                    className={cn(
+                      "w-full p-3 rounded-lg text-left transition-colors mb-1",
+                      selectedConversationId === conversation.id
+                        ? "bg-salis-black dark:bg-salis-white text-salis-white dark:text-salis-black"
+                        : "hover:bg-salis-gray-light/20 dark:hover:bg-salis-gray-dark/20"
+                    )}
+                    data-testid={`button-conversation-${conversation.id}`}
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center gap-3 flex-1 min-w-0">
+                        <Avatar className="h-10 w-10 flex-shrink-0">
+                          <AvatarFallback className="bg-salis-gray dark:bg-salis-gray-dark text-salis-white font-medium">
+                            {conversation.title?.charAt(0) || '?'}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium font-poppins truncate">
+                            {conversation.title || 'Untitled Conversation'}
                           </p>
-                          <div className="flex items-center gap-2 mt-2">
-                            <p className="text-xs opacity-70">
-                              {formatDistanceToNow(new Date(message.createdAt), {
+                          {conversation.lastMessageAt && (
+                            <p className="text-xs text-salis-gray dark:text-salis-gray-light">
+                              {formatDistanceToNow(new Date(conversation.lastMessageAt), {
                                 addSuffix: true,
                               })}
                             </p>
-                            {message.isEdited && (
-                              <Badge variant="outline" className="text-xs">
-                                Edited
-                              </Badge>
-                            )}
-                          </div>
-                          <div className="flex gap-1 mt-2">
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              className="h-6 px-2"
-                              onClick={() => addReactionMutation.mutate({ messageId: message.id, emoji: '👍' })}
-                            >
-                              <Smile className="h-3 w-3" />
-                            </Button>
-                          </div>
+                          )}
                         </div>
                       </div>
-                    );
-                  })
-                )}
+                    </div>
+                  </button>
+                ))
+              )}
+            </div>
+          </ScrollArea>
+        </Card>
 
-                {/* Typing Indicator */}
-                {conversationTypingUsers.length > 0 && (
-                  <div className="flex justify-start">
-                    <div className="bg-white dark:bg-salis-gray-dark rounded-lg px-4 py-2">
-                      <p className="text-sm text-salis-gray dark:text-salis-gray-light italic">
-                        {conversationTypingUsers[0].userName} is typing...
+        <div className="flex-1 flex flex-col bg-salis-gray-light/10 dark:bg-salis-black">
+          {selectedConversation ? (
+            <>
+              <div className="p-4 border-b bg-white dark:bg-salis-black dark:border-salis-gray-dark">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <Avatar className="h-10 w-10">
+                      <AvatarFallback className="bg-salis-black dark:bg-salis-white text-salis-white dark:text-salis-black font-medium">
+                        {selectedConversation.title?.charAt(0) || '?'}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <h3 className="font-montserrat font-semibold text-salis-black dark:text-salis-white">
+                        {selectedConversation.title || 'Untitled Conversation'}
+                      </h3>
+                      <p className="text-xs text-salis-gray dark:text-salis-gray-light">
+                        {participants.length} participant{participants.length !== 1 ? 's' : ''}
                       </p>
                     </div>
                   </div>
-                )}
-
-                <div ref={messagesEndRef} />
-              </div>
-            </ScrollArea>
-
-            {/* File Upload Preview */}
-            {uploadingFiles.length > 0 && (
-              <div className="px-4 py-2 border-t bg-white dark:bg-salis-black dark:border-salis-gray-dark">
-                <div className="flex gap-2 flex-wrap">
-                  {uploadingFiles.map((file, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center gap-2 bg-salis-gray-light/20 dark:bg-salis-gray-dark/20 rounded px-3 py-2"
-                    >
-                      <Paperclip className="h-4 w-4" />
-                      <span className="text-sm truncate max-w-[200px]">{file.name}</span>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="h-6 w-6 p-0"
-                        onClick={() => removeFile(index)}
-                      >
-                        <X className="h-3 w-3" />
-                      </Button>
-                    </div>
-                  ))}
+                  <Button size="sm" variant="ghost" data-testid="button-conversation-options">
+                    <MoreVertical className="h-4 w-4" />
+                  </Button>
                 </div>
               </div>
-            )}
 
-            {/* Message Input */}
-            <div className="p-4 border-t bg-white dark:bg-salis-black dark:border-salis-gray-dark">
-              <div className="flex items-center gap-2">
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  onChange={handleFileSelect}
-                  multiple
-                  className="hidden"
-                  accept="image/*,application/pdf,.doc,.docx,.xls,.xlsx"
-                />
+              <ScrollArea className="flex-1 p-4">
+                <div className="space-y-4">
+                  {messages.length === 0 ? (
+                    <div className="text-center py-12">
+                      <MessageCircle className="h-16 w-16 mx-auto text-salis-gray dark:text-salis-gray-light mb-4" />
+                      <p className="text-salis-gray dark:text-salis-gray-light">No messages yet. Start the conversation!</p>
+                    </div>
+                  ) : (
+                    [...messages].reverse().map((message) => {
+                      const isOwnMessage = message.senderId === user?.id;
+                      return (
+                        <div
+                          key={message.id}
+                          className={cn(
+                            "flex",
+                            isOwnMessage ? "justify-end" : "justify-start"
+                          )}
+                          data-testid={`message-${message.id}`}
+                        >
+                          <div
+                            className={cn(
+                              "max-w-[70%] rounded-lg p-3",
+                              isOwnMessage
+                                ? "bg-salis-black dark:bg-salis-white text-salis-white dark:text-salis-black"
+                                : "bg-white dark:bg-salis-gray-dark text-salis-black dark:text-salis-white"
+                            )}
+                          >
+                            <p className="font-poppins whitespace-pre-wrap break-words">
+                              {message.content}
+                            </p>
+                            <div className="flex items-center gap-2 mt-2">
+                              <p className="text-xs opacity-70">
+                                {formatDistanceToNow(new Date(message.createdAt), {
+                                  addSuffix: true,
+                                })}
+                              </p>
+                              {message.isEdited && (
+                                <Badge variant="outline" className="text-xs">
+                                  Edited
+                                </Badge>
+                              )}
+                            </div>
+                            <div className="flex gap-1 mt-2">
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                className="h-6 px-2"
+                                onClick={() => addReactionMutation.mutate({ messageId: message.id, emoji: '👍' })}
+                              >
+                                <Smile className="h-3 w-3" />
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+
+                  {conversationTypingUsers.length > 0 && (
+                    <div className="flex justify-start">
+                      <div className="bg-white dark:bg-salis-gray-dark rounded-lg px-4 py-2">
+                        <p className="text-sm text-salis-gray dark:text-salis-gray-light italic">
+                          {conversationTypingUsers[0].userName} is typing...
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  <div ref={messagesEndRef} />
+                </div>
+              </ScrollArea>
+
+              {uploadingFiles.length > 0 && (
+                <div className="px-4 py-2 border-t bg-white dark:bg-salis-black dark:border-salis-gray-dark">
+                  <div className="flex gap-2 flex-wrap">
+                    {uploadingFiles.map((file, index) => (
+                      <div
+                        key={index}
+                        className="flex items-center gap-2 bg-salis-gray-light/20 dark:bg-salis-gray-dark/20 rounded px-3 py-2"
+                      >
+                        <Paperclip className="h-4 w-4" />
+                        <span className="text-sm truncate max-w-[200px]">{file.name}</span>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-6 w-6 p-0"
+                          onClick={() => removeFile(index)}
+                        >
+                          <X className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="p-4 border-t bg-white dark:bg-salis-black dark:border-salis-gray-dark">
+                <div className="flex items-center gap-2">
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleFileSelect}
+                    multiple
+                    className="hidden"
+                    accept="image/*,application/pdf,.doc,.docx,.xls,.xlsx"
+                  />
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => fileInputRef.current?.click()}
+                    data-testid="button-attach-file"
+                  >
+                    <Paperclip className="h-4 w-4" />
+                  </Button>
+                  <Input
+                    placeholder="Type a message..."
+                    value={newMessage}
+                    onChange={(e) => {
+                      setNewMessage(e.target.value);
+                      handleTyping();
+                    }}
+                    onKeyPress={handleKeyPress}
+                    className="flex-1"
+                    data-testid="input-message"
+                  />
+                  <Button
+                    onClick={handleSendMessage}
+                    disabled={!newMessage.trim() || sendMessageMutation.isPending}
+                    data-testid="button-send-message"
+                  >
+                    <Send className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="flex-1 flex items-center justify-center">
+              <div className="text-center">
+                <MessageCircle className="h-24 w-24 mx-auto text-salis-gray dark:text-salis-gray-light mb-4" />
+                <h3 className="font-montserrat font-semibold text-xl text-salis-black dark:text-salis-white mb-2">
+                  Welcome to Support & Chat
+                </h3>
+                <p className="text-salis-gray dark:text-salis-gray-light mb-4">
+                  Select a conversation or create a support ticket to get started
+                </p>
                 <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => fileInputRef.current?.click()}
-                  data-testid="button-attach-file"
+                  onClick={() => setShowSupportDialog(true)}
+                  data-testid="button-create-ticket-cta"
                 >
-                  <Paperclip className="h-4 w-4" />
-                </Button>
-                <Input
-                  placeholder="Type a message..."
-                  value={newMessage}
-                  onChange={(e) => {
-                    setNewMessage(e.target.value);
-                    handleTyping();
-                  }}
-                  onKeyPress={handleKeyPress}
-                  className="flex-1"
-                  data-testid="input-message"
-                />
-                <Button
-                  onClick={handleSendMessage}
-                  disabled={!newMessage.trim() || sendMessageMutation.isPending}
-                  data-testid="button-send-message"
-                >
-                  <Send className="h-4 w-4" />
+                  <Ticket className="h-4 w-4 mr-2" />
+                  Create Support Ticket
                 </Button>
               </div>
             </div>
-          </>
-        ) : (
-          <div className="flex-1 flex items-center justify-center">
-            <div className="text-center">
-              <MessageCircle className="h-24 w-24 mx-auto text-salis-gray dark:text-salis-gray-light mb-4" />
-              <h3 className="font-montserrat font-semibold text-xl text-salis-black dark:text-salis-white mb-2">
-                Welcome to Support & Chat
-              </h3>
-              <p className="text-salis-gray dark:text-salis-gray-light mb-4">
-                Select a conversation or create a support ticket to get started
-              </p>
-              <Button
-                onClick={() => setShowSupportDialog(true)}
-                data-testid="button-create-ticket-cta"
-              >
-                <Ticket className="h-4 w-4 mr-2" />
-                Create Support Ticket
-              </Button>
-            </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
-    </div>
+    </StandardPageLayout>
   );
 }

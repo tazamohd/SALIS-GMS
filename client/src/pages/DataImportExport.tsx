@@ -13,10 +13,10 @@ import {
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { ExportJob } from "@shared/schema";
+import { TabsPageLayout } from "@/components/layouts";
 
 export default function DataImportExport() {
   const { toast } = useToast();
@@ -25,7 +25,6 @@ export default function DataImportExport() {
   const [importFile, setImportFile] = useState<File | null>(null);
   const [garageId, setGarageId] = useState("");
 
-  // Get garages
   const { data: garages } = useQuery<any[]>({
     queryKey: ['/api/garages'],
   });
@@ -36,13 +35,11 @@ export default function DataImportExport() {
     }
   }, [garages, garageId]);
 
-  // Get export jobs
   const { data: exportJobs } = useQuery<ExportJob[]>({
     queryKey: ['/api/export-jobs', { garageId }],
     enabled: !!garageId,
   });
 
-  // Export mutation
   const exportMutation = useMutation({
     mutationFn: async () => {
       return apiRequest("POST", "/api/export", {
@@ -63,7 +60,6 @@ export default function DataImportExport() {
     },
   });
 
-  // Import mutation
   const importMutation = useMutation({
     mutationFn: async (data: any[]) => {
       return apiRequest("POST", "/api/import", {
@@ -78,7 +74,6 @@ export default function DataImportExport() {
         description: `Imported: ${result.imported}, Skipped: ${result.skipped}, Errors: ${result.errors.length}` 
       });
       setImportFile(null);
-      // Invalidate relevant queries
       queryClient.invalidateQueries({
         predicate: (query) => {
           const key = query.queryKey[0];
@@ -169,203 +164,224 @@ export default function DataImportExport() {
     { value: "spareParts", label: "Spare Parts" },
   ];
 
-  return (
-    <div className="container mx-auto p-8 bg-gray-50 dark:bg-salis-black min-h-screen space-y-6">
-      <div>
-        <h1 className="font-['Poppins',Helvetica] font-bold text-3xl text-gray-900 dark:text-white">Data Import/Export</h1>
-        <p className="text-gray-900 dark:text-white/60">Import and export data across modules</p>
-      </div>
-
-      {garages && garages.length > 0 && (
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
-          <CardHeader>
-            <CardTitle className="text-gray-900 dark:text-white">Select Garage</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Select value={garageId} onValueChange={setGarageId}>
-              <SelectTrigger data-testid="select-garage">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {garages.map((garage: any) => (
-                  <SelectItem key={garage.id} value={garage.id}>
-                    {garage.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </CardContent>
-        </Card>
-      )}
-
-      <div className="grid md:grid-cols-2 gap-6">
-        {/* Export Section */}
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Download className="h-5 w-5" />
-              Export Data
-            </CardTitle>
-            <CardDescription className="text-gray-900 dark:text-white/60">Export data from selected module</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label>Module</Label>
-              <Select value={selectedModule} onValueChange={setSelectedModule}>
-                <SelectTrigger data-testid="select-export-module">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {modules.map(({ value, label }) => (
-                    <SelectItem key={value} value={value}>{label}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label>Format</Label>
-              <Select value={selectedFormat} onValueChange={setSelectedFormat}>
-                <SelectTrigger data-testid="select-export-format">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="csv">
-                    <div className="flex items-center gap-2">
-                      <FileSpreadsheet className="h-4 w-4" />
-                      CSV
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="json">
-                    <div className="flex items-center gap-2">
-                      <FileJson className="h-4 w-4" />
-                      JSON
-                    </div>
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <Button
-              className="w-full"
-              onClick={handleExport}
-              disabled={exportMutation.isPending || !garageId}
-              data-testid="button-export"
-            >
-              <Download className="h-4 w-4 mr-2" />
-              {exportMutation.isPending ? "Starting Export..." : "Export Data"}
-            </Button>
-          </CardContent>
-        </Card>
-
-        {/* Import Section */}
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Upload className="h-5 w-5" />
-              Import Data
-            </CardTitle>
-            <CardDescription className="text-gray-900 dark:text-white/60">Import data from CSV or JSON file</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label>Module</Label>
-              <Select value={selectedModule} onValueChange={setSelectedModule}>
-                <SelectTrigger data-testid="select-import-module">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {modules.map(({ value, label }) => (
-                    <SelectItem key={value} value={value}>{label}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label>File</Label>
-              <Input
-                type="file"
-                accept=".csv,.json"
-                onChange={(e) => setImportFile(e.target.files?.[0] || null)}
-                data-testid="input-import-file"
-              />
-              {importFile && (
-                <p className="text-sm text-gray-900 dark:text-white/60">
-                  Selected: {importFile.name}
-                </p>
-              )}
-            </div>
-
-            <Button
-              className="w-full"
-              onClick={handleImport}
-              disabled={importMutation.isPending || !importFile}
-              data-testid="button-import"
-            >
-              <Upload className="h-4 w-4 mr-2" />
-              {importMutation.isPending ? "Importing..." : "Import Data"}
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Export Jobs History */}
-      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
-        <CardHeader>
-          <CardTitle className="text-gray-900 dark:text-white">Export History</CardTitle>
-          <CardDescription className="text-gray-900 dark:text-white/60">Recent export jobs</CardDescription>
-        </CardHeader>
-        <CardContent>
-          {!exportJobs || exportJobs.length === 0 ? (
-            <div className="text-center text-gray-900 dark:text-white/60 py-8">
-              No export history
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {exportJobs.map((job) => (
-                <div
-                  key={job.id}
-                  className="flex items-center justify-between p-4 border border-gray-200 dark:border-salis-gray-dark rounded-lg"
-                  data-testid={`export-job-${job.id}`}
-                >
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium">{modules.find(m => m.value === job.module)?.label}</span>
-                      <span className="text-sm text-gray-900 dark:text-white/60">({job.format.toUpperCase()})</span>
-                    </div>
-                    <div className="text-sm text-gray-900 dark:text-white/60">
-                      {job.createdAt && new Date(job.createdAt).toLocaleString()}
-                      {job.recordCount && ` • ${job.recordCount} records`}
-                    </div>
-                    {job.errorMessage && (
-                      <div className="text-sm text-destructive mt-1">
-                        Error: {job.errorMessage}
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-3">
-                    {getStatusBadge(job.status)}
-                    {job.status === 'completed' && job.fileUrl && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        asChild
-                        data-testid={`button-download-${job.id}`}
-                      >
-                        <a href={job.fileUrl} download={job.fileName}>
-                          <Download className="h-4 w-4 mr-2" />
-                          Download
-                        </a>
-                      </Button>
-                    )}
-                  </div>
-                </div>
+  const exportTab = (
+    <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Download className="h-5 w-5" />
+          Export Data
+        </CardTitle>
+        <CardDescription className="text-gray-900 dark:text-white/60">Export data from selected module</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="space-y-2">
+          <Label>Module</Label>
+          <Select value={selectedModule} onValueChange={setSelectedModule}>
+            <SelectTrigger data-testid="select-export-module">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {modules.map(({ value, label }) => (
+                <SelectItem key={value} value={value}>{label}</SelectItem>
               ))}
-            </div>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
+          <Label>Format</Label>
+          <Select value={selectedFormat} onValueChange={setSelectedFormat}>
+            <SelectTrigger data-testid="select-export-format">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="csv">
+                <div className="flex items-center gap-2">
+                  <FileSpreadsheet className="h-4 w-4" />
+                  CSV
+                </div>
+              </SelectItem>
+              <SelectItem value="json">
+                <div className="flex items-center gap-2">
+                  <FileJson className="h-4 w-4" />
+                  JSON
+                </div>
+              </SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <Button
+          className="w-full"
+          onClick={handleExport}
+          disabled={exportMutation.isPending || !garageId}
+          data-testid="button-export"
+        >
+          <Download className="h-4 w-4 mr-2" />
+          {exportMutation.isPending ? "Starting Export..." : "Export Data"}
+        </Button>
+      </CardContent>
+    </Card>
+  );
+
+  const importTab = (
+    <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Upload className="h-5 w-5" />
+          Import Data
+        </CardTitle>
+        <CardDescription className="text-gray-900 dark:text-white/60">Import data from CSV or JSON file</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="space-y-2">
+          <Label>Module</Label>
+          <Select value={selectedModule} onValueChange={setSelectedModule}>
+            <SelectTrigger data-testid="select-import-module">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {modules.map(({ value, label }) => (
+                <SelectItem key={value} value={value}>{label}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
+          <Label>File</Label>
+          <Input
+            type="file"
+            accept=".csv,.json"
+            onChange={(e) => setImportFile(e.target.files?.[0] || null)}
+            data-testid="input-import-file"
+          />
+          {importFile && (
+            <p className="text-sm text-gray-900 dark:text-white/60">
+              Selected: {importFile.name}
+            </p>
           )}
-        </CardContent>
-      </Card>
-    </div>
+        </div>
+
+        <Button
+          className="w-full"
+          onClick={handleImport}
+          disabled={importMutation.isPending || !importFile}
+          data-testid="button-import"
+        >
+          <Upload className="h-4 w-4 mr-2" />
+          {importMutation.isPending ? "Importing..." : "Import Data"}
+        </Button>
+      </CardContent>
+    </Card>
+  );
+
+  const historyTab = (
+    <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+      <CardHeader>
+        <CardTitle className="text-gray-900 dark:text-white">Export History</CardTitle>
+        <CardDescription className="text-gray-900 dark:text-white/60">Recent export jobs</CardDescription>
+      </CardHeader>
+      <CardContent>
+        {!exportJobs || exportJobs.length === 0 ? (
+          <div className="text-center text-gray-900 dark:text-white/60 py-8">
+            No export history
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {exportJobs.map((job) => (
+              <div
+                key={job.id}
+                className="flex items-center justify-between p-4 border border-gray-200 dark:border-salis-gray-dark rounded-lg"
+                data-testid={`export-job-${job.id}`}
+              >
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium">{modules.find(m => m.value === job.module)?.label}</span>
+                    <span className="text-sm text-gray-900 dark:text-white/60">({job.format.toUpperCase()})</span>
+                  </div>
+                  <div className="text-sm text-gray-900 dark:text-white/60">
+                    {job.createdAt && new Date(job.createdAt).toLocaleString()}
+                    {job.recordCount && ` • ${job.recordCount} records`}
+                  </div>
+                  {job.errorMessage && (
+                    <div className="text-sm text-destructive mt-1">
+                      Error: {job.errorMessage}
+                    </div>
+                  )}
+                </div>
+                <div className="flex items-center gap-3">
+                  {getStatusBadge(job.status)}
+                  {job.status === 'completed' && job.fileUrl && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      asChild
+                      data-testid={`button-download-${job.id}`}
+                    >
+                      <a href={job.fileUrl} download={job.fileName}>
+                        <Download className="h-4 w-4 mr-2" />
+                        Download
+                      </a>
+                    </Button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+
+  return (
+    <TabsPageLayout
+      title="Data Import/Export"
+      description="Import and export data across modules"
+      icon={Upload}
+      headerContent={
+        garages && garages.length > 0 && (
+          <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark mb-6">
+            <CardHeader>
+              <CardTitle className="text-gray-900 dark:text-white">Select Garage</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Select value={garageId} onValueChange={setGarageId}>
+                <SelectTrigger data-testid="select-garage">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {garages.map((garage: any) => (
+                    <SelectItem key={garage.id} value={garage.id}>
+                      {garage.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </CardContent>
+          </Card>
+        )
+      }
+      tabs={[
+        {
+          id: "export",
+          label: "Export",
+          icon: Download,
+          content: exportTab,
+        },
+        {
+          id: "import",
+          label: "Import",
+          icon: Upload,
+          content: importTab,
+        },
+        {
+          id: "history",
+          label: "History",
+          content: historyTab,
+        },
+      ]}
+      defaultTab="export"
+    />
   );
 }

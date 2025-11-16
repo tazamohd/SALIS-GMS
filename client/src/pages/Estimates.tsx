@@ -1,24 +1,15 @@
 import { useState } from "react";
-import { FileText, Plus, Search, Building2 } from "lucide-react";
+import { FileText, Plus } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { CreateEstimateDialog } from "@/components/CreateEstimateDialog";
 import { EstimateDetailsDialog } from "@/components/EstimateDetailsDialog";
+import { StandardTablePage } from "@/components/layouts";
 import type { Estimate, Garage, User } from "@shared/schema";
 
 export function Estimates() {
   const [selectedGarageId, setSelectedGarageId] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [searchTerm, setSearchTerm] = useState("");
 
   const { data: garages } = useQuery<Garage[]>({
     queryKey: ['/api/garages'],
@@ -52,142 +43,105 @@ export function Estimates() {
     return colors[status] || "bg-gray-100 dark:bg-salis-gray-dark text-gray-800 dark:text-gray-200";
   };
 
-  const filteredEstimates = (estimates ?? []).filter((estimate) => {
-    if (!searchTerm) return true;
-    const customer = customers?.find(c => c.id === estimate.customerId);
-    const searchLower = searchTerm.toLowerCase();
-    return (
-      estimate.estimateNumber.toLowerCase().includes(searchLower) ||
-      customer?.fullName?.toLowerCase().includes(searchLower)
-    );
-  });
+  const columns = [
+    {
+      key: "estimateNumber",
+      label: "Estimate #",
+      render: (estimate: Estimate) => (
+        <div className="flex items-center gap-3">
+          <FileText className="w-5 h-5 text-gray-900 dark:text-white/50" />
+          <div>
+            <p className="font-semibold text-sm text-gray-900 dark:text-white" data-testid={`text-estimate-number-${estimate.id}`}>
+              {estimate.estimateNumber}
+            </p>
+            <p className="text-xs text-gray-900 dark:text-white/60" data-testid={`text-customer-${estimate.id}`}>
+              {customers?.find(c => c.id === estimate.customerId)?.fullName || "Unknown Customer"}
+            </p>
+          </div>
+        </div>
+      ),
+    },
+    {
+      key: "totalAmount",
+      label: "Amount",
+      render: (estimate: Estimate) => (
+        <div className="text-right">
+          <p className="font-bold text-sm text-gray-900 dark:text-white" data-testid={`text-amount-${estimate.id}`}>
+            ${estimate.totalAmount}
+          </p>
+          {estimate.validUntil && (
+            <p className="text-xs text-gray-900 dark:text-white/60">
+              Valid until {new Date(estimate.validUntil).toLocaleDateString()}
+            </p>
+          )}
+        </div>
+      ),
+    },
+    {
+      key: "status",
+      label: "Status",
+      render: (estimate: Estimate) => (
+        <span
+          className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(estimate.status)}`}
+          data-testid={`status-${estimate.id}`}
+        >
+          {estimate.status}
+        </span>
+      ),
+    },
+  ];
 
   return (
-    <div className="p-8">
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="font-['Poppins',Helvetica] font-bold text-3xl text-gray-900 dark:text-white">
-            Estimates & Quotes
-          </h1>
-          <p className="font-['Poppins',Helvetica] font-normal text-sm text-gray-900 dark:text-white/60 mt-1">
-            Create and manage customer estimates
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <CreateEstimateDialog />
-        </div>
-      </div>
-
-      <div className="flex gap-4 mb-6">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-900 dark:text-white/50" />
-          <Input
-            placeholder="Search estimates..."
-            className="pl-10"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            data-testid="input-search-estimates"
-          />
-        </div>
-        <Select value={selectedGarageId} onValueChange={setSelectedGarageId}>
-          <SelectTrigger className="w-[200px]" data-testid="select-garage-filter">
-            <Building2 className="w-4 h-4 mr-2" />
-            <SelectValue placeholder="All Garages" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Garages</SelectItem>
-            {(garages ?? []).map((garage) => (
-              <SelectItem key={garage.id} value={garage.id}>
-                {garage.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-[200px]" data-testid="select-status-filter">
-            <SelectValue placeholder="All Status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Status</SelectItem>
-            <SelectItem value="draft">Draft</SelectItem>
-            <SelectItem value="sent">Sent</SelectItem>
-            <SelectItem value="accepted">Accepted</SelectItem>
-            <SelectItem value="declined">Declined</SelectItem>
-            <SelectItem value="expired">Expired</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
-        <CardContent className="p-6">
-          {isLoading ? (
-            <div className="text-center py-12">
-              <div className="animate-spin w-8 h-8 border-4 border-gray-900 dark:border-white border-t-transparent rounded-full mx-auto mb-4"></div>
-              <p className="text-gray-900 dark:text-white/60">Loading estimates...</p>
-            </div>
-          ) : filteredEstimates.length === 0 ? (
-            <div className="text-center py-12">
-              <FileText className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <h3 className="font-['Poppins',Helvetica] font-semibold text-lg text-gray-600 mb-2">
-                No Estimates
-              </h3>
-              <p className="text-sm text-gray-900 dark:text-white/50 mb-4">
-                {searchTerm
-                  ? "No estimates match your search"
-                  : "Create your first estimate to start quoting customers"}
-              </p>
-              {!searchTerm && <CreateEstimateDialog />}
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {filteredEstimates.map((estimate) => {
-                const customer = customers?.find(c => c.id === estimate.customerId);
-                return (
-                  <EstimateDetailsDialog key={estimate.id} estimateId={estimate.id}>
-                    <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark p-4 cursor-pointer hover:shadow-md transition-shadow" data-testid={`card-estimate-${estimate.id}`}>
-                      <div className="flex items-center justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3">
-                            <FileText className="w-5 h-5 text-gray-900 dark:text-white/50" />
-                            <div>
-                              <p className="font-['Poppins',Helvetica] font-semibold text-sm text-gray-900 dark:text-white" data-testid={`text-estimate-number-${estimate.id}`}>
-                                {estimate.estimateNumber}
-                              </p>
-                              <p className="font-['Poppins',Helvetica] font-normal text-xs text-gray-900 dark:text-white/60" data-testid={`text-customer-${estimate.id}`}>
-                                {customer?.fullName || "Unknown Customer"}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-4">
-                          <div className="text-right">
-                            <p className="font-['Poppins',Helvetica] font-bold text-sm text-gray-900 dark:text-white" data-testid={`text-amount-${estimate.id}`}>
-                              ${estimate.totalAmount}
-                            </p>
-                            {estimate.validUntil && (
-                              <p className="font-['Poppins',Helvetica] font-normal text-xs text-gray-900 dark:text-white/60">
-                                Valid until {new Date(estimate.validUntil).toLocaleDateString()}
-                              </p>
-                            )}
-                          </div>
-                          <span
-                            className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
-                              estimate.status
-                            )}`}
-                            data-testid={`status-${estimate.id}`}
-                          >
-                            {estimate.status}
-                          </span>
-                        </div>
-                      </div>
-                    </Card>
-                  </EstimateDetailsDialog>
-                );
-              })}
-            </div>
-          )}
-        </CardContent>
-      </Card>
-    </div>
+    <StandardTablePage
+      title="Estimates & Quotes"
+      description="Create and manage customer estimates"
+      icon={FileText}
+      actions={[
+        {
+          label: "Create Estimate",
+          onClick: () => {},
+          icon: Plus,
+        },
+      ]}
+      data={estimates || []}
+      isLoading={isLoading}
+      columns={columns}
+      searchPlaceholder="Search estimates..."
+      filters={[
+        {
+          id: "garageId",
+          label: "Garage",
+          options: [
+            { value: "all", label: "All Garages" },
+            ...(garages || []).map(g => ({ value: g.id, label: g.name })),
+          ],
+          defaultValue: selectedGarageId,
+        },
+        {
+          id: "status",
+          label: "Status",
+          options: [
+            { value: "all", label: "All Status" },
+            { value: "draft", label: "Draft" },
+            { value: "sent", label: "Sent" },
+            { value: "accepted", label: "Accepted" },
+            { value: "declined", label: "Declined" },
+            { value: "expired", label: "Expired" },
+          ],
+          defaultValue: statusFilter,
+        },
+      ]}
+      onFilterChange={(id, value) => {
+        if (id === "garageId") setSelectedGarageId(value);
+        if (id === "status") setStatusFilter(value);
+      }}
+      onRowClick={(estimate) => {}}
+      emptyState={{
+        icon: FileText,
+        title: "No Estimates",
+        description: "Create your first estimate to start quoting customers",
+      }}
+      additionalContent={<CreateEstimateDialog />}
+    />
   );
 }

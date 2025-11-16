@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Search, Car, AlertTriangle, CheckCircle, Info } from "lucide-react";
+import { StandardPageLayout } from "@/components/layouts/StandardPageLayout";
 
 export default function VINDecoder() {
   const [vin, setVin] = useState("");
@@ -34,17 +35,11 @@ export default function VINDecoder() {
   const results = vehicleData?.Results || [];
 
   return (
-    <div className="flex-1 p-6 bg-gray-50 dark:bg-salis-black min-h-screen">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold font-['Montserrat'] text-gray-900 dark:text-white mb-2 flex items-center gap-3">
-          <Car className="h-8 w-8 text-blue-600" />
-          VIN Decoder
-        </h1>
-        <p className="text-gray-600 dark:text-gray-400">
-          Decode vehicle identification numbers to retrieve vehicle specifications and recall information
-        </p>
-      </div>
-
+    <StandardPageLayout
+      title="VIN Decoder"
+      description="Decode vehicle identification numbers to retrieve vehicle specifications and recall information"
+      icon={Car}
+    >
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-1">
           <Card className="bg-white dark:bg-salis-black">
@@ -191,6 +186,6 @@ export default function VINDecoder() {
           )}
         </div>
       </div>
-    </div>
+    </StandardPageLayout>
   );
 }

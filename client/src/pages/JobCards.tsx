@@ -546,7 +546,7 @@ export function JobCards() {
                   <div>
                     <Label htmlFor="assignedTo">Assign Technician</Label>
                     <Select
-                      value={createForm.watch("assignedTo")}
+                      value={createForm.watch("assignedTo") || undefined}
                       onValueChange={(value) => createForm.setValue("assignedTo", value)}
                     >
                       <SelectTrigger id="assignedTo" data-testid="select-technician">

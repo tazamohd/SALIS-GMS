@@ -3,12 +3,12 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { TabsPageLayout, type TabConfig } from "@/components/layouts";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -39,7 +39,7 @@ type ArticleFormData = z.infer<typeof articleSchema>;
 
 export default function KnowledgeBase() {
   const { toast } = useToast();
-  const [selectedTab, setSelectedTab] = useState("articles");
+  const [activeTab, setActiveTab] = useState("articles");
   const [isCategoryDialogOpen, setIsCategoryDialogOpen] = useState(false);
   const [isArticleDialogOpen, setIsArticleDialogOpen] = useState(false);
   const [selectedArticle, setSelectedArticle] = useState<any>(null);
@@ -108,119 +108,85 @@ export default function KnowledgeBase() {
     article.excerpt?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  return (
-    <div className="container mx-auto py-6 space-y-6 bg-white dark:bg-[#010101] min-h-screen">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-montserrat font-semibold text-salis-black dark:text-white" data-testid="heading-knowledge-base">
-            Knowledge Base
-          </h1>
-          <p className="text-salis-gray dark:text-salis-gray-light font-poppins mt-1" data-testid="text-subtitle">
-            Manage documentation articles and FAQ resources
-          </p>
-        </div>
-        <Button
-          onClick={() => setIsArticleDialogOpen(true)}
-          className="bg-salis-black hover:bg-salis-gray-dark text-white font-poppins"
-          data-testid="button-create-article"
-        >
-          <BookOpen className="mr-2 h-4 w-4" />
-          Create Article
-        </Button>
-      </div>
-
-      <div className="flex gap-4 items-center">
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-salis-gray" />
-          <Input
-            placeholder="Search articles..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
-            data-testid="input-search"
-          />
-        </div>
-      </div>
-
-      <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full">
-        <TabsList className="bg-salis-gray-light dark:bg-salis-gray-dark" data-testid="tabs-knowledge-base">
-          <TabsTrigger value="articles" className="font-poppins" data-testid="tab-articles">
-            <BookOpen className="mr-2 h-4 w-4" />
-            Articles
-          </TabsTrigger>
-          <TabsTrigger value="categories" className="font-poppins" data-testid="tab-categories">
-            <FolderPlus className="mr-2 h-4 w-4" />
-            Categories
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="articles" className="space-y-4">
-          <Card className="border-salis-gray-light dark:border-salis-gray-dark bg-white dark:bg-[#010101]">
-            <CardHeader>
-              <CardTitle className="font-montserrat text-salis-black dark:text-white">Knowledge Articles</CardTitle>
-              <CardDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
-                All documentation and FAQ articles
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {articlesLoading ? (
-                <p className="text-salis-gray font-poppins" data-testid="text-loading">Loading articles...</p>
-              ) : filteredArticles.length === 0 ? (
-                <p className="text-salis-gray font-poppins" data-testid="text-no-articles">No articles found</p>
-              ) : (
-                <div className="grid gap-4">
-                  {filteredArticles.map((article: any) => (
-                    <Card
-                      key={article.id}
-                      className="border-salis-gray-light dark:border-salis-gray-dark cursor-pointer hover:border-salis-gray dark:hover:border-salis-gray transition-colors"
-                      onClick={() => setSelectedArticle(article)}
-                      data-testid={`card-article-${article.id}`}
-                    >
-                      <CardContent className="p-6">
-                        <div className="flex justify-between items-start">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-3 mb-2">
-                              <h3 className="text-lg font-montserrat font-medium text-salis-black dark:text-white" data-testid={`text-article-title-${article.id}`}>
-                                {article.title}
-                              </h3>
-                              {article.isFeatured && (
-                                <Badge className="bg-salis-black text-white" data-testid={`badge-featured-${article.id}`}>
-                                  Featured
-                                </Badge>
-                              )}
-                              {article.isPublished ? (
-                                <Badge className="bg-green-500 text-white" data-testid={`badge-published-${article.id}`}>
-                                  Published
-                                </Badge>
-                              ) : (
-                                <Badge className="bg-salis-gray text-white" data-testid={`badge-draft-${article.id}`}>
-                                  Draft
-                                </Badge>
-                              )}
-                            </div>
-                            <p className="text-sm text-salis-gray dark:text-salis-gray-light font-poppins mb-3" data-testid={`text-article-excerpt-${article.id}`}>
-                              {article.excerpt || "No excerpt available"}
-                            </p>
-                            <div className="flex gap-4 text-sm text-salis-gray dark:text-salis-gray-light">
-                              <span className="flex items-center gap-1" data-testid={`text-views-${article.id}`}>
-                                <Eye className="h-4 w-4" /> {article.viewCount || 0} views
-                              </span>
-                              <span className="flex items-center gap-1" data-testid={`text-helpful-${article.id}`}>
-                                <ThumbsUp className="h-4 w-4" /> {article.helpfulCount || 0} helpful
-                              </span>
-                            </div>
+  const tabs: TabConfig[] = [
+    {
+      id: "articles",
+      label: "Articles",
+      icon: BookOpen,
+      badge: articles.length,
+      content: (
+        <Card className="border-salis-gray-light dark:border-salis-gray-dark bg-white dark:bg-[#010101]">
+          <CardHeader>
+            <CardTitle className="font-montserrat text-salis-black dark:text-white">Knowledge Articles</CardTitle>
+            <CardDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
+              All documentation and FAQ articles
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {articlesLoading ? (
+              <p className="text-salis-gray font-poppins" data-testid="text-loading">Loading articles...</p>
+            ) : filteredArticles.length === 0 ? (
+              <p className="text-salis-gray font-poppins" data-testid="text-no-articles">No articles found</p>
+            ) : (
+              <div className="grid gap-4">
+                {filteredArticles.map((article: any) => (
+                  <Card
+                    key={article.id}
+                    className="border-salis-gray-light dark:border-salis-gray-dark cursor-pointer hover:border-salis-gray dark:hover:border-salis-gray transition-colors"
+                    onClick={() => setSelectedArticle(article)}
+                    data-testid={`card-article-${article.id}`}
+                  >
+                    <CardContent className="p-6">
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-2">
+                            <h3 className="text-lg font-montserrat font-medium text-salis-black dark:text-white" data-testid={`text-article-title-${article.id}`}>
+                              {article.title}
+                            </h3>
+                            {article.isFeatured && (
+                              <Badge className="bg-salis-black text-white" data-testid={`badge-featured-${article.id}`}>
+                                Featured
+                              </Badge>
+                            )}
+                            {article.isPublished ? (
+                              <Badge className="bg-green-500 text-white" data-testid={`badge-published-${article.id}`}>
+                                Published
+                              </Badge>
+                            ) : (
+                              <Badge className="bg-salis-gray text-white" data-testid={`badge-draft-${article.id}`}>
+                                Draft
+                              </Badge>
+                            )}
+                          </div>
+                          <p className="text-sm text-salis-gray dark:text-salis-gray-light font-poppins mb-3" data-testid={`text-article-excerpt-${article.id}`}>
+                            {article.excerpt || "No excerpt available"}
+                          </p>
+                          <div className="flex gap-4 text-sm text-salis-gray dark:text-salis-gray-light">
+                            <span className="flex items-center gap-1" data-testid={`text-views-${article.id}`}>
+                              <Eye className="h-4 w-4" /> {article.viewCount || 0} views
+                            </span>
+                            <span className="flex items-center gap-1" data-testid={`text-helpful-${article.id}`}>
+                              <ThumbsUp className="h-4 w-4" /> {article.helpfulCount || 0} helpful
+                            </span>
                           </div>
                         </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="categories" className="space-y-4">
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      ),
+    },
+    {
+      id: "categories",
+      label: "Categories",
+      icon: FolderPlus,
+      badge: categories.length,
+      content: (
+        <>
           <div className="flex justify-end mb-4">
             <Button
               onClick={() => setIsCategoryDialogOpen(true)}
@@ -261,8 +227,39 @@ export default function KnowledgeBase() {
               )}
             </CardContent>
           </Card>
-        </TabsContent>
-      </Tabs>
+        </>
+      ),
+    },
+  ];
+
+  return (
+    <>
+      <TabsPageLayout
+        title="Knowledge Base"
+        description="Manage documentation articles and FAQ resources"
+        icon={BookOpen}
+        primaryAction={{
+          label: "Create Article",
+          onClick: () => setIsArticleDialogOpen(true),
+          icon: BookOpen,
+          testId: "button-create-article",
+        }}
+        tabs={tabs}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        headerContent={
+          <div className="mb-6 relative max-w-md">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-salis-gray" />
+            <Input
+              placeholder="Search articles..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10"
+              data-testid="input-search"
+            />
+          </div>
+        }
+      />
 
       <Dialog open={isCategoryDialogOpen} onOpenChange={setIsCategoryDialogOpen}>
         <DialogContent className="bg-white dark:bg-salis-black">
@@ -423,6 +420,6 @@ export default function KnowledgeBase() {
           </Form>
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 }

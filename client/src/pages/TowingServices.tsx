@@ -15,6 +15,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Truck, MapPin, Phone, Clock } from "lucide-react";
+import { StandardPageLayout } from "@/components/layouts/StandardPageLayout";
 
 const towingJobSchema = z.object({
   customerId: z.string().optional(),
@@ -105,26 +106,18 @@ export default function TowingServices() {
   const filteredJobs = statusFilter === "all" ? jobs : jobs.filter((job: any) => job.status === statusFilter);
 
   return (
-    <div className="container mx-auto py-6 space-y-6 bg-white dark:bg-[#010101] min-h-screen">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-montserrat font-semibold text-salis-black dark:text-white" data-testid="heading-towing">
-            Towing Services
-          </h1>
-          <p className="text-salis-gray dark:text-salis-gray-light font-poppins mt-1" data-testid="text-subtitle">
-            Manage towing job requests and dispatch operations
-          </p>
-        </div>
-        <Button
-          onClick={() => setIsJobDialogOpen(true)}
-          className="bg-salis-black hover:bg-salis-gray-dark text-white font-poppins"
-          data-testid="button-create-job"
-        >
-          <Truck className="mr-2 h-4 w-4" />
-          Create Towing Job
-        </Button>
-      </div>
-
+    <StandardPageLayout
+      title="Towing Services"
+      description="Manage towing job requests and dispatch operations"
+      icon={Truck}
+      actions={[
+        {
+          label: "Create Towing Job",
+          icon: Truck,
+          onClick: () => setIsJobDialogOpen(true),
+        }
+      ]}
+    >
       <div className="flex gap-2 items-center mb-4">
         <span className="text-sm text-salis-gray dark:text-salis-gray-light font-poppins">Filter by status:</span>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
@@ -414,6 +407,6 @@ export default function TowingServices() {
           </Form>
         </DialogContent>
       </Dialog>
-    </div>
+    </StandardPageLayout>
   );
 }

@@ -61,6 +61,7 @@ import {
   Search,
 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
+import { TabsPageLayout } from "@/components/layouts/TabsPageLayout";
 
 const supplierFormSchema = insertSupplierSchema.extend({
   garageId: z.string().optional(),

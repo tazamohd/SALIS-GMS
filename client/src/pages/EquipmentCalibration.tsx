@@ -5,16 +5,15 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Wrench, AlertCircle, CheckCircle, Clock } from "lucide-react";
+import { DashboardPage } from "@/components/layouts";
 
 export default function EquipmentCalibration() {
   const { toast } = useToast();
 
-  // Fetch calibration records from backend
   const { data: records = [] } = useQuery<any[]>({
     queryKey: ['/api/calibration/due'],
   });
 
-  // Add calibration mutation
   const addCalibrationMutation = useMutation({
     mutationFn: async () => {
       return apiRequest('POST', '/api/calibration', {
@@ -43,7 +42,6 @@ export default function EquipmentCalibration() {
     },
   });
 
-  // Calculate statistics from records
   const stats = {
     totalEquipment: records.length,
     valid: records.filter((r: any) => r.status === 'valid').length,
@@ -66,70 +64,48 @@ export default function EquipmentCalibration() {
     );
   };
 
-  return (
-    <div className="p-8 space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold font-montserrat text-gray-900 dark:text-white">
-            🔧 Equipment Calibration
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">Track tool calibration and certifications</p>
-        </div>
-        <Button 
-          onClick={() => addCalibrationMutation.mutate()}
-          disabled={addCalibrationMutation.isPending}
-          data-testid="button-add-calibration"
-        >
-          {addCalibrationMutation.isPending ? "Adding..." : "Add Calibration"}
-        </Button>
-      </div>
+  const metrics = [
+    {
+      label: "Total Equipment",
+      value: stats.totalEquipment,
+      icon: Wrench,
+      color: "text-blue-600",
+    },
+    {
+      label: "Valid",
+      value: stats.valid,
+      icon: CheckCircle,
+      color: "text-green-600",
+    },
+    {
+      label: "Due Soon",
+      value: stats.due,
+      icon: Clock,
+      color: "text-yellow-600",
+    },
+    {
+      label: "Overdue",
+      value: stats.overdue,
+      icon: AlertCircle,
+      color: "text-red-600",
+    },
+  ];
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Total Equipment</p>
-                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="text-total-equipment">{stats.totalEquipment}</h3>
-              </div>
-              <Wrench className="h-12 w-12 text-blue-600" />
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Valid</p>
-                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="text-valid">{stats.valid}</h3>
-              </div>
-              <CheckCircle className="h-12 w-12 text-green-600" />
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Due Soon</p>
-                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="text-due">{stats.due}</h3>
-              </div>
-              <Clock className="h-12 w-12 text-yellow-600" />
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Overdue</p>
-                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="text-overdue">{stats.overdue}</h3>
-              </div>
-              <AlertCircle className="h-12 w-12 text-red-600" />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+  return (
+    <DashboardPage
+      title="🔧 Equipment Calibration"
+      description="Track tool calibration and certifications"
+      icon={Wrench}
+      metrics={metrics}
+    >
+      <Button 
+        onClick={() => addCalibrationMutation.mutate()}
+        disabled={addCalibrationMutation.isPending}
+        data-testid="button-add-calibration"
+        className="absolute top-8 right-8"
+      >
+        {addCalibrationMutation.isPending ? "Adding..." : "Add Calibration"}
+      </Button>
 
       <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
         <CardHeader>
@@ -162,6 +138,6 @@ export default function EquipmentCalibration() {
           )}
         </CardContent>
       </Card>
-    </div>
+    </DashboardPage>
   );
 }

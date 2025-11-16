@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,74 +14,59 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Shield, Lock, Database, FileText, UserCheck, Key, Download, Upload, AlertTriangle, CheckCircle, Clock, Copy } from "lucide-react";
 import { format } from "date-fns";
+import { TabsPageLayout } from "@/components/layouts";
 
 export default function Security() {
-  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("2fa");
 
+  const tabs = [
+    {
+      id: "2fa",
+      label: "2FA",
+      icon: Lock,
+      content: <TwoFactorAuthTab />,
+    },
+    {
+      id: "audit",
+      label: "Audit Logs",
+      icon: FileText,
+      content: <AuditLogsTab />,
+    },
+    {
+      id: "backup",
+      label: "Backup",
+      icon: Database,
+      content: <BackupRestoreTab />,
+    },
+    {
+      id: "gdpr",
+      label: "GDPR",
+      icon: UserCheck,
+      content: <GDPRTab />,
+    },
+    {
+      id: "consents",
+      label: "Consents",
+      icon: CheckCircle,
+      content: <ConsentsTab />,
+    },
+    {
+      id: "permissions",
+      label: "Permissions",
+      icon: Key,
+      content: <PermissionsTab />,
+    },
+  ];
+
   return (
-    <div className="p-6 space-y-6" data-testid="page-security">
-      <div className="flex items-center gap-3">
-        <Shield className="h-8 w-8 text-primary" />
-        <div>
-          <h1 className="text-3xl font-bold" data-testid="text-page-title">Security & Compliance</h1>
-          <p className="text-muted-foreground">Manage security settings and compliance features</p>
-        </div>
-      </div>
-
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="grid w-full grid-cols-6">
-          <TabsTrigger value="2fa" data-testid="tab-2fa">
-            <Lock className="h-4 w-4 mr-2" />
-            2FA
-          </TabsTrigger>
-          <TabsTrigger value="audit" data-testid="tab-audit">
-            <FileText className="h-4 w-4 mr-2" />
-            Audit Logs
-          </TabsTrigger>
-          <TabsTrigger value="backup" data-testid="tab-backup">
-            <Database className="h-4 w-4 mr-2" />
-            Backup
-          </TabsTrigger>
-          <TabsTrigger value="gdpr" data-testid="tab-gdpr">
-            <UserCheck className="h-4 w-4 mr-2" />
-            GDPR
-          </TabsTrigger>
-          <TabsTrigger value="consents" data-testid="tab-consents">
-            <CheckCircle className="h-4 w-4 mr-2" />
-            Consents
-          </TabsTrigger>
-          <TabsTrigger value="permissions" data-testid="tab-permissions">
-            <Key className="h-4 w-4 mr-2" />
-            Permissions
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="2fa" className="space-y-4">
-          <TwoFactorAuthTab />
-        </TabsContent>
-
-        <TabsContent value="audit" className="space-y-4">
-          <AuditLogsTab />
-        </TabsContent>
-
-        <TabsContent value="backup" className="space-y-4">
-          <BackupRestoreTab />
-        </TabsContent>
-
-        <TabsContent value="gdpr" className="space-y-4">
-          <GDPRTab />
-        </TabsContent>
-
-        <TabsContent value="consents" className="space-y-4">
-          <ConsentsTab />
-        </TabsContent>
-
-        <TabsContent value="permissions" className="space-y-4">
-          <PermissionsTab />
-        </TabsContent>
-      </Tabs>
-    </div>
+    <TabsPageLayout
+      title="Security & Compliance"
+      description="Manage security settings and compliance features"
+      icon={Shield}
+      tabs={tabs}
+      activeTab={activeTab}
+      onTabChange={setActiveTab}
+    />
   );
 }
 
@@ -91,12 +75,15 @@ function TwoFactorAuthTab() {
   const [verificationCode, setVerificationCode] = useState("");
   const [setupData, setSetupData] = useState<any>(null);
 
-  const { data: status } = useQuery({
+  const { data: status } = useQuery<{ enabled: boolean; backupCodesCount: number }>({
     queryKey: ['/api/security/2fa/status'],
   });
 
   const setupMutation = useMutation({
-    mutationFn: () => apiRequest('/api/security/2fa/setup', { method: 'POST' }),
+    mutationFn: async () => {
+      const res = await apiRequest('POST', '/api/security/2fa/setup');
+      return res.json();
+    },
     onSuccess: (data) => {
       setSetupData(data);
       toast({ title: "2FA Setup Initiated", description: "Scan the QR code with your authenticator app" });
@@ -107,10 +94,7 @@ function TwoFactorAuthTab() {
   });
 
   const enableMutation = useMutation({
-    mutationFn: (token: string) => apiRequest('/api/security/2fa/enable', { 
-      method: 'POST',
-      body: JSON.stringify({ token }),
-    }),
+    mutationFn: (token: string) => apiRequest('POST', '/api/security/2fa/enable', { token }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/security/2fa/status'] });
       setSetupData(null);
@@ -123,7 +107,7 @@ function TwoFactorAuthTab() {
   });
 
   const disableMutation = useMutation({
-    mutationFn: () => apiRequest('/api/security/2fa', { method: 'DELETE' }),
+    mutationFn: () => apiRequest('DELETE', '/api/security/2fa'),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/security/2fa/status'] });
       toast({ title: "2FA Disabled", description: "Two-factor authentication has been disabled" });
@@ -380,15 +364,12 @@ function BackupRestoreTab() {
   const { toast } = useToast();
   const [backupType, setBackupType] = useState('full');
 
-  const { data: backups = [], isLoading } = useQuery({
+  const { data: backups = [], isLoading } = useQuery<any[]>({
     queryKey: ['/api/security/backups'],
   });
 
   const createBackupMutation = useMutation({
-    mutationFn: (type: string) => apiRequest('/api/security/backups', {
-      method: 'POST',
-      body: JSON.stringify({ type, includeAttachments: true }),
-    }),
+    mutationFn: (type: string) => apiRequest('POST', '/api/security/backups', { type, includeAttachments: true }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/security/backups'] });
       toast({ title: "Backup Started", description: "Your data backup is in progress" });
@@ -396,7 +377,7 @@ function BackupRestoreTab() {
   });
 
   const restoreMutation = useMutation({
-    mutationFn: (id: string) => apiRequest(`/api/security/backups/${id}/restore`, { method: 'POST' }),
+    mutationFn: (id: string) => apiRequest('POST', `/api/security/backups/${id}/restore`),
     onSuccess: () => {
       toast({ title: "Restore Initiated", description: "Your data is being restored" });
     },
@@ -509,15 +490,12 @@ function GDPRTab() {
   const [dataSubjectId, setDataSubjectId] = useState('');
   const [reason, setReason] = useState('');
 
-  const { data: requests = [], isLoading } = useQuery({
+  const { data: requests = [], isLoading } = useQuery<any[]>({
     queryKey: ['/api/security/gdpr/requests'],
   });
 
   const createRequestMutation = useMutation({
-    mutationFn: () => apiRequest('/api/security/gdpr/requests', {
-      method: 'POST',
-      body: JSON.stringify({ requestType, dataSubjectId, reason }),
-    }),
+    mutationFn: () => apiRequest('POST', '/api/security/gdpr/requests', { requestType, dataSubjectId, reason }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/security/gdpr/requests'] });
       setDataSubjectId('');
@@ -632,15 +610,12 @@ function ConsentsTab() {
   const [consentType, setConsentType] = useState('');
   const [granted, setGranted] = useState(true);
 
-  const { data: consents = [], isLoading } = useQuery({
+  const { data: consents = [], isLoading } = useQuery<any[]>({
     queryKey: ['/api/security/consents'],
   });
 
   const createConsentMutation = useMutation({
-    mutationFn: () => apiRequest('/api/security/consents', {
-      method: 'POST',
-      body: JSON.stringify({ consentType, granted }),
-    }),
+    mutationFn: () => apiRequest('POST', '/api/security/consents', { consentType, granted }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/security/consents'] });
       setConsentType('');
@@ -739,15 +714,12 @@ function PermissionsTab() {
   const [granted, setGranted] = useState(true);
   const [reason, setReason] = useState('');
 
-  const { data: overrides = [], isLoading } = useQuery({
+  const { data: overrides = [], isLoading } = useQuery<any[]>({
     queryKey: ['/api/security/permissions/overrides'],
   });
 
   const createOverrideMutation = useMutation({
-    mutationFn: () => apiRequest('/api/security/permissions/overrides', {
-      method: 'POST',
-      body: JSON.stringify({ userId, permission, granted, reason }),
-    }),
+    mutationFn: () => apiRequest('POST', '/api/security/permissions/overrides', { userId, permission, granted, reason }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/security/permissions/overrides'] });
       setUserId('');
@@ -758,7 +730,7 @@ function PermissionsTab() {
   });
 
   const deleteOverrideMutation = useMutation({
-    mutationFn: (id: string) => apiRequest(`/api/security/permissions/overrides/${id}`, { method: 'DELETE' }),
+    mutationFn: (id: string) => apiRequest('DELETE', `/api/security/permissions/overrides/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/security/permissions/overrides'] });
       toast({ title: "Override Removed", description: "Permission override has been deleted" });

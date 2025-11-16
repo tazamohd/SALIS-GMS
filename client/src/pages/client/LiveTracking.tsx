@@ -10,18 +10,18 @@ export default function LiveTracking() {
   const { user } = useAuth();
 
   const { data: vehicles } = useQuery({
-    queryKey: ["/api/vehicles", user?.id],
-    enabled: !!user?.id,
+    queryKey: ["/api/vehicles", (user as any)?.id],
+    enabled: !!(user as any)?.id,
   });
 
   const { data: jobCards, isLoading } = useQuery({
     queryKey: ["/api/job-cards"],
-    enabled: !!user?.id,
+    enabled: !!(user as any)?.id,
     refetchInterval: 30000, // Refresh every 30 seconds for live updates
   });
 
   const myVehicles = Array.isArray(vehicles)
-    ? vehicles.filter((v: any) => v.customerId === user?.id)
+    ? vehicles.filter((v: any) => v.customerId === (user as any)?.id)
     : [];
 
   const activeJobs = Array.isArray(jobCards)

@@ -37,12 +37,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
@@ -70,8 +64,8 @@ import {
   type FleetMaintenanceSchedule,
 } from "@shared/schema";
 import { useAuth } from "@/hooks/useAuth";
+import { TabsPageLayout } from "@/components/layouts/TabsPageLayout";
 
-// Extend insert schemas to handle form inputs (strings that need to be converted to numbers)
 const fleetGroupFormSchema = insertFleetGroupSchema.extend({
   discountPercentage: z.string().optional().transform(val => val ? parseFloat(val) : undefined),
 });
@@ -123,41 +117,34 @@ export default function FleetManagement() {
   const [editingScheduleId, setEditingScheduleId] = useState<string | null>(null);
   const [selectedGroupId, setSelectedGroupId] = useState<string>("");
 
-  // Fetch fleet groups
   const { data: fleetGroups = [], isLoading: groupsLoading } = useQuery<FleetGroup[]>({
     queryKey: ["/api/fleet/groups"],
   });
 
-  // Fetch fleet vehicles for selected group
   const { data: fleetVehicles = [] } = useQuery<any[]>({
     queryKey: ["/api/fleet/vehicles/group", selectedGroupId],
     enabled: !!selectedGroupId && selectedTab === "vehicles",
   });
 
-  // Fetch all vehicles for the dropdown
   const { data: allVehicles = [] } = useQuery<any[]>({
     queryKey: ["/api/vehicles"],
     enabled: isVehicleDialogOpen,
   });
 
-  // Fetch fleet contracts for selected group
   const { data: contracts = [] } = useQuery<FleetContract[]>({
     queryKey: ["/api/fleet/contracts/group", selectedGroupId],
     enabled: !!selectedGroupId && selectedTab === "contracts",
   });
 
-  // Fetch pricing tiers
   const { data: pricingTiers = [] } = useQuery<FleetPricingTier[]>({
     queryKey: ["/api/fleet/pricing-tiers"],
   });
 
-  // Fetch maintenance schedules for selected group
   const { data: schedules = [] } = useQuery<FleetMaintenanceSchedule[]>({
     queryKey: ["/api/fleet/maintenance-schedules/group", selectedGroupId],
     enabled: !!selectedGroupId && selectedTab === "schedules",
   });
 
-  // Fleet Group Form
   const groupForm = useForm<FleetGroupFormData>({
     resolver: zodResolver(fleetGroupFormSchema),
     defaultValues: {
@@ -175,7 +162,6 @@ export default function FleetManagement() {
     },
   });
 
-  // Fleet Vehicle Form
   const vehicleForm = useForm<FleetVehicleFormData>({
     resolver: zodResolver(fleetVehicleFormSchema),
     defaultValues: {
@@ -186,7 +172,6 @@ export default function FleetManagement() {
     },
   });
 
-  // Contract Form
   const contractForm = useForm<FleetContractFormData>({
     resolver: zodResolver(fleetContractFormSchema),
     defaultValues: {
@@ -202,7 +187,6 @@ export default function FleetManagement() {
     },
   });
 
-  // Pricing Tier Form
   const pricingForm = useForm<PricingTierFormData>({
     resolver: zodResolver(pricingTierFormSchema),
     defaultValues: {
@@ -216,7 +200,6 @@ export default function FleetManagement() {
     },
   });
 
-  // Maintenance Schedule Form
   const scheduleForm = useForm<MaintenanceScheduleFormData>({
     resolver: zodResolver(maintenanceScheduleFormSchema),
     defaultValues: {
@@ -231,7 +214,6 @@ export default function FleetManagement() {
     },
   });
 
-  // Create/Update Fleet Group Mutation
   const groupMutation = useMutation({
     mutationFn: async (data: FleetGroupFormData) => {
       const parsed = fleetGroupFormSchema.parse(data);
@@ -252,7 +234,6 @@ export default function FleetManagement() {
     },
   });
 
-  // Create/Update Fleet Vehicle Mutation
   const vehicleMutation = useMutation({
     mutationFn: async (data: FleetVehicleFormData) => {
       const parsed = fleetVehicleFormSchema.parse(data);
@@ -273,7 +254,6 @@ export default function FleetManagement() {
     },
   });
 
-  // Create/Update Contract Mutation
   const contractMutation = useMutation({
     mutationFn: async (data: FleetContractFormData) => {
       const parsed = fleetContractFormSchema.parse(data);
@@ -294,7 +274,6 @@ export default function FleetManagement() {
     },
   });
 
-  // Create/Update Pricing Tier Mutation
   const pricingMutation = useMutation({
     mutationFn: async (data: PricingTierFormData) => {
       const parsed = pricingTierFormSchema.parse(data);
@@ -315,7 +294,6 @@ export default function FleetManagement() {
     },
   });
 
-  // Create/Update Maintenance Schedule Mutation
   const scheduleMutation = useMutation({
     mutationFn: async (data: MaintenanceScheduleFormData) => {
       const parsed = maintenanceScheduleFormSchema.parse(data);
@@ -336,7 +314,6 @@ export default function FleetManagement() {
     },
   });
 
-  // Delete Mutations
   const deleteGroupMutation = useMutation({
     mutationFn: (id: string) => apiRequest("DELETE", `/api/fleet/groups/${id}`),
     onSuccess: () => {
@@ -451,547 +428,549 @@ export default function FleetManagement() {
     setIsScheduleDialogOpen(true);
   };
 
-  return (
-    <div className="flex flex-col gap-6 p-6 bg-white dark:bg-salis-black min-h-screen">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-montserrat font-semibold text-salis-black dark:text-white">
-            Fleet Management
-          </h1>
-          <p className="text-sm text-salis-gray mt-1">
-            Manage corporate fleet clients, contracts, and maintenance schedules
-          </p>
+  const renderFleetGroupsContent = () => (
+    <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <h2 className="text-xl font-semibold text-salis-black dark:text-white">
+          Fleet Groups
+        </h2>
+        <Button
+          onClick={() => {
+            setEditingGroupId(null);
+            groupForm.reset();
+            setIsGroupDialogOpen(true);
+          }}
+          className="bg-salis-black dark:bg-white text-white dark:text-salis-black"
+          data-testid="button-create-fleet-group"
+        >
+          <Plus className="mr-2 h-4 w-4" />
+          Add Fleet Group
+        </Button>
+      </div>
+
+      <div className="border border-salis-gray-light dark:border-salis-gray-dark rounded-lg">
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-salis-gray-light dark:bg-salis-gray-dark">
+              <TableHead className="text-salis-black dark:text-white">Fleet Name</TableHead>
+              <TableHead className="text-salis-black dark:text-white">Company</TableHead>
+              <TableHead className="text-salis-black dark:text-white">Contact Person</TableHead>
+              <TableHead className="text-salis-black dark:text-white">Contact Email</TableHead>
+              <TableHead className="text-salis-black dark:text-white">Discount</TableHead>
+              <TableHead className="text-salis-black dark:text-white">Status</TableHead>
+              <TableHead className="text-salis-black dark:text-white text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {groupsLoading ? (
+              <TableRow>
+                <TableCell colSpan={7} className="text-center text-salis-gray">
+                  Loading fleet groups...
+                </TableCell>
+              </TableRow>
+            ) : fleetGroups.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={7} className="text-center text-salis-gray">
+                  No fleet groups found. Create one to get started.
+                </TableCell>
+              </TableRow>
+            ) : (
+              fleetGroups.map((group) => (
+                <TableRow key={group.id} className="border-b border-salis-gray-light dark:border-salis-gray-dark" data-testid={`row-fleet-group-${group.id}`}>
+                  <TableCell className="font-medium text-salis-black dark:text-white">
+                    {group.fleetName}
+                  </TableCell>
+                  <TableCell className="text-salis-gray">{group.companyName || "—"}</TableCell>
+                  <TableCell className="text-salis-gray">{group.contactPerson || "—"}</TableCell>
+                  <TableCell className="text-salis-gray">{group.contactEmail || "—"}</TableCell>
+                  <TableCell className="text-salis-gray">{group.discountPercentage}%</TableCell>
+                  <TableCell>
+                    <Badge
+                      variant={group.isActive ? "default" : "secondary"}
+                      className={group.isActive ? "bg-salis-black dark:bg-white text-white dark:text-salis-black" : ""}
+                    >
+                      {group.isActive ? "Active" : "Inactive"}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex justify-end gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleEditGroup(group)}
+                        data-testid={`button-edit-fleet-group-${group.id}`}
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => deleteGroupMutation.mutate(group.id)}
+                        data-testid={`button-delete-fleet-group-${group.id}`}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </div>
+    </div>
+  );
+
+  const renderFleetVehiclesContent = () => (
+    <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <h2 className="text-xl font-semibold text-salis-black dark:text-white">
+          Fleet Vehicles
+        </h2>
+        <div className="flex gap-4">
+          <Select value={selectedGroupId} onValueChange={setSelectedGroupId}>
+            <SelectTrigger className="w-64" data-testid="select-vehicle-fleet-group">
+              <SelectValue placeholder="Select Fleet Group" />
+            </SelectTrigger>
+            <SelectContent>
+              {fleetGroups.map((group) => (
+                <SelectItem key={group.id} value={group.id}>
+                  {group.fleetName}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Button
+            onClick={() => {
+              setEditingVehicleId(null);
+              vehicleForm.reset({ fleetGroupId: selectedGroupId });
+              setIsVehicleDialogOpen(true);
+            }}
+            className="bg-salis-black dark:bg-white text-white dark:text-salis-black"
+            disabled={!selectedGroupId}
+            data-testid="button-add-fleet-vehicle"
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            Add Vehicle
+          </Button>
         </div>
       </div>
 
-      <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-5 bg-salis-gray-light dark:bg-salis-gray-dark">
-          <TabsTrigger value="groups" className="flex items-center gap-2" data-testid="tab-fleet-groups">
-            <Building2 className="h-4 w-4" />
-            Fleet Groups
-          </TabsTrigger>
-          <TabsTrigger value="vehicles" className="flex items-center gap-2" data-testid="tab-fleet-vehicles">
-            <Car className="h-4 w-4" />
-            Fleet Vehicles
-          </TabsTrigger>
-          <TabsTrigger value="contracts" className="flex items-center gap-2" data-testid="tab-contracts">
-            <FileText className="h-4 w-4" />
-            Contracts
-          </TabsTrigger>
-          <TabsTrigger value="pricing" className="flex items-center gap-2" data-testid="tab-pricing">
-            <DollarSign className="h-4 w-4" />
-            Pricing Tiers
-          </TabsTrigger>
-          <TabsTrigger value="schedules" className="flex items-center gap-2" data-testid="tab-schedules">
-            <Calendar className="h-4 w-4" />
-            Maintenance Schedules
-          </TabsTrigger>
-        </TabsList>
-
-        {/* Fleet Groups Tab */}
-        <TabsContent value="groups" className="space-y-4">
-          <div className="flex justify-between items-center">
-            <h2 className="text-xl font-semibold text-salis-black dark:text-white">
-              Fleet Groups
-            </h2>
-            <Button
-              onClick={() => {
-                setEditingGroupId(null);
-                groupForm.reset();
-                setIsGroupDialogOpen(true);
-              }}
-              className="bg-salis-black dark:bg-white text-white dark:text-salis-black"
-              data-testid="button-create-fleet-group"
-            >
-              <Plus className="mr-2 h-4 w-4" />
-              Add Fleet Group
-            </Button>
-          </div>
-
-          <div className="border border-salis-gray-light dark:border-salis-gray-dark rounded-lg">
-            <Table>
-              <TableHeader>
-                <TableRow className="bg-salis-gray-light dark:bg-salis-gray-dark">
-                  <TableHead className="text-salis-black dark:text-white">Fleet Name</TableHead>
-                  <TableHead className="text-salis-black dark:text-white">Company</TableHead>
-                  <TableHead className="text-salis-black dark:text-white">Contact Person</TableHead>
-                  <TableHead className="text-salis-black dark:text-white">Contact Email</TableHead>
-                  <TableHead className="text-salis-black dark:text-white">Discount</TableHead>
-                  <TableHead className="text-salis-black dark:text-white">Status</TableHead>
-                  <TableHead className="text-salis-black dark:text-white text-right">Actions</TableHead>
+      <div className="border border-salis-gray-light dark:border-salis-gray-dark rounded-lg">
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-salis-gray-light dark:bg-salis-gray-dark">
+              <TableHead className="text-salis-black dark:text-white">Vehicle</TableHead>
+              <TableHead className="text-salis-black dark:text-white">Make/Model</TableHead>
+              <TableHead className="text-salis-black dark:text-white">License Plate</TableHead>
+              <TableHead className="text-salis-black dark:text-white">Avg. Monthly Mileage</TableHead>
+              <TableHead className="text-salis-black dark:text-white">Assigned Date</TableHead>
+              <TableHead className="text-salis-black dark:text-white text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {!selectedGroupId ? (
+              <TableRow>
+                <TableCell colSpan={6} className="text-center text-salis-gray">
+                  Select a fleet group to view vehicles
+                </TableCell>
+              </TableRow>
+            ) : fleetVehicles.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={6} className="text-center text-salis-gray">
+                  No vehicles assigned to this fleet group
+                </TableCell>
+              </TableRow>
+            ) : (
+              fleetVehicles.map((vehicle: any) => (
+                <TableRow key={vehicle.fleetVehicle.id} className="border-b border-salis-gray-light dark:border-salis-gray-dark" data-testid={`row-fleet-vehicle-${vehicle.fleetVehicle.id}`}>
+                  <TableCell className="font-medium text-salis-black dark:text-white">
+                    {vehicle.vehicle?.year} {vehicle.vehicle?.make} {vehicle.vehicle?.model}
+                  </TableCell>
+                  <TableCell className="text-salis-gray">
+                    {vehicle.vehicle?.make} {vehicle.vehicle?.model}
+                  </TableCell>
+                  <TableCell className="text-salis-gray">{vehicle.vehicle?.licensePlate || "—"}</TableCell>
+                  <TableCell className="text-salis-gray">
+                    {vehicle.fleetVehicle.averageMonthlyMileage ? `${vehicle.fleetVehicle.averageMonthlyMileage} km` : "—"}
+                  </TableCell>
+                  <TableCell className="text-salis-gray">
+                    {vehicle.fleetVehicle.assignedAt ? format(new Date(vehicle.fleetVehicle.assignedAt), "MMM dd, yyyy") : "—"}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex justify-end gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleEditVehicle(vehicle)}
+                        data-testid={`button-edit-fleet-vehicle-${vehicle.fleetVehicle.id}`}
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => deleteVehicleMutation.mutate(vehicle.fleetVehicle.id)}
+                        data-testid={`button-delete-fleet-vehicle-${vehicle.fleetVehicle.id}`}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
                 </TableRow>
-              </TableHeader>
-              <TableBody>
-                {groupsLoading ? (
-                  <TableRow>
-                    <TableCell colSpan={7} className="text-center text-salis-gray">
-                      Loading fleet groups...
-                    </TableCell>
-                  </TableRow>
-                ) : fleetGroups.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={7} className="text-center text-salis-gray">
-                      No fleet groups found. Create one to get started.
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  fleetGroups.map((group) => (
-                    <TableRow key={group.id} className="border-b border-salis-gray-light dark:border-salis-gray-dark" data-testid={`row-fleet-group-${group.id}`}>
-                      <TableCell className="font-medium text-salis-black dark:text-white">
-                        {group.fleetName}
-                      </TableCell>
-                      <TableCell className="text-salis-gray">{group.companyName || "—"}</TableCell>
-                      <TableCell className="text-salis-gray">{group.contactPerson || "—"}</TableCell>
-                      <TableCell className="text-salis-gray">{group.contactEmail || "—"}</TableCell>
-                      <TableCell className="text-salis-gray">{group.discountPercentage}%</TableCell>
-                      <TableCell>
-                        <Badge
-                          variant={group.isActive ? "default" : "secondary"}
-                          className={group.isActive ? "bg-salis-black dark:bg-white text-white dark:text-salis-black" : ""}
-                        >
-                          {group.isActive ? "Active" : "Inactive"}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleEditGroup(group)}
-                            data-testid={`button-edit-fleet-group-${group.id}`}
-                          >
-                            <Pencil className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => deleteGroupMutation.mutate(group.id)}
-                            data-testid={`button-delete-fleet-group-${group.id}`}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
-        </TabsContent>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </div>
+    </div>
+  );
 
-        {/* Fleet Vehicles Tab */}
-        <TabsContent value="vehicles" className="space-y-4">
-          <div className="flex justify-between items-center">
-            <h2 className="text-xl font-semibold text-salis-black dark:text-white">
-              Fleet Vehicles
-            </h2>
-            <div className="flex gap-4">
-              <Select value={selectedGroupId} onValueChange={setSelectedGroupId}>
-                <SelectTrigger className="w-64" data-testid="select-vehicle-fleet-group">
-                  <SelectValue placeholder="Select Fleet Group" />
-                </SelectTrigger>
-                <SelectContent>
-                  {fleetGroups.map((group) => (
-                    <SelectItem key={group.id} value={group.id}>
-                      {group.fleetName}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Button
-                onClick={() => {
-                  setEditingVehicleId(null);
-                  vehicleForm.reset({ fleetGroupId: selectedGroupId });
-                  setIsVehicleDialogOpen(true);
-                }}
-                className="bg-salis-black dark:bg-white text-white dark:text-salis-black"
-                disabled={!selectedGroupId}
-                data-testid="button-add-fleet-vehicle"
-              >
-                <Plus className="mr-2 h-4 w-4" />
-                Add Vehicle
-              </Button>
-            </div>
-          </div>
+  const renderContractsContent = () => (
+    <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <h2 className="text-xl font-semibold text-salis-black dark:text-white">
+          Fleet Contracts
+        </h2>
+        <div className="flex gap-4">
+          <Select value={selectedGroupId} onValueChange={setSelectedGroupId}>
+            <SelectTrigger className="w-64" data-testid="select-contract-fleet-group">
+              <SelectValue placeholder="Select Fleet Group" />
+            </SelectTrigger>
+            <SelectContent>
+              {fleetGroups.map((group) => (
+                <SelectItem key={group.id} value={group.id}>
+                  {group.fleetName}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Button
+            onClick={() => {
+              setEditingContractId(null);
+              contractForm.reset({ fleetGroupId: selectedGroupId });
+              setIsContractDialogOpen(true);
+            }}
+            className="bg-salis-black dark:bg-white text-white dark:text-salis-black"
+            disabled={!selectedGroupId}
+            data-testid="button-create-contract"
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            Add Contract
+          </Button>
+        </div>
+      </div>
 
-          <div className="border border-salis-gray-light dark:border-salis-gray-dark rounded-lg">
-            <Table>
-              <TableHeader>
-                <TableRow className="bg-salis-gray-light dark:bg-salis-gray-dark">
-                  <TableHead className="text-salis-black dark:text-white">Vehicle</TableHead>
-                  <TableHead className="text-salis-black dark:text-white">Make/Model</TableHead>
-                  <TableHead className="text-salis-black dark:text-white">License Plate</TableHead>
-                  <TableHead className="text-salis-black dark:text-white">Avg. Monthly Mileage</TableHead>
-                  <TableHead className="text-salis-black dark:text-white">Assigned Date</TableHead>
-                  <TableHead className="text-salis-black dark:text-white text-right">Actions</TableHead>
+      <div className="border border-salis-gray-light dark:border-salis-gray-dark rounded-lg">
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-salis-gray-light dark:bg-salis-gray-dark">
+              <TableHead className="text-salis-black dark:text-white">Contract #</TableHead>
+              <TableHead className="text-salis-black dark:text-white">Type</TableHead>
+              <TableHead className="text-salis-black dark:text-white">Start Date</TableHead>
+              <TableHead className="text-salis-black dark:text-white">End Date</TableHead>
+              <TableHead className="text-salis-black dark:text-white">Vehicles</TableHead>
+              <TableHead className="text-salis-black dark:text-white">Status</TableHead>
+              <TableHead className="text-salis-black dark:text-white text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {!selectedGroupId ? (
+              <TableRow>
+                <TableCell colSpan={7} className="text-center text-salis-gray">
+                  Select a fleet group to view contracts
+                </TableCell>
+              </TableRow>
+            ) : contracts.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={7} className="text-center text-salis-gray">
+                  No contracts found for this fleet group
+                </TableCell>
+              </TableRow>
+            ) : (
+              contracts.map((contract) => (
+                <TableRow key={contract.id} className="border-b border-salis-gray-light dark:border-salis-gray-dark" data-testid={`row-contract-${contract.id}`}>
+                  <TableCell className="font-medium text-salis-black dark:text-white">
+                    {contract.contractNumber}
+                  </TableCell>
+                  <TableCell className="text-salis-gray">{contract.contractType}</TableCell>
+                  <TableCell className="text-salis-gray">
+                    {contract.startDate ? format(new Date(contract.startDate), "MMM dd, yyyy") : "—"}
+                  </TableCell>
+                  <TableCell className="text-salis-gray">
+                    {contract.endDate ? format(new Date(contract.endDate), "MMM dd, yyyy") : "—"}
+                  </TableCell>
+                  <TableCell className="text-salis-gray">{contract.maxVehicles || "—"}</TableCell>
+                  <TableCell>
+                    <Badge className="bg-salis-black dark:bg-white text-white dark:text-salis-black">
+                      {contract.status || "Active"}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex justify-end gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleEditContract(contract)}
+                        data-testid={`button-edit-contract-${contract.id}`}
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => deleteContractMutation.mutate(contract.id)}
+                        data-testid={`button-delete-contract-${contract.id}`}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
                 </TableRow>
-              </TableHeader>
-              <TableBody>
-                {!selectedGroupId ? (
-                  <TableRow>
-                    <TableCell colSpan={6} className="text-center text-salis-gray">
-                      Select a fleet group to view vehicles
-                    </TableCell>
-                  </TableRow>
-                ) : fleetVehicles.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={6} className="text-center text-salis-gray">
-                      No vehicles assigned to this fleet group
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  fleetVehicles.map((vehicle: any) => (
-                    <TableRow key={vehicle.fleetVehicle.id} className="border-b border-salis-gray-light dark:border-salis-gray-dark" data-testid={`row-fleet-vehicle-${vehicle.fleetVehicle.id}`}>
-                      <TableCell className="font-medium text-salis-black dark:text-white">
-                        {vehicle.vehicle?.year} {vehicle.vehicle?.make} {vehicle.vehicle?.model}
-                      </TableCell>
-                      <TableCell className="text-salis-gray">
-                        {vehicle.vehicle?.make} {vehicle.vehicle?.model}
-                      </TableCell>
-                      <TableCell className="text-salis-gray">{vehicle.vehicle?.licensePlate || "—"}</TableCell>
-                      <TableCell className="text-salis-gray">
-                        {vehicle.fleetVehicle.averageMonthlyMileage ? `${vehicle.fleetVehicle.averageMonthlyMileage} km` : "—"}
-                      </TableCell>
-                      <TableCell className="text-salis-gray">
-                        {vehicle.fleetVehicle.assignedAt ? format(new Date(vehicle.fleetVehicle.assignedAt), "MMM dd, yyyy") : "—"}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleEditVehicle(vehicle)}
-                            data-testid={`button-edit-fleet-vehicle-${vehicle.fleetVehicle.id}`}
-                          >
-                            <Pencil className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => deleteVehicleMutation.mutate(vehicle.fleetVehicle.id)}
-                            data-testid={`button-delete-fleet-vehicle-${vehicle.fleetVehicle.id}`}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
-        </TabsContent>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </div>
+    </div>
+  );
 
-        {/* Contracts Tab */}
-        <TabsContent value="contracts" className="space-y-4">
-          <div className="flex justify-between items-center">
-            <h2 className="text-xl font-semibold text-salis-black dark:text-white">
-              Fleet Contracts
-            </h2>
-            <div className="flex gap-4">
-              <Select value={selectedGroupId} onValueChange={setSelectedGroupId}>
-                <SelectTrigger className="w-64" data-testid="select-contract-fleet-group">
-                  <SelectValue placeholder="Select Fleet Group" />
-                </SelectTrigger>
-                <SelectContent>
-                  {fleetGroups.map((group) => (
-                    <SelectItem key={group.id} value={group.id}>
-                      {group.fleetName}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Button
-                onClick={() => {
-                  setEditingContractId(null);
-                  contractForm.reset({ fleetGroupId: selectedGroupId });
-                  setIsContractDialogOpen(true);
-                }}
-                className="bg-salis-black dark:bg-white text-white dark:text-salis-black"
-                disabled={!selectedGroupId}
-                data-testid="button-create-contract"
-              >
-                <Plus className="mr-2 h-4 w-4" />
-                Add Contract
-              </Button>
-            </div>
-          </div>
+  const renderPricingTiersContent = () => (
+    <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <h2 className="text-xl font-semibold text-salis-black dark:text-white">
+          Pricing Tiers
+        </h2>
+        <Button
+          onClick={() => {
+            setEditingPricingId(null);
+            pricingForm.reset({ garageId: (user as any)?.garageId || "" });
+            setIsPricingDialogOpen(true);
+          }}
+          className="bg-salis-black dark:bg-white text-white dark:text-salis-black"
+          data-testid="button-create-pricing-tier"
+        >
+          <Plus className="mr-2 h-4 w-4" />
+          Add Pricing Tier
+        </Button>
+      </div>
 
-          <div className="border border-salis-gray-light dark:border-salis-gray-dark rounded-lg">
-            <Table>
-              <TableHeader>
-                <TableRow className="bg-salis-gray-light dark:bg-salis-gray-dark">
-                  <TableHead className="text-salis-black dark:text-white">Contract #</TableHead>
-                  <TableHead className="text-salis-black dark:text-white">Type</TableHead>
-                  <TableHead className="text-salis-black dark:text-white">Start Date</TableHead>
-                  <TableHead className="text-salis-black dark:text-white">End Date</TableHead>
-                  <TableHead className="text-salis-black dark:text-white">Vehicles</TableHead>
-                  <TableHead className="text-salis-black dark:text-white">Status</TableHead>
-                  <TableHead className="text-salis-black dark:text-white text-right">Actions</TableHead>
+      <div className="border border-salis-gray-light dark:border-salis-gray-dark rounded-lg">
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-salis-gray-light dark:bg-salis-gray-dark">
+              <TableHead className="text-salis-black dark:text-white">Tier Name</TableHead>
+              <TableHead className="text-salis-black dark:text-white">Min Vehicles</TableHead>
+              <TableHead className="text-salis-black dark:text-white">Max Vehicles</TableHead>
+              <TableHead className="text-salis-black dark:text-white">Discount</TableHead>
+              <TableHead className="text-salis-black dark:text-white">Status</TableHead>
+              <TableHead className="text-salis-black dark:text-white text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {pricingTiers.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={6} className="text-center text-salis-gray">
+                  No pricing tiers found. Create one to get started.
+                </TableCell>
+              </TableRow>
+            ) : (
+              pricingTiers.map((tier) => (
+                <TableRow key={tier.id} className="border-b border-salis-gray-light dark:border-salis-gray-dark" data-testid={`row-pricing-tier-${tier.id}`}>
+                  <TableCell className="font-medium text-salis-black dark:text-white">
+                    {tier.tierName}
+                  </TableCell>
+                  <TableCell className="text-salis-gray">{tier.minVehicles}</TableCell>
+                  <TableCell className="text-salis-gray">{tier.maxVehicles || "Unlimited"}</TableCell>
+                  <TableCell className="text-salis-gray">{tier.discountPercentage}%</TableCell>
+                  <TableCell>
+                    <Badge
+                      variant={tier.isActive ? "default" : "secondary"}
+                      className={tier.isActive ? "bg-salis-black dark:bg-white text-white dark:text-salis-black" : ""}
+                    >
+                      {tier.isActive ? "Active" : "Inactive"}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex justify-end gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleEditPricing(tier)}
+                        data-testid={`button-edit-pricing-tier-${tier.id}`}
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => deletePricingMutation.mutate(tier.id)}
+                        data-testid={`button-delete-pricing-tier-${tier.id}`}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
                 </TableRow>
-              </TableHeader>
-              <TableBody>
-                {!selectedGroupId ? (
-                  <TableRow>
-                    <TableCell colSpan={7} className="text-center text-salis-gray">
-                      Select a fleet group to view contracts
-                    </TableCell>
-                  </TableRow>
-                ) : contracts.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={7} className="text-center text-salis-gray">
-                      No contracts found for this fleet group
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  contracts.map((contract) => (
-                    <TableRow key={contract.id} className="border-b border-salis-gray-light dark:border-salis-gray-dark" data-testid={`row-contract-${contract.id}`}>
-                      <TableCell className="font-medium text-salis-black dark:text-white">
-                        {contract.contractNumber}
-                      </TableCell>
-                      <TableCell className="text-salis-gray">{contract.contractType}</TableCell>
-                      <TableCell className="text-salis-gray">
-                        {contract.startDate ? format(new Date(contract.startDate), "MMM dd, yyyy") : "—"}
-                      </TableCell>
-                      <TableCell className="text-salis-gray">
-                        {contract.endDate ? format(new Date(contract.endDate), "MMM dd, yyyy") : "—"}
-                      </TableCell>
-                      <TableCell className="text-salis-gray">{contract.maxVehicles || "—"}</TableCell>
-                      <TableCell>
-                        <Badge className="bg-salis-black dark:bg-white text-white dark:text-salis-black">
-                          {contract.status || "Active"}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleEditContract(contract)}
-                            data-testid={`button-edit-contract-${contract.id}`}
-                          >
-                            <Pencil className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => deleteContractMutation.mutate(contract.id)}
-                            data-testid={`button-delete-contract-${contract.id}`}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
-        </TabsContent>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </div>
+    </div>
+  );
 
-        {/* Pricing Tiers Tab */}
-        <TabsContent value="pricing" className="space-y-4">
-          <div className="flex justify-between items-center">
-            <h2 className="text-xl font-semibold text-salis-black dark:text-white">
-              Fleet Pricing Tiers
-            </h2>
-            <Button
-              onClick={() => {
-                setEditingPricingId(null);
-                pricingForm.reset();
-                setIsPricingDialogOpen(true);
-              }}
-              className="bg-salis-black dark:bg-white text-white dark:text-salis-black"
-              data-testid="button-create-pricing-tier"
-            >
-              <Plus className="mr-2 h-4 w-4" />
-              Add Pricing Tier
-            </Button>
-          </div>
+  const renderMaintenanceSchedulesContent = () => (
+    <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <h2 className="text-xl font-semibold text-salis-black dark:text-white">
+          Maintenance Schedules
+        </h2>
+        <div className="flex gap-4">
+          <Select value={selectedGroupId} onValueChange={setSelectedGroupId}>
+            <SelectTrigger className="w-64" data-testid="select-schedule-fleet-group">
+              <SelectValue placeholder="Select Fleet Group" />
+            </SelectTrigger>
+            <SelectContent>
+              {fleetGroups.map((group) => (
+                <SelectItem key={group.id} value={group.id}>
+                  {group.fleetName}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Button
+            onClick={() => {
+              setEditingScheduleId(null);
+              scheduleForm.reset({ fleetGroupId: selectedGroupId });
+              setIsScheduleDialogOpen(true);
+            }}
+            className="bg-salis-black dark:bg-white text-white dark:text-salis-black"
+            disabled={!selectedGroupId}
+            data-testid="button-create-schedule"
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            Add Schedule
+          </Button>
+        </div>
+      </div>
 
-          <div className="border border-salis-gray-light dark:border-salis-gray-dark rounded-lg">
-            <Table>
-              <TableHeader>
-                <TableRow className="bg-salis-gray-light dark:bg-salis-gray-dark">
-                  <TableHead className="text-salis-black dark:text-white">Tier Name</TableHead>
-                  <TableHead className="text-salis-black dark:text-white">Min Vehicles</TableHead>
-                  <TableHead className="text-salis-black dark:text-white">Max Vehicles</TableHead>
-                  <TableHead className="text-salis-black dark:text-white">Discount</TableHead>
-                  <TableHead className="text-salis-black dark:text-white">Status</TableHead>
-                  <TableHead className="text-salis-black dark:text-white text-right">Actions</TableHead>
+      <div className="border border-salis-gray-light dark:border-salis-gray-dark rounded-lg">
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-salis-gray-light dark:bg-salis-gray-dark">
+              <TableHead className="text-salis-black dark:text-white">Schedule Name</TableHead>
+              <TableHead className="text-salis-black dark:text-white">Service Type</TableHead>
+              <TableHead className="text-salis-black dark:text-white">Interval Type</TableHead>
+              <TableHead className="text-salis-black dark:text-white">Mileage</TableHead>
+              <TableHead className="text-salis-black dark:text-white">Months</TableHead>
+              <TableHead className="text-salis-black dark:text-white">Est. Cost</TableHead>
+              <TableHead className="text-salis-black dark:text-white text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {!selectedGroupId ? (
+              <TableRow>
+                <TableCell colSpan={7} className="text-center text-salis-gray">
+                  Select a fleet group to view schedules
+                </TableCell>
+              </TableRow>
+            ) : schedules.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={7} className="text-center text-salis-gray">
+                  No maintenance schedules found for this fleet group
+                </TableCell>
+              </TableRow>
+            ) : (
+              schedules.map((schedule) => (
+                <TableRow key={schedule.id} className="border-b border-salis-gray-light dark:border-salis-gray-dark" data-testid={`row-schedule-${schedule.id}`}>
+                  <TableCell className="font-medium text-salis-black dark:text-white">
+                    {schedule.scheduleName}
+                  </TableCell>
+                  <TableCell className="text-salis-gray">{schedule.serviceType}</TableCell>
+                  <TableCell className="text-salis-gray">{schedule.intervalType}</TableCell>
+                  <TableCell className="text-salis-gray">
+                    {schedule.intervalMileage ? `${schedule.intervalMileage} km` : "—"}
+                  </TableCell>
+                  <TableCell className="text-salis-gray">
+                    {schedule.intervalMonths ? `${schedule.intervalMonths} mo` : "—"}
+                  </TableCell>
+                  <TableCell className="text-salis-gray">
+                    {schedule.estimatedCost ? `$${schedule.estimatedCost}` : "—"}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex justify-end gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleEditSchedule(schedule)}
+                        data-testid={`button-edit-schedule-${schedule.id}`}
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => deleteScheduleMutation.mutate(schedule.id)}
+                        data-testid={`button-delete-schedule-${schedule.id}`}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
                 </TableRow>
-              </TableHeader>
-              <TableBody>
-                {pricingTiers.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={6} className="text-center text-salis-gray">
-                      No pricing tiers found. Create one to get started.
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  pricingTiers.map((tier) => (
-                    <TableRow key={tier.id} className="border-b border-salis-gray-light dark:border-salis-gray-dark" data-testid={`row-pricing-tier-${tier.id}`}>
-                      <TableCell className="font-medium text-salis-black dark:text-white">
-                        {tier.tierName}
-                      </TableCell>
-                      <TableCell className="text-salis-gray">{tier.minVehicles}</TableCell>
-                      <TableCell className="text-salis-gray">{tier.maxVehicles || "No limit"}</TableCell>
-                      <TableCell className="text-salis-gray">{tier.discountPercentage}%</TableCell>
-                      <TableCell>
-                        <Badge
-                          variant={tier.isActive ? "default" : "secondary"}
-                          className={tier.isActive ? "bg-salis-black dark:bg-white text-white dark:text-salis-black" : ""}
-                        >
-                          {tier.isActive ? "Active" : "Inactive"}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleEditPricing(tier)}
-                            data-testid={`button-edit-pricing-tier-${tier.id}`}
-                          >
-                            <Pencil className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => deletePricingMutation.mutate(tier.id)}
-                            data-testid={`button-delete-pricing-tier-${tier.id}`}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
-        </TabsContent>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </div>
+    </div>
+  );
 
-        {/* Maintenance Schedules Tab */}
-        <TabsContent value="schedules" className="space-y-4">
-          <div className="flex justify-between items-center">
-            <h2 className="text-xl font-semibold text-salis-black dark:text-white">
-              Fleet Maintenance Schedules
-            </h2>
-            <div className="flex gap-4">
-              <Select value={selectedGroupId} onValueChange={setSelectedGroupId}>
-                <SelectTrigger className="w-64" data-testid="select-schedule-fleet-group">
-                  <SelectValue placeholder="Select Fleet Group" />
-                </SelectTrigger>
-                <SelectContent>
-                  {fleetGroups.map((group) => (
-                    <SelectItem key={group.id} value={group.id}>
-                      {group.fleetName}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Button
-                onClick={() => {
-                  setEditingScheduleId(null);
-                  scheduleForm.reset({ fleetGroupId: selectedGroupId });
-                  setIsScheduleDialogOpen(true);
-                }}
-                className="bg-salis-black dark:bg-white text-white dark:text-salis-black"
-                disabled={!selectedGroupId}
-                data-testid="button-create-schedule"
-              >
-                <Plus className="mr-2 h-4 w-4" />
-                Add Schedule
-              </Button>
-            </div>
-          </div>
+  return (
+    <>
+      <TabsPageLayout
+        title="Fleet Management"
+        description="Manage corporate fleet clients, contracts, and maintenance schedules"
+        icon={Building2}
+        activeTab={selectedTab}
+        onTabChange={setSelectedTab}
+        tabs={[
+          {
+            id: "groups",
+            label: "Fleet Groups",
+            icon: Building2,
+            content: renderFleetGroupsContent(),
+            badge: fleetGroups.length,
+          },
+          {
+            id: "vehicles",
+            label: "Fleet Vehicles",
+            icon: Car,
+            content: renderFleetVehiclesContent(),
+          },
+          {
+            id: "contracts",
+            label: "Contracts",
+            icon: FileText,
+            content: renderContractsContent(),
+          },
+          {
+            id: "pricing",
+            label: "Pricing Tiers",
+            icon: DollarSign,
+            content: renderPricingTiersContent(),
+            badge: pricingTiers.length,
+          },
+          {
+            id: "schedules",
+            label: "Maintenance Schedules",
+            icon: Calendar,
+            content: renderMaintenanceSchedulesContent(),
+          },
+        ]}
+      />
 
-          <div className="border border-salis-gray-light dark:border-salis-gray-dark rounded-lg">
-            <Table>
-              <TableHeader>
-                <TableRow className="bg-salis-gray-light dark:bg-salis-gray-dark">
-                  <TableHead className="text-salis-black dark:text-white">Schedule Name</TableHead>
-                  <TableHead className="text-salis-black dark:text-white">Service Type</TableHead>
-                  <TableHead className="text-salis-black dark:text-white">Interval Type</TableHead>
-                  <TableHead className="text-salis-black dark:text-white">Interval</TableHead>
-                  <TableHead className="text-salis-black dark:text-white">Est. Cost</TableHead>
-                  <TableHead className="text-salis-black dark:text-white">Status</TableHead>
-                  <TableHead className="text-salis-black dark:text-white text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {!selectedGroupId ? (
-                  <TableRow>
-                    <TableCell colSpan={7} className="text-center text-salis-gray">
-                      Select a fleet group to view maintenance schedules
-                    </TableCell>
-                  </TableRow>
-                ) : schedules.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={7} className="text-center text-salis-gray">
-                      No maintenance schedules found for this fleet group
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  schedules.map((schedule) => (
-                    <TableRow key={schedule.id} className="border-b border-salis-gray-light dark:border-salis-gray-dark" data-testid={`row-schedule-${schedule.id}`}>
-                      <TableCell className="font-medium text-salis-black dark:text-white">
-                        {schedule.scheduleName}
-                      </TableCell>
-                      <TableCell className="text-salis-gray">{schedule.serviceType}</TableCell>
-                      <TableCell className="text-salis-gray capitalize">{schedule.intervalType}</TableCell>
-                      <TableCell className="text-salis-gray">
-                        {schedule.intervalType === "mileage" && schedule.intervalMileage && `${schedule.intervalMileage} km`}
-                        {schedule.intervalType === "time" && schedule.intervalMonths && `${schedule.intervalMonths} months`}
-                        {schedule.intervalType === "both" &&
-                          `${schedule.intervalMileage || 0} km / ${schedule.intervalMonths || 0} months`}
-                      </TableCell>
-                      <TableCell className="text-salis-gray">
-                        ${schedule.estimatedCost || "—"}
-                      </TableCell>
-                      <TableCell>
-                        <Badge
-                          variant={schedule.isActive ? "default" : "secondary"}
-                          className={schedule.isActive ? "bg-salis-black dark:bg-white text-white dark:text-salis-black" : ""}
-                        >
-                          {schedule.isActive ? "Active" : "Inactive"}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleEditSchedule(schedule)}
-                            data-testid={`button-edit-schedule-${schedule.id}`}
-                          >
-                            <Pencil className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => deleteScheduleMutation.mutate(schedule.id)}
-                            data-testid={`button-delete-schedule-${schedule.id}`}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
-        </TabsContent>
-      </Tabs>
-
-      {/* Fleet Group Dialog */}
       <Dialog open={isGroupDialogOpen} onOpenChange={setIsGroupDialogOpen}>
         <DialogContent className="max-w-2xl bg-white dark:bg-salis-black">
           <DialogHeader>
@@ -1178,7 +1157,6 @@ export default function FleetManagement() {
         </DialogContent>
       </Dialog>
 
-      {/* Fleet Vehicle Dialog */}
       <Dialog open={isVehicleDialogOpen} onOpenChange={setIsVehicleDialogOpen}>
         <DialogContent className="max-w-2xl bg-white dark:bg-salis-black">
           <DialogHeader>
@@ -1267,7 +1245,6 @@ export default function FleetManagement() {
         </DialogContent>
       </Dialog>
 
-      {/* Contract Dialog */}
       <Dialog open={isContractDialogOpen} onOpenChange={setIsContractDialogOpen}>
         <DialogContent className="max-w-2xl bg-white dark:bg-salis-black">
           <DialogHeader>
@@ -1427,7 +1404,6 @@ export default function FleetManagement() {
         </DialogContent>
       </Dialog>
 
-      {/* Pricing Tier Dialog */}
       <Dialog open={isPricingDialogOpen} onOpenChange={setIsPricingDialogOpen}>
         <DialogContent className="max-w-2xl bg-white dark:bg-salis-black">
           <DialogHeader>
@@ -1530,7 +1506,6 @@ export default function FleetManagement() {
         </DialogContent>
       </Dialog>
 
-      {/* Maintenance Schedule Dialog */}
       <Dialog open={isScheduleDialogOpen} onOpenChange={setIsScheduleDialogOpen}>
         <DialogContent className="max-w-2xl bg-white dark:bg-salis-black">
           <DialogHeader>
@@ -1667,6 +1642,6 @@ export default function FleetManagement() {
           </Form>
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 }

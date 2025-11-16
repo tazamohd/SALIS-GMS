@@ -3,7 +3,6 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { Network, Users, Package, Truck, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
@@ -15,10 +14,10 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { NetworkPartner, FulfillmentOrder, ShipmentEvent, WarehouseNode, InsertNetworkPartner, InsertFulfillmentOrder } from "@shared/schema";
 import { insertNetworkPartnerSchema, insertFulfillmentOrderSchema } from "@shared/schema";
+import { TabsPageLayout } from "@/components/layouts";
 
 export default function PartsSupplyNetwork() {
   const { toast } = useToast();
-  const [activeTab, setActiveTab] = useState("partners");
   const [showPartnerDialog, setShowPartnerDialog] = useState(false);
   const [showOrderDialog, setShowOrderDialog] = useState(false);
 
@@ -33,7 +32,7 @@ export default function PartsSupplyNetwork() {
   });
   const orderForm = useForm<InsertFulfillmentOrder>({ 
     resolver: zodResolver(insertFulfillmentOrderSchema),
-    defaultValues: { partnerId: "", branchId: "", orderNumber: "", totalAmount: "0", estimatedDelivery: new Date(), status: "pending" } 
+    defaultValues: { partnerId: "", branchId: "", orderNumber: "", totalAmount: "0", status: "pending" } 
   });
 
   const createPartnerMutation = useMutation({
@@ -78,36 +77,13 @@ export default function PartsSupplyNetwork() {
     );
   };
 
-  return (
-    <div className="flex-1 p-6 bg-gray-50 dark:bg-salis-black min-h-screen">
-      <div className="mb-6">
-        <h1 className="font-montserrat font-semibold text-2xl text-gray-900 dark:text-white" data-testid="text-page-title">Parts Supply Network</h1>
-        <p className="font-poppins text-sm text-gray-600 dark:text-gray-400 mt-1" data-testid="text-page-description">
-          Manage B2B partners, fulfillment orders, shipments, and warehouse distribution
-        </p>
-      </div>
-
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="bg-white dark:bg-salis-black/50 border border-gray-200 dark:border-salis-gray-dark" data-testid="tabs-navigation">
-          <TabsTrigger value="partners" data-testid="tab-partners" className="gap-2">
-            <Users className="h-4 w-4" />
-            Network Partners
-          </TabsTrigger>
-          <TabsTrigger value="orders" data-testid="tab-orders" className="gap-2">
-            <Package className="h-4 w-4" />
-            Fulfillment Orders
-          </TabsTrigger>
-          <TabsTrigger value="shipments" data-testid="tab-shipments" className="gap-2">
-            <Truck className="h-4 w-4" />
-            Shipments
-          </TabsTrigger>
-          <TabsTrigger value="warehouses" data-testid="tab-warehouses" className="gap-2">
-            <Network className="h-4 w-4" />
-            Warehouses
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="partners" className="space-y-4">
+  const tabs = [
+    {
+      id: "partners",
+      label: "Network Partners",
+      icon: Users,
+      content: (
+        <div className="space-y-4">
           <div className="flex justify-between items-center">
             <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">Network Partners</h2>
             <Button onClick={() => { partnerForm.reset(); setShowPartnerDialog(true); }} data-testid="button-add-partner">
@@ -144,9 +120,15 @@ export default function PartsSupplyNetwork() {
               </Table>
             </CardContent>
           </Card>
-        </TabsContent>
-
-        <TabsContent value="orders" className="space-y-4">
+        </div>
+      ),
+    },
+    {
+      id: "orders",
+      label: "Fulfillment Orders",
+      icon: Package,
+      content: (
+        <div className="space-y-4">
           <div className="flex justify-between items-center">
             <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">Fulfillment Orders</h2>
             <Button onClick={() => { orderForm.reset(); setShowOrderDialog(true); }} data-testid="button-add-order">
@@ -179,9 +161,15 @@ export default function PartsSupplyNetwork() {
               </Table>
             </CardContent>
           </Card>
-        </TabsContent>
-
-        <TabsContent value="shipments" className="space-y-4">
+        </div>
+      ),
+    },
+    {
+      id: "shipments",
+      label: "Shipments",
+      icon: Truck,
+      content: (
+        <div className="space-y-4">
           <div className="flex justify-between items-center">
             <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">Shipment Tracking</h2>
           </div>
@@ -210,9 +198,15 @@ export default function PartsSupplyNetwork() {
               </Table>
             </CardContent>
           </Card>
-        </TabsContent>
-
-        <TabsContent value="warehouses" className="space-y-4">
+        </div>
+      ),
+    },
+    {
+      id: "warehouses",
+      label: "Warehouses",
+      icon: Network,
+      content: (
+        <div className="space-y-4">
           <div className="flex justify-between items-center">
             <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">Warehouse Network</h2>
           </div>
@@ -245,10 +239,21 @@ export default function PartsSupplyNetwork() {
               </Table>
             </CardContent>
           </Card>
-        </TabsContent>
-      </Tabs>
+        </div>
+      ),
+    },
+  ];
 
-      {/* Partner Dialog */}
+  return (
+    <>
+      <TabsPageLayout
+        title="Parts Supply Network"
+        description="Manage B2B partners, fulfillment orders, shipments, and warehouse distribution"
+        icon={Network}
+        tabs={tabs}
+        defaultTab="partners"
+      />
+
       <Dialog open={showPartnerDialog} onOpenChange={setShowPartnerDialog}>
         <DialogContent>
           <DialogHeader>
@@ -288,6 +293,6 @@ export default function PartsSupplyNetwork() {
           </Form>
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 }

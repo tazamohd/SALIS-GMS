@@ -1,4 +1,5 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { DashboardPage } from "@/components/layouts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -9,17 +10,14 @@ import { Leaf, Droplet, Battery, Recycle } from "lucide-react";
 export default function EnvironmentalCompliance() {
   const { toast } = useToast();
 
-  // Fetch environmental compliance records
   const { data: records = [], isLoading: recordsLoading } = useQuery<any[]>({
     queryKey: ['/api/compliance/environmental'],
   });
 
-  // Fetch analytics for KPIs
   const { data: analytics = [] } = useQuery<any[]>({
     queryKey: ['/api/compliance/environmental/analytics'],
   });
 
-  // Calculate KPIs from analytics or records
   const totalRecords = records.length || 0;
   const recyclingRecords = records.filter((r: any) => r.complianceType === 'recycling').length;
   const compliantRecords = records.filter((r: any) => r.certificationNumber || r.disposalCompany).length;
@@ -31,7 +29,6 @@ export default function EnvironmentalCompliance() {
     recyclingRate: totalRecords > 0 ? Math.round((recyclingRecords / totalRecords) * 100) : 0,
   };
 
-  // Create compliance record mutation
   const createRecordMutation = useMutation({
     mutationFn: async (data: any) => {
       return apiRequest('POST', '/api/compliance/environmental', data);
@@ -53,82 +50,40 @@ export default function EnvironmentalCompliance() {
     },
   });
 
-  return (
-    <div className="p-8 space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold font-montserrat text-gray-900 dark:text-white">
-            🌱 Environmental Compliance
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">Track waste disposal and environmental compliance</p>
-        </div>
-        <Button 
-          onClick={() => {
-            createRecordMutation.mutate({
-              complianceType: 'waste_disposal',
-              recordDate: new Date().toISOString(),
-              wasteType: 'Used Oil',
-              quantity: 55,
-              unit: 'gallons',
-              disposalMethod: 'recycling',
-              disposalCompany: 'EcoWaste Inc',
-              certificationNumber: 'CERT-2024-001',
-              cost: 125,
-            });
-          }}
-          disabled={createRecordMutation.isPending}
-          data-testid="button-add-record"
-        >
-          {createRecordMutation.isPending ? "Adding..." : "Add Disposal Record"}
-        </Button>
-      </div>
+  const metrics = [
+    { label: "Total This Month", value: stats.totalDisposals, icon: Leaf, color: "text-green-600" },
+    { label: "Compliance Rate", value: `${stats.complianceRate}%`, icon: Droplet, color: "text-blue-600" },
+    { label: "Disposal Costs", value: `$${Math.round(stats.thisMonthCost)}`, icon: Battery, color: "text-yellow-600" },
+    { label: "Recycling Rate", value: `${stats.recyclingRate}%`, icon: Recycle, color: "text-purple-600" },
+  ];
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Total This Month</p>
-                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="text-total-disposals">{stats.totalDisposals}</h3>
-              </div>
-              <Leaf className="h-12 w-12 text-green-600" />
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Compliance Rate</p>
-                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="text-compliance-rate">{stats.complianceRate}%</h3>
-              </div>
-              <Droplet className="h-12 w-12 text-blue-600" />
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Disposal Costs</p>
-                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="text-disposal-costs">${Math.round(stats.thisMonthCost)}</h3>
-              </div>
-              <Battery className="h-12 w-12 text-yellow-600" />
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Recycling Rate</p>
-                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="text-recycling-rate">{stats.recyclingRate}%</h3>
-              </div>
-              <Recycle className="h-12 w-12 text-purple-600" />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+  return (
+    <DashboardPage
+      title="🌱 Environmental Compliance"
+      description="Track waste disposal and environmental compliance"
+      icon={Leaf}
+      metrics={metrics}
+    >
+      <Button 
+        onClick={() => {
+          createRecordMutation.mutate({
+            complianceType: 'waste_disposal',
+            recordDate: new Date().toISOString(),
+            wasteType: 'Used Oil',
+            quantity: 55,
+            unit: 'gallons',
+            disposalMethod: 'recycling',
+            disposalCompany: 'EcoWaste Inc',
+            certificationNumber: 'CERT-2024-001',
+            cost: 125,
+          });
+        }}
+        disabled={createRecordMutation.isPending}
+        data-testid="button-add-record"
+        className="mb-6"
+      >
+        {createRecordMutation.isPending ? "Adding..." : "Add Disposal Record"}
+      </Button>
 
       <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
         <CardHeader>
@@ -162,6 +117,6 @@ export default function EnvironmentalCompliance() {
           )}
         </CardContent>
       </Card>
-    </div>
+    </DashboardPage>
   );
 }

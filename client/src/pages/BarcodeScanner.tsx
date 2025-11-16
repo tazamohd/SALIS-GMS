@@ -5,6 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { StandardPageLayout } from "@/components/layouts/StandardPageLayout";
 import { Scan, Package, Wrench, Car } from "lucide-react";
 
 export default function BarcodeScanner() {
@@ -12,7 +13,7 @@ export default function BarcodeScanner() {
   const { toast } = useToast();
 
   // Fetch barcode scan history
-  const { data: scans = [], isLoading } = useQuery({
+  const { data: scans = [], isLoading } = useQuery<any[]>({
     queryKey: ["/api/barcode/scans"],
   });
 
@@ -25,10 +26,7 @@ export default function BarcodeScanner() {
       itemId?: string;
       location?: string;
     }) => {
-      return await apiRequest("/api/barcode/scan", {
-        method: "POST",
-        body: JSON.stringify(scanData),
-      });
+      return await apiRequest("POST", "/api/barcode/scan", scanData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/barcode/scans"] });
@@ -81,32 +79,27 @@ export default function BarcodeScanner() {
   };
 
   return (
-    <div className="p-8 space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold font-montserrat text-gray-900 dark:text-white">
-            📱 Barcode & QR Scanner
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">Scan parts, vehicles, and tools</p>
-        </div>
-        <Button
-          size="lg"
-          variant={scanning ? "destructive" : "default"}
-          onClick={() => {
+    <StandardPageLayout
+      title="📱 Barcode & QR Scanner"
+      description="Scan parts, vehicles, and tools"
+      icon={Scan}
+      actions={[
+        {
+          label: scanning ? "Stop Scanner" : "Start Scanner",
+          onClick: () => {
             if (scanning) {
               setScanning(false);
             } else {
               setScanning(true);
               simulateScan();
             }
-          }}
-          disabled={recordScanMutation.isPending}
-          data-testid="button-toggle-scanner"
-        >
-          <Scan className="h-5 w-5 mr-2" />
-          {scanning ? "Stop Scanner" : "Start Scanner"}
-        </Button>
-      </div>
+          },
+          icon: Scan,
+          variant: scanning ? "destructive" : "default",
+        },
+      ]}
+    >
+      <div className="space-y-6">
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
@@ -205,6 +198,7 @@ export default function BarcodeScanner() {
           )}
         </CardContent>
       </Card>
-    </div>
+      </div>
+    </StandardPageLayout>
   );
 }

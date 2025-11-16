@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { formatDistanceToNow } from "date-fns";
 import type { SupplierPartsAvailability } from "@shared/schema";
+import { StandardPageLayout } from "@/components/layouts/StandardPageLayout";
 
 export function PartsAvailability() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -110,22 +111,19 @@ export function PartsAvailability() {
   };
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold" data-testid="text-page-title">Parts Availability Tracker</h1>
-          <p className="text-muted-foreground">Real-time multi-supplier parts availability</p>
-        </div>
-        <Button 
-          onClick={handleMockSync} 
-          disabled={syncMutation.isPending}
-          data-testid="button-sync-mock"
-        >
-          <RefreshCw className={`w-4 h-4 mr-2 ${syncMutation.isPending ? 'animate-spin' : ''}`} />
-          Sync Mock Data
-        </Button>
-      </div>
-
+    <StandardPageLayout
+      title="Parts Availability Tracker"
+      description="Real-time multi-supplier parts availability"
+      icon={Package}
+      actions={[
+        {
+          label: "Sync Mock Data",
+          icon: RefreshCw,
+          onClick: handleMockSync,
+          variant: "default",
+        },
+      ]}
+    >
       <Card>
         <CardHeader>
           <CardTitle>Search Parts</CardTitle>
@@ -226,6 +224,6 @@ export function PartsAvailability() {
           ))}
         </div>
       )}
-    </div>
+    </StandardPageLayout>
   );
 }

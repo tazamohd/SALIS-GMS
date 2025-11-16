@@ -6,6 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { StandardPageLayout } from "@/components/layouts";
+import { User as UserIcon, Save, X } from "lucide-react";
 import type { User } from "@shared/schema";
 
 export function Profile() {
@@ -36,20 +38,38 @@ export function Profile() {
 
   if (isLoading) {
     return (
-      <div className="flex-1 p-8 bg-white dark:bg-salis-black">
+      <StandardPageLayout
+        title="My Profile"
+        description="Manage your profile information and settings"
+        icon={UserIcon}
+      >
         <div className="animate-pulse space-y-4">
-          <div className="h-8 bg-gray-200 rounded w-48"></div>
+          <div className="h-64 bg-gray-200 rounded"></div>
           <div className="h-64 bg-gray-200 rounded"></div>
         </div>
-      </div>
+      </StandardPageLayout>
     );
   }
 
   return (
-    <div className="flex-1 p-8 bg-white dark:bg-salis-black">
-      <div className="mb-8">
-        <h1 className="font-['Poppins',Helvetica] font-semibold text-2xl text-gray-900 dark:text-white">My Profile</h1>
-      </div>
+    <StandardPageLayout
+      title="My Profile"
+      description="Manage your profile information and settings"
+      icon={UserIcon}
+      actions={!isChangingPassword ? [
+        {
+          label: isEditing ? 'Cancel' : 'Edit Profile',
+          onClick: () => setIsEditing(!isEditing),
+          variant: 'outline' as const,
+          icon: isEditing ? X : undefined,
+        },
+        ...(isEditing ? [{
+          label: 'Save',
+          onClick: handleSave,
+          icon: Save,
+        }] : [])
+      ] : []}
+    >
 
       {/* Personal Details */}
       <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark border border-gray-200 dark:border-salis-gray-dark mb-6">
@@ -289,23 +309,6 @@ export function Profile() {
         </CardContent>
       </Card>
 
-      {/* Action Buttons */}
-      {!isChangingPassword && (
-        <div className="flex gap-4">
-          <Button
-            variant="outline"
-            onClick={() => setIsEditing(!isEditing)}
-            data-testid="button-edit-profile"
-          >
-            {isEditing ? 'Cancel' : 'Edit Profile'}
-          </Button>
-          {isEditing && (
-            <Button onClick={handleSave} data-testid="button-save-profile">
-              Save
-            </Button>
-          )}
-        </div>
-      )}
-    </div>
+    </StandardPageLayout>
   );
 }
