@@ -382,6 +382,8 @@ export class ChatWebSocketServer {
   private handleJoinCallCenter(ws: AuthenticatedWebSocket) {
     if (!ws.userId || !ws.garageId) {
       this.sendError(ws, 'Not authenticated');
+      console.log('Call-center join rejected: not authenticated');
+      ws.close(4003, 'Not authenticated');
       return;
     }
     

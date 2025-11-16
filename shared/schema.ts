@@ -8473,6 +8473,7 @@ export const agentPerformanceSnapshots = pgTable("agent_performance_snapshots", 
 export type CallQueue = typeof callQueues.$inferSelect;
 export type InsertCallQueue = typeof callQueues.$inferInsert;
 export const insertCallQueueSchema = createInsertSchema(callQueues).omit({ id: true, createdAt: true, updatedAt: true });
+export const selectCallQueueSchema = createSelectSchema(callQueues);
 
 export type CallQueueMember = typeof callQueueMembers.$inferSelect;
 export type InsertCallQueueMember = typeof callQueueMembers.$inferInsert;
@@ -8481,6 +8482,7 @@ export const insertCallQueueMemberSchema = createInsertSchema(callQueueMembers).
 export type CallSession = typeof callSessions.$inferSelect;
 export type InsertCallSession = typeof callSessions.$inferInsert;
 export const insertCallSessionSchema = createInsertSchema(callSessions).omit({ id: true, createdAt: true, updatedAt: true });
+export const selectCallSessionSchema = createSelectSchema(callSessions);
 
 export type CallEvent = typeof callEvents.$inferSelect;
 export type InsertCallEvent = typeof callEvents.$inferInsert;

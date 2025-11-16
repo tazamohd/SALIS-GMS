@@ -1,6 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import rateLimit from "express-rate-limit";
 import { setupAuth, isAuthenticated, hashPassword } from "./auth";
 import passport from "passport";
 import { emailService } from "./services/emailService";
@@ -2458,8 +2459,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Call Center Module API Routes - Wave 2
   
+  // Rate limiter for Call Center endpoints (100 req/15min per IP)
+  const callCenterLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // Limit each IP to 100 requests per windowMs
+    message: 'Too many requests from this IP, please try again later.',
+    standardHeaders: true,
+    legacyHeaders: false,
+  });
+  
   // Call Queues
-  app.get('/api/call-center/queues', isAuthenticated, async (req: any, res) => {
+  app.get('/api/call-center/queues', isAuthenticated, callCenterLimiter, async (req: any, res) => {
     try {
       const userGarageId = req.user.garageId;
       if (!userGarageId) {
@@ -2478,7 +2488,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/call-center/queues', isAuthenticated, async (req: any, res) => {
+  app.post('/api/call-center/queues', isAuthenticated, callCenterLimiter, async (req: any, res) => {
     try {
       const { insertCallQueueSchema } = await import("@shared/schema");
       const userGarageId = req.user.garageId;
@@ -2531,7 +2541,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/call-center/queues/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/call-center/queues/:id', isAuthenticated, callCenterLimiter, async (req: any, res) => {
     try {
       const { id } = req.params;
       const userGarageId = req.user.garageId;
@@ -2560,7 +2570,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/call-center/queues/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/call-center/queues/:id', isAuthenticated, callCenterLimiter, async (req: any, res) => {
     try {
       const { id } = req.params;
       const userGarageId = req.user.garageId;
@@ -2601,7 +2611,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Queue Members
-  app.post('/api/call-center/queues/:queueId/members', isAuthenticated, async (req: any, res) => {
+  app.post('/api/call-center/queues/:queueId/members', isAuthenticated, callCenterLimiter, async (req: any, res) => {
     try {
       const { insertCallQueueMemberSchema } = await import("@shared/schema");
       const { queueId } = req.params;
@@ -2651,7 +2661,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/call-center/queue-members/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/call-center/queue-members/:id', isAuthenticated, callCenterLimiter, async (req: any, res) => {
     try {
       const { id } = req.params;
       const userGarageId = req.user.garageId;
@@ -2673,7 +2683,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/call-center/queue-members/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/call-center/queue-members/:id', isAuthenticated, callCenterLimiter, async (req: any, res) => {
     try {
       const { id } = req.params;
       const userGarageId = req.user.garageId;
@@ -2716,7 +2726,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/call-center/sessions', isAuthenticated, async (req: any, res) => {
+  app.post('/api/call-center/sessions', isAuthenticated, callCenterLimiter, async (req: any, res) => {
     try {
       const { insertCallSessionSchema } = await import("@shared/schema");
       const userGarageId = req.user.garageId;
@@ -2769,7 +2779,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/call-center/sessions/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/call-center/sessions/:id', isAuthenticated, callCenterLimiter, async (req: any, res) => {
     try {
       const { id } = req.params;
       const userGarageId = req.user.garageId;
@@ -2798,7 +2808,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/call-center/sessions/:id/assign', isAuthenticated, async (req: any, res) => {
+  app.post('/api/call-center/sessions/:id/assign', isAuthenticated, callCenterLimiter, async (req: any, res) => {
     try {
       const { id } = req.params;
       const userGarageId = req.user.garageId;
@@ -2834,7 +2844,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Call Notes
-  app.post('/api/call-center/sessions/:sessionId/notes', isAuthenticated, async (req: any, res) => {
+  app.post('/api/call-center/sessions/:sessionId/notes', isAuthenticated, callCenterLimiter, async (req: any, res) => {
     try {
       const { insertCallNoteSchema } = await import("@shared/schema");
       const { sessionId } = req.params;
@@ -2870,7 +2880,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Call Recordings
-  app.post('/api/call-center/sessions/:sessionId/recordings', isAuthenticated, async (req: any, res) => {
+  app.post('/api/call-center/sessions/:sessionId/recordings', isAuthenticated, callCenterLimiter, async (req: any, res) => {
     try {
       const { insertCallRecordingSchema } = await import("@shared/schema");
       const { sessionId } = req.params;
@@ -2923,7 +2933,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/call-center/disposition-codes', isAuthenticated, async (req: any, res) => {
+  app.post('/api/call-center/disposition-codes', isAuthenticated, callCenterLimiter, async (req: any, res) => {
     try {
       const { insertCallDispositionCodeSchema } = await import("@shared/schema");
       const userGarageId = req.user.garageId;
@@ -2949,7 +2959,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/call-center/disposition-codes/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/call-center/disposition-codes/:id', isAuthenticated, callCenterLimiter, async (req: any, res) => {
     try {
       const { id } = req.params;
       const userGarageId = req.user.garageId;
@@ -2971,7 +2981,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/call-center/disposition-codes/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/call-center/disposition-codes/:id', isAuthenticated, callCenterLimiter, async (req: any, res) => {
     try {
       const { id } = req.params;
       const userGarageId = req.user.garageId;
@@ -2992,7 +3002,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Agent Performance
-  app.post('/api/call-center/performance', isAuthenticated, async (req: any, res) => {
+  app.post('/api/call-center/performance', isAuthenticated, callCenterLimiter, async (req: any, res) => {
     try {
       const { insertAgentPerformanceSnapshotSchema } = await import("@shared/schema");
       const userGarageId = req.user.garageId;

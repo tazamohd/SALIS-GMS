@@ -1,17 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { queryClient } from '@/lib/queryClient';
-
-interface CallCenterSession {
-  id: string;
-  status: string;
-  [key: string]: any;
-}
-
-interface CallCenterQueue {
-  id: string;
-  isActive: boolean;
-  [key: string]: any;
-}
+import { selectCallSessionSchema, selectCallQueueSchema } from '@shared/schema';
+import type { CallSession, CallQueue } from '@shared/schema';
 
 export function useCallCenterWebSocket(userId: string | null, garageId: string | null) {
   const wsRef = useRef<WebSocket | null>(null);
@@ -104,19 +94,27 @@ export function useCallCenterWebSocket(userId: string | null, garageId: string |
       }
     };
 
-    const handleSessionUpdate = (session: CallCenterSession) => {
-      queryClient.setQueryData<CallCenterSession[]>(
+    const handleSessionUpdate = (session: any) => {
+      const validation = selectCallSessionSchema.safeParse(session);
+      if (!validation.success) {
+        console.error('Invalid session payload from WebSocket:', validation.error);
+        return;
+      }
+      
+      const validSession = validation.data as CallSession;
+      
+      queryClient.setQueryData<CallSession[]>(
         ['/api/call-center/sessions'],
         (oldSessions) => {
-          if (!oldSessions) return [session];
+          if (!oldSessions) return [validSession];
           
-          const existingIndex = oldSessions.findIndex(s => s.id === session.id);
+          const existingIndex = oldSessions.findIndex(s => s.id === validSession.id);
           if (existingIndex >= 0) {
             const updated = [...oldSessions];
-            updated[existingIndex] = session;
+            updated[existingIndex] = validSession;
             return updated;
           } else {
-            return [session, ...oldSessions];
+            return [validSession, ...oldSessions];
           }
         }
       );
@@ -124,19 +122,27 @@ export function useCallCenterWebSocket(userId: string | null, garageId: string |
       queryClient.invalidateQueries({ queryKey: ['/api/call-center/sessions'] });
     };
 
-    const handleQueueUpdate = (queue: CallCenterQueue) => {
-      queryClient.setQueryData<CallCenterQueue[]>(
+    const handleQueueUpdate = (queue: any) => {
+      const validation = selectCallQueueSchema.safeParse(queue);
+      if (!validation.success) {
+        console.error('Invalid queue payload from WebSocket:', validation.error);
+        return;
+      }
+      
+      const validQueue = validation.data as CallQueue;
+      
+      queryClient.setQueryData<CallQueue[]>(
         ['/api/call-center/queues'],
         (oldQueues) => {
-          if (!oldQueues) return [queue];
+          if (!oldQueues) return [validQueue];
           
-          const existingIndex = oldQueues.findIndex(q => q.id === queue.id);
+          const existingIndex = oldQueues.findIndex(q => q.id === validQueue.id);
           if (existingIndex >= 0) {
             const updated = [...oldQueues];
-            updated[existingIndex] = queue;
+            updated[existingIndex] = validQueue;
             return updated;
           } else {
-            return [queue, ...oldQueues];
+            return [validQueue, ...oldQueues];
           }
         }
       );
