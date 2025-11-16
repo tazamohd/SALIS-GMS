@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -103,6 +103,14 @@ export default function VehicleInspections() {
     },
   });
 
+  // Update form defaults when currentUser loads
+  useEffect(() => {
+    if (currentUser?.garageId) {
+      templateForm.setValue("garageId", currentUser.garageId);
+      inspectionForm.setValue("garageId", currentUser.garageId);
+    }
+  }, [currentUser]);
+
   const createTemplateMutation = useMutation({
     mutationFn: async (data: TemplateFormData) => {
       // Ensure garageId is set from current user
@@ -138,7 +146,18 @@ export default function VehicleInspections() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/inspection-templates"] });
       setIsTemplateDialogOpen(false);
-      templateForm.reset();
+      templateForm.reset({
+        garageId: currentUser?.garageId || "",
+        templateName: "",
+        description: "",
+        category: "general",
+        vehicleTypes: [],
+        checklistItems: [],
+        estimateRules: [],
+        isDefault: false,
+        isActive: true,
+        checklistItemsText: "",
+      });
       toast({ title: "Success", description: "Template created successfully" });
     },
     onError: (error: Error) => {
