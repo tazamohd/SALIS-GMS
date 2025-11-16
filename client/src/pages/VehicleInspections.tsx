@@ -65,6 +65,11 @@ export default function VehicleInspections() {
     queryKey: ["/api/users"],
   });
 
+  // Get current user for garageId
+  const { data: currentUser } = useQuery<any>({
+    queryKey: ["/api/user"],
+  });
+
   const templateForm = useForm<TemplateFormData>({
     resolver: zodResolver(templateFormSchema),
     defaultValues: {
@@ -100,6 +105,11 @@ export default function VehicleInspections() {
 
   const createTemplateMutation = useMutation({
     mutationFn: async (data: TemplateFormData) => {
+      // Ensure garageId is set from current user
+      if (!currentUser?.garageId) {
+        throw new Error("User garage not found. Please try again.");
+      }
+
       // Transform textarea to JSON array
       const checklistItems = data.checklistItemsText
         .split("\n")
@@ -115,6 +125,8 @@ export default function VehicleInspections() {
 
       const payload = {
         ...data,
+        garageId: currentUser.garageId,
+        createdBy: currentUser.id,
         checklistItems,
         vehicleTypes: data.vehicleTypes || [],
         estimateRules: data.estimateRules || [],
@@ -149,6 +161,11 @@ export default function VehicleInspections() {
 
   const createInspectionMutation = useMutation({
     mutationFn: async (data: InspectionFormData) => {
+      // Ensure garageId is set from current user
+      if (!currentUser?.garageId) {
+        throw new Error("User garage not found. Please try again.");
+      }
+
       // Transform textarea to JSON array
       const findings = data.findingsText
         ? data.findingsText.split("\n").filter(f => f.trim()).map((finding, idx) => ({
@@ -163,6 +180,7 @@ export default function VehicleInspections() {
 
       const payload = {
         ...data,
+        garageId: currentUser.garageId,
         findings,
         recommendations: data.recommendations || [],
         findingsText: undefined, // Remove UI-only field
