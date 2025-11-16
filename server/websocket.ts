@@ -88,6 +88,9 @@ export class ChatWebSocketServer {
       case 'presence':
         this.handlePresenceUpdate(ws, message.data);
         break;
+      case 'join-call-center':
+        this.handleJoinCallCenter(ws);
+        break;
       default:
         console.log('Unknown message type:', message.type);
     }
@@ -374,6 +377,47 @@ export class ChatWebSocketServer {
 
   public isUserOnline(userId: string): boolean {
     return this.clients.has(userId) && this.clients.get(userId)!.size > 0;
+  }
+
+  private handleJoinCallCenter(ws: AuthenticatedWebSocket) {
+    if (!ws.userId || !ws.garageId) {
+      this.sendError(ws, 'Not authenticated');
+      return;
+    }
+    
+    this.send(ws, { 
+      type: 'call-center.joined', 
+      data: { garageId: ws.garageId } 
+    });
+    console.log(`User ${ws.userId} joined call-center for garage ${ws.garageId}`);
+  }
+
+  public broadcastCallSessionUpdate(garageId: string, session: any) {
+    const payload = {
+      type: 'call-center.session.updated',
+      data: { session },
+    };
+    
+    this.wss.clients.forEach((client: WebSocket) => {
+      const authClient = client as AuthenticatedWebSocket;
+      if (authClient.garageId === garageId && authClient.userId) {
+        this.send(authClient, payload);
+      }
+    });
+  }
+
+  public broadcastCallQueueUpdate(garageId: string, queue: any) {
+    const payload = {
+      type: 'call-center.queue.updated',
+      data: { queue },
+    };
+    
+    this.wss.clients.forEach((client: WebSocket) => {
+      const authClient = client as AuthenticatedWebSocket;
+      if (authClient.garageId === garageId && authClient.userId) {
+        this.send(authClient, payload);
+      }
+    });
   }
 }
 

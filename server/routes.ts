@@ -2497,6 +2497,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const queue = await storage.createCallQueue(validationResult.data);
+      
+      const { getChatWebSocketServer } = await import("./websocket");
+      const wsServer = getChatWebSocketServer();
+      if (wsServer && userGarageId) {
+        wsServer.broadcastCallQueueUpdate(userGarageId, queue);
+      }
+      
       res.status(201).json(queue);
     } catch (error) {
       console.error("Error creating call queue:", error);
@@ -2539,6 +2546,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!updated) {
         return res.status(404).json({ message: "Call queue not found" });
       }
+      
+      const { getChatWebSocketServer } = await import("./websocket");
+      const wsServer = getChatWebSocketServer();
+      if (wsServer) {
+        wsServer.broadcastCallQueueUpdate(userGarageId, updated);
+      }
+      
       res.json(updated);
     } catch (error) {
       console.error("Error updating call queue:", error);
@@ -2721,6 +2735,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const session = await storage.createCallSession(validationResult.data);
+      
+      const { getChatWebSocketServer } = await import("./websocket");
+      const wsServer = getChatWebSocketServer();
+      if (wsServer && userGarageId) {
+        wsServer.broadcastCallSessionUpdate(userGarageId, session);
+      }
+      
       res.status(201).json(session);
     } catch (error) {
       console.error("Error creating call session:", error);
@@ -2763,6 +2784,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!updated) {
         return res.status(404).json({ message: "Call session not found" });
       }
+      
+      const { getChatWebSocketServer } = await import("./websocket");
+      const wsServer = getChatWebSocketServer();
+      if (wsServer) {
+        wsServer.broadcastCallSessionUpdate(userGarageId, updated);
+      }
+      
       res.json(updated);
     } catch (error) {
       console.error("Error updating call session:", error);
@@ -2791,6 +2819,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         agentId,
         assignedBy: userId
       });
+      
+      const { getChatWebSocketServer } = await import("./websocket");
+      const wsServer = getChatWebSocketServer();
+      if (wsServer) {
+        wsServer.broadcastCallSessionUpdate(userGarageId, session);
+      }
       
       res.json(session);
     } catch (error) {
