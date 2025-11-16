@@ -415,4 +415,118 @@
   .item-spacing {
     @apply space-y-4;
   }
+  
+  /* Interactive States - Hover, Focus, Active */
+  .interactive-hover {
+    @apply transition-all duration-200 ease-in-out;
+  }
+  
+  .interactive-hover:hover {
+    @apply bg-accent/50 cursor-pointer;
+  }
+  
+  .interactive-card {
+    @apply transition-all duration-300 ease-in-out hover:shadow-lg hover:-translate-y-1 cursor-pointer;
+  }
+  
+  /* Touch-Friendly Sizing (WCAG 2.1 AA - minimum 44x44px) */
+  .btn-touch {
+    @apply min-h-[44px] min-w-[44px] px-4 py-3;
+  }
+  
+  .input-touch {
+    @apply min-h-[44px] px-4 py-3 text-base;
+  }
+  
+  /* Accessibility - Focus States */
+  .focus-visible-ring {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background;
+  }
+  
+  .skip-link {
+    @apply sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-md focus-visible-ring;
+  }
+  
+  /* High Contrast Text for Accessibility (WCAG AAA) */
+  .text-high-contrast {
+    @apply text-foreground dark:text-foreground;
+    font-weight: 500;
+  }
+  
+  /* Responsive Table Utilities */
+  .table-responsive {
+    @apply w-full overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0;
+  }
+  
+  .table-responsive table {
+    @apply min-w-full;
+  }
+  
+  .table-sticky-header thead {
+    @apply sticky top-0 bg-background z-10 shadow-sm;
+  }
+  
+  /* Empty State Utilities */
+  .empty-state-container {
+    @apply flex flex-col items-center justify-center py-16 px-4 text-center;
+  }
+  
+  .empty-state-icon {
+    @apply w-24 h-24 mb-6 text-muted-foreground/40;
+  }
+  
+  .empty-state-title {
+    @apply text-xl font-semibold text-foreground mb-2;
+  }
+  
+  .empty-state-description {
+    @apply text-sm text-muted-foreground mb-6 max-w-md;
+  }
+  
+  /* Loading States */
+  .skeleton {
+    @apply animate-pulse bg-muted rounded;
+  }
+  
+  .spinner {
+    @apply animate-spin rounded-full border-2 border-primary border-t-transparent;
+  }
+  
+  /* Mobile-First Responsive Breakpoints */
+  @media (max-width: 768px) {
+    .mobile-stack {
+      @apply flex-col space-y-2;
+    }
+    
+    .mobile-full-width {
+      @apply w-full;
+    }
+    
+    .mobile-hide {
+      @apply hidden;
+    }
+  }
+  
+  /* Smooth Scrolling for Better UX */
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  /* Custom Scrollbar for Dark Theme */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    @apply bg-muted/20;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    @apply bg-muted rounded-full;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-muted-foreground;
+  }
 }
