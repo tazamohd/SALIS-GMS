@@ -3,7 +3,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { TabsPageLayout, type TabConfig } from "@/components/layouts";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -11,30 +11,35 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { ClipboardList, FileCheck, Plus, Pencil, Trash2, CheckCircle, XCircle, AlertCircle } from "lucide-react";
+import { 
+  insertInspectionTemplateSchema, 
+  insertVehicleInspectionSchema, 
+  type InspectionTemplate, 
+  type VehicleInspection 
+} from "@shared/schema";
 import { z } from "zod";
+import { Skeleton } from "@/components/ui/skeleton";
 
-const inspectionTemplateSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  description: z.string().optional(),
-  checkpoints: z.string().min(1, "Checkpoints are required"),
-  vehicleType: z.string().optional(),
+// Extend shared schemas with UI-specific validations
+const templateFormSchema = insertInspectionTemplateSchema.extend({
+  templateName: z.string().min(1, "Template name is required"),
+  checklistItemsText: z.string().min(1, "At least one checklist item is required"),
 });
 
-const vehicleInspectionSchema = z.object({
+const inspectionFormSchema = insertVehicleInspectionSchema.extend({
   vehicleId: z.string().min(1, "Vehicle is required"),
-  templateId: z.string().min(1, "Template is required"),
+  customerId: z.string().min(1, "Customer is required"),
   inspectorId: z.string().min(1, "Inspector is required"),
-  status: z.enum(["pending", "in_progress", "completed", "failed"]).default("pending"),
-  findings: z.string().optional(),
-  passedCheckpoints: z.number().optional(),
-  totalCheckpoints: z.number().optional(),
+  inspectionType: z.string().min(1, "Inspection type is required"),
+  findingsText: z.string().optional(),
 });
 
-type InspectionTemplate = z.infer<typeof inspectionTemplateSchema> & { id: string };
-type VehicleInspection = z.infer<typeof vehicleInspectionSchema> & { id: string; inspectedAt?: string };
+type TemplateFormData = z.infer<typeof templateFormSchema>;
+type InspectionFormData = z.infer<typeof inspectionFormSchema>;
 
 export default function VehicleInspections() {
   const { toast } = useToast();
@@ -42,64 +47,87 @@ export default function VehicleInspections() {
   const [isTemplateDialogOpen, setIsTemplateDialogOpen] = useState(false);
   const [isInspectionDialogOpen, setIsInspectionDialogOpen] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState<InspectionTemplate | null>(null);
-  const [selectedInspection, setSelectedInspection] = useState<VehicleInspection | null>(null);
 
-  const { data: templates = [] } = useQuery<InspectionTemplate[]>({
+  const { data: templates = [], isLoading: templatesLoading } = useQuery<InspectionTemplate[]>({
     queryKey: ["/api/inspection-templates"],
   });
 
-  const { data: inspections = [] } = useQuery<VehicleInspection[]>({
+  const { data: inspections = [], isLoading: inspectionsLoading } = useQuery<VehicleInspection[]>({
     queryKey: ["/api/vehicle-inspections"],
   });
 
-  const templateForm = useForm<z.infer<typeof inspectionTemplateSchema>>({
-    resolver: zodResolver(inspectionTemplateSchema),
+  // Supporting data for dropdowns
+  const { data: vehicles = [] } = useQuery<any[]>({
+    queryKey: ["/api/vehicles"],
+  });
+
+  const { data: users = [] } = useQuery<any[]>({
+    queryKey: ["/api/users"],
+  });
+
+  const templateForm = useForm<TemplateFormData>({
+    resolver: zodResolver(templateFormSchema),
     defaultValues: {
-      name: "",
+      garageId: "", // Should be set from user context
+      templateName: "",
       description: "",
-      checkpoints: "",
-      vehicleType: "",
+      category: "general",
+      vehicleTypes: [],
+      checklistItems: [],
+      estimateRules: [],
+      isDefault: false,
+      isActive: true,
+      checklistItemsText: "",
     },
   });
 
-  const inspectionForm = useForm<z.infer<typeof vehicleInspectionSchema>>({
-    resolver: zodResolver(vehicleInspectionSchema),
+  const inspectionForm = useForm<InspectionFormData>({
+    resolver: zodResolver(inspectionFormSchema),
     defaultValues: {
+      garageId: "", // Should be set from user context
       vehicleId: "",
-      templateId: "",
+      customerId: "",
       inspectorId: "",
-      status: "pending",
-      findings: "",
-      passedCheckpoints: 0,
-      totalCheckpoints: 0,
+      inspectionType: "general",
+      overallStatus: "in_progress",
+      findings: [],
+      recommendations: [],
+      estimateGenerated: false,
+      customerNotified: false,
+      findingsText: "",
     },
   });
 
   const createTemplateMutation = useMutation({
-    mutationFn: async (data: z.infer<typeof inspectionTemplateSchema>) => {
-      return await apiRequest("POST", "/api/inspection-templates", data);
+    mutationFn: async (data: TemplateFormData) => {
+      // Transform textarea to JSON array
+      const checklistItems = data.checklistItemsText
+        .split("\n")
+        .filter(item => item.trim())
+        .map((item, idx) => ({
+          id: idx + 1,
+          section: "General",
+          item: item.trim(),
+          type: "checkbox",
+          required: true,
+          passCriteria: "Pass",
+        }));
+
+      const payload = {
+        ...data,
+        checklistItems,
+        vehicleTypes: data.vehicleTypes || [],
+        estimateRules: data.estimateRules || [],
+        checklistItemsText: undefined, // Remove UI-only field
+      };
+
+      return await apiRequest("POST", "/api/inspection-templates", payload);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/inspection-templates"] });
       setIsTemplateDialogOpen(false);
       templateForm.reset();
       toast({ title: "Success", description: "Template created successfully" });
-    },
-    onError: (error: Error) => {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
-    },
-  });
-
-  const updateTemplateMutation = useMutation({
-    mutationFn: async (data: z.infer<typeof inspectionTemplateSchema> & { id: string }) => {
-      return await apiRequest("PATCH", `/api/inspection-templates/${data.id}`, data);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/inspection-templates"] });
-      setIsTemplateDialogOpen(false);
-      setSelectedTemplate(null);
-      templateForm.reset();
-      toast({ title: "Success", description: "Template updated successfully" });
     },
     onError: (error: Error) => {
       toast({ title: "Error", description: error.message, variant: "destructive" });
@@ -120,8 +148,27 @@ export default function VehicleInspections() {
   });
 
   const createInspectionMutation = useMutation({
-    mutationFn: async (data: z.infer<typeof vehicleInspectionSchema>) => {
-      return await apiRequest("POST", "/api/vehicle-inspections", data);
+    mutationFn: async (data: InspectionFormData) => {
+      // Transform textarea to JSON array
+      const findings = data.findingsText
+        ? data.findingsText.split("\n").filter(f => f.trim()).map((finding, idx) => ({
+            id: idx + 1,
+            item: finding.trim(),
+            status: "pending",
+            severity: "medium",
+            notes: "",
+            photoUrls: [],
+          }))
+        : [];
+
+      const payload = {
+        ...data,
+        findings,
+        recommendations: data.recommendations || [],
+        findingsText: undefined, // Remove UI-only field
+      };
+
+      return await apiRequest("POST", "/api/vehicle-inspections", payload);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/vehicle-inspections"] });
@@ -134,197 +181,189 @@ export default function VehicleInspections() {
     },
   });
 
-  const updateInspectionMutation = useMutation({
-    mutationFn: async (data: z.infer<typeof vehicleInspectionSchema> & { id: string }) => {
-      return await apiRequest("PATCH", `/api/vehicle-inspections/${data.id}`, data);
+  const deleteInspectionMutation = useMutation({
+    mutationFn: async (id: string) => {
+      return await apiRequest("DELETE", `/api/vehicle-inspections/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/vehicle-inspections"] });
-      setIsInspectionDialogOpen(false);
-      setSelectedInspection(null);
-      inspectionForm.reset();
-      toast({ title: "Success", description: "Inspection updated successfully" });
+      toast({ title: "Success", description: "Inspection deleted successfully" });
     },
     onError: (error: Error) => {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     },
   });
 
-  const handleEditTemplate = (template: InspectionTemplate) => {
-    setSelectedTemplate(template);
-    templateForm.reset({
-      name: template.name,
-      description: template.description || "",
-      checkpoints: template.checkpoints,
-      vehicleType: template.vehicleType || "",
-    });
+  const handleCreateTemplate = () => {
+    setSelectedTemplate(null);
+    templateForm.reset();
     setIsTemplateDialogOpen(true);
   };
 
-  const handleEditInspection = (inspection: VehicleInspection) => {
-    setSelectedInspection(inspection);
-    inspectionForm.reset({
-      vehicleId: inspection.vehicleId,
-      templateId: inspection.templateId,
-      inspectorId: inspection.inspectorId,
-      status: inspection.status,
-      findings: inspection.findings || "",
-      passedCheckpoints: inspection.passedCheckpoints || 0,
-      totalCheckpoints: inspection.totalCheckpoints || 0,
-    });
+  const handleCreateInspection = () => {
+    inspectionForm.reset();
     setIsInspectionDialogOpen(true);
   };
 
-  const handleSubmitTemplate = (data: z.infer<typeof inspectionTemplateSchema>) => {
-    if (selectedTemplate) {
-      updateTemplateMutation.mutate({ ...data, id: selectedTemplate.id });
-    } else {
-      createTemplateMutation.mutate(data);
-    }
-  };
-
-  const handleSubmitInspection = (data: z.infer<typeof vehicleInspectionSchema>) => {
-    if (selectedInspection) {
-      updateInspectionMutation.mutate({ ...data, id: selectedInspection.id });
-    } else {
-      createInspectionMutation.mutate(data);
-    }
-  };
-
   const getStatusBadge = (status: string) => {
-    const variants: Record<string, { variant: "default" | "secondary" | "destructive"; icon: any }> = {
-      pending: { variant: "secondary", icon: AlertCircle },
-      in_progress: { variant: "default", icon: AlertCircle },
-      completed: { variant: "default", icon: CheckCircle },
-      failed: { variant: "destructive", icon: XCircle },
+    const statusColors: Record<string, string> = {
+      in_progress: "bg-blue-500",
+      completed: "bg-green-500",
+      failed: "bg-red-500",
+      passed: "bg-green-500",
     };
-    const config = variants[status] || variants.pending;
-    const Icon = config.icon;
-    return (
-      <Badge variant={config.variant}>
-        <Icon className="h-3 w-3 mr-1" />
-        {status.replace("_", " ")}
-      </Badge>
-    );
+    return statusColors[status] || "bg-gray-500";
   };
 
   const templatesTabContent = (
     <div className="space-y-4">
-      <div className="flex justify-end">
-        <Button onClick={() => {
-          setSelectedTemplate(null);
-          templateForm.reset();
-          setIsTemplateDialogOpen(true);
-        }} data-testid="button-create-template">
+      <div className="flex justify-between items-center">
+        <div>
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Inspection Templates</h2>
+          <p className="text-sm text-gray-600 dark:text-gray-400">Manage reusable inspection checklists</p>
+        </div>
+        <Button onClick={handleCreateTemplate} data-testid="button-create-template">
           <Plus className="h-4 w-4 mr-2" />
           Create Template
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {templates.map((template) => (
-          <Card key={template.id} className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800" data-testid={`template-card-${template.id}`}>
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                <span className="text-gray-900 dark:text-white">{template.name}</span>
-                <div className="flex gap-2">
-                  <Button size="sm" variant="outline" onClick={() => handleEditTemplate(template)} data-testid={`button-edit-template-${template.id}`}>
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  <Button size="sm" variant="outline" onClick={() => deleteTemplateMutation.mutate(template.id)} data-testid={`button-delete-template-${template.id}`}>
-                    <Trash2 className="h-4 w-4 text-red-600" />
-                  </Button>
-                </div>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">{template.description}</p>
-              {template.vehicleType && (
-                <Badge variant="secondary" className="mb-2">{template.vehicleType}</Badge>
-              )}
-              <p className="text-xs text-gray-500 dark:text-gray-500">
-                {template.checkpoints.split('\n').length} checkpoints
-              </p>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {templates.length === 0 && (
+      {templatesLoading ? (
+        <div className="space-y-3">
+          {[1, 2, 3].map((i) => (
+            <Skeleton key={i} className="h-32 w-full" />
+          ))}
+        </div>
+      ) : templates.length === 0 ? (
         <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
           <CardContent className="p-12 text-center">
             <ClipboardList className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-600 dark:text-gray-400">No inspection templates yet</p>
-            <Button className="mt-4" onClick={() => setIsTemplateDialogOpen(true)} data-testid="button-create-first-template">
-              <Plus className="h-4 w-4 mr-2" />
-              Create First Template
-            </Button>
+            <p className="text-gray-600 dark:text-gray-400">No templates yet. Create your first inspection template.</p>
           </CardContent>
         </Card>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {templates.map((template) => (
+            <Card key={template.id} className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+              <CardHeader>
+                <div className="flex justify-between items-start">
+                  <div className="flex-1">
+                    <CardTitle className="text-lg">{template.templateName}</CardTitle>
+                    {template.description && (
+                      <CardDescription className="mt-1">{template.description}</CardDescription>
+                    )}
+                  </div>
+                  <div className="flex gap-2">
+                    {template.isDefault && (
+                      <Badge variant="secondary">Default</Badge>
+                    )}
+                    {!template.isActive && (
+                      <Badge variant="outline">Inactive</Badge>
+                    )}
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-gray-600 dark:text-gray-400">Category:</span>
+                    <Badge variant="outline">{template.category || "General"}</Badge>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-gray-600 dark:text-gray-400">Items:</span>
+                    <span className="font-semibold text-gray-900 dark:text-white">
+                      {Array.isArray(template.checklistItems) ? template.checklistItems.length : 0}
+                    </span>
+                  </div>
+                  <div className="flex gap-2 mt-4">
+                    <Button size="sm" variant="outline" className="flex-1" data-testid={`button-delete-template-${template.id}`} onClick={() => deleteTemplateMutation.mutate(template.id)}>
+                      <Trash2 className="h-3 w-3 mr-1" />
+                      Delete
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       )}
     </div>
   );
 
   const inspectionsTabContent = (
     <div className="space-y-4">
-      <div className="flex justify-end">
-        <Button onClick={() => {
-          setSelectedInspection(null);
-          inspectionForm.reset();
-          setIsInspectionDialogOpen(true);
-        }} data-testid="button-create-inspection">
+      <div className="flex justify-between items-center">
+        <div>
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Vehicle Inspections</h2>
+          <p className="text-sm text-gray-600 dark:text-gray-400">Track inspection results</p>
+        </div>
+        <Button onClick={handleCreateInspection} data-testid="button-create-inspection">
           <Plus className="h-4 w-4 mr-2" />
-          Create Inspection
+          New Inspection
         </Button>
       </div>
 
-      <div className="space-y-3">
-        {inspections.map((inspection) => (
-          <Card key={inspection.id} className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800" data-testid={`inspection-card-${inspection.id}`}>
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
-                    <h3 className="font-semibold text-gray-900 dark:text-white">Vehicle ID: {inspection.vehicleId}</h3>
-                    {getStatusBadge(inspection.status)}
-                  </div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
-                    Template ID: {inspection.templateId}
-                  </p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
-                    Inspector ID: {inspection.inspectorId}
-                  </p>
-                  {inspection.passedCheckpoints !== undefined && inspection.totalCheckpoints !== undefined && (
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      Progress: {inspection.passedCheckpoints}/{inspection.totalCheckpoints} checkpoints
-                    </p>
-                  )}
-                  {inspection.findings && (
-                    <p className="text-sm text-gray-500 dark:text-gray-500 mt-2 italic">{inspection.findings}</p>
-                  )}
-                </div>
-                <div className="flex gap-2">
-                  <Button size="sm" variant="outline" onClick={() => handleEditInspection(inspection)} data-testid={`button-edit-inspection-${inspection.id}`}>
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {inspections.length === 0 && (
+      {inspectionsLoading ? (
+        <div className="space-y-3">
+          {[1, 2, 3].map((i) => (
+            <Skeleton key={i} className="h-32 w-full" />
+          ))}
+        </div>
+      ) : inspections.length === 0 ? (
         <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
           <CardContent className="p-12 text-center">
             <FileCheck className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-600 dark:text-gray-400">No inspections yet</p>
-            <Button className="mt-4" onClick={() => setIsInspectionDialogOpen(true)} data-testid="button-create-first-inspection">
-              <Plus className="h-4 w-4 mr-2" />
-              Create First Inspection
-            </Button>
+            <p className="text-gray-600 dark:text-gray-400">No inspections yet. Create your first inspection.</p>
           </CardContent>
         </Card>
+      ) : (
+        <div className="space-y-3">
+          {inspections.map((inspection) => (
+            <Card key={inspection.id} className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-semibold text-gray-900 dark:text-white">
+                        {inspection.inspectionNumber || `Inspection #${inspection.id.substring(0, 8)}`}
+                      </h3>
+                      <Badge className={getStatusBadge(inspection.overallStatus || "in_progress")}>
+                        {inspection.overallStatus || "In Progress"}
+                      </Badge>
+                    </div>
+                    <div className="mt-2 space-y-1 text-sm text-gray-600 dark:text-gray-400">
+                      <p>Type: {inspection.inspectionType}</p>
+                      <p>Date: {inspection.inspectionDate ? new Date(inspection.inspectionDate).toLocaleDateString() : "N/A"}</p>
+                      {inspection.currentMileage && <p>Mileage: {inspection.currentMileage.toLocaleString()} km</p>}
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    {inspection.estimateGenerated && (
+                      <Badge variant="secondary">
+                        <CheckCircle className="h-3 w-3 mr-1" />
+                        Estimate
+                      </Badge>
+                    )}
+                    {inspection.customerNotified && (
+                      <Badge variant="secondary">
+                        <CheckCircle className="h-3 w-3 mr-1" />
+                        Notified
+                      </Badge>
+                    )}
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      data-testid={`button-delete-inspection-${inspection.id}`}
+                      onClick={() => deleteInspectionMutation.mutate(inspection.id)}
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       )}
     </div>
   );
@@ -348,31 +387,32 @@ export default function VehicleInspections() {
     <>
       <TabsPageLayout
         title="Vehicle Inspections"
-        description="Manage inspection templates and vehicle inspections"
+        description="Manage inspection templates and track vehicle inspections"
         icon={ClipboardList}
         tabs={tabs}
         activeTab={activeTab}
         onTabChange={setActiveTab}
       />
 
+      {/* Template Dialog */}
       <Dialog open={isTemplateDialogOpen} onOpenChange={setIsTemplateDialogOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800 sm:max-w-[600px]">
           <DialogHeader>
             <DialogTitle>{selectedTemplate ? "Edit Template" : "Create Template"}</DialogTitle>
             <DialogDescription>
-              {selectedTemplate ? "Update the inspection template" : "Create a new inspection template"}
+              {selectedTemplate ? "Update inspection template" : "Create a new inspection template"}
             </DialogDescription>
           </DialogHeader>
           <Form {...templateForm}>
-            <form onSubmit={templateForm.handleSubmit(handleSubmitTemplate)} className="space-y-4">
+            <form onSubmit={templateForm.handleSubmit((data) => createTemplateMutation.mutate(data))} className="space-y-4">
               <FormField
                 control={templateForm.control}
-                name="name"
+                name="templateName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Template Name *</FormLabel>
+                    <FormLabel>Template Name</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="Pre-Purchase Inspection" data-testid="input-template-name" />
+                      <Input {...field} placeholder="e.g., Pre-Purchase Inspection" data-testid="input-template-name" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -385,7 +425,7 @@ export default function VehicleInspections() {
                   <FormItem>
                     <FormLabel>Description</FormLabel>
                     <FormControl>
-                      <Textarea {...field} placeholder="Template description" rows={2} data-testid="input-template-description" />
+                      <Textarea {...field} placeholder="Optional description" data-testid="input-template-description" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -393,12 +433,41 @@ export default function VehicleInspections() {
               />
               <FormField
                 control={templateForm.control}
-                name="vehicleType"
+                name="category"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Vehicle Type</FormLabel>
+                    <FormLabel>Category</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger data-testid="select-template-category">
+                          <SelectValue placeholder="Select category" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="general">General</SelectItem>
+                        <SelectItem value="pre_purchase">Pre-Purchase</SelectItem>
+                        <SelectItem value="seasonal">Seasonal</SelectItem>
+                        <SelectItem value="safety">Safety</SelectItem>
+                        <SelectItem value="state_inspection">State Inspection</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={templateForm.control}
+                name="checklistItemsText"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Checklist Items (one per line)</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="Sedan, SUV, Truck, etc." data-testid="input-template-vehicle-type" />
+                      <Textarea 
+                        {...field} 
+                        placeholder="Check tire pressure&#10;Inspect brake pads&#10;Check engine oil level" 
+                        rows={6}
+                        data-testid="input-template-checklist"
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -406,27 +475,28 @@ export default function VehicleInspections() {
               />
               <FormField
                 control={templateForm.control}
-                name="checkpoints"
+                name="isDefault"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Checkpoints (one per line) *</FormLabel>
+                  <FormItem className="flex flex-row items-start space-x-3 space-y-0">
                     <FormControl>
-                      <Textarea {...field} placeholder="Tire condition&#10;Brake pads&#10;Engine oil level" rows={6} data-testid="input-template-checkpoints" />
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        data-testid="checkbox-template-default"
+                      />
                     </FormControl>
-                    <FormMessage />
+                    <div className="space-y-1 leading-none">
+                      <FormLabel>Set as default template</FormLabel>
+                    </div>
                   </FormItem>
                 )}
               />
               <div className="flex justify-end gap-2">
-                <Button type="button" variant="outline" onClick={() => {
-                  setIsTemplateDialogOpen(false);
-                  setSelectedTemplate(null);
-                  templateForm.reset();
-                }} data-testid="button-cancel-template">
+                <Button type="button" variant="outline" onClick={() => setIsTemplateDialogOpen(false)} data-testid="button-cancel-template">
                   Cancel
                 </Button>
-                <Button type="submit" disabled={createTemplateMutation.isPending || updateTemplateMutation.isPending} data-testid="button-submit-template">
-                  {selectedTemplate ? "Update" : "Create"} Template
+                <Button type="submit" disabled={createTemplateMutation.isPending} data-testid="button-save-template">
+                  {createTemplateMutation.isPending ? "Saving..." : "Save Template"}
                 </Button>
               </div>
             </form>
@@ -434,45 +504,55 @@ export default function VehicleInspections() {
         </DialogContent>
       </Dialog>
 
+      {/* Inspection Dialog */}
       <Dialog open={isInspectionDialogOpen} onOpenChange={setIsInspectionDialogOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800 sm:max-w-[600px]">
           <DialogHeader>
-            <DialogTitle>{selectedInspection ? "Edit Inspection" : "Create Inspection"}</DialogTitle>
-            <DialogDescription>
-              {selectedInspection ? "Update the vehicle inspection" : "Create a new vehicle inspection"}
-            </DialogDescription>
+            <DialogTitle>Create Inspection</DialogTitle>
+            <DialogDescription>Start a new vehicle inspection</DialogDescription>
           </DialogHeader>
           <Form {...inspectionForm}>
-            <form onSubmit={inspectionForm.handleSubmit(handleSubmitInspection)} className="space-y-4">
+            <form onSubmit={inspectionForm.handleSubmit((data) => createInspectionMutation.mutate(data))} className="space-y-4">
               <FormField
                 control={inspectionForm.control}
                 name="vehicleId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Vehicle ID *</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="Vehicle ID" data-testid="input-inspection-vehicle-id" />
-                    </FormControl>
+                    <FormLabel>Vehicle</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger data-testid="select-inspection-vehicle">
+                          <SelectValue placeholder="Select vehicle" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {vehicles.map((vehicle) => (
+                          <SelectItem key={vehicle.id} value={vehicle.id}>
+                            {vehicle.make} {vehicle.model} ({vehicle.year})
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
               />
               <FormField
                 control={inspectionForm.control}
-                name="templateId"
+                name="customerId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Template *</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
+                    <FormLabel>Customer</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
-                        <SelectTrigger data-testid="select-inspection-template">
-                          <SelectValue placeholder="Select template" />
+                        <SelectTrigger data-testid="select-inspection-customer">
+                          <SelectValue placeholder="Select customer" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {templates.map((template) => (
-                          <SelectItem key={template.id} value={template.id}>
-                            {template.name}
+                        {users.filter(u => u.role === 'customer').map((user) => (
+                          <SelectItem key={user.id} value={user.id}>
+                            {user.fullName || user.email}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -486,88 +566,73 @@ export default function VehicleInspections() {
                 name="inspectorId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Inspector ID *</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="Inspector ID" data-testid="input-inspection-inspector-id" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={inspectionForm.control}
-                name="status"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Status</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
+                    <FormLabel>Inspector</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
-                        <SelectTrigger data-testid="select-inspection-status">
-                          <SelectValue />
+                        <SelectTrigger data-testid="select-inspection-inspector">
+                          <SelectValue placeholder="Select inspector" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="pending">Pending</SelectItem>
-                        <SelectItem value="in_progress">In Progress</SelectItem>
-                        <SelectItem value="completed">Completed</SelectItem>
-                        <SelectItem value="failed">Failed</SelectItem>
+                        {users.filter(u => u.role === 'technician' || u.role === 'admin').map((user) => (
+                          <SelectItem key={user.id} value={user.id}>
+                            {user.fullName || user.email}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={inspectionForm.control}
-                  name="passedCheckpoints"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Passed Checkpoints</FormLabel>
-                      <FormControl>
-                        <Input {...field} type="number" onChange={(e) => field.onChange(parseInt(e.target.value) || 0)} data-testid="input-inspection-passed-checkpoints" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={inspectionForm.control}
-                  name="totalCheckpoints"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Total Checkpoints</FormLabel>
-                      <FormControl>
-                        <Input {...field} type="number" onChange={(e) => field.onChange(parseInt(e.target.value) || 0)} data-testid="input-inspection-total-checkpoints" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
               <FormField
                 control={inspectionForm.control}
-                name="findings"
+                name="inspectionType"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Findings</FormLabel>
+                    <FormLabel>Inspection Type</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger data-testid="select-inspection-type">
+                          <SelectValue placeholder="Select type" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="general">General</SelectItem>
+                        <SelectItem value="pre_purchase">Pre-Purchase</SelectItem>
+                        <SelectItem value="seasonal">Seasonal</SelectItem>
+                        <SelectItem value="safety">Safety</SelectItem>
+                        <SelectItem value="state_inspection">State Inspection</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={inspectionForm.control}
+                name="findingsText"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Initial Findings (optional, one per line)</FormLabel>
                     <FormControl>
-                      <Textarea {...field} placeholder="Inspection findings and notes" rows={4} data-testid="input-inspection-findings" />
+                      <Textarea 
+                        {...field} 
+                        placeholder="Enter findings..." 
+                        rows={4}
+                        data-testid="input-inspection-findings"
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
               <div className="flex justify-end gap-2">
-                <Button type="button" variant="outline" onClick={() => {
-                  setIsInspectionDialogOpen(false);
-                  setSelectedInspection(null);
-                  inspectionForm.reset();
-                }} data-testid="button-cancel-inspection">
+                <Button type="button" variant="outline" onClick={() => setIsInspectionDialogOpen(false)} data-testid="button-cancel-inspection">
                   Cancel
                 </Button>
-                <Button type="submit" disabled={createInspectionMutation.isPending || updateInspectionMutation.isPending} data-testid="button-submit-inspection">
-                  {selectedInspection ? "Update" : "Create"} Inspection
+                <Button type="submit" disabled={createInspectionMutation.isPending} data-testid="button-save-inspection">
+                  {createInspectionMutation.isPending ? "Creating..." : "Create Inspection"}
                 </Button>
               </div>
             </form>
