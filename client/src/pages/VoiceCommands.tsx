@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
-import { useQuery } from "@tantml:function_calls>
-<invoke name="TabsPageLayout, TabConfig } from "@/components/layouts";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { TabsPageLayout, type TabConfig } from "@/components/layouts";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
