@@ -2410,6 +2410,34 @@ export const userConsents = pgTable("user_consents", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Permissions - defines all possible permissions in the system
+export const permissions = pgTable("permissions", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  resource: varchar("resource", { length: 100 }).notNull(),
+  action: varchar("action", { length: 50 }).notNull(),
+  description: text("description"),
+  category: varchar("category", { length: 100 }).notNull(),
+  isSystemPermission: boolean("is_system_permission").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Role Permissions - maps permissions to roles
+export const rolePermissions = pgTable("role_permissions", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  roleId: uuid("role_id")
+    .references(() => roles.id, { onDelete: "cascade" })
+    .notNull(),
+  permissionId: uuid("permission_id")
+    .references(() => permissions.id, { onDelete: "cascade" })
+    .notNull(),
+  granted: boolean("granted").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 export const permissionOverrides = pgTable("permission_overrides", {
   id: uuid("id")
     .primaryKey()
@@ -2516,6 +2544,14 @@ export const insertUserConsentSchema = createInsertSchema(userConsents).omit({
   createdAt: true,
   updatedAt: true,
 });
+
+export type Permission = typeof permissions.$inferSelect;
+export type InsertPermission = typeof permissions.$inferInsert;
+export const insertPermissionSchema = createInsertSchema(permissions).omit({ id: true, createdAt: true });
+
+export type RolePermission = typeof rolePermissions.$inferSelect;
+export type InsertRolePermission = typeof rolePermissions.$inferInsert;
+export const insertRolePermissionSchema = createInsertSchema(rolePermissions).omit({ id: true, createdAt: true });
 
 export type PermissionOverride = typeof permissionOverrides.$inferSelect;
 export type InsertPermissionOverride = typeof permissionOverrides.$inferInsert;
