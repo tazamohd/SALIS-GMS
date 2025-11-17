@@ -6,17 +6,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { TabletSmartphone, User, Car, Calendar, CheckCircle } from "lucide-react";
+import { DashboardPage } from "@/components/layouts";
 
 export default function KioskCheckIn() {
   const [checkInStep, setCheckInStep] = useState<"idle" | "phone" | "vehicle" | "confirm" | "complete">("idle");
   const { toast } = useToast();
 
-  // Fetch kiosk check-in sessions
   const { data: sessions = [], isLoading } = useQuery<any[]>({
     queryKey: ["/api/kiosk/sessions"],
   });
 
-  // Complete check-in mutation
   const checkInMutation = useMutation({
     mutationFn: async (checkInData: {
       customerId: string;
@@ -44,16 +43,14 @@ export default function KioskCheckIn() {
     },
   });
 
-  // Calculate stats
   const todayStart = new Date();
   todayStart.setHours(0, 0, 0, 0);
   const todaySessions = sessions.filter((s: any) => new Date(s.checkInTime || s.createdAt) >= todayStart);
   
-  // Calculate average check-in duration if available
   const sessionsWithDuration = todaySessions.filter((s: any) => s.checkInDuration);
   const avgDuration = sessionsWithDuration.length > 0
     ? Math.round(sessionsWithDuration.reduce((sum: number, s: any) => sum + (Number(s.checkInDuration) || 0), 0) / sessionsWithDuration.length)
-    : (todaySessions.length > 0 ? 45 : 0); // Default to 45 if no duration data but sessions exist
+    : (todaySessions.length > 0 ? 45 : 0);
   
   const stats = {
     todayCheckIns: todaySessions.length || 0,
@@ -62,7 +59,6 @@ export default function KioskCheckIn() {
     avgCheckInTime: avgDuration,
   };
 
-  // Simulate check-in for demo
   const simulateCheckIn = () => {
     checkInMutation.mutate({
       customerId: "demo-customer",
@@ -72,64 +68,40 @@ export default function KioskCheckIn() {
     });
   };
 
+  const metrics = [
+    {
+      label: "Today's Check-Ins",
+      value: stats.todayCheckIns,
+      icon: TabletSmartphone,
+      color: "text-blue-600",
+    },
+    {
+      label: "With Appointment",
+      value: stats.withAppointment,
+      icon: Calendar,
+      color: "text-green-600",
+    },
+    {
+      label: "Walk-Ins",
+      value: stats.walkIns,
+      icon: User,
+      color: "text-purple-600",
+    },
+    {
+      label: "Avg Time (sec)",
+      value: stats.avgCheckInTime,
+      icon: CheckCircle,
+      color: "text-yellow-600",
+    },
+  ];
+
   return (
-    <div className="p-8 space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold font-montserrat text-gray-900 dark:text-white">
-            🖥️ Kiosk Check-In
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">Self-service customer check-in system</p>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Today's Check-Ins</p>
-                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="stat-today-checkins">{stats.todayCheckIns}</h3>
-              </div>
-              <TabletSmartphone className="h-12 w-12 text-blue-600" />
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">With Appointment</p>
-                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="stat-with-appointment">{stats.withAppointment}</h3>
-              </div>
-              <Calendar className="h-12 w-12 text-green-600" />
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Walk-Ins</p>
-                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="stat-walk-ins">{stats.walkIns}</h3>
-              </div>
-              <User className="h-12 w-12 text-purple-600" />
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Avg Time (sec)</p>
-                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="stat-avg-time">{stats.avgCheckInTime}</h3>
-              </div>
-              <CheckCircle className="h-12 w-12 text-yellow-600" />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
+    <DashboardPage
+      title="🖥️ Kiosk Check-In"
+      description="Self-service customer check-in system"
+      icon={TabletSmartphone}
+      metrics={metrics}
+    >
       <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
         <CardHeader>
           <CardTitle>Kiosk Interface Demo</CardTitle>
@@ -238,6 +210,6 @@ export default function KioskCheckIn() {
           )}
         </CardContent>
       </Card>
-    </div>
+    </DashboardPage>
   );
 }

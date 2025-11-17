@@ -5,11 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { Building2, FileText, TrendingUp, DollarSign, Plus, Edit, Trash2, Eye, CheckCircle2, XCircle, AlertCircle } from "lucide-react";
+import { Building2, FileText, TrendingUp, DollarSign, Plus, Edit, Trash2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -19,6 +17,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { insertFranchiseGroupSchema, insertFranchiseContractSchema, insertFranchiseKpiSchema, insertRevenueSharingRuleSchema } from "@shared/schema";
 import { z } from "zod";
+import { TabsPageLayout } from "@/components/layouts";
 
 type InsertFranchiseGroup = z.infer<typeof insertFranchiseGroupSchema>;
 type InsertFranchiseContract = z.infer<typeof insertFranchiseContractSchema>;
@@ -306,36 +305,13 @@ export default function FranchiseManagement() {
     );
   };
 
-  return (
-    <div className="flex-1 p-6 bg-gray-50 dark:bg-salis-black min-h-screen">
-      <div className="mb-6">
-        <h1 className="font-montserrat font-semibold text-2xl text-gray-900 dark:text-white" data-testid="text-page-title">Franchise Command Center</h1>
-        <p className="font-poppins text-sm text-gray-600 dark:text-gray-400 mt-1" data-testid="text-page-description">
-          Manage franchise groups, contracts, KPIs, and revenue sharing across your network
-        </p>
-      </div>
-
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="bg-white dark:bg-salis-black/50 border border-gray-200 dark:border-salis-gray-dark" data-testid="tabs-navigation">
-          <TabsTrigger value="groups" data-testid="tab-groups" className="gap-2">
-            <Building2 className="h-4 w-4" />
-            Franchise Groups
-          </TabsTrigger>
-          <TabsTrigger value="contracts" data-testid="tab-contracts" className="gap-2">
-            <FileText className="h-4 w-4" />
-            Contracts
-          </TabsTrigger>
-          <TabsTrigger value="kpis" data-testid="tab-kpis" className="gap-2">
-            <TrendingUp className="h-4 w-4" />
-            KPIs
-          </TabsTrigger>
-          <TabsTrigger value="revenue" data-testid="tab-revenue" className="gap-2">
-            <DollarSign className="h-4 w-4" />
-            Revenue Sharing
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="groups" className="space-y-4">
+  const tabsConfig = [
+    {
+      id: "groups",
+      label: "Franchise Groups",
+      icon: Building2,
+      content: (
+        <div className="space-y-4">
           <div className="flex justify-between items-center">
             <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">Franchise Groups</h2>
             <Button onClick={() => { setEditingGroup(null); groupForm.reset(); setShowGroupDialog(true); }} data-testid="button-add-group">
@@ -404,9 +380,15 @@ export default function FranchiseManagement() {
               </Table>
             </CardContent>
           </Card>
-        </TabsContent>
-
-        <TabsContent value="contracts" className="space-y-4">
+        </div>
+      ),
+    },
+    {
+      id: "contracts",
+      label: "Contracts",
+      icon: FileText,
+      content: (
+        <div className="space-y-4">
           <div className="flex justify-between items-center">
             <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">Franchise Contracts</h2>
             <Button onClick={() => { setEditingContract(null); contractForm.reset(); setShowContractDialog(true); }} data-testid="button-add-contract">
@@ -464,9 +446,15 @@ export default function FranchiseManagement() {
               </Table>
             </CardContent>
           </Card>
-        </TabsContent>
-
-        <TabsContent value="kpis" className="space-y-4">
+        </div>
+      ),
+    },
+    {
+      id: "kpis",
+      label: "KPIs",
+      icon: TrendingUp,
+      content: (
+        <div className="space-y-4">
           <div className="flex justify-between items-center">
             <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">Franchise KPIs</h2>
             <Button onClick={() => { setEditingKpi(null); kpiForm.reset(); setShowKpiDialog(true); }} data-testid="button-add-kpi">
@@ -484,9 +472,15 @@ export default function FranchiseManagement() {
               <p className="text-sm text-muted-foreground dark:text-muted-foreground">Select a branch to view KPI reports</p>
             </CardContent>
           </Card>
-        </TabsContent>
-
-        <TabsContent value="revenue" className="space-y-4">
+        </div>
+      ),
+    },
+    {
+      id: "revenue",
+      label: "Revenue Sharing",
+      icon: DollarSign,
+      content: (
+        <div className="space-y-4">
           <div className="flex justify-between items-center">
             <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">Revenue Sharing Rules</h2>
             <Button onClick={() => { setEditingRule(null); ruleForm.reset(); setShowRuleDialog(true); }} data-testid="button-add-rule">
@@ -504,8 +498,21 @@ export default function FranchiseManagement() {
               <p className="text-sm text-muted-foreground dark:text-muted-foreground">No revenue sharing rules configured</p>
             </CardContent>
           </Card>
-        </TabsContent>
-      </Tabs>
+        </div>
+      ),
+    },
+  ];
+
+  return (
+    <>
+      <TabsPageLayout
+        title="Franchise Command Center"
+        description="Manage franchise groups, contracts, KPIs, and revenue sharing across your network"
+        icon={Building2}
+        tabs={tabsConfig}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+      />
 
       <Dialog open={showGroupDialog} onOpenChange={setShowGroupDialog}>
         <DialogContent className="bg-background dark:bg-background border-border dark:border-border max-w-2xl">
@@ -670,6 +677,6 @@ export default function FranchiseManagement() {
           </Form>
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 }

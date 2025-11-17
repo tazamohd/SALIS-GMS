@@ -2,27 +2,24 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { 
   TrendingUp, 
-  TrendingDown, 
   DollarSign, 
   Users, 
   Clock, 
   Target,
   Star,
   Wrench,
-  Calendar,
   BarChart3,
   PieChart,
   Activity,
   Award,
   CheckCircle,
-  AlertTriangle
 } from "lucide-react";
 import { LineChart, Line, BarChart, Bar, PieChart as RechartsPie, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area } from "recharts";
 import { useState } from "react";
+import { DashboardPage } from "@/components/layouts";
 
 export default function KPIDashboard() {
   const [timeRange, setTimeRange] = useState("30d");
@@ -37,7 +34,6 @@ export default function KPIDashboard() {
   const customers = (customersData as any[]) || [];
   const technicians = ((technicianData as any[]) || []).filter((u: any) => u.role === 'technician');
 
-  // Calculate KPIs
   const now = new Date();
   const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
   
@@ -84,10 +80,9 @@ export default function KPIDashboard() {
     return hasRecentInvoice;
   }).length;
 
-  const customerSatisfaction = 4.6; // Mock - would come from ratings table
-  const npsScore = 72; // Mock - would be calculated from survey data
+  const customerSatisfaction = 4.6;
+  const npsScore = 72;
 
-  // Revenue trend data (mock daily data for last 30 days)
   const revenueTrend = Array.from({ length: 30 }, (_, i) => {
     const date = new Date(now.getTime() - (29 - i) * 24 * 60 * 60 * 1000);
     const dayInvoices = invoices.filter((inv: any) => {
@@ -103,7 +98,6 @@ export default function KPIDashboard() {
     };
   });
 
-  // Service type distribution
   const serviceTypes = [
     { name: 'Oil Change', value: 35, color: '#3b82f6' },
     { name: 'Brake Service', value: 25, color: '#10b981' },
@@ -112,7 +106,6 @@ export default function KPIDashboard() {
     { name: 'Other', value: 8, color: '#6b7280' },
   ];
 
-  // Technician performance
   const techPerformance = technicians.slice(0, 5).map((tech: any) => {
     const techJobs = jobCards.filter((j: any) => j.technicianId === tech.id);
     const techRevenue = techJobs.reduce((sum: number, job: any) => 
@@ -125,114 +118,44 @@ export default function KPIDashboard() {
     };
   });
 
-  const getStatusBadge = (status: string) => {
-    const statusConfig: any = {
-      completed: { label: 'Completed', className: 'bg-green-500' },
-      in_progress: { label: 'In Progress', className: 'bg-blue-500' },
-      pending: { label: 'Pending', className: 'bg-yellow-500' },
-      cancelled: { label: 'Cancelled', className: 'bg-red-500' },
-    };
-    const config = statusConfig[status] || { label: status, className: 'bg-gray-500' };
-    return <Badge className={config.className}>{config.label}</Badge>;
-  };
+  const metrics = [
+    {
+      label: "Total Revenue",
+      value: `$${totalRevenue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+      icon: DollarSign,
+      color: "text-blue-600",
+      trend: { value: "+12.5%", isPositive: true },
+    },
+    {
+      label: "Jobs Completed",
+      value: completedJobs,
+      icon: CheckCircle,
+      color: "text-green-600",
+      trend: { value: `${completionRate.toFixed(1)}%`, isPositive: true },
+    },
+    {
+      label: "Avg Job Value",
+      value: `$${avgJobValue.toFixed(2)}`,
+      icon: Target,
+      color: "text-purple-600",
+      trend: { value: "+8.3%", isPositive: true },
+    },
+    {
+      label: "Active Customers",
+      value: activeCustomers,
+      icon: Users,
+      color: "text-orange-600",
+      trend: { value: "+5.2%", isPositive: true },
+    },
+  ];
 
   return (
-    <div className="flex-1 p-6 bg-gray-50 dark:bg-salis-black min-h-screen">
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold font-['Montserrat'] text-gray-900 dark:text-white mb-2 flex items-center gap-3">
-            <BarChart3 className="h-8 w-8 text-blue-600" />
-            KPI Dashboard
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400">
-            Real-time business intelligence and performance metrics
-          </p>
-        </div>
-        <Select value={timeRange} onValueChange={setTimeRange}>
-          <SelectTrigger className="w-40" data-testid="select-timerange">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="7d">Last 7 Days</SelectItem>
-            <SelectItem value="30d">Last 30 Days</SelectItem>
-            <SelectItem value="90d">Last 90 Days</SelectItem>
-            <SelectItem value="1y">Last Year</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      {/* Primary KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <Card className="bg-white dark:bg-salis-black border-l-4 border-l-blue-600" data-testid="card-revenue">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Revenue</p>
-              <DollarSign className="h-5 w-5 text-blue-600" />
-            </div>
-            <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1" data-testid="text-total-revenue">
-              ${totalRevenue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-            </p>
-            <div className="flex items-center gap-1 text-sm">
-              <TrendingUp className="h-4 w-4 text-green-600" />
-              <span className="text-green-600 font-semibold">+12.5%</span>
-              <span className="text-gray-500 dark:text-gray-400">vs last period</span>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-white dark:bg-salis-black border-l-4 border-l-green-600" data-testid="card-jobs-completed">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Jobs Completed</p>
-              <CheckCircle className="h-5 w-5 text-green-600" />
-            </div>
-            <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1" data-testid="text-jobs-completed">
-              {completedJobs}
-            </p>
-            <div className="flex items-center gap-1 text-sm">
-              <TrendingUp className="h-4 w-4 text-green-600" />
-              <span className="text-green-600 font-semibold">{completionRate.toFixed(1)}%</span>
-              <span className="text-gray-500 dark:text-gray-400">completion rate</span>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-white dark:bg-salis-black border-l-4 border-l-purple-600" data-testid="card-avg-job-value">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Avg Job Value</p>
-              <Target className="h-5 w-5 text-purple-600" />
-            </div>
-            <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1" data-testid="text-avg-job-value">
-              ${avgJobValue.toFixed(2)}
-            </p>
-            <div className="flex items-center gap-1 text-sm">
-              <TrendingUp className="h-4 w-4 text-green-600" />
-              <span className="text-green-600 font-semibold">+8.3%</span>
-              <span className="text-gray-500 dark:text-gray-400">vs last period</span>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-white dark:bg-salis-black border-l-4 border-l-orange-600" data-testid="card-active-customers">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Active Customers</p>
-              <Users className="h-5 w-5 text-orange-600" />
-            </div>
-            <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1" data-testid="text-active-customers">
-              {activeCustomers}
-            </p>
-            <div className="flex items-center gap-1 text-sm">
-              <TrendingUp className="h-4 w-4 text-green-600" />
-              <span className="text-green-600 font-semibold">+5.2%</span>
-              <span className="text-gray-500 dark:text-gray-400">vs last period</span>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Secondary KPI Cards */}
+    <DashboardPage
+      title="KPI Dashboard"
+      description="Real-time business intelligence and performance metrics"
+      icon={BarChart3}
+      metrics={metrics}
+    >
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <Card className="bg-white dark:bg-salis-black">
           <CardContent className="p-6">
@@ -271,7 +194,6 @@ export default function KPIDashboard() {
         </Card>
       </div>
 
-      {/* Charts and Analytics */}
       <Tabs defaultValue="revenue" className="space-y-6" data-testid="tabs-analytics">
         <TabsList className="bg-white dark:bg-salis-black">
           <TabsTrigger value="revenue" data-testid="tab-revenue">Revenue Trends</TabsTrigger>
@@ -280,7 +202,6 @@ export default function KPIDashboard() {
           <TabsTrigger value="efficiency" data-testid="tab-efficiency">Operational Efficiency</TabsTrigger>
         </TabsList>
 
-        {/* Revenue Trends Tab */}
         <TabsContent value="revenue">
           <Card className="bg-white dark:bg-salis-black">
             <CardHeader>
@@ -324,7 +245,6 @@ export default function KPIDashboard() {
           </Card>
         </TabsContent>
 
-        {/* Service Mix Tab */}
         <TabsContent value="services">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Card className="bg-white dark:bg-salis-black">
@@ -393,7 +313,6 @@ export default function KPIDashboard() {
           </div>
         </TabsContent>
 
-        {/* Technician Performance Tab */}
         <TabsContent value="technicians">
           <Card className="bg-white dark:bg-salis-black">
             <CardHeader>
@@ -427,7 +346,6 @@ export default function KPIDashboard() {
           </Card>
         </TabsContent>
 
-        {/* Operational Efficiency Tab */}
         <TabsContent value="efficiency">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Card className="bg-white dark:bg-salis-black">
@@ -494,6 +412,6 @@ export default function KPIDashboard() {
           </div>
         </TabsContent>
       </Tabs>
-    </div>
+    </DashboardPage>
   );
 }

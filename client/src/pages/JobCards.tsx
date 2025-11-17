@@ -28,6 +28,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import type { JobCard, Garage, User as UserType, InsertJobCard, TechnicianProfile } from "@shared/schema";
 import { insertJobCardSchema } from "@shared/schema";
+import { StandardPageLayout } from "@/components/layouts";
 
 const statusColors = {
   pending: "bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300",
@@ -44,7 +45,6 @@ const priorityColors = {
   urgent: "bg-salis-black dark:bg-white text-white dark:text-salis-black",
 };
 
-// Extend the insertJobCardSchema for the form (with string types for numbers and dates)
 const jobCardFormSchema = insertJobCardSchema.extend({
   estimatedHours: z.string().optional(),
   totalCost: z.string().optional(),
@@ -86,7 +86,6 @@ export function JobCards() {
     queryKey: ['/api/users'],
   });
 
-  // Fetch technicians for assignment dropdown
   const { data: technicians } = useQuery<UserType[]>({
     queryKey: ['/api/technicians', filterGarageId],
     queryFn: () =>
@@ -95,7 +94,6 @@ export function JobCards() {
       ).then((r) => r.json()),
   });
 
-  // Fetch all technician profiles
   const { data: technicianProfiles } = useQuery<TechnicianProfile[]>({
     queryKey: ['/api/technician-profiles'],
     enabled: !!technicians && technicians.length > 0,
@@ -205,7 +203,6 @@ export function JobCards() {
     updateStatusMutation.mutate({ id: jobCard.id, status: newStatus, jobCard });
   };
 
-  // Filter job cards
   const filteredJobCards = (jobCards ?? []).filter((jc) => {
     if (filterStatus !== "all" && jc.status !== filterStatus) return false;
     if (filterPriority !== "all" && jc.priority !== filterPriority) return false;
@@ -213,192 +210,183 @@ export function JobCards() {
   });
 
   return (
-    <div className="p-8">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="font-['Poppins',Helvetica] font-bold text-3xl text-gray-900 dark:text-white">
-            Job Cards
-          </h1>
-          <p className="font-['Poppins',Helvetica] font-normal text-sm text-gray-900 dark:text-white/60 mt-1">
-            Manage service job cards and track progress
-          </p>
-        </div>
-        <Button
-          onClick={() => setIsCreateOpen(true)}
-          className="bg-white dark:bg-salis-black hover:bg-gray-100 dark:hover:bg-salis-gray-dark text-gray-900 dark:text-white"
-          data-testid="button-create-job-card"
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          Create Job Card
-        </Button>
-      </div>
-
-      {/* Filters */}
-      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark mb-6">
-        <CardContent className="pt-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div>
-              <Label>Garage</Label>
-              <Select value={filterGarageId} onValueChange={setFilterGarageId}>
-                <SelectTrigger data-testid="select-filter-garage">
-                  <Building2 className="w-4 h-4 mr-2" />
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Garages</SelectItem>
-                  {(garages ?? []).map((garage) => (
-                    <SelectItem key={garage.id} value={garage.id}>
-                      {garage.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+    <>
+      <StandardPageLayout
+        title="Job Cards"
+        description="Manage service job cards and track progress"
+        icon={Wrench}
+        actions={[
+          {
+            label: "Create Job Card",
+            onClick: () => setIsCreateOpen(true),
+            icon: Plus,
+            variant: "default",
+          },
+        ]}
+      >
+        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark mb-6">
+          <CardContent className="pt-6">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div>
+                <Label>Garage</Label>
+                <Select value={filterGarageId} onValueChange={setFilterGarageId}>
+                  <SelectTrigger data-testid="select-filter-garage">
+                    <Building2 className="w-4 h-4 mr-2" />
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Garages</SelectItem>
+                    {(garages ?? []).map((garage) => (
+                      <SelectItem key={garage.id} value={garage.id}>
+                        {garage.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label>Status</Label>
+                <Select value={filterStatus} onValueChange={setFilterStatus}>
+                  <SelectTrigger data-testid="select-filter-status">
+                    <Filter className="w-4 h-4 mr-2" />
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Statuses</SelectItem>
+                    <SelectItem value="pending">Pending</SelectItem>
+                    <SelectItem value="assigned">Assigned</SelectItem>
+                    <SelectItem value="in_progress">In Progress</SelectItem>
+                    <SelectItem value="completed">Completed</SelectItem>
+                    <SelectItem value="cancelled">Cancelled</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label>Priority</Label>
+                <Select value={filterPriority} onValueChange={setFilterPriority}>
+                  <SelectTrigger data-testid="select-filter-priority">
+                    <Filter className="w-4 h-4 mr-2" />
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Priorities</SelectItem>
+                    <SelectItem value="low">Low</SelectItem>
+                    <SelectItem value="medium">Medium</SelectItem>
+                    <SelectItem value="high">High</SelectItem>
+                    <SelectItem value="urgent">Urgent</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
-            <div>
-              <Label>Status</Label>
-              <Select value={filterStatus} onValueChange={setFilterStatus}>
-                <SelectTrigger data-testid="select-filter-status">
-                  <Filter className="w-4 h-4 mr-2" />
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Statuses</SelectItem>
-                  <SelectItem value="pending">Pending</SelectItem>
-                  <SelectItem value="assigned">Assigned</SelectItem>
-                  <SelectItem value="in_progress">In Progress</SelectItem>
-                  <SelectItem value="completed">Completed</SelectItem>
-                  <SelectItem value="cancelled">Cancelled</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label>Priority</Label>
-              <Select value={filterPriority} onValueChange={setFilterPriority}>
-                <SelectTrigger data-testid="select-filter-priority">
-                  <Filter className="w-4 h-4 mr-2" />
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Priorities</SelectItem>
-                  <SelectItem value="low">Low</SelectItem>
-                  <SelectItem value="medium">Medium</SelectItem>
-                  <SelectItem value="high">High</SelectItem>
-                  <SelectItem value="urgent">Urgent</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Job Cards Grid */}
-      {isLoading ? (
-        <div className="text-center py-12">
-          <div className="animate-spin w-8 h-8 border-4 border-gray-900 dark:border-white border-t-transparent rounded-full mx-auto mb-4"></div>
-          <p className="text-gray-900 dark:text-white/60">Loading job cards...</p>
-        </div>
-      ) : filteredJobCards.length === 0 ? (
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
-          <CardContent className="text-center py-12">
-            <Wrench className="w-12 h-12 text-gray-400 dark:text-gray-600 mx-auto mb-4" />
-            <p className="text-gray-600 dark:text-gray-400">No job cards found</p>
-            <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">Create your first job card to get started</p>
           </CardContent>
         </Card>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredJobCards.map((jobCard) => {
-            const vehicle = jobCard.vehicleInfo as any;
-            const garage = garages?.find(g => g.id === jobCard.garageId);
-            const assignedTech = users?.find(u => u.id === jobCard.assignedTo);
 
-            return (
-              <Card key={jobCard.id} className="hover:shadow-lg transition-shadow" data-testid={`card-job-card-${jobCard.id}`}>
-                <CardHeader className="pb-3">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <CardTitle className="text-lg font-semibold">
-                        {jobCard.jobNumber}
-                      </CardTitle>
-                      <p className="text-sm text-gray-900 dark:text-white/60 mt-1">
-                        {vehicle?.make} {vehicle?.model} ({vehicle?.year})
-                      </p>
-                      <p className="text-xs text-gray-900 dark:text-white/50">{vehicle?.licensePlate}</p>
-                    </div>
-                    <div className="flex flex-col gap-1">
-                      <Badge className={statusColors[jobCard.status as keyof typeof statusColors]}>
-                        {jobCard.status}
-                      </Badge>
-                      <Badge className={priorityColors[jobCard.priority as keyof typeof priorityColors]}>
-                        {jobCard.priority}
-                      </Badge>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-                      <Building2 className="w-4 h-4" />
-                      <span>{garage?.name || 'Unknown Garage'}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-                      <Wrench className="w-4 h-4" />
-                      <span>{jobCard.serviceType}</span>
-                    </div>
-                    {assignedTech && (
-                      <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-                        <User className="w-4 h-4" />
-                        <span>{assignedTech.fullName || assignedTech.email}</span>
+        {isLoading ? (
+          <div className="text-center py-12">
+            <div className="animate-spin w-8 h-8 border-4 border-gray-900 dark:border-white border-t-transparent rounded-full mx-auto mb-4"></div>
+            <p className="text-gray-900 dark:text-white/60">Loading job cards...</p>
+          </div>
+        ) : filteredJobCards.length === 0 ? (
+          <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+            <CardContent className="text-center py-12">
+              <Wrench className="w-12 h-12 text-gray-400 dark:text-gray-600 mx-auto mb-4" />
+              <p className="text-gray-600 dark:text-gray-400">No job cards found</p>
+              <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">Create your first job card to get started</p>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filteredJobCards.map((jobCard) => {
+              const vehicle = jobCard.vehicleInfo as any;
+              const garage = garages?.find(g => g.id === jobCard.garageId);
+              const assignedTech = users?.find(u => u.id === jobCard.assignedTo);
+
+              return (
+                <Card key={jobCard.id} className="hover:shadow-lg transition-shadow" data-testid={`card-job-card-${jobCard.id}`}>
+                  <CardHeader className="pb-3">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <CardTitle className="text-lg font-semibold">
+                          {jobCard.jobNumber}
+                        </CardTitle>
+                        <p className="text-sm text-gray-900 dark:text-white/60 mt-1">
+                          {vehicle?.make} {vehicle?.model} ({vehicle?.year})
+                        </p>
+                        <p className="text-xs text-gray-900 dark:text-white/50">{vehicle?.licensePlate}</p>
                       </div>
-                    )}
-                    {jobCard.scheduledDate && (
-                      <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-                        <Calendar className="w-4 h-4" />
-                        <span>{new Date(jobCard.scheduledDate).toLocaleDateString()}</span>
+                      <div className="flex flex-col gap-1">
+                        <Badge className={statusColors[jobCard.status as keyof typeof statusColors]}>
+                          {jobCard.status}
+                        </Badge>
+                        <Badge className={priorityColors[jobCard.priority as keyof typeof priorityColors]}>
+                          {jobCard.priority}
+                        </Badge>
                       </div>
-                    )}
-                  </div>
-                  <p className="text-sm text-gray-700 dark:text-gray-300 mt-3 line-clamp-2">
-                    {jobCard.description}
-                  </p>
-                  <div className="flex gap-2 mt-4">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleViewDetails(jobCard)}
-                      className="flex-1"
-                      data-testid={`button-view-details-${jobCard.id}`}
-                    >
-                      <Eye className="w-4 h-4 mr-1" />
-                      Details
-                    </Button>
-                    {jobCard.status !== 'completed' && jobCard.status !== 'cancelled' && (
-                      <Select
-                        value={jobCard.status}
-                        onValueChange={(status) => handleStatusChange(jobCard, status)}
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                        <Building2 className="w-4 h-4" />
+                        <span>{garage?.name || 'Unknown Garage'}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                        <Wrench className="w-4 h-4" />
+                        <span>{jobCard.serviceType}</span>
+                      </div>
+                      {assignedTech && (
+                        <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                          <User className="w-4 h-4" />
+                          <span>{assignedTech.fullName || assignedTech.email}</span>
+                        </div>
+                      )}
+                      {jobCard.scheduledDate && (
+                        <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                          <Calendar className="w-4 h-4" />
+                          <span>{new Date(jobCard.scheduledDate).toLocaleDateString()}</span>
+                        </div>
+                      )}
+                    </div>
+                    <p className="text-sm text-gray-700 dark:text-gray-300 mt-3 line-clamp-2">
+                      {jobCard.description}
+                    </p>
+                    <div className="flex gap-2 mt-4">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleViewDetails(jobCard)}
+                        className="flex-1"
+                        data-testid={`button-view-details-${jobCard.id}`}
                       >
-                        <SelectTrigger className="flex-1" data-testid={`select-status-${jobCard.id}`}>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="pending">Pending</SelectItem>
-                          <SelectItem value="assigned">Assigned</SelectItem>
-                          <SelectItem value="in_progress">In Progress</SelectItem>
-                          <SelectItem value="completed">Completed</SelectItem>
-                          <SelectItem value="cancelled">Cancelled</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
-      )}
+                        <Eye className="w-4 h-4 mr-1" />
+                        Details
+                      </Button>
+                      {jobCard.status !== 'completed' && jobCard.status !== 'cancelled' && (
+                        <Select
+                          value={jobCard.status}
+                          onValueChange={(status) => handleStatusChange(jobCard, status)}
+                        >
+                          <SelectTrigger className="flex-1" data-testid={`select-status-${jobCard.id}`}>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="pending">Pending</SelectItem>
+                            <SelectItem value="assigned">Assigned</SelectItem>
+                            <SelectItem value="in_progress">In Progress</SelectItem>
+                            <SelectItem value="completed">Completed</SelectItem>
+                            <SelectItem value="cancelled">Cancelled</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        )}
+      </StandardPageLayout>
 
-      {/* Create Job Card Dialog */}
       <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
@@ -441,7 +429,6 @@ export function JobCards() {
               </div>
             </div>
 
-            {/* Vehicle Information */}
             <div className="border-t pt-4">
               <h3 className="font-semibold mb-3">Vehicle Information</h3>
               <div className="grid grid-cols-2 gap-4">
@@ -493,7 +480,6 @@ export function JobCards() {
               </div>
             </div>
 
-            {/* Service Details */}
             <div className="border-t pt-4">
               <h3 className="font-semibold mb-3">Service Details</h3>
               <div className="space-y-4">
@@ -641,7 +627,6 @@ export function JobCards() {
         </DialogContent>
       </Dialog>
 
-      {/* Job Card Details Dialog */}
       <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
@@ -774,6 +759,6 @@ export function JobCards() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 }
