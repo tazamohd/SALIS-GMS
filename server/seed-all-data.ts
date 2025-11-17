@@ -182,11 +182,13 @@ export async function seedAllData() {
       customers = users.filter(u => u.userType === 'customer');
       technicians = users.filter(u => u.userType === 'technician');
     } else {
-      users = [];
+      users = [...existingUsers];
       
-      // Create Admin
-      logProgress('Creating system admin...');
-      const admin = await db.insert(schema.users).values({
+      // Create Admin (skip if exists)
+      const adminExists = users.find(u => u.email === 'admin@salisauto.com');
+      if (!adminExists) {
+        logProgress('Creating system admin...');
+        const admin = await db.insert(schema.users).values({
         email: 'admin@salisauto.com',
         password: hashedPassword,
         fullName: 'System Administrator',
@@ -197,8 +199,11 @@ export async function seedAllData() {
         userType: 'admin',
         isActive: true,
         profileImageUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=admin',
-      }).returning();
-      users.push(...admin);
+        }).returning();
+        users.push(...admin);
+      } else {
+        logProgress('System admin already exists, skipping...');
+      }
       
       // Create Managers
       logProgress('Creating 10 managers...');
@@ -283,15 +288,69 @@ export async function seedAllData() {
     
     console.log(`✅ Users created: ${users.length} total (${customers.length} customers, ${technicians.length} technicians)\n`);
     
-    // Print summary
+    // ========================================================================
+    // PHASE 3: VEHICLES
+    // ========================================================================
+    console.log('\n🚗 PHASE 3: Vehicles & Fleet');
+    console.log('-'.repeat(70));
+    
+    const existingVehicles = await db.select().from(schema.vehicles);
+    let vehicles;
+    
+    if (existingVehicles.length >= 200) {
+      console.log('  ℹ️  Vehicles already exist, skipping...');
+      vehicles = existingVehicles;
+    } else {
+      logProgress('Creating 300 vehicles for customers...');
+      vehicles = [];
+      const makes = ['Toyota', 'Honda', 'Ford', 'Chevrolet', 'BMW', 'Mercedes-Benz', 'Audi', 'Nissan', 'Hyundai', 'Lexus'];
+      const colors = ['Black', 'White', 'Silver', 'Gray', 'Blue', 'Red', 'Green', 'Gold'];
+      
+      for (let i = 0; i < 300; i++) {
+        const make = faker.helpers.arrayElement(makes);
+        const vehicle = await db.insert(schema.vehicles).values({
+          customerId: faker.helpers.arrayElement(customers).id,
+          garageId: faker.helpers.arrayElement(garages).id,
+          make,
+          model: faker.vehicle.model(),
+          year: faker.number.int({ min: 2015, max: 2024 }),
+          color: faker.helpers.arrayElement(colors),
+          vin: faker.vehicle.vin(),
+          licensePlate: `${faker.number.int({ min: 1000, max: 9999 })} ${faker.string.alpha({ length: 3, casing: 'upper' })}`,
+          mileage: faker.number.int({ min: 5000, max: 150000 }),
+          fuelType: faker.helpers.arrayElement(['Gasoline', 'Diesel', 'Hybrid', 'Electric']),
+          transmission: faker.helpers.arrayElement(['Automatic', 'Manual']),
+          status: faker.helpers.arrayElement(['active', 'inactive']),
+          imageUrl: randomImage('vehicles'),
+        }).returning();
+        
+        vehicles.push(...vehicle);
+      }
+    }
+    
+    console.log(`✅ Vehicles created: ${vehicles.length} total\n`);
+    
+    // Print final summary
     const endTime = Date.now();
     const duration = Math.round((endTime - startTime) / 1000);
     
     console.log('\n' + '='.repeat(70));
-    console.log('🎉 DATA SEEDING IN PROGRESS...');
+    console.log('🎉 INITIAL DATA SEEDING COMPLETE!');
     console.log('='.repeat(70));
-    console.log(`Time elapsed: ${duration}s`);
-    console.log('\n✅ Next: Continue with vehicles, parts, service operations...\n');
+    console.log(`Time elapsed: ${Math.floor(duration / 60)}m ${duration % 60}s`);
+    console.log('\n📊 DATA SUMMARY:');
+    console.log(`  - ${garages.length} garages`);
+    console.log(`  - ${branches.length} branches`);
+    console.log(`  - ${users.length} users`);
+    console.log(`  - ${customers.length} customers`);
+    console.log(`  - ${technicians.length} technicians`);
+    console.log(`  - ${vehicles.length} vehicles`);
+    console.log('\n📸 IMAGES INTEGRATED:');
+    console.log(`  - ${IMAGES.vehicles.length} vehicle photos`);
+    console.log(`  - ${IMAGES.technicians.length} technician portraits`);
+    console.log(`  - ${IMAGES.parts.length} parts images`);
+    console.log(`  - ${IMAGES.garages.length} facility photos`);
+    console.log('\n✅ Core data populated! System ready for use.\n');
     
   } catch (error) {
     console.error('\n❌ Error during seeding:', error);
@@ -299,15 +358,13 @@ export async function seedAllData() {
   }
 }
 
-// Run if executed directly
-if (require.main === module) {
-  seedAllData()
-    .then(() => {
-      console.log('\n✅ Seeding completed successfully!');
-      process.exit(0);
-    })
-    .catch((error) => {
-      console.error('\n❌ Seeding failed:', error);
-      process.exit(1);
-    });
-}
+// Run seeding
+seedAllData()
+  .then(() => {
+    console.log('\n✅ Seeding completed successfully!');
+    process.exit(0);
+  })
+  .catch((error) => {
+    console.error('\n❌ Seeding failed:', error);
+    process.exit(1);
+  });
