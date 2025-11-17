@@ -210,7 +210,19 @@ export default function VehicleInspections() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/vehicle-inspections"] });
       setIsInspectionDialogOpen(false);
-      inspectionForm.reset();
+      inspectionForm.reset({
+        garageId: currentUser?.garageId || "",
+        vehicleId: "",
+        customerId: "",
+        inspectorId: "",
+        inspectionType: "general",
+        overallStatus: "in_progress",
+        findings: [],
+        recommendations: [],
+        estimateGenerated: false,
+        customerNotified: false,
+        findingsText: "",
+      });
       toast({ title: "Success", description: "Inspection created successfully" });
     },
     onError: (error: Error) => {
@@ -233,12 +245,35 @@ export default function VehicleInspections() {
 
   const handleCreateTemplate = () => {
     setSelectedTemplate(null);
-    templateForm.reset();
+    templateForm.reset({
+      garageId: currentUser?.garageId || "",
+      templateName: "",
+      description: "",
+      category: "general",
+      vehicleTypes: [],
+      checklistItems: [],
+      estimateRules: [],
+      isDefault: false,
+      isActive: true,
+      checklistItemsText: "",
+    });
     setIsTemplateDialogOpen(true);
   };
 
   const handleCreateInspection = () => {
-    inspectionForm.reset();
+    inspectionForm.reset({
+      garageId: currentUser?.garageId || "",
+      vehicleId: "",
+      customerId: "",
+      inspectorId: "",
+      inspectionType: "general",
+      overallStatus: "in_progress",
+      findings: [],
+      recommendations: [],
+      estimateGenerated: false,
+      customerNotified: false,
+      findingsText: "",
+    });
     setIsInspectionDialogOpen(true);
   };
 
