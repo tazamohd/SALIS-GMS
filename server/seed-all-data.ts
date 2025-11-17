@@ -330,6 +330,269 @@ export async function seedAllData() {
     
     console.log(`✅ Vehicles created: ${vehicles.length} total\n`);
     
+    // ============================================================
+    // PHASE 4: Parts & Inventory
+    // ============================================================
+    console.log('\n📦 PHASE 4: Parts & Inventory');
+    console.log('-'.repeat(70));
+    
+    const existingParts = await db.select().from(schema.spareParts);
+    let spareParts;
+    
+    if (existingParts.length >= 100) {
+      console.log('  ℹ️  Parts already exist, skipping...');
+      spareParts = existingParts;
+    } else {
+      logProgress('Creating 200 spare parts with images...');
+      spareParts = [];
+      
+      const partCategories = [
+        { category: 'engine', items: ['Oil Filter', 'Air Filter', 'Fuel Filter', 'Spark Plugs', 'Engine Oil', 'Timing Belt', 'Water Pump'] },
+        { category: 'brakes', items: ['Brake Pads', 'Brake Discs', 'Brake Fluid', 'Brake Shoes', 'Brake Calipers'] },
+        { category: 'electrical', items: ['Battery', 'Alternator', 'Starter Motor', 'Headlight Bulb', 'Fuse Set', 'Ignition Coil'] },
+        { category: 'suspension', items: ['Shock Absorbers', 'Struts', 'Control Arms', 'Ball Joints', 'Bushings'] },
+        { category: 'transmission', items: ['Transmission Fluid', 'Clutch Kit', 'Drive Belt', 'CV Joint'] },
+        { category: 'fluids', items: ['Coolant', 'Power Steering Fluid', 'Windshield Washer Fluid'] },
+      ];
+      
+      const brands = ['Bosch', 'ACDelco', 'Mobil', 'Castrol', 'NGK', 'Denso', 'Brembo', 'Monroe', 'Gates', 'Mahle'];
+      
+      for (const { category, items } of partCategories) {
+        for (const itemName of items) {
+          for (let i = 0; i < 5; i++) {
+            const brand = faker.helpers.arrayElement(brands);
+            const part = await db.insert(schema.spareParts).values({
+              name: `${brand} ${itemName}`,
+              description: faker.commerce.productDescription(),
+              category,
+              subcategory: faker.helpers.arrayElement(['OEM', 'Aftermarket', 'Performance']),
+              brand,
+              manufacturer: brand,
+              sku: faker.string.alphanumeric({ length: 10, casing: 'upper' }),
+              barcode: faker.string.numeric({ length: 13 }),
+              partType: faker.helpers.arrayElement(['oem', 'generic', 'consumable']),
+              unitOfMeasure: faker.helpers.arrayElement(['pcs', 'liters', 'kg', 'boxes']),
+              media: [randomImage('parts')],
+              createdBy: faker.helpers.arrayElement(users).id,
+              isActive: true,
+            }).returning();
+            
+            spareParts.push(...part);
+            
+            // Create inventory for this part at each garage
+            for (const garage of garages) {
+              await db.insert(schema.sparePartInventories).values({
+                sparePartId: part[0].id,
+                garageId: garage.id,
+                stockQuantity: faker.number.int({ min: 0, max: 100 }),
+                minThreshold: faker.number.int({ min: 5, max: 20 }),
+                purchasePrice: faker.commerce.price({ min: 10, max: 500 }),
+                sellingPrice: faker.commerce.price({ min: 15, max: 700 }),
+                costPrice: faker.commerce.price({ min: 8, max: 450 }),
+              });
+            }
+          }
+        }
+      }
+    }
+    
+    console.log(`✅ Parts created: ${spareParts.length} with inventory across garages\n`);
+    
+    // ============================================================
+    // PHASE 5: Service Operations (Job Cards & Appointments)
+    // ============================================================
+    console.log('\n🔧 PHASE 5: Service Operations');
+    console.log('-'.repeat(70));
+    
+    const existingJobCards = await db.select().from(schema.jobCards);
+    let jobCards;
+    
+    if (existingJobCards.length >= 100) {
+      console.log('  ℹ️  Job cards already exist, skipping...');
+      jobCards = existingJobCards;
+    } else {
+      logProgress('Creating 150 job cards...');
+      jobCards = [];
+      
+      const serviceTypes = ['maintenance', 'repair', 'diagnostic', 'inspection', 'bodywork'];
+      const statuses = ['pending', 'assigned', 'in_progress', 'completed', 'cancelled'];
+      const priorities = ['low', 'medium', 'high', 'urgent'];
+      
+      for (let i = 0; i < 150; i++) {
+        const vehicle = faker.helpers.arrayElement(vehicles);
+        const technician = faker.helpers.arrayElement(technicians);
+        const garage = faker.helpers.arrayElement(garages);
+        const status = faker.helpers.arrayElement(statuses);
+        
+        const jobCard = await db.insert(schema.jobCards).values({
+          jobNumber: `JOB-${faker.string.numeric({ length: 6 })}`,
+          garageId: garage.id,
+          customerId: vehicle.customerId,
+          vehicleInfo: {
+            make: vehicle.make,
+            model: vehicle.model,
+            year: vehicle.year,
+            licensePlate: vehicle.licensePlate,
+            vin: vehicle.vin,
+          },
+          serviceType: faker.helpers.arrayElement(serviceTypes),
+          description: faker.lorem.sentence({ min: 10, max: 20 }),
+          status,
+          priority: faker.helpers.arrayElement(priorities),
+          estimatedHours: faker.number.float({ min: 1, max: 8, fractionDigits: 2 }),
+          actualHours: status === 'completed' ? faker.number.float({ min: 1, max: 10, fractionDigits: 2 }) : null,
+          totalCost: faker.commerce.price({ min: 100, max: 5000 }),
+          createdBy: faker.helpers.arrayElement(users).id,
+          assignedTo: technician.id,
+          scheduledDate: faker.date.between({ from: '2024-01-01', to: '2025-12-31' }),
+          startedAt: status !== 'pending' ? faker.date.recent({ days: 30 }) : null,
+          completedAt: status === 'completed' ? faker.date.recent({ days: 15 }) : null,
+          publicTrackingToken: faker.string.alphanumeric({ length: 64 }),
+        }).returning();
+        
+        jobCards.push(...jobCard);
+      }
+    }
+    
+    console.log(`✅ Job cards created: ${jobCards.length}\n`);
+    
+    // Create Appointments
+    const existingAppointments = await db.select().from(schema.appointments);
+    let appointments;
+    
+    if (existingAppointments.length >= 100) {
+      console.log('  ℹ️  Appointments already exist, skipping...');
+      appointments = existingAppointments;
+    } else {
+      logProgress('Creating 200 appointments...');
+      appointments = [];
+      
+      const appointmentStatuses = ['scheduled', 'confirmed', 'in_progress', 'completed', 'cancelled', 'no_show'];
+      
+      for (let i = 0; i < 200; i++) {
+        const vehicle = faker.helpers.arrayElement(vehicles);
+        const customer = users.find(u => u.id === vehicle.customerId);
+        const technician = faker.helpers.arrayElement(technicians);
+        const garage = faker.helpers.arrayElement(garages);
+        
+        const appointment = await db.insert(schema.appointments).values({
+          appointmentNumber: `APT-${faker.string.numeric({ length: 6 })}`,
+          garageId: garage.id,
+          customerId: customer?.id || faker.helpers.arrayElement(customers).id,
+          customerName: customer?.fullName || faker.person.fullName(),
+          customerPhone: customer?.phone || generatePhone(),
+          customerEmail: customer?.email || faker.internet.email(),
+          vehicleInfo: {
+            make: vehicle.make,
+            model: vehicle.model,
+            year: vehicle.year,
+            licensePlate: vehicle.licensePlate,
+          },
+          serviceType: faker.helpers.arrayElement(['maintenance', 'repair', 'diagnostic', 'inspection']),
+          description: faker.lorem.sentence(),
+          appointmentDate: faker.date.between({ from: '2024-11-01', to: '2025-12-31' }),
+          duration: faker.helpers.arrayElement([30, 60, 90, 120, 180]),
+          status: faker.helpers.arrayElement(appointmentStatuses),
+          assignedTo: technician.id,
+          createdBy: faker.helpers.arrayElement(users).id,
+        }).returning();
+        
+        appointments.push(...appointment);
+      }
+    }
+    
+    console.log(`✅ Appointments created: ${appointments.length}\n`);
+    
+    // ============================================================
+    // PHASE 6: Financial Data (Invoices & Payments)
+    // ============================================================
+    console.log('\n💰 PHASE 6: Financial Data');
+    console.log('-'.repeat(70));
+    
+    const existingInvoices = await db.select().from(schema.invoices);
+    let invoices;
+    
+    if (existingInvoices.length >= 100) {
+      console.log('  ℹ️  Invoices already exist, skipping...');
+      invoices = existingInvoices;
+    } else {
+      logProgress('Creating 200 invoices with line items...');
+      invoices = [];
+      
+      const invoiceStatuses = ['draft', 'sent', 'paid', 'overdue', 'cancelled'];
+      
+      for (let i = 0; i < 200; i++) {
+        const jobCard = faker.helpers.arrayElement(jobCards);
+        const customer = users.find(u => u.id === jobCard.customerId) || faker.helpers.arrayElement(customers);
+        const vehicle = vehicles.find(v => v.customerId === customer.id) || faker.helpers.arrayElement(vehicles);
+        const garage = garages.find(g => g.id === jobCard.garageId) || faker.helpers.arrayElement(garages);
+        const status = faker.helpers.arrayElement(invoiceStatuses);
+        
+        const subtotal = parseFloat(faker.commerce.price({ min: 200, max: 8000 }));
+        const taxAmount = subtotal * 0.15; // 15% VAT
+        const discountAmount = faker.number.float({ min: 0, max: subtotal * 0.1, fractionDigits: 2 });
+        const totalAmount = subtotal + taxAmount - discountAmount;
+        const paidAmount = status === 'paid' ? totalAmount : (status === 'overdue' ? faker.number.float({ min: 0, max: totalAmount * 0.5, fractionDigits: 2 }) : 0);
+        const balanceAmount = totalAmount - paidAmount;
+        
+        const invoice = await db.insert(schema.invoices).values({
+          invoiceNumber: `INV-${faker.string.numeric({ length: 6 })}`,
+          garageId: garage.id,
+          customerId: customer.id,
+          vehicleId: vehicle.id,
+          jobCardId: jobCard.id,
+          invoiceDate: faker.date.between({ from: '2024-01-01', to: '2025-11-17' }),
+          dueDate: faker.date.soon({ days: 30 }),
+          status,
+          subtotal: subtotal.toFixed(2),
+          taxAmount: taxAmount.toFixed(2),
+          discountAmount: discountAmount.toFixed(2),
+          totalAmount: totalAmount.toFixed(2),
+          paidAmount: paidAmount.toFixed(2),
+          balanceAmount: balanceAmount.toFixed(2),
+          notes: faker.lorem.sentence(),
+          createdBy: faker.helpers.arrayElement(users).id,
+          sentAt: status !== 'draft' ? faker.date.recent({ days: 30 }) : null,
+          paidAt: status === 'paid' ? faker.date.recent({ days: 15 }) : null,
+        }).returning();
+        
+        invoices.push(...invoice);
+        
+        // Create 2-5 line items for each invoice
+        const itemCount = faker.number.int({ min: 2, max: 5 });
+        for (let j = 0; j < itemCount; j++) {
+          const quantity = faker.number.int({ min: 1, max: 5 });
+          const unitPrice = parseFloat(faker.commerce.price({ min: 20, max: 500 }));
+          const lineTotal = quantity * unitPrice;
+          
+          await db.insert(schema.invoiceItems).values({
+            invoiceId: invoice[0].id,
+            itemType: faker.helpers.arrayElement(['service', 'part', 'labor']),
+            description: faker.commerce.productName(),
+            quantity,
+            unitPrice: unitPrice.toFixed(2),
+            unitCost: (unitPrice * 0.7).toFixed(2),
+            lineTotal: lineTotal.toFixed(2),
+            taxRate: '15.00',
+          });
+        }
+        
+        // Create payment if invoice is paid
+        if (status === 'paid') {
+          await db.insert(schema.payments).values({
+            invoiceId: invoice[0].id,
+            paymentDate: faker.date.recent({ days: 15 }),
+            amount: totalAmount.toFixed(2),
+            paymentMethod: faker.helpers.arrayElement(['cash', 'card', 'transfer', 'check']),
+            referenceNumber: faker.string.alphanumeric({ length: 12, casing: 'upper' }),
+            createdBy: faker.helpers.arrayElement(users).id,
+          });
+        }
+      }
+    }
+    
+    console.log(`✅ Invoices created: ${invoices.length} with line items and payments\n`);
+    
     // Print final summary
     const endTime = Date.now();
     const duration = Math.round((endTime - startTime) / 1000);
@@ -338,19 +601,39 @@ export async function seedAllData() {
     console.log('🎉 INITIAL DATA SEEDING COMPLETE!');
     console.log('='.repeat(70));
     console.log(`Time elapsed: ${Math.floor(duration / 60)}m ${duration % 60}s`);
-    console.log('\n📊 DATA SUMMARY:');
+    console.log('\n📊 COMPREHENSIVE DATA SUMMARY:');
+    console.log('\n🏢 CORE BUSINESS:');
     console.log(`  - ${garages.length} garages`);
     console.log(`  - ${branches.length} branches`);
     console.log(`  - ${users.length} users`);
     console.log(`  - ${customers.length} customers`);
     console.log(`  - ${technicians.length} technicians`);
+    
+    console.log('\n🚗 FLEET & VEHICLES:');
     console.log(`  - ${vehicles.length} vehicles`);
+    
+    console.log('\n📦 PARTS & INVENTORY:');
+    console.log(`  - ${spareParts.length} spare parts`);
+    console.log(`  - ${spareParts.length * garages.length} inventory records`);
+    
+    console.log('\n🔧 SERVICE OPERATIONS:');
+    console.log(`  - ${jobCards.length} job cards`);
+    console.log(`  - ${appointments.length} appointments`);
+    
+    console.log('\n💰 FINANCIAL DATA:');
+    console.log(`  - ${invoices.length} invoices`);
+    console.log(`  - ${invoices.length * 3} invoice line items (avg)`);
+    
     console.log('\n📸 IMAGES INTEGRATED:');
     console.log(`  - ${IMAGES.vehicles.length} vehicle photos`);
     console.log(`  - ${IMAGES.technicians.length} technician portraits`);
     console.log(`  - ${IMAGES.parts.length} parts images`);
     console.log(`  - ${IMAGES.garages.length} facility photos`);
-    console.log('\n✅ Core data populated! System ready for use.\n');
+    console.log(`  - ${IMAGES.analytics.length} analytics dashboards`);
+    console.log(`  - TOTAL: ${Object.values(IMAGES).flat().length} images`);
+    
+    console.log('\n✅ COMPREHENSIVE DATA POPULATED!');
+    console.log('🎉 System ready for full-scale operations!\n');
     
   } catch (error) {
     console.error('\n❌ Error during seeding:', error);
