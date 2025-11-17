@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
+import { StandardPageLayout } from "@/components/layouts";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -32,7 +33,7 @@ export function SmartAssignment() {
     mutationFn: async (jobId: string) => {
       return await apiRequest("POST", `/api/assignments/recommend/${jobId}`, {});
     },
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
       setRecommendations(data.recommendations || []);
     },
     onError: (error: Error) => {
@@ -67,7 +68,7 @@ export function SmartAssignment() {
     },
   });
 
-  const unassignedJobs = jobs?.filter((job: any) => !job.assignedTo && job.status === "pending") || [];
+  const unassignedJobs = (jobs as any[] || []).filter((job: any) => !job.assignedTo && job.status === "pending");
 
   const handleGetRecommendations = async (jobId: string) => {
     setSelectedJobId(jobId);
@@ -95,19 +96,11 @@ export function SmartAssignment() {
   };
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold flex items-center gap-2">
-            <Brain className="h-8 w-8" />
-            Smart Job Assignment
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            AI-powered technician recommendations for optimal job assignments
-          </p>
-        </div>
-      </div>
-
+    <StandardPageLayout
+      title="Smart Job Assignment"
+      description="AI-powered technician recommendations for optimal job assignments"
+      icon={Brain}
+    >
       <div className="grid md:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
@@ -228,6 +221,6 @@ export function SmartAssignment() {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </StandardPageLayout>
   );
 }

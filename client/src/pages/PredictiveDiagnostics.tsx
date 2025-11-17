@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
+import { StandardPageLayout } from "@/components/layouts";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -35,12 +36,12 @@ export default function PredictiveDiagnostics() {
 
   const { data: vehicles } = useQuery<Vehicle[]>({
     queryKey: ["/api/vehicles"],
-    enabled: !!user?.garageId,
+    enabled: !!(user as any)?.garageId,
   });
 
   const { data: predictions } = useQuery<any[]>({
     queryKey: ["/api/ai/maintenance-predictions"],
-    enabled: !!user?.garageId,
+    enabled: !!(user as any)?.garageId,
   });
 
   const predictMutation = useMutation({
@@ -115,18 +116,12 @@ export default function PredictiveDiagnostics() {
   };
 
   return (
-    <div className="p-8 space-y-8" data-testid="predictive-diagnostics-page">
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-          <Brain className="w-8 h-8 text-blue-600" />
-          AI-Powered Predictive Diagnostics
-        </h1>
-        <p className="text-gray-600 dark:text-gray-400 mt-2">
-          Analyze vehicle data to predict potential failures and maintenance needs using advanced AI
-        </p>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <StandardPageLayout
+      title="AI-Powered Predictive Diagnostics"
+      description="Analyze vehicle data to predict potential failures and maintenance needs using advanced AI"
+      icon={Brain}
+    >
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8" data-testid="predictive-diagnostics-page">
         {/* Input Form */}
         <Card>
           <CardHeader>
@@ -416,6 +411,6 @@ export default function PredictiveDiagnostics() {
           </Card>
         </div>
       </div>
-    </div>
+    </StandardPageLayout>
   );
 }
