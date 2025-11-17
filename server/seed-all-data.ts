@@ -629,7 +629,6 @@ export async function seedAllData() {
     console.log(`  - ${IMAGES.technicians.length} technician portraits`);
     console.log(`  - ${IMAGES.parts.length} parts images`);
     console.log(`  - ${IMAGES.garages.length} facility photos`);
-    console.log(`  - ${IMAGES.analytics.length} analytics dashboards`);
     console.log(`  - TOTAL: ${Object.values(IMAGES).flat().length} images`);
     
     console.log('\n✅ COMPREHENSIVE DATA POPULATED!');
