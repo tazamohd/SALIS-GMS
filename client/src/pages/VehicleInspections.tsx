@@ -497,7 +497,7 @@ export default function VehicleInspections() {
                   <FormItem>
                     <FormLabel>Description</FormLabel>
                     <FormControl>
-                      <Textarea {...field} placeholder="Optional description" data-testid="input-template-description" />
+                      <Textarea {...field} value={field.value || ""} placeholder="Optional description" data-testid="input-template-description" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -509,7 +509,7 @@ export default function VehicleInspections() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Category</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} defaultValue={field.value || undefined}>
                       <FormControl>
                         <SelectTrigger data-testid="select-template-category">
                           <SelectValue placeholder="Select category" />
@@ -552,7 +552,7 @@ export default function VehicleInspections() {
                   <FormItem className="flex flex-row items-start space-x-3 space-y-0">
                     <FormControl>
                       <Checkbox
-                        checked={field.value}
+                        checked={field.value || false}
                         onCheckedChange={field.onChange}
                         data-testid="checkbox-template-default"
                       />
