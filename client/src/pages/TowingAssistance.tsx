@@ -3,6 +3,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { TabsPageLayout } from "@/components/layouts";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -37,12 +38,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
@@ -65,7 +60,6 @@ import {
 } from "@shared/schema";
 import { useAuth } from "@/hooks/useAuth";
 
-// Extend insert schemas for form handling
 const towingRequestFormSchema = insertTowingRequestSchema.extend({
   pickupLatitude: z.string().optional().transform(val => val && val !== "" ? parseFloat(val) : undefined),
   pickupLongitude: z.string().optional().transform(val => val && val !== "" ? parseFloat(val) : undefined),
@@ -94,35 +88,29 @@ export default function TowingAssistance() {
   const [editingRequestId, setEditingRequestId] = useState<string | null>(null);
   const [editingTruckId, setEditingTruckId] = useState<string | null>(null);
 
-  // Fetch towing requests
   const { data: towingRequests = [], isLoading: requestsLoading } = useQuery<TowingRequest[]>({
     queryKey: ["/api/towing-requests"],
   });
 
-  // Fetch tow trucks
   const { data: towTrucks = [], isLoading: trucksLoading } = useQuery<TowTruck[]>({
     queryKey: ["/api/tow-trucks"],
   });
 
-  // Fetch customers for dropdown
   const { data: customers = [] } = useQuery<User[]>({
     queryKey: ["/api/customers"],
     enabled: isRequestDialogOpen,
   });
 
-  // Fetch vehicles for dropdown
   const { data: vehicles = [] } = useQuery<Vehicle[]>({
     queryKey: ["/api/vehicles"],
     enabled: isRequestDialogOpen,
   });
 
-  // Fetch users/drivers for dropdown
   const { data: drivers = [] } = useQuery<User[]>({
     queryKey: ["/api/users"],
     enabled: isRequestDialogOpen || isTruckDialogOpen,
   });
 
-  // Towing Request Form
   const requestForm = useForm<TowingRequestFormData>({
     resolver: zodResolver(towingRequestFormSchema),
     defaultValues: {
@@ -149,7 +137,6 @@ export default function TowingAssistance() {
     },
   });
 
-  // Tow Truck Form
   const truckForm = useForm<TowTruckFormData>({
     resolver: zodResolver(towTruckFormSchema),
     defaultValues: {
@@ -168,7 +155,6 @@ export default function TowingAssistance() {
     },
   });
 
-  // Create/Update Towing Request Mutation
   const requestMutation = useMutation({
     mutationFn: async (data: TowingRequestFormData) => {
       const parsed = towingRequestFormSchema.parse(data);
@@ -196,7 +182,6 @@ export default function TowingAssistance() {
     },
   });
 
-  // Create/Update Tow Truck Mutation
   const truckMutation = useMutation({
     mutationFn: async (data: TowTruckFormData) => {
       const parsed = towTruckFormSchema.parse(data);
@@ -224,7 +209,6 @@ export default function TowingAssistance() {
     },
   });
 
-  // Delete Mutations
   const deleteRequestMutation = useMutation({
     mutationFn: (id: string) => apiRequest("DELETE", `/api/towing-requests/${id}`),
     onSuccess: () => {
@@ -334,213 +318,212 @@ export default function TowingAssistance() {
     );
   };
 
-  return (
-    <div className="flex flex-col gap-6 p-6 bg-white dark:bg-salis-black min-h-screen">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-montserrat font-semibold text-salis-black dark:text-white">
-            Towing & Roadside Assistance
-          </h1>
-          <p className="text-sm text-salis-gray dark:text-salis-gray-light mt-1">
-            Manage towing requests, roadside assistance, and tow truck fleet
-          </p>
-        </div>
+  const requestsTab = (
+    <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <h2 className="text-xl font-semibold text-salis-black dark:text-white">Towing Requests</h2>
+        <Button
+          onClick={() => {
+            setEditingRequestId(null);
+            requestForm.reset();
+            setIsRequestDialogOpen(true);
+          }}
+          className="bg-salis-black dark:bg-white text-white dark:text-salis-black"
+          data-testid="button-create-request"
+        >
+          <Plus className="w-4 h-4 mr-2" />
+          Create Request
+        </Button>
       </div>
 
-      <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full">
-        <TabsList className="bg-salis-gray-light dark:bg-salis-gray-dark">
-          <TabsTrigger value="requests" data-testid="tab-requests" className="data-[state=active]:bg-white dark:data-[state=active]:bg-salis-black">
-            <Truck className="w-4 h-4 mr-2" />
-            Towing Requests
-          </TabsTrigger>
-          <TabsTrigger value="trucks" data-testid="tab-trucks" className="data-[state=active]:bg-white dark:data-[state=active]:bg-salis-black">
-            <Radio className="w-4 h-4 mr-2" />
-            Tow Trucks
-          </TabsTrigger>
-        </TabsList>
-
-        {/* Towing Requests Tab */}
-        <TabsContent value="requests" className="space-y-4">
-          <div className="flex justify-between items-center">
-            <h2 className="text-xl font-semibold text-salis-black dark:text-white">Towing Requests</h2>
-            <Button
-              onClick={() => {
-                setEditingRequestId(null);
-                requestForm.reset();
-                setIsRequestDialogOpen(true);
-              }}
-              className="bg-salis-black dark:bg-white text-white dark:text-salis-black"
-              data-testid="button-create-request"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Create Request
-            </Button>
-          </div>
-
-          <div className="border border-salis-gray-light dark:border-salis-gray rounded-lg overflow-hidden">
-            <Table>
-              <TableHeader className="bg-salis-gray-light dark:bg-salis-gray-dark">
-                <TableRow>
-                  <TableHead className="text-salis-black dark:text-white">Request #</TableHead>
-                  <TableHead className="text-salis-black dark:text-white">Customer</TableHead>
-                  <TableHead className="text-salis-black dark:text-white">Vehicle</TableHead>
-                  <TableHead className="text-salis-black dark:text-white">Service Type</TableHead>
-                  <TableHead className="text-salis-black dark:text-white">Pickup Location</TableHead>
-                  <TableHead className="text-salis-black dark:text-white">Status</TableHead>
-                  <TableHead className="text-salis-black dark:text-white">Urgency</TableHead>
-                  <TableHead className="text-salis-black dark:text-white">Requested At</TableHead>
-                  <TableHead className="text-salis-black dark:text-white">Actions</TableHead>
+      <div className="border border-salis-gray-light dark:border-salis-gray rounded-lg overflow-hidden">
+        <Table>
+          <TableHeader className="bg-salis-gray-light dark:bg-salis-gray-dark">
+            <TableRow>
+              <TableHead className="text-salis-black dark:text-white">Request #</TableHead>
+              <TableHead className="text-salis-black dark:text-white">Customer</TableHead>
+              <TableHead className="text-salis-black dark:text-white">Vehicle</TableHead>
+              <TableHead className="text-salis-black dark:text-white">Service Type</TableHead>
+              <TableHead className="text-salis-black dark:text-white">Pickup Location</TableHead>
+              <TableHead className="text-salis-black dark:text-white">Status</TableHead>
+              <TableHead className="text-salis-black dark:text-white">Urgency</TableHead>
+              <TableHead className="text-salis-black dark:text-white">Requested At</TableHead>
+              <TableHead className="text-salis-black dark:text-white">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {requestsLoading ? (
+              <TableRow>
+                <TableCell colSpan={9} className="text-center text-salis-gray dark:text-salis-gray-light">
+                  Loading...
+                </TableCell>
+              </TableRow>
+            ) : towingRequests.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={9} className="text-center text-salis-gray dark:text-salis-gray-light">
+                  No towing requests found
+                </TableCell>
+              </TableRow>
+            ) : (
+              towingRequests.map((request) => (
+                <TableRow key={request.id} data-testid={`row-request-${request.id}`}>
+                  <TableCell className="text-salis-black dark:text-white">{request.requestNumber || "N/A"}</TableCell>
+                  <TableCell className="text-salis-black dark:text-white">
+                    {customers.find(c => c.id === request.customerId)?.fullName || "Unknown"}
+                  </TableCell>
+                  <TableCell className="text-salis-black dark:text-white">
+                    {vehicles.find(v => v.id === request.vehicleId)?.make || "N/A"} {vehicles.find(v => v.id === request.vehicleId)?.model || ""}
+                  </TableCell>
+                  <TableCell className="text-salis-black dark:text-white capitalize">{request.serviceType.replace("_", " ")}</TableCell>
+                  <TableCell className="text-salis-black dark:text-white max-w-xs truncate">{request.pickupLocation}</TableCell>
+                  <TableCell>{getRequestStatusBadge(request.status || "requested", request.id)}</TableCell>
+                  <TableCell>{getUrgencyBadge(request.urgency || "normal", request.id)}</TableCell>
+                  <TableCell className="text-salis-black dark:text-white">
+                    {request.requestedAt ? format(new Date(request.requestedAt), "MMM dd, yyyy HH:mm") : "N/A"}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleEditRequest(request)}
+                        data-testid={`button-edit-request-${request.id}`}
+                      >
+                        <Pencil className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => deleteRequestMutation.mutate(request.id)}
+                        data-testid={`button-delete-request-${request.id}`}
+                      >
+                        <Trash2 className="w-4 h-4 text-salis-gray" />
+                      </Button>
+                    </div>
+                  </TableCell>
                 </TableRow>
-              </TableHeader>
-              <TableBody>
-                {requestsLoading ? (
-                  <TableRow>
-                    <TableCell colSpan={9} className="text-center text-salis-gray dark:text-salis-gray-light">
-                      Loading...
-                    </TableCell>
-                  </TableRow>
-                ) : towingRequests.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={9} className="text-center text-salis-gray dark:text-salis-gray-light">
-                      No towing requests found
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  towingRequests.map((request) => (
-                    <TableRow key={request.id} data-testid={`row-request-${request.id}`}>
-                      <TableCell className="text-salis-black dark:text-white">{request.requestNumber || "N/A"}</TableCell>
-                      <TableCell className="text-salis-black dark:text-white">
-                        {customers.find(c => c.id === request.customerId)?.fullName || "Unknown"}
-                      </TableCell>
-                      <TableCell className="text-salis-black dark:text-white">
-                        {vehicles.find(v => v.id === request.vehicleId)?.make || "N/A"} {vehicles.find(v => v.id === request.vehicleId)?.model || ""}
-                      </TableCell>
-                      <TableCell className="text-salis-black dark:text-white capitalize">{request.serviceType.replace("_", " ")}</TableCell>
-                      <TableCell className="text-salis-black dark:text-white max-w-xs truncate">{request.pickupLocation}</TableCell>
-                      <TableCell>{getRequestStatusBadge(request.status || "requested", request.id)}</TableCell>
-                      <TableCell>{getUrgencyBadge(request.urgency || "normal", request.id)}</TableCell>
-                      <TableCell className="text-salis-black dark:text-white">
-                        {request.requestedAt ? format(new Date(request.requestedAt), "MMM dd, yyyy HH:mm") : "N/A"}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex gap-2">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleEditRequest(request)}
-                            data-testid={`button-edit-request-${request.id}`}
-                          >
-                            <Pencil className="w-4 h-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => deleteRequestMutation.mutate(request.id)}
-                            data-testid={`button-delete-request-${request.id}`}
-                          >
-                            <Trash2 className="w-4 h-4 text-salis-gray" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
-        </TabsContent>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </div>
+    </div>
+  );
 
-        {/* Tow Trucks Tab */}
-        <TabsContent value="trucks" className="space-y-4">
-          <div className="flex justify-between items-center">
-            <h2 className="text-xl font-semibold text-salis-black dark:text-white">Tow Trucks</h2>
-            <Button
-              onClick={() => {
-                setEditingTruckId(null);
-                truckForm.reset();
-                setIsTruckDialogOpen(true);
-              }}
-              className="bg-salis-black dark:bg-white text-white dark:text-salis-black"
-              data-testid="button-create-truck"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Add Truck
-            </Button>
-          </div>
+  const trucksTab = (
+    <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <h2 className="text-xl font-semibold text-salis-black dark:text-white">Tow Trucks</h2>
+        <Button
+          onClick={() => {
+            setEditingTruckId(null);
+            truckForm.reset();
+            setIsTruckDialogOpen(true);
+          }}
+          className="bg-salis-black dark:bg-white text-white dark:text-salis-black"
+          data-testid="button-create-truck"
+        >
+          <Plus className="w-4 h-4 mr-2" />
+          Add Truck
+        </Button>
+      </div>
 
-          <div className="border border-salis-gray-light dark:border-salis-gray rounded-lg overflow-hidden">
-            <Table>
-              <TableHeader className="bg-salis-gray-light dark:bg-salis-gray-dark">
-                <TableRow>
-                  <TableHead className="text-salis-black dark:text-white">Truck Name</TableHead>
-                  <TableHead className="text-salis-black dark:text-white">Truck #</TableHead>
-                  <TableHead className="text-salis-black dark:text-white">License Plate</TableHead>
-                  <TableHead className="text-salis-black dark:text-white">Capacity</TableHead>
-                  <TableHead className="text-salis-black dark:text-white">Current Driver</TableHead>
-                  <TableHead className="text-salis-black dark:text-white">Status</TableHead>
-                  <TableHead className="text-salis-black dark:text-white">GPS Enabled</TableHead>
-                  <TableHead className="text-salis-black dark:text-white">Last Updated</TableHead>
-                  <TableHead className="text-salis-black dark:text-white">Actions</TableHead>
+      <div className="border border-salis-gray-light dark:border-salis-gray rounded-lg overflow-hidden">
+        <Table>
+          <TableHeader className="bg-salis-gray-light dark:bg-salis-gray-dark">
+            <TableRow>
+              <TableHead className="text-salis-black dark:text-white">Truck Name</TableHead>
+              <TableHead className="text-salis-black dark:text-white">Truck #</TableHead>
+              <TableHead className="text-salis-black dark:text-white">License Plate</TableHead>
+              <TableHead className="text-salis-black dark:text-white">Capacity</TableHead>
+              <TableHead className="text-salis-black dark:text-white">Current Driver</TableHead>
+              <TableHead className="text-salis-black dark:text-white">Status</TableHead>
+              <TableHead className="text-salis-black dark:text-white">GPS Enabled</TableHead>
+              <TableHead className="text-salis-black dark:text-white">Last Updated</TableHead>
+              <TableHead className="text-salis-black dark:text-white">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {trucksLoading ? (
+              <TableRow>
+                <TableCell colSpan={9} className="text-center text-salis-gray dark:text-salis-gray-light">
+                  Loading...
+                </TableCell>
+              </TableRow>
+            ) : towTrucks.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={9} className="text-center text-salis-gray dark:text-salis-gray-light">
+                  No tow trucks found
+                </TableCell>
+              </TableRow>
+            ) : (
+              towTrucks.map((truck) => (
+                <TableRow key={truck.id} data-testid={`row-truck-${truck.id}`}>
+                  <TableCell className="text-salis-black dark:text-white">{truck.truckName}</TableCell>
+                  <TableCell className="text-salis-black dark:text-white">{truck.truckNumber || "N/A"}</TableCell>
+                  <TableCell className="text-salis-black dark:text-white">{truck.licensePlate || "N/A"}</TableCell>
+                  <TableCell className="text-salis-black dark:text-white capitalize">{truck.capacity?.replace("_", " ") || "N/A"}</TableCell>
+                  <TableCell className="text-salis-black dark:text-white">
+                    {drivers.find(d => d.id === truck.currentDriverId)?.fullName || "Unassigned"}
+                  </TableCell>
+                  <TableCell>{getTruckStatusBadge(truck.status || "available", truck.id)}</TableCell>
+                  <TableCell className="text-salis-black dark:text-white">{truck.gpsEnabled ? "Yes" : "No"}</TableCell>
+                  <TableCell className="text-salis-black dark:text-white">
+                    {truck.updatedAt ? format(new Date(truck.updatedAt), "MMM dd, yyyy HH:mm") : "N/A"}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleEditTruck(truck)}
+                        data-testid={`button-edit-truck-${truck.id}`}
+                      >
+                        <Pencil className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => deleteTruckMutation.mutate(truck.id)}
+                        data-testid={`button-delete-truck-${truck.id}`}
+                      >
+                        <Trash2 className="w-4 h-4 text-salis-gray" />
+                      </Button>
+                    </div>
+                  </TableCell>
                 </TableRow>
-              </TableHeader>
-              <TableBody>
-                {trucksLoading ? (
-                  <TableRow>
-                    <TableCell colSpan={9} className="text-center text-salis-gray dark:text-salis-gray-light">
-                      Loading...
-                    </TableCell>
-                  </TableRow>
-                ) : towTrucks.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={9} className="text-center text-salis-gray dark:text-salis-gray-light">
-                      No tow trucks found
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  towTrucks.map((truck) => (
-                    <TableRow key={truck.id} data-testid={`row-truck-${truck.id}`}>
-                      <TableCell className="text-salis-black dark:text-white">{truck.truckName}</TableCell>
-                      <TableCell className="text-salis-black dark:text-white">{truck.truckNumber || "N/A"}</TableCell>
-                      <TableCell className="text-salis-black dark:text-white">{truck.licensePlate || "N/A"}</TableCell>
-                      <TableCell className="text-salis-black dark:text-white capitalize">{truck.capacity?.replace("_", " ") || "N/A"}</TableCell>
-                      <TableCell className="text-salis-black dark:text-white">
-                        {drivers.find(d => d.id === truck.currentDriverId)?.fullName || "Unassigned"}
-                      </TableCell>
-                      <TableCell>{getTruckStatusBadge(truck.status || "available", truck.id)}</TableCell>
-                      <TableCell className="text-salis-black dark:text-white">{truck.gpsEnabled ? "Yes" : "No"}</TableCell>
-                      <TableCell className="text-salis-black dark:text-white">
-                        {truck.updatedAt ? format(new Date(truck.updatedAt), "MMM dd, yyyy HH:mm") : "N/A"}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex gap-2">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleEditTruck(truck)}
-                            data-testid={`button-edit-truck-${truck.id}`}
-                          >
-                            <Pencil className="w-4 h-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => deleteTruckMutation.mutate(truck.id)}
-                            data-testid={`button-delete-truck-${truck.id}`}
-                          >
-                            <Trash2 className="w-4 h-4 text-salis-gray" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
-        </TabsContent>
-      </Tabs>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </div>
+    </div>
+  );
 
-      {/* Create/Edit Request Dialog */}
+  return (
+    <>
+      <TabsPageLayout
+        title="Towing & Roadside Assistance"
+        description="Manage towing requests, roadside assistance, and tow truck fleet"
+        icon={Truck}
+        tabs={[
+          {
+            id: "requests",
+            label: "Towing Requests",
+            icon: Truck,
+            content: requestsTab,
+          },
+          {
+            id: "trucks",
+            label: "Tow Trucks",
+            icon: Radio,
+            content: trucksTab,
+          },
+        ]}
+        activeTab={selectedTab}
+        onTabChange={setSelectedTab}
+      />
+
       <Dialog open={isRequestDialogOpen} onOpenChange={setIsRequestDialogOpen}>
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto bg-white dark:bg-salis-black">
           <DialogHeader>
@@ -998,7 +981,6 @@ export default function TowingAssistance() {
         </DialogContent>
       </Dialog>
 
-      {/* Create/Edit Truck Dialog */}
       <Dialog open={isTruckDialogOpen} onOpenChange={setIsTruckDialogOpen}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white dark:bg-salis-black">
           <DialogHeader>
@@ -1151,10 +1133,10 @@ export default function TowingAssistance() {
                   <FormItem>
                     <FormLabel className="text-salis-black dark:text-white">Current Location</FormLabel>
                     <FormControl>
-                      <Input
+                      <Textarea
                         {...field}
                         value={field.value ?? ''}
-                        placeholder="Current location address"
+                        placeholder="Enter current location"
                         className="bg-white dark:bg-salis-gray-dark border-salis-gray-light dark:border-salis-gray text-salis-black dark:text-white"
                         data-testid="input-current-location"
                       />
@@ -1170,7 +1152,7 @@ export default function TowingAssistance() {
                   name="lastKnownLatitude"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">GPS Latitude</FormLabel>
+                      <FormLabel className="text-salis-black dark:text-white">Last Known Latitude</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -1178,7 +1160,7 @@ export default function TowingAssistance() {
                           step="0.0000001"
                           placeholder="e.g., 40.7128"
                           className="bg-white dark:bg-salis-gray-dark border-salis-gray-light dark:border-salis-gray text-salis-black dark:text-white"
-                          data-testid="input-gps-latitude"
+                          data-testid="input-last-latitude"
                         />
                       </FormControl>
                       <FormMessage />
@@ -1191,7 +1173,7 @@ export default function TowingAssistance() {
                   name="lastKnownLongitude"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">GPS Longitude</FormLabel>
+                      <FormLabel className="text-salis-black dark:text-white">Last Known Longitude</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -1199,7 +1181,7 @@ export default function TowingAssistance() {
                           step="0.0000001"
                           placeholder="e.g., -74.0060"
                           className="bg-white dark:bg-salis-gray-dark border-salis-gray-light dark:border-salis-gray text-salis-black dark:text-white"
-                          data-testid="input-gps-longitude"
+                          data-testid="input-last-longitude"
                         />
                       </FormControl>
                       <FormMessage />
@@ -1208,43 +1190,47 @@ export default function TowingAssistance() {
                 />
               </div>
 
-              <div className="flex items-center gap-4">
-                <FormField
-                  control={truckForm.control}
-                  name="gpsEnabled"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-center gap-2 space-y-0">
-                      <FormControl>
-                        <Checkbox
-                          checked={field.value ?? false}
-                          onCheckedChange={field.onChange}
-                          data-testid="checkbox-gps-enabled"
-                        />
-                      </FormControl>
-                      <FormLabel className="text-salis-black dark:text-white">GPS Enabled</FormLabel>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+              <FormField
+                control={truckForm.control}
+                name="gpsEnabled"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        data-testid="checkbox-gps-enabled"
+                      />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel className="text-salis-black dark:text-white">
+                        GPS Enabled
+                      </FormLabel>
+                    </div>
+                  </FormItem>
+                )}
+              />
 
-                <FormField
-                  control={truckForm.control}
-                  name="isActive"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-center gap-2 space-y-0">
-                      <FormControl>
-                        <Checkbox
-                          checked={field.value ?? false}
-                          onCheckedChange={field.onChange}
-                          data-testid="checkbox-is-active"
-                        />
-                      </FormControl>
-                      <FormLabel className="text-salis-black dark:text-white">Active</FormLabel>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
+              <FormField
+                control={truckForm.control}
+                name="isActive"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        data-testid="checkbox-is-active"
+                      />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel className="text-salis-black dark:text-white">
+                        Active Truck
+                      </FormLabel>
+                    </div>
+                  </FormItem>
+                )}
+              />
 
               <DialogFooter>
                 <Button
@@ -1268,6 +1254,6 @@ export default function TowingAssistance() {
           </Form>
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 }

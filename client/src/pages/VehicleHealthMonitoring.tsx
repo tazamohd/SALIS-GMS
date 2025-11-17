@@ -1,3 +1,4 @@
+import { StandardPageLayout } from "@/components/layouts";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -120,264 +121,257 @@ export default function VehicleHealthMonitoring() {
   };
 
   return (
-    <div className="p-6 space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-          Real-Time Vehicle Health Monitoring
-        </h1>
-        <p className="text-gray-600 dark:text-gray-400 mt-2">
-          IoT sensor integration with predictive maintenance alerts
-        </p>
-      </div>
-
-      {/* Health Score */}
-      <Card className="border-gray-200 dark:border-gray-800 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20" data-testid="card-health-score">
-        <CardContent className="pt-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="w-20 h-20 rounded-full bg-white dark:bg-gray-900 flex items-center justify-center shadow-lg">
-                <Car className="w-10 h-10 text-blue-600 dark:text-blue-400" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Overall Health Score</p>
-                <div className="flex items-baseline gap-2">
-                  <p className="text-4xl font-bold text-gray-900 dark:text-white" data-testid="text-health-score">{healthScore}</p>
-                  <p className="text-gray-500">/100</p>
+    <StandardPageLayout
+      title="Real-Time Vehicle Health Monitoring"
+      description="IoT sensor integration with predictive maintenance alerts"
+      icon={Activity}
+    >
+      <div className="space-y-6">
+        <Card className="border-gray-200 dark:border-gray-800 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20" data-testid="card-health-score">
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="w-20 h-20 rounded-full bg-white dark:bg-gray-900 flex items-center justify-center shadow-lg">
+                  <Car className="w-10 h-10 text-blue-600 dark:text-blue-400" />
                 </div>
-                <p className="text-sm text-green-600 dark:text-green-400 mt-1" data-testid="text-health-trend">
-                  <TrendingUp className="w-4 h-4 inline mr-1" />
-                  +3 from last week
-                </p>
-              </div>
-            </div>
-            
-            <div className="text-right space-y-2">
-              <Badge variant="outline" className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-200" data-testid="badge-health-status">
-                Healthy
-              </Badge>
-              <div>
-                <p className="text-xs text-gray-500">Connected Since</p>
-                <p className="text-sm font-medium text-gray-900 dark:text-white" data-testid="text-connection-time">10:00 AM</p>
-              </div>
-              <div className="flex items-center gap-1 text-green-600 dark:text-green-400" data-testid="badge-live-status">
-                <Radio className="w-3 h-3 animate-pulse" />
-                <span className="text-xs">Live</span>
-              </div>
-            </div>
-          </div>
-          
-          <div className="mt-4">
-            <Progress value={healthScore} className="h-3" data-testid="progress-health-score" />
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Real-time Sensor Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {sensors.map((sensor, idx) => {
-          const Icon = sensor.icon;
-          return (
-            <Card key={idx} className={`border ${getStatusColor(sensor.status)}`} data-testid={`card-sensor-${idx}`}>
-              <CardContent className="pt-6">
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex items-center gap-3">
-                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${getStatusColor(sensor.status)}`}>
-                      <Icon className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-gray-900 dark:text-white" data-testid={`text-sensor-name-${idx}`}>
-                        {sensor.name}
-                      </p>
-                      <p className="text-xs text-gray-500" data-testid={`text-sensor-range-${idx}`}>{sensor.healthy}</p>
-                    </div>
+                <div>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Overall Health Score</p>
+                  <div className="flex items-baseline gap-2">
+                    <p className="text-4xl font-bold text-gray-900 dark:text-white" data-testid="text-health-score">{healthScore}</p>
+                    <p className="text-gray-500">/100</p>
                   </div>
-                  <Badge variant="outline" className={getStatusColor(sensor.status)} data-testid={`badge-sensor-status-${idx}`}>
-                    {sensor.status}
-                  </Badge>
-                </div>
-                
-                <div className="flex items-baseline justify-between mb-2">
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white" data-testid={`text-sensor-value-${idx}`}>
-                    {sensor.value}
+                  <p className="text-sm text-green-600 dark:text-green-400 mt-1" data-testid="text-health-trend">
+                    <TrendingUp className="w-4 h-4 inline mr-1" />
+                    +3 from last week
                   </p>
-                  <span className={`text-sm ${
-                    sensor.trend.startsWith("+") ? "text-red-600" : "text-green-600"
-                  }`} data-testid={`text-sensor-trend-${idx}`}>
-                    {sensor.trend}
-                  </span>
                 </div>
-                
-                <Progress value={sensor.metric} className="h-2" data-testid={`progress-sensor-${idx}`} />
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
-
-      {/* Charts */}
-      <Card className="border-gray-200 dark:border-gray-800">
-        <CardHeader>
-          <CardTitle>Live Sensor Telemetry</CardTitle>
-          <CardDescription>
-            Real-time monitoring of critical vehicle systems
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Tabs defaultValue="temp" className="w-full">
-            <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="temp" data-testid="tab-temperature">Temperature</TabsTrigger>
-              <TabsTrigger value="pressure" data-testid="tab-pressure">Pressure</TabsTrigger>
-              <TabsTrigger value="rpm" data-testid="tab-rpm">RPM</TabsTrigger>
-              <TabsTrigger value="voltage" data-testid="tab-voltage">Voltage</TabsTrigger>
-            </TabsList>
+              </div>
+              
+              <div className="text-right space-y-2">
+                <Badge variant="outline" className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-200" data-testid="badge-health-status">
+                  Healthy
+                </Badge>
+                <div>
+                  <p className="text-xs text-gray-500">Connected Since</p>
+                  <p className="text-sm font-medium text-gray-900 dark:text-white" data-testid="text-connection-time">10:00 AM</p>
+                </div>
+                <div className="flex items-center gap-1 text-green-600 dark:text-green-400" data-testid="badge-live-status">
+                  <Radio className="w-3 h-3 animate-pulse" />
+                  <span className="text-xs">Live</span>
+                </div>
+              </div>
+            </div>
             
-            <TabsContent value="temp" className="space-y-4">
-              <ResponsiveContainer width="100%" height={300}>
-                <AreaChart data={sensorData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                  <XAxis dataKey="time" stroke="#9CA3AF" />
-                  <YAxis stroke="#9CA3AF" domain={[190, 215]} />
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: '#1F2937', 
-                      border: '1px solid #374151',
-                      borderRadius: '8px'
-                    }}
-                  />
-                  <Area 
-                    type="monotone" 
-                    dataKey="temp" 
-                    stroke="#EF4444" 
-                    fill="#FEE2E2" 
-                    fillOpacity={0.3}
-                    name="Engine Temp (°F)"
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            </TabsContent>
-            
-            <TabsContent value="pressure" className="space-y-4">
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={sensorData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                  <XAxis dataKey="time" stroke="#9CA3AF" />
-                  <YAxis stroke="#9CA3AF" domain={[25, 35]} />
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: '#1F2937', 
-                      border: '1px solid #374151',
-                      borderRadius: '8px'
-                    }}
-                  />
-                  <Line 
-                    type="monotone" 
-                    dataKey="pressure" 
-                    stroke="#3B82F6" 
-                    strokeWidth={2}
-                    name="Oil Pressure (PSI)"
-                    dot={{ r: 4 }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </TabsContent>
+            <div className="mt-4">
+              <Progress value={healthScore} className="h-3" data-testid="progress-health-score" />
+            </div>
+          </CardContent>
+        </Card>
 
-            <TabsContent value="rpm" className="space-y-4">
-              <ResponsiveContainer width="100%" height={300}>
-                <AreaChart data={sensorData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                  <XAxis dataKey="time" stroke="#9CA3AF" />
-                  <YAxis stroke="#9CA3AF" domain={[2000, 3000]} />
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: '#1F2937', 
-                      border: '1px solid #374151',
-                      borderRadius: '8px'
-                    }}
-                  />
-                  <Area 
-                    type="monotone" 
-                    dataKey="rpm" 
-                    stroke="#8B5CF6" 
-                    fill="#EDE9FE" 
-                    fillOpacity={0.3}
-                    name="Engine RPM"
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            </TabsContent>
-
-            <TabsContent value="voltage" className="space-y-4">
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={sensorData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                  <XAxis dataKey="time" stroke="#9CA3AF" />
-                  <YAxis stroke="#9CA3AF" domain={[13, 15]} />
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: '#1F2937', 
-                      border: '1px solid #374151',
-                      borderRadius: '8px'
-                    }}
-                  />
-                  <Line 
-                    type="monotone" 
-                    dataKey="voltage" 
-                    stroke="#10B981" 
-                    strokeWidth={2}
-                    name="Battery Voltage (V)"
-                    dot={{ r: 4 }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </TabsContent>
-          </Tabs>
-        </CardContent>
-      </Card>
-
-      {/* Alerts */}
-      <Card className="border-gray-200 dark:border-gray-800">
-        <CardHeader>
-          <CardTitle>Active Alerts & Recommendations</CardTitle>
-          <CardDescription>
-            IoT-triggered notifications and predictive maintenance suggestions
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {alerts.map((alert, idx) => {
-              const Icon = getSeverityIcon(alert.severity);
-              return (
-                <Card key={idx} className={`border ${getStatusColor(alert.severity)}`} data-testid={`card-alert-${idx}`}>
-                  <CardContent className="pt-4">
-                    <div className="flex items-start gap-3">
-                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${getStatusColor(alert.severity)}`}>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {sensors.map((sensor, idx) => {
+            const Icon = sensor.icon;
+            return (
+              <Card key={idx} className={`border ${getStatusColor(sensor.status)}`} data-testid={`card-sensor-${idx}`}>
+                <CardContent className="pt-6">
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${getStatusColor(sensor.status)}`}>
                         <Icon className="w-5 h-5" />
                       </div>
-                      <div className="flex-1">
-                        <div className="flex items-start justify-between mb-1">
-                          <h4 className="font-semibold text-gray-900 dark:text-white" data-testid={`text-alert-title-${idx}`}>
-                            {alert.title}
-                          </h4>
-                          <span className="text-xs text-gray-500" data-testid={`text-alert-time-${idx}`}>{alert.time}</span>
-                        </div>
-                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-2" data-testid={`text-alert-description-${idx}`}>
-                          {alert.description}
+                      <div>
+                        <p className="text-sm font-medium text-gray-900 dark:text-white" data-testid={`text-sensor-name-${idx}`}>
+                          {sensor.name}
                         </p>
-                        <div className="flex items-center gap-2">
-                          <Zap className="w-3 h-3 text-blue-600 dark:text-blue-400" />
-                          <p className="text-xs font-medium text-blue-600 dark:text-blue-400" data-testid={`text-alert-action-${idx}`}>
-                            {alert.action}
-                          </p>
-                        </div>
+                        <p className="text-xs text-gray-500" data-testid={`text-sensor-range-${idx}`}>{sensor.healthy}</p>
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+                    <Badge variant="outline" className={getStatusColor(sensor.status)} data-testid={`badge-sensor-status-${idx}`}>
+                      {sensor.status}
+                    </Badge>
+                  </div>
+                  
+                  <div className="flex items-baseline justify-between mb-2">
+                    <p className="text-2xl font-bold text-gray-900 dark:text-white" data-testid={`text-sensor-value-${idx}`}>
+                      {sensor.value}
+                    </p>
+                    <span className={`text-sm ${
+                      sensor.trend.startsWith("+") ? "text-red-600" : "text-green-600"
+                    }`} data-testid={`text-sensor-trend-${idx}`}>
+                      {sensor.trend}
+                    </span>
+                  </div>
+                  
+                  <Progress value={sensor.metric} className="h-2" data-testid={`progress-sensor-${idx}`} />
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+
+        <Card className="border-gray-200 dark:border-gray-800">
+          <CardHeader>
+            <CardTitle>Live Sensor Telemetry</CardTitle>
+            <CardDescription>
+              Real-time monitoring of critical vehicle systems
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Tabs defaultValue="temp" className="w-full">
+              <TabsList className="grid w-full grid-cols-4">
+                <TabsTrigger value="temp" data-testid="tab-temperature">Temperature</TabsTrigger>
+                <TabsTrigger value="pressure" data-testid="tab-pressure">Pressure</TabsTrigger>
+                <TabsTrigger value="rpm" data-testid="tab-rpm">RPM</TabsTrigger>
+                <TabsTrigger value="voltage" data-testid="tab-voltage">Voltage</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="temp" className="space-y-4">
+                <ResponsiveContainer width="100%" height={300}>
+                  <AreaChart data={sensorData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                    <XAxis dataKey="time" stroke="#9CA3AF" />
+                    <YAxis stroke="#9CA3AF" domain={[190, 215]} />
+                    <Tooltip 
+                      contentStyle={{ 
+                        backgroundColor: '#1F2937', 
+                        border: '1px solid #374151',
+                        borderRadius: '8px'
+                      }}
+                    />
+                    <Area 
+                      type="monotone" 
+                      dataKey="temp" 
+                      stroke="#EF4444" 
+                      fill="#FEE2E2" 
+                      fillOpacity={0.3}
+                      name="Engine Temp (°F)"
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </TabsContent>
+              
+              <TabsContent value="pressure" className="space-y-4">
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart data={sensorData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                    <XAxis dataKey="time" stroke="#9CA3AF" />
+                    <YAxis stroke="#9CA3AF" domain={[25, 35]} />
+                    <Tooltip 
+                      contentStyle={{ 
+                        backgroundColor: '#1F2937', 
+                        border: '1px solid #374151',
+                        borderRadius: '8px'
+                      }}
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="pressure" 
+                      stroke="#3B82F6" 
+                      strokeWidth={2}
+                      name="Oil Pressure (PSI)"
+                      dot={{ r: 4 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </TabsContent>
+
+              <TabsContent value="rpm" className="space-y-4">
+                <ResponsiveContainer width="100%" height={300}>
+                  <AreaChart data={sensorData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                    <XAxis dataKey="time" stroke="#9CA3AF" />
+                    <YAxis stroke="#9CA3AF" domain={[2000, 3000]} />
+                    <Tooltip 
+                      contentStyle={{ 
+                        backgroundColor: '#1F2937', 
+                        border: '1px solid #374151',
+                        borderRadius: '8px'
+                      }}
+                    />
+                    <Area 
+                      type="monotone" 
+                      dataKey="rpm" 
+                      stroke="#8B5CF6" 
+                      fill="#EDE9FE" 
+                      fillOpacity={0.3}
+                      name="Engine RPM"
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </TabsContent>
+
+              <TabsContent value="voltage" className="space-y-4">
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart data={sensorData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                    <XAxis dataKey="time" stroke="#9CA3AF" />
+                    <YAxis stroke="#9CA3AF" domain={[13, 15]} />
+                    <Tooltip 
+                      contentStyle={{ 
+                        backgroundColor: '#1F2937', 
+                        border: '1px solid #374151',
+                        borderRadius: '8px'
+                      }}
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="voltage" 
+                      stroke="#10B981" 
+                      strokeWidth={2}
+                      name="Battery Voltage (V)"
+                      dot={{ r: 4 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
+
+        <Card className="border-gray-200 dark:border-gray-800">
+          <CardHeader>
+            <CardTitle>Active Alerts & Recommendations</CardTitle>
+            <CardDescription>
+              IoT-triggered notifications and predictive maintenance suggestions
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {alerts.map((alert, idx) => {
+                const Icon = getSeverityIcon(alert.severity);
+                return (
+                  <Card key={idx} className={`border ${getStatusColor(alert.severity)}`} data-testid={`card-alert-${idx}`}>
+                    <CardContent className="pt-4">
+                      <div className="flex items-start gap-3">
+                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${getStatusColor(alert.severity)}`}>
+                          <Icon className="w-5 h-5" />
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-start justify-between mb-1">
+                            <h4 className="font-semibold text-gray-900 dark:text-white" data-testid={`text-alert-title-${idx}`}>
+                              {alert.title}
+                            </h4>
+                            <span className="text-xs text-gray-500" data-testid={`text-alert-time-${idx}`}>{alert.time}</span>
+                          </div>
+                          <p className="text-sm text-gray-600 dark:text-gray-400 mb-2" data-testid={`text-alert-description-${idx}`}>
+                            {alert.description}
+                          </p>
+                          <div className="flex items-center gap-2">
+                            <Zap className="w-3 h-3 text-blue-600 dark:text-blue-400" />
+                            <p className="text-xs font-medium text-blue-600 dark:text-blue-400" data-testid={`text-alert-action-${idx}`}>
+                              {alert.action}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </StandardPageLayout>
   );
 }

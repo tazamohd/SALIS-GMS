@@ -77,8 +77,10 @@ export function TabsPageLayout({
       {headerContent}
       
       <Tabs
-        value={isControlled ? activeTab : defaultTab || tabs[0]?.id}
-        onValueChange={onTabChange}
+        {...(isControlled 
+          ? { value: activeTab, onValueChange: onTabChange }
+          : { defaultValue: defaultTab || tabs[0]?.id }
+        )}
         className="w-full"
       >
         <TabsList className="grid w-full" style={{ gridTemplateColumns: `repeat(${tabs.length}, minmax(0, 1fr))` }}>

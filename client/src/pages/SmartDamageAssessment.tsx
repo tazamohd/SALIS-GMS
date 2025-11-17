@@ -4,9 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Camera, Upload, Zap, DollarSign, AlertTriangle, CheckCircle, Loader2 } from "lucide-react";
+import { Camera, Upload, Zap, DollarSign, AlertTriangle, CheckCircle, Loader2, BarChart3, FileText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { StandardPageLayout } from "@/components/layouts";
+import { TabsPageLayout } from "@/components/layouts";
 
 interface DamageDetection {
   type: string;
@@ -94,12 +94,13 @@ export default function SmartDamageAssessment() {
     }
   };
 
-  return (
-    <StandardPageLayout
-      title="Smart Damage Assessment"
-      description="AI-powered vehicle damage detection with instant cost estimation"
-      icon={Camera}
-    >
+  const tabsConfig = [
+    {
+      id: "detection",
+      label: "Detection",
+      icon: Camera,
+      content: (
+        <>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Upload Section */}
         <Card className="lg:col-span-2 border-gray-200 dark:border-gray-800">
@@ -304,52 +305,97 @@ export default function SmartDamageAssessment() {
         </Card>
       )}
 
-      {/* AI Insights */}
-      {detections.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card className="border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-950/20" data-testid="card-average-confidence">
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-3">
-                <CheckCircle className="w-8 h-8 text-green-600 dark:text-green-400" />
-                <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Average Confidence</p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white" data-testid="text-average-confidence">
-                    {(detections.reduce((sum, d) => sum + d.confidence, 0) / detections.length).toFixed(1)}%
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        </>
+      ),
+    },
+    {
+      id: "insights",
+      label: "Insights",
+      icon: BarChart3,
+      content: (
+        <>
+          {detections.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Card className="border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-950/20" data-testid="card-average-confidence">
+                <CardContent className="pt-6">
+                  <div className="flex items-center gap-3">
+                    <CheckCircle className="w-8 h-8 text-green-600 dark:text-green-400" />
+                    <div>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Average Confidence</p>
+                      <p className="text-2xl font-bold text-gray-900 dark:text-white" data-testid="text-average-confidence">
+                        {(detections.reduce((sum, d) => sum + d.confidence, 0) / detections.length).toFixed(1)}%
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
 
-          <Card className="border-blue-200 dark:border-blue-900 bg-blue-50/50 dark:bg-blue-950/20" data-testid="card-labor-parts">
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-3">
-                <DollarSign className="w-8 h-8 text-blue-600 dark:text-blue-400" />
-                <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Labor + Parts</p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white" data-testid="text-labor-parts-total">
-                    ${totalCost.toFixed(2)}
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              <Card className="border-blue-200 dark:border-blue-900 bg-blue-50/50 dark:bg-blue-950/20" data-testid="card-labor-parts">
+                <CardContent className="pt-6">
+                  <div className="flex items-center gap-3">
+                    <DollarSign className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+                    <div>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Labor + Parts</p>
+                      <p className="text-2xl font-bold text-gray-900 dark:text-white" data-testid="text-labor-parts-total">
+                        ${totalCost.toFixed(2)}
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
 
-          <Card className="border-orange-200 dark:border-orange-900 bg-orange-50/50 dark:bg-orange-950/20" data-testid="card-priority-items">
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-3">
-                <AlertTriangle className="w-8 h-8 text-orange-600 dark:text-orange-400" />
-                <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Priority Items</p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white" data-testid="text-priority-items-count">
-                    {detections.filter(d => d.severity === "severe").length}
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
-    </StandardPageLayout>
+              <Card className="border-orange-200 dark:border-orange-900 bg-orange-50/50 dark:bg-orange-950/20" data-testid="card-priority-items">
+                <CardContent className="pt-6">
+                  <div className="flex items-center gap-3">
+                    <AlertTriangle className="w-8 h-8 text-orange-600 dark:text-orange-400" />
+                    <div>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Priority Items</p>
+                      <p className="text-2xl font-bold text-gray-900 dark:text-white" data-testid="text-priority-items-count">
+                        {detections.filter(d => d.severity === "severe").length}
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          ) : (
+            <Card className="border-gray-200 dark:border-gray-800">
+              <CardContent className="pt-6 text-center text-gray-500 dark:text-gray-400">
+                <BarChart3 className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                <p>No analysis data available. Upload and analyze a vehicle image in the Detection tab.</p>
+              </CardContent>
+            </Card>
+          )}
+        </>
+      ),
+    },
+    {
+      id: "reports",
+      label: "Reports",
+      icon: FileText,
+      content: (
+        <Card className="border-gray-200 dark:border-gray-800">
+          <CardHeader>
+            <CardTitle>Damage Assessment Reports</CardTitle>
+            <CardDescription>
+              Historical damage assessments and generated reports
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="text-center text-gray-500 dark:text-gray-400 py-8">
+            <FileText className="w-12 h-12 mx-auto mb-4 opacity-50" />
+            <p>No reports available yet. Complete damage assessments to generate reports.</p>
+          </CardContent>
+        </Card>
+      ),
+    },
+  ];
+
+  return (
+    <TabsPageLayout
+      title="Smart Damage Assessment"
+      description="AI-powered vehicle damage detection with instant cost estimation"
+      icon={Camera}
+      tabs={tabsConfig}
+    />
   );
 }
