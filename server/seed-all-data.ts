@@ -223,10 +223,14 @@ export async function seedAllData() {
         users.push(...manager);
       }
       
-      // Create Technicians with Profiles
+      // Create Technicians with Profiles - Ensure even distribution across garages
       logProgress('Creating 30 technicians with profiles...');
       technicians = [];
       for (let i = 0; i < 30; i++) {
+        // Distribute technicians evenly across garages (15 per garage for 2 garages)
+        const garageIndex = i % garages.length;
+        const assignedGarage = garages[garageIndex];
+        
         const tech = await db.insert(schema.users).values({
           email: faker.internet.email(),
           password: hashedPassword,
@@ -234,7 +238,7 @@ export async function seedAllData() {
           firstName: faker.person.firstName(),
           lastName: faker.person.lastName(),
           phone: generatePhone(),
-          garageId: faker.helpers.arrayElement(garages).id,
+          garageId: assignedGarage.id,
           userType: 'technician',
           isActive: true,
           profileImageUrl: randomImage('technicians'),
@@ -418,10 +422,19 @@ export async function seedAllData() {
       const statuses = ['pending', 'assigned', 'in_progress', 'completed', 'cancelled'];
       const priorities = ['low', 'medium', 'high', 'urgent'];
       
-      for (let i = 0; i < 150; i++) {
+      let jobCardAttempts = 0;
+      while (jobCards.length < 150 && jobCardAttempts < 300) {
+        jobCardAttempts++;
         const vehicle = faker.helpers.arrayElement(vehicles);
-        const technician = faker.helpers.arrayElement(technicians);
-        const garage = faker.helpers.arrayElement(garages);
+        // Use the vehicle's garage to maintain referential integrity
+        const garage = garages.find(g => g.id === vehicle.garageId);
+        if (!garage) continue;
+        
+        // Get a technician from the same garage - skip if none available
+        const garageTechnicians = technicians.filter(t => t.garageId === garage.id);
+        if (garageTechnicians.length === 0) continue;
+        
+        const technician = faker.helpers.arrayElement(garageTechnicians);
         const status = faker.helpers.arrayElement(statuses);
         
         const jobCard = await db.insert(schema.jobCards).values({
@@ -469,11 +482,20 @@ export async function seedAllData() {
       
       const appointmentStatuses = ['scheduled', 'confirmed', 'in_progress', 'completed', 'cancelled', 'no_show'];
       
-      for (let i = 0; i < 200; i++) {
+      let appointmentAttempts = 0;
+      while (appointments.length < 200 && appointmentAttempts < 400) {
+        appointmentAttempts++;
         const vehicle = faker.helpers.arrayElement(vehicles);
         const customer = users.find(u => u.id === vehicle.customerId);
-        const technician = faker.helpers.arrayElement(technicians);
-        const garage = faker.helpers.arrayElement(garages);
+        // Use the vehicle's garage to maintain referential integrity
+        const garage = garages.find(g => g.id === vehicle.garageId);
+        if (!garage) continue;
+        
+        // Get a technician from the same garage - skip if none available
+        const garageTechnicians = technicians.filter(t => t.garageId === garage.id);
+        if (garageTechnicians.length === 0) continue;
+        
+        const technician = faker.helpers.arrayElement(garageTechnicians);
         
         const appointment = await db.insert(schema.appointments).values({
           appointmentNumber: `APT-${faker.string.numeric({ length: 6 })}`,
@@ -521,11 +543,25 @@ export async function seedAllData() {
       
       const invoiceStatuses = ['draft', 'sent', 'paid', 'overdue', 'cancelled'];
       
-      for (let i = 0; i < 200; i++) {
+      let invoiceAttempts = 0;
+      while (invoices.length < 200 && invoiceAttempts < 400) {
+        invoiceAttempts++;
         const jobCard = faker.helpers.arrayElement(jobCards);
-        const customer = users.find(u => u.id === jobCard.customerId) || faker.helpers.arrayElement(customers);
-        const vehicle = vehicles.find(v => v.customerId === customer.id) || faker.helpers.arrayElement(vehicles);
-        const garage = garages.find(g => g.id === jobCard.garageId) || faker.helpers.arrayElement(garages);
+        const customer = users.find(u => u.id === jobCard.customerId);
+        if (!customer) continue;
+        
+        const garage = garages.find(g => g.id === jobCard.garageId);
+        if (!garage) continue;
+        
+        // Ensure vehicle belongs to BOTH the customer AND the job card's garage
+        // This guarantees complete referential integrity (no cross-garage mismatches)
+        const customerVehicles = vehicles.filter(v => 
+          v.customerId === customer.id && v.garageId === garage.id
+        );
+        if (customerVehicles.length === 0) continue;
+        
+        const vehicle = faker.helpers.arrayElement(customerVehicles);
+        
         const status = faker.helpers.arrayElement(invoiceStatuses);
         
         const subtotal = parseFloat(faker.commerce.price({ min: 200, max: 8000 }));
