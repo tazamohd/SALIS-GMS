@@ -10,6 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Brain, Sparkles, Package, TrendingUp, CheckCircle, AlertCircle } from 'lucide-react';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
+import { StandardPageLayout } from '@/components/layouts';
 
 export default function SmartPartsRecommender() {
   const { toast } = useToast();
@@ -28,7 +29,7 @@ export default function SmartPartsRecommender() {
     mutationFn: async (data: any) => {
       return await apiRequest('/api/ai/recommend-parts', 'POST', data);
     },
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
       setRecommendations(data.recommendations || []);
       queryClient.invalidateQueries({ queryKey: ['/api/ai/parts-recommendations'] });
       toast({
@@ -78,17 +79,11 @@ export default function SmartPartsRecommender() {
   };
 
   return (
-    <div className="flex-1 p-6 bg-gray-50 dark:bg-salis-black min-h-screen">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold font-['Montserrat'] text-gray-900 dark:text-white mb-2 flex items-center gap-3">
-          <Brain className="h-8 w-8 text-purple-600" />
-          Smart Parts Recommender
-        </h1>
-        <p className="text-gray-600 dark:text-gray-400 font-['Poppins']">
-          AI-powered parts recommendations using GPT-5 analysis and vehicle compatibility data
-        </p>
-      </div>
-
+    <StandardPageLayout
+      title="Smart Parts Recommender"
+      description="AI-powered parts recommendations using GPT-5 analysis and vehicle compatibility data"
+      icon={Brain}
+    >
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Input Form */}
         <Card className="lg:col-span-1 bg-white dark:bg-salis-black">
@@ -308,6 +303,6 @@ export default function SmartPartsRecommender() {
           )}
         </CardContent>
       </Card>
-    </div>
+    </StandardPageLayout>
   );
 }

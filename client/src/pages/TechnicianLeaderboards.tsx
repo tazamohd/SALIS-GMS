@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Trophy, Award, Target, TrendingUp, Star, Zap, Medal } from "lucide-react";
+import { StandardPageLayout } from "@/components/layouts";
 
 export default function TechnicianLeaderboards() {
   const { data: usersData } = useQuery({ queryKey: ["/api/users"] });
@@ -42,17 +43,11 @@ export default function TechnicianLeaderboards() {
   };
 
   return (
-    <div className="flex-1 p-6 bg-gray-50 dark:bg-salis-black min-h-screen">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold font-['Montserrat'] text-gray-900 dark:text-white mb-2 flex items-center gap-3">
-          <Trophy className="h-8 w-8 text-yellow-500" />
-          Technician Leaderboards
-        </h1>
-        <p className="text-gray-600 dark:text-gray-400">
-          Performance rankings, achievements, badges, and gamification challenges
-        </p>
-      </div>
-
+    <StandardPageLayout
+      title="Technician Leaderboards"
+      description="Performance rankings, achievements, badges, and gamification challenges"
+      icon={Trophy}
+    >
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Leaderboard */}
         <div className="lg:col-span-2 space-y-4">
@@ -205,6 +200,6 @@ export default function TechnicianLeaderboards() {
           </Card>
         </div>
       </div>
-    </div>
+    </StandardPageLayout>
   );
 }

@@ -6,6 +6,7 @@ import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Camera, Upload, Zap, DollarSign, AlertTriangle, CheckCircle, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { StandardPageLayout } from "@/components/layouts";
 
 interface DamageDetection {
   type: string;
@@ -94,14 +95,11 @@ export default function SmartDamageAssessment() {
   };
 
   return (
-    <div className="p-6 space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Smart Damage Assessment</h1>
-        <p className="text-gray-600 dark:text-gray-400 mt-2">
-          AI-powered vehicle damage detection with instant cost estimation
-        </p>
-      </div>
-
+    <StandardPageLayout
+      title="Smart Damage Assessment"
+      description="AI-powered vehicle damage detection with instant cost estimation"
+      icon={Camera}
+    >
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Upload Section */}
         <Card className="lg:col-span-2 border-gray-200 dark:border-gray-800">
@@ -352,6 +350,6 @@ export default function SmartDamageAssessment() {
           </Card>
         </div>
       )}
-    </div>
+    </StandardPageLayout>
   );
 }

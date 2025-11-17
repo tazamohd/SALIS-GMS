@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Package, TrendingUp, AlertCircle, RefreshCw, Brain, CheckCircle } from "lucide-react";
 import { LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { DashboardPage } from "@/components/layouts";
 
 const forecastData = [
   { week: "W1", actual: 45, predicted: 43, demand: 50 },
@@ -78,64 +79,40 @@ export default function SmartInventoryForecasting() {
     }
   };
 
+  const metrics = [
+    {
+      label: "Forecast Accuracy",
+      value: "91.5%",
+      icon: Brain,
+      color: "text-purple-600 dark:text-purple-400",
+    },
+    {
+      label: "Critical Items",
+      value: "3",
+      icon: AlertCircle,
+      color: "text-red-600 dark:text-red-400",
+    },
+    {
+      label: "Auto Orders",
+      value: "12",
+      icon: Package,
+      color: "text-blue-600 dark:text-blue-400",
+    },
+    {
+      label: "Cost Savings",
+      value: "$4.2K",
+      icon: TrendingUp,
+      color: "text-green-600 dark:text-green-400",
+    },
+  ];
+
   return (
-    <div className="p-6 space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Smart Inventory Forecasting</h1>
-        <p className="text-gray-600 dark:text-gray-400 mt-2">
-          ML-powered demand prediction with automated reordering recommendations
-        </p>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="border-purple-200 dark:border-purple-900 bg-purple-50/50 dark:bg-purple-950/20" data-testid="card-forecast-accuracy">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <Brain className="w-8 h-8 text-purple-600 dark:text-purple-400" />
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Forecast Accuracy</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white" data-testid="text-forecast-accuracy">91.5%</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-red-200 dark:border-red-900 bg-red-50/50 dark:bg-red-950/20" data-testid="card-critical-items">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <AlertCircle className="w-8 h-8 text-red-600 dark:text-red-400" />
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Critical Items</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white" data-testid="text-critical-items">3</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-blue-200 dark:border-blue-900 bg-blue-50/50 dark:bg-blue-950/20" data-testid="card-auto-orders">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <Package className="w-8 h-8 text-blue-600 dark:text-blue-400" />
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Auto Orders</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white" data-testid="text-auto-orders">12</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-950/20" data-testid="card-cost-savings">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <TrendingUp className="w-8 h-8 text-green-600 dark:text-green-400" />
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Cost Savings</p>
-                <p className="text-2xl font-bold text-green-600 dark:text-green-400" data-testid="text-cost-savings">$4.2K</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+    <DashboardPage
+      title="Smart Inventory Forecasting"
+      description="ML-powered demand prediction with automated reordering recommendations"
+      icon={Brain}
+      metrics={metrics}
+    >
 
       <Card className="border-gray-200 dark:border-gray-800">
         <CardHeader>
@@ -391,6 +368,6 @@ export default function SmartInventoryForecasting() {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </DashboardPage>
   );
 }
