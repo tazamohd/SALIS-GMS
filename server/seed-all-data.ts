@@ -660,14 +660,15 @@ export async function seedAllData() {
     
     for (const training of trainingTypes) {
       const record = await db.insert(schema.trainings).values({
+        garageId: faker.helpers.arrayElement(garages).id,
         name: training.name,
         description: faker.lorem.paragraph(),
-        category: training.category,
+        trainingType: training.category,
         duration: training.duration,
         provider: faker.company.name(),
         validityPeriod: training.category === 'certification' ? 24 : null,
         cost: faker.commerce.price({ min: 200, max: 2000 }),
-        isActive: true,
+        isRecurring: false,
       }).returning();
       trainings.push(...record);
     }
@@ -677,12 +678,14 @@ export async function seedAllData() {
       const assignedTrainings = faker.helpers.arrayElements(trainings, faker.number.int({ min: 2, max: 5 }));
       for (const training of assignedTrainings) {
         await db.insert(schema.employeeTrainings).values({
-          userId: technician.id,
+          garageId: technician.garageId,
+          employeeId: technician.id,
           trainingId: training.id,
-          completedAt: faker.date.past({ years: 2 }),
-          score: faker.number.int({ min: 70, max: 100 }),
+          status: 'completed',
+          completedDate: faker.date.past({ years: 2 }),
+          score: faker.number.int({ min: 70, max: 100 }).toFixed(2),
           certificateUrl: `/certificates/${faker.string.alphanumeric({ length: 16 })}.pdf`,
-          expiresAt: training.validityPeriod ? faker.date.future({ years: 2 }) : null,
+          expiryDate: training.validityPeriod ? faker.date.future({ years: 2 }) : null,
         });
       }
     }
@@ -702,27 +705,34 @@ export async function seedAllData() {
         const clockOutTime = new Date(clockInTime.getTime() + (8 * 60 * 60 * 1000)); // 8 hours later
         
         await db.insert(schema.employeeAttendance).values({
-          userId: technician.id,
           garageId: technician.garageId,
+          employeeId: technician.id,
+          date: clockInTime,
           clockIn: clockInTime,
           clockOut: clockOutTime,
           status: faker.helpers.arrayElement(['present', 'late', 'absent', 'on_leave']),
-          notes: faker.helpers.maybe(() => faker.lorem.sentence(), { probability: 0.1 }),
+          notes: faker.helpers.maybe(() => faker.lorem.sentence(), { probability: 0.1 }) || undefined,
         });
       }
     }
     
     logProgress('Creating performance reviews...');
     for (const technician of technicians) {
+      const managers = users.filter(u => u.userType === 'manager');
       await db.insert(schema.performanceReviews).values({
+        garageId: technician.garageId,
         employeeId: technician.id,
-        reviewerId: faker.helpers.arrayElement(users.filter(u => u.userType === 'manager')).id,
-        reviewDate: faker.date.recent({ days: 90 }),
-        rating: faker.number.int({ min: 3, max: 5 }),
+        reviewerId: managers.length > 0 ? managers[0].id : users[0].id,
+        reviewPeriod: 'Q4 2024',
+        overallRating: faker.number.float({ min: 3, max: 5, fractionDigits: 2 }).toFixed(2),
+        technicalSkills: faker.number.float({ min: 3, max: 5, fractionDigits: 2 }).toFixed(2),
+        customerService: faker.number.float({ min: 3, max: 5, fractionDigits: 2 }).toFixed(2),
+        teamwork: faker.number.float({ min: 3, max: 5, fractionDigits: 2 }).toFixed(2),
         strengths: faker.lorem.paragraph(),
         areasForImprovement: faker.lorem.paragraph(),
         goals: faker.lorem.paragraph(),
         comments: faker.lorem.paragraph(),
+        status: 'submitted',
       });
     }
     
@@ -739,20 +749,25 @@ export async function seedAllData() {
     for (let i = 0; i < 100; i++) {
       const jobCard = faker.helpers.arrayElement(jobCards.filter(jc => jc.status === 'completed'));
       if (jobCard) {
-        await db.insert(schema.blockchainRecords).values({
-          vehicleId: vehicles.find(v => v.customerId === jobCard.customerId)?.id || vehicles[0].id,
-          jobCardId: jobCard.id,
-          eventType: faker.helpers.arrayElement(['service', 'repair', 'inspection', 'maintenance']),
-          description: faker.lorem.sentence(),
-          blockHash: faker.string.alphanumeric({ length: 64, casing: 'lower' }),
-          previousBlockHash: faker.string.alphanumeric({ length: 64, casing: 'lower' }),
-          timestamp: faker.date.recent({ days: 180 }),
-          metadata: JSON.stringify({ 
-            technician: faker.person.fullName(),
-            parts: faker.helpers.arrayElements(['oil_filter', 'brake_pads', 'air_filter'], 2) 
-          }),
-        });
-        blockchainRecords++;
+        const vehicle = vehicles.find(v => v.customerId === jobCard.customerId);
+        if (vehicle) {
+          await db.insert(schema.blockchainRecords).values({
+            garageId: jobCard.garageId,
+            vehicleId: vehicle.id,
+            recordType: faker.helpers.arrayElement(['service', 'repair', 'inspection']),
+            transactionHash: `0x${faker.string.alphanumeric({ length: 64, casing: 'lower' })}`,
+            blockNumber: faker.number.int({ min: 1000000, max: 2000000 }),
+            recordData: { 
+              jobCardId: jobCard.id,
+              technician: faker.person.fullName(),
+              parts: faker.helpers.arrayElements(['oil_filter', 'brake_pads', 'air_filter'], 2),
+              description: faker.lorem.sentence()
+            },
+            previousHash: `0x${faker.string.alphanumeric({ length: 64, casing: 'lower' })}`,
+            timestamp: faker.date.recent({ days: 180 }),
+          });
+          blockchainRecords++;
+        }
       }
     }
     
@@ -761,16 +776,14 @@ export async function seedAllData() {
     for (let i = 0; i < 150; i++) {
       const vehicle = faker.helpers.arrayElement(vehicles);
       await db.insert(schema.aiMaintenancePredictions).values({
+        garageId: vehicle.garageId,
         vehicleId: vehicle.id,
-        predictionType: faker.helpers.arrayElement(['preventive', 'predictive', 'urgent']),
-        component: faker.helpers.arrayElement(['Engine', 'Transmission', 'Brakes', 'Battery', 'Tires']),
-        description: faker.lorem.sentence(),
-        probability: faker.number.float({ min: 0.5, max: 0.99, fractionDigits: 2 }),
-        estimatedDaysUntilFailure: faker.number.int({ min: 7, max: 365 }),
-        recommendedAction: faker.lorem.sentence(),
+        predictedIssue: `${faker.helpers.arrayElement(['Engine', 'Transmission', 'Brakes', 'Battery', 'Tires'])} - ${faker.lorem.sentence()}`,
         severity: faker.helpers.arrayElement(['low', 'medium', 'high', 'critical']),
-        modelVersion: '1.0.0',
-        predictionDate: faker.date.recent({ days: 30 }),
+        recommendedAction: faker.lorem.sentence(),
+        estimatedTimeframe: `${faker.number.int({ min: 7, max: 365 })} days`,
+        confidence: faker.number.float({ min: 0.5, max: 0.99, fractionDigits: 2 }).toFixed(2),
+        status: faker.helpers.arrayElement(['pending', 'acknowledged']),
       });
       aiPredictions++;
     }
@@ -782,11 +795,11 @@ export async function seedAllData() {
       const sensor = await db.insert(schema.iotSensors).values({
         vehicleId: vehicle.id,
         sensorType: faker.helpers.arrayElement(['temperature', 'pressure', 'vibration', 'speed', 'fuel_level']),
-        sensorId: `SENSOR-${faker.string.alphanumeric({ length: 12, casing: 'upper' })}`,
+        sensorIdentifier: `SENSOR-${faker.string.alphanumeric({ length: 12, casing: 'upper' })}`,
         manufacturer: faker.helpers.arrayElement(['Bosch', 'Denso', 'Continental', 'Delphi']),
+        model: faker.helpers.arrayElement(['T100', 'P200', 'V300', 'S400']),
         installationDate: faker.date.past({ years: 1 }),
         status: faker.helpers.arrayElement(['active', 'inactive', 'maintenance']),
-        metadata: JSON.stringify({ location: faker.helpers.arrayElement(['engine', 'transmission', 'wheels', 'exhaust']) }),
       }).returning();
       iotSensors.push(...sensor);
     }
@@ -796,10 +809,11 @@ export async function seedAllData() {
       for (let i = 0; i < 20; i++) {
         await db.insert(schema.iotSensorReadings).values({
           sensorId: sensor.id,
-          value: faker.number.float({ min: 0, max: 100, fractionDigits: 2 }).toString(),
+          readingType: sensor.sensorType,
+          value: faker.number.float({ min: 0, max: 100, fractionDigits: 2 }).toFixed(4),
           unit: faker.helpers.arrayElement(['celsius', 'psi', 'hz', 'km/h', 'liters']),
           timestamp: faker.date.recent({ days: 7 }),
-          status: faker.helpers.arrayElement(['normal', 'warning', 'critical']),
+          isAbnormal: faker.datatype.boolean({ probability: 0.1 }),
         });
         iotReadings++;
       }
