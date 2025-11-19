@@ -273,7 +273,7 @@ export async function seedRBAC(): Promise<void> {
 }
 
 // If run directly, execute the seed
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   seedRBAC()
     .then(() => process.exit(0))
     .catch((error) => {
