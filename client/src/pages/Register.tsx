@@ -28,7 +28,7 @@ export default function Register() {
         title: "Success",
         description: "Account created successfully",
       });
-      window.location.href = "/";
+      window.location.href = "/login-dashboard";
     },
     onError: (error: Error) => {
       toast({
