@@ -6,7 +6,7 @@ This guide documents the comprehensive data seeding system for SALIS AUTO, which
 
 ## System Status ✅
 
-**Total Database Records**: 10,000+ realistic records
+**Total Database Records**: 6,250+ realistic records
 **Seeding Phases**: 9 comprehensive phases
 **Data Integrity**: 100% referential integrity guaranteed
 **Stock Images**: 35+ images across modules

@@ -155,12 +155,19 @@ The SALIS AUTO platform includes a comprehensive Role-Based Access Control (RBAC
 - **Key Permissions**: View assigned jobs, read-only diagnostics, training materials
 - **Best For**: Entry-level and trainee technicians
 
-### 21-24. **Legacy Roles**
-Additional roles inherited from earlier system versions:
-- **Super Admin** (SYSTEM) - Merged with System Administrator
-- **Garage Manager** (GARAGE) - 10 users (legacy role for garage operations)
+### 21. **Garage Manager**
+- **Scope**: Garage-wide (GARAGE)
+- **Access**: Comprehensive garage operations management
+- **Current Users**: 10 (distributed across both garages)
+- **Key Permissions**: Garage operations, staff oversight, service coordination, reporting
+- **Best For**: Garage location managers and operational supervisors
+
+### 22-24. **Additional Roles**
+Other available roles for specific use cases:
+- **Super Admin** (SYSTEM) - 1 user - Legacy admin role
 - **Branch Manager** (BRANCH) - Available for assignment
 - **Assistant** (BRANCH) - Available for general support tasks
+- **Lead Technician** (BRANCH) - Available for senior technician promotions
 
 ## User Distribution by Role
 
@@ -348,12 +355,12 @@ All staff accounts use the password: **password123**
 ### Management
 - raphaelle.boyle@salisauto.com (Business Owner)
 - elmira.frami@salisauto.com (General Manager)
-- donna.crooks@gmail.com (Garage Manager)
+- boyd85@gmail.com (Garage Manager - Donna Crooks)
 
 ### Service Operations
 - isaias.schumm@salisauto.com (Service Manager)
 - sasha.emard@salisauto.com (Service Advisor)
-- lillian.pouros@gmail.com (Technician)
+- freddie.boyle70@gmail.com (Technician - Lillian Pouros)
 
 ### Parts & Inventory
 - fannie.deckow-howell@salisauto.com (Parts Manager)

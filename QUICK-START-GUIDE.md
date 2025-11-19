@@ -37,7 +37,7 @@ SALIS AUTO is a **production-ready automotive ERP platform** with:
 
 ### Technician
 **Service execution**
-- Email: `lillian.pouros@gmail.com`
+- Email: `freddie.boyle70@gmail.com`
 - Password: `password123`
 
 ### Parts Manager
