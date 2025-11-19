@@ -18,8 +18,9 @@ The application uses a full-stack architecture with clear client-server separati
 
 **Frontend**: React 18 with Vite, `wouter` for routing, `TanStack Query` for state management, and `shadcn/ui` (Radix UI) for components, adhering to the Figma design.
 **Backend**: Express server written in TypeScript.
-**Authentication**: Custom email/password authentication with role-based access control.
+**Authentication**: Custom email/password authentication with comprehensive role-based access control (RBAC).
 **Database**: PostgreSQL with Drizzle ORM, comprising **141+ comprehensive modules with 290+ tables**.
+**RBAC System**: 24 professional roles, 70 staff users across departments, granular permissions for 141+ resources.
 **Real-Time Features**: WebSocket server (`/ws/chat`) for in-app chat support, live notifications, and call center real-time updates with session-based authentication.
 
 **UI/UX Decisions**: The design preserves the Figma aesthetic, ensures responsiveness, and uses a consistent component-based approach with a monochrome design system based on the SALIS AUTO brand. It supports PWA, mobile-responsive navigation, and WCAG 2.1 AA accessibility features, including an offline mode. A pure grayscale design is enforced with distinct light and dark modes.
@@ -51,6 +52,8 @@ The application uses a full-stack architecture with clear client-server separati
 - **Real-Time Parts Availability Tracker**: Multi-supplier inventory sync with cached availability and a UI at `/parts-availability`.
 - **Smart Job Assignment System**: AI-powered technician recommendation engine using OpenAI GPT-5 for optimal job assignments.
 - **Call Center Module**: Call center infrastructure with real-time updates via WebSocket, managing call queues, sessions, and agent performance, with a UI at `/call-center`.
+- **Comprehensive RBAC System**: 24 professional roles with 70 staff users across all departments (Service Advisors, Call Center Agents, Parts Managers, Accountants, Marketing, HR, QC, etc.).
+- **Production-Ready Data Seeding**: 9-phase comprehensive seeding system with 6,250+ records, 35+ stock images, 100% referential integrity across all 290+ tables (vehicles, parts, job cards, invoices, training, attendance, blockchain, IoT).
 
 ## External Dependencies
 - Replit Auth
