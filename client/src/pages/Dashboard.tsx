@@ -2,6 +2,7 @@ import { useState } from "react";
 import { BarChart3, Clock, AlertCircle, CheckCircle, Wrench, TrendingUp, Users, DollarSign, Package, FileText } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
+import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { TaskDetailsDialog } from "@/components/TaskDetailsDialog";
@@ -219,8 +220,10 @@ export function Dashboard() {
         <CardContent className="p-5">
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">{t('dashboard.latestTasks')}</h2>
-            <Button variant="ghost" size="sm" className="text-gray-700 dark:text-gray-300" data-testid="button-view-all">
-              {t('common.viewAll')} →
+            <Button variant="ghost" size="sm" className="text-gray-700 dark:text-gray-300" data-testid="button-view-all" asChild>
+              <Link href="/job-cards">
+                {t('common.viewAll')} →
+              </Link>
             </Button>
           </div>
 

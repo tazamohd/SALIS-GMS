@@ -80,6 +80,68 @@ export default function AppointmentReminders() {
   const emailReminders = recentReminders.filter((r: any) => r.reminderType === 'email').length;
   const whatsappReminders = recentReminders.filter((r: any) => r.reminderType === 'whatsapp').length;
 
+  const escapeCsvField = (value: any): string => {
+    if (value === null || value === undefined) return '';
+    const stringValue = String(value);
+    if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n')) {
+      return `"${stringValue.replace(/"/g, '""')}"`;
+    }
+    return stringValue;
+  };
+
+  const exportNoShowsToCSV = () => {
+    if (recentNoShows.length === 0) {
+      alert('No no-show data to export');
+      return;
+    }
+
+    try {
+      const headers = ['Date', 'Customer', 'Phone', 'Scheduled Time', 'Revenue Loss', 'Contact Attempts', 'Fee Charged', 'Status', 'Rescheduled', 'Reason'];
+      const csvRows = [
+        headers.join(','),
+        ...recentNoShows.map((ns: any) => {
+          const markedDate = ns.markedNoShowAt ? new Date(ns.markedNoShowAt).toLocaleDateString() : 'N/A';
+          const scheduledTime = ns.scheduledTime ? new Date(ns.scheduledTime).toLocaleString() : 'N/A';
+          const revenueLoss = `$${Number(ns.estimatedRevenueLoss || 0).toFixed(2)}`;
+          const feeCharged = ns.noShowFeeCharged ? `$${Number(ns.feeAmount || 0).toFixed(2)}` : 'None';
+          const status = ns.feePaid ? 'Paid' : ns.feeWaived ? 'Waived' : 'Unpaid';
+          
+          return [
+            escapeCsvField(markedDate),
+            escapeCsvField(ns.customerName || 'N/A'),
+            escapeCsvField(ns.customerPhone || 'N/A'),
+            escapeCsvField(scheduledTime),
+            escapeCsvField(revenueLoss),
+            escapeCsvField(ns.contactAttempts || 0),
+            escapeCsvField(feeCharged),
+            escapeCsvField(status),
+            escapeCsvField(ns.rescheduled ? 'Yes' : 'No'),
+            escapeCsvField(ns.customerReason || ''),
+          ].join(',');
+        })
+      ];
+
+      const csvContent = csvRows.join('\n');
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      
+      link.setAttribute('href', url);
+      link.setAttribute('download', `no-shows-report-${new Date().toISOString().split('T')[0]}.csv`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      URL.revokeObjectURL(url);
+      
+      alert('No-show report exported successfully!');
+    } catch (error) {
+      console.error('Error exporting no-shows:', error);
+      alert('Failed to export report. Please try again.');
+    }
+  };
+
   const statsCards = (
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
@@ -282,7 +344,7 @@ export default function AppointmentReminders() {
                 No-Show History
               </span>
               <div className="flex gap-2">
-                <Button variant="outline" data-testid="button-export-noshows">
+                <Button variant="outline" onClick={exportNoShowsToCSV} data-testid="button-export-noshows">
                   Export Report
                 </Button>
                 <Button className="bg-red-600 hover:bg-red-700" data-testid="button-mark-noshow">

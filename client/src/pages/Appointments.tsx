@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Calendar, Clock, Plus, Search, User, Phone, Car } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -11,6 +12,7 @@ import { format } from "date-fns";
 import { StandardPageLayout } from "@/components/layouts/StandardPageLayout";
 
 export function Appointments() {
+  const [, navigate] = useLocation();
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -68,7 +70,7 @@ export function Appointments() {
       actions={[
         {
           label: "New Appointment",
-          onClick: () => {},
+          onClick: () => navigate("/calendar"),
           icon: Plus,
           variant: "default",
         }
