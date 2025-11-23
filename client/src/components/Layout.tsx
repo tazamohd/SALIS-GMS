@@ -391,7 +391,7 @@ export function Layout({ children }: LayoutProps) {
           <div className="p-4 border-b border-gray-200 dark:border-salis-gray-dark">
             <Link href="/dashboard">
               <img
-                src="/attached_assets/Logo_blue_orange_1760743036292.png"
+                src="/attached_assets/Screenshot 2025-11-23 200618_1763921860224.png"
                 alt="SALIS AUTO"
                 className="w-24 h-auto mx-auto"
                 data-testid="logo-salis-auto"
