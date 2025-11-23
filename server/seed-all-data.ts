@@ -322,10 +322,9 @@ export async function seedAllData() {
           vin: faker.vehicle.vin(),
           licensePlate: `${faker.number.int({ min: 1000, max: 9999 })} ${faker.string.alpha({ length: 3, casing: 'upper' })}`,
           mileage: faker.number.int({ min: 5000, max: 150000 }),
-          fuelType: faker.helpers.arrayElement(['Gasoline', 'Diesel', 'Hybrid', 'Electric']),
-          transmission: faker.helpers.arrayElement(['Automatic', 'Manual']),
-          status: faker.helpers.arrayElement(['active', 'inactive']),
-          imageUrl: randomImage('vehicles'),
+          engineType: faker.helpers.arrayElement(['Gasoline', 'Diesel', 'Hybrid', 'Electric']),
+          transmissionType: faker.helpers.arrayElement(['Automatic', 'Manual']),
+          photos: [randomImage('vehicles')],
         }).returning();
         
         vehicles.push(...vehicle);
@@ -440,7 +439,6 @@ export async function seedAllData() {
         const jobCard = await db.insert(schema.jobCards).values({
           jobNumber: `JOB-${faker.string.numeric({ length: 6 })}`,
           garageId: garage.id,
-          customerId: vehicle.customerId,
           vehicleInfo: {
             make: vehicle.make,
             model: vehicle.model,
@@ -677,16 +675,17 @@ export async function seedAllData() {
     for (const technician of technicians) {
       const assignedTrainings = faker.helpers.arrayElements(trainings, faker.number.int({ min: 2, max: 5 }));
       for (const training of assignedTrainings) {
-        await db.insert(schema.employeeTrainings).values({
-          garageId: technician.garageId,
-          employeeId: technician.id,
-          trainingId: training.id,
-          status: 'completed',
-          completedDate: faker.date.past({ years: 2 }),
-          score: faker.number.int({ min: 70, max: 100 }).toFixed(2),
-          certificateUrl: `/certificates/${faker.string.alphanumeric({ length: 16 })}.pdf`,
-          expiryDate: training.validityPeriod ? faker.date.future({ years: 2 }) : null,
-        });
+        if (technician.garageId) {
+          await db.insert(schema.employeeTrainings).values({
+            employeeId: technician.id,
+            trainingId: training.id,
+            status: 'completed',
+            completedDate: faker.date.past({ years: 2 }),
+            score: faker.number.int({ min: 70, max: 100 }).toFixed(2),
+            certificateUrl: `/certificates/${faker.string.alphanumeric({ length: 16 })}.pdf`,
+            expiryDate: training.validityPeriod ? faker.date.future({ years: 2 }) : null,
+          });
+        }
       }
     }
     
@@ -700,40 +699,42 @@ export async function seedAllData() {
     
     logProgress('Creating employee attendance records...');
     for (const technician of technicians) {
-      for (let i = 0; i < 60; i++) {
-        const clockInTime = faker.date.recent({ days: 60 });
-        const clockOutTime = new Date(clockInTime.getTime() + (8 * 60 * 60 * 1000)); // 8 hours later
-        
-        await db.insert(schema.employeeAttendance).values({
-          garageId: technician.garageId,
-          employeeId: technician.id,
-          date: clockInTime,
-          clockIn: clockInTime,
-          clockOut: clockOutTime,
-          status: faker.helpers.arrayElement(['present', 'late', 'absent', 'on_leave']),
-          notes: faker.helpers.maybe(() => faker.lorem.sentence(), { probability: 0.1 }) || undefined,
-        });
+      if (technician.garageId) {
+        for (let i = 0; i < 60; i++) {
+          const clockInTime = faker.date.recent({ days: 60 });
+          const clockOutTime = new Date(clockInTime.getTime() + (8 * 60 * 60 * 1000)); // 8 hours later
+          
+          await db.insert(schema.employeeAttendance).values({
+            employeeId: technician.id,
+            date: clockInTime,
+            clockIn: clockInTime,
+            clockOut: clockOutTime,
+            status: faker.helpers.arrayElement(['present', 'late', 'absent', 'on_leave']),
+            notes: faker.helpers.maybe(() => faker.lorem.sentence(), { probability: 0.1 }) || undefined,
+          });
+        }
       }
     }
     
     logProgress('Creating performance reviews...');
     for (const technician of technicians) {
-      const managers = users.filter(u => u.userType === 'manager');
-      await db.insert(schema.performanceReviews).values({
-        garageId: technician.garageId,
-        employeeId: technician.id,
-        reviewerId: managers.length > 0 ? managers[0].id : users[0].id,
-        reviewPeriod: 'Q4 2024',
-        overallRating: faker.number.float({ min: 3, max: 5, fractionDigits: 2 }).toFixed(2),
-        technicalSkills: faker.number.float({ min: 3, max: 5, fractionDigits: 2 }).toFixed(2),
-        customerService: faker.number.float({ min: 3, max: 5, fractionDigits: 2 }).toFixed(2),
-        teamwork: faker.number.float({ min: 3, max: 5, fractionDigits: 2 }).toFixed(2),
-        strengths: faker.lorem.paragraph(),
-        areasForImprovement: faker.lorem.paragraph(),
-        goals: faker.lorem.paragraph(),
-        comments: faker.lorem.paragraph(),
-        status: 'submitted',
-      });
+      if (technician.garageId) {
+        const managers = users.filter(u => u.userType === 'manager');
+        await db.insert(schema.performanceReviews).values({
+          employeeId: technician.id,
+          reviewerId: managers.length > 0 ? managers[0].id : users[0].id,
+          reviewPeriod: 'Q4 2024',
+          overallRating: faker.number.float({ min: 3, max: 5, fractionDigits: 2 }).toFixed(2),
+          technicalSkills: faker.number.float({ min: 3, max: 5, fractionDigits: 2 }).toFixed(2),
+          customerService: faker.number.float({ min: 3, max: 5, fractionDigits: 2 }).toFixed(2),
+          teamwork: faker.number.float({ min: 3, max: 5, fractionDigits: 2 }).toFixed(2),
+          strengths: faker.lorem.paragraph(),
+          areasForImprovement: faker.lorem.paragraph(),
+          goals: faker.lorem.paragraph(),
+          comments: faker.lorem.paragraph(),
+          status: 'submitted',
+        });
+      }
     }
     
     console.log(`✅ HR data created: ${technicians.length * 60} attendance records, ${technicians.length} reviews\n`);
