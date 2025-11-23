@@ -61,7 +61,7 @@ export function Dashboard() {
   const checkInCount = (jobCards?.filter(jc => jc.status === 'pending') ?? []).length;
   const repairCount = (jobCards?.filter(jc => jc.status === 'in_progress') ?? []).length;
   const qualityCheckCount = (jobCards?.filter(jc => jc.status === 'completed') ?? []).length;
-  const completionCount = (jobCards?.filter(jc => jc.status === 'delivered') ?? []).length;
+  const completionCount = (jobCards?.filter(jc => jc.status === 'completed') ?? []).length;
 
   const totalPages = Math.ceil((jobCards?.length || 0) / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;

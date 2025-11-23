@@ -418,7 +418,7 @@ export async function seedAllData() {
       jobCards = [];
       
       const serviceTypes = ['maintenance', 'repair', 'diagnostic', 'inspection', 'bodywork'];
-      const statuses = ['pending', 'assigned', 'in_progress', 'completed', 'delivered', 'cancelled'];
+      const statuses = ['pending', 'assigned', 'in_progress', 'completed', 'cancelled'];
       const priorities = ['low', 'medium', 'high', 'urgent'];
       
       let jobCardAttempts = 0;
@@ -451,13 +451,13 @@ export async function seedAllData() {
           status,
           priority: faker.helpers.arrayElement(priorities),
           estimatedHours: faker.number.float({ min: 1, max: 8, fractionDigits: 2 }),
-          actualHours: (status === 'completed' || status === 'delivered') ? faker.number.float({ min: 1, max: 10, fractionDigits: 2 }) : null,
+          actualHours: status === 'completed' ? faker.number.float({ min: 1, max: 10, fractionDigits: 2 }) : null,
           totalCost: faker.commerce.price({ min: 100, max: 5000 }),
           createdBy: faker.helpers.arrayElement(users).id,
           assignedTo: technician.id,
           scheduledDate: faker.date.between({ from: '2024-10-01', to: '2024-11-30' }),
           startedAt: status !== 'pending' ? faker.date.between({ from: '2024-10-01', to: '2024-11-25' }) : null,
-          completedAt: (status === 'completed' || status === 'delivered') ? faker.date.between({ from: '2024-10-10', to: '2024-11-23' }) : null,
+          completedAt: status === 'completed' ? faker.date.between({ from: '2024-10-10', to: '2024-11-23' }) : null,
           publicTrackingToken: faker.string.alphanumeric({ length: 64 }),
         }).returning();
         

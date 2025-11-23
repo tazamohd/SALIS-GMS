@@ -62,9 +62,7 @@ export default function KPIDashboard() {
     ? totalRevenue / recentInvoices.length 
     : 0;
 
-  const completedJobs = recentJobCards.filter((j: any) => 
-    j.status === 'completed' || j.status === 'delivered'
-  ).length;
+  const completedJobs = recentJobCards.filter((j: any) => j.status === 'completed').length;
   const totalJobs = recentJobCards.length || 1;
   const completionRate = (completedJobs / totalJobs) * 100;
 
