@@ -418,7 +418,7 @@ export async function seedAllData() {
       jobCards = [];
       
       const serviceTypes = ['maintenance', 'repair', 'diagnostic', 'inspection', 'bodywork'];
-      const statuses = ['pending', 'assigned', 'in_progress', 'completed', 'cancelled'];
+      const statuses = ['pending', 'assigned', 'in_progress', 'completed', 'delivered', 'cancelled'];
       const priorities = ['low', 'medium', 'high', 'urgent'];
       
       let jobCardAttempts = 0;
@@ -451,13 +451,13 @@ export async function seedAllData() {
           status,
           priority: faker.helpers.arrayElement(priorities),
           estimatedHours: faker.number.float({ min: 1, max: 8, fractionDigits: 2 }),
-          actualHours: status === 'completed' ? faker.number.float({ min: 1, max: 10, fractionDigits: 2 }) : null,
+          actualHours: (status === 'completed' || status === 'delivered') ? faker.number.float({ min: 1, max: 10, fractionDigits: 2 }) : null,
           totalCost: faker.commerce.price({ min: 100, max: 5000 }),
           createdBy: faker.helpers.arrayElement(users).id,
           assignedTo: technician.id,
-          scheduledDate: faker.date.between({ from: '2024-01-01', to: '2025-12-31' }),
-          startedAt: status !== 'pending' ? faker.date.recent({ days: 30 }) : null,
-          completedAt: status === 'completed' ? faker.date.recent({ days: 15 }) : null,
+          scheduledDate: faker.date.between({ from: '2024-10-01', to: '2024-11-30' }),
+          startedAt: status !== 'pending' ? faker.date.between({ from: '2024-10-01', to: '2024-11-25' }) : null,
+          completedAt: (status === 'completed' || status === 'delivered') ? faker.date.between({ from: '2024-10-10', to: '2024-11-23' }) : null,
           publicTrackingToken: faker.string.alphanumeric({ length: 64 }),
         }).returning();
         
@@ -569,14 +569,17 @@ export async function seedAllData() {
         const paidAmount = status === 'paid' ? totalAmount : (status === 'overdue' ? faker.number.float({ min: 0, max: totalAmount * 0.5, fractionDigits: 2 }) : 0);
         const balanceAmount = totalAmount - paidAmount;
         
+        // Spread invoices across October and November 2024 for month-over-month comparison
+        const createdDate = faker.date.between({ from: '2024-10-01', to: '2024-11-23' });
+        
         const invoice = await db.insert(schema.invoices).values({
           invoiceNumber: `INV-${faker.string.numeric({ length: 6 })}`,
           garageId: garage.id,
           customerId: customer.id,
           vehicleId: vehicle.id,
           jobCardId: jobCard.id,
-          invoiceDate: faker.date.between({ from: '2024-01-01', to: '2025-11-17' }),
-          dueDate: faker.date.soon({ days: 30 }),
+          invoiceDate: createdDate,
+          dueDate: new Date(createdDate.getTime() + 30 * 24 * 60 * 60 * 1000), // 30 days after created
           status,
           subtotal: subtotal.toFixed(2),
           taxAmount: taxAmount.toFixed(2),
@@ -586,8 +589,9 @@ export async function seedAllData() {
           balanceAmount: balanceAmount.toFixed(2),
           notes: faker.lorem.sentence(),
           createdBy: faker.helpers.arrayElement(users).id,
-          sentAt: status !== 'draft' ? faker.date.recent({ days: 30 }) : null,
-          paidAt: status === 'paid' ? faker.date.recent({ days: 15 }) : null,
+          createdAt: createdDate,
+          sentAt: status !== 'draft' ? new Date(createdDate.getTime() + faker.number.int({ min: 1, max: 5 }) * 24 * 60 * 60 * 1000) : null,
+          paidAt: status === 'paid' ? new Date(createdDate.getTime() + faker.number.int({ min: 5, max: 20 }) * 24 * 60 * 60 * 1000) : null,
         }).returning();
         
         invoices.push(...invoice);
@@ -677,6 +681,7 @@ export async function seedAllData() {
       for (const training of assignedTrainings) {
         if (technician.garageId) {
           await db.insert(schema.employeeTrainings).values({
+            garageId: technician.garageId,
             employeeId: technician.id,
             trainingId: training.id,
             status: 'completed',
@@ -705,6 +710,7 @@ export async function seedAllData() {
           const clockOutTime = new Date(clockInTime.getTime() + (8 * 60 * 60 * 1000)); // 8 hours later
           
           await db.insert(schema.employeeAttendance).values({
+            garageId: technician.garageId,
             employeeId: technician.id,
             date: clockInTime,
             clockIn: clockInTime,
@@ -721,6 +727,7 @@ export async function seedAllData() {
       if (technician.garageId) {
         const managers = users.filter(u => u.userType === 'manager');
         await db.insert(schema.performanceReviews).values({
+          garageId: technician.garageId,
           employeeId: technician.id,
           reviewerId: managers.length > 0 ? managers[0].id : users[0].id,
           reviewPeriod: 'Q4 2024',

@@ -24,8 +24,8 @@ import { DashboardPage } from "@/components/layouts";
 export default function KPIDashboard() {
   const [timeRange, setTimeRange] = useState("30d");
 
-  const { data: jobCardsData } = useQuery({ queryKey: ["/api/job-cards"] });
-  const { data: invoicesData } = useQuery({ queryKey: ["/api/invoices"] });
+  const { data: jobCardsData, isLoading: isLoadingJobCards } = useQuery({ queryKey: ["/api/job-cards"] });
+  const { data: invoicesData, isLoading: isLoadingInvoices } = useQuery({ queryKey: ["/api/invoices"] });
   const { data: customersData } = useQuery({ queryKey: ["/api/customers"] });
   const { data: technicianData } = useQuery({ queryKey: ["/api/users"] });
 
@@ -50,8 +50,10 @@ export default function KPIDashboard() {
   const totalRevenue = recentInvoices.reduce((sum: number, inv: any) => 
     sum + (Number(inv.totalAmount) || 0), 0);
   
-  const totalLabor = recentJobCards.reduce((sum: number, job: any) => 
-    sum + (Number(job.laborCost) || 0), 0);
+  const totalLabor = recentJobCards.reduce((sum: number, job: any) => {
+    const cost = Number(job.totalCost);
+    return sum + (isNaN(cost) ? 0 : cost * 0.65);
+  }, 0);
   
   const totalParts = recentInvoices.reduce((sum: number, inv: any) => 
     sum + (Number(inv.taxAmount) || 0), 0);
@@ -60,7 +62,9 @@ export default function KPIDashboard() {
     ? totalRevenue / recentInvoices.length 
     : 0;
 
-  const completedJobs = recentJobCards.filter((j: any) => j.status === 'completed').length;
+  const completedJobs = recentJobCards.filter((j: any) => 
+    j.status === 'completed' || j.status === 'delivered'
+  ).length;
   const totalJobs = recentJobCards.length || 1;
   const completionRate = (completedJobs / totalJobs) * 100;
 
@@ -82,6 +86,69 @@ export default function KPIDashboard() {
 
   const customerSatisfaction = 4.6;
   const npsScore = 72;
+
+  // Month-over-month comparison
+  const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  const lastMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59);
+
+  const thisMonthInvoices = invoices.filter((inv: any) => {
+    if (!inv.createdAt) return false;
+    const invDate = new Date(inv.createdAt);
+    return invDate >= thisMonthStart;
+  });
+
+  const lastMonthInvoices = invoices.filter((inv: any) => {
+    if (!inv.createdAt) return false;
+    const invDate = new Date(inv.createdAt);
+    return invDate >= lastMonthStart && invDate <= lastMonthEnd;
+  });
+
+  const thisMonthRevenue = thisMonthInvoices.reduce((sum: number, inv: any) => 
+    sum + (Number(inv.totalAmount) || 0), 0);
+  const lastMonthRevenue = lastMonthInvoices.reduce((sum: number, inv: any) => 
+    sum + (Number(inv.totalAmount) || 0), 0);
+
+  const revenueChange = lastMonthRevenue > 0 
+    ? ((thisMonthRevenue - lastMonthRevenue) / lastMonthRevenue) * 100 
+    : 0;
+
+  const thisMonthJobCards = jobCards.filter((job: any) => {
+    if (!job.createdAt) return false;
+    const jobDate = new Date(job.createdAt);
+    return jobDate >= thisMonthStart;
+  });
+
+  const lastMonthJobCards = jobCards.filter((job: any) => {
+    if (!job.createdAt) return false;
+    const jobDate = new Date(job.createdAt);
+    return jobDate >= lastMonthStart && jobDate <= lastMonthEnd;
+  });
+
+  const jobsChange = lastMonthJobCards.length > 0
+    ? ((thisMonthJobCards.length - lastMonthJobCards.length) / lastMonthJobCards.length) * 100
+    : 0;
+
+  const monthlyComparison = [
+    {
+      month: lastMonthStart.toLocaleDateString('en-US', { month: 'short' }),
+      revenue: lastMonthRevenue,
+      jobs: lastMonthJobCards.length,
+      labor: lastMonthJobCards.reduce((sum: number, job: any) => {
+        const cost = Number(job.totalCost);
+        return sum + (isNaN(cost) ? 0 : cost * 0.65);
+      }, 0),
+    },
+    {
+      month: thisMonthStart.toLocaleDateString('en-US', { month: 'short' }),
+      revenue: thisMonthRevenue,
+      jobs: thisMonthJobCards.length,
+      labor: thisMonthJobCards.reduce((sum: number, job: any) => {
+        const cost = Number(job.totalCost);
+        return sum + (isNaN(cost) ? 0 : cost * 0.65);
+      }, 0),
+    },
+  ];
 
   const revenueTrend = Array.from({ length: 30 }, (_, i) => {
     const date = new Date(now.getTime() - (29 - i) * 24 * 60 * 60 * 1000);
@@ -106,17 +173,23 @@ export default function KPIDashboard() {
     { name: 'Other', value: 8, color: '#6b7280' },
   ];
 
-  const techPerformance = technicians.slice(0, 5).map((tech: any) => {
-    const techJobs = jobCards.filter((j: any) => j.technicianId === tech.id);
-    const techRevenue = techJobs.reduce((sum: number, job: any) => 
-      sum + (Number(job.laborCost) || 0), 0);
-    return {
-      name: tech.name || 'Unknown',
-      jobs: techJobs.length,
-      revenue: techRevenue,
-      efficiency: Math.min(100, 75 + Math.random() * 25),
-    };
-  });
+  const techPerformance = technicians
+    .map((tech: any) => {
+      const techJobs = jobCards.filter((j: any) => j.assignedTo === tech.id);
+      const techRevenue = techJobs.reduce((sum: number, job: any) => {
+        const cost = Number(job.totalCost);
+        return sum + (isNaN(cost) ? 0 : cost * 0.65);
+      }, 0);
+      return {
+        name: tech.fullName || tech.name || 'Unknown',
+        jobs: techJobs.length,
+        revenue: techRevenue,
+        efficiency: techJobs.length > 0 ? Math.min(100, 75 + Math.random() * 25) : 0,
+      };
+    })
+    .filter(tech => tech.jobs > 0)
+    .sort((a, b) => b.revenue - a.revenue)
+    .slice(0, 5);
 
   const metrics = [
     {
@@ -124,28 +197,34 @@ export default function KPIDashboard() {
       value: `$${totalRevenue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
       icon: DollarSign,
       color: "text-blue-600",
-      trend: { value: "+12.5%", isPositive: true },
+      trend: { 
+        value: `${revenueChange >= 0 ? '+' : ''}${revenueChange.toFixed(1)}%`, 
+        isPositive: revenueChange >= 0 
+      },
     },
     {
       label: "Jobs Completed",
       value: completedJobs,
       icon: CheckCircle,
       color: "text-green-600",
-      trend: { value: `${completionRate.toFixed(1)}%`, isPositive: true },
+      trend: { 
+        value: `${jobsChange >= 0 ? '+' : ''}${jobsChange.toFixed(1)}%`, 
+        isPositive: jobsChange >= 0 
+      },
     },
     {
       label: "Avg Job Value",
       value: `$${avgJobValue.toFixed(2)}`,
       icon: Target,
       color: "text-purple-600",
-      trend: { value: "+8.3%", isPositive: true },
+      trend: { value: `${completionRate.toFixed(1)}% rate`, isPositive: true },
     },
     {
-      label: "Active Customers",
-      value: activeCustomers,
+      label: "Total Labor Cost",
+      value: `$${totalLabor.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
       icon: Users,
       color: "text-orange-600",
-      trend: { value: "+5.2%", isPositive: true },
+      trend: { value: `${completionRate.toFixed(1)}% complete`, isPositive: true },
     },
   ];
 
@@ -241,6 +320,66 @@ export default function KPIDashboard() {
                   />
                 </AreaChart>
               </ResponsiveContainer>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white dark:bg-salis-black mt-6" data-testid="card-month-over-month">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <TrendingUp className="h-5 w-5 text-green-600" />
+                Month-over-Month Comparison
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {isLoadingJobCards || isLoadingInvoices ? (
+                <div className="flex items-center justify-center h-[350px]">
+                  <p className="text-gray-500 dark:text-gray-400" data-testid="text-loading">Loading comparison data...</p>
+                </div>
+              ) : (
+                <>
+                  <ResponsiveContainer width="100%" height={350} data-testid="chart-month-comparison">
+                    <BarChart data={monthlyComparison}>
+                      <CartesianGrid strokeDasharray="3 3" className="stroke-gray-200 dark:stroke-gray-700" />
+                      <XAxis 
+                        dataKey="month" 
+                        className="text-xs fill-gray-600 dark:fill-gray-400"
+                      />
+                      <YAxis className="text-xs fill-gray-600 dark:fill-gray-400" />
+                      <Tooltip 
+                        contentStyle={{ 
+                          backgroundColor: 'rgba(255, 255, 255, 0.95)', 
+                          border: '1px solid #e5e7eb',
+                          borderRadius: '8px'
+                        }}
+                      />
+                      <Legend />
+                      <Bar dataKey="revenue" fill="#3b82f6" name="Revenue" />
+                      <Bar dataKey="jobs" fill="#10b981" name="Jobs" />
+                      <Bar dataKey="labor" fill="#f59e0b" name="Labor Cost" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                  <div className="grid grid-cols-3 gap-4 mt-4">
+                    <div className="text-center p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg" data-testid="card-revenue-change">
+                      <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Revenue Change</p>
+                      <p className={`text-lg font-bold ${revenueChange >= 0 ? 'text-green-600' : 'text-red-600'}`} data-testid="text-revenue-change">
+                        {revenueChange >= 0 ? '+' : ''}{revenueChange.toFixed(1)}%
+                      </p>
+                    </div>
+                    <div className="text-center p-3 bg-green-50 dark:bg-green-900/20 rounded-lg" data-testid="card-jobs-change">
+                      <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Jobs Change</p>
+                      <p className={`text-lg font-bold ${jobsChange >= 0 ? 'text-green-600' : 'text-red-600'}`} data-testid="text-jobs-change">
+                        {jobsChange >= 0 ? '+' : ''}{jobsChange.toFixed(1)}%
+                      </p>
+                    </div>
+                    <div className="text-center p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg" data-testid="card-labor-total">
+                      <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">This Month Labor</p>
+                      <p className="text-lg font-bold text-gray-900 dark:text-white" data-testid="text-labor-total">
+                        ${(monthlyComparison[1]?.labor || 0).toLocaleString('en-US', { maximumFractionDigits: 0 })}
+                      </p>
+                    </div>
+                  </div>
+                </>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
