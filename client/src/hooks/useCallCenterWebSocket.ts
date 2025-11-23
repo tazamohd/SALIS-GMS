@@ -14,7 +14,8 @@ export function useCallCenterWebSocket(userId: string | null, garageId: string |
       if (wsRef.current?.readyState === WebSocket.OPEN) return;
 
       const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-      const wsUrl = `${protocol}//${window.location.host}/ws/chat`;
+      const host = window.location.host || `${window.location.hostname}:${window.location.port || (protocol === 'wss:' ? 443 : 80)}`;
+      const wsUrl = `${protocol}//${host}/ws/chat`;
 
       try {
         wsRef.current = new WebSocket(wsUrl);
