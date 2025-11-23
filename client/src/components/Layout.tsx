@@ -387,18 +387,6 @@ export function Layout({ children }: LayoutProps) {
         ${mobileMenuOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
       `}
         >
-          {/* Logo - Compact */}
-          <div className="p-4 border-b border-gray-200 dark:border-salis-gray-dark">
-            <Link href="/dashboard">
-              <img
-                src="/attached_assets/Screenshot 2025-11-23 200618_1763921860224.png"
-                alt="SALIS AUTO"
-                className="w-24 h-auto mx-auto"
-                data-testid="logo-salis-auto"
-              />
-            </Link>
-          </div>
-
           {/* Navigation - Compact */}
           <nav className="flex-1 p-3 overflow-y-auto">
             <div className="space-y-0.5">
