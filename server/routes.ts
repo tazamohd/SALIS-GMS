@@ -18254,6 +18254,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Send payment reminder via SMS
+  app.post('/api/send-payment-reminder', isAuthenticated, async (req: any, res) => {
+    try {
+      // Validate request body with Zod
+      const paymentReminderSchema = z.object({
+        customerId: z.string(),
+        customerName: z.string().optional(),
+        customerPhone: z.string().min(1, "Phone number is required"),
+        invoiceId: z.string(),
+        amount: z.union([z.number(), z.string()]).transform(val => 
+          typeof val === 'number' ? val : parseFloat(val) || 0
+        ),
+      });
+
+      const validated = paymentReminderSchema.parse(req.body);
+
+      const { smsService } = await import('./services/smsService');
+      const garages = await storage.getGarages();
+      const userGarage = garages.find(g => g.id === req.user.garageId);
+      const garageName = userGarage?.name || 'SALIS AUTO';
+
+      const template = smsService.invoiceNotification({
+        customerName: validated.customerName || 'Customer',
+        invoiceNumber: validated.invoiceId.substring(0, 8),
+        amount: validated.amount.toFixed(2),
+        dueDate: 'soon',
+        garageName,
+      });
+
+      await smsService.sendSMS({
+        to: validated.customerPhone,
+        recipientId: validated.customerId,
+        garageId: req.user.garageId,
+        template,
+        category: 'payment_reminder',
+        metadata: { invoiceId: validated.invoiceId, amount: validated.amount },
+      });
+
+      res.json({ success: true, message: "Payment reminder sent successfully" });
+    } catch (error: any) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json(sanitizeZodError(error));
+      }
+      console.error("Error sending payment reminder:", error);
+      res.status(500).json({ message: "Failed to send payment reminder" });
+    }
+  });
+
   const httpServer = createServer(app);
   
   // Initialize WebSocket server for chat

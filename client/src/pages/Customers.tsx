@@ -1,9 +1,12 @@
 import { useState } from "react";
-import { Users, Search, Car, Phone, Mail, MessageSquare, Building2, Trash2 } from "lucide-react";
+import { Users, Search, Car, Phone, Mail, MessageSquare, Building2, Trash2, FileText, AlertCircle, DollarSign, ClipboardList, Send, CheckCircle, Clock, XCircle } from "lucide-react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Select,
   SelectContent,
@@ -56,7 +59,68 @@ export function Customers() {
     enabled: !!selectedCustomerId,
   });
 
+  const { data: allJobCards } = useQuery<any[]>({
+    queryKey: ['/api/job-cards'],
+    enabled: !!selectedCustomerId,
+  });
+
+  const { data: allInvoices } = useQuery<any[]>({
+    queryKey: ['/api/invoices'],
+    enabled: !!selectedCustomerId,
+  });
+
+  const customerJobCards = !customerVehicles ? [] : (allJobCards ?? []).filter((job: any) => {
+    // Match by customer ID directly if available
+    if (job.customerId === selectedCustomerId) {
+      return true;
+    }
+    // Otherwise, match by vehicle info
+    if (job.vehicleInfo) {
+      const vehicle = customerVehicles.find(v => 
+        job.vehicleInfo.licensePlate === v.licensePlate || 
+        job.vehicleInfo.vin === v.vin
+      );
+      return !!vehicle;
+    }
+    return false;
+  });
+
+  const customerInvoices = (allInvoices ?? []).filter((inv: any) => inv.customerId === selectedCustomerId);
+
+  const outstandingJobs = customerJobCards.filter((job: any) => 
+    job.status !== 'completed' && job.status !== 'cancelled'
+  );
+
+  const unpaidInvoices = customerInvoices.filter((inv: any) => inv.status === 'pending');
+
   const { toast } = useToast();
+
+  const sendReminderMutation = useMutation({
+    mutationFn: async (data: { invoiceId: string; amount: number }) => {
+      return await apiRequest("POST", `/api/send-payment-reminder`, { 
+        customerId: selectedCustomerId,
+        customerName: selectedCustomer?.fullName,
+        customerPhone: selectedCustomer?.phone,
+        invoiceId: data.invoiceId,
+        amount: data.amount
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/invoices'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/notifications'] });
+      toast({
+        title: "Reminder Sent",
+        description: "Payment reminder has been sent via SMS",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to send reminder",
+        variant: "destructive",
+      });
+    },
+  });
 
   const deleteVehicleMutation = useMutation({
     mutationFn: async (vehicleId: string) => {
@@ -232,8 +296,19 @@ export function Customers() {
                         <p className="text-sm text-gray-900 dark:text-white/60 mt-1">Customer ID: {selectedCustomer?.id}</p>
                       </div>
                     </div>
-                    <div className="text-xs text-gray-900 dark:text-white/60">
-                      Customer managed via authentication
+                    <div className="flex flex-col gap-2 items-end">
+                      {outstandingJobs.length > 0 && (
+                        <Badge variant="outline" className="bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800">
+                          <AlertCircle className="w-3 h-3 mr-1" />
+                          {outstandingJobs.length} Active Jobs
+                        </Badge>
+                      )}
+                      {unpaidInvoices.length > 0 && (
+                        <Badge variant="outline" className="bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800">
+                          <DollarSign className="w-3 h-3 mr-1" />
+                          {unpaidInvoices.length} Unpaid
+                        </Badge>
+                      )}
                     </div>
                   </div>
 
@@ -261,132 +336,317 @@ export function Customers() {
                       </div>
                     )}
                   </div>
+
+                  {(outstandingJobs.length > 0 || unpaidInvoices.length > 0) && (
+                    <div className="mt-6 space-y-3">
+                      {unpaidInvoices.length > 0 && (
+                        <Alert className="bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800">
+                          <AlertCircle className="h-4 w-4 text-red-600" />
+                          <AlertDescription className="text-sm text-gray-900 dark:text-white">
+                            <strong>Outstanding Payments:</strong> ${unpaidInvoices.reduce((sum, inv) => sum + Number(inv.totalAmount || 0), 0).toFixed(2)} due across {unpaidInvoices.length} invoice(s)
+                          </AlertDescription>
+                        </Alert>
+                      )}
+                      {outstandingJobs.length > 0 && (
+                        <Alert className="bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800">
+                          <ClipboardList className="h-4 w-4 text-yellow-600" />
+                          <AlertDescription className="text-sm text-gray-900 dark:text-white">
+                            <strong>Active Service:</strong> {outstandingJobs.length} job(s) currently in progress
+                          </AlertDescription>
+                        </Alert>
+                      )}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
 
-              <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="font-['Poppins',Helvetica] font-semibold text-lg text-gray-900 dark:text-white">
-                      Vehicles
-                    </h3>
-                    {selectedCustomer?.garageId && (
-                      <AddVehicleDialog 
-                        customerId={selectedCustomerId} 
-                        garageId={selectedCustomer.garageId} 
-                      />
-                    )}
-                  </div>
+              <Tabs defaultValue="vehicles" className="space-y-4" data-testid="tabs-customer-history">
+                <TabsList className="bg-white dark:bg-salis-black">
+                  <TabsTrigger value="vehicles" data-testid="tab-vehicles">
+                    <Car className="w-4 h-4 mr-2" />
+                    Vehicles
+                  </TabsTrigger>
+                  <TabsTrigger value="jobs" data-testid="tab-jobs">
+                    <ClipboardList className="w-4 h-4 mr-2" />
+                    Job History
+                  </TabsTrigger>
+                  <TabsTrigger value="invoices" data-testid="tab-invoices">
+                    <FileText className="w-4 h-4 mr-2" />
+                    Invoices & Payments
+                  </TabsTrigger>
+                  <TabsTrigger value="notes" data-testid="tab-notes">
+                    <MessageSquare className="w-4 h-4 mr-2" />
+                    Notes
+                  </TabsTrigger>
+                </TabsList>
 
-                  {(customerVehicles ?? []).length === 0 ? (
-                    <div className="text-center py-8">
-                      <Car className="w-12 h-12 text-gray-300 mx-auto mb-2" />
-                      <p className="text-sm text-gray-900 dark:text-white/60">No vehicles registered</p>
-                    </div>
-                  ) : (
-                    <div className="space-y-3">
-                      {customerVehicles?.map((vehicle) => (
-                        <div
-                          key={vehicle.id}
-                          className="p-4 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-salis-gray-dark transition-colors"
-                          data-testid={`vehicle-item-${vehicle.id}`}
-                        >
-                          <div className="flex items-start justify-between">
-                            <div className="flex items-start gap-3 flex-1">
-                              <Car className="w-5 h-5 text-gray-900 dark:text-white/50 mt-1" />
-                              <div className="flex-1">
-                                <h4 className="font-['Poppins',Helvetica] font-semibold text-sm text-gray-900 dark:text-white">
-                                  {vehicle.year} {vehicle.make} {vehicle.model}
-                                </h4>
-                                <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-xs text-gray-900 dark:text-white/60">
-                                  <span>License: {vehicle.licensePlate}</span>
-                                  {vehicle.color && <span>Color: {vehicle.color}</span>}
-                                  {vehicle.mileage && <span>Mileage: {vehicle.mileage.toLocaleString()} km</span>}
-                                </div>
-                                {vehicle.engineType && (
-                                  <div className="mt-2 flex items-center gap-2">
-                                    <span className="px-2 py-1 bg-gray-100 dark:bg-salis-gray-dark rounded text-xs capitalize">
-                                      {vehicle.engineType}
-                                    </span>
-                                    {vehicle.transmissionType && (
-                                      <span className="px-2 py-1 bg-gray-100 dark:bg-salis-gray-dark rounded text-xs capitalize">
-                                        {vehicle.transmissionType}
-                                      </span>
+                <TabsContent value="vehicles">
+                  <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+                    <CardHeader>
+                      <div className="flex items-center justify-between">
+                        <CardTitle className="font-['Poppins',Helvetica] font-semibold text-lg text-gray-900 dark:text-white">
+                          Vehicles
+                        </CardTitle>
+                        {selectedCustomer?.garageId && (
+                          <AddVehicleDialog 
+                            customerId={selectedCustomerId} 
+                            garageId={selectedCustomer.garageId} 
+                          />
+                        )}
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      {(customerVehicles ?? []).length === 0 ? (
+                        <div className="text-center py-8">
+                          <Car className="w-12 h-12 text-gray-300 mx-auto mb-2" />
+                          <p className="text-sm text-gray-900 dark:text-white/60">No vehicles registered</p>
+                        </div>
+                      ) : (
+                        <div className="space-y-3">
+                          {customerVehicles?.map((vehicle) => (
+                            <div
+                              key={vehicle.id}
+                              className="p-4 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-salis-gray-dark transition-colors"
+                              data-testid={`vehicle-item-${vehicle.id}`}
+                            >
+                              <div className="flex items-start justify-between">
+                                <div className="flex items-start gap-3 flex-1">
+                                  <Car className="w-5 h-5 text-gray-900 dark:text-white/50 mt-1" />
+                                  <div className="flex-1">
+                                    <h4 className="font-['Poppins',Helvetica] font-semibold text-sm text-gray-900 dark:text-white">
+                                      {vehicle.year} {vehicle.make} {vehicle.model}
+                                    </h4>
+                                    <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-xs text-gray-900 dark:text-white/60">
+                                      <span>License: {vehicle.licensePlate}</span>
+                                      {vehicle.color && <span>Color: {vehicle.color}</span>}
+                                      {vehicle.mileage && <span>Mileage: {vehicle.mileage.toLocaleString()} km</span>}
+                                    </div>
+                                    {vehicle.engineType && (
+                                      <div className="mt-2 flex items-center gap-2">
+                                        <span className="px-2 py-1 bg-gray-100 dark:bg-salis-gray-dark rounded text-xs capitalize">
+                                          {vehicle.engineType}
+                                        </span>
+                                        {vehicle.transmissionType && (
+                                          <span className="px-2 py-1 bg-gray-100 dark:bg-salis-gray-dark rounded text-xs capitalize">
+                                            {vehicle.transmissionType}
+                                          </span>
+                                        )}
+                                      </div>
                                     )}
                                   </div>
-                                )}
+                                </div>
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm" 
+                                  onClick={() => deleteVehicleMutation.mutate(vehicle.id)}
+                                  data-testid={`button-delete-vehicle-${vehicle.id}`}
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
                               </div>
                             </div>
-                            <Button 
-                              variant="ghost" 
-                              size="sm" 
-                              onClick={() => deleteVehicleMutation.mutate(vehicle.id)}
-                              data-testid={`button-delete-vehicle-${vehicle.id}`}
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          </div>
+                          ))}
                         </div>
-                      ))}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
+                      )}
+                    </CardContent>
+                  </Card>
+                </TabsContent>
 
-              <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="font-['Poppins',Helvetica] font-semibold text-lg text-gray-900 dark:text-white">
-                      Notes & Communication
-                    </h3>
-                    <AddCustomerNoteDialog customerId={selectedCustomerId} />
-                  </div>
-
-                  {(customerNotes ?? []).length === 0 ? (
-                    <div className="text-center py-8">
-                      <MessageSquare className="w-12 h-12 text-gray-300 mx-auto mb-2" />
-                      <p className="text-sm text-gray-900 dark:text-white/60">No notes available</p>
-                    </div>
-                  ) : (
-                    <div className="space-y-3">
-                      {customerNotes?.map((note) => (
-                        <div
-                          key={note.id}
-                          className="p-4 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-salis-gray-dark transition-colors"
-                          data-testid={`note-item-${note.id}`}
-                        >
-                          <div className="flex items-start justify-between">
-                            <div className="flex-1">
-                              {note.subject && (
-                                <h4 className="font-['Poppins',Helvetica] font-semibold text-sm text-gray-900 dark:text-white mb-1">
-                                  {note.subject}
-                                </h4>
-                              )}
-                              <p className="text-sm text-gray-700 mb-2">{note.content}</p>
-                              <div className="flex items-center gap-2">
-                                <span className="px-2 py-1 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded text-xs capitalize">
-                                  {note.noteType}
-                                </span>
-                                <span className="text-xs text-gray-900 dark:text-white/60">
-                                  {note.createdAt ? new Date(note.createdAt).toLocaleDateString() : 'N/A'}
-                                </span>
+                <TabsContent value="jobs">
+                  <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+                    <CardHeader>
+                      <CardTitle className="font-['Poppins',Helvetica] font-semibold text-lg text-gray-900 dark:text-white">
+                        Job History ({customerJobCards.length} total)
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      {customerJobCards.length === 0 ? (
+                        <div className="text-center py-8">
+                          <ClipboardList className="w-12 h-12 text-gray-300 mx-auto mb-2" />
+                          <p className="text-sm text-gray-900 dark:text-white/60">No job history available</p>
+                        </div>
+                      ) : (
+                        <div className="space-y-3">
+                          {customerJobCards.map((job: any) => (
+                            <div
+                              key={job.id}
+                              className="p-4 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-salis-gray-dark transition-colors"
+                              data-testid={`job-item-${job.id}`}
+                            >
+                              <div className="flex items-start justify-between mb-2">
+                                <div className="flex-1">
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <h4 className="font-['Poppins',Helvetica] font-semibold text-sm text-gray-900 dark:text-white">
+                                      {job.jobNumber}
+                                    </h4>
+                                    <Badge 
+                                      variant="outline" 
+                                      className={
+                                        job.status === 'completed' ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800' :
+                                        job.status === 'in_progress' ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800' :
+                                        job.status === 'cancelled' ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800' :
+                                        'bg-gray-50 dark:bg-gray-900/20 border-gray-200 dark:border-gray-800'
+                                      }
+                                    >
+                                      {job.status === 'completed' && <CheckCircle className="w-3 h-3 mr-1" />}
+                                      {job.status === 'in_progress' && <Clock className="w-3 h-3 mr-1" />}
+                                      {job.status === 'cancelled' && <XCircle className="w-3 h-3 mr-1" />}
+                                      {job.status}
+                                    </Badge>
+                                  </div>
+                                  <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">{job.description}</p>
+                                  <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-900 dark:text-white/60">
+                                    <span>Service: {job.serviceType}</span>
+                                    <span>Vehicle: {job.vehicleInfo?.make} {job.vehicleInfo?.model}</span>
+                                    {job.completedAt && <span>Completed: {new Date(job.completedAt).toLocaleDateString()}</span>}
+                                    {job.totalCost && <span className="font-semibold text-gray-900 dark:text-white">${Number(job.totalCost).toFixed(2)}</span>}
+                                  </div>
+                                </div>
                               </div>
                             </div>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => deleteNoteMutation.mutate(note.id)}
-                              data-testid={`button-delete-note-${note.id}`}
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          </div>
+                          ))}
                         </div>
-                      ))}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
+                      )}
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+
+                <TabsContent value="invoices">
+                  <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+                    <CardHeader>
+                      <CardTitle className="font-['Poppins',Helvetica] font-semibold text-lg text-gray-900 dark:text-white">
+                        Invoices & Payments ({customerInvoices.length} total)
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      {customerInvoices.length === 0 ? (
+                        <div className="text-center py-8">
+                          <FileText className="w-12 h-12 text-gray-300 mx-auto mb-2" />
+                          <p className="text-sm text-gray-900 dark:text-white/60">No invoices available</p>
+                        </div>
+                      ) : (
+                        <div className="space-y-3">
+                          {customerInvoices.map((invoice: any) => (
+                            <div
+                              key={invoice.id}
+                              className="p-4 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-salis-gray-dark transition-colors"
+                              data-testid={`invoice-item-${invoice.id}`}
+                            >
+                              <div className="flex items-start justify-between">
+                                <div className="flex-1">
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <h4 className="font-['Poppins',Helvetica] font-semibold text-sm text-gray-900 dark:text-white">
+                                      Invoice #{invoice.invoiceNumber}
+                                    </h4>
+                                    <Badge 
+                                      variant="outline" 
+                                      className={
+                                        invoice.status === 'paid' ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800' :
+                                        invoice.status === 'pending' ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800' :
+                                        'bg-gray-50 dark:bg-gray-900/20 border-gray-200 dark:border-gray-800'
+                                      }
+                                    >
+                                      {invoice.status}
+                                    </Badge>
+                                  </div>
+                                  <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-900 dark:text-white/60 mb-2">
+                                    <span>Date: {invoice.createdAt ? new Date(invoice.createdAt).toLocaleDateString() : 'N/A'}</span>
+                                    {invoice.dueDate && <span>Due: {new Date(invoice.dueDate).toLocaleDateString()}</span>}
+                                  </div>
+                                  <div className="flex items-center justify-between">
+                                    <span className="text-lg font-bold text-gray-900 dark:text-white">
+                                      ${Number(invoice.totalAmount || 0).toFixed(2)}
+                                    </span>
+                                    {invoice.status === 'pending' && (
+                                      selectedCustomer?.phone && selectedCustomer.phone.trim().length > 0 ? (
+                                        <Button
+                                          size="sm"
+                                          variant="outline"
+                                          onClick={() => sendReminderMutation.mutate({ 
+                                            invoiceId: invoice.id, 
+                                            amount: Number(invoice.totalAmount) 
+                                          })}
+                                          disabled={sendReminderMutation.isPending}
+                                          data-testid={`button-send-reminder-${invoice.id}`}
+                                        >
+                                          <Send className="w-3 h-3 mr-2" />
+                                          Send Reminder
+                                        </Button>
+                                      ) : (
+                                        <span className="text-xs text-gray-500 dark:text-gray-400" data-testid="text-no-phone">
+                                          No phone number
+                                        </span>
+                                      )
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+
+                <TabsContent value="notes">
+                  <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+                    <CardHeader>
+                      <div className="flex items-center justify-between">
+                        <CardTitle className="font-['Poppins',Helvetica] font-semibold text-lg text-gray-900 dark:text-white">
+                          Notes & Communication
+                        </CardTitle>
+                        <AddCustomerNoteDialog customerId={selectedCustomerId} />
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      {(customerNotes ?? []).length === 0 ? (
+                        <div className="text-center py-8">
+                          <MessageSquare className="w-12 h-12 text-gray-300 mx-auto mb-2" />
+                          <p className="text-sm text-gray-900 dark:text-white/60">No notes available</p>
+                        </div>
+                      ) : (
+                        <div className="space-y-3">
+                          {customerNotes?.map((note) => (
+                            <div
+                              key={note.id}
+                              className="p-4 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-salis-gray-dark transition-colors"
+                              data-testid={`note-item-${note.id}`}
+                            >
+                              <div className="flex items-start justify-between">
+                                <div className="flex-1">
+                                  {note.subject && (
+                                    <h4 className="font-['Poppins',Helvetica] font-semibold text-sm text-gray-900 dark:text-white mb-1">
+                                      {note.subject}
+                                    </h4>
+                                  )}
+                                  <p className="text-sm text-gray-700 mb-2">{note.content}</p>
+                                  <div className="flex items-center gap-2">
+                                    <span className="px-2 py-1 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded text-xs capitalize">
+                                      {note.noteType}
+                                    </span>
+                                    <span className="text-xs text-gray-900 dark:text-white/60">
+                                      {note.createdAt ? new Date(note.createdAt).toLocaleDateString() : 'N/A'}
+                                    </span>
+                                  </div>
+                                </div>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => deleteNoteMutation.mutate(note.id)}
+                                  data-testid={`button-delete-note-${note.id}`}
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+              </Tabs>
             </div>
           )}
         </div>
