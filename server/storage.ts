@@ -46,6 +46,23 @@ import {
   invoices,
   invoiceItems,
   payments,
+  technicianMetricDefinitions,
+  technicianMetricPreferences,
+  technicianPerformanceStream,
+  technicianPerformanceRollups,
+  serviceFeedback,
+  technicianFeedbackSummary,
+  maintenanceRecommendations,
+  maintenanceTriggerRules,
+  telematicsProviders,
+  telematicsDevices,
+  telematicsStreams,
+  telematicsReadings,
+  gamificationEventDefinitions,
+  gamificationBadges,
+  gamificationEvents,
+  gamificationBadgeAwards,
+  leaderboardSnapshots,
   type User,
   type UpsertUser,
   type Garage,
@@ -10042,21 +10059,21 @@ export class DatabaseStorage implements IStorage {
   // ========================================
   
   async getTechnicianMetricDefinitions(): Promise<any[]> {
-    return await db.select().from(schema.technicianMetricDefinitions)
-      .where(eq(schema.technicianMetricDefinitions.isActive, true));
+    return await db.select().from(technicianMetricDefinitions)
+      .where(eq(technicianMetricDefinitions.isActive, true));
   }
 
   async getTechnicianMetricPreferences(userId: string): Promise<any[]> {
-    return await db.select().from(schema.technicianMetricPreferences)
-      .where(eq(schema.technicianMetricPreferences.userId, userId))
-      .orderBy(schema.technicianMetricPreferences.sortOrder);
+    return await db.select().from(technicianMetricPreferences)
+      .where(eq(technicianMetricPreferences.userId, userId))
+      .orderBy(technicianMetricPreferences.sortOrder);
   }
 
   async upsertTechnicianMetricPreference(data: any): Promise<any> {
-    const [preference] = await db.insert(schema.technicianMetricPreferences)
+    const [preference] = await db.insert(technicianMetricPreferences)
       .values(data)
       .onConflictDoUpdate({
-        target: [schema.technicianMetricPreferences.userId, schema.technicianMetricPreferences.metricKey],
+        target: [technicianMetricPreferences.userId, technicianMetricPreferences.metricKey],
         set: data
       })
       .returning();
@@ -10064,12 +10081,12 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getTechnicianPerformanceRollups(technicianId: string, period: string): Promise<any[]> {
-    return await db.select().from(schema.technicianPerformanceRollups)
+    return await db.select().from(technicianPerformanceRollups)
       .where(and(
-        eq(schema.technicianPerformanceRollups.technicianId, technicianId),
-        eq(schema.technicianPerformanceRollups.intervalType, period)
+        eq(technicianPerformanceRollups.technicianId, technicianId),
+        eq(technicianPerformanceRollups.intervalType, period)
       ))
-      .orderBy(desc(schema.technicianPerformanceRollups.intervalStart))
+      .orderBy(desc(technicianPerformanceRollups.intervalStart))
       .limit(30);
   }
 
@@ -10078,25 +10095,25 @@ export class DatabaseStorage implements IStorage {
   // ========================================
   
   async createServiceFeedback(data: any): Promise<any> {
-    const [feedback] = await db.insert(schema.serviceFeedback).values(data).returning();
+    const [feedback] = await db.insert(serviceFeedback).values(data).returning();
     return feedback;
   }
 
   async getServiceFeedbackByJobCard(jobCardId: string): Promise<any[]> {
-    return await db.select().from(schema.serviceFeedback)
-      .where(eq(schema.serviceFeedback.jobCardId, jobCardId));
+    return await db.select().from(serviceFeedback)
+      .where(eq(serviceFeedback.jobCardId, jobCardId));
   }
 
   async getServiceFeedbackByTechnician(technicianId: string): Promise<any[]> {
-    return await db.select().from(schema.serviceFeedback)
-      .where(eq(schema.serviceFeedback.technicianId, technicianId))
-      .orderBy(desc(schema.serviceFeedback.submittedAt))
+    return await db.select().from(serviceFeedback)
+      .where(eq(serviceFeedback.technicianId, technicianId))
+      .orderBy(desc(serviceFeedback.submittedAt))
       .limit(100);
   }
 
   async getTechnicianFeedbackSummary(technicianId: string): Promise<any | null> {
-    const [summary] = await db.select().from(schema.technicianFeedbackSummary)
-      .where(eq(schema.technicianFeedbackSummary.technicianId, technicianId));
+    const [summary] = await db.select().from(technicianFeedbackSummary)
+      .where(eq(technicianFeedbackSummary.technicianId, technicianId));
     return summary || null;
   }
 
@@ -10111,7 +10128,7 @@ export class DatabaseStorage implements IStorage {
       return acc;
     }, {} as any);
 
-    await db.insert(schema.technicianFeedbackSummary)
+    await db.insert(technicianFeedbackSummary)
       .values({
         technicianId,
         totalReviews,
@@ -10123,7 +10140,7 @@ export class DatabaseStorage implements IStorage {
         rating1Count: ratingCounts.rating1Count || 0,
       })
       .onConflictDoUpdate({
-        target: schema.technicianFeedbackSummary.technicianId,
+        target: technicianFeedbackSummary.technicianId,
         set: {
           totalReviews,
           averageRating: avgRating.toFixed(2),
@@ -10142,19 +10159,19 @@ export class DatabaseStorage implements IStorage {
   // ========================================
   
   async getMaintenanceRecommendations(vehicleId: string): Promise<any[]> {
-    return await db.select().from(schema.maintenanceRecommendations)
-      .where(eq(schema.maintenanceRecommendations.vehicleId, vehicleId))
-      .orderBy(schema.maintenanceRecommendations.predictedDueAt);
+    return await db.select().from(maintenanceRecommendations)
+      .where(eq(maintenanceRecommendations.vehicleId, vehicleId))
+      .orderBy(maintenanceRecommendations.predictedDueAt);
   }
 
   async acknowledgeMaintenanceRecommendation(id: string): Promise<any> {
-    const [recommendation] = await db.update(schema.maintenanceRecommendations)
+    const [recommendation] = await db.update(maintenanceRecommendations)
       .set({
         status: 'acknowledged',
         acknowledgedAt: new Date(),
         updatedAt: new Date(),
       })
-      .where(eq(schema.maintenanceRecommendations.id, id))
+      .where(eq(maintenanceRecommendations.id, id))
       .returning();
     return recommendation;
   }
@@ -10164,8 +10181,8 @@ export class DatabaseStorage implements IStorage {
   // ========================================
   
   async getTelematicsDeviceByVehicle(vehicleId: string): Promise<any | null> {
-    const [device] = await db.select().from(schema.telematicsDevices)
-      .where(eq(schema.telematicsDevices.vehicleId, vehicleId));
+    const [device] = await db.select().from(telematicsDevices)
+      .where(eq(telematicsDevices.vehicleId, vehicleId));
     return device || null;
   }
 
@@ -10173,10 +10190,10 @@ export class DatabaseStorage implements IStorage {
     const device = await this.getTelematicsDeviceByVehicle(vehicleId);
     if (!device) return [];
 
-    const streams = await db.select().from(schema.telematicsStreams)
+    const streams = await db.select().from(telematicsStreams)
       .where(and(
-        eq(schema.telematicsStreams.deviceId, device.id),
-        streamType ? eq(schema.telematicsStreams.streamType, streamType) : sql`true`
+        eq(telematicsStreams.deviceId, device.id),
+        streamType ? eq(telematicsStreams.streamType, streamType) : sql`true`
       ));
 
     if (streams.length === 0) return [];
@@ -10184,12 +10201,12 @@ export class DatabaseStorage implements IStorage {
     const cutoffTime = new Date(Date.now() - hours * 60 * 60 * 1000);
     const streamIds = streams.map(s => s.id);
 
-    return await db.select().from(schema.telematicsReadings)
+    return await db.select().from(telematicsReadings)
       .where(and(
-        sql`${schema.telematicsReadings.streamId} = ANY(${streamIds})`,
-        gte(schema.telematicsReadings.recordedAt, cutoffTime)
+        sql`${telematicsReadings.streamId} = ANY(${streamIds})`,
+        gte(telematicsReadings.recordedAt, cutoffTime)
       ))
-      .orderBy(schema.telematicsReadings.recordedAt);
+      .orderBy(telematicsReadings.recordedAt);
   }
 
   // ========================================
@@ -10197,17 +10214,17 @@ export class DatabaseStorage implements IStorage {
   // ========================================
   
   async getLeaderboard(period: string, limit: number = 10): Promise<any[]> {
-    return await db.select().from(schema.leaderboardSnapshots)
-      .where(eq(schema.leaderboardSnapshots.period, period))
-      .orderBy(schema.leaderboardSnapshots.rank)
+    return await db.select().from(leaderboardSnapshots)
+      .where(eq(leaderboardSnapshots.period, period))
+      .orderBy(leaderboardSnapshots.rank)
       .limit(limit);
   }
 
   async getTechnicianPoints(technicianId: string): Promise<number> {
-    const events = await db.select().from(schema.gamificationEvents)
-      .where(eq(schema.gamificationEvents.technicianId, technicianId));
+    const events = await db.select().from(gamificationEvents)
+      .where(eq(gamificationEvents.technicianId, technicianId));
     
-    const definitions = await db.select().from(schema.gamificationEventDefinitions);
+    const definitions = await db.select().from(gamificationEventDefinitions);
     const pointsMap = Object.fromEntries(definitions.map(d => [d.eventKey, d.points]));
     
     return events.reduce((total, event) => total + (pointsMap[event.eventKey] || 0), 0);
@@ -10215,25 +10232,25 @@ export class DatabaseStorage implements IStorage {
 
   async getTechnicianBadges(technicianId: string): Promise<any[]> {
     return await db.select({
-      badge: schema.gamificationBadges,
-      awardedAt: schema.gamificationBadgeAwards.awardedAt
+      badge: gamificationBadges,
+      awardedAt: gamificationBadgeAwards.awardedAt
     })
-      .from(schema.gamificationBadgeAwards)
-      .innerJoin(schema.gamificationBadges, eq(schema.gamificationBadgeAwards.badgeId, schema.gamificationBadges.id))
-      .where(eq(schema.gamificationBadgeAwards.technicianId, technicianId))
-      .orderBy(desc(schema.gamificationBadgeAwards.awardedAt));
+      .from(gamificationBadgeAwards)
+      .innerJoin(gamificationBadges, eq(gamificationBadgeAwards.badgeId, gamificationBadges.id))
+      .where(eq(gamificationBadgeAwards.technicianId, technicianId))
+      .orderBy(desc(gamificationBadgeAwards.awardedAt));
   }
 
   async getTechnicianRecentEvents(technicianId: string, limit: number = 10): Promise<any[]> {
-    return await db.select().from(schema.gamificationEvents)
-      .where(eq(schema.gamificationEvents.technicianId, technicianId))
-      .orderBy(desc(schema.gamificationEvents.occurredAt))
+    return await db.select().from(gamificationEvents)
+      .where(eq(gamificationEvents.technicianId, technicianId))
+      .orderBy(desc(gamificationEvents.occurredAt))
       .limit(limit);
   }
 
   async getGamificationBadges(): Promise<any[]> {
-    return await db.select().from(schema.gamificationBadges)
-      .where(eq(schema.gamificationBadges.isActive, true));
+    return await db.select().from(gamificationBadges)
+      .where(eq(gamificationBadges.isActive, true));
   }
 }
 
