@@ -307,16 +307,32 @@ export async function seedAllData() {
     } else {
       logProgress('Creating 300 vehicles for customers...');
       vehicles = [];
-      const makes = ['Toyota', 'Honda', 'Ford', 'Chevrolet', 'BMW', 'Mercedes-Benz', 'Audi', 'Nissan', 'Hyundai', 'Lexus'];
+      
+      // Proper make/model combinations
+      const vehicleOptions = [
+        { make: 'Toyota', models: ['Camry', 'Corolla', 'RAV4', 'Highlander', 'Tacoma', 'Tundra', 'Prius', 'Sienna'] },
+        { make: 'Honda', models: ['Civic', 'Accord', 'CR-V', 'Pilot', 'Odyssey', 'HR-V', 'Ridgeline'] },
+        { make: 'Ford', models: ['F-150', 'Mustang', 'Explorer', 'Escape', 'Edge', 'Bronco', 'Ranger', 'Expedition'] },
+        { make: 'Chevrolet', models: ['Silverado', 'Malibu', 'Equinox', 'Traverse', 'Tahoe', 'Suburban', 'Colorado', 'Camaro'] },
+        { make: 'BMW', models: ['3 Series', '5 Series', 'X3', 'X5', 'X7', '7 Series', 'M3', 'iX'] },
+        { make: 'Mercedes-Benz', models: ['C-Class', 'E-Class', 'S-Class', 'GLE', 'GLC', 'GLS', 'A-Class'] },
+        { make: 'Audi', models: ['A4', 'A6', 'Q5', 'Q7', 'Q3', 'A3', 'e-tron'] },
+        { make: 'Nissan', models: ['Altima', 'Sentra', 'Rogue', 'Pathfinder', 'Frontier', 'Murano', 'Kicks'] },
+        { make: 'Hyundai', models: ['Elantra', 'Sonata', 'Tucson', 'Santa Fe', 'Palisade', 'Kona', 'Venue'] },
+        { make: 'Lexus', models: ['ES', 'RX', 'NX', 'GX', 'IS', 'LS', 'UX'] },
+      ];
       const colors = ['Black', 'White', 'Silver', 'Gray', 'Blue', 'Red', 'Green', 'Gold'];
       
       for (let i = 0; i < 300; i++) {
-        const make = faker.helpers.arrayElement(makes);
+        const vehicleOption = faker.helpers.arrayElement(vehicleOptions);
+        const make = vehicleOption.make;
+        const model = faker.helpers.arrayElement(vehicleOption.models);
+        
         const vehicle = await db.insert(schema.vehicles).values({
           customerId: faker.helpers.arrayElement(customers).id,
           garageId: faker.helpers.arrayElement(garages).id,
           make,
-          model: faker.vehicle.model(),
+          model,
           year: faker.number.int({ min: 2015, max: 2024 }),
           color: faker.helpers.arrayElement(colors),
           vin: faker.vehicle.vin(),
