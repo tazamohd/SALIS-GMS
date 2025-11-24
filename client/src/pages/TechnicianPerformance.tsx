@@ -150,34 +150,34 @@ export default function TechnicianPerformance() {
           {topPerformers.map((tech: any, index: number) => (
             <div
               key={tech.id}
-              className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg"
+              className="flex items-center justify-between p-4 border border-gray-200 dark:border-salis-gray-dark rounded-lg bg-gray-50 dark:bg-salis-gray-dark/30 hover:bg-gray-100 dark:hover:bg-salis-gray-dark/50 transition-colors"
               data-testid={`technician-${tech.id}`}
             >
               <div className="flex items-center gap-4">
-                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 font-bold text-gray-900 dark:text-white">
+                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-900 dark:bg-white font-bold text-white dark:text-gray-900">
                   #{index + 1}
                 </div>
                 <Avatar>
-                  <AvatarFallback className="bg-gray-800 dark:bg-gray-200 text-white dark:text-black">
+                  <AvatarFallback className="bg-gray-900 dark:bg-white text-white dark:text-gray-900">
                     {tech.name.split(' ').map((n: string) => n[0]).join('')}
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <p className="font-semibold text-gray-900 dark:text-white">{tech.name}</p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">{tech.role}</p>
+                  <p className="font-poppins font-semibold text-gray-900 dark:text-white">{tech.name}</p>
+                  <p className="font-poppins text-sm text-gray-600 dark:text-gray-400">{tech.role}</p>
                 </div>
               </div>
               <div className="flex items-center gap-6">
                 <div className="text-center">
-                  <p className="text-lg font-bold text-gray-900 dark:text-white">{tech.tasksCompleted}</p>
-                  <p className="text-xs text-gray-600 dark:text-gray-400">Tasks</p>
+                  <p className="text-lg font-montserrat font-bold text-gray-900 dark:text-white">{tech.tasksCompleted}</p>
+                  <p className="text-xs font-poppins text-gray-600 dark:text-gray-400">Tasks</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-lg font-bold text-gray-900 dark:text-white">{tech.rating}</p>
-                  <p className="text-xs text-gray-600 dark:text-gray-400">Rating</p>
+                  <p className="text-lg font-montserrat font-bold text-gray-900 dark:text-white">{tech.rating}</p>
+                  <p className="text-xs font-poppins text-gray-600 dark:text-gray-400">Rating</p>
                 </div>
                 <div className="text-center">
-                  <Badge className="bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white border-0">
+                  <Badge className="bg-gray-900 dark:bg-white text-white dark:text-gray-900 border-0">
                     {tech.efficiency}% Efficiency
                   </Badge>
                 </div>
@@ -193,13 +193,27 @@ export default function TechnicianPerformance() {
       content: (
         <ResponsiveContainer width="100%" height={400}>
           <BarChart data={performanceData}>
-            <CartesianGrid strokeDasharray="3 3" className="stroke-gray-200 dark:stroke-gray-700" />
-            <XAxis dataKey="name" className="text-xs" />
-            <YAxis />
-            <Tooltip contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))" }} />
+            <CartesianGrid strokeDasharray="3 3" className="stroke-gray-200 dark:stroke-salis-gray-dark" />
+            <XAxis 
+              dataKey="name" 
+              className="text-xs" 
+              tick={{ fill: 'currentColor' }}
+              style={{ fill: 'hsl(var(--foreground))' }}
+            />
+            <YAxis 
+              tick={{ fill: 'currentColor' }}
+              style={{ fill: 'hsl(var(--foreground))' }}
+            />
+            <Tooltip 
+              contentStyle={{ 
+                backgroundColor: "hsl(var(--card))", 
+                border: "1px solid hsl(var(--border))",
+                borderRadius: "6px"
+              }} 
+            />
             <Legend />
-            <Bar dataKey="tasksCompleted" fill="#1f2937" name="Tasks Completed" />
-            <Bar dataKey="efficiency" fill="#6b7280" name="Efficiency %" />
+            <Bar dataKey="tasksCompleted" fill="hsl(var(--foreground))" name="Tasks Completed" />
+            <Bar dataKey="efficiency" fill="hsl(var(--muted-foreground))" name="Efficiency %" />
           </BarChart>
         </ResponsiveContainer>
       ),
@@ -212,17 +226,30 @@ export default function TechnicianPerformance() {
       content: selectedTechnician !== 'all' && weeklyTrends.length > 0 ? (
         <ResponsiveContainer width="100%" height={300}>
           <LineChart data={weeklyTrends}>
-            <CartesianGrid strokeDasharray="3 3" className="stroke-gray-200 dark:stroke-gray-700" />
-            <XAxis dataKey="week" />
-            <YAxis />
-            <Tooltip contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))" }} />
+            <CartesianGrid strokeDasharray="3 3" className="stroke-gray-200 dark:stroke-salis-gray-dark" />
+            <XAxis 
+              dataKey="week" 
+              tick={{ fill: 'currentColor' }}
+              style={{ fill: 'hsl(var(--foreground))' }}
+            />
+            <YAxis 
+              tick={{ fill: 'currentColor' }}
+              style={{ fill: 'hsl(var(--foreground))' }}
+            />
+            <Tooltip 
+              contentStyle={{ 
+                backgroundColor: "hsl(var(--card))", 
+                border: "1px solid hsl(var(--border))",
+                borderRadius: "6px"
+              }} 
+            />
             <Legend />
-            <Line type="monotone" dataKey="completed" stroke="#1f2937" strokeWidth={2} name="Completed" />
-            <Line type="monotone" dataKey="target" stroke="#9ca3af" strokeWidth={2} strokeDasharray="5 5" name="Target" />
+            <Line type="monotone" dataKey="completed" stroke="hsl(var(--foreground))" strokeWidth={2} name="Completed" />
+            <Line type="monotone" dataKey="target" stroke="hsl(var(--muted-foreground))" strokeWidth={2} strokeDasharray="5 5" name="Target" />
           </LineChart>
         </ResponsiveContainer>
       ) : (
-        <div className="flex items-center justify-center h-[300px] text-gray-500 dark:text-gray-400">
+        <div className="flex items-center justify-center h-[300px] text-gray-600 dark:text-gray-400 font-poppins">
           Select a specific technician to view completion trends
         </div>
       ),
@@ -233,11 +260,33 @@ export default function TechnicianPerformance() {
       content: (
         <ResponsiveContainer width="100%" height={400}>
           <RadarChart data={skillsData}>
-            <PolarGrid className="stroke-gray-200 dark:stroke-gray-700" />
-            <PolarAngleAxis dataKey="skill" className="text-xs" />
-            <PolarRadiusAxis angle={90} domain={[0, 100]} />
-            <Radar name="Proficiency" dataKey="proficiency" stroke="#1f2937" fill="#1f2937" fillOpacity={0.3} />
-            <Tooltip contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))" }} />
+            <PolarGrid className="stroke-gray-200 dark:stroke-salis-gray-dark" />
+            <PolarAngleAxis 
+              dataKey="skill" 
+              className="text-xs" 
+              tick={{ fill: 'currentColor' }}
+              style={{ fill: 'hsl(var(--foreground))' }}
+            />
+            <PolarRadiusAxis 
+              angle={90} 
+              domain={[0, 100]}
+              tick={{ fill: 'currentColor' }}
+              style={{ fill: 'hsl(var(--foreground))' }}
+            />
+            <Radar 
+              name="Proficiency" 
+              dataKey="proficiency" 
+              stroke="hsl(var(--foreground))" 
+              fill="hsl(var(--foreground))" 
+              fillOpacity={0.2} 
+            />
+            <Tooltip 
+              contentStyle={{ 
+                backgroundColor: "hsl(var(--card))", 
+                border: "1px solid hsl(var(--border))",
+                borderRadius: "6px"
+              }} 
+            />
           </RadarChart>
         </ResponsiveContainer>
       ),
