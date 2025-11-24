@@ -21,16 +21,18 @@ export default function TechnicianPerformance() {
   const [selectedTechnician, setSelectedTechnician] = useState("all");
   const [preferencesOpen, setPreferencesOpen] = useState(false);
 
-  const { data: metricDefinitions = [] } = useQuery({
+  const { data: metricDefinitions = [] } = useQuery<any[]>({
     queryKey: ['/api/technician-performance/metrics/definitions'],
   });
 
-  const { data: metricPreferences = [] } = useQuery({
-    queryKey: ['/api/technician-performance/metrics/preferences', user?.id],
-    enabled: !!user?.id,
+  const userId = user?.id || '';
+  
+  const { data: metricPreferences = [] } = useQuery<any[]>({
+    queryKey: ['/api/technician-performance/metrics/preferences', userId],
+    enabled: !!userId,
   });
 
-  const { data: technicians = [] } = useQuery({
+  const { data: technicians = [] } = useQuery<any[]>({
     queryKey: ['/api/users'],
   });
 
@@ -75,9 +77,9 @@ export default function TechnicianPerformance() {
   ];
 
   const topPerformers = performanceData
-    .sort((a, b) => b.tasksCompleted - a.tasksCompleted)
+    .sort((a: any, b: any) => b.tasksCompleted - a.tasksCompleted)
     .slice(0, 5)
-    .map((tech, index) => ({
+    .map((tech: any, index: number) => ({
       id: index + 1,
       name: tech.name,
       role: "Technician",
@@ -88,16 +90,13 @@ export default function TechnicianPerformance() {
 
   const handleMetricPreferenceChange = async (metricKey: string, isVisible: boolean) => {
     try {
-      await apiRequest('/api/technician-performance/metrics/preferences', {
-        method: 'POST',
-        body: JSON.stringify({
-          userId: user?.id,
-          metricKey,
-          isVisible,
-          sortOrder: metricPreferences.length + 1,
-        }),
+      await apiRequest('/api/technician-performance/metrics/preferences', 'POST', {
+        userId,
+        metricKey,
+        isVisible,
+        sortOrder: metricPreferences.length + 1,
       });
-      queryClient.invalidateQueries({ queryKey: ['/api/technician-performance/metrics/preferences', user?.id] });
+      queryClient.invalidateQueries({ queryKey: ['/api/technician-performance/metrics/preferences', userId] });
       toast({
         title: "Preferences Updated",
         description: "Your metric preferences have been saved.",
@@ -143,6 +142,51 @@ export default function TechnicianPerformance() {
   ];
 
   const sections = [
+    {
+      title: "Top Performing Technicians",
+      description: "Highest ranked technicians based on tasks completed",
+      content: (
+        <div className="space-y-4">
+          {topPerformers.map((tech: any, index: number) => (
+            <div
+              key={tech.id}
+              className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg"
+              data-testid={`technician-${tech.id}`}
+            >
+              <div className="flex items-center gap-4">
+                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 font-bold text-gray-900 dark:text-white">
+                  #{index + 1}
+                </div>
+                <Avatar>
+                  <AvatarFallback className="bg-gray-800 dark:bg-gray-200 text-white dark:text-black">
+                    {tech.name.split(' ').map((n: string) => n[0]).join('')}
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <p className="font-semibold text-gray-900 dark:text-white">{tech.name}</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">{tech.role}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-6">
+                <div className="text-center">
+                  <p className="text-lg font-bold text-gray-900 dark:text-white">{tech.tasksCompleted}</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">Tasks</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-lg font-bold text-gray-900 dark:text-white">{tech.rating}</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">Rating</p>
+                </div>
+                <div className="text-center">
+                  <Badge className="bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white border-0">
+                    {tech.efficiency}% Efficiency
+                  </Badge>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      ),
+    },
     {
       title: "Technician Performance Comparison",
       description: "Compare key metrics across all technicians",
@@ -207,93 +251,6 @@ export default function TechnicianPerformance() {
       icon={Users}
       filters={filters}
       sections={sections}
-      actions={
-        <Dialog open={preferencesOpen} onOpenChange={setPreferencesOpen}>
-          <DialogTrigger asChild>
-            <Button variant="outline" size="sm" data-testid="button-metric-preferences">
-              <Settings className="w-4 h-4 mr-2" />
-              Metric Preferences
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="bg-white dark:bg-gray-900">
-            <DialogHeader>
-              <DialogTitle>Customize Performance Metrics</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4">
-              {metricDefinitions.map((metric: any) => (
-                <div key={metric.metricKey} className="flex items-center justify-between">
-                  <div>
-                    <Label>{metric.metricName}</Label>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">{metric.description}</p>
-                  </div>
-                  <Select
-                    value={metricPreferences.find((p: any) => p.metricKey === metric.metricKey)?.isVisible ? 'visible' : 'hidden'}
-                    onValueChange={(value) => handleMetricPreferenceChange(metric.metricKey, value === 'visible')}
-                  >
-                    <SelectTrigger className="w-32" data-testid={`select-metric-${metric.metricKey}`}>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="visible">Visible</SelectItem>
-                      <SelectItem value="hidden">Hidden</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              ))}
-            </div>
-          </DialogContent>
-        </Dialog>
-      }
-    >
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <TrendingUp className="w-5 h-5" />
-            Top Performing Technicians
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {topPerformers.map((tech, index) => (
-              <div
-                key={tech.id}
-                className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg"
-                data-testid={`technician-${tech.id}`}
-              >
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 font-bold text-gray-900 dark:text-white">
-                    #{index + 1}
-                  </div>
-                  <Avatar>
-                    <AvatarFallback className="bg-gray-800 dark:bg-gray-200 text-white dark:text-black">
-                      {tech.name.split(' ').map(n => n[0]).join('')}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <p className="font-semibold text-gray-900 dark:text-white">{tech.name}</p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">{tech.role}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-6">
-                  <div className="text-center">
-                    <p className="text-lg font-bold text-gray-900 dark:text-white">{tech.tasksCompleted}</p>
-                    <p className="text-xs text-gray-600 dark:text-gray-400">Tasks</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-lg font-bold text-gray-900 dark:text-white">{tech.rating}</p>
-                    <p className="text-xs text-gray-600 dark:text-gray-400">Rating</p>
-                  </div>
-                  <div className="text-center">
-                    <Badge className="bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white border-0">
-                      {tech.efficiency}% Efficiency
-                    </Badge>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-    </AnalyticsPage>
+    />
   );
 }

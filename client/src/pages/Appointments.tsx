@@ -231,6 +231,7 @@ export function Appointments() {
                             <Button 
                               size="sm" 
                               className="bg-gray-100 hover:bg-gray-200 dark:bg-salis-gray-dark dark:hover:bg-salis-gray text-gray-900 dark:text-gray-100 border border-gray-200 dark:border-gray-700"
+                              onClick={() => navigate(`/calendar?appointmentId=${apt.id}`)}
                               data-testid={`button-view-${apt.id}`}
                             >
                               View
