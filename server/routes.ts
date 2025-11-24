@@ -18302,6 +18302,219 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ========================================
+  // TECHNICIAN PERFORMANCE ROUTES
+  // ========================================
+
+  // Get metric definitions
+  app.get('/api/technician-performance/metrics', isAuthenticated, async (req: any, res) => {
+    try {
+      const metrics = await storage.getTechnicianMetricDefinitions();
+      res.json(metrics);
+    } catch (error: any) {
+      console.error("Error fetching metric definitions:", error);
+      res.status(500).json({ message: "Failed to fetch metrics" });
+    }
+  });
+
+  // Get technician's metric preferences
+  app.get('/api/technician-performance/preferences', isAuthenticated, async (req: any, res) => {
+    try {
+      const preferences = await storage.getTechnicianMetricPreferences(req.user.id);
+      res.json(preferences);
+    } catch (error: any) {
+      console.error("Error fetching preferences:", error);
+      res.status(500).json({ message: "Failed to fetch preferences" });
+    }
+  });
+
+  // Update metric preferences
+  app.post('/api/technician-performance/preferences', isAuthenticated, async (req: any, res) => {
+    try {
+      const preference = await storage.upsertTechnicianMetricPreference({
+        userId: req.user.id,
+        ...req.body,
+      });
+      res.json(preference);
+    } catch (error: any) {
+      console.error("Error updating preferences:", error);
+      res.status(500).json({ message: "Failed to update preferences" });
+    }
+  });
+
+  // Get performance dashboard data
+  app.get('/api/technician-performance/dashboard', isAuthenticated, async (req: any, res) => {
+    try {
+      const { technicianId, period = 'weekly' } = req.query;
+      const targetTechnicianId = technicianId || req.user.id;
+      
+      // Get rollup data
+      const rollups = await storage.getTechnicianPerformanceRollups(
+        targetTechnicianId as string,
+        period as string
+      );
+      
+      res.json(rollups);
+    } catch (error: any) {
+      console.error("Error fetching dashboard data:", error);
+      res.status(500).json({ message: "Failed to fetch dashboard data" });
+    }
+  });
+
+  // ========================================
+  // CUSTOMER FEEDBACK ROUTES
+  // ========================================
+
+  // Submit feedback
+  app.post('/api/feedback', isAuthenticated, async (req: any, res) => {
+    try {
+      const validated = schema.insertServiceFeedbackSchema.parse(req.body);
+      const feedback = await storage.createServiceFeedback(validated);
+      
+      // Update technician summary asynchronously
+      if (feedback.technicianId) {
+        storage.updateTechnicianFeedbackSummary(feedback.technicianId).catch(console.error);
+      }
+      
+      res.json(feedback);
+    } catch (error: any) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json(sanitizeZodError(error));
+      }
+      console.error("Error submitting feedback:", error);
+      res.status(500).json({ message: "Failed to submit feedback" });
+    }
+  });
+
+  // Get feedback for a job card
+  app.get('/api/feedback/job-card/:jobCardId', isAuthenticated, async (req: any, res) => {
+    try {
+      const feedback = await storage.getServiceFeedbackByJobCard(req.params.jobCardId);
+      res.json(feedback);
+    } catch (error: any) {
+      console.error("Error fetching feedback:", error);
+      res.status(500).json({ message: "Failed to fetch feedback" });
+    }
+  });
+
+  // Get feedback for a technician
+  app.get('/api/feedback/technician/:technicianId', isAuthenticated, async (req: any, res) => {
+    try {
+      const feedback = await storage.getServiceFeedbackByTechnician(req.params.technicianId);
+      const summary = await storage.getTechnicianFeedbackSummary(req.params.technicianId);
+      res.json({ feedback, summary });
+    } catch (error: any) {
+      console.error("Error fetching technician feedback:", error);
+      res.status(500).json({ message: "Failed to fetch feedback" });
+    }
+  });
+
+  // ========================================
+  // MAINTENANCE RECOMMENDATIONS ROUTES
+  // ========================================
+
+  // Get maintenance recommendations for a vehicle
+  app.get('/api/maintenance/recommendations/:vehicleId', isAuthenticated, async (req: any, res) => {
+    try {
+      const recommendations = await storage.getMaintenanceRecommendations(req.params.vehicleId);
+      res.json(recommendations);
+    } catch (error: any) {
+      console.error("Error fetching recommendations:", error);
+      res.status(500).json({ message: "Failed to fetch recommendations" });
+    }
+  });
+
+  // Acknowledge recommendation
+  app.patch('/api/maintenance/recommendations/:id/acknowledge', isAuthenticated, async (req: any, res) => {
+    try {
+      const recommendation = await storage.acknowledgeMaintenanceRecommendation(req.params.id);
+      res.json(recommendation);
+    } catch (error: any) {
+      console.error("Error acknowledging recommendation:", error);
+      res.status(500).json({ message: "Failed to acknowledge recommendation" });
+    }
+  });
+
+  // ========================================
+  // TELEMATICS ROUTES
+  // ========================================
+
+  // Get telematic device for vehicle
+  app.get('/api/telematics/device/:vehicleId', isAuthenticated, async (req: any, res) => {
+    try {
+      const device = await storage.getTelematicsDeviceByVehicle(req.params.vehicleId);
+      if (!device) {
+        return res.status(404).json({ message: "No telematics device found" });
+      }
+      res.json(device);
+    } catch (error: any) {
+      console.error("Error fetching telematics device:", error);
+      res.status(500).json({ message: "Failed to fetch device" });
+    }
+  });
+
+  // Get latest telematics readings
+  app.get('/api/telematics/readings/:vehicleId', isAuthenticated, async (req: any, res) => {
+    try {
+      const { streamType, hours = 24 } = req.query;
+      const readings = await storage.getTelematicsReadings(
+        req.params.vehicleId,
+        streamType as string,
+        parseInt(hours as string)
+      );
+      res.json(readings);
+    } catch (error: any) {
+      console.error("Error fetching telematics readings:", error);
+      res.status(500).json({ message: "Failed to fetch readings" });
+    }
+  });
+
+  // ========================================
+  // GAMIFICATION ROUTES
+  // ========================================
+
+  // Get leaderboard
+  app.get('/api/gamification/leaderboard', isAuthenticated, async (req: any, res) => {
+    try {
+      const { period = 'weekly', limit = 10 } = req.query;
+      const leaderboard = await storage.getLeaderboard(
+        period as string,
+        parseInt(limit as string)
+      );
+      res.json(leaderboard);
+    } catch (error: any) {
+      console.error("Error fetching leaderboard:", error);
+      res.status(500).json({ message: "Failed to fetch leaderboard" });
+    }
+  });
+
+  // Get technician gamification profile
+  app.get('/api/gamification/profile/:technicianId', isAuthenticated, async (req: any, res) => {
+    try {
+      const [points, badges, recentEvents] = await Promise.all([
+        storage.getTechnicianPoints(req.params.technicianId),
+        storage.getTechnicianBadges(req.params.technicianId),
+        storage.getTechnicianRecentEvents(req.params.technicianId, 10),
+      ]);
+      
+      res.json({ points, badges, recentEvents });
+    } catch (error: any) {
+      console.error("Error fetching gamification profile:", error);
+      res.status(500).json({ message: "Failed to fetch profile" });
+    }
+  });
+
+  // Get available badges
+  app.get('/api/gamification/badges', isAuthenticated, async (req: any, res) => {
+    try {
+      const badges = await storage.getGamificationBadges();
+      res.json(badges);
+    } catch (error: any) {
+      console.error("Error fetching badges:", error);
+      res.status(500).json({ message: "Failed to fetch badges" });
+    }
+  });
+
   const httpServer = createServer(app);
   
   // Initialize WebSocket server for chat

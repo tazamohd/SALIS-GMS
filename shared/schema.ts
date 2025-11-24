@@ -8539,3 +8539,344 @@ export const insertCallDispositionCodeSchema = createInsertSchema(callDispositio
 export type AgentPerformanceSnapshot = typeof agentPerformanceSnapshots.$inferSelect;
 export type InsertAgentPerformanceSnapshot = typeof agentPerformanceSnapshots.$inferInsert;
 export const insertAgentPerformanceSnapshotSchema = createInsertSchema(agentPerformanceSnapshots).omit({ id: true, createdAt: true });
+
+// ========================================
+// TECHNICIAN PERFORMANCE MODULE
+// ========================================
+
+// Technician Metric Definitions - Define available performance metrics
+export const technicianMetricDefinitions = pgTable("technician_metric_definitions", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  metricKey: varchar("metric_key", { length: 100 }).notNull().unique(),
+  label: varchar("label", { length: 255 }).notNull(),
+  unit: varchar("unit", { length: 50 }),
+  category: varchar("category", { length: 50 }), // efficiency, quality, customer_satisfaction, productivity
+  aggregationType: varchar("aggregation_type", { length: 50 }), // sum, avg, count, min, max
+  defaultConfig: jsonb("default_config"), // Default thresholds and visualization settings
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Technician Metric Preferences - User customization for dashboard metrics
+export const technicianMetricPreferences = pgTable("technician_metric_preferences", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  metricKey: varchar("metric_key", { length: 100 }).notNull(),
+  isPinned: boolean("is_pinned").default(false),
+  thresholdConfig: jsonb("threshold_config"), // Custom thresholds for alerts
+  sortOrder: integer("sort_order").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => ({
+  userMetricUnique: uniqueIndex("tech_metric_pref_user_metric_unique").on(table.userId, table.metricKey),
+}));
+
+// Technician Performance Stream - Real-time metric values
+export const technicianPerformanceStream = pgTable("technician_performance_stream", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  technicianId: varchar("technician_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  jobCardId: uuid("job_card_id").references(() => jobCards.id),
+  metricKey: varchar("metric_key", { length: 100 }).notNull(),
+  metricValue: decimal("metric_value", { precision: 12, scale: 2 }).notNull(),
+  metadata: jsonb("metadata"), // Additional context
+  recordedAt: timestamp("recorded_at").notNull().defaultNow(),
+}, (table) => ({
+  technicianIdx: index("perf_stream_technician_idx").on(table.technicianId),
+  recordedAtIdx: index("perf_stream_recorded_at_idx").on(table.recordedAt),
+  metricKeyIdx: index("perf_stream_metric_key_idx").on(table.metricKey),
+}));
+
+// Technician Performance Rollups - Aggregated metrics for efficient querying
+export const technicianPerformanceRollups = pgTable("technician_performance_rollups", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  technicianId: varchar("technician_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  intervalType: varchar("interval_type", { length: 20 }).notNull(), // daily, weekly, monthly
+  intervalStart: timestamp("interval_start").notNull(),
+  intervalEnd: timestamp("interval_end").notNull(),
+  metrics: jsonb("metrics").notNull(), // {metricKey: {value, count, avg, min, max}}
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => ({
+  technicianIntervalIdx: index("perf_rollup_tech_interval_idx").on(table.technicianId, table.intervalStart),
+}));
+
+// ========================================
+// CUSTOMER FEEDBACK & RATING MODULE
+// ========================================
+
+// Service Feedback - Customer ratings and reviews
+export const serviceFeedback = pgTable("service_feedback", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  jobCardId: uuid("job_card_id").references(() => jobCards.id),
+  vehicleId: uuid("vehicle_id").references(() => vehicles.id),
+  customerId: varchar("customer_id").references(() => customerProfiles.userId),
+  technicianId: varchar("technician_id").references(() => users.id),
+  overallRating: integer("overall_rating").notNull(), // 1-5
+  waitTimeRating: integer("wait_time_rating"), // 1-5
+  qualityRating: integer("quality_rating"), // 1-5
+  communicationRating: integer("communication_rating"), // 1-5
+  comments: text("comments"),
+  media: jsonb("media"), // Array of image URLs
+  isVerified: boolean("is_verified").default(false),
+  isPublic: boolean("is_public").default(true),
+  submittedAt: timestamp("submitted_at").notNull().defaultNow(),
+  respondedAt: timestamp("responded_at"),
+  response: text("response"),
+}, (table) => ({
+  jobCardIdx: index("feedback_job_card_idx").on(table.jobCardId),
+  technicianIdx: index("feedback_technician_idx").on(table.technicianId),
+  submittedAtIdx: index("feedback_submitted_at_idx").on(table.submittedAt),
+}));
+
+// Technician Feedback Summary - Cached aggregate ratings
+export const technicianFeedbackSummary = pgTable("technician_feedback_summary", {
+  technicianId: varchar("technician_id").primaryKey().references(() => users.id, { onDelete: "cascade" }),
+  totalReviews: integer("total_reviews").default(0),
+  averageRating: decimal("average_rating", { precision: 3, scale: 2 }),
+  rating5Count: integer("rating_5_count").default(0),
+  rating4Count: integer("rating_4_count").default(0),
+  rating3Count: integer("rating_3_count").default(0),
+  rating2Count: integer("rating_2_count").default(0),
+  rating1Count: integer("rating_1_count").default(0),
+  rollingAvgLast30Days: decimal("rolling_avg_last_30_days", { precision: 3, scale: 2 }),
+  lastUpdated: timestamp("last_updated").defaultNow(),
+});
+
+// ========================================
+// MAINTENANCE REMINDER MODULE
+// ========================================
+
+// Maintenance Trigger Rules - Define when maintenance should be recommended
+export const maintenanceTriggerRules = pgTable("maintenance_trigger_rules", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id),
+  ruleName: varchar("rule_name", { length: 255 }).notNull(),
+  vehicleType: varchar("vehicle_type", { length: 100 }), // null = all types
+  serviceType: varchar("service_type", { length: 100 }).notNull(),
+  mileageThreshold: integer("mileage_threshold"),
+  durationThresholdDays: integer("duration_threshold_days"),
+  conditionExpression: jsonb("condition_expression"), // JSONLogic rules
+  priority: integer("priority").default(5), // 1-10
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => ({
+  garageIdx: index("maint_rules_garage_idx").on(table.garageId),
+}));
+
+// Maintenance Recommendations - Predicted maintenance needs
+export const maintenanceRecommendations = pgTable("maintenance_recommendations", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  vehicleId: uuid("vehicle_id").notNull().references(() => vehicles.id, { onDelete: "cascade" }),
+  ruleId: uuid("rule_id").references(() => maintenanceTriggerRules.id),
+  serviceType: varchar("service_type", { length: 100 }).notNull(),
+  predictedDueAt: timestamp("predicted_due_at").notNull(),
+  predictedMileage: integer("predicted_mileage"),
+  confidence: decimal("confidence", { precision: 3, scale: 2 }), // 0.00-1.00
+  status: varchar("status", { length: 50 }).default("pending"), // pending, sent, acknowledged, completed, dismissed
+  source: varchar("source", { length: 50 }).notNull(), // usage, history, manual, telematics
+  notificationSentAt: timestamp("notification_sent_at"),
+  acknowledgedAt: timestamp("acknowledged_at"),
+  completedAt: timestamp("completed_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => ({
+  vehicleStatusIdx: index("maint_rec_vehicle_status_idx").on(table.vehicleId, table.status),
+  predictedDueIdx: index("maint_rec_predicted_due_idx").on(table.predictedDueAt),
+}));
+
+// ========================================
+// TELEMATICS MODULE
+// ========================================
+
+// Telematics Providers - External telematics service providers
+export const telematicsProviders = pgTable("telematics_providers", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: varchar("name", { length: 255 }).notNull(),
+  apiType: varchar("api_type", { length: 50 }).notNull(), // rest, mqtt, webhook
+  baseUrl: varchar("base_url", { length: 500 }),
+  authSchema: jsonb("auth_schema"), // OAuth config, API key format
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Telematics Devices - Vehicle-linked telematics hardware
+export const telematicsDevices = pgTable("telematics_devices", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  vehicleId: uuid("vehicle_id").notNull().references(() => vehicles.id, { onDelete: "cascade" }),
+  providerId: uuid("provider_id").notNull().references(() => telematicsProviders.id),
+  externalDeviceId: varchar("external_device_id", { length: 255 }).notNull().unique(),
+  deviceType: varchar("device_type", { length: 100 }), // obd2, gps_tracker, fleet_sensor
+  firmwareVersion: varchar("firmware_version", { length: 50 }),
+  lastHeartbeat: timestamp("last_heartbeat"),
+  status: varchar("status", { length: 50 }).default("active"), // active, inactive, disconnected
+  installedAt: timestamp("installed_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => ({
+  vehicleIdx: index("telem_devices_vehicle_idx").on(table.vehicleId),
+  providerIdx: index("telem_devices_provider_idx").on(table.providerId),
+}));
+
+// Telematics Streams - Define data streams from devices
+export const telematicsStreams = pgTable("telematics_streams", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  deviceId: uuid("device_id").notNull().references(() => telematicsDevices.id, { onDelete: "cascade" }),
+  streamType: varchar("stream_type", { length: 100 }).notNull(), // location, mileage, engine_hours, dtc_codes, fuel_level
+  unit: varchar("unit", { length: 50 }), // miles, km, liters, hours
+  thresholdConfig: jsonb("threshold_config"), // Alert thresholds
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => ({
+  deviceIdx: index("telem_streams_device_idx").on(table.deviceId),
+}));
+
+// Telematics Readings - Time-series data from devices
+export const telematicsReadings = pgTable("telematics_readings", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  streamId: uuid("stream_id").notNull().references(() => telematicsStreams.id, { onDelete: "cascade" }),
+  recordedAt: timestamp("recorded_at").notNull(),
+  value: decimal("value", { precision: 12, scale: 2 }).notNull(),
+  payload: jsonb("payload"), // Full data payload for extensibility
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => ({
+  streamRecordedIdx: index("telem_readings_stream_recorded_idx").on(table.streamId, table.recordedAt),
+  streamRecordedUnique: uniqueIndex("telem_readings_stream_recorded_unique").on(table.streamId, table.recordedAt),
+}));
+
+// ========================================
+// GAMIFICATION MODULE
+// ========================================
+
+// Gamification Event Definitions - Define point-earning events
+export const gamificationEventDefinitions = pgTable("gamification_event_definitions", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  eventKey: varchar("event_key", { length: 100 }).notNull().unique(),
+  name: varchar("name", { length: 255 }).notNull(),
+  description: text("description"),
+  points: integer("points").notNull(),
+  badgeId: uuid("badge_id").references(() => gamificationBadges.id), // Optional badge award
+  category: varchar("category", { length: 50 }), // job_completion, quality, punctuality, customer_service
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Gamification Badges - Achievement badges
+export const gamificationBadges = pgTable("gamification_badges", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: varchar("name", { length: 255 }).notNull(),
+  description: text("description"),
+  icon: varchar("icon", { length: 255 }), // Icon name or URL
+  tier: varchar("tier", { length: 50 }).default("bronze"), // bronze, silver, gold, platinum
+  criteria: jsonb("criteria"), // JSONLogic for badge unlock conditions
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Gamification Events - Point-earning event log
+export const gamificationEvents = pgTable("gamification_events", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  technicianId: varchar("technician_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  eventKey: varchar("event_key", { length: 100 }).notNull(),
+  sourceId: uuid("source_id"), // Job card ID, feedback ID, etc.
+  metadata: jsonb("metadata"),
+  occurredAt: timestamp("occurred_at").notNull().defaultNow(),
+}, (table) => ({
+  technicianIdx: index("gamif_events_technician_idx").on(table.technicianId),
+  occurredAtIdx: index("gamif_events_occurred_at_idx").on(table.occurredAt),
+}));
+
+// Gamification Badge Awards - Badges earned by technicians
+export const gamificationBadgeAwards = pgTable("gamification_badge_awards", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  technicianId: varchar("technician_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  badgeId: uuid("badge_id").notNull().references(() => gamificationBadges.id, { onDelete: "cascade" }),
+  awardedAt: timestamp("awarded_at").notNull().defaultNow(),
+}, (table) => ({
+  technicianBadgeUnique: uniqueIndex("gamif_badge_awards_tech_badge_unique").on(table.technicianId, table.badgeId),
+}));
+
+// Leaderboard Snapshots - Historical leaderboard rankings
+export const leaderboardSnapshots = pgTable("leaderboard_snapshots", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  period: varchar("period", { length: 50 }).notNull(), // daily, weekly, monthly, all_time
+  periodStart: timestamp("period_start").notNull(),
+  periodEnd: timestamp("period_end").notNull(),
+  technicianId: varchar("technician_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  pointsTotal: integer("points_total").default(0),
+  rank: integer("rank"),
+  generatedAt: timestamp("generated_at").notNull().defaultNow(),
+}, (table) => ({
+  periodTechIdx: index("leaderboard_period_tech_idx").on(table.period, table.technicianId),
+  periodRankIdx: index("leaderboard_period_rank_idx").on(table.period, table.rank),
+}));
+
+// Type exports for Technician Performance
+export type TechnicianMetricDefinition = typeof technicianMetricDefinitions.$inferSelect;
+export type InsertTechnicianMetricDefinition = typeof technicianMetricDefinitions.$inferInsert;
+export const insertTechnicianMetricDefinitionSchema = createInsertSchema(technicianMetricDefinitions).omit({ id: true, createdAt: true });
+
+export type TechnicianMetricPreference = typeof technicianMetricPreferences.$inferSelect;
+export type InsertTechnicianMetricPreference = typeof technicianMetricPreferences.$inferInsert;
+export const insertTechnicianMetricPreferenceSchema = createInsertSchema(technicianMetricPreferences).omit({ id: true, createdAt: true });
+
+export type TechnicianPerformanceStream = typeof technicianPerformanceStream.$inferSelect;
+export type InsertTechnicianPerformanceStream = typeof technicianPerformanceStream.$inferInsert;
+export const insertTechnicianPerformanceStreamSchema = createInsertSchema(technicianPerformanceStream).omit({ id: true, recordedAt: true });
+
+export type TechnicianPerformanceRollup = typeof technicianPerformanceRollups.$inferSelect;
+export type InsertTechnicianPerformanceRollup = typeof technicianPerformanceRollups.$inferInsert;
+export const insertTechnicianPerformanceRollupSchema = createInsertSchema(technicianPerformanceRollups).omit({ id: true, createdAt: true });
+
+// Type exports for Customer Feedback
+export type ServiceFeedback = typeof serviceFeedback.$inferSelect;
+export type InsertServiceFeedback = typeof serviceFeedback.$inferInsert;
+export const insertServiceFeedbackSchema = createInsertSchema(serviceFeedback).omit({ id: true, submittedAt: true });
+
+export type TechnicianFeedbackSummary = typeof technicianFeedbackSummary.$inferSelect;
+export type InsertTechnicianFeedbackSummary = typeof technicianFeedbackSummary.$inferInsert;
+export const insertTechnicianFeedbackSummarySchema = createInsertSchema(technicianFeedbackSummary).omit({ lastUpdated: true });
+
+// Type exports for Maintenance Reminders
+export type MaintenanceTriggerRule = typeof maintenanceTriggerRules.$inferSelect;
+export type InsertMaintenanceTriggerRule = typeof maintenanceTriggerRules.$inferInsert;
+export const insertMaintenanceTriggerRuleSchema = createInsertSchema(maintenanceTriggerRules).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type MaintenanceRecommendation = typeof maintenanceRecommendations.$inferSelect;
+export type InsertMaintenanceRecommendation = typeof maintenanceRecommendations.$inferInsert;
+export const insertMaintenanceRecommendationSchema = createInsertSchema(maintenanceRecommendations).omit({ id: true, createdAt: true, updatedAt: true });
+
+// Type exports for Telematics
+export type TelematicsProvider = typeof telematicsProviders.$inferSelect;
+export type InsertTelematicsProvider = typeof telematicsProviders.$inferInsert;
+export const insertTelematicsProviderSchema = createInsertSchema(telematicsProviders).omit({ id: true, createdAt: true });
+
+export type TelematicsDevice = typeof telematicsDevices.$inferSelect;
+export type InsertTelematicsDevice = typeof telematicsDevices.$inferInsert;
+export const insertTelematicsDeviceSchema = createInsertSchema(telematicsDevices).omit({ id: true, createdAt: true });
+
+export type TelematicsStream = typeof telematicsStreams.$inferSelect;
+export type InsertTelematicsStream = typeof telematicsStreams.$inferInsert;
+export const insertTelematicsStreamSchema = createInsertSchema(telematicsStreams).omit({ id: true, createdAt: true });
+
+export type TelematicsReading = typeof telematicsReadings.$inferSelect;
+export type InsertTelematicsReading = typeof telematicsReadings.$inferInsert;
+export const insertTelematicsReadingSchema = createInsertSchema(telematicsReadings).omit({ id: true, createdAt: true });
+
+// Type exports for Gamification
+export type GamificationEventDefinition = typeof gamificationEventDefinitions.$inferSelect;
+export type InsertGamificationEventDefinition = typeof gamificationEventDefinitions.$inferInsert;
+export const insertGamificationEventDefinitionSchema = createInsertSchema(gamificationEventDefinitions).omit({ id: true, createdAt: true });
+
+export type GamificationBadge = typeof gamificationBadges.$inferSelect;
+export type InsertGamificationBadge = typeof gamificationBadges.$inferInsert;
+export const insertGamificationBadgeSchema = createInsertSchema(gamificationBadges).omit({ id: true, createdAt: true });
+
+export type GamificationEvent = typeof gamificationEvents.$inferSelect;
+export type InsertGamificationEvent = typeof gamificationEvents.$inferInsert;
+export const insertGamificationEventSchema = createInsertSchema(gamificationEvents).omit({ id: true, occurredAt: true });
+
+export type GamificationBadgeAward = typeof gamificationBadgeAwards.$inferSelect;
+export type InsertGamificationBadgeAward = typeof gamificationBadgeAwards.$inferInsert;
+export const insertGamificationBadgeAwardSchema = createInsertSchema(gamificationBadgeAwards).omit({ id: true, awardedAt: true });
+
+export type LeaderboardSnapshot = typeof leaderboardSnapshots.$inferSelect;
+export type InsertLeaderboardSnapshot = typeof leaderboardSnapshots.$inferInsert;
+export const insertLeaderboardSnapshotSchema = createInsertSchema(leaderboardSnapshots).omit({ id: true, generatedAt: true });
