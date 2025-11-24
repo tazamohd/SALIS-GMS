@@ -333,6 +333,123 @@ export async function seedAllData() {
     
     console.log(`✅ Vehicles created: ${vehicles.length} total\n`);
     
+    // Add warranty information to some vehicles
+    logProgress('Adding warranty information to vehicles...');
+    const warrantyProviders = ['Toyota Extended', 'Honda Care', 'BMW Warranty Plus', 'Mercedes-Benz Extended', 'Lexus Complete', 'Generic Auto Warranty'];
+    const warrantyTypes = ['Bumper-to-Bumper', 'Powertrain', 'Extended Coverage', 'Certified Pre-Owned'];
+    
+    for (let i = 0; i < Math.min(100, vehicles.length); i++) {
+      const vehicle = vehicles[i];
+      const warrantyStartDate = faker.date.past({ years: 2 });
+      const warrantyEndDate = faker.date.future({ years: faker.helpers.arrayElement([2, 3, 5, 7]) });
+      
+      await db.update(schema.vehicles)
+        .set({
+          warrantyProvider: faker.helpers.arrayElement(warrantyProviders),
+          warrantyType: faker.helpers.arrayElement(warrantyTypes),
+          warrantyStartDate,
+          warrantyEndDate,
+          warrantyMileageLimit: faker.number.int({ min: 50000, max: 150000 }),
+          warrantyNotes: faker.helpers.maybe(() => faker.lorem.sentence(), { probability: 0.5 }),
+        })
+        .where(eq(schema.vehicles.id, vehicle.id));
+    }
+    console.log(`✅ Warranty information added to 100 vehicles\n`);
+    
+    // Add service history for vehicles
+    logProgress('Creating service history records...');
+    let serviceHistoryCount = 0;
+    const serviceTypes = ['Oil Change', 'Tire Rotation', 'Brake Service', 'Engine Diagnostic', 'Transmission Service', 'Battery Replacement', 'Air Filter Replacement', 'Coolant Flush'];
+    
+    for (let i = 0; i < Math.min(150, vehicles.length); i++) {
+      const vehicle = vehicles[i];
+      const numServices = faker.number.int({ min: 2, max: 8 });
+      
+      for (let j = 0; j < numServices; j++) {
+        const currentMileage = vehicle.mileage || 50000;
+        await db.insert(schema.vehicleServiceHistory).values({
+          vehicleId: vehicle.id,
+          serviceType: faker.helpers.arrayElement(serviceTypes),
+          description: faker.lorem.sentences(2),
+          serviceDate: faker.date.past({ years: 3 }),
+          mileageAtService: faker.number.int({ min: Math.max(0, currentMileage - 50000), max: currentMileage }),
+          cost: faker.commerce.price({ min: 50, max: 1500 }),
+          performedBy: faker.helpers.arrayElement(technicians).id,
+          notes: faker.helpers.maybe(() => faker.lorem.sentence(), { probability: 0.3 }),
+        });
+        serviceHistoryCount++;
+      }
+    }
+    console.log(`✅ Service history records created: ${serviceHistoryCount}\n`);
+    
+    // Add maintenance schedules for vehicles
+    logProgress('Creating maintenance schedules...');
+    let maintenanceScheduleCount = 0;
+    const maintenanceServices = [
+      { name: 'Oil Change', intervalMileage: 5000, intervalMonths: 6 },
+      { name: 'Tire Rotation', intervalMileage: 7500, intervalMonths: 6 },
+      { name: 'Brake Inspection', intervalMileage: 15000, intervalMonths: 12 },
+      { name: 'Engine Air Filter', intervalMileage: 15000, intervalMonths: 12 },
+      { name: 'Transmission Service', intervalMileage: 30000, intervalMonths: 24 },
+      { name: 'Coolant Flush', intervalMileage: 30000, intervalMonths: 24 },
+    ];
+    
+    for (let i = 0; i < Math.min(100, vehicles.length); i++) {
+      const vehicle = vehicles[i];
+      const currentMileage = vehicle.mileage || 50000;
+      const numSchedules = faker.number.int({ min: 2, max: 5 });
+      const selectedServices = faker.helpers.arrayElements(maintenanceServices, numSchedules);
+      
+      for (const service of selectedServices) {
+        const nextDueMileage = currentMileage + faker.number.int({ min: 1000, max: service.intervalMileage });
+        const nextDueDate = faker.date.future({ years: 1 });
+        
+        await db.insert(schema.maintenanceSchedules).values({
+          vehicleId: vehicle.id,
+          serviceName: service.name,
+          description: `Regular ${service.name} maintenance`,
+          intervalType: 'both',
+          intervalMileage: service.intervalMileage,
+          intervalMonths: service.intervalMonths,
+          nextDueMileage,
+          nextDueDate,
+          isActive: true,
+        });
+        maintenanceScheduleCount++;
+      }
+    }
+    console.log(`✅ Maintenance schedules created: ${maintenanceScheduleCount}\n`);
+    
+    // Add service reminders for vehicles
+    logProgress('Creating service reminders...');
+    let serviceReminderCount = 0;
+    const reminderStatuses = ['pending', 'sent', 'acknowledged', 'completed'];
+    const reminderTypes = ['service', 'inspection', 'registration', 'insurance'];
+    
+    for (let i = 0; i < Math.min(100, vehicles.length); i++) {
+      const vehicle = vehicles[i];
+      const currentMileage = vehicle.mileage || 50000;
+      const numReminders = faker.number.int({ min: 1, max: 4 });
+      
+      for (let j = 0; j < numReminders; j++) {
+        const triggerDate = faker.date.future({ years: 1 });
+        const triggerMileage = currentMileage + faker.number.int({ min: 2000, max: 15000 });
+        
+        await db.insert(schema.serviceReminders).values({
+          vehicleId: vehicle.id,
+          reminderType: faker.helpers.arrayElement(reminderTypes),
+          reminderTitle: `Upcoming ${faker.helpers.arrayElement(['Service', 'Inspection', 'Maintenance'])} Due`,
+          reminderMessage: faker.lorem.sentence(),
+          triggerDate,
+          triggerMileage,
+          status: faker.helpers.arrayElement(reminderStatuses),
+          sentAt: faker.helpers.maybe(() => faker.date.recent({ days: 30 }), { probability: 0.4 }),
+        });
+        serviceReminderCount++;
+      }
+    }
+    console.log(`✅ Service reminders created: ${serviceReminderCount}\n`);
+    
     // ============================================================
     // PHASE 4: Parts & Inventory
     // ============================================================
