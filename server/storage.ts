@@ -10036,6 +10036,205 @@ export class DatabaseStorage implements IStorage {
       .returning();
     return checkpoint;
   }
+
+  // ========================================
+  // TECHNICIAN PERFORMANCE METHODS
+  // ========================================
+  
+  async getTechnicianMetricDefinitions(): Promise<any[]> {
+    return await db.select().from(schema.technicianMetricDefinitions)
+      .where(eq(schema.technicianMetricDefinitions.isActive, true));
+  }
+
+  async getTechnicianMetricPreferences(userId: string): Promise<any[]> {
+    return await db.select().from(schema.technicianMetricPreferences)
+      .where(eq(schema.technicianMetricPreferences.userId, userId))
+      .orderBy(schema.technicianMetricPreferences.sortOrder);
+  }
+
+  async upsertTechnicianMetricPreference(data: any): Promise<any> {
+    const [preference] = await db.insert(schema.technicianMetricPreferences)
+      .values(data)
+      .onConflictDoUpdate({
+        target: [schema.technicianMetricPreferences.userId, schema.technicianMetricPreferences.metricKey],
+        set: data
+      })
+      .returning();
+    return preference;
+  }
+
+  async getTechnicianPerformanceRollups(technicianId: string, period: string): Promise<any[]> {
+    return await db.select().from(schema.technicianPerformanceRollups)
+      .where(and(
+        eq(schema.technicianPerformanceRollups.technicianId, technicianId),
+        eq(schema.technicianPerformanceRollups.intervalType, period)
+      ))
+      .orderBy(desc(schema.technicianPerformanceRollups.intervalStart))
+      .limit(30);
+  }
+
+  // ========================================
+  // CUSTOMER FEEDBACK METHODS
+  // ========================================
+  
+  async createServiceFeedback(data: any): Promise<any> {
+    const [feedback] = await db.insert(schema.serviceFeedback).values(data).returning();
+    return feedback;
+  }
+
+  async getServiceFeedbackByJobCard(jobCardId: string): Promise<any[]> {
+    return await db.select().from(schema.serviceFeedback)
+      .where(eq(schema.serviceFeedback.jobCardId, jobCardId));
+  }
+
+  async getServiceFeedbackByTechnician(technicianId: string): Promise<any[]> {
+    return await db.select().from(schema.serviceFeedback)
+      .where(eq(schema.serviceFeedback.technicianId, technicianId))
+      .orderBy(desc(schema.serviceFeedback.submittedAt))
+      .limit(100);
+  }
+
+  async getTechnicianFeedbackSummary(technicianId: string): Promise<any | null> {
+    const [summary] = await db.select().from(schema.technicianFeedbackSummary)
+      .where(eq(schema.technicianFeedbackSummary.technicianId, technicianId));
+    return summary || null;
+  }
+
+  async updateTechnicianFeedbackSummary(technicianId: string): Promise<void> {
+    const feedback = await this.getServiceFeedbackByTechnician(technicianId);
+    if (feedback.length === 0) return;
+
+    const totalReviews = feedback.length;
+    const avgRating = feedback.reduce((sum, f) => sum + (f.overallRating || 0), 0) / totalReviews;
+    const ratingCounts = feedback.reduce((acc, f) => {
+      acc[`rating${f.overallRating}Count`] = (acc[`rating${f.overallRating}Count`] || 0) + 1;
+      return acc;
+    }, {} as any);
+
+    await db.insert(schema.technicianFeedbackSummary)
+      .values({
+        technicianId,
+        totalReviews,
+        averageRating: avgRating.toFixed(2),
+        rating5Count: ratingCounts.rating5Count || 0,
+        rating4Count: ratingCounts.rating4Count || 0,
+        rating3Count: ratingCounts.rating3Count || 0,
+        rating2Count: ratingCounts.rating2Count || 0,
+        rating1Count: ratingCounts.rating1Count || 0,
+      })
+      .onConflictDoUpdate({
+        target: schema.technicianFeedbackSummary.technicianId,
+        set: {
+          totalReviews,
+          averageRating: avgRating.toFixed(2),
+          rating5Count: ratingCounts.rating5Count || 0,
+          rating4Count: ratingCounts.rating4Count || 0,
+          rating3Count: ratingCounts.rating3Count || 0,
+          rating2Count: ratingCounts.rating2Count || 0,
+          rating1Count: ratingCounts.rating1Count || 0,
+          lastUpdated: new Date(),
+        }
+      });
+  }
+
+  // ========================================
+  // MAINTENANCE RECOMMENDATIONS METHODS
+  // ========================================
+  
+  async getMaintenanceRecommendations(vehicleId: string): Promise<any[]> {
+    return await db.select().from(schema.maintenanceRecommendations)
+      .where(eq(schema.maintenanceRecommendations.vehicleId, vehicleId))
+      .orderBy(schema.maintenanceRecommendations.predictedDueAt);
+  }
+
+  async acknowledgeMaintenanceRecommendation(id: string): Promise<any> {
+    const [recommendation] = await db.update(schema.maintenanceRecommendations)
+      .set({
+        status: 'acknowledged',
+        acknowledgedAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .where(eq(schema.maintenanceRecommendations.id, id))
+      .returning();
+    return recommendation;
+  }
+
+  // ========================================
+  // TELEMATICS METHODS
+  // ========================================
+  
+  async getTelematicsDeviceByVehicle(vehicleId: string): Promise<any | null> {
+    const [device] = await db.select().from(schema.telematicsDevices)
+      .where(eq(schema.telematicsDevices.vehicleId, vehicleId));
+    return device || null;
+  }
+
+  async getTelematicsReadings(vehicleId: string, streamType?: string, hours: number = 24): Promise<any[]> {
+    const device = await this.getTelematicsDeviceByVehicle(vehicleId);
+    if (!device) return [];
+
+    const streams = await db.select().from(schema.telematicsStreams)
+      .where(and(
+        eq(schema.telematicsStreams.deviceId, device.id),
+        streamType ? eq(schema.telematicsStreams.streamType, streamType) : sql`true`
+      ));
+
+    if (streams.length === 0) return [];
+
+    const cutoffTime = new Date(Date.now() - hours * 60 * 60 * 1000);
+    const streamIds = streams.map(s => s.id);
+
+    return await db.select().from(schema.telematicsReadings)
+      .where(and(
+        sql`${schema.telematicsReadings.streamId} = ANY(${streamIds})`,
+        gte(schema.telematicsReadings.recordedAt, cutoffTime)
+      ))
+      .orderBy(schema.telematicsReadings.recordedAt);
+  }
+
+  // ========================================
+  // GAMIFICATION METHODS
+  // ========================================
+  
+  async getLeaderboard(period: string, limit: number = 10): Promise<any[]> {
+    return await db.select().from(schema.leaderboardSnapshots)
+      .where(eq(schema.leaderboardSnapshots.period, period))
+      .orderBy(schema.leaderboardSnapshots.rank)
+      .limit(limit);
+  }
+
+  async getTechnicianPoints(technicianId: string): Promise<number> {
+    const events = await db.select().from(schema.gamificationEvents)
+      .where(eq(schema.gamificationEvents.technicianId, technicianId));
+    
+    const definitions = await db.select().from(schema.gamificationEventDefinitions);
+    const pointsMap = Object.fromEntries(definitions.map(d => [d.eventKey, d.points]));
+    
+    return events.reduce((total, event) => total + (pointsMap[event.eventKey] || 0), 0);
+  }
+
+  async getTechnicianBadges(technicianId: string): Promise<any[]> {
+    return await db.select({
+      badge: schema.gamificationBadges,
+      awardedAt: schema.gamificationBadgeAwards.awardedAt
+    })
+      .from(schema.gamificationBadgeAwards)
+      .innerJoin(schema.gamificationBadges, eq(schema.gamificationBadgeAwards.badgeId, schema.gamificationBadges.id))
+      .where(eq(schema.gamificationBadgeAwards.technicianId, technicianId))
+      .orderBy(desc(schema.gamificationBadgeAwards.awardedAt));
+  }
+
+  async getTechnicianRecentEvents(technicianId: string, limit: number = 10): Promise<any[]> {
+    return await db.select().from(schema.gamificationEvents)
+      .where(eq(schema.gamificationEvents.technicianId, technicianId))
+      .orderBy(desc(schema.gamificationEvents.occurredAt))
+      .limit(limit);
+  }
+
+  async getGamificationBadges(): Promise<any[]> {
+    return await db.select().from(schema.gamificationBadges)
+      .where(eq(schema.gamificationBadges.isActive, true));
+  }
 }
 
 export const storage = new DatabaseStorage();
