@@ -1,31 +1,35 @@
 # SALIS AUTO - UI Screenshots Index
 
-## Total Screenshots: 129
+## Total Screenshots: 14
 
 ### By Category:
 
-| Category | Count | Folder |
-|----------|-------|--------|
-| Dashboard & Overview | 2 | screenshots/dashboard/ |
-| Customer Intake & Appointments | 5 | screenshots/customer-intake/ |
-| Vehicle Management | 6 | screenshots/vehicle-management/ |
-| Inspection & Check-In | 5 | screenshots/inspection/ |
-| Diagnostics & Assessment | 6 | screenshots/diagnostics/ |
-| Service Planning & Scheduling | 10 | screenshots/service-planning/ |
-| Parts & Inventory | 11 | screenshots/parts-inventory/ |
-| Service Execution & Operations | 10 | screenshots/operations/ |
-| Quality & Delivery | 4 | screenshots/quality/ |
-| Billing & Payments | 8 | screenshots/billing/ |
-| Analytics & Business Intelligence | 7 | screenshots/analytics/ |
-| Customer Experience & Growth | 8 | screenshots/customer-experience/ |
-| Team & HR Management | 6 | screenshots/hr/ |
-| Compliance & Safety | 5 | screenshots/compliance/ |
-| Enterprise & Franchise | 5 | screenshots/enterprise/ |
-| Emerging Technologies | 15 | screenshots/emerging-tech/ |
-| AI & Automation Hub | 6 | screenshots/ai-automation/ |
-| System & Settings | 8 | screenshots/system-settings/ |
-| Customer Portal | 9 | screenshots/customer-portal/ |
-| Authentication & Public | 5 | screenshots/auth/ |
+| Category | Folder |
+|----------|--------|
+| Auth | screenshots/auth/ |
+| Dashboard | screenshots/dashboard/ |
+| Customer Intake | screenshots/customer-intake/ |
+| Vehicle Management | screenshots/vehicle-management/ |
+| Inspection | screenshots/inspection/ |
+| Diagnostics | screenshots/diagnostics/ |
+| Service Planning | screenshots/service-planning/ |
+| Parts Inventory | screenshots/parts-inventory/ |
+| Operations | screenshots/operations/ |
+| Quality | screenshots/quality/ |
+| Billing | screenshots/billing/ |
+| Analytics | screenshots/analytics/ |
+| Customer Experience | screenshots/customer-experience/ |
+| Hr | screenshots/hr/ |
+| Compliance | screenshots/compliance/ |
+| Enterprise | screenshots/enterprise/ |
+| Emerging Tech | screenshots/emerging-tech/ |
+| Ai Automation | screenshots/ai-automation/ |
+| System Settings | screenshots/system-settings/ |
+| Customer Portal | screenshots/customer-portal/ |
+| Client Portal | screenshots/client-portal/ |
+| Mobile Customer | screenshots/mobile-customer/ |
+| Mobile Technician | screenshots/mobile-technician/ |
+| Portal | screenshots/portal/ |
 
 ---
 
@@ -37,4 +41,4 @@
 
 ---
 
-*Generated on: $(date)*
+*Generated on: 2025-11-26T05:47:24.360Z*
