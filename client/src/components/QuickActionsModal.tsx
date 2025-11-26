@@ -19,6 +19,12 @@ import {
   Command,
   Car,
   Receipt,
+  Brain,
+  Zap,
+  Package,
+  Shield,
+  TrendingUp,
+  Sparkles,
 } from "lucide-react";
 
 interface QuickAction {
@@ -103,6 +109,54 @@ export function QuickActionsModal({ open, onOpenChange }: QuickActionsModalProps
       icon: ShoppingCart,
       path: "/purchase-orders",
       keywords: ["purchase", "order", "parts", "supplier", "buy"],
+    },
+    {
+      id: "smart-assignment",
+      label: "Smart Job Assignment",
+      description: "AI-powered technician job assignment",
+      icon: Brain,
+      path: "/smart-assignment",
+      keywords: ["smart", "ai", "assignment", "technician", "job", "auto", "intelligent"],
+    },
+    {
+      id: "smart-parts-recommendations",
+      label: "Smart Parts Recommendations",
+      description: "AI-powered parts suggestions for repairs",
+      icon: Sparkles,
+      path: "/smart-parts-recommendations",
+      keywords: ["smart", "ai", "parts", "recommendations", "suggest", "auto"],
+    },
+    {
+      id: "smart-parts-recommender",
+      label: "Smart Parts Recommender",
+      description: "Intelligent parts matching and suggestions",
+      icon: Package,
+      path: "/smart-parts-recommender",
+      keywords: ["smart", "parts", "recommender", "match", "suggest", "inventory"],
+    },
+    {
+      id: "smart-damage-assessment",
+      label: "Smart Damage Assessment",
+      description: "AI-powered vehicle damage analysis",
+      icon: Shield,
+      path: "/smart-damage-assessment",
+      keywords: ["smart", "ai", "damage", "assessment", "analysis", "vehicle", "inspection"],
+    },
+    {
+      id: "smart-inventory-forecasting",
+      label: "Smart Inventory Forecasting",
+      description: "AI-powered demand prediction for parts",
+      icon: TrendingUp,
+      path: "/smart-inventory-forecasting",
+      keywords: ["smart", "ai", "inventory", "forecast", "prediction", "demand", "stock"],
+    },
+    {
+      id: "smart-contracts",
+      label: "Smart Contracts",
+      description: "Blockchain-based service agreements",
+      icon: Zap,
+      path: "/smart-contracts",
+      keywords: ["smart", "contracts", "blockchain", "agreement", "service", "digital"],
     },
   ];
 
