@@ -55,6 +55,7 @@ import FleetTracking from "@/pages/FleetTracking";
 import ContractManagement from "@/pages/ContractManagement";
 import WarrantyManagement from "@/pages/WarrantyManagement";
 import VehicleInspections from "@/pages/VehicleInspections";
+import VehicleChecklist from "@/pages/VehicleChecklist";
 import TowingAssistance from "@/pages/TowingAssistance";
 import LoanerVehicles from "@/pages/LoanerVehicles";
 import VendorSupplierPortal from "@/pages/VendorSupplierPortal";
@@ -297,6 +298,11 @@ function Router() {
       <Route path="/vehicle-inspections">
         <Layout>
           <VehicleInspections />
+        </Layout>
+      </Route>
+      <Route path="/vehicle-checklist">
+        <Layout>
+          <VehicleChecklist />
         </Layout>
       </Route>
       <Route path="/towing-assistance">

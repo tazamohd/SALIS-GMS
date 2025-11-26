@@ -163,6 +163,7 @@ export function Layout({ children }: LayoutProps) {
       label: "Inspection & Check-In",
       items: [
         { path: "/vehicle-inspections", icon: FileCheck, label: "Vehicle Inspections" },
+        { path: "/vehicle-checklist", icon: ClipboardList, label: "Vehicle Checklist" },
         { path: "/digital-vehicle-walkaround", icon: Camera, label: "Vehicle Walkaround" },
         { path: "/security-cameras", icon: Camera, label: "Security Cameras" },
         { path: "/license-plate", icon: Car, label: "Plate Recognition" },
