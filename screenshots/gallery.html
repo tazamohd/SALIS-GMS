@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SALIS AUTO - UI Screenshots Gallery</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #1a1a1a;
+      color: #fff;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+      color: #fff;
+    }
+    .subtitle {
+      text-align: center;
+      color: #888;
+      margin-bottom: 40px;
+    }
+    .stats {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      margin-bottom: 40px;
+    }
+    .stat {
+      background: #2a2a2a;
+      padding: 15px 30px;
+      border-radius: 10px;
+      text-align: center;
+    }
+    .stat-value {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #fff;
+    }
+    .stat-label {
+      color: #888;
+      font-size: 0.9rem;
+    }
+    .category {
+      margin-bottom: 50px;
+    }
+    .category-title {
+      font-size: 1.5rem;
+      padding: 15px 20px;
+      background: #2a2a2a;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .category-count {
+      background: #444;
+      padding: 3px 10px;
+      border-radius: 15px;
+      font-size: 0.8rem;
+    }
+    .screenshots-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 20px;
+    }
+    .screenshot-card {
+      background: #2a2a2a;
+      border-radius: 12px;
+      overflow: hidden;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .screenshot-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    .screenshot-img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      object-position: top;
+      border-bottom: 1px solid #333;
+    }
+    .screenshot-info {
+      padding: 15px;
+    }
+    .screenshot-name {
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 5px;
+    }
+    .screenshot-route {
+      color: #888;
+      font-size: 0.85rem;
+      font-family: monospace;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.95);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+    .modal.active { display: flex; }
+    .modal img {
+      max-width: 95%;
+      max-height: 95%;
+      border-radius: 8px;
+    }
+    .modal-close {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      font-size: 2rem;
+      color: #fff;
+      cursor: pointer;
+    }
+    .nav {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      display: flex;
+      gap: 10px;
+    }
+    .nav-btn {
+      background: #333;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .nav-btn:hover { background: #444; }
+  </style>
+</head>
+<body>
+  <h1>SALIS AUTO</h1>
+  <p class="subtitle">Complete UI Screenshots Gallery - 174+ Screens</p>
+  
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-value" id="total-count">0</div>
+      <div class="stat-label">Total Screenshots</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value" id="category-count">0</div>
+      <div class="stat-label">Categories</div>
+    </div>
+  </div>
+
+  <div id="gallery"></div>
+
+  <div class="modal" id="modal">
+    <span class="modal-close" onclick="closeModal()">&times;</span>
+    <img id="modal-img" src="" alt="">
+  </div>
+
+  <script>
+    const categories = {
+      'dashboard': { title: 'Dashboard & Overview', screens: [] },
+      'customer-intake': { title: 'Customer Intake & Appointments', screens: [] },
+      'vehicle-management': { title: 'Vehicle Management', screens: [] },
+      'inspection': { title: 'Inspection & Check-In', screens: [] },
+      'diagnostics': { title: 'Diagnostics & Assessment', screens: [] },
+      'service-planning': { title: 'Service Planning & Scheduling', screens: [] },
+      'parts-inventory': { title: 'Parts & Inventory', screens: [] },
+      'operations': { title: 'Service Execution & Operations', screens: [] },
+      'quality': { title: 'Quality & Delivery', screens: [] },
+      'billing': { title: 'Billing & Payments', screens: [] },
+      'analytics': { title: 'Analytics & Business Intelligence', screens: [] },
+      'customer-experience': { title: 'Customer Experience & Growth', screens: [] },
+      'hr': { title: 'Team & HR Management', screens: [] },
+      'compliance': { title: 'Compliance & Safety', screens: [] },
+      'enterprise': { title: 'Enterprise & Franchise', screens: [] },
+      'emerging-tech': { title: 'Emerging Technologies', screens: [] },
+      'ai-automation': { title: 'AI & Automation Hub', screens: [] },
+      'system-settings': { title: 'System & Settings', screens: [] },
+      'customer-portal': { title: 'Customer Portal', screens: [] },
+      'mobile-customer': { title: 'Mobile Apps - Customer', screens: [] },
+      'mobile-technician': { title: 'Mobile Apps - Technician', screens: [] },
+      'auth': { title: 'Authentication & Public', screens: [] },
+      'additional': { title: 'Additional Modules', screens: [] }
+    };
+
+    const allScreens = [
+      { name: '01-dashboard', route: '/dashboard', category: 'dashboard' },
+      { name: '02-kpi-dashboard', route: '/kpi-dashboard', category: 'dashboard' },
+      { name: '03-customers', route: '/customers', category: 'customer-intake' },
+      { name: '04-appointments', route: '/appointments', category: 'customer-intake' },
+      { name: '05-calendar', route: '/calendar', category: 'customer-intake' },
+      { name: '06-appointment-reminders', route: '/appointment-reminders', category: 'customer-intake' },
+      { name: '07-kiosk-checkin', route: '/kiosk-checkin', category: 'customer-intake' },
+      { name: '08-vehicles', route: '/vehicles', category: 'vehicle-management' },
+      { name: '09-vehicle-history', route: '/vehicle-history', category: 'vehicle-management' },
+      { name: '10-vin-decoder', route: '/vin-decoder', category: 'vehicle-management' },
+      { name: '11-fleet-management', route: '/fleet-management', category: 'vehicle-management' },
+      { name: '12-fleet-tracking', route: '/fleet-tracking', category: 'vehicle-management' },
+      { name: '13-loaner-vehicles', route: '/loaner-vehicles', category: 'vehicle-management' },
+      { name: '14-vehicle-inspections', route: '/vehicle-inspections', category: 'inspection' },
+      { name: '15-vehicle-checklist', route: '/vehicle-checklist', category: 'inspection' },
+      { name: '16-digital-walkaround', route: '/digital-vehicle-walkaround', category: 'inspection' },
+      { name: '17-security-cameras', route: '/security-cameras', category: 'inspection' },
+      { name: '18-license-plate', route: '/license-plate', category: 'inspection' },
+      { name: '19-diagnostics-obd', route: '/diagnostics-obd', category: 'diagnostics' },
+      { name: '20-smart-damage', route: '/smart-damage-assessment', category: 'diagnostics' },
+      { name: '21-vehicle-health', route: '/vehicle-health-monitoring', category: 'diagnostics' },
+      { name: '22-predictive-maintenance', route: '/predictive-maintenance', category: 'diagnostics' },
+      { name: '23-predictive-diagnostics', route: '/predictive-diagnostics', category: 'diagnostics' },
+      { name: '24-document-ocr', route: '/document-ocr', category: 'diagnostics' },
+      { name: '25-job-cards', route: '/job-cards', category: 'service-planning' },
+      { name: '26-tasks', route: '/tasks', category: 'service-planning' },
+      { name: '27-service-templates', route: '/service-templates', category: 'service-planning' },
+      { name: '28-ai-scheduling', route: '/ai-scheduling', category: 'service-planning' },
+      { name: '29-smart-assignment', route: '/smart-assignment', category: 'service-planning' },
+      { name: '30-estimates', route: '/estimates', category: 'service-planning' },
+      { name: '31-video-estimates', route: '/video-estimates', category: 'service-planning' },
+      { name: '32-smart-parts-reco', route: '/smart-parts-recommendations', category: 'service-planning' },
+      { name: '33-smart-parts-recommender', route: '/smart-parts-recommender', category: 'service-planning' },
+      { name: '34-price-optimizer', route: '/intelligent-price-optimizer', category: 'service-planning' },
+      { name: '35-inventory', route: '/inventory-management', category: 'parts-inventory' },
+      { name: '36-spare-parts', route: '/spare-parts', category: 'parts-inventory' },
+      { name: '37-tools', route: '/tools', category: 'parts-inventory' },
+      { name: '38-auto-reorder', route: '/parts-auto-reorder', category: 'parts-inventory' },
+      { name: '39-inventory-forecast', route: '/smart-inventory-forecasting', category: 'parts-inventory' },
+      { name: '40-suppliers', route: '/suppliers', category: 'parts-inventory' },
+      { name: '41-vendor-portal', route: '/vendor-supplier-portal', category: 'parts-inventory' },
+      { name: '42-purchase-orders', route: '/purchase-orders', category: 'parts-inventory' },
+      { name: '43-parts-marketplace', route: '/parts-marketplace', category: 'parts-inventory' },
+      { name: '44-parts-network', route: '/parts-supply-network', category: 'parts-inventory' },
+      { name: '45-barcode-scanner', route: '/barcode-scanner', category: 'parts-inventory' },
+      { name: '46-technician-portal', route: '/technician-portal', category: 'operations' },
+      { name: '47-technician-management', route: '/technician-management', category: 'operations' },
+      { name: '48-leaderboards', route: '/technician-leaderboards', category: 'operations' },
+      { name: '49-technician-performance', route: '/technician-performance', category: 'operations' },
+      { name: '50-towing-services', route: '/towing-services', category: 'operations' },
+      { name: '51-towing-assistance', route: '/towing-assistance', category: 'operations' },
+      { name: '52-vehicle-storage', route: '/vehicle-storage', category: 'operations' },
+      { name: '53-tire-management', route: '/tire-management', category: 'operations' },
+      { name: '54-routing-optimizer', route: '/routing-optimizer', category: 'operations' },
+      { name: '55-task-management', route: '/task-management', category: 'operations' },
+      { name: '56-computer-vision-qc', route: '/computer-vision-qc', category: 'quality' },
+      { name: '57-iso-quality', route: '/iso-quality-management', category: 'quality' },
+      { name: '58-performance-analytics', route: '/performance-analytics', category: 'quality' },
+      { name: '59-staff-review', route: '/staff-performance-review', category: 'quality' },
+      { name: '60-invoices', route: '/invoices', category: 'billing' },
+      { name: '61-payments', route: '/payments', category: 'billing' },
+      { name: '62-stripe-payments', route: '/stripe-payments', category: 'billing' },
+      { name: '63-refund-management', route: '/refund-management', category: 'billing' },
+      { name: '64-financial-settings', route: '/financial-settings', category: 'billing' },
+      { name: '65-expense-tracking', route: '/expense-tracking', category: 'billing' },
+      { name: '66-payroll', route: '/payroll-management', category: 'billing' },
+      { name: '67-insurance-claims', route: '/insurance-claims', category: 'billing' },
+      // ... more screens
+    ];
+
+    allScreens.forEach(screen => {
+      if (categories[screen.category]) {
+        categories[screen.category].screens.push(screen);
+      }
+    });
+
+    let totalScreens = 0;
+    const gallery = document.getElementById('gallery');
+    
+    Object.entries(categories).forEach(([key, cat]) => {
+      if (cat.screens.length === 0) return;
+      
+      totalScreens += cat.screens.length;
+      
+      const section = document.createElement('div');
+      section.className = 'category';
+      section.innerHTML = `
+        <div class="category-title">
+          ${cat.title}
+          <span class="category-count">${cat.screens.length}</span>
+        </div>
+        <div class="screenshots-grid">
+          ${cat.screens.map(s => `
+            <div class="screenshot-card" onclick="openModal('${key}/${s.name}.png')">
+              <img class="screenshot-img" src="${key}/${s.name}.png" alt="${s.name}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23333%22 width=%22100%22 height=%22100%22/><text x=%2250%22 y=%2255%22 fill=%22%23666%22 text-anchor=%22middle%22 font-size=%2212%22>Coming Soon</text></svg>'">
+              <div class="screenshot-info">
+                <div class="screenshot-name">${s.name.replace(/-/g, ' ').replace(/^\d+\s*/, '')}</div>
+                <div class="screenshot-route">${s.route}</div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+      gallery.appendChild(section);
+    });
+
+    document.getElementById('total-count').textContent = totalScreens;
+    document.getElementById('category-count').textContent = Object.keys(categories).length;
+
+    function openModal(src) {
+      document.getElementById('modal-img').src = src;
+      document.getElementById('modal').classList.add('active');
+    }
+
+    function closeModal() {
+      document.getElementById('modal').classList.remove('active');
+    }
+
+    document.getElementById('modal').addEventListener('click', (e) => {
+      if (e.target.id === 'modal') closeModal();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeModal();
+    });
+  </script>
+</body>
+</html>
