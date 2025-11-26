@@ -10154,6 +10154,209 @@ export class DatabaseStorage implements IStorage {
       });
   }
 
+  // Get all feedback with filters
+  async getAllServiceFeedback(filters?: { 
+    sentiment?: string; 
+    minRating?: number; 
+    maxRating?: number;
+    isFlagged?: boolean;
+    startDate?: Date;
+    endDate?: Date;
+    limit?: number;
+    offset?: number;
+  }): Promise<any[]> {
+    let query = db.select({
+      feedback: serviceFeedback,
+      customer: {
+        id: customerProfiles.userId,
+        firstName: customerProfiles.firstName,
+        lastName: customerProfiles.lastName,
+        email: customerProfiles.email,
+        phone: customerProfiles.phone,
+      },
+      technician: {
+        id: users.id,
+        firstName: users.firstName,
+        lastName: users.lastName,
+      },
+      vehicle: {
+        id: vehicles.id,
+        make: vehicles.make,
+        model: vehicles.model,
+        year: vehicles.year,
+        licensePlate: vehicles.licensePlate,
+      },
+    }).from(serviceFeedback)
+      .leftJoin(customerProfiles, eq(serviceFeedback.customerId, customerProfiles.userId))
+      .leftJoin(users, eq(serviceFeedback.technicianId, users.id))
+      .leftJoin(vehicles, eq(serviceFeedback.vehicleId, vehicles.id))
+      .$dynamic();
+
+    if (filters?.sentiment) {
+      query = query.where(eq(serviceFeedback.sentiment, filters.sentiment));
+    }
+    if (filters?.minRating) {
+      query = query.where(gte(serviceFeedback.overallRating, filters.minRating));
+    }
+    if (filters?.maxRating) {
+      query = query.where(lte(serviceFeedback.overallRating, filters.maxRating));
+    }
+    if (filters?.isFlagged !== undefined) {
+      query = query.where(eq(serviceFeedback.isFlagged, filters.isFlagged));
+    }
+    if (filters?.startDate) {
+      query = query.where(gte(serviceFeedback.submittedAt, filters.startDate));
+    }
+    if (filters?.endDate) {
+      query = query.where(lte(serviceFeedback.submittedAt, filters.endDate));
+    }
+
+    query = query.orderBy(desc(serviceFeedback.submittedAt));
+    
+    if (filters?.limit) {
+      query = query.limit(filters.limit);
+    }
+    if (filters?.offset) {
+      query = query.offset(filters.offset);
+    }
+
+    return await query;
+  }
+
+  // Get feedback analytics with sentiment breakdown
+  async getFeedbackAnalytics(): Promise<any> {
+    const allFeedback = await db.select().from(serviceFeedback);
+    
+    const totalFeedback = allFeedback.length;
+    const avgOverallRating = allFeedback.length > 0 
+      ? allFeedback.reduce((sum, f) => sum + (f.overallRating || 0), 0) / totalFeedback 
+      : 0;
+    
+    const sentimentCounts = allFeedback.reduce((acc, f) => {
+      const sentiment = f.sentiment || 'unanalyzed';
+      acc[sentiment] = (acc[sentiment] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+    const ratingDistribution = allFeedback.reduce((acc, f) => {
+      acc[f.overallRating] = (acc[f.overallRating] || 0) + 1;
+      return acc;
+    }, {} as Record<number, number>);
+
+    const flaggedCount = allFeedback.filter(f => f.isFlagged).length;
+    const pendingResponseCount = allFeedback.filter(f => !f.response && f.overallRating <= 3).length;
+
+    const avgWaitTime = allFeedback.filter(f => f.waitTimeRating).length > 0
+      ? allFeedback.filter(f => f.waitTimeRating).reduce((sum, f) => sum + (f.waitTimeRating || 0), 0) / allFeedback.filter(f => f.waitTimeRating).length
+      : 0;
+    const avgQuality = allFeedback.filter(f => f.qualityRating).length > 0
+      ? allFeedback.filter(f => f.qualityRating).reduce((sum, f) => sum + (f.qualityRating || 0), 0) / allFeedback.filter(f => f.qualityRating).length
+      : 0;
+    const avgCommunication = allFeedback.filter(f => f.communicationRating).length > 0
+      ? allFeedback.filter(f => f.communicationRating).reduce((sum, f) => sum + (f.communicationRating || 0), 0) / allFeedback.filter(f => f.communicationRating).length
+      : 0;
+
+    return {
+      totalFeedback,
+      avgOverallRating: avgOverallRating.toFixed(2),
+      sentimentCounts,
+      ratingDistribution,
+      flaggedCount,
+      pendingResponseCount,
+      categoryRatings: {
+        waitTime: avgWaitTime.toFixed(2),
+        quality: avgQuality.toFixed(2),
+        communication: avgCommunication.toFixed(2),
+      },
+    };
+  }
+
+  // Update feedback with response
+  async respondToFeedback(id: string, response: string): Promise<any> {
+    const [updated] = await db.update(serviceFeedback)
+      .set({
+        response,
+        respondedAt: new Date(),
+      })
+      .where(eq(serviceFeedback.id, id))
+      .returning();
+    return updated;
+  }
+
+  // Flag feedback for moderation
+  async flagFeedback(id: string, reason: string): Promise<any> {
+    const [updated] = await db.update(serviceFeedback)
+      .set({
+        isFlagged: true,
+        flagReason: reason,
+      })
+      .where(eq(serviceFeedback.id, id))
+      .returning();
+    return updated;
+  }
+
+  // Unflag feedback
+  async unflagFeedback(id: string): Promise<any> {
+    const [updated] = await db.update(serviceFeedback)
+      .set({
+        isFlagged: false,
+        flagReason: null,
+      })
+      .where(eq(serviceFeedback.id, id))
+      .returning();
+    return updated;
+  }
+
+  // Update sentiment analysis for feedback
+  async updateFeedbackSentiment(id: string, sentiment: string, sentimentScore: number, keywords: string[]): Promise<any> {
+    const [updated] = await db.update(serviceFeedback)
+      .set({
+        sentiment,
+        sentimentScore: sentimentScore.toString(),
+        sentimentKeywords: keywords,
+      })
+      .where(eq(serviceFeedback.id, id))
+      .returning();
+    return updated;
+  }
+
+  // Get feedback by ID
+  async getServiceFeedbackById(id: string): Promise<any | null> {
+    const [feedback] = await db.select({
+      feedback: serviceFeedback,
+      customer: {
+        id: customerProfiles.userId,
+        firstName: customerProfiles.firstName,
+        lastName: customerProfiles.lastName,
+        email: customerProfiles.email,
+        phone: customerProfiles.phone,
+      },
+      technician: {
+        id: users.id,
+        firstName: users.firstName,
+        lastName: users.lastName,
+      },
+      vehicle: {
+        id: vehicles.id,
+        make: vehicles.make,
+        model: vehicles.model,
+        year: vehicles.year,
+        licensePlate: vehicles.licensePlate,
+      },
+      jobCard: {
+        id: jobCards.id,
+        jobNumber: jobCards.jobNumber,
+        status: jobCards.status,
+      },
+    }).from(serviceFeedback)
+      .leftJoin(customerProfiles, eq(serviceFeedback.customerId, customerProfiles.userId))
+      .leftJoin(users, eq(serviceFeedback.technicianId, users.id))
+      .leftJoin(vehicles, eq(serviceFeedback.vehicleId, vehicles.id))
+      .leftJoin(jobCards, eq(serviceFeedback.jobCardId, jobCards.id))
+      .where(eq(serviceFeedback.id, id));
+    return feedback || null;
+  }
+
   // ========================================
   // MAINTENANCE RECOMMENDATIONS METHODS
   // ========================================
