@@ -4,18 +4,27 @@
 1. [Project Overview](#project-overview)
 2. [Technology Stack](#technology-stack)
 3. [Project Structure](#project-structure)
-4. [Database Architecture](#database-architecture)
-5. [Authentication & Authorization](#authentication--authorization)
-6. [API Design Standards](#api-design-standards)
-7. [Frontend Development](#frontend-development)
-8. [Styling & Theming](#styling--theming)
-9. [Internationalization (i18n)](#internationalization-i18n)
-10. [Real-Time Features](#real-time-features)
-11. [Testing Guidelines](#testing-guidelines)
-12. [Performance Best Practices](#performance-best-practices)
-13. [Security Guidelines](#security-guidelines)
-14. [Deployment](#deployment)
-15. [Related Documentation](#related-documentation)
+4. [Module Reference](#module-reference)
+5. [Database Architecture](#database-architecture)
+6. [Authentication & Authorization](#authentication--authorization)
+7. [RBAC System](#rbac-system)
+8. [API Reference](#api-reference)
+9. [Frontend Development](#frontend-development)
+10. [Component Library](#component-library)
+11. [Styling & Theming](#styling--theming)
+12. [Internationalization (i18n)](#internationalization-i18n)
+13. [Real-Time Features](#real-time-features)
+14. [Saudi Arabia Compliance](#saudi-arabia-compliance)
+15. [AI & Automation](#ai--automation)
+16. [Mobile Applications](#mobile-applications)
+17. [Data Seeding](#data-seeding)
+18. [Testing Guidelines](#testing-guidelines)
+19. [Error Handling](#error-handling)
+20. [Performance Best Practices](#performance-best-practices)
+21. [Security Guidelines](#security-guidelines)
+22. [Deployment](#deployment)
+23. [Troubleshooting](#troubleshooting)
+24. [Related Documentation](#related-documentation)
 
 ---
 
@@ -137,6 +146,168 @@ salis-auto/
     ├── DATA-SEEDING-GUIDE.md
     └── ...
 ```
+
+---
+
+## Module Reference
+
+### 141+ Modules Organized by Phase
+
+#### Phase 1: Core Foundation
+| Module | Description | Route |
+|--------|-------------|-------|
+| Dashboard | Main analytics dashboard | `/dashboard` |
+| Customer Management | Customer profiles & history | `/customers` |
+| Vehicle Management | Vehicle records & service history | `/vehicles` |
+| Job Cards | Service job tracking | `/job-cards` |
+| Inventory | Parts & stock management | `/inventory` |
+| Invoicing | Billing & payment processing | `/invoicing` |
+| User Management | Staff accounts & access | `/users` |
+| Garage Settings | Garage configuration | `/settings` |
+
+#### Phase 2: Operations Enhancement
+| Module | Description | Route |
+|--------|-------------|-------|
+| Service Templates | Predefined service packages | `/service-templates` |
+| Estimates | Cost estimation system | `/estimates` |
+| Appointments | Booking & scheduling | `/appointments` |
+| Work Orders | Detailed work management | `/work-orders` |
+| Purchase Orders | Supplier ordering | `/purchase-orders` |
+| Suppliers | Vendor management | `/suppliers` |
+| Reports & Analytics | Business intelligence | `/reports` |
+| Notifications | Alert management | `/notifications` |
+
+#### Phase 3: Advanced Features
+| Module | Description | Route |
+|--------|-------------|-------|
+| Multi-Branch | Branch network management | `/branches` |
+| Warranty Tracking | Warranty claims & coverage | `/warranty` |
+| Loyalty Program | Customer rewards | `/loyalty` |
+| Technician Performance | Staff KPIs | `/technician-kpis` |
+| Equipment Management | Tools & machinery | `/equipment` |
+| Time Tracking | Labor hour logging | `/time-tracking` |
+| Document Management | File storage & retrieval | `/documents` |
+| Audit Trail | Action history logging | `/audit-trail` |
+
+#### Phase 4: Integration & Automation
+| Module | Description | Route |
+|--------|-------------|-------|
+| Email Marketing | Campaign management | `/email-marketing` |
+| SMS Integration | Text notifications | `/sms-notifications` |
+| Accounting Integration | Financial sync | `/accounting` |
+| Payment Gateway | Online payments | `/payments` |
+| Calendar Sync | Google Calendar | `/calendar-sync` |
+| Vehicle History | Service timeline | `/vehicle-history` |
+| Customer Feedback | Reviews & ratings | `/customer-feedback` |
+| Import/Export | Data migration tools | `/import-export` |
+
+#### Phase 5: Enterprise Features
+| Module | Description | Route |
+|--------|-------------|-------|
+| Franchise Management | Multi-tenant network | `/franchise` |
+| OBD Diagnostics | Vehicle diagnostics | `/diagnostics` |
+| OEM Software | License management | `/oem-software` |
+| Globalization | Multi-currency/language | `/globalization` |
+| Parts Network | B2B supply chain | `/parts-network` |
+| Contract Management | SLA tracking | `/contracts` |
+| Fleet Management | Corporate fleets | `/fleet` |
+| Insurance Claims | Claim processing | `/insurance` |
+
+#### Phase 6: Advanced Analytics
+| Module | Description | Route |
+|--------|-------------|-------|
+| Business Intelligence | Advanced BI dashboard | `/business-intelligence` |
+| Profit Analysis | Margin tracking | `/profit-analysis` |
+| Customer Lifetime Value | CLV calculations | `/customer-ltv` |
+| Predictive Maintenance | AI predictions | `/predictive-maintenance` |
+| Demand Forecasting | Inventory planning | `/demand-forecast` |
+| Competitor Analysis | Market intelligence | `/competitor-analysis` |
+| ROI Calculator | Investment analysis | `/roi-calculator` |
+| Custom Reports | Report builder | `/custom-reports` |
+
+#### Phase 7: Customer Experience
+| Module | Description | Route |
+|--------|-------------|-------|
+| Client Portal | Customer self-service | `/client-portal` |
+| Live Tracking | Real-time job status | `/live-tracking` |
+| Digital Signatures | E-signature capture | `/e-signatures` |
+| Service Reminders | Automated notifications | `/service-reminders` |
+| Review System | Customer reviews | `/reviews` |
+| Chat Support | In-app messaging | `/chat-support` |
+| Knowledge Base | FAQ & help articles | `/knowledge-base` |
+| Training LMS | Learning management | `/training` |
+
+#### Phase 8: Compliance & Quality
+| Module | Description | Route |
+|--------|-------------|-------|
+| ZATCA E-Invoicing | Saudi tax compliance | `/zatca` |
+| VAT Management | Tax calculations | `/vat-management` |
+| Quality Control | QC workflows | `/quality-control` |
+| Safety Compliance | Safety standards | `/safety-compliance` |
+| Environmental | Eco-regulations | `/environmental` |
+| Certification | Staff certifications | `/certifications` |
+| Incident Reports | Safety reporting | `/incidents` |
+| Compliance Dashboard | Regulatory overview | `/compliance-dashboard` |
+
+#### Phase 9: Hardware Integration
+| Module | Description | Route |
+|--------|-------------|-------|
+| Barcode Scanner | Inventory scanning | `/barcode-scanner` |
+| QR Code System | QR generation/reading | `/qr-codes` |
+| Digital Signage | Display management | `/digital-signage` |
+| Kiosk Check-In | Self-service kiosks | `/kiosk` |
+| License Plate Reader | LPR integration | `/lpr` |
+| IoT Sensors | Equipment monitoring | `/iot-sensors` |
+| Printer Integration | Receipt/label printing | `/printing` |
+| POS Integration | Point of sale | `/pos` |
+
+#### Phase 10: AI & Automation
+| Module | Description | Route |
+|--------|-------------|-------|
+| AI Chatbot | Customer assistant | `/ai-chatbot` |
+| Smart Diagnostics | AI-powered analysis | `/smart-diagnostics` |
+| Parts Recommendations | AI suggestions | `/smart-parts` |
+| Smart Job Assignment | AI scheduling | `/smart-assignment` |
+| Sentiment Analysis | Feedback analysis | `/sentiment-analysis` |
+| Voice Commands | Voice control | `/voice-commands` |
+| Automated Workflows | Process automation | `/automation` |
+| Machine Learning | ML models | `/ml-models` |
+
+#### Phase 11: Blockchain & Security
+| Module | Description | Route |
+|--------|-------------|-------|
+| Blockchain History | Immutable records | `/blockchain` |
+| Smart Contracts | Automated agreements | `/smart-contracts` |
+| Two-Factor Auth | 2FA security | `/two-factor` |
+| Data Encryption | Security settings | `/encryption` |
+| Access Logs | Security audit | `/access-logs` |
+| Backup & Restore | Data protection | `/data-backup` |
+| Privacy Controls | GDPR compliance | `/privacy` |
+| Security Dashboard | Security overview | `/security-dashboard` |
+
+#### Phase 12: Emerging Technologies
+| Module | Description | Route |
+|--------|-------------|-------|
+| AR/VR Training | Immersive training | `/ar-vr` |
+| Quantum Computing | Advanced processing | `/quantum` |
+| Edge Computing | Distributed processing | `/edge-computing` |
+| 5G Integration | High-speed connectivity | `/5g-integration` |
+| Digital Twin | Virtual modeling | `/digital-twin` |
+| Sustainable Energy | Green initiatives | `/sustainable-energy` |
+| Biometrics | Biometric auth | `/biometrics` |
+| Wearables | Wearable devices | `/wearables` |
+
+#### Phase 13: Operations
+| Module | Description | Route |
+|--------|-------------|-------|
+| Payroll Management | Staff payroll | `/payroll` |
+| Expense Tracking | Expense management | `/expenses` |
+| Towing Services | Roadside assistance | `/towing` |
+| Vehicle Storage | Storage management | `/vehicle-storage` |
+| Telematics | Vehicle telemetry | `/telematics` |
+| Google My Business | GMB integration | `/google-business` |
+| Call Center | Call management | `/call-center` |
+| Dashboard Widgets | Customizable widgets | `/dashboard-widgets` |
 
 ---
 
@@ -295,6 +466,206 @@ app.get('/api/admin/users', isAuthenticated, isAdmin, async (req, res) => {
 
 ---
 
+## RBAC System
+
+### Complete Role Hierarchy
+
+#### Tier 1: Super Administrators
+| Role | Access Level | Permissions |
+|------|--------------|-------------|
+| Super Admin | Full system access | All resources, all actions |
+| System Administrator | Technical administration | System settings, user management, security |
+
+#### Tier 2: Business Owners
+| Role | Access Level | Permissions |
+|------|--------------|-------------|
+| Garage Owner | Full garage access | All garage operations, staff management, reporting |
+| Franchise Owner | Multi-garage access | Franchise oversight, inter-branch transfers |
+
+#### Tier 3: Managers
+| Role | Access Level | Permissions |
+|------|--------------|-------------|
+| General Manager | Operations oversight | Staff, scheduling, inventory, reporting |
+| Service Manager | Service operations | Job cards, technicians, quality control |
+| Parts Manager | Inventory management | Stock, orders, suppliers, pricing |
+| Sales Manager | Sales operations | Estimates, invoices, customer relations |
+| Finance Manager | Financial operations | Payments, accounting, payroll, reports |
+| HR Manager | Human resources | Staff records, training, attendance, payroll |
+| Marketing Manager | Marketing operations | Campaigns, loyalty, feedback, analytics |
+
+#### Tier 4: Specialists
+| Role | Access Level | Permissions |
+|------|--------------|-------------|
+| Service Advisor | Customer interaction | Appointments, estimates, job cards, follow-ups |
+| Senior Technician | Technical work | Job execution, diagnostics, mentoring |
+| Accountant | Financial processing | Invoices, payments, VAT, reconciliation |
+| QC Inspector | Quality assurance | Inspections, checklists, certifications |
+| Compliance Officer | Regulatory compliance | ZATCA, safety, environmental |
+
+#### Tier 5: Staff
+| Role | Access Level | Permissions |
+|------|--------------|-------------|
+| Technician | Service execution | Assigned jobs, time logging, parts requests |
+| Parts Specialist | Inventory operations | Stock checks, receiving, transfers |
+| Call Center Agent | Customer support | Calls, appointments, basic inquiries |
+| Cashier | Payment processing | Payments, receipts, basic invoicing |
+| Receptionist | Front desk | Check-in, scheduling, basic customer info |
+
+### Permission Matrix
+
+```typescript
+// Permission format: resource:action
+const permissions = {
+  // Customer permissions
+  'customers:read': ['all'],
+  'customers:create': ['service_advisor', 'manager', 'admin'],
+  'customers:update': ['service_advisor', 'manager', 'admin'],
+  'customers:delete': ['admin'],
+  
+  // Vehicle permissions
+  'vehicles:read': ['all'],
+  'vehicles:create': ['service_advisor', 'technician', 'manager'],
+  'vehicles:update': ['service_advisor', 'technician', 'manager'],
+  'vehicles:delete': ['manager', 'admin'],
+  
+  // Job card permissions
+  'jobcards:read': ['technician', 'service_advisor', 'manager'],
+  'jobcards:create': ['service_advisor', 'manager'],
+  'jobcards:update': ['technician', 'service_advisor', 'manager'],
+  'jobcards:complete': ['qc_inspector', 'manager'],
+  
+  // Financial permissions
+  'invoices:read': ['accountant', 'manager', 'admin'],
+  'invoices:create': ['service_advisor', 'accountant', 'manager'],
+  'payments:process': ['cashier', 'accountant', 'manager'],
+  'refunds:process': ['accountant', 'finance_manager', 'admin'],
+  
+  // Admin permissions
+  'users:manage': ['hr_manager', 'admin'],
+  'settings:manage': ['admin'],
+  'reports:access': ['manager', 'admin'],
+};
+```
+
+### 70 Seeded Staff Users
+
+| Department | Count | Roles |
+|------------|-------|-------|
+| Service | 15 | Service Advisors, Technicians |
+| Parts | 8 | Parts Managers, Specialists |
+| Finance | 10 | Accountants, Cashiers |
+| Customer Service | 12 | Call Center Agents, Reps |
+| Quality | 5 | QC Inspectors, Officers |
+| HR | 5 | HR Managers, Coordinators |
+| Marketing | 5 | Marketing Managers, Specialists |
+| Management | 10 | General/Branch Managers |
+
+---
+
+## API Reference
+
+### Core API Endpoints
+
+#### Authentication
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/login` | User login |
+| POST | `/api/logout` | User logout |
+| GET | `/api/user` | Get current user |
+| POST | `/api/register` | Register new user |
+| POST | `/api/forgot-password` | Password reset request |
+
+#### Customers
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/customers` | List all customers |
+| GET | `/api/customers/:id` | Get customer by ID |
+| POST | `/api/customers` | Create customer |
+| PATCH | `/api/customers/:id` | Update customer |
+| DELETE | `/api/customers/:id` | Delete customer |
+| GET | `/api/customers/:id/vehicles` | Customer's vehicles |
+| GET | `/api/customers/:id/history` | Service history |
+
+#### Vehicles
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/vehicles` | List all vehicles |
+| GET | `/api/vehicles/:id` | Get vehicle by ID |
+| POST | `/api/vehicles` | Create vehicle |
+| PATCH | `/api/vehicles/:id` | Update vehicle |
+| DELETE | `/api/vehicles/:id` | Delete vehicle |
+| GET | `/api/vehicles/:id/service-history` | Service history |
+| GET | `/api/vehicles/vin/:vin` | Lookup by VIN |
+
+#### Job Cards
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/job-cards` | List job cards |
+| GET | `/api/job-cards/:id` | Get job card |
+| POST | `/api/job-cards` | Create job card |
+| PATCH | `/api/job-cards/:id` | Update job card |
+| PATCH | `/api/job-cards/:id/status` | Update status |
+| POST | `/api/job-cards/:id/assign` | Assign technician |
+| POST | `/api/job-cards/:id/complete` | Complete job |
+
+#### Inventory
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/inventory` | List inventory items |
+| GET | `/api/inventory/:id` | Get item details |
+| POST | `/api/inventory` | Add inventory item |
+| PATCH | `/api/inventory/:id` | Update item |
+| PATCH | `/api/inventory/:id/stock` | Adjust stock |
+| GET | `/api/inventory/low-stock` | Low stock alerts |
+| POST | `/api/inventory/transfer` | Cross-branch transfer |
+
+#### Invoicing
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/invoices` | List invoices |
+| GET | `/api/invoices/:id` | Get invoice |
+| POST | `/api/invoices` | Create invoice |
+| POST | `/api/invoices/:id/payment` | Record payment |
+| GET | `/api/invoices/:id/pdf` | Generate PDF |
+| POST | `/api/invoices/:id/email` | Email invoice |
+
+#### Appointments
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/appointments` | List appointments |
+| POST | `/api/appointments` | Create appointment |
+| PATCH | `/api/appointments/:id` | Update appointment |
+| DELETE | `/api/appointments/:id` | Cancel appointment |
+| GET | `/api/appointments/available-slots` | Get available slots |
+
+#### Reports
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/reports/revenue` | Revenue report |
+| GET | `/api/reports/technician-performance` | Staff KPIs |
+| GET | `/api/reports/inventory-turnover` | Inventory analytics |
+| GET | `/api/reports/customer-satisfaction` | Feedback analytics |
+| GET | `/api/reports/dashboard-stats` | Dashboard metrics |
+
+### Real-Time WebSocket Events
+
+#### Chat Support (`/ws/chat`)
+| Event | Direction | Payload |
+|-------|-----------|---------|
+| `message` | Both | `{ ticketId, content, sender }` |
+| `typing` | Both | `{ ticketId, userId, isTyping }` |
+| `read` | Client→Server | `{ ticketId, messageId }` |
+| `presence` | Server→Client | `{ userId, status }` |
+
+#### Notifications (`/ws/notifications`)
+| Event | Direction | Payload |
+|-------|-----------|---------|
+| `notification` | Server→Client | `{ type, title, message }` |
+| `job-update` | Server→Client | `{ jobCardId, status }` |
+| `appointment-reminder` | Server→Client | `{ appointmentId }` |
+
+---
+
 ## API Design Standards
 
 ### RESTful Conventions
@@ -434,6 +805,90 @@ Use these 7 production-ready layout wrappers:
 | `AnalyticsPage` | Reports and data visualization |
 | `MobileCardPage` | Mobile-optimized card layouts |
 | `TabsPageLayout` | Multi-tab interfaces |
+
+---
+
+## Component Library
+
+### shadcn/ui Components (40+ Components)
+
+#### Layout Components
+| Component | Import | Use Case |
+|-----------|--------|----------|
+| `Card` | `@/components/ui/card` | Content containers |
+| `Dialog` | `@/components/ui/dialog` | Modal windows |
+| `Sheet` | `@/components/ui/sheet` | Side panels |
+| `Tabs` | `@/components/ui/tabs` | Tabbed content |
+| `Accordion` | `@/components/ui/accordion` | Collapsible sections |
+| `Collapsible` | `@/components/ui/collapsible` | Toggle content |
+| `ScrollArea` | `@/components/ui/scroll-area` | Custom scrollbars |
+| `Separator` | `@/components/ui/separator` | Visual dividers |
+| `AspectRatio` | `@/components/ui/aspect-ratio` | Responsive ratios |
+
+#### Form Components
+| Component | Import | Use Case |
+|-----------|--------|----------|
+| `Form` | `@/components/ui/form` | Form wrapper with validation |
+| `Input` | `@/components/ui/input` | Text inputs |
+| `Textarea` | `@/components/ui/textarea` | Multi-line text |
+| `Select` | `@/components/ui/select` | Dropdown selection |
+| `Checkbox` | `@/components/ui/checkbox` | Boolean inputs |
+| `RadioGroup` | `@/components/ui/radio-group` | Single selection |
+| `Switch` | `@/components/ui/switch` | Toggle switches |
+| `Slider` | `@/components/ui/slider` | Range inputs |
+| `Calendar` | `@/components/ui/calendar` | Date picker |
+| `DatePicker` | `@/components/ui/date-picker` | Date selection |
+
+#### Interactive Components
+| Component | Import | Use Case |
+|-----------|--------|----------|
+| `Button` | `@/components/ui/button` | Actions & triggers |
+| `DropdownMenu` | `@/components/ui/dropdown-menu` | Action menus |
+| `ContextMenu` | `@/components/ui/context-menu` | Right-click menus |
+| `Menubar` | `@/components/ui/menubar` | Navigation menus |
+| `NavigationMenu` | `@/components/ui/navigation-menu` | Site navigation |
+| `Command` | `@/components/ui/command` | Command palette |
+| `Popover` | `@/components/ui/popover` | Floating content |
+| `Tooltip` | `@/components/ui/tooltip` | Hover information |
+| `HoverCard` | `@/components/ui/hover-card` | Rich previews |
+
+#### Feedback Components
+| Component | Import | Use Case |
+|-----------|--------|----------|
+| `Alert` | `@/components/ui/alert` | Status messages |
+| `AlertDialog` | `@/components/ui/alert-dialog` | Confirmation dialogs |
+| `Toast` | `@/components/ui/toast` | Notifications |
+| `Progress` | `@/components/ui/progress` | Loading indicators |
+| `Skeleton` | `@/components/ui/skeleton` | Loading placeholders |
+| `Badge` | `@/components/ui/badge` | Status labels |
+| `Avatar` | `@/components/ui/avatar` | User avatars |
+
+#### Data Display
+| Component | Import | Use Case |
+|-----------|--------|----------|
+| `Table` | `@/components/ui/table` | Data tables |
+| `DataTable` | `@/components/DataTable` | Advanced tables |
+| `Label` | `@/components/ui/label` | Form labels |
+
+### Custom Components
+
+| Component | Path | Purpose |
+|-----------|------|---------|
+| `Layout` | `@/components/Layout` | Main app layout with sidebar |
+| `PageHeader` | `@/components/PageHeader` | Page title & actions |
+| `EmptyState` | `@/components/EmptyState` | Empty data placeholders |
+| `DataTable` | `@/components/DataTable` | Sortable data tables |
+| `FilterBar` | `@/components/FilterBar` | Search & filter controls |
+| `DateRangePicker` | `@/components/DateRangePicker` | Date range selection |
+| `BarcodeScanner` | `@/components/BarcodeScanner` | Barcode scanning |
+| `QRScanner` | `@/components/QRScanner` | QR code scanning |
+| `SignaturePad` | `@/components/SignaturePad` | Digital signatures |
+| `MediaUpload` | `@/components/MediaUpload` | File uploads |
+| `MediaGallery` | `@/components/MediaGallery` | Image galleries |
+| `LanguageSwitcher` | `@/components/LanguageSwitcher` | i18n language selector |
+| `ThemeToggle` | `@/components/ThemeToggle` | Dark/light mode toggle |
+| `NotificationBell` | `@/components/NotificationBell` | Notification center |
+| `GlobalSearch` | `@/components/GlobalSearch` | App-wide search |
 
 ---
 
@@ -596,6 +1051,301 @@ function useWebSocket(url: string) {
   }, [url]);
 
   return { socket, messages, send: socket?.send.bind(socket) };
+}
+```
+
+---
+
+## Saudi Arabia Compliance
+
+### ZATCA E-Invoicing Integration
+
+#### Requirements
+- Tax Registration Number (TRN) validation
+- QR code generation for invoices
+- Digital signature support
+- XML invoice format (UBL 2.1)
+
+#### Implementation
+```typescript
+// ZATCA invoice generation
+interface ZATCAInvoice {
+  invoiceNumber: string;
+  issueDate: Date;
+  sellerTRN: string;
+  buyerTRN?: string;
+  totalAmount: number;
+  vatAmount: number;
+  qrCode: string;
+  signature: string;
+}
+
+// TRN validation (15-digit format)
+const validateTRN = (trn: string): boolean => {
+  return /^3\d{14}$/.test(trn);
+};
+```
+
+### VAT Management
+
+| Rate | Description | Application |
+|------|-------------|-------------|
+| 15% | Standard Rate | Most goods & services |
+| 0% | Zero Rate | Exports, certain supplies |
+| Exempt | Exempt | Financial services, residential rent |
+
+### Hijri Calendar Support
+```typescript
+// Convert Gregorian to Hijri
+import { toHijri } from 'hijri-converter';
+
+const hijriDate = toHijri(new Date());
+// Returns: { year: 1446, month: 5, day: 15 }
+```
+
+### Arabic Language Support
+- Full RTL layout support
+- Arabic translations in `client/src/i18n/locales/ar.json`
+- Arabic number formatting
+- Arabic date formatting
+
+### Zakat Compliance
+- Zakat calculation utilities
+- Annual reporting support
+- Asset valuation tools
+
+---
+
+## AI & Automation
+
+### OpenAI Integration
+
+#### Configuration
+```typescript
+import OpenAI from 'openai';
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+```
+
+#### AI Chatbot
+```typescript
+// Customer query handling
+const response = await openai.chat.completions.create({
+  model: 'gpt-4',
+  messages: [
+    { role: 'system', content: 'You are a helpful automotive service assistant.' },
+    { role: 'user', content: customerQuery },
+  ],
+});
+```
+
+### AI Features
+
+| Feature | Description | Endpoint |
+|---------|-------------|----------|
+| Smart Diagnostics | AI-powered fault analysis | `/api/ai/diagnostics` |
+| Parts Recommendations | Intelligent parts suggestions | `/api/ai/parts-recommend` |
+| Job Assignment | Optimal technician matching | `/api/ai/smart-assignment` |
+| Sentiment Analysis | Customer feedback analysis | `/api/ai/sentiment` |
+| Predictive Maintenance | Failure prediction | `/api/ai/predictive` |
+
+### Smart Job Assignment Algorithm
+```typescript
+// Factors considered:
+// 1. Technician skills & certifications
+// 2. Current workload
+// 3. Job complexity
+// 4. Historical performance
+// 5. Availability
+
+const recommendation = await openai.chat.completions.create({
+  model: 'gpt-4',
+  messages: [{
+    role: 'system',
+    content: `Analyze job requirements and technician profiles.
+              Return the best technician match with reasoning.`
+  }],
+});
+```
+
+---
+
+## Mobile Applications
+
+### Three Cross-Platform Apps
+
+| App | Target Users | Key Features |
+|-----|--------------|--------------|
+| Technician App | Service staff | Job queue, time tracking, parts requests |
+| Customer App | Vehicle owners | Appointments, tracking, payments |
+| Manager App | Supervisors | KPIs, approvals, staff management |
+
+### PWA Configuration
+```json
+// public/manifest.json
+{
+  "name": "SALIS AUTO",
+  "short_name": "SALIS",
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#1a1a1a",
+  "background_color": "#ffffff",
+  "icons": [...]
+}
+```
+
+### Mobile-Responsive Layouts
+
+| Breakpoint | Width | Target Device |
+|------------|-------|---------------|
+| `sm` | 640px | Mobile phones |
+| `md` | 768px | Tablets |
+| `lg` | 1024px | Small laptops |
+| `xl` | 1280px | Desktops |
+| `2xl` | 1536px | Large screens |
+
+### Offline Mode
+```typescript
+// Service worker registration
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js');
+}
+
+// IndexedDB for offline data
+const db = await openDB('salis-auto', 1, {
+  upgrade(db) {
+    db.createObjectStore('pending-jobs');
+  },
+});
+```
+
+---
+
+## Data Seeding
+
+### 9-Phase Comprehensive Seeding
+
+| Phase | Records | Description |
+|-------|---------|-------------|
+| 1 | Roles & Permissions | 24 roles with permissions |
+| 2 | Users | 70 staff users across departments |
+| 3 | Customers | 500+ customer profiles |
+| 4 | Vehicles | 800+ vehicle records |
+| 5 | Inventory | 1000+ parts & supplies |
+| 6 | Job Cards | 300+ service records |
+| 7 | Invoices | 400+ billing records |
+| 8 | Training | Courses & certifications |
+| 9 | IoT & Blockchain | Sensor data & records |
+
+### Running Seeders
+```bash
+# Full database seed
+npm run db:seed
+
+# Seed specific phase
+npm run db:seed:users
+npm run db:seed:vehicles
+npm run db:seed:inventory
+```
+
+### Stock Images
+35+ professional stock images for:
+- Customer avatars
+- Vehicle photos
+- Technician profiles
+- Product images
+- Location photos
+
+### Sample Data Patterns
+```typescript
+// Realistic data generation with Faker.js
+import { faker } from '@faker-js/faker';
+
+const customer = {
+  name: faker.person.fullName(),
+  email: faker.internet.email(),
+  phone: faker.phone.number('+966 5## ### ####'),
+  address: faker.location.streetAddress(),
+};
+```
+
+---
+
+## Error Handling
+
+### Frontend Error Boundaries
+```typescript
+class ErrorBoundary extends Component<Props, State> {
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return <ErrorFallback error={this.state.error} />;
+    }
+    return this.props.children;
+  }
+}
+```
+
+### API Error Handling
+```typescript
+// Consistent error response format
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+  console.error('API Error:', err);
+  
+  if (err instanceof ValidationError) {
+    return res.status(400).json({
+      message: 'Validation failed',
+      errors: err.errors,
+    });
+  }
+  
+  if (err instanceof AuthenticationError) {
+    return res.status(401).json({
+      message: 'Authentication required',
+    });
+  }
+  
+  res.status(500).json({
+    message: 'Internal server error',
+  });
+});
+```
+
+### Toast Notifications
+```typescript
+import { useToast } from '@/hooks/use-toast';
+
+const { toast } = useToast();
+
+// Success notification
+toast({
+  title: 'Success',
+  description: 'Vehicle added successfully',
+});
+
+// Error notification
+toast({
+  title: 'Error',
+  description: 'Failed to save changes',
+  variant: 'destructive',
+});
+```
+
+### Query Error Handling
+```typescript
+const { data, error, isError } = useQuery({
+  queryKey: ['/api/vehicles'],
+  retry: 3,
+  retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+});
+
+if (isError) {
+  return <ErrorMessage error={error} />;
 }
 ```
 
@@ -782,6 +1532,84 @@ import logoUrl from '@assets/logo.png';
 16. Emerging Technologies
 17. AI & Automation Hub
 18. System & Settings
+
+---
+
+## Troubleshooting
+
+### Common Issues & Solutions
+
+#### Database Connection Issues
+```bash
+# Check database connection
+npm run db:push
+
+# If connection fails:
+# 1. Verify DATABASE_URL environment variable
+# 2. Check Neon dashboard for database status
+# 3. Ensure IP is whitelisted (if applicable)
+```
+
+#### Build Errors
+| Error | Cause | Solution |
+|-------|-------|----------|
+| `Module not found` | Missing dependency | Run `npm install` |
+| `Type errors` | TypeScript issues | Run `npm run check` |
+| `Vite build failed` | Configuration issue | Check vite.config.ts |
+
+#### Authentication Issues
+```typescript
+// Debug session issues
+app.use((req, res, next) => {
+  console.log('Session:', req.session);
+  console.log('User:', req.user);
+  next();
+});
+```
+
+#### API Errors
+| Status | Meaning | Fix |
+|--------|---------|-----|
+| 401 | Unauthorized | Check login, session expired |
+| 403 | Forbidden | Check role permissions |
+| 404 | Not found | Verify API endpoint path |
+| 500 | Server error | Check server logs |
+
+#### Frontend Issues
+```typescript
+// Debug React Query issues
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+
+// Add to App.tsx
+<ReactQueryDevtools initialIsOpen={false} />
+```
+
+#### i18n Issues
+```typescript
+// Debug translation issues
+console.log(i18n.language); // Current language
+console.log(i18n.t('key')); // Translation result
+console.log(i18n.exists('key')); // Key exists?
+```
+
+### Performance Debugging
+
+```typescript
+// React performance profiling
+import { Profiler } from 'react';
+
+<Profiler id="MyComponent" onRender={onRenderCallback}>
+  <MyComponent />
+</Profiler>
+```
+
+### Log Locations
+| Log Type | Location |
+|----------|----------|
+| Server logs | Console output |
+| Database logs | Neon dashboard |
+| Client errors | Browser console |
+| Build logs | Terminal output |
 
 ---
 
