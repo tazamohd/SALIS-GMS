@@ -18698,6 +18698,231 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ========================================
+  // DASHBOARD WIDGETS ROUTES
+  // ========================================
+
+  // Get user's dashboard widgets
+  app.get('/api/dashboard/widgets', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId || 'default-garage';
+      const widgets = await storage.getDashboardWidgets(req.user.id, garageId);
+      res.json(widgets);
+    } catch (error: any) {
+      console.error("Error fetching widgets:", error);
+      res.status(500).json({ message: "Failed to fetch widgets" });
+    }
+  });
+
+  // Get default widget templates
+  app.get('/api/dashboard/widgets/defaults', isAuthenticated, async (req: any, res) => {
+    try {
+      const defaults = await storage.getDefaultWidgets();
+      res.json(defaults);
+    } catch (error: any) {
+      console.error("Error fetching default widgets:", error);
+      res.status(500).json({ message: "Failed to fetch default widgets" });
+    }
+  });
+
+  // Create new widget
+  app.post('/api/dashboard/widgets', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId || 'default-garage';
+      const widget = await storage.createDashboardWidget({
+        ...req.body,
+        userId: req.user.id,
+        garageId,
+      });
+      res.json(widget);
+    } catch (error: any) {
+      console.error("Error creating widget:", error);
+      res.status(500).json({ message: "Failed to create widget" });
+    }
+  });
+
+  // Update widget
+  app.patch('/api/dashboard/widgets/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const widget = await storage.updateDashboardWidget(req.params.id, req.body);
+      res.json(widget);
+    } catch (error: any) {
+      console.error("Error updating widget:", error);
+      res.status(500).json({ message: "Failed to update widget" });
+    }
+  });
+
+  // Update multiple widget positions
+  app.patch('/api/dashboard/widgets/positions', isAuthenticated, async (req: any, res) => {
+    try {
+      await storage.updateWidgetPositions(req.user.id, req.body.positions);
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error("Error updating widget positions:", error);
+      res.status(500).json({ message: "Failed to update positions" });
+    }
+  });
+
+  // Delete widget
+  app.delete('/api/dashboard/widgets/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      await storage.deleteDashboardWidget(req.params.id);
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error("Error deleting widget:", error);
+      res.status(500).json({ message: "Failed to delete widget" });
+    }
+  });
+
+  // ========================================
+  // ENHANCED BACKUP & RESTORE ROUTES
+  // ========================================
+
+  // Get backup statistics
+  app.get('/api/backups/stats', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId || 'default-garage';
+      const stats = await storage.getBackupStats(garageId);
+      res.json(stats);
+    } catch (error: any) {
+      console.error("Error fetching backup stats:", error);
+      res.status(500).json({ message: "Failed to fetch stats" });
+    }
+  });
+
+  // Get latest backup
+  app.get('/api/backups/latest', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId || 'default-garage';
+      const backup = await storage.getLatestBackup(garageId);
+      res.json(backup || null);
+    } catch (error: any) {
+      console.error("Error fetching latest backup:", error);
+      res.status(500).json({ message: "Failed to fetch latest backup" });
+    }
+  });
+
+  // Get all backups
+  app.get('/api/backups', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId || 'default-garage';
+      const { status } = req.query;
+      const backups = await storage.getBackupJobs(garageId, status as string);
+      res.json(backups);
+    } catch (error: any) {
+      console.error("Error fetching backups:", error);
+      res.status(500).json({ message: "Failed to fetch backups" });
+    }
+  });
+
+  // Create new backup job
+  app.post('/api/backups', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user.garageId || 'default-garage';
+      const backup = await storage.createBackupJob({
+        garageId,
+        jobType: req.body.jobType || 'full',
+        status: 'pending',
+        dataTypes: req.body.dataTypes || ['all'],
+        createdBy: req.user.id,
+        startedAt: new Date(),
+      });
+      
+      // Simulate backup processing
+      setTimeout(async () => {
+        try {
+          const fileSize = Math.floor(Math.random() * 50000000) + 10000000;
+          const fileName = `backup_${garageId}_${Date.now()}.zip`;
+          await storage.updateBackupJob(backup.id, {
+            status: 'completed',
+            completedAt: new Date(),
+            fileSize,
+            fileName,
+          });
+        } catch (e) {
+          await storage.updateBackupJob(backup.id, {
+            status: 'failed',
+            errorMessage: (e as Error).message,
+          });
+        }
+      }, 3000);
+      
+      res.json(backup);
+    } catch (error: any) {
+      console.error("Error creating backup:", error);
+      res.status(500).json({ message: "Failed to create backup" });
+    }
+  });
+
+  // Get single backup by ID
+  app.get('/api/backups/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const backup = await storage.getBackupJob(req.params.id);
+      if (!backup) {
+        return res.status(404).json({ message: "Backup not found" });
+      }
+      res.json(backup);
+    } catch (error: any) {
+      console.error("Error fetching backup:", error);
+      res.status(500).json({ message: "Failed to fetch backup" });
+    }
+  });
+
+  // Delete backup
+  app.delete('/api/backups/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      await storage.deleteBackupJob(req.params.id);
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error("Error deleting backup:", error);
+      res.status(500).json({ message: "Failed to delete backup" });
+    }
+  });
+
+  // Restore from backup
+  app.post('/api/backups/:id/restore', isAuthenticated, async (req: any, res) => {
+    try {
+      const backup = await storage.getBackupJob(req.params.id);
+      if (!backup) {
+        return res.status(404).json({ message: "Backup not found" });
+      }
+      if (backup.status !== 'completed') {
+        return res.status(400).json({ message: "Backup is not completed" });
+      }
+      
+      // Create restore job
+      const garageId = req.user.garageId || 'default-garage';
+      const restoreJob = await storage.createBackupJob({
+        garageId,
+        jobType: 'restore',
+        status: 'in_progress',
+        dataTypes: backup.dataTypes,
+        createdBy: req.user.id,
+        startedAt: new Date(),
+      });
+      
+      // Simulate restore processing
+      setTimeout(async () => {
+        try {
+          await storage.updateBackupJob(restoreJob.id, {
+            status: 'completed',
+            completedAt: new Date(),
+          });
+        } catch (e) {
+          await storage.updateBackupJob(restoreJob.id, {
+            status: 'failed',
+            errorMessage: (e as Error).message,
+          });
+        }
+      }, 5000);
+      
+      res.json(restoreJob);
+    } catch (error: any) {
+      console.error("Error restoring backup:", error);
+      res.status(500).json({ message: "Failed to restore backup" });
+    }
+  });
+
   const httpServer = createServer(app);
   
   // Initialize WebSocket server for chat

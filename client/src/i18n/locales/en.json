@@ -11,7 +11,11 @@
     "logout": "Logout",
     "viewAll": "View all",
     "previous": "Previous",
-    "next": "Next"
+    "next": "Next",
+    "enable": "Enable",
+    "disable": "Disable",
+    "active": "Active",
+    "inactive": "Inactive"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -48,7 +52,9 @@
     "dataImportExport": "Data Import/Export",
     "settings": "Settings",
     "security": "Security",
-    "profile": "Profile"
+    "profile": "Profile",
+    "backup": "Data Backup",
+    "widgets": "Dashboard Widgets"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -107,6 +113,60 @@
     "permissions": {
       "title": "Permission Overrides",
       "description": "Grant or restrict specific permissions for users"
+    }
+  },
+  "backup": {
+    "title": "Data Backup & Restore",
+    "subtitle": "Manage automated backups and restore data",
+    "automatedBackups": "Automated Backups",
+    "automatedBackupsDesc": "Configure scheduled backups",
+    "schedule": "Schedule",
+    "daily": "Daily",
+    "weekly": "Weekly",
+    "monthly": "Monthly",
+    "retention": "Retention Period",
+    "days": "days",
+    "saveSettings": "Save Settings",
+    "manualBackup": "Create Manual Backup",
+    "manualBackupDesc": "Create an immediate backup of all data",
+    "backupType": "Backup Type",
+    "fullBackup": "Full Backup",
+    "incrementalBackup": "Incremental Backup",
+    "createBackup": "Create Backup",
+    "creatingBackup": "Creating backup...",
+    "restoreData": "Restore Data",
+    "restoreDataDesc": "Restore from a previous backup",
+    "selectBackup": "Select a backup to restore",
+    "restoreNow": "Restore Now",
+    "restoring": "Restoring...",
+    "recentBackups": "Recent Backups",
+    "noBackupsFound": "No backups found. Create your first backup.",
+    "status": {
+      "completed": "Completed",
+      "pending": "Pending",
+      "running": "Running",
+      "failed": "Failed"
+    }
+  },
+  "widgets": {
+    "title": "Dashboard Widgets",
+    "subtitle": "Customize your dashboard layout",
+    "customize": "Customize Dashboard",
+    "customizeDesc": "Drag and drop widgets to rearrange or toggle visibility",
+    "dragToReorder": "Drag to reorder",
+    "availableWidgets": "Available Widgets",
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "saveLayout": "Save Layout",
+    "resetLayout": "Reset to Default",
+    "preview": "Preview",
+    "previewDesc": "See how your dashboard will look",
+    "widgetTypes": {
+      "kpi": "KPI Metrics",
+      "chart": "Charts & Graphs",
+      "table": "Data Tables",
+      "calendar": "Calendar",
+      "tasks": "Task List"
     }
   }
 }

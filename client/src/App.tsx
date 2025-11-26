@@ -143,6 +143,8 @@ import TechnicianPerformance from "@/pages/TechnicianPerformance";
 import TimesheetManagement from "@/pages/TimesheetManagement";
 import VehicleHistory from "@/pages/VehicleHistory";
 import CustomerFeedback from "@/pages/CustomerFeedback";
+import DataBackup from "@/pages/DataBackup";
+import DashboardWidgets from "@/pages/DashboardWidgets";
 import Vehicles from "@/pages/Vehicles";
 import VoiceCommandInterface from "@/pages/VoiceCommandInterface";
 import VRShowroom from "@/pages/VRShowroom";
@@ -529,6 +531,16 @@ function Router() {
       <Route path="/settings">
         <Layout>
           <Settings />
+        </Layout>
+      </Route>
+      <Route path="/data-backup">
+        <Layout>
+          <DataBackup />
+        </Layout>
+      </Route>
+      <Route path="/dashboard-widgets">
+        <Layout>
+          <DashboardWidgets />
         </Layout>
       </Route>
       <Route path="/chat">

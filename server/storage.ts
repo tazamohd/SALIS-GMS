@@ -292,6 +292,9 @@ import {
   actionHistory,
   type ActionHistory,
   type InsertActionHistory,
+  dashboardWidgets,
+  type DashboardWidget,
+  type InsertDashboardWidget,
   customerPortalSessions,
   digitalSignatures,
   mediaAttachments,
@@ -10454,6 +10457,103 @@ export class DatabaseStorage implements IStorage {
   async getGamificationBadges(): Promise<any[]> {
     return await db.select().from(gamificationBadges)
       .where(eq(gamificationBadges.isActive, true));
+  }
+
+  // ========================================
+  // DASHBOARD WIDGETS METHODS
+  // ========================================
+  
+  async getDashboardWidgets(userId: string, garageId: string): Promise<DashboardWidget[]> {
+    return await db.select().from(dashboardWidgets)
+      .where(and(
+        eq(dashboardWidgets.userId, userId),
+        eq(dashboardWidgets.garageId, garageId),
+        eq(dashboardWidgets.isActive, true)
+      ))
+      .orderBy(dashboardWidgets.createdAt);
+  }
+
+  async getDashboardWidget(id: string): Promise<DashboardWidget | undefined> {
+    const [widget] = await db.select().from(dashboardWidgets)
+      .where(eq(dashboardWidgets.id, id));
+    return widget;
+  }
+
+  async createDashboardWidget(data: InsertDashboardWidget): Promise<DashboardWidget> {
+    const [widget] = await db.insert(dashboardWidgets).values(data).returning();
+    return widget;
+  }
+
+  async updateDashboardWidget(id: string, data: Partial<DashboardWidget>): Promise<DashboardWidget> {
+    const [widget] = await db.update(dashboardWidgets)
+      .set(data)
+      .where(eq(dashboardWidgets.id, id))
+      .returning();
+    return widget;
+  }
+
+  async deleteDashboardWidget(id: string): Promise<void> {
+    await db.delete(dashboardWidgets).where(eq(dashboardWidgets.id, id));
+  }
+
+  async updateWidgetPositions(userId: string, positions: { id: string; position: any }[]): Promise<void> {
+    for (const { id, position } of positions) {
+      await db.update(dashboardWidgets)
+        .set({ position })
+        .where(and(
+          eq(dashboardWidgets.id, id),
+          eq(dashboardWidgets.userId, userId)
+        ));
+    }
+  }
+
+  async getDefaultWidgets(): Promise<any[]> {
+    return [
+      { widgetType: 'kpi', title: 'Total Revenue', dataSource: 'invoices', configuration: { metric: 'sum', field: 'total' } },
+      { widgetType: 'kpi', title: 'Active Customers', dataSource: 'customers', configuration: { metric: 'count' } },
+      { widgetType: 'kpi', title: 'Open Job Cards', dataSource: 'job_cards', configuration: { metric: 'count', filter: { status: 'in_progress' } } },
+      { widgetType: 'kpi', title: 'Parts Inventory', dataSource: 'inventory', configuration: { metric: 'count' } },
+      { widgetType: 'chart', title: 'Revenue Trend', dataSource: 'invoices', configuration: { chartType: 'line', groupBy: 'month' } },
+      { widgetType: 'chart', title: 'Service Distribution', dataSource: 'job_cards', configuration: { chartType: 'pie', groupBy: 'serviceType' } },
+      { widgetType: 'table', title: 'Recent Jobs', dataSource: 'job_cards', configuration: { limit: 5, orderBy: 'createdAt' } },
+      { widgetType: 'metric', title: 'Average Repair Time', dataSource: 'job_cards', configuration: { metric: 'avg', field: 'duration' } },
+    ];
+  }
+
+  // ========================================
+  // BACKUP SCHEDULE METHODS
+  // ========================================
+  
+  async deleteBackupJob(id: string): Promise<void> {
+    await db.delete(backupJobs).where(eq(backupJobs.id, id));
+  }
+
+  async getLatestBackup(garageId: string): Promise<BackupJob | undefined> {
+    const [backup] = await db.select().from(backupJobs)
+      .where(and(
+        eq(backupJobs.garageId, garageId),
+        eq(backupJobs.status, 'completed')
+      ))
+      .orderBy(desc(backupJobs.completedAt))
+      .limit(1);
+    return backup;
+  }
+
+  async getBackupStats(garageId: string): Promise<any> {
+    const allBackups = await db.select().from(backupJobs)
+      .where(eq(backupJobs.garageId, garageId));
+    
+    const completed = allBackups.filter(b => b.status === 'completed');
+    const failed = allBackups.filter(b => b.status === 'failed');
+    const totalSize = completed.reduce((sum, b) => sum + (b.fileSize || 0), 0);
+    
+    return {
+      totalBackups: allBackups.length,
+      completedBackups: completed.length,
+      failedBackups: failed.length,
+      totalStorageUsed: totalSize,
+      lastBackupDate: completed[0]?.completedAt || null,
+    };
   }
 }
 

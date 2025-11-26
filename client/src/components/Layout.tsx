@@ -67,6 +67,7 @@ import {
   Building,
   Satellite,
   Wallet,
+  LayoutDashboard,
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -341,6 +342,8 @@ export function Layout({ children }: LayoutProps) {
       items: [
         { path: "/settings", icon: SettingsIcon, label: t("nav.settings") },
         { path: "/security", icon: Shield, label: t("nav.security") },
+        { path: "/data-backup", icon: DatabaseBackup, label: t("nav.backup", "Data Backup") },
+        { path: "/dashboard-widgets", icon: LayoutDashboard, label: t("nav.widgets", "Dashboard Widgets") },
         { path: "/profile", icon: UserIcon, label: t("nav.profile") },
         { path: "/notifications", icon: Bell, label: "Notifications" },
         { path: "/document-management", icon: FileText, label: "Document Management" },
