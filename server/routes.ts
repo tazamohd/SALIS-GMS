@@ -11652,7 +11652,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/documents", isAuthenticated, async (req: any, res) => {
     try {
       const user = req.user;
-      const data = { ...req.body, garageId: user.garageId };
+      const data = { 
+        ...req.body, 
+        garageId: user.garageId,
+        uploadedBy: user.id,
+        status: req.body.status || "active"
+      };
       const document = await storage.createDocument(data);
       res.status(201).json(document);
     } catch (error: any) {

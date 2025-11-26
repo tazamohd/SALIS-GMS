@@ -14,7 +14,23 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { BookOpen, FolderPlus, Eye, ThumbsUp, Search } from "lucide-react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { 
+  BookOpen, 
+  FolderPlus, 
+  Eye, 
+  ThumbsUp, 
+  Search, 
+  FileText, 
+  Download, 
+  File, 
+  FileImage, 
+  FileSpreadsheet,
+  FilePlus,
+  Trash2,
+  Calendar,
+  User
+} from "lucide-react";
 
 const categorySchema = z.object({
   categoryName: z.string().min(1, "Category name is required"),
@@ -34,16 +50,49 @@ const articleSchema = z.object({
   isFeatured: z.boolean().default(false),
 });
 
+const documentSchema = z.object({
+  categoryId: z.string().optional(),
+  documentName: z.string().min(1, "Document name is required"),
+  description: z.string().optional(),
+  fileUrl: z.string().min(1, "File URL is required"),
+  fileName: z.string().min(1, "File name is required"),
+  mimeType: z.string().optional(),
+  tags: z.array(z.string()).optional(),
+});
+
 type CategoryFormData = z.infer<typeof categorySchema>;
 type ArticleFormData = z.infer<typeof articleSchema>;
+type DocumentFormData = z.infer<typeof documentSchema>;
+
+const getFileIcon = (mimeType: string | undefined) => {
+  if (!mimeType) return File;
+  if (mimeType.includes("image")) return FileImage;
+  if (mimeType.includes("spreadsheet") || mimeType.includes("excel")) return FileSpreadsheet;
+  if (mimeType.includes("pdf") || mimeType.includes("document") || mimeType.includes("text")) return FileText;
+  return File;
+};
+
+const formatFileSize = (bytes: number | undefined) => {
+  if (!bytes) return "Unknown";
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+};
+
+const formatDate = (dateString: string | undefined) => {
+  if (!dateString) return "Unknown";
+  return new Date(dateString).toLocaleDateString();
+};
 
 export default function KnowledgeBase() {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("articles");
   const [isCategoryDialogOpen, setIsCategoryDialogOpen] = useState(false);
   const [isArticleDialogOpen, setIsArticleDialogOpen] = useState(false);
+  const [isDocumentDialogOpen, setIsDocumentDialogOpen] = useState(false);
   const [selectedArticle, setSelectedArticle] = useState<any>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [documentSearchQuery, setDocumentSearchQuery] = useState("");
 
   const { data: categories = [], isLoading: categoriesLoading } = useQuery<any[]>({
     queryKey: ["/api/knowledge-base/categories"],
@@ -51,6 +100,14 @@ export default function KnowledgeBase() {
 
   const { data: articles = [], isLoading: articlesLoading } = useQuery<any[]>({
     queryKey: ["/api/knowledge-base/articles"],
+  });
+
+  const { data: documents = [], isLoading: documentsLoading } = useQuery<any[]>({
+    queryKey: ["/api/documents"],
+  });
+
+  const { data: documentCategories = [] } = useQuery<any[]>({
+    queryKey: ["/api/document-categories"],
   });
 
   const categoryForm = useForm<CategoryFormData>({
@@ -74,6 +131,19 @@ export default function KnowledgeBase() {
       tags: [],
       isPublished: true,
       isFeatured: false,
+    }
+  });
+
+  const documentForm = useForm<DocumentFormData>({
+    resolver: zodResolver(documentSchema),
+    defaultValues: {
+      categoryId: "",
+      documentName: "",
+      description: "",
+      fileUrl: "",
+      fileName: "",
+      mimeType: "",
+      tags: [],
     }
   });
 
@@ -103,9 +173,39 @@ export default function KnowledgeBase() {
     }
   });
 
+  const createDocumentMutation = useMutation({
+    mutationFn: (data: DocumentFormData) => apiRequest("POST", "/api/documents", data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/documents"] });
+      toast({ title: "Success", description: "Document added successfully" });
+      setIsDocumentDialogOpen(false);
+      documentForm.reset();
+    },
+    onError: () => {
+      toast({ title: "Error", description: "Failed to add document", variant: "destructive" });
+    }
+  });
+
+  const deleteDocumentMutation = useMutation({
+    mutationFn: (id: string) => apiRequest("DELETE", `/api/documents/${id}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/documents"] });
+      toast({ title: "Success", description: "Document deleted successfully" });
+    },
+    onError: () => {
+      toast({ title: "Error", description: "Failed to delete document", variant: "destructive" });
+    }
+  });
+
   const filteredArticles = articles.filter((article: any) =>
     article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     article.excerpt?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const filteredDocuments = documents.filter((doc: any) =>
+    doc.documentName?.toLowerCase().includes(documentSearchQuery.toLowerCase()) ||
+    doc.description?.toLowerCase().includes(documentSearchQuery.toLowerCase()) ||
+    doc.fileName?.toLowerCase().includes(documentSearchQuery.toLowerCase())
   );
 
   const tabs: TabConfig[] = [
@@ -181,6 +281,143 @@ export default function KnowledgeBase() {
       ),
     },
     {
+      id: "library",
+      label: "Document Library",
+      icon: FileText,
+      badge: documents.length,
+      content: (
+        <>
+          <div className="flex justify-between items-center mb-4">
+            <div className="relative max-w-md flex-1 mr-4">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-salis-gray" />
+              <Input
+                placeholder="Search documents..."
+                value={documentSearchQuery}
+                onChange={(e) => setDocumentSearchQuery(e.target.value)}
+                className="pl-10"
+                data-testid="input-search-documents"
+              />
+            </div>
+            <Button
+              onClick={() => setIsDocumentDialogOpen(true)}
+              className="bg-salis-black hover:bg-salis-gray-dark text-white font-poppins"
+              data-testid="button-add-document"
+            >
+              <FilePlus className="mr-2 h-4 w-4" />
+              Add Document
+            </Button>
+          </div>
+          <Card className="border-salis-gray-light dark:border-salis-gray-dark bg-white dark:bg-[#010101]">
+            <CardHeader>
+              <CardTitle className="font-montserrat text-salis-black dark:text-white">Document Library</CardTitle>
+              <CardDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
+                Manage and organize your documents, manuals, and files
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {documentsLoading ? (
+                <p className="text-salis-gray font-poppins" data-testid="text-loading-documents">Loading documents...</p>
+              ) : filteredDocuments.length === 0 ? (
+                <div className="text-center py-12">
+                  <FileText className="mx-auto h-12 w-12 text-salis-gray-light dark:text-salis-gray-dark mb-4" />
+                  <p className="text-salis-gray font-poppins" data-testid="text-no-documents">No documents found</p>
+                  <p className="text-sm text-salis-gray-light dark:text-salis-gray-dark font-poppins mt-1">
+                    Add your first document to get started
+                  </p>
+                </div>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow className="border-salis-gray-light dark:border-salis-gray-dark">
+                      <TableHead className="text-salis-gray dark:text-salis-gray-light">Document</TableHead>
+                      <TableHead className="text-salis-gray dark:text-salis-gray-light">Type</TableHead>
+                      <TableHead className="text-salis-gray dark:text-salis-gray-light">Size</TableHead>
+                      <TableHead className="text-salis-gray dark:text-salis-gray-light">Uploaded</TableHead>
+                      <TableHead className="text-salis-gray dark:text-salis-gray-light">Status</TableHead>
+                      <TableHead className="text-salis-gray dark:text-salis-gray-light text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredDocuments.map((doc: any) => {
+                      const FileIcon = getFileIcon(doc.mimeType);
+                      return (
+                        <TableRow 
+                          key={doc.id} 
+                          className="border-salis-gray-light dark:border-salis-gray-dark hover:bg-gray-50 dark:hover:bg-gray-900"
+                          data-testid={`row-document-${doc.id}`}
+                        >
+                          <TableCell>
+                            <div className="flex items-center gap-3">
+                              <FileIcon className="h-5 w-5 text-salis-gray dark:text-salis-gray-light" />
+                              <div>
+                                <p className="font-medium text-salis-black dark:text-white font-poppins" data-testid={`text-doc-name-${doc.id}`}>
+                                  {doc.documentName}
+                                </p>
+                                {doc.description && (
+                                  <p className="text-xs text-salis-gray dark:text-salis-gray-light font-poppins">
+                                    {doc.description}
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="outline" className="text-xs">
+                              {doc.mimeType?.split("/")[1]?.toUpperCase() || "FILE"}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-salis-gray dark:text-salis-gray-light font-poppins text-sm">
+                            {formatFileSize(doc.fileSize)}
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-1 text-salis-gray dark:text-salis-gray-light text-sm">
+                              <Calendar className="h-3 w-3" />
+                              {formatDate(doc.createdAt)}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <Badge 
+                              className={doc.status === "active" ? "bg-green-500 text-white" : "bg-salis-gray text-white"}
+                            >
+                              {doc.status || "Active"}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex justify-end gap-2">
+                              {doc.fileUrl && (
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => window.open(doc.fileUrl, "_blank")}
+                                  className="text-salis-gray hover:text-salis-black dark:text-salis-gray-light dark:hover:text-white"
+                                  data-testid={`button-download-${doc.id}`}
+                                >
+                                  <Download className="h-4 w-4" />
+                                </Button>
+                              )}
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => deleteDocumentMutation.mutate(doc.id)}
+                                className="text-red-500 hover:text-red-700 hover:border-red-300"
+                                data-testid={`button-delete-${doc.id}`}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              )}
+            </CardContent>
+          </Card>
+        </>
+      ),
+    },
+    {
       id: "categories",
       label: "Categories",
       icon: FolderPlus,
@@ -235,8 +472,8 @@ export default function KnowledgeBase() {
   return (
     <>
       <TabsPageLayout
-        title="Knowledge Base"
-        description="Manage documentation articles and FAQ resources"
+        title="Knowledge Base & Library"
+        description="Manage documentation articles, FAQ resources, and document library"
         icon={BookOpen}
         primaryAction={{
           label: "Create Article",
@@ -248,16 +485,18 @@ export default function KnowledgeBase() {
         activeTab={activeTab}
         onTabChange={setActiveTab}
         headerContent={
-          <div className="mb-6 relative max-w-md">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-salis-gray" />
-            <Input
-              placeholder="Search articles..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
-              data-testid="input-search"
-            />
-          </div>
+          activeTab === "articles" ? (
+            <div className="mb-6 relative max-w-md">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-salis-gray" />
+              <Input
+                placeholder="Search articles..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10"
+                data-testid="input-search"
+              />
+            </div>
+          ) : null
         }
       />
 
@@ -414,6 +653,130 @@ export default function KnowledgeBase() {
               <DialogFooter>
                 <Button type="submit" disabled={createArticleMutation.isPending} data-testid="button-submit-article">
                   {createArticleMutation.isPending ? "Creating..." : "Create Article"}
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isDocumentDialogOpen} onOpenChange={setIsDocumentDialogOpen}>
+        <DialogContent className="bg-white dark:bg-salis-black max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="font-montserrat text-salis-black dark:text-white">Add Document</DialogTitle>
+            <DialogDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
+              Add a new document to the library
+            </DialogDescription>
+          </DialogHeader>
+          <Form {...documentForm}>
+            <form onSubmit={documentForm.handleSubmit((data) => createDocumentMutation.mutate(data))} className="space-y-4">
+              <FormField
+                control={documentForm.control}
+                name="documentName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Document Name</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="User Manual v1.0" data-testid="input-doc-name" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={documentForm.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Description</FormLabel>
+                    <FormControl>
+                      <Textarea {...field} placeholder="Brief description of the document..." data-testid="input-doc-description" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={documentForm.control}
+                name="fileName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>File Name</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="manual.pdf" data-testid="input-file-name" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={documentForm.control}
+                name="fileUrl"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>File URL</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="https://example.com/files/manual.pdf" data-testid="input-file-url" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={documentForm.control}
+                name="mimeType"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>File Type</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger data-testid="select-mime-type">
+                          <SelectValue placeholder="Select file type" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="application/pdf">PDF Document</SelectItem>
+                        <SelectItem value="application/msword">Word Document</SelectItem>
+                        <SelectItem value="application/vnd.ms-excel">Excel Spreadsheet</SelectItem>
+                        <SelectItem value="image/png">PNG Image</SelectItem>
+                        <SelectItem value="image/jpeg">JPEG Image</SelectItem>
+                        <SelectItem value="text/plain">Text File</SelectItem>
+                        <SelectItem value="application/zip">ZIP Archive</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              {documentCategories.length > 0 && (
+                <FormField
+                  control={documentForm.control}
+                  name="categoryId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Category (Optional)</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger data-testid="select-doc-category">
+                            <SelectValue placeholder="Select category" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {documentCategories.map((cat: any) => (
+                            <SelectItem key={cat.id} value={cat.id}>
+                              {cat.categoryName}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+              <DialogFooter>
+                <Button type="submit" disabled={createDocumentMutation.isPending} data-testid="button-submit-document">
+                  {createDocumentMutation.isPending ? "Adding..." : "Add Document"}
                 </Button>
               </DialogFooter>
             </form>
