@@ -269,6 +269,7 @@ export function Layout({ children }: LayoutProps) {
         { path: "/customer-loyalty", icon: Award, label: "Customer Loyalty" },
         { path: "/referral-program", icon: Users, label: "Referral Program" },
         { path: "/customer-reviews-ratings", icon: Star, label: "Reviews & Ratings" },
+        { path: "/customer-feedback", icon: MessageCircle, label: "Customer Feedback" },
         { path: "/live-service-tracking", icon: Radio, label: "Live Tracking" },
         { path: "/video-consultations", icon: FileText, label: "Video Calls" },
         { path: "/social-media-integration", icon: MessageCircle, label: "Social Media" },

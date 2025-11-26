@@ -142,6 +142,7 @@ import TaskManagement from "@/pages/TaskManagement";
 import TechnicianPerformance from "@/pages/TechnicianPerformance";
 import TimesheetManagement from "@/pages/TimesheetManagement";
 import VehicleHistory from "@/pages/VehicleHistory";
+import CustomerFeedback from "@/pages/CustomerFeedback";
 import Vehicles from "@/pages/Vehicles";
 import VoiceCommandInterface from "@/pages/VoiceCommandInterface";
 import VRShowroom from "@/pages/VRShowroom";
@@ -698,6 +699,11 @@ function Router() {
       <Route path="/customer-reviews-ratings">
         <Layout>
           <CustomerReviewsRatings />
+        </Layout>
+      </Route>
+      <Route path="/customer-feedback">
+        <Layout>
+          <CustomerFeedback />
         </Layout>
       </Route>
       <Route path="/referral-program">
