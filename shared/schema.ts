@@ -8614,9 +8614,14 @@ export const serviceFeedback = pgTable("service_feedback", {
   qualityRating: integer("quality_rating"), // 1-5
   communicationRating: integer("communication_rating"), // 1-5
   comments: text("comments"),
+  sentiment: varchar("sentiment", { length: 20 }), // positive, negative, neutral
+  sentimentScore: decimal("sentiment_score", { precision: 4, scale: 3 }), // -1.000 to 1.000
+  sentimentKeywords: jsonb("sentiment_keywords"), // Array of detected keywords
   media: jsonb("media"), // Array of image URLs
   isVerified: boolean("is_verified").default(false),
   isPublic: boolean("is_public").default(true),
+  isFlagged: boolean("is_flagged").default(false), // Flag for moderation
+  flagReason: varchar("flag_reason", { length: 255 }),
   submittedAt: timestamp("submitted_at").notNull().defaultNow(),
   respondedAt: timestamp("responded_at"),
   response: text("response"),
@@ -8624,6 +8629,7 @@ export const serviceFeedback = pgTable("service_feedback", {
   jobCardIdx: index("feedback_job_card_idx").on(table.jobCardId),
   technicianIdx: index("feedback_technician_idx").on(table.technicianId),
   submittedAtIdx: index("feedback_submitted_at_idx").on(table.submittedAt),
+  sentimentIdx: index("feedback_sentiment_idx").on(table.sentiment),
 }));
 
 // Technician Feedback Summary - Cached aggregate ratings
