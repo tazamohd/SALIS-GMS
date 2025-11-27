@@ -1567,6 +1567,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post('/api/customers', isAuthenticated, async (req: any, res) => {
+    try {
+      const { fullName, email, phone, garageId, nationalId } = req.body;
+      
+      if (!fullName || !email || !garageId) {
+        return res.status(400).json({ message: "Name, email, and garage are required" });
+      }
+
+      const existingUser = await storage.getUserByEmail(email);
+      if (existingUser) {
+        return res.status(400).json({ message: "A customer with this email already exists" });
+      }
+
+      const bcrypt = await import('bcrypt');
+      const tempPassword = await bcrypt.hash(Math.random().toString(36).slice(-8), 10);
+
+      const customer = await storage.createUser({
+        fullName,
+        email,
+        phone: phone || null,
+        password: tempPassword,
+        garageId,
+        nationalId: nationalId || null,
+        userType: 'customer',
+        isActive: true,
+      });
+
+      res.status(201).json(customer);
+    } catch (error) {
+      console.error("Error creating customer:", error);
+      res.status(500).json({ message: "Failed to create customer" });
+    }
+  });
+
   app.get('/api/customers/:id', isAuthenticated, async (req, res) => {
     try {
       const { id } = req.params;

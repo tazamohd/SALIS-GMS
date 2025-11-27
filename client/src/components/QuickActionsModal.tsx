@@ -25,6 +25,11 @@ import {
   Shield,
   TrendingUp,
   Sparkles,
+  User,
+  History,
+  Bell,
+  MapPin,
+  MessageCircle,
 } from "lucide-react";
 
 interface QuickAction {
@@ -157,6 +162,46 @@ export function QuickActionsModal({ open, onOpenChange }: QuickActionsModalProps
       icon: Zap,
       path: "/smart-contracts",
       keywords: ["smart", "contracts", "blockchain", "agreement", "service", "digital"],
+    },
+    {
+      id: "customer-portal",
+      label: "Customer Portal",
+      description: "Access the customer self-service portal",
+      icon: User,
+      path: "/client/dashboard",
+      keywords: ["customer", "portal", "client", "self-service", "dashboard"],
+    },
+    {
+      id: "customer-service-history",
+      label: "Customer Service History",
+      description: "View customer vehicle service records",
+      icon: History,
+      path: "/client/service-history",
+      keywords: ["customer", "service", "history", "records", "timeline", "portal"],
+    },
+    {
+      id: "customer-reminders",
+      label: "Service Reminders",
+      description: "Customer service reminder notifications",
+      icon: Bell,
+      path: "/client/reminders",
+      keywords: ["customer", "reminders", "notifications", "service", "due", "portal"],
+    },
+    {
+      id: "customer-live-tracking",
+      label: "Live Service Tracking",
+      description: "Real-time vehicle service status tracking",
+      icon: MapPin,
+      path: "/client/live-tracking",
+      keywords: ["customer", "live", "tracking", "status", "real-time", "portal"],
+    },
+    {
+      id: "customer-review-chat",
+      label: "Customer Reviews & Chat",
+      description: "Customer feedback and support chat",
+      icon: MessageCircle,
+      path: "/client/review-chat",
+      keywords: ["customer", "review", "chat", "feedback", "support", "portal"],
     },
   ];
 

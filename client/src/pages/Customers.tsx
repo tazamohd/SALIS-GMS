@@ -18,6 +18,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { AddVehicleDialog } from "@/components/AddVehicleDialog";
 import { AddCustomerNoteDialog } from "@/components/AddCustomerNoteDialog";
+import { AddCustomerDialog } from "@/components/AddCustomerDialog";
 import type { User, Vehicle, Garage, CustomerNote } from "@shared/schema";
 import { StandardPageLayout } from "@/components/layouts";
 
@@ -203,6 +204,14 @@ export function Customers() {
                 ))}
               </SelectContent>
             </Select>
+          ),
+        } as any,
+        {
+          label: "Add Customer",
+          onClick: () => {},
+          testId: "add-customer-action",
+          customRender: (
+            <AddCustomerDialog defaultGarageId={selectedGarageId !== "all" ? selectedGarageId : undefined} />
           ),
         } as any,
       ]}
