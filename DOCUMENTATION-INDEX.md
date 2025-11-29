@@ -4,8 +4,8 @@
 
 This is the central hub for all SALIS AUTO documentation. Whether you're a new user, system administrator, developer, or business stakeholder, you'll find comprehensive guides here.
 
-**Last Updated**: January 2025  
-**Platform Version**: 2.0  
+**Last Updated**: November 2025  
+**Platform Version**: 1.0  
 **Status**: ✅ Production Ready
 
 ---
@@ -26,9 +26,11 @@ This is the central hub for all SALIS AUTO documentation. Whether you're a new u
 ### For End Users
 - **[User Manual](USER-MANUAL.md)** - Complete guide for daily use
 - **[Quick Start Guide](QUICK-START-GUIDE.md)** - Get started fast
+- **[Keyboard Shortcuts Guide](docs/KEYBOARD_SHORTCUTS_GUIDE.md)** - Quick Actions & hotkeys
 - **[FAQ](FAQ.md)** - Frequently asked questions
 - **[Troubleshooting Guide](TROUBLESHOOTING-GUIDE.md)** - Fix common issues
 - **[Training Materials](TRAINING-MATERIALS.md)** - Learn the system
+- **[Video Script Outlines](docs/VIDEO_SCRIPT_OUTLINES.md)** - Tutorial video guides
 
 ### For Administrators
 - **[Installation & Setup Guide](INSTALLATION-SETUP-GUIDE.md)** - Deploy SALIS AUTO
@@ -91,6 +93,9 @@ This is the central hub for all SALIS AUTO documentation. Whether you're a new u
 | [Architecture Guide](ARCHITECTURE-GUIDE.md) | System architecture | Architects |
 | [Technology Stack](TECHNOLOGY_STACK.md) | Technologies used | Developers |
 | [Authentication Guide](AUTHENTICATION_GUIDE.md) | Auth system | Developers |
+| [Component Library Guide](docs/COMPONENT_LIBRARY_GUIDE.md) | UI components & patterns | Developers |
+| [Workflow Diagrams](docs/WORKFLOW_DIAGRAMS.md) | Visual process flows | Developers, Business |
+| [Audit Trail Guide](docs/AUDIT_TRAIL_GUIDE.md) | Action history & logging | Developers, Admins |
 
 ### 5️⃣ Feature Documentation
 
@@ -258,6 +263,15 @@ This is the central hub for all SALIS AUTO documentation. Whether you're a new u
 40. [SALIS_AUTO_COMPLETE_APPLICATION_DESCRIPTION.md](SALIS_AUTO_COMPLETE_APPLICATION_DESCRIPTION.md) - Full description
 41. [SALIS_AUTO_COMPLETE_PROJECT_DOCUMENTATION.md](SALIS_AUTO_COMPLETE_PROJECT_DOCUMENTATION.md) - Project docs
 42. [SALIS_AUTO_DOCUMENTATION.md](SALIS_AUTO_DOCUMENTATION.md) - Legacy docs
+43. [Release Notes](docs/RELEASE_NOTES.md) - Version history & changelog
+
+### New Documentation (November 2025)
+44. [Keyboard Shortcuts Guide](docs/KEYBOARD_SHORTCUTS_GUIDE.md) - All 19 Quick Actions
+45. [Component Library Guide](docs/COMPONENT_LIBRARY_GUIDE.md) - UI components & patterns
+46. [Workflow Diagrams](docs/WORKFLOW_DIAGRAMS.md) - Visual process flows
+47. [Audit Trail Guide](docs/AUDIT_TRAIL_GUIDE.md) - Action history & logging
+48. [Video Script Outlines](docs/VIDEO_SCRIPT_OUTLINES.md) - Tutorial video scripts
+49. [Release Notes](docs/RELEASE_NOTES.md) - Version history & changelog
 
 ### Miscellaneous
 43. [AUDIENCE_PAIN_POINTS.md](AUDIENCE_PAIN_POINTS.md) - User challenges
@@ -343,16 +357,21 @@ This is the central hub for all SALIS AUTO documentation. Whether you're a new u
 
 ## 🚀 What's New
 
-**Latest Updates (January 2025):**
-- ✅ Complete documentation suite (46 documents)
+**Latest Updates (November 2025):**
+- ✅ Complete documentation suite (52+ documents)
+- ✅ **NEW** Keyboard Shortcuts Guide - All 19 Quick Actions
+- ✅ **NEW** Component Library Guide - UI components & patterns
+- ✅ **NEW** Workflow Diagrams - Visual process flows
+- ✅ **NEW** Audit Trail Guide - Action history & logging
+- ✅ **NEW** Video Script Outlines - Tutorial video scripts
+- ✅ **NEW** Release Notes - Version history & changelog
 - ✅ Comprehensive training materials
 - ✅ API documentation refresh
 - ✅ Enhanced troubleshooting guides
 - ✅ Updated security guides
-- ✅ New feature catalog
 
 **Upcoming:**
-- Video tutorial library
+- Video tutorial recordings
 - Interactive demos
 - Mobile app documentation
 - Advanced integration guides
