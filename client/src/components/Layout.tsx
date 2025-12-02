@@ -68,6 +68,9 @@ import {
   Satellite,
   Wallet,
   LayoutDashboard,
+  Landmark,
+  TrendingDown,
+  Megaphone,
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -210,6 +213,7 @@ export function Layout({ children }: LayoutProps) {
         { path: "/parts-marketplace", icon: ShoppingCart, label: "Parts Marketplace" },
         { path: "/parts-supply-network", icon: Network, label: "Parts Network" },
         { path: "/barcode-scanner", icon: Scan, label: "Barcode Scanner" },
+        { path: "/internal-warehouse", icon: Warehouse, label: "Internal Warehouse" },
       ],
     },
     {
@@ -247,6 +251,8 @@ export function Layout({ children }: LayoutProps) {
         { path: "/expense-tracking", icon: Receipt, label: "Expense Tracking" },
         { path: "/payroll-management", icon: Wallet, label: "Payroll Management" },
         { path: "/stripe-payment-processing", icon: DollarSign, label: "Payment Processing" },
+        { path: "/bank-account-management", icon: Landmark, label: "Bank Accounts" },
+        { path: "/loss-account", icon: TrendingDown, label: "Loss Account" },
       ],
     },
     {
@@ -282,6 +288,7 @@ export function Layout({ children }: LayoutProps) {
         { path: "/ai-service-advisor", icon: MessageCircle, label: "AI Service Advisor" },
         { path: "/voice-commands", icon: Radio, label: "Voice Commands" },
         { path: "/voice-command-interface", icon: Radio, label: "Voice Interface" },
+        { path: "/sales-guide", icon: Megaphone, label: "Sales Guide" },
       ],
     },
     {

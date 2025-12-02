@@ -149,6 +149,10 @@ import Vehicles from "@/pages/Vehicles";
 import VoiceCommandInterface from "@/pages/VoiceCommandInterface";
 import VRShowroom from "@/pages/VRShowroom";
 import WearableIntegration from "@/pages/WearableIntegration";
+import BankAccountManagement from "@/pages/BankAccountManagement";
+import InternalWarehouse from "@/pages/InternalWarehouse";
+import LossAccount from "@/pages/LossAccount";
+import SalesGuide from "@/pages/SalesGuide";
 import { CustomerDashboard } from "@/pages/customer/CustomerDashboard";
 import { ClientLayout } from "@/components/ClientLayout";
 import ClientDashboard from "@/pages/client/Dashboard";
@@ -536,6 +540,26 @@ function Router() {
       <Route path="/data-backup">
         <Layout>
           <DataBackup />
+        </Layout>
+      </Route>
+      <Route path="/bank-account-management">
+        <Layout>
+          <BankAccountManagement />
+        </Layout>
+      </Route>
+      <Route path="/internal-warehouse">
+        <Layout>
+          <InternalWarehouse />
+        </Layout>
+      </Route>
+      <Route path="/loss-account">
+        <Layout>
+          <LossAccount />
+        </Layout>
+      </Route>
+      <Route path="/sales-guide">
+        <Layout>
+          <SalesGuide />
         </Layout>
       </Route>
       <Route path="/dashboard-widgets">
