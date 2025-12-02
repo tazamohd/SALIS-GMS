@@ -71,6 +71,7 @@ import {
   Landmark,
   TrendingDown,
   Megaphone,
+  CreditCard,
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -253,6 +254,11 @@ export function Layout({ children }: LayoutProps) {
         { path: "/stripe-payment-processing", icon: DollarSign, label: "Payment Processing" },
         { path: "/bank-account-management", icon: Landmark, label: "Bank Accounts" },
         { path: "/loss-account", icon: TrendingDown, label: "Loss Account" },
+        { path: "/assets-management", icon: Building2, label: "Assets - الاصول" },
+        { path: "/liabilities-management", icon: CreditCard, label: "Liabilities - الخصوم" },
+        { path: "/sales-management", icon: ShoppingCart, label: "Sales - المبيعات" },
+        { path: "/expenses-management", icon: Receipt, label: "Expenses - المصروفات" },
+        { path: "/equity-management", icon: Wallet, label: "Equity - حقوق الملكية" },
       ],
     },
     {

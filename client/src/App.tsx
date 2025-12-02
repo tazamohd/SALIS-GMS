@@ -153,6 +153,11 @@ import BankAccountManagement from "@/pages/BankAccountManagement";
 import InternalWarehouse from "@/pages/InternalWarehouse";
 import LossAccount from "@/pages/LossAccount";
 import SalesGuide from "@/pages/SalesGuide";
+import AssetsManagement from "@/pages/AssetsManagement";
+import LiabilitiesManagement from "@/pages/LiabilitiesManagement";
+import SalesManagement from "@/pages/SalesManagement";
+import ExpensesManagement from "@/pages/ExpensesManagement";
+import EquityManagement from "@/pages/EquityManagement";
 import { CustomerDashboard } from "@/pages/customer/CustomerDashboard";
 import { ClientLayout } from "@/components/ClientLayout";
 import ClientDashboard from "@/pages/client/Dashboard";
@@ -560,6 +565,31 @@ function Router() {
       <Route path="/sales-guide">
         <Layout>
           <SalesGuide />
+        </Layout>
+      </Route>
+      <Route path="/assets-management">
+        <Layout>
+          <AssetsManagement />
+        </Layout>
+      </Route>
+      <Route path="/liabilities-management">
+        <Layout>
+          <LiabilitiesManagement />
+        </Layout>
+      </Route>
+      <Route path="/sales-management">
+        <Layout>
+          <SalesManagement />
+        </Layout>
+      </Route>
+      <Route path="/expenses-management">
+        <Layout>
+          <ExpensesManagement />
+        </Layout>
+      </Route>
+      <Route path="/equity-management">
+        <Layout>
+          <EquityManagement />
         </Layout>
       </Route>
       <Route path="/dashboard-widgets">
