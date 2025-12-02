@@ -158,6 +158,9 @@ import LiabilitiesManagement from "@/pages/LiabilitiesManagement";
 import SalesManagement from "@/pages/SalesManagement";
 import ExpensesManagement from "@/pages/ExpensesManagement";
 import EquityManagement from "@/pages/EquityManagement";
+import CapitalManagement from "@/pages/CapitalManagement";
+import PartnersCurrentAccount from "@/pages/PartnersCurrentAccount";
+import RetainedEarnings from "@/pages/RetainedEarnings";
 import { CustomerDashboard } from "@/pages/customer/CustomerDashboard";
 import { ClientLayout } from "@/components/ClientLayout";
 import ClientDashboard from "@/pages/client/Dashboard";
@@ -590,6 +593,21 @@ function Router() {
       <Route path="/equity-management">
         <Layout>
           <EquityManagement />
+        </Layout>
+      </Route>
+      <Route path="/capital-management">
+        <Layout>
+          <CapitalManagement />
+        </Layout>
+      </Route>
+      <Route path="/partners-current-account">
+        <Layout>
+          <PartnersCurrentAccount />
+        </Layout>
+      </Route>
+      <Route path="/retained-earnings">
+        <Layout>
+          <RetainedEarnings />
         </Layout>
       </Route>
       <Route path="/dashboard-widgets">

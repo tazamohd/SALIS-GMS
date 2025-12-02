@@ -259,6 +259,9 @@ export function Layout({ children }: LayoutProps) {
         { path: "/sales-management", icon: ShoppingCart, label: "Sales - المبيعات" },
         { path: "/expenses-management", icon: Receipt, label: "Expenses - المصروفات" },
         { path: "/equity-management", icon: Wallet, label: "Equity - حقوق الملكية" },
+        { path: "/capital-management", icon: Landmark, label: "Capital - رأس المال" },
+        { path: "/partners-current-account", icon: Users, label: "Partners Account - جاري الشركاء" },
+        { path: "/retained-earnings", icon: TrendingUp, label: "Retained Earnings - الاحتياطات" },
       ],
     },
     {
