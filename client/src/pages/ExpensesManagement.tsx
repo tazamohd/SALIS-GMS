@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { Link } from "wouter";
 import { TabsPageLayout } from "@/components/layouts/TabsPageLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -59,6 +60,8 @@ import {
   AlertTriangle,
   CheckCircle,
   Clock,
+  ExternalLink,
+  ShoppingCart,
 } from "lucide-react";
 
 const expenseSchema = z.object({
@@ -312,6 +315,48 @@ export default function ExpensesManagement() {
           </CardContent>
         </Card>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Related Financial Modules</CardTitle>
+          <CardDescription>الوحدات المالية ذات الصلة - Quick access to related accounting</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Link href="/sales-management">
+              <Card className="cursor-pointer hover:border-primary transition-colors h-full" data-testid="link-sales-management">
+                <CardHeader className="pb-2">
+                  <div className="flex items-center justify-between">
+                    <ShoppingCart className="h-8 w-8 text-green-600" />
+                    <ExternalLink className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                  <CardTitle className="text-lg">Sales Management</CardTitle>
+                  <CardDescription>المبيعات</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground">Track revenue, transactions, and sales performance</p>
+                </CardContent>
+              </Card>
+            </Link>
+
+            <Link href="/invoices">
+              <Card className="cursor-pointer hover:border-primary transition-colors h-full" data-testid="link-invoices">
+                <CardHeader className="pb-2">
+                  <div className="flex items-center justify-between">
+                    <FileText className="h-8 w-8 text-blue-600" />
+                    <ExternalLink className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                  <CardTitle className="text-lg">Invoices</CardTitle>
+                  <CardDescription>الفواتير</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground">Manage customer invoices and payment tracking</p>
+                </CardContent>
+              </Card>
+            </Link>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 

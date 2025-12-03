@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { Link } from "wouter";
 import { TabsPageLayout } from "@/components/layouts/TabsPageLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -57,6 +58,9 @@ import {
   Award,
   Coins,
   Scale,
+  Landmark,
+  ExternalLink,
+  PiggyBank,
 } from "lucide-react";
 
 const capitalSchema = z.object({
@@ -281,6 +285,64 @@ export default function EquityManagement() {
               <p className="text-2xl font-bold">23.5%</p>
               <p className="text-sm text-muted-foreground">Dividend Payout</p>
             </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Related Equity Modules</CardTitle>
+          <CardDescription>وحدات حقوق الملكية ذات الصلة - Quick access to equity sub-categories</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Link href="/capital-management">
+              <Card className="cursor-pointer hover:border-primary transition-colors h-full" data-testid="link-capital-management">
+                <CardHeader className="pb-2">
+                  <div className="flex items-center justify-between">
+                    <Landmark className="h-8 w-8 text-blue-600" />
+                    <ExternalLink className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                  <CardTitle className="text-lg">Capital Management</CardTitle>
+                  <CardDescription>رأس المال</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground">Manage share capital, ownership structure, and capital contributions</p>
+                </CardContent>
+              </Card>
+            </Link>
+
+            <Link href="/partners-current-account">
+              <Card className="cursor-pointer hover:border-primary transition-colors h-full" data-testid="link-partners-account">
+                <CardHeader className="pb-2">
+                  <div className="flex items-center justify-between">
+                    <Users className="h-8 w-8 text-green-600" />
+                    <ExternalLink className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                  <CardTitle className="text-lg">Partners Account</CardTitle>
+                  <CardDescription>جاري الشركاء</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground">Track partner balances, transactions, and withdrawals</p>
+                </CardContent>
+              </Card>
+            </Link>
+
+            <Link href="/retained-earnings">
+              <Card className="cursor-pointer hover:border-primary transition-colors h-full" data-testid="link-retained-earnings">
+                <CardHeader className="pb-2">
+                  <div className="flex items-center justify-between">
+                    <PiggyBank className="h-8 w-8 text-purple-600" />
+                    <ExternalLink className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                  <CardTitle className="text-lg">Retained Earnings</CardTitle>
+                  <CardDescription>الاحتياطات والأرباح</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground">Manage profit reserves, distributions, and retained earnings</p>
+                </CardContent>
+              </Card>
+            </Link>
           </div>
         </CardContent>
       </Card>

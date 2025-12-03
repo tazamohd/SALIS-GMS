@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { Link } from "wouter";
 import { TabsPageLayout } from "@/components/layouts/TabsPageLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -57,6 +58,8 @@ import {
   AlertTriangle,
   CheckCircle,
   Package,
+  ExternalLink,
+  CreditCard,
 } from "lucide-react";
 
 const assetSchema = z.object({
@@ -501,6 +504,48 @@ export default function AssetsManagement() {
               ))}
             </TableBody>
           </Table>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Related Financial Modules</CardTitle>
+          <CardDescription>الوحدات المالية ذات الصلة - Quick access to balance sheet items</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Link href="/liabilities-management">
+              <Card className="cursor-pointer hover:border-primary transition-colors h-full" data-testid="link-liabilities-management">
+                <CardHeader className="pb-2">
+                  <div className="flex items-center justify-between">
+                    <CreditCard className="h-8 w-8 text-red-600" />
+                    <ExternalLink className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                  <CardTitle className="text-lg">Liabilities & Obligations</CardTitle>
+                  <CardDescription>الخصوم</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground">Manage company debts, loans, and financial obligations</p>
+                </CardContent>
+              </Card>
+            </Link>
+
+            <Link href="/equity-management">
+              <Card className="cursor-pointer hover:border-primary transition-colors h-full" data-testid="link-equity-management">
+                <CardHeader className="pb-2">
+                  <div className="flex items-center justify-between">
+                    <DollarSign className="h-8 w-8 text-green-600" />
+                    <ExternalLink className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                  <CardTitle className="text-lg">Equity Management</CardTitle>
+                  <CardDescription>حقوق الملكية</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground">Track owner's equity, capital, and retained earnings</p>
+                </CardContent>
+              </Card>
+            </Link>
+          </div>
         </CardContent>
       </Card>
     </div>
