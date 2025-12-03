@@ -73,6 +73,9 @@ import {
   Megaphone,
   CreditCard,
   FolderTree,
+  Scale,
+  Banknote,
+  Calculator,
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -264,6 +267,16 @@ export function Layout({ children }: LayoutProps) {
         { path: "/partners-current-account", icon: Users, label: "Partners Account - جاري الشركاء" },
         { path: "/retained-earnings", icon: TrendingUp, label: "Retained Earnings - الاحتياطات" },
         { path: "/chart-of-accounts", icon: FolderTree, label: "Chart of Accounts - شجرة الحسابات" },
+        { path: "/general-ledger", icon: BookOpen, label: "General Ledger - دفتر الأستاذ" },
+        { path: "/journal-entries", icon: FileText, label: "Journal Entries - القيود اليومية" },
+        { path: "/trial-balance", icon: Scale, label: "Trial Balance - ميزان المراجعة" },
+        { path: "/income-statement", icon: TrendingUp, label: "Income Statement - قائمة الدخل" },
+        { path: "/balance-sheet", icon: Scale, label: "Balance Sheet - الميزانية" },
+        { path: "/cash-flow-statement", icon: Banknote, label: "Cash Flow - التدفقات النقدية" },
+        { path: "/accounts-receivable", icon: Users, label: "Accounts Receivable - المدينين" },
+        { path: "/accounts-payable", icon: Building2, label: "Accounts Payable - الدائنين" },
+        { path: "/cost-centers", icon: Target, label: "Cost Centers - مراكز التكلفة" },
+        { path: "/budget-management", icon: Calculator, label: "Budget Management - الميزانية التقديرية" },
       ],
     },
     {

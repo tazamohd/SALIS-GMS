@@ -162,6 +162,16 @@ import CapitalManagement from "@/pages/CapitalManagement";
 import PartnersCurrentAccount from "@/pages/PartnersCurrentAccount";
 import RetainedEarnings from "@/pages/RetainedEarnings";
 import ChartOfAccounts from "@/pages/ChartOfAccounts";
+import GeneralLedger from "@/pages/GeneralLedger";
+import JournalEntries from "@/pages/JournalEntries";
+import TrialBalance from "@/pages/TrialBalance";
+import IncomeStatement from "@/pages/IncomeStatement";
+import BalanceSheet from "@/pages/BalanceSheet";
+import CashFlowStatement from "@/pages/CashFlowStatement";
+import AccountsReceivable from "@/pages/AccountsReceivable";
+import AccountsPayable from "@/pages/AccountsPayable";
+import CostCenters from "@/pages/CostCenters";
+import BudgetManagement from "@/pages/BudgetManagement";
 import { CustomerDashboard } from "@/pages/customer/CustomerDashboard";
 import { ClientLayout } from "@/components/ClientLayout";
 import ClientDashboard from "@/pages/client/Dashboard";
@@ -614,6 +624,56 @@ function Router() {
       <Route path="/chart-of-accounts">
         <Layout>
           <ChartOfAccounts />
+        </Layout>
+      </Route>
+      <Route path="/general-ledger">
+        <Layout>
+          <GeneralLedger />
+        </Layout>
+      </Route>
+      <Route path="/journal-entries">
+        <Layout>
+          <JournalEntries />
+        </Layout>
+      </Route>
+      <Route path="/trial-balance">
+        <Layout>
+          <TrialBalance />
+        </Layout>
+      </Route>
+      <Route path="/income-statement">
+        <Layout>
+          <IncomeStatement />
+        </Layout>
+      </Route>
+      <Route path="/balance-sheet">
+        <Layout>
+          <BalanceSheet />
+        </Layout>
+      </Route>
+      <Route path="/cash-flow-statement">
+        <Layout>
+          <CashFlowStatement />
+        </Layout>
+      </Route>
+      <Route path="/accounts-receivable">
+        <Layout>
+          <AccountsReceivable />
+        </Layout>
+      </Route>
+      <Route path="/accounts-payable">
+        <Layout>
+          <AccountsPayable />
+        </Layout>
+      </Route>
+      <Route path="/cost-centers">
+        <Layout>
+          <CostCenters />
+        </Layout>
+      </Route>
+      <Route path="/budget-management">
+        <Layout>
+          <BudgetManagement />
         </Layout>
       </Route>
       <Route path="/dashboard-widgets">
