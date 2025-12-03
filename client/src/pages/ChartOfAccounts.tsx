@@ -448,7 +448,7 @@ function AccountTreeNode({ account, level = 0 }: AccountTreeNodeProps) {
         >
           {hasChildren ? (
             <CollapsibleTrigger asChild>
-              <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+              <Button variant="ghost" size="sm" className="h-6 w-6 p-0" data-testid={`button-toggle-${account.code}`}>
                 {isOpen ? (
                   <ChevronDown className="h-4 w-4" />
                 ) : (
@@ -1213,8 +1213,7 @@ export default function ChartOfAccounts() {
 
   return (
     <TabsPageLayout
-      title="Chart of Accounts"
-      titleAr="شجرة الحسابات"
+      title="Chart of Accounts - شجرة الحسابات"
       description="Manage your complete chart of accounts with hierarchical structure"
       icon={FolderTree}
       tabs={tabs}
