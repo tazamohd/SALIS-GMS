@@ -72,6 +72,7 @@ import {
   TrendingDown,
   Megaphone,
   CreditCard,
+  FolderTree,
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -262,6 +263,7 @@ export function Layout({ children }: LayoutProps) {
         { path: "/capital-management", icon: Landmark, label: "Capital - رأس المال" },
         { path: "/partners-current-account", icon: Users, label: "Partners Account - جاري الشركاء" },
         { path: "/retained-earnings", icon: TrendingUp, label: "Retained Earnings - الاحتياطات" },
+        { path: "/chart-of-accounts", icon: FolderTree, label: "Chart of Accounts - شجرة الحسابات" },
       ],
     },
     {

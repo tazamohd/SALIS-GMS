@@ -161,6 +161,7 @@ import EquityManagement from "@/pages/EquityManagement";
 import CapitalManagement from "@/pages/CapitalManagement";
 import PartnersCurrentAccount from "@/pages/PartnersCurrentAccount";
 import RetainedEarnings from "@/pages/RetainedEarnings";
+import ChartOfAccounts from "@/pages/ChartOfAccounts";
 import { CustomerDashboard } from "@/pages/customer/CustomerDashboard";
 import { ClientLayout } from "@/components/ClientLayout";
 import ClientDashboard from "@/pages/client/Dashboard";
@@ -608,6 +609,11 @@ function Router() {
       <Route path="/retained-earnings">
         <Layout>
           <RetainedEarnings />
+        </Layout>
+      </Route>
+      <Route path="/chart-of-accounts">
+        <Layout>
+          <ChartOfAccounts />
         </Layout>
       </Route>
       <Route path="/dashboard-widgets">
