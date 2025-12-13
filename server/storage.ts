@@ -143,8 +143,11 @@ import {
   type TechnicianProfile,
   type InsertTechnicianProfile,
   notifications,
+  notificationSchedules,
   type Notification,
   type InsertNotification,
+  type NotificationSchedule,
+  type InsertNotificationSchedule,
   estimates,
   estimateItems,
   type Estimate,
@@ -2572,11 +2575,6 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(serviceReminders)
       .where(eq(serviceReminders.customerId, customerId))
       .orderBy(desc(serviceReminders.createdAt));
-  }
-
-  async createServiceReminder(data: InsertServiceReminder): Promise<ServiceReminder> {
-    const [reminder] = await db.insert(serviceReminders).values(data).returning();
-    return reminder;
   }
 
   async getServiceChatMessages(jobCardId: string): Promise<ServiceChatMessage[]> {
@@ -9139,24 +9137,24 @@ export class DatabaseStorage implements IStorage {
   }
 
   // AR Repair Guides
-  async createArRepairGuide(data: InsertArRepairGuide): Promise<ArRepairGuide> {
+  async createArRepairGuide(data: InsertARRepairGuide): Promise<ARRepairGuide> {
     const [guide] = await db.insert(arRepairGuides).values(data).returning();
     return guide;
   }
 
-  async getArRepairGuides(garageId?: string): Promise<ArRepairGuide[]> {
+  async getArRepairGuides(garageId?: string): Promise<ARRepairGuide[]> {
     if (garageId) {
       return await db.select().from(arRepairGuides).where(eq(arRepairGuides.garageId, garageId)).orderBy(desc(arRepairGuides.createdAt));
     }
     return await db.select().from(arRepairGuides).orderBy(desc(arRepairGuides.createdAt));
   }
 
-  async getArRepairGuide(id: string): Promise<ArRepairGuide | undefined> {
+  async getArRepairGuide(id: string): Promise<ARRepairGuide | undefined> {
     const [guide] = await db.select().from(arRepairGuides).where(eq(arRepairGuides.id, id));
     return guide;
   }
 
-  async updateArRepairGuide(id: string, data: Partial<ArRepairGuide>): Promise<ArRepairGuide> {
+  async updateArRepairGuide(id: string, data: Partial<ARRepairGuide>): Promise<ARRepairGuide> {
     const [guide] = await db.update(arRepairGuides)
       .set({ ...data, updatedAt: new Date() })
       .where(eq(arRepairGuides.id, id))
@@ -9164,30 +9162,30 @@ export class DatabaseStorage implements IStorage {
     return guide;
   }
 
-  async createArGuideSession(data: InsertArGuideSession): Promise<ArGuideSession> {
+  async createArGuideSession(data: InsertARGuideSession): Promise<ARGuideSession> {
     const [session] = await db.insert(arGuideSessions).values(data).returning();
     return session;
   }
 
   // IoT Sensor Integration
-  async createIotSensor(data: InsertIotSensor): Promise<IotSensor> {
+  async createIoTSensor(data: InsertIoTSensor): Promise<IoTSensor> {
     const [sensor] = await db.insert(iotSensors).values(data).returning();
     return sensor;
   }
 
-  async getIotSensors(vehicleId?: string): Promise<IotSensor[]> {
+  async getIoTSensors(vehicleId?: string): Promise<IoTSensor[]> {
     if (vehicleId) {
       return await db.select().from(iotSensors).where(eq(iotSensors.vehicleId, vehicleId));
     }
     return await db.select().from(iotSensors).orderBy(desc(iotSensors.createdAt));
   }
 
-  async createIotSensorReading(data: InsertIotSensorReading): Promise<IotSensorReading> {
+  async createIoTSensorReading(data: InsertIoTSensorReading): Promise<IoTSensorReading> {
     const [reading] = await db.insert(iotSensorReadings).values(data).returning();
     return reading;
   }
 
-  async getIotSensorReadings(sensorId?: string, vehicleId?: string): Promise<IotSensorReading[]> {
+  async getIoTSensorReadings(sensorId?: string, vehicleId?: string): Promise<IoTSensorReading[]> {
     const conditions = [];
     if (sensorId) conditions.push(eq(iotSensorReadings.sensorId, sensorId));
     
