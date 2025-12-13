@@ -215,23 +215,25 @@ import Login from "@/pages/Login";
 import Register from "@/pages/Register";
 
 function Router() {
-  const { isAuthenticated, isLoading } = useAuth();
+  // TEMPORARILY DISABLED: Authentication bypass for development testing
+  // const { isAuthenticated, isLoading } = useAuth();
   
   const { data: user } = useQuery<User>({
     queryKey: ['/api/auth/user'],
-    enabled: isAuthenticated,
+    // enabled: isAuthenticated,
   });
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
-        </div>
-      </div>
-    );
-  }
+  // TEMPORARILY DISABLED: Loading check bypassed
+  // if (isLoading) {
+  //   return (
+  //     <div className="min-h-screen flex items-center justify-center">
+  //       <div className="text-center">
+  //         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+  //         <p className="mt-4 text-gray-600">Loading...</p>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   // TEMPORARILY DISABLED: Authentication bypass - remove this comment block to re-enable auth
   // if (!isAuthenticated) {
