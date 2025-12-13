@@ -240,6 +240,67 @@ Share these links with customers and technicians for mobile access.
 
 ---
 
+---
+
+## Part 8: Accounting Basics (10 minutes)
+
+### Step 1: View General Ledger
+
+1. Click **General Ledger** in the Billing & Payments section
+2. Browse the chart of accounts
+3. Click any account to see transaction history
+
+### Step 2: Create a Journal Entry
+
+1. Go to **Journal Entries**
+2. Click **+ New Entry**
+3. Fill in:
+   - **Date:** Today's date
+   - **Description:** Sample transaction
+   - **Debit Account:** Cash
+   - **Credit Account:** Revenue
+   - **Amount:** 1000
+4. Click **Post Entry**
+
+✅ **Success:** Entry posted to General Ledger
+
+### Step 3: View Financial Reports
+
+1. **Trial Balance:** Check that debits = credits
+2. **Income Statement:** View revenue and expenses
+3. **Balance Sheet:** See assets, liabilities, equity
+
+### Step 4: Track Receivables
+
+1. Go to **Accounts Receivable**
+2. View customer aging (who owes money)
+3. Click a customer to see outstanding invoices
+
+### Step 5: Manage Budgets
+
+1. Go to **Budget Management**
+2. View existing budgets
+3. Compare actual vs budgeted amounts
+
+---
+
+## Accounting Quick Reference
+
+| Module | Purpose | Key Actions |
+|--------|---------|-------------|
+| General Ledger | Chart of accounts | View balances, transaction history |
+| Journal Entries | Record transactions | Create, approve, reverse entries |
+| Trial Balance | Verify accuracy | Check debits = credits |
+| Income Statement | Profit/Loss | View revenue, expenses, net income |
+| Balance Sheet | Financial position | Assets, liabilities, equity |
+| Cash Flow | Cash movements | Operating, investing, financing |
+| Accounts Receivable | Money owed to you | Customer aging, collections |
+| Accounts Payable | Money you owe | Vendor invoices, payments |
+| Cost Centers | Track costs | Department/project costs |
+| Budget Management | Plan finances | Budget vs actual, forecasts |
+
+---
+
 ## Next Steps
 
 ### Advanced Training
@@ -249,6 +310,7 @@ Share these links with customers and technicians for mobile access.
 3. **Email/SMS:** Configure notification templates
 4. **Payment Processing:** Set up Stripe/PayPal
 5. **AI Features:** Use AI chatbot and predictive maintenance
+6. **Accounting:** Master financial reporting and compliance
 
 ### Resources
 

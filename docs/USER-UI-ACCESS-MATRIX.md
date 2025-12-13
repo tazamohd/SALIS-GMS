@@ -1,13 +1,13 @@
 # SALIS AUTO - User Role to UI Access Matrix
 
-This document maps all **24 professional roles** to the **174 UI pages** they can access based on their permissions and scope.
+This document maps all **24 professional roles** to the **184 UI pages** they can access based on their permissions and scope.
 
 ---
 
 ## 🎯 Quick Reference by Role Type
 
 ### SYSTEM SCOPE (Full Platform Access)
-**System Administrator** - ✅ ALL 174 pages
+**System Administrator** - ✅ ALL 184 pages
 
 ### GARAGE SCOPE (Garage-Wide Access)
 **Business Owner** - ✅ 160+ pages (all except specialized tech features)
@@ -129,7 +129,7 @@ This document maps all **24 professional roles** to the **174 UI pages** they ca
 | ISO 9001 QMS | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
 | Knowledge Base | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ✅ | ✅ | ❌ | ✅ |
 
-### 🔟 Billing & Payments (7 pages)
+### 🔟 Billing & Payments (17 pages)
 | Page | System Admin | Owner | General Mgr | Service Mgr | Service Advisor | Parts Mgr | Technician | Finance Mgr | Accountant | HR Mgr | Call Center | CSR | Receptionist | QC Inspector |
 |------|--------------|-------|-------------|-------------|-----------------|-----------|------------|-------------|------------|--------|-------------|-----|--------------|--------------|
 | Invoices | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ | ❌ |
@@ -139,6 +139,16 @@ This document maps all **24 professional roles** to the **174 UI pages** they ca
 | Expense Tracking | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | Payroll Management | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ |
 | Payment Processing (Stripe) | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ | ❌ |
+| **General Ledger** | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| **Journal Entries** | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| **Trial Balance** | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| **Income Statement** | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| **Balance Sheet** | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| **Cash Flow Statement** | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| **Accounts Receivable** | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ | ❌ |
+| **Accounts Payable** | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| **Cost Centers** | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| **Budget Management** | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
 
 ### 1️⃣1️⃣ Analytics & Business Intelligence (8 pages)
 | Page | System Admin | Owner | General Mgr | Service Mgr | Service Advisor | Parts Mgr | Technician | Finance Mgr | Accountant | HR Mgr | Call Center | CSR | Receptionist | QC Inspector |
@@ -277,7 +287,7 @@ This document maps all **24 professional roles** to the **174 UI pages** they ca
 
 ---
 
-**Last Updated**: January 2025  
-**Version**: 1.0  
+**Last Updated**: December 2025  
+**Version**: 1.1  
 **Total Users**: 70 staff across 24 roles  
-**Total UI Pages**: 174 pages with granular access control
+**Total UI Pages**: 184 pages with granular access control

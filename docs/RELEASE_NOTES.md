@@ -10,6 +10,7 @@ This document tracks all releases, features, bug fixes, and improvements to the 
 
 | Version | Release Date | Type | Highlights |
 |---------|-------------|------|------------|
+| 1.1.0 | December 2025 | Feature | Core Accounting Modules |
 | 1.0.0 | November 2025 | Major | Initial production release |
 | 0.13.0 | October 2025 | Feature | Phase 13 operational modules |
 | 0.12.0 | September 2025 | Feature | Mobile web apps, RBAC system |
@@ -18,12 +19,110 @@ This document tracks all releases, features, bug fixes, and improvements to the 
 
 ---
 
+# v1.1.0 - Core Accounting Modules
+**Release Date:** December 2025  
+**Type:** Feature Release
+
+## Highlights
+- **10 new accounting modules** for complete financial management
+- **151+ comprehensive modules** across 14 phases
+- **ZATCA-compliant** accounting with Saudi VAT integration
+- **Bilingual support** (Arabic/English) for all accounting features
+
+## New Features
+
+### General Ledger (دفتر الأستاذ العام)
+- Chart of accounts management
+- Account hierarchy and grouping
+- Opening balance configuration
+- Account transaction history
+- Export to PDF/Excel
+
+### Journal Entries (القيود اليومية)
+- Manual journal entry creation
+- Recurring entries support
+- Entry templates
+- Approval workflow
+- Audit trail tracking
+
+### Trial Balance (ميزان المراجعة)
+- Real-time balance calculations
+- Date range filtering
+- Debit/credit verification
+- Export capabilities
+- Variance analysis
+
+### Income Statement (قائمة الدخل)
+- Revenue and expense tracking
+- Period comparison
+- Gross and net profit margins
+- Department breakdown
+- Trend analysis
+
+### Balance Sheet (الميزانية العمومية)
+- Assets, liabilities, equity view
+- Current vs non-current classification
+- Point-in-time snapshots
+- Comparative periods
+- Financial ratios
+
+### Cash Flow Statement (قائمة التدفقات النقدية)
+- Operating, investing, financing activities
+- Direct and indirect methods
+- Cash position tracking
+- Forecasting tools
+- Bank reconciliation
+
+### Accounts Receivable (حسابات المدينين)
+- Customer aging reports
+- Invoice tracking
+- Payment collection workflow
+- Credit limit management
+- Dunning letters
+
+### Accounts Payable (حسابات الدائنين)
+- Vendor invoice management
+- Payment scheduling
+- Purchase order matching
+- Early payment discounts
+- Vendor statements
+
+### Cost Centers (مراكز التكلفة)
+- Department cost allocation
+- Project cost tracking
+- Overhead distribution
+- Profitability analysis
+- Budget vs actual
+
+### Budget Management (الميزانية التقديرية)
+- Annual budget creation
+- Monthly allocations
+- Variance reporting
+- Forecast updates
+- Approval workflow
+
+## Saudi Arabia Compliance
+- ZATCA e-invoicing integration with accounting
+- VAT 15% automatic calculations
+- Zakat reporting preparation
+- Hijri calendar support in reports
+- Arabic financial statements
+
+## Technical Improvements
+- TabsPageLayout for all accounting pages
+- Real-time data synchronization
+- Optimized query performance
+- Enhanced error handling
+- Comprehensive data-testid coverage
+
+---
+
 # v1.0.0 - Production Release
 **Release Date:** November 2025  
 **Type:** Major Release
 
 ## Highlights
-- **141+ comprehensive modules** across 13 phases
+- **151+ comprehensive modules** across 14 phases
 - **290+ database tables** with full referential integrity
 - **24 professional roles** with granular permissions
 - **174 UI pages** with consistent design system
@@ -366,5 +465,5 @@ For issues or questions:
 
 ---
 
-*Last Updated: November 2025*
+*Last Updated: December 2025*
 *SALIS AUTO Platform*

@@ -1,7 +1,7 @@
 # 🇸🇦 SALIS AUTO - Saudi Arabia Market Features
 
-**Last Updated**: October 30, 2025  
-**Version**: 1.0.0  
+**Last Updated**: December 13, 2025  
+**Version**: 1.1.0  
 **Status**: ✅ Production Ready
 
 ---
@@ -37,6 +37,7 @@ SALIS AUTO has been comprehensively enhanced for the Saudi Arabian market with f
 | **PDF Exports** | Professional invoices with VAT breakdown | ✅ Ready |
 | **Excel Exports** | CSV reports for VAT compliance | ✅ Ready |
 | **SMS Reminders** | Saudi phone formatting with Twilio | ✅ Ready |
+| **Accounting Compliance** | ZATCA-integrated accounting modules | ✅ Ready |
 
 ---
 

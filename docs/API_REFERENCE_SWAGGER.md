@@ -187,6 +187,98 @@ components:
               message:
                 type: string
 
+    LedgerAccount:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        accountCode:
+          type: string
+        accountName:
+          type: string
+        accountNameAr:
+          type: string
+        accountType:
+          type: string
+          enum: [asset, liability, equity, revenue, expense]
+        balance:
+          type: number
+          format: decimal
+        isActive:
+          type: boolean
+
+    JournalEntry:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        entryNumber:
+          type: string
+        entryDate:
+          type: string
+          format: date
+        description:
+          type: string
+        debitAccountId:
+          type: string
+          format: uuid
+        creditAccountId:
+          type: string
+          format: uuid
+        amount:
+          type: number
+          format: decimal
+        status:
+          type: string
+          enum: [draft, posted, reversed]
+
+    CostCenter:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        nameAr:
+          type: string
+        budgetAmount:
+          type: number
+          format: decimal
+        actualAmount:
+          type: number
+          format: decimal
+        variance:
+          type: number
+          format: decimal
+
+    Budget:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        fiscalYear:
+          type: integer
+        totalAmount:
+          type: number
+          format: decimal
+        allocatedAmount:
+          type: number
+          format: decimal
+        spentAmount:
+          type: number
+          format: decimal
+        status:
+          type: string
+          enum: [draft, approved, active, closed]
+
 paths:
   /auth/login:
     post:
@@ -569,6 +661,293 @@ paths:
                   topServices:
                     type: array
 
+  /accounting/general-ledger:
+    get:
+      summary: List all ledger accounts
+      tags: [Accounting]
+      security:
+        - sessionAuth: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/LedgerAccount'
+
+  /accounting/journal-entries:
+    get:
+      summary: List all journal entries
+      tags: [Accounting]
+      security:
+        - sessionAuth: []
+      parameters:
+        - name: startDate
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/JournalEntry'
+
+    post:
+      summary: Create new journal entry
+      tags: [Accounting]
+      security:
+        - sessionAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JournalEntry'
+      responses:
+        '201':
+          description: Journal entry created
+
+  /accounting/trial-balance:
+    get:
+      summary: Get trial balance report
+      tags: [Accounting]
+      security:
+        - sessionAuth: []
+      parameters:
+        - name: asOfDate
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalDebits:
+                    type: number
+                  totalCredits:
+                    type: number
+                  accounts:
+                    type: array
+
+  /accounting/income-statement:
+    get:
+      summary: Get income statement (P&L)
+      tags: [Accounting]
+      security:
+        - sessionAuth: []
+      parameters:
+        - name: startDate
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalRevenue:
+                    type: number
+                  totalExpenses:
+                    type: number
+                  netIncome:
+                    type: number
+
+  /accounting/balance-sheet:
+    get:
+      summary: Get balance sheet
+      tags: [Accounting]
+      security:
+        - sessionAuth: []
+      parameters:
+        - name: asOfDate
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalAssets:
+                    type: number
+                  totalLiabilities:
+                    type: number
+                  totalEquity:
+                    type: number
+
+  /accounting/cash-flow:
+    get:
+      summary: Get cash flow statement
+      tags: [Accounting]
+      security:
+        - sessionAuth: []
+      parameters:
+        - name: startDate
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  operatingActivities:
+                    type: number
+                  investingActivities:
+                    type: number
+                  financingActivities:
+                    type: number
+                  netCashFlow:
+                    type: number
+
+  /accounting/accounts-receivable:
+    get:
+      summary: Get accounts receivable aging
+      tags: [Accounting]
+      security:
+        - sessionAuth: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  current:
+                    type: number
+                  days30:
+                    type: number
+                  days60:
+                    type: number
+                  days90Plus:
+                    type: number
+                  totalReceivable:
+                    type: number
+
+  /accounting/accounts-payable:
+    get:
+      summary: Get accounts payable aging
+      tags: [Accounting]
+      security:
+        - sessionAuth: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  current:
+                    type: number
+                  days30:
+                    type: number
+                  days60:
+                    type: number
+                  days90Plus:
+                    type: number
+                  totalPayable:
+                    type: number
+
+  /accounting/cost-centers:
+    get:
+      summary: List all cost centers
+      tags: [Accounting]
+      security:
+        - sessionAuth: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CostCenter'
+
+  /accounting/budgets:
+    get:
+      summary: List all budgets
+      tags: [Accounting]
+      security:
+        - sessionAuth: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Budget'
+
+    post:
+      summary: Create new budget
+      tags: [Accounting]
+      security:
+        - sessionAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Budget'
+      responses:
+        '201':
+          description: Budget created
+
 tags:
   - name: Authentication
     description: User authentication operations
@@ -580,6 +959,8 @@ tags:
     description: Job card operations
   - name: Invoices
     description: Invoice management
+  - name: Accounting
+    description: Financial accounting and reporting
   - name: AI Services
     description: AI-powered features
   - name: Analytics
@@ -616,4 +997,4 @@ All list endpoints support pagination:
 
 ---
 
-**Last Updated:** November 3, 2025
+**Last Updated:** December 13, 2025
