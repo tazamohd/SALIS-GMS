@@ -4,10 +4,10 @@
 
 This is the central hub for all SALIS AUTO documentation. All documentation files are consolidated in this `docs/` folder for easy access and organization.
 
-**Last Updated**: November 2025  
+**Last Updated**: December 2025  
 **Platform Version**: 1.0  
 **Status**: ✅ Production Ready  
-**Total Documents**: 59 files
+**Total Documents**: 60 files
 
 ---
 
@@ -48,7 +48,7 @@ This is the central hub for all SALIS AUTO documentation. All documentation file
 - **[Testing Strategy](TESTING_STRATEGY_GUIDE.md)** - Testing approach
 
 ### For Business Stakeholders
-- **[Feature Catalog](FEATURE-CATALOG.md)** - All 141+ features
+- **[Feature Catalog](FEATURE-CATALOG.md)** - All 151+ features
 - **[Workflow Diagrams](WORKFLOW_DIAGRAMS.md)** - Visual process flows
 - **[Platform Status](PLATFORM_STATUS.md)** - Current status
 - **[Project Overview](PROJECT_OVERVIEW.md)** - Project summary
@@ -106,11 +106,12 @@ This is the central hub for all SALIS AUTO documentation. All documentation file
 | [NOTIFICATION_SYSTEM.md](NOTIFICATION_SYSTEM.md) | Notifications | Developers |
 | [ADVANCED_REPORTING_SYSTEM.md](ADVANCED_REPORTING_SYSTEM.md) | Reporting system | Developers |
 
-### 5️⃣ Feature Documentation (8 files)
+### 5️⃣ Feature Documentation (9 files)
 
 | Document | Description | Audience |
 |----------|-------------|----------|
-| [FEATURE-CATALOG.md](FEATURE-CATALOG.md) | All 141+ features | Everyone |
+| [FEATURE-CATALOG.md](FEATURE-CATALOG.md) | All 151+ features | Everyone |
+| [ACCOUNTING_MODULES.md](ACCOUNTING_MODULES.md) | 10 Core Accounting Modules | Finance |
 | [RBAC-DOCUMENTATION.md](RBAC-DOCUMENTATION.md) | Roles & permissions | Admins |
 | [USER-UI-ACCESS-MATRIX.md](USER-UI-ACCESS-MATRIX.md) | Role access to UI | Admins |
 | [SAUDI_ARABIA_FEATURES.md](SAUDI_ARABIA_FEATURES.md) | KSA compliance | Regional |
@@ -192,6 +193,9 @@ This is the central hub for all SALIS AUTO documentation. All documentation file
 → [TROUBLESHOOTING-GUIDE.md](TROUBLESHOOTING-GUIDE.md)  
 → [FAQ.md](FAQ.md)
 
+**...manage accounting and financial records**
+→ [ACCOUNTING_MODULES.md](ACCOUNTING_MODULES.md)
+
 **...configure security**
 → [SECURITY_AUDIT_CHECKLIST.md](SECURITY_AUDIT_CHECKLIST.md)
 
@@ -218,11 +222,11 @@ This is the central hub for all SALIS AUTO documentation. All documentation file
 **Current Implementation:**
 - ✅ **174 UI Pages** - Complete interface
 - ✅ **290+ Database Tables** - Comprehensive data model
-- ✅ **141+ Feature Modules** - Across 13 phases
+- ✅ **151+ Feature Modules** - Across 13 phases (including 10 core accounting modules)
 - ✅ **70 Staff Users** - Across 24 professional roles
 - ✅ **6,250+ Seeded Records** - Realistic test data
 - ✅ **2,500+ Permissions** - Granular RBAC
-- ✅ **59 Documentation Files** - Consolidated in docs/
+- ✅ **60 Documentation Files** - Consolidated in docs/
 
 **Supported Operations:**
 - 🏢 Multi-location franchise management

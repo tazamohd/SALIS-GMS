@@ -11,10 +11,10 @@
 
 ## Overview
 
-SALIS AUTO includes **141+ comprehensive modules** organized across **13 implementation phases**, providing complete automotive service management from customer intake to business intelligence.
+SALIS AUTO includes **151+ comprehensive modules** organized across **13 implementation phases**, providing complete automotive service management from customer intake to business intelligence.
 
 **Quick Stats:**
-- 📊 141+ Feature Modules
+- 📊 151+ Feature Modules
 - 🎯 174 UI Pages
 - 📈 290+ Database Tables
 - 👥 24 Professional Roles
@@ -51,7 +51,7 @@ SALIS AUTO includes **141+ comprehensive modules** organized across **13 impleme
 21. **Warranty Management** - Warranty tracking, claims
 22. **Quality Control** - QC checklists, final inspections
 
-### **Phase 3: Financial Management** (9 modules)
+### **Phase 3: Financial Management** (19 modules)
 23. **Advanced Invoicing** - Recurring invoices, templates
 24. **Payment Plans** - Installment payments
 25. **Refunds & Credits** - Credit notes, refund processing
@@ -61,6 +61,18 @@ SALIS AUTO includes **141+ comprehensive modules** organized across **13 impleme
 29. **Tax Management** - Multi-tax rates, exemptions
 30. **Financial Reports** - P&L, cash flow, balance sheet
 31. **Accounting Integration** - QuickBooks, Xero sync
+
+#### **Core Accounting Modules** (10 NEW modules - December 2025)
+- **General Ledger** (دفتر الأستاذ العام) - Chart of accounts, account hierarchy
+- **Journal Entries** (القيود اليومية) - Double-entry bookkeeping, transaction recording
+- **Trial Balance** (ميزان المراجعة) - Debit/credit verification, adjusted views
+- **Income Statement** (قائمة الدخل) - P&L reporting, variance analysis
+- **Balance Sheet** (الميزانية العمومية) - Financial position, IFRS/GAAP compliant
+- **Cash Flow Statement** (قائمة التدفقات النقدية) - Operating/investing/financing activities
+- **Accounts Receivable** (حسابات المدينين) - Customer balances, aging analysis
+- **Accounts Payable** (حسابات الدائنين) - Vendor obligations, payment scheduling
+- **Cost Centers** (مراكز التكلفة) - Departmental cost tracking, variance analysis
+- **Budget Management** (الميزانية التقديرية) - Annual budgets, forecasting
 
 ### **Phase 4: Customer Experience** (11 modules)
 32. **Customer Portal** - Self-service customer access
@@ -235,6 +247,16 @@ SALIS AUTO includes **141+ comprehensive modules** organized across **13 impleme
 - Tax management
 - Accounting sync
 - Financial reporting
+- **General Ledger** - Chart of accounts management
+- **Journal Entries** - Double-entry bookkeeping
+- **Trial Balance** - Debit/credit verification
+- **Income Statement** - Profit & loss reporting
+- **Balance Sheet** - Financial position statements
+- **Cash Flow Statement** - Cash movement tracking
+- **Accounts Receivable** - Customer balance management
+- **Accounts Payable** - Vendor payment tracking
+- **Cost Centers** - Department cost allocation
+- **Budget Management** - Financial planning & forecasting
 
 ### 👥 Customer Service
 - Customer profiles

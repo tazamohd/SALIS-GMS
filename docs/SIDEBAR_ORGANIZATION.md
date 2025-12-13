@@ -56,10 +56,23 @@ The sidebar navigation has been **reorganized from a flat list to organized, col
 - Customers
 - Vehicles
 
-### 8. **Financial Management**
+### 8. **Billing & Payments** (Expanded - 16 items)
 - Invoices
 - Financial Settings
 - Refund Management
+- Commissions
+- Stripe Integration
+- PayPal Integration
+- **General Ledger** (NEW - دفتر الأستاذ العام)
+- **Journal Entries** (NEW - القيود اليومية)
+- **Trial Balance** (NEW - ميزان المراجعة)
+- **Income Statement** (NEW - قائمة الدخل)
+- **Balance Sheet** (NEW - الميزانية العمومية)
+- **Cash Flow Statement** (NEW - قائمة التدفقات النقدية)
+- **Accounts Receivable** (NEW - حسابات المدينين)
+- **Accounts Payable** (NEW - حسابات الدائنين)
+- **Cost Centers** (NEW - مراكز التكلفة)
+- **Budget Management** (NEW - الميزانية التقديرية)
 
 ### 9. **Analytics & Insights**
 - Reports

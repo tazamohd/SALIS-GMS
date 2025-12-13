@@ -1,7 +1,7 @@
 # Login Dashboard Project
 
 ## Overview
-SALIS AUTO is a world-class automotive ERP platform designed for efficient garage operations at scale. It offers enterprise-grade features including franchise management, OBD diagnostics integration, OEM software licensing, global multi-currency/multi-language support, and a B2B spare parts supply network. The platform has expanded to **141+ comprehensive modules** across 13 phases, supporting multi-tenant franchise networks, advanced hardware integrations, cutting-edge technologies (AI, blockchain, AR/VR, quantum computing, sustainable energy management), and dedicated mobile web applications. It includes comprehensive compliance and localization features for the Saudi Arabian market (VAT, ZATCA E-Invoicing, Hijri calendar, Zakat, TRN validation, Arabic language, localized exports, SMS). Recent enhancements include an in-app chat support system, a comprehensive technician portal, AI-powered predictive diagnostics, an AI chatbot assistant, blockchain service history, smart contracts, and 9 operational modules from Phase 13 (Payroll, Expense Tracking, Towing Services, Vehicle Storage, Telematics Integration, Knowledge Base, Training LMS, Google My Business Integration, and Enhanced Compliance Management).
+SALIS AUTO is a world-class automotive ERP platform designed for efficient garage operations at scale. It offers enterprise-grade features including franchise management, OBD diagnostics integration, OEM software licensing, global multi-currency/multi-language support, and a B2B spare parts supply network. The platform has expanded to **151+ comprehensive modules** across 13 phases, supporting multi-tenant franchise networks, advanced hardware integrations, cutting-edge technologies (AI, blockchain, AR/VR, quantum computing, sustainable energy management), and dedicated mobile web applications. It includes comprehensive compliance and localization features for the Saudi Arabian market (VAT, ZATCA E-Invoicing, Hijri calendar, Zakat, TRN validation, Arabic language, localized exports, SMS). Recent enhancements include an in-app chat support system, a comprehensive technician portal, AI-powered predictive diagnostics, an AI chatbot assistant, blockchain service history, smart contracts, and 9 operational modules from Phase 13 (Payroll, Expense Tracking, Towing Services, Vehicle Storage, Telematics Integration, Knowledge Base, Training LMS, Google My Business Integration, and Enhanced Compliance Management).
 
 ## User Preferences
 - Modern React patterns with hooks
@@ -19,8 +19,8 @@ The application uses a full-stack architecture with clear client-server separati
 **Frontend**: React 18 with Vite, `wouter` for routing, `TanStack Query` for state management, and `shadcn/ui` (Radix UI) for components, adhering to the Figma design.
 **Backend**: Express server written in TypeScript.
 **Authentication**: Custom email/password authentication with comprehensive role-based access control (RBAC).
-**Database**: PostgreSQL with Drizzle ORM, comprising **141+ comprehensive modules with 290+ tables**.
-**RBAC System**: 24 professional roles, 70 staff users across departments, granular permissions for 141+ resources.
+**Database**: PostgreSQL with Drizzle ORM, comprising **151+ comprehensive modules with 290+ tables**.
+**RBAC System**: 24 professional roles, 70 staff users across departments, granular permissions for 151+ resources.
 **Real-Time Features**: WebSocket server (`/ws/chat`) for in-app chat support, live notifications, and call center real-time updates with session-based authentication.
 
 **UI/UX Decisions**: The design preserves the Figma aesthetic, ensures responsiveness, and uses a consistent component-based approach with a monochrome design system based on the SALIS AUTO brand. It supports PWA, mobile-responsive navigation, and WCAG 2.1 AA accessibility features, including an offline mode. A pure grayscale design is enforced with distinct light and dark modes.
@@ -54,6 +54,7 @@ The application uses a full-stack architecture with clear client-server separati
 - **Call Center Module**: Call center infrastructure with real-time updates via WebSocket, managing call queues, sessions, and agent performance, with a UI at `/call-center`.
 - **Comprehensive RBAC System**: 24 professional roles with 70 staff users across all departments (Service Advisors, Call Center Agents, Parts Managers, Accountants, Marketing, HR, QC, etc.).
 - **Production-Ready Data Seeding**: 9-phase comprehensive seeding system with 6,250+ records, 35+ stock images, 100% referential integrity across all 290+ tables (vehicles, parts, job cards, invoices, training, attendance, blockchain, IoT).
+- **Core Accounting Modules (10 NEW)**: Complete accounting system with General Ledger (دفتر الأستاذ العام), Journal Entries (القيود اليومية), Trial Balance (ميزان المراجعة), Income Statement (قائمة الدخل), Balance Sheet (الميزانية العمومية), Cash Flow Statement (قائمة التدفقات النقدية), Accounts Receivable (حسابات المدينين), Accounts Payable (حسابات الدائنين), Cost Centers (مراكز التكلفة), and Budget Management (الميزانية التقديرية).
 
 ## External Dependencies
 - Replit Auth
