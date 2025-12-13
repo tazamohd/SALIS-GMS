@@ -253,9 +253,9 @@ function Router() {
 
   return (
     <Switch>
-      {/* Root redirect based on user type */}
+      {/* Root redirect - always go to dashboard */}
       <Route path="/" component={() => (
-        <Redirect to={isCustomer ? "/portal/dashboard" : "/dashboard"} />
+        <Redirect to="/dashboard" />
       )} />
 
       {/* Customer Portal Routes */}
