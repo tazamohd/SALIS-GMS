@@ -36,6 +36,14 @@ import TechnicianTimeClock from "@/pages/technician/TimeClock";
 import TechnicianPartsLookup from "@/pages/technician/PartsLookup";
 import TechnicianJobDocumentation from "@/pages/technician/JobDocumentation";
 import TechnicianProfile from "@/pages/technician/Profile";
+import { PurchaseAgentLayout } from "@/components/PurchaseAgentLayout";
+import PurchaseAgentDashboard from "@/pages/purchase-agent/Dashboard";
+import PurchaseAgentOrders from "@/pages/purchase-agent/Orders";
+import PurchaseAgentSuppliers from "@/pages/purchase-agent/Suppliers";
+import PurchaseAgentInventory from "@/pages/purchase-agent/Inventory";
+import PurchaseAgentPriceCompare from "@/pages/purchase-agent/PriceCompare";
+import PurchaseAgentTracking from "@/pages/purchase-agent/Tracking";
+import PurchaseAgentReports from "@/pages/purchase-agent/Reports";
 import Notifications from "@/pages/Notifications";
 import Landing from "@/pages/Landing";
 import PublicTracking from "@/pages/PublicTracking";
@@ -486,6 +494,44 @@ function Router() {
           <TechnicianProfile />
         </TechnicianLayout>
       </Route>
+
+      {/* Purchase Agent Portal Routes */}
+      <Route path="/purchase-agent">
+        <PurchaseAgentLayout>
+          <PurchaseAgentDashboard />
+        </PurchaseAgentLayout>
+      </Route>
+      <Route path="/purchase-agent/orders">
+        <PurchaseAgentLayout>
+          <PurchaseAgentOrders />
+        </PurchaseAgentLayout>
+      </Route>
+      <Route path="/purchase-agent/suppliers">
+        <PurchaseAgentLayout>
+          <PurchaseAgentSuppliers />
+        </PurchaseAgentLayout>
+      </Route>
+      <Route path="/purchase-agent/inventory">
+        <PurchaseAgentLayout>
+          <PurchaseAgentInventory />
+        </PurchaseAgentLayout>
+      </Route>
+      <Route path="/purchase-agent/price-compare">
+        <PurchaseAgentLayout>
+          <PurchaseAgentPriceCompare />
+        </PurchaseAgentLayout>
+      </Route>
+      <Route path="/purchase-agent/tracking">
+        <PurchaseAgentLayout>
+          <PurchaseAgentTracking />
+        </PurchaseAgentLayout>
+      </Route>
+      <Route path="/purchase-agent/reports">
+        <PurchaseAgentLayout>
+          <PurchaseAgentReports />
+        </PurchaseAgentLayout>
+      </Route>
+
       <Route path="/technician-portal-old">
         <Layout>
           <TechnicianPortal />

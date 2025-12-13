@@ -214,6 +214,7 @@ export function Layout({ children }: LayoutProps) {
         { path: "/smart-inventory-forecasting", icon: TrendingUp, label: "Smart Inventory Forecasting" },
         { path: "/suppliers", icon: Building2, label: t("nav.suppliers") },
         { path: "/vendor-supplier-portal", icon: Store, label: "Vendor/Supplier Portal" },
+        { path: "/purchase-agent", icon: ShoppingCart, label: "Purchase Agent Portal" },
         { path: "/purchase-orders", icon: ShoppingCart, label: t("nav.purchaseOrders") },
         { path: "/parts-marketplace", icon: ShoppingCart, label: "Parts Marketplace" },
         { path: "/parts-supply-network", icon: Network, label: "Parts Network" },

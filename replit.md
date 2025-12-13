@@ -55,6 +55,7 @@ The application uses a full-stack architecture with clear client-server separati
 - **Comprehensive RBAC System**: 24 professional roles with 70 staff users across all departments (Service Advisors, Call Center Agents, Parts Managers, Accountants, Marketing, HR, QC, etc.).
 - **Production-Ready Data Seeding**: 9-phase comprehensive seeding system with 6,250+ records, 35+ stock images, 100% referential integrity across all 290+ tables (vehicles, parts, job cards, invoices, training, attendance, blockchain, IoT).
 - **Core Accounting Modules (10 NEW)**: Complete accounting system with General Ledger (دفتر الأستاذ العام), Journal Entries (القيود اليومية), Trial Balance (ميزان المراجعة), Income Statement (قائمة الدخل), Balance Sheet (الميزانية العمومية), Cash Flow Statement (قائمة التدفقات النقدية), Accounts Receivable (حسابات المدينين), Accounts Payable (حسابات الدائنين), Cost Centers (مراكز التكلفة), and Budget Management (الميزانية التقديرية).
+- **Purchase Agent Portal**: Dedicated portal at `/purchase-agent` for procurement staff with 7 specialized pages: Dashboard, Purchase Orders, Supplier Management, Inventory Needs, Price Comparison, Order Tracking, and Reports. Features dedicated navigation, quick stats sidebar, and mobile-responsive design.
 
 ## External Dependencies
 - Replit Auth
