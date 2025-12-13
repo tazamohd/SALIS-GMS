@@ -624,6 +624,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
     try {
       const user = req.user;
+      // If no user (auth bypassed), return a mock admin user
+      if (!user) {
+        return res.json({
+          id: 'default-user',
+          email: 'admin@salisauto.com',
+          firstName: 'Admin',
+          lastName: 'User',
+          userType: 'admin',
+          isActive: true,
+          garageId: null
+        });
+      }
       const { password: _, ...userWithoutPassword } = user;
       res.json(userWithoutPassword);
     } catch (error) {
