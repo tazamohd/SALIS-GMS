@@ -253,10 +253,12 @@ function Router() {
 
   return (
     <Switch>
-      {/* Root redirect - always go to dashboard */}
-      <Route path="/" component={() => (
-        <Redirect to="/dashboard" />
-      )} />
+      {/* Root path - show dashboard directly */}
+      <Route path="/">
+        <Layout>
+          <Dashboard />
+        </Layout>
+      </Route>
 
       {/* Customer Portal Routes */}
       <Route path="/portal/dashboard">
