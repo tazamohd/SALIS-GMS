@@ -74,19 +74,19 @@ export function PurchaseAgentLayout({ children }: { children: React.ReactNode })
             {navigation.map((item) => {
               const isActive = location === item.href;
               return (
-                <Link key={item.href} href={item.href}>
-                  <a
-                    className={cn(
-                      "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
-                      isActive
-                        ? "bg-gray-100 dark:bg-salis-gray text-gray-900 dark:text-white"
-                        : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-salis-gray hover:text-gray-900 dark:hover:text-white"
-                    )}
-                    data-testid={`nav-${item.name.toLowerCase().replace(/\s+/g, "-")}`}
-                  >
-                    <item.icon className="h-5 w-5" />
-                    {item.name}
-                  </a>
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={cn(
+                    "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+                    isActive
+                      ? "bg-gray-100 dark:bg-salis-gray text-gray-900 dark:text-white"
+                      : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-salis-gray hover:text-gray-900 dark:hover:text-white"
+                  )}
+                  data-testid={`nav-${item.name.toLowerCase().replace(/\s+/g, "-")}`}
+                >
+                  <item.icon className="h-5 w-5" />
+                  {item.name}
                 </Link>
               );
             })}
@@ -125,19 +125,19 @@ export function PurchaseAgentLayout({ children }: { children: React.ReactNode })
           {navigation.slice(0, 4).map((item) => {
             const isActive = location === item.href;
             return (
-              <Link key={item.href} href={item.href}>
-                <a
-                  className={cn(
-                    "flex flex-col items-center gap-1 p-2 rounded-lg text-xs transition-colors",
-                    isActive
-                      ? "bg-gray-100 dark:bg-salis-gray text-gray-900 dark:text-white"
-                      : "text-gray-600 dark:text-gray-400"
-                  )}
-                  data-testid={`mobile-nav-${item.name.toLowerCase().replace(/\s+/g, "-")}`}
-                >
-                  <item.icon className="h-5 w-5" />
-                  <span className="truncate w-full text-center">{item.name}</span>
-                </a>
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(
+                  "flex flex-col items-center gap-1 p-2 rounded-lg text-xs transition-colors",
+                  isActive
+                    ? "bg-gray-100 dark:bg-salis-gray text-gray-900 dark:text-white"
+                    : "text-gray-600 dark:text-gray-400"
+                )}
+                data-testid={`mobile-nav-${item.name.toLowerCase().replace(/\s+/g, "-")}`}
+              >
+                <item.icon className="h-5 w-5" />
+                <span className="truncate w-full text-center">{item.name}</span>
               </Link>
             );
           })}
