@@ -58,7 +58,7 @@ export function PurchaseAgentLayout({ children }: { children: React.ReactNode })
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => window.location.href = "/api/auth/logout"}
+                onClick={() => window.location.href = "/api/logout"}
                 data-testid="button-logout"
               >
                 <LogOut className="h-4 w-4" />
