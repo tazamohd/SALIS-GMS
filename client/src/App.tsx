@@ -233,55 +233,18 @@ function Router() {
     );
   }
 
-  if (!isAuthenticated) {
-    return (
-      <Switch>
-        <Route path="/login" component={Login} />
-        <Route path="/register" component={Register} />
-        <Route path="/customer-portal" component={CustomerPortal} />
-        <Route path="/track/:token" component={PublicTracking} />
-        
-        {/* Purchase Agent Portal - temporarily accessible without auth */}
-        <Route path="/purchase-agent">
-          <PurchaseAgentLayout>
-            <PurchaseAgentDashboard />
-          </PurchaseAgentLayout>
-        </Route>
-        <Route path="/purchase-agent/orders">
-          <PurchaseAgentLayout>
-            <PurchaseAgentOrders />
-          </PurchaseAgentLayout>
-        </Route>
-        <Route path="/purchase-agent/suppliers">
-          <PurchaseAgentLayout>
-            <PurchaseAgentSuppliers />
-          </PurchaseAgentLayout>
-        </Route>
-        <Route path="/purchase-agent/inventory">
-          <PurchaseAgentLayout>
-            <PurchaseAgentInventory />
-          </PurchaseAgentLayout>
-        </Route>
-        <Route path="/purchase-agent/price-compare">
-          <PurchaseAgentLayout>
-            <PurchaseAgentPriceCompare />
-          </PurchaseAgentLayout>
-        </Route>
-        <Route path="/purchase-agent/tracking">
-          <PurchaseAgentLayout>
-            <PurchaseAgentTracking />
-          </PurchaseAgentLayout>
-        </Route>
-        <Route path="/purchase-agent/reports">
-          <PurchaseAgentLayout>
-            <PurchaseAgentReports />
-          </PurchaseAgentLayout>
-        </Route>
-        
-        <Route component={Landing} />
-      </Switch>
-    );
-  }
+  // TEMPORARILY DISABLED: Authentication bypass - remove this comment block to re-enable auth
+  // if (!isAuthenticated) {
+  //   return (
+  //     <Switch>
+  //       <Route path="/login" component={Login} />
+  //       <Route path="/register" component={Register} />
+  //       <Route path="/customer-portal" component={CustomerPortal} />
+  //       <Route path="/track/:token" component={PublicTracking} />
+  //       <Route component={Landing} />
+  //     </Switch>
+  //   );
+  // }
 
   // Check if user is a customer
   const isCustomer = user?.userType === 'customer';
