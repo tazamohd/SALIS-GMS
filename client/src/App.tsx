@@ -180,6 +180,14 @@ import AccountsReceivable from "@/pages/AccountsReceivable";
 import AccountsPayable from "@/pages/AccountsPayable";
 import CostCenters from "@/pages/CostCenters";
 import BudgetManagement from "@/pages/BudgetManagement";
+import PartsNetworkLayout from "@/pages/parts-network/PartsNetworkLayout";
+import PartsNetworkDashboard from "@/pages/parts-network/PartsNetworkDashboard";
+import SendQuotationRequest from "@/pages/parts-network/SendQuotationRequest";
+import MyRequests from "@/pages/parts-network/MyRequests";
+import IncomingRequests from "@/pages/parts-network/IncomingRequests";
+import QuotationsList from "@/pages/parts-network/QuotationsList";
+import NetworkMembers from "@/pages/parts-network/NetworkMembers";
+import NetworkOrders from "@/pages/parts-network/NetworkOrders";
 import { CustomerDashboard } from "@/pages/customer/CustomerDashboard";
 import { ClientLayout } from "@/components/ClientLayout";
 import ClientDashboard from "@/pages/client/Dashboard";
@@ -535,6 +543,43 @@ function Router() {
         <PurchaseAgentLayout>
           <PurchaseAgentReports />
         </PurchaseAgentLayout>
+      </Route>
+
+      {/* B2B Parts Network Portal Routes */}
+      <Route path="/parts-network">
+        <PartsNetworkLayout title="Parts Network Dashboard">
+          <PartsNetworkDashboard />
+        </PartsNetworkLayout>
+      </Route>
+      <Route path="/parts-network/send-request">
+        <PartsNetworkLayout title="Send Quotation Request">
+          <SendQuotationRequest />
+        </PartsNetworkLayout>
+      </Route>
+      <Route path="/parts-network/my-requests">
+        <PartsNetworkLayout title="My Requests">
+          <MyRequests />
+        </PartsNetworkLayout>
+      </Route>
+      <Route path="/parts-network/incoming-requests">
+        <PartsNetworkLayout title="Incoming Requests">
+          <IncomingRequests />
+        </PartsNetworkLayout>
+      </Route>
+      <Route path="/parts-network/quotations">
+        <PartsNetworkLayout title="Quotations">
+          <QuotationsList />
+        </PartsNetworkLayout>
+      </Route>
+      <Route path="/parts-network/members">
+        <PartsNetworkLayout title="Network Members">
+          <NetworkMembers />
+        </PartsNetworkLayout>
+      </Route>
+      <Route path="/parts-network/orders">
+        <PartsNetworkLayout title="Orders">
+          <NetworkOrders />
+        </PartsNetworkLayout>
       </Route>
 
       <Route path="/technician-portal-old">
