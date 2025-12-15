@@ -47,6 +47,10 @@ import PurchaseAgentInventory from "@/pages/purchase-agent/Inventory";
 import PurchaseAgentPriceCompare from "@/pages/purchase-agent/PriceCompare";
 import PurchaseAgentTracking from "@/pages/purchase-agent/Tracking";
 import PurchaseAgentReports from "@/pages/purchase-agent/Reports";
+import PurchaseAgentTaskInbox from "@/pages/purchase-agent/TaskInbox";
+import PurchaseAgentQuotationManagement from "@/pages/purchase-agent/QuotationManagement";
+import PurchaseAgentPaymentTracking from "@/pages/purchase-agent/PaymentTracking";
+import PurchaseAgentDeliveryTracking from "@/pages/purchase-agent/DeliveryTracking";
 import Notifications from "@/pages/Notifications";
 import Landing from "@/pages/Landing";
 import PublicTracking from "@/pages/PublicTracking";
@@ -530,6 +534,26 @@ function Router() {
       <Route path="/purchase-agent">
         <PurchaseAgentLayout>
           <PurchaseAgentDashboard />
+        </PurchaseAgentLayout>
+      </Route>
+      <Route path="/purchase-agent/tasks">
+        <PurchaseAgentLayout>
+          <PurchaseAgentTaskInbox />
+        </PurchaseAgentLayout>
+      </Route>
+      <Route path="/purchase-agent/quotations">
+        <PurchaseAgentLayout>
+          <PurchaseAgentQuotationManagement />
+        </PurchaseAgentLayout>
+      </Route>
+      <Route path="/purchase-agent/payments">
+        <PurchaseAgentLayout>
+          <PurchaseAgentPaymentTracking />
+        </PurchaseAgentLayout>
+      </Route>
+      <Route path="/purchase-agent/delivery">
+        <PurchaseAgentLayout>
+          <PurchaseAgentDeliveryTracking />
         </PurchaseAgentLayout>
       </Route>
       <Route path="/purchase-agent/orders">

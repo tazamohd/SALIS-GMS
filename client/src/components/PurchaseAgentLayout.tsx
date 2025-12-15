@@ -12,6 +12,9 @@ import {
   Bell,
   FileText,
   BarChart3,
+  Inbox,
+  CreditCard,
+  Truck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -21,7 +24,11 @@ export function PurchaseAgentLayout({ children }: { children: React.ReactNode })
 
   const navigation = [
     { name: "Dashboard", href: "/purchase-agent", icon: LayoutDashboard },
+    { name: "Task Inbox", href: "/purchase-agent/tasks", icon: Inbox },
+    { name: "Quotations", href: "/purchase-agent/quotations", icon: FileText },
     { name: "Purchase Orders", href: "/purchase-agent/orders", icon: ShoppingCart },
+    { name: "Payment Tracking", href: "/purchase-agent/payments", icon: CreditCard },
+    { name: "Delivery Tracking", href: "/purchase-agent/delivery", icon: Truck },
     { name: "Supplier Management", href: "/purchase-agent/suppliers", icon: Users },
     { name: "Inventory Needs", href: "/purchase-agent/inventory", icon: Package },
     { name: "Price Comparison", href: "/purchase-agent/price-compare", icon: TrendingUp },
