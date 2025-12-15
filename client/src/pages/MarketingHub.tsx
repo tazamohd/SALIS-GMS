@@ -19,7 +19,15 @@ import {
   RefreshCw,
   CheckCircle,
   AlertCircle,
-  Clock
+  Clock,
+  Inbox,
+  MessageCircle,
+  Send,
+  User,
+  ThumbsUp,
+  Reply,
+  Archive,
+  Tag
 } from "lucide-react";
 import { SiFacebook, SiInstagram, SiGoogle, SiLinkedin, SiX, SiTiktok, SiYoutube } from "react-icons/si";
 import { TabsPageLayout } from "@/components/layouts";
@@ -54,6 +62,34 @@ const MOCK_TASKS = [
   { id: "2", title: "Review Google Ads performance", type: "performance_review", status: "in_progress", priority: "medium", dueDate: "2024-12-18" },
   { id: "3", title: "Create new Facebook ad creatives", type: "creative_review", status: "pending", priority: "medium", dueDate: "2024-12-22" },
   { id: "4", title: "Optimize campaign budgets", type: "budget_review", status: "completed", priority: "low", dueDate: "2024-12-15" },
+];
+
+const MOCK_CONVERSATIONS = [
+  { id: "1", providerId: "facebook", name: "Ahmed Al-Rashid", handle: "@ahmed_rashid", avatar: "", status: "open", unread: 2, lastMessage: "Hi, I saw your ad about the winter service special. Is it still available?", lastMessageTime: "10 min ago", platform: "Messenger" },
+  { id: "2", providerId: "instagram", name: "Sara Al-Mansouri", handle: "@sara_cars", avatar: "", status: "open", unread: 1, lastMessage: "When is the best time to come for an oil change?", lastMessageTime: "25 min ago", platform: "Instagram DM" },
+  { id: "3", providerId: "twitter", name: "Mohammed Fahad", handle: "@mfahad_auto", avatar: "", status: "pending", unread: 0, lastMessage: "Thanks for the quick response!", lastMessageTime: "1 hour ago", platform: "X DM" },
+  { id: "4", providerId: "facebook", name: "Layla Hassan", handle: "@layla.hassan", avatar: "", status: "open", unread: 3, lastMessage: "Do you offer pickup service for my car?", lastMessageTime: "2 hours ago", platform: "Messenger" },
+  { id: "5", providerId: "linkedin", name: "Khalid Ibrahim", handle: "Khalid Ibrahim", avatar: "", status: "resolved", unread: 0, lastMessage: "Great, I'll schedule the fleet service for next week.", lastMessageTime: "1 day ago", platform: "LinkedIn" },
+];
+
+const MOCK_MESSAGES = [
+  { id: "1", conversationId: "1", direction: "inbound", content: "Hi, I saw your ad about the winter service special. Is it still available?", time: "10:30 AM" },
+  { id: "2", conversationId: "1", direction: "outbound", content: "Hello Ahmed! Yes, our Winter Service Special is still available until December 31st. Would you like to book an appointment?", time: "10:35 AM" },
+  { id: "3", conversationId: "1", direction: "inbound", content: "Yes please! What times are available this Saturday?", time: "10:38 AM" },
+];
+
+const MOCK_COMMENT_THREADS = [
+  { id: "1", providerId: "facebook", postContent: "Winter is here! Get your car ready with our comprehensive winter service package...", platform: "Facebook", totalComments: 12, unreplied: 3, sentiment: "positive" },
+  { id: "2", providerId: "instagram", postContent: "Before & After: Watch this amazing transformation of a 2020 BMW...", platform: "Instagram", totalComments: 45, unreplied: 8, sentiment: "mixed" },
+  { id: "3", providerId: "youtube", postContent: "How to maintain your car's engine: Expert tips from SALIS AUTO", platform: "YouTube", totalComments: 89, unreplied: 15, sentiment: "positive" },
+];
+
+const MOCK_COMMENTS = [
+  { id: "1", threadId: "1", author: "Ali Mohammed", content: "Great service! I brought my car last week and they did an amazing job.", likes: 5, sentiment: "positive", hasReplied: true, postedAt: "2 hours ago" },
+  { id: "2", threadId: "1", author: "Fatima Al-Saud", content: "What's included in the winter package?", likes: 2, sentiment: "neutral", hasReplied: false, postedAt: "3 hours ago" },
+  { id: "3", threadId: "1", author: "Hassan Khalil", content: "How much does the full service cost?", likes: 1, sentiment: "neutral", hasReplied: false, postedAt: "4 hours ago" },
+  { id: "4", threadId: "2", author: "Noor Ahmed", content: "Wow! Amazing transformation 👏", likes: 12, sentiment: "positive", hasReplied: true, postedAt: "1 day ago" },
+  { id: "5", threadId: "2", author: "Yusuf Ibrahim", content: "Is this covered under warranty?", likes: 3, sentiment: "neutral", hasReplied: false, postedAt: "1 day ago" },
 ];
 
 export default function MarketingHub() {
@@ -648,6 +684,259 @@ export default function MarketingHub() {
     </div>
   );
 
+  const inboxContent = (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <div>
+          <h3 className="text-lg font-semibold">Unified Inbox</h3>
+          <p className="text-sm text-muted-foreground">All your social media messages in one place</p>
+        </div>
+        <div className="flex gap-2">
+          <Select defaultValue="all">
+            <SelectTrigger className="w-[150px]" data-testid="select-inbox-platform">
+              <SelectValue placeholder="All Platforms" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Platforms</SelectItem>
+              <SelectItem value="facebook">Facebook</SelectItem>
+              <SelectItem value="instagram">Instagram</SelectItem>
+              <SelectItem value="twitter">X (Twitter)</SelectItem>
+              <SelectItem value="linkedin">LinkedIn</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select defaultValue="open">
+            <SelectTrigger className="w-[120px]" data-testid="select-inbox-status">
+              <SelectValue placeholder="Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Status</SelectItem>
+              <SelectItem value="open">Open</SelectItem>
+              <SelectItem value="pending">Pending</SelectItem>
+              <SelectItem value="resolved">Resolved</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-3">
+        <Card className="md:col-span-1">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base flex items-center gap-2">
+              <Inbox className="h-4 w-4" />
+              Conversations
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-2">
+            <div className="space-y-1">
+              {MOCK_CONVERSATIONS.map(conv => {
+                const platform = getPlatformInfo(conv.providerId);
+                const PlatformIcon = platform.icon;
+                
+                return (
+                  <div 
+                    key={conv.id}
+                    className={`flex items-start gap-3 p-3 rounded-lg cursor-pointer hover:bg-muted transition-colors ${conv.id === "1" ? "bg-muted" : ""}`}
+                    data-testid={`conversation-${conv.id}`}
+                  >
+                    <div className="relative">
+                      <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center">
+                        <User className="h-5 w-5 text-muted-foreground" />
+                      </div>
+                      <PlatformIcon className={`absolute -bottom-1 -right-1 h-4 w-4 ${platform.color}`} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between">
+                        <p className="font-medium text-sm truncate">{conv.name}</p>
+                        <span className="text-xs text-muted-foreground">{conv.lastMessageTime}</span>
+                      </div>
+                      <p className="text-xs text-muted-foreground truncate">{conv.lastMessage}</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="text-xs text-muted-foreground">{conv.platform}</span>
+                        {conv.unread > 0 && (
+                          <Badge variant="default" className="h-5 px-1.5 text-xs">{conv.unread}</Badge>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="md:col-span-2">
+          <CardHeader className="pb-2 border-b">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center">
+                  <User className="h-5 w-5 text-muted-foreground" />
+                </div>
+                <div>
+                  <CardTitle className="text-base">Ahmed Al-Rashid</CardTitle>
+                  <CardDescription>@ahmed_rashid • via Messenger</CardDescription>
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <Button variant="outline" size="sm" data-testid="button-archive-conv">
+                  <Archive className="h-4 w-4 mr-1" />
+                  Archive
+                </Button>
+                <Button variant="outline" size="sm" data-testid="button-tag-conv">
+                  <Tag className="h-4 w-4 mr-1" />
+                  Tag
+                </Button>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="p-4">
+            <div className="space-y-4 min-h-[300px] max-h-[400px] overflow-y-auto">
+              {MOCK_MESSAGES.map(msg => (
+                <div 
+                  key={msg.id}
+                  className={`flex ${msg.direction === "outbound" ? "justify-end" : "justify-start"}`}
+                  data-testid={`message-${msg.id}`}
+                >
+                  <div className={`max-w-[70%] p-3 rounded-lg ${msg.direction === "outbound" ? "bg-primary text-primary-foreground" : "bg-muted"}`}>
+                    <p className="text-sm">{msg.content}</p>
+                    <p className={`text-xs mt-1 ${msg.direction === "outbound" ? "text-primary-foreground/70" : "text-muted-foreground"}`}>{msg.time}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="mt-4 pt-4 border-t">
+              <div className="flex gap-2">
+                <Input placeholder="Type your message..." className="flex-1" data-testid="input-message" />
+                <Button data-testid="button-send-message">
+                  <Send className="h-4 w-4 mr-2" />
+                  Send
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+
+  const commentsContent = (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <div>
+          <h3 className="text-lg font-semibold">Comment Management</h3>
+          <p className="text-sm text-muted-foreground">Reply to comments on your posts and ads</p>
+        </div>
+        <div className="flex gap-2">
+          <Select defaultValue="all">
+            <SelectTrigger className="w-[150px]" data-testid="select-comments-platform">
+              <SelectValue placeholder="All Platforms" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Platforms</SelectItem>
+              <SelectItem value="facebook">Facebook</SelectItem>
+              <SelectItem value="instagram">Instagram</SelectItem>
+              <SelectItem value="youtube">YouTube</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select defaultValue="unreplied">
+            <SelectTrigger className="w-[140px]" data-testid="select-comments-filter">
+              <SelectValue placeholder="Filter" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Comments</SelectItem>
+              <SelectItem value="unreplied">Unreplied</SelectItem>
+              <SelectItem value="positive">Positive</SelectItem>
+              <SelectItem value="negative">Negative</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      <div className="grid gap-4">
+        {MOCK_COMMENT_THREADS.map(thread => {
+          const platform = getPlatformInfo(thread.providerId);
+          const PlatformIcon = platform.icon;
+          const threadComments = MOCK_COMMENTS.filter(c => c.threadId === thread.id);
+          
+          return (
+            <Card key={thread.id} data-testid={`comment-thread-${thread.id}`}>
+              <CardHeader className="pb-3">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-3">
+                    <PlatformIcon className={`h-6 w-6 ${platform.color}`} />
+                    <div>
+                      <CardTitle className="text-base">{thread.platform} Post</CardTitle>
+                      <CardDescription className="line-clamp-1">{thread.postContent}</CardDescription>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Badge variant={thread.sentiment === "positive" ? "default" : "secondary"}>
+                      {thread.sentiment}
+                    </Badge>
+                    <div className="text-center">
+                      <p className="text-sm font-medium">{thread.totalComments}</p>
+                      <p className="text-xs text-muted-foreground">comments</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-sm font-medium text-orange-500">{thread.unreplied}</p>
+                      <p className="text-xs text-muted-foreground">unreplied</p>
+                    </div>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <div className="space-y-3">
+                  {threadComments.map(comment => (
+                    <div 
+                      key={comment.id}
+                      className={`p-3 rounded-lg border ${comment.hasReplied ? "bg-muted/30" : "bg-muted"}`}
+                      data-testid={`comment-${comment.id}`}
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="h-8 w-8 rounded-full bg-muted-foreground/20 flex items-center justify-center">
+                            <User className="h-4 w-4" />
+                          </div>
+                          <div>
+                            <p className="font-medium text-sm">{comment.author}</p>
+                            <p className="text-xs text-muted-foreground">{comment.postedAt}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Badge 
+                            variant={comment.sentiment === "positive" ? "default" : comment.sentiment === "negative" ? "destructive" : "secondary"}
+                            className="text-xs"
+                          >
+                            {comment.sentiment}
+                          </Badge>
+                          {comment.hasReplied && (
+                            <CheckCircle className="h-4 w-4 text-green-500" />
+                          )}
+                        </div>
+                      </div>
+                      <p className="mt-2 text-sm">{comment.content}</p>
+                      <div className="mt-3 flex items-center justify-between">
+                        <div className="flex items-center gap-2 text-muted-foreground">
+                          <ThumbsUp className="h-4 w-4" />
+                          <span className="text-xs">{comment.likes} likes</span>
+                        </div>
+                        {!comment.hasReplied && (
+                          <Button size="sm" variant="outline" data-testid={`button-reply-${comment.id}`}>
+                            <Reply className="h-4 w-4 mr-1" />
+                            Reply
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
+    </div>
+  );
+
   return (
     <>
       <TabsPageLayout
@@ -656,18 +945,19 @@ export default function MarketingHub() {
         icon={LayoutDashboard}
         tabs={[
           { id: "overview", label: "Overview", icon: LayoutDashboard, content: overviewContent },
+          { id: "inbox", label: "Inbox", icon: Inbox, content: inboxContent },
+          { id: "comments", label: "Comments", icon: MessageCircle, content: commentsContent },
           { id: "accounts", label: "Accounts", icon: LinkIcon, content: accountsContent },
           { id: "campaigns", label: "Campaigns", icon: BarChart3, content: campaignsContent },
           { id: "reports", label: "Reports", icon: TrendingUp, content: reportsContent },
         ]}
         activeTab={selectedTab}
         onTabChange={setSelectedTab}
-        actions={
-          <Button variant="outline" data-testid="button-sync-all">
-            <RefreshCw className="h-4 w-4 mr-2" />
-            Sync All
-          </Button>
-        }
+        primaryAction={{
+          label: "Sync All",
+          icon: RefreshCw,
+          onClick: () => console.log("Syncing all platforms...")
+        }}
       />
 
       <Dialog open={isConnectDialogOpen} onOpenChange={setIsConnectDialogOpen}>

@@ -9404,3 +9404,138 @@ export const insertMarketingCreativeSchema = createInsertSchema(marketingCreativ
   createdAt: true,
   updatedAt: true,
 });
+
+// Marketing Conversations - unified inbox for all platforms
+export const marketingConversations = pgTable("marketing_conversations", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  accountId: uuid("account_id")
+    .references(() => marketingAccounts.id)
+    .notNull(),
+  customerId: varchar("customer_id").references(() => customerProfiles.userId),
+  providerThreadId: varchar("provider_thread_id", { length: 255 }), // External thread ID
+  channel: varchar("channel", { length: 50 }).notNull(), // "dm", "messenger", "instagram_dm", "twitter_dm", "linkedin_message"
+  participantName: varchar("participant_name", { length: 255 }),
+  participantAvatar: varchar("participant_avatar", { length: 1000 }),
+  participantHandle: varchar("participant_handle", { length: 255 }),
+  status: varchar("status", { length: 50 }).default("open"), // "open", "pending", "resolved", "archived"
+  priority: varchar("priority", { length: 20 }).default("normal"), // "low", "normal", "high", "urgent"
+  assignedTo: varchar("assigned_to").references(() => users.id),
+  unreadCount: integer("unread_count").default(0),
+  lastMessageAt: timestamp("last_message_at"),
+  lastMessagePreview: text("last_message_preview"),
+  tags: jsonb("tags").default([]),
+  metadata: jsonb("metadata").default({}),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Marketing Messages - individual messages in conversations
+export const marketingMessages = pgTable("marketing_messages", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  conversationId: uuid("conversation_id")
+    .references(() => marketingConversations.id)
+    .notNull(),
+  providerMessageId: varchar("provider_message_id", { length: 255 }),
+  direction: varchar("direction", { length: 20 }).notNull(), // "inbound", "outbound"
+  senderName: varchar("sender_name", { length: 255 }),
+  senderAvatar: varchar("sender_avatar", { length: 1000 }),
+  content: text("content").notNull(),
+  contentType: varchar("content_type", { length: 50 }).default("text"), // "text", "image", "video", "file", "template"
+  attachments: jsonb("attachments").default([]),
+  deliveryStatus: varchar("delivery_status", { length: 50 }).default("sent"), // "pending", "sent", "delivered", "read", "failed"
+  isRead: boolean("is_read").default(false),
+  sentBy: varchar("sent_by").references(() => users.id),
+  sentAt: timestamp("sent_at").defaultNow(),
+  metadata: jsonb("metadata").default({}),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Marketing Comment Threads - comments on posts/ads
+export const marketingCommentThreads = pgTable("marketing_comment_threads", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  accountId: uuid("account_id")
+    .references(() => marketingAccounts.id)
+    .notNull(),
+  campaignId: uuid("campaign_id").references(() => marketingAdCampaigns.id),
+  providerPostId: varchar("provider_post_id", { length: 255 }),
+  postContent: text("post_content"),
+  postUrl: varchar("post_url", { length: 1000 }),
+  postType: varchar("post_type", { length: 50 }), // "ad", "organic", "story", "reel"
+  totalComments: integer("total_comments").default(0),
+  unrepliedCount: integer("unreplied_count").default(0),
+  sentiment: varchar("sentiment", { length: 20 }), // "positive", "neutral", "negative", "mixed"
+  lastCommentAt: timestamp("last_comment_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Marketing Comments - individual comments and replies
+export const marketingComments = pgTable("marketing_comments", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  threadId: uuid("thread_id")
+    .references(() => marketingCommentThreads.id)
+    .notNull(),
+  parentCommentId: uuid("parent_comment_id"), // For replies to comments
+  providerCommentId: varchar("provider_comment_id", { length: 255 }),
+  authorName: varchar("author_name", { length: 255 }),
+  authorAvatar: varchar("author_avatar", { length: 1000 }),
+  authorHandle: varchar("author_handle", { length: 255 }),
+  content: text("content").notNull(),
+  sentiment: varchar("sentiment", { length: 20 }), // "positive", "neutral", "negative"
+  isFromUs: boolean("is_from_us").default(false),
+  isHidden: boolean("is_hidden").default(false),
+  hasReplied: boolean("has_replied").default(false),
+  likes: integer("likes").default(0),
+  repliedBy: varchar("replied_by").references(() => users.id),
+  repliedAt: timestamp("replied_at"),
+  postedAt: timestamp("posted_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Type exports for Marketing Conversations
+export type MarketingConversation = typeof marketingConversations.$inferSelect;
+export type InsertMarketingConversation = typeof marketingConversations.$inferInsert;
+export const insertMarketingConversationSchema = createInsertSchema(marketingConversations).omit({
+  id: true,
+  unreadCount: true,
+  lastMessageAt: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type MarketingMessage = typeof marketingMessages.$inferSelect;
+export type InsertMarketingMessage = typeof marketingMessages.$inferInsert;
+export const insertMarketingMessageSchema = createInsertSchema(marketingMessages).omit({
+  id: true,
+  isRead: true,
+  sentAt: true,
+  createdAt: true,
+});
+
+export type MarketingCommentThread = typeof marketingCommentThreads.$inferSelect;
+export type InsertMarketingCommentThread = typeof marketingCommentThreads.$inferInsert;
+export const insertMarketingCommentThreadSchema = createInsertSchema(marketingCommentThreads).omit({
+  id: true,
+  totalComments: true,
+  unrepliedCount: true,
+  lastCommentAt: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type MarketingComment = typeof marketingComments.$inferSelect;
+export type InsertMarketingComment = typeof marketingComments.$inferInsert;
+export const insertMarketingCommentSchema = createInsertSchema(marketingComments).omit({
+  id: true,
+  hasReplied: true,
+  repliedAt: true,
+  createdAt: true,
+});
