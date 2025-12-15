@@ -36,6 +36,9 @@ import TechnicianTimeClock from "@/pages/technician/TimeClock";
 import TechnicianPartsLookup from "@/pages/technician/PartsLookup";
 import TechnicianJobDocumentation from "@/pages/technician/JobDocumentation";
 import TechnicianProfile from "@/pages/technician/Profile";
+import TechnicianAttendance from "@/pages/technician/Attendance";
+import TechnicianServiceGuides from "@/pages/technician/ServiceGuides";
+import TechnicianSoftware from "@/pages/technician/TechnicalSoftware";
 import { PurchaseAgentLayout } from "@/components/PurchaseAgentLayout";
 import PurchaseAgentDashboard from "@/pages/purchase-agent/Dashboard";
 import PurchaseAgentOrders from "@/pages/purchase-agent/Orders";
@@ -505,6 +508,21 @@ function Router() {
       <Route path="/technician-portal/profile">
         <TechnicianLayout>
           <TechnicianProfile />
+        </TechnicianLayout>
+      </Route>
+      <Route path="/technician-portal/attendance">
+        <TechnicianLayout>
+          <TechnicianAttendance />
+        </TechnicianLayout>
+      </Route>
+      <Route path="/technician-portal/guides">
+        <TechnicianLayout>
+          <TechnicianServiceGuides />
+        </TechnicianLayout>
+      </Route>
+      <Route path="/technician-portal/software">
+        <TechnicianLayout>
+          <TechnicianSoftware />
         </TechnicianLayout>
       </Route>
 

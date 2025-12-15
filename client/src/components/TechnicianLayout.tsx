@@ -9,6 +9,9 @@ import {
   User,
   LayoutDashboard,
   LogOut,
+  MapPin,
+  BookOpen,
+  Monitor,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -19,8 +22,11 @@ export function TechnicianLayout({ children }: { children: React.ReactNode }) {
   const navigation = [
     { name: "Dashboard", href: "/technician-portal", icon: LayoutDashboard },
     { name: "My Jobs", href: "/technician-portal/my-jobs", icon: ClipboardList },
+    { name: "Attendance", href: "/technician-portal/attendance", icon: MapPin },
     { name: "Time Clock", href: "/technician-portal/time-clock", icon: Clock },
     { name: "Parts Lookup", href: "/technician-portal/parts", icon: Package },
+    { name: "Service Guides", href: "/technician-portal/guides", icon: BookOpen },
+    { name: "Tech Software", href: "/technician-portal/software", icon: Monitor },
     { name: "Job Photos", href: "/technician-portal/documentation", icon: Camera },
     { name: "Profile", href: "/technician-portal/profile", icon: User },
   ];
