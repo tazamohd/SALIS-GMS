@@ -19,7 +19,7 @@ The application uses a full-stack architecture with clear client-server separati
 **Frontend**: React 18 with Vite, `wouter` for routing, `TanStack Query` for state management, and `shadcn/ui` (Radix UI) for components, adhering to the Figma design.
 **Backend**: Express server written in TypeScript.
 **Authentication**: Custom email/password authentication with comprehensive role-based access control (RBAC).
-**Database**: PostgreSQL with Drizzle ORM, comprising **151+ comprehensive modules with 290+ tables**.
+**Database**: PostgreSQL with Drizzle ORM, comprising **170+ comprehensive modules with 307+ tables**.
 **RBAC System**: 24 professional roles, 70 staff users across departments, granular permissions for 151+ resources.
 **Real-Time Features**: WebSocket server (`/ws/chat`) for in-app chat support, live notifications, and call center real-time updates with session-based authentication.
 
@@ -57,6 +57,18 @@ The application uses a full-stack architecture with clear client-server separati
 - **Core Accounting Modules (10 NEW)**: Complete accounting system with General Ledger (دفتر الأستاذ العام), Journal Entries (القيود اليومية), Trial Balance (ميزان المراجعة), Income Statement (قائمة الدخل), Balance Sheet (الميزانية العمومية), Cash Flow Statement (قائمة التدفقات النقدية), Accounts Receivable (حسابات المدينين), Accounts Payable (حسابات الدائنين), Cost Centers (مراكز التكلفة), and Budget Management (الميزانية التقديرية).
 - **Purchase Agent Portal**: Dedicated portal at `/purchase-agent` for procurement staff with 7 specialized pages: Dashboard, Purchase Orders, Supplier Management, Inventory Needs, Price Comparison, Order Tracking, and Reports. Features dedicated navigation, quick stats sidebar, and mobile-responsive design.
 - **Marketing Platform Hub**: Unified advertising management platform at `/marketing-hub` for managing all external advertising platforms (Google Ads, Facebook, Instagram, X/Twitter, LinkedIn, TikTok, YouTube). Features platform connection management, campaign creation and tracking, performance reporting with unified metrics (spend, impressions, clicks, CTR, CPC, conversions), task management, unified social inbox for direct messaging across platforms, and comment management for replying to customer comments on posts/ads. Database schema includes 11 new tables: marketingProviders, marketingAccounts, marketingAdCampaigns, marketingSpendSnapshots, marketingTasks, marketingNotes, marketingCreatives, marketingConversations, marketingMessages, marketingCommentThreads, and marketingComments.
+- **Comprehensive HR Module**: Complete Human Resources management system at `/hr-management` with 10 integrated tabs covering all HR functions. Database schema includes 17 new tables: hrDepartments, hrPositions, hrEmployeeProfiles, hrContracts, hrDocuments, hrLeaveTypes, hrLeaveBalances, hrLeaveRequests, hrJobPostings, hrCandidates, hrInterviews, hrBenefitPlans, hrBenefitEnrollments, hrPerformanceReviews, hrPerformanceGoals, hrAnnouncements, and hrSelfServiceRequests. Features include:
+  - **Employees**: Employee directory with search/filter, profile management, add employee functionality
+  - **Attendance**: Clock in/out system, time tracking, attendance records with daily summaries
+  - **Leave Management**: Leave types (Annual, Sick, Emergency, Hajj, Unpaid), leave request workflow, balance tracking
+  - **Payroll**: Salary processing, allowances, deductions, net pay calculations, export functionality
+  - **Performance**: Performance reviews with ratings, quarterly cycles, manager feedback
+  - **Training**: Training programs catalog, certifications, enrollment tracking, completion status
+  - **Recruitment**: Job postings, candidate pipeline (applied/screening/interview/offer/hired), interview scheduling
+  - **Benefits**: Benefit plans (health insurance, housing, transportation), enrollment management
+  - **Organization**: Departments structure, positions, announcements, cost centers
+  - **Self-Service**: Employee request portal (salary certificates, experience letters, NOC, info updates)
+  Saudi Arabia specific features include GOSI number, IBAN, SAR currency, Arabic names for departments/positions, and Hijj leave type.
 
 ## External Dependencies
 - Replit Auth

@@ -9539,3 +9539,470 @@ export const insertMarketingCommentSchema = createInsertSchema(marketingComments
   repliedAt: true,
   createdAt: true,
 });
+
+// ============================================
+// COMPREHENSIVE HR MODULE
+// ============================================
+
+// HR Departments - organizational structure
+export const hrDepartments = pgTable("hr_departments", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  garageId: varchar("garage_id").references(() => garages.id).notNull(),
+  name: varchar("name", { length: 255 }).notNull(),
+  nameAr: varchar("name_ar", { length: 255 }),
+  code: varchar("code", { length: 50 }),
+  description: text("description"),
+  parentDepartmentId: uuid("parent_department_id"),
+  managerId: varchar("manager_id").references(() => users.id),
+  costCenter: varchar("cost_center", { length: 50 }),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// HR Positions/Job Titles
+export const hrPositions = pgTable("hr_positions", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  garageId: varchar("garage_id").references(() => garages.id).notNull(),
+  departmentId: uuid("department_id").references(() => hrDepartments.id),
+  title: varchar("title", { length: 255 }).notNull(),
+  titleAr: varchar("title_ar", { length: 255 }),
+  code: varchar("code", { length: 50 }),
+  level: varchar("level", { length: 50 }), // "entry", "mid", "senior", "lead", "manager", "director", "executive"
+  minSalary: decimal("min_salary", { precision: 12, scale: 2 }),
+  maxSalary: decimal("max_salary", { precision: 12, scale: 2 }),
+  description: text("description"),
+  requirements: text("requirements"),
+  responsibilities: text("responsibilities"),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// HR Employee Profiles - extended employee information
+export const hrEmployeeProfiles = pgTable("hr_employee_profiles", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  garageId: varchar("garage_id").references(() => garages.id).notNull(),
+  employeeNumber: varchar("employee_number", { length: 50 }),
+  departmentId: uuid("department_id").references(() => hrDepartments.id),
+  positionId: uuid("position_id").references(() => hrPositions.id),
+  managerId: varchar("manager_id").references(() => users.id),
+  employmentType: varchar("employment_type", { length: 50 }).default("full_time"), // "full_time", "part_time", "contract", "intern"
+  employmentStatus: varchar("employment_status", { length: 50 }).default("active"), // "active", "on_leave", "suspended", "terminated", "resigned"
+  hireDate: date("hire_date"),
+  probationEndDate: date("probation_end_date"),
+  terminationDate: date("termination_date"),
+  workLocation: varchar("work_location", { length: 255 }),
+  workEmail: varchar("work_email", { length: 255 }),
+  workPhone: varchar("work_phone", { length: 50 }),
+  extension: varchar("extension", { length: 20 }),
+  emergencyContactName: varchar("emergency_contact_name", { length: 255 }),
+  emergencyContactPhone: varchar("emergency_contact_phone", { length: 50 }),
+  emergencyContactRelation: varchar("emergency_contact_relation", { length: 100 }),
+  nationalId: varchar("national_id", { length: 50 }),
+  passportNumber: varchar("passport_number", { length: 50 }),
+  passportExpiry: date("passport_expiry"),
+  visaType: varchar("visa_type", { length: 100 }),
+  visaExpiry: date("visa_expiry"),
+  bankName: varchar("bank_name", { length: 255 }),
+  bankAccountNumber: varchar("bank_account_number", { length: 100 }),
+  iban: varchar("iban", { length: 50 }),
+  baseSalary: decimal("base_salary", { precision: 12, scale: 2 }),
+  currency: varchar("currency", { length: 10 }).default("SAR"),
+  salaryPaymentMethod: varchar("salary_payment_method", { length: 50 }).default("bank_transfer"),
+  gosiNumber: varchar("gosi_number", { length: 50 }), // Saudi Social Insurance
+  medicalInsuranceNumber: varchar("medical_insurance_number", { length: 100 }),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// HR Employment Contracts
+export const hrContracts = pgTable("hr_contracts", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  employeeId: uuid("employee_id").references(() => hrEmployeeProfiles.id).notNull(),
+  contractType: varchar("contract_type", { length: 50 }).notNull(), // "permanent", "fixed_term", "probation", "internship"
+  startDate: date("start_date").notNull(),
+  endDate: date("end_date"),
+  salary: decimal("salary", { precision: 12, scale: 2 }).notNull(),
+  currency: varchar("currency", { length: 10 }).default("SAR"),
+  salaryFrequency: varchar("salary_frequency", { length: 20 }).default("monthly"),
+  workingHoursPerWeek: decimal("working_hours_per_week", { precision: 4, scale: 1 }).default("40"),
+  probationPeriodDays: integer("probation_period_days"),
+  noticePeriodDays: integer("notice_period_days"),
+  benefits: jsonb("benefits").default([]),
+  terms: text("terms"),
+  signedAt: timestamp("signed_at"),
+  signedByEmployee: boolean("signed_by_employee").default(false),
+  signedByHr: boolean("signed_by_hr").default(false),
+  status: varchar("status", { length: 50 }).default("draft"), // "draft", "pending_signature", "active", "expired", "terminated"
+  documentUrl: varchar("document_url", { length: 1000 }),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// HR Documents
+export const hrDocuments = pgTable("hr_documents", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  employeeId: uuid("employee_id").references(() => hrEmployeeProfiles.id).notNull(),
+  documentType: varchar("document_type", { length: 100 }).notNull(), // "id_card", "passport", "visa", "certificate", "contract", "offer_letter", "warning", "other"
+  documentName: varchar("document_name", { length: 255 }).notNull(),
+  fileUrl: varchar("file_url", { length: 1000 }),
+  fileSize: integer("file_size"),
+  mimeType: varchar("mime_type", { length: 100 }),
+  expiryDate: date("expiry_date"),
+  isVerified: boolean("is_verified").default(false),
+  verifiedBy: varchar("verified_by").references(() => users.id),
+  verifiedAt: timestamp("verified_at"),
+  notes: text("notes"),
+  uploadedBy: varchar("uploaded_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Leave Types
+export const hrLeaveTypes = pgTable("hr_leave_types", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  garageId: varchar("garage_id").references(() => garages.id).notNull(),
+  name: varchar("name", { length: 255 }).notNull(),
+  nameAr: varchar("name_ar", { length: 255 }),
+  code: varchar("code", { length: 20 }),
+  description: text("description"),
+  isPaid: boolean("is_paid").default(true),
+  defaultDaysPerYear: integer("default_days_per_year").default(0),
+  maxConsecutiveDays: integer("max_consecutive_days"),
+  requiresApproval: boolean("requires_approval").default(true),
+  requiresDocument: boolean("requires_document").default(false),
+  carryOverAllowed: boolean("carry_over_allowed").default(false),
+  maxCarryOverDays: integer("max_carry_over_days"),
+  color: varchar("color", { length: 20 }).default("#3b82f6"),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Leave Balances
+export const hrLeaveBalances = pgTable("hr_leave_balances", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  employeeId: uuid("employee_id").references(() => hrEmployeeProfiles.id).notNull(),
+  leaveTypeId: uuid("leave_type_id").references(() => hrLeaveTypes.id).notNull(),
+  year: integer("year").notNull(),
+  totalDays: decimal("total_days", { precision: 5, scale: 1 }).default("0"),
+  usedDays: decimal("used_days", { precision: 5, scale: 1 }).default("0"),
+  pendingDays: decimal("pending_days", { precision: 5, scale: 1 }).default("0"),
+  carriedOverDays: decimal("carried_over_days", { precision: 5, scale: 1 }).default("0"),
+  adjustedDays: decimal("adjusted_days", { precision: 5, scale: 1 }).default("0"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Leave Requests
+export const hrLeaveRequests = pgTable("hr_leave_requests", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  employeeId: uuid("employee_id").references(() => hrEmployeeProfiles.id).notNull(),
+  leaveTypeId: uuid("leave_type_id").references(() => hrLeaveTypes.id).notNull(),
+  startDate: date("start_date").notNull(),
+  endDate: date("end_date").notNull(),
+  totalDays: decimal("total_days", { precision: 5, scale: 1 }).notNull(),
+  reason: text("reason"),
+  documentUrl: varchar("document_url", { length: 1000 }),
+  status: varchar("status", { length: 50 }).default("pending"), // "pending", "approved", "rejected", "cancelled"
+  approvedBy: varchar("approved_by").references(() => users.id),
+  approvedAt: timestamp("approved_at"),
+  rejectionReason: text("rejection_reason"),
+  emergencyContact: varchar("emergency_contact", { length: 255 }),
+  handoverTo: varchar("handover_to").references(() => users.id),
+  handoverNotes: text("handover_notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Job Postings / Openings
+export const hrJobPostings = pgTable("hr_job_postings", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  garageId: varchar("garage_id").references(() => garages.id).notNull(),
+  positionId: uuid("position_id").references(() => hrPositions.id),
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description"),
+  requirements: text("requirements"),
+  responsibilities: text("responsibilities"),
+  departmentId: uuid("department_id").references(() => hrDepartments.id),
+  employmentType: varchar("employment_type", { length: 50 }),
+  experienceLevel: varchar("experience_level", { length: 50 }),
+  salaryRangeMin: decimal("salary_range_min", { precision: 12, scale: 2 }),
+  salaryRangeMax: decimal("salary_range_max", { precision: 12, scale: 2 }),
+  currency: varchar("currency", { length: 10 }).default("SAR"),
+  location: varchar("location", { length: 255 }),
+  isRemote: boolean("is_remote").default(false),
+  openPositions: integer("open_positions").default(1),
+  filledPositions: integer("filled_positions").default(0),
+  status: varchar("status", { length: 50 }).default("draft"), // "draft", "open", "on_hold", "closed", "filled"
+  publishedAt: timestamp("published_at"),
+  closingDate: date("closing_date"),
+  createdBy: varchar("created_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Candidates / Applicants
+export const hrCandidates = pgTable("hr_candidates", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  jobPostingId: uuid("job_posting_id").references(() => hrJobPostings.id).notNull(),
+  firstName: varchar("first_name", { length: 255 }).notNull(),
+  lastName: varchar("last_name", { length: 255 }).notNull(),
+  email: varchar("email", { length: 255 }).notNull(),
+  phone: varchar("phone", { length: 50 }),
+  resumeUrl: varchar("resume_url", { length: 1000 }),
+  coverLetterUrl: varchar("cover_letter_url", { length: 1000 }),
+  linkedinUrl: varchar("linkedin_url", { length: 500 }),
+  source: varchar("source", { length: 100 }), // "linkedin", "indeed", "referral", "website", "walk_in"
+  referredBy: varchar("referred_by").references(() => users.id),
+  currentCompany: varchar("current_company", { length: 255 }),
+  currentPosition: varchar("current_position", { length: 255 }),
+  expectedSalary: decimal("expected_salary", { precision: 12, scale: 2 }),
+  noticePeriod: varchar("notice_period", { length: 100 }),
+  yearsOfExperience: decimal("years_of_experience", { precision: 4, scale: 1 }),
+  stage: varchar("stage", { length: 50 }).default("applied"), // "applied", "screening", "phone_interview", "interview", "technical_test", "offer", "hired", "rejected"
+  rating: integer("rating"),
+  notes: text("notes"),
+  skills: jsonb("skills").default([]),
+  assignedTo: varchar("assigned_to").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Candidate Interview Schedule
+export const hrInterviews = pgTable("hr_interviews", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  candidateId: uuid("candidate_id").references(() => hrCandidates.id).notNull(),
+  interviewType: varchar("interview_type", { length: 100 }).notNull(), // "phone_screening", "video", "in_person", "technical", "panel", "final"
+  scheduledAt: timestamp("scheduled_at").notNull(),
+  durationMinutes: integer("duration_minutes").default(60),
+  location: varchar("location", { length: 255 }),
+  meetingLink: varchar("meeting_link", { length: 500 }),
+  interviewers: jsonb("interviewers").default([]),
+  status: varchar("status", { length: 50 }).default("scheduled"), // "scheduled", "completed", "cancelled", "no_show"
+  feedback: text("feedback"),
+  rating: integer("rating"),
+  recommendation: varchar("recommendation", { length: 50 }), // "strong_hire", "hire", "no_hire", "strong_no_hire"
+  createdBy: varchar("created_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Benefit Plans
+export const hrBenefitPlans = pgTable("hr_benefit_plans", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  garageId: varchar("garage_id").references(() => garages.id).notNull(),
+  name: varchar("name", { length: 255 }).notNull(),
+  nameAr: varchar("name_ar", { length: 255 }),
+  type: varchar("type", { length: 100 }).notNull(), // "health_insurance", "life_insurance", "dental", "vision", "retirement", "housing", "transportation", "education", "other"
+  description: text("description"),
+  provider: varchar("provider", { length: 255 }),
+  policyNumber: varchar("policy_number", { length: 100 }),
+  coverage: text("coverage"),
+  employerContribution: decimal("employer_contribution", { precision: 12, scale: 2 }),
+  employeeContribution: decimal("employee_contribution", { precision: 12, scale: 2 }),
+  eligibilityRules: jsonb("eligibility_rules").default({}),
+  effectiveDate: date("effective_date"),
+  expirationDate: date("expiration_date"),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Employee Benefit Enrollments
+export const hrBenefitEnrollments = pgTable("hr_benefit_enrollments", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  employeeId: uuid("employee_id").references(() => hrEmployeeProfiles.id).notNull(),
+  benefitPlanId: uuid("benefit_plan_id").references(() => hrBenefitPlans.id).notNull(),
+  enrollmentDate: date("enrollment_date").notNull(),
+  effectiveDate: date("effective_date"),
+  terminationDate: date("termination_date"),
+  coverage: varchar("coverage", { length: 100 }), // "employee_only", "employee_spouse", "employee_children", "family"
+  dependents: jsonb("dependents").default([]),
+  employeeContribution: decimal("employee_contribution", { precision: 12, scale: 2 }),
+  employerContribution: decimal("employer_contribution", { precision: 12, scale: 2 }),
+  status: varchar("status", { length: 50 }).default("active"), // "pending", "active", "terminated", "waived"
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Performance Reviews / Evaluations
+export const hrPerformanceReviews = pgTable("hr_performance_reviews", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  employeeId: uuid("employee_id").references(() => hrEmployeeProfiles.id).notNull(),
+  reviewerId: varchar("reviewer_id").references(() => users.id).notNull(),
+  reviewPeriodStart: date("review_period_start").notNull(),
+  reviewPeriodEnd: date("review_period_end").notNull(),
+  reviewType: varchar("review_type", { length: 50 }).default("annual"), // "probation", "quarterly", "annual", "mid_year", "project"
+  overallRating: integer("overall_rating"),
+  ratings: jsonb("ratings").default({}), // {"communication": 4, "teamwork": 5, ...}
+  strengths: text("strengths"),
+  areasForImprovement: text("areas_for_improvement"),
+  achievements: text("achievements"),
+  goals: text("goals"),
+  selfAssessment: text("self_assessment"),
+  managerComments: text("manager_comments"),
+  employeeComments: text("employee_comments"),
+  developmentPlan: text("development_plan"),
+  status: varchar("status", { length: 50 }).default("pending"), // "pending", "self_review", "manager_review", "calibration", "completed"
+  acknowledgedByEmployee: boolean("acknowledged_by_employee").default(false),
+  acknowledgedAt: timestamp("acknowledged_at"),
+  completedAt: timestamp("completed_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Performance Goals
+export const hrPerformanceGoals = pgTable("hr_performance_goals", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  employeeId: uuid("employee_id").references(() => hrEmployeeProfiles.id).notNull(),
+  reviewId: uuid("review_id").references(() => hrPerformanceReviews.id),
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description"),
+  category: varchar("category", { length: 100 }), // "performance", "development", "project", "team"
+  targetDate: date("target_date"),
+  weight: integer("weight").default(100),
+  progress: integer("progress").default(0),
+  status: varchar("status", { length: 50 }).default("in_progress"), // "not_started", "in_progress", "completed", "cancelled"
+  measurementCriteria: text("measurement_criteria"),
+  result: text("result"),
+  rating: integer("rating"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// HR Announcements
+export const hrAnnouncements = pgTable("hr_announcements", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  garageId: varchar("garage_id").references(() => garages.id).notNull(),
+  title: varchar("title", { length: 255 }).notNull(),
+  content: text("content").notNull(),
+  type: varchar("type", { length: 50 }).default("general"), // "general", "policy", "event", "holiday", "urgent"
+  priority: varchar("priority", { length: 20 }).default("normal"), // "low", "normal", "high", "urgent"
+  targetAudience: varchar("target_audience", { length: 100 }).default("all"), // "all", "department", "position"
+  targetDepartmentId: uuid("target_department_id").references(() => hrDepartments.id),
+  attachmentUrl: varchar("attachment_url", { length: 1000 }),
+  publishedAt: timestamp("published_at"),
+  expiresAt: timestamp("expires_at"),
+  isActive: boolean("is_active").default(true),
+  createdBy: varchar("created_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Employee Self-Service Requests
+export const hrSelfServiceRequests = pgTable("hr_self_service_requests", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  employeeId: uuid("employee_id").references(() => hrEmployeeProfiles.id).notNull(),
+  requestType: varchar("request_type", { length: 100 }).notNull(), // "salary_certificate", "experience_letter", "bank_letter", "noc", "info_update", "expense_claim", "loan", "advance"
+  subject: varchar("subject", { length: 255 }).notNull(),
+  description: text("description"),
+  attachments: jsonb("attachments").default([]),
+  priority: varchar("priority", { length: 20 }).default("normal"),
+  status: varchar("status", { length: 50 }).default("pending"), // "pending", "in_progress", "approved", "rejected", "completed"
+  assignedTo: varchar("assigned_to").references(() => users.id),
+  response: text("response"),
+  documentUrl: varchar("document_url", { length: 1000 }),
+  processedBy: varchar("processed_by").references(() => users.id),
+  processedAt: timestamp("processed_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Type exports for HR Module
+export type HrDepartment = typeof hrDepartments.$inferSelect;
+export type InsertHrDepartment = typeof hrDepartments.$inferInsert;
+export const insertHrDepartmentSchema = createInsertSchema(hrDepartments).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type HrPosition = typeof hrPositions.$inferSelect;
+export type InsertHrPosition = typeof hrPositions.$inferInsert;
+export const insertHrPositionSchema = createInsertSchema(hrPositions).omit({ id: true, createdAt: true });
+
+export type HrEmployeeProfile = typeof hrEmployeeProfiles.$inferSelect;
+export type InsertHrEmployeeProfile = typeof hrEmployeeProfiles.$inferInsert;
+export const insertHrEmployeeProfileSchema = createInsertSchema(hrEmployeeProfiles).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type HrContract = typeof hrContracts.$inferSelect;
+export type InsertHrContract = typeof hrContracts.$inferInsert;
+export const insertHrContractSchema = createInsertSchema(hrContracts).omit({ id: true, createdAt: true });
+
+export type HrDocument = typeof hrDocuments.$inferSelect;
+export type InsertHrDocument = typeof hrDocuments.$inferInsert;
+export const insertHrDocumentSchema = createInsertSchema(hrDocuments).omit({ id: true, createdAt: true });
+
+export type HrLeaveType = typeof hrLeaveTypes.$inferSelect;
+export type InsertHrLeaveType = typeof hrLeaveTypes.$inferInsert;
+export const insertHrLeaveTypeSchema = createInsertSchema(hrLeaveTypes).omit({ id: true, createdAt: true });
+
+export type HrLeaveBalance = typeof hrLeaveBalances.$inferSelect;
+export type InsertHrLeaveBalance = typeof hrLeaveBalances.$inferInsert;
+export const insertHrLeaveBalanceSchema = createInsertSchema(hrLeaveBalances).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type HrLeaveRequest = typeof hrLeaveRequests.$inferSelect;
+export type InsertHrLeaveRequest = typeof hrLeaveRequests.$inferInsert;
+export const insertHrLeaveRequestSchema = createInsertSchema(hrLeaveRequests).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type HrJobPosting = typeof hrJobPostings.$inferSelect;
+export type InsertHrJobPosting = typeof hrJobPostings.$inferInsert;
+export const insertHrJobPostingSchema = createInsertSchema(hrJobPostings).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type HrCandidate = typeof hrCandidates.$inferSelect;
+export type InsertHrCandidate = typeof hrCandidates.$inferInsert;
+export const insertHrCandidateSchema = createInsertSchema(hrCandidates).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type HrInterview = typeof hrInterviews.$inferSelect;
+export type InsertHrInterview = typeof hrInterviews.$inferInsert;
+export const insertHrInterviewSchema = createInsertSchema(hrInterviews).omit({ id: true, createdAt: true });
+
+export type HrBenefitPlan = typeof hrBenefitPlans.$inferSelect;
+export type InsertHrBenefitPlan = typeof hrBenefitPlans.$inferInsert;
+export const insertHrBenefitPlanSchema = createInsertSchema(hrBenefitPlans).omit({ id: true, createdAt: true });
+
+export type HrBenefitEnrollment = typeof hrBenefitEnrollments.$inferSelect;
+export type InsertHrBenefitEnrollment = typeof hrBenefitEnrollments.$inferInsert;
+export const insertHrBenefitEnrollmentSchema = createInsertSchema(hrBenefitEnrollments).omit({ id: true, createdAt: true });
+
+export type HrPerformanceReview = typeof hrPerformanceReviews.$inferSelect;
+export type InsertHrPerformanceReview = typeof hrPerformanceReviews.$inferInsert;
+export const insertHrPerformanceReviewSchema = createInsertSchema(hrPerformanceReviews).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type HrPerformanceGoal = typeof hrPerformanceGoals.$inferSelect;
+export type InsertHrPerformanceGoal = typeof hrPerformanceGoals.$inferInsert;
+export const insertHrPerformanceGoalSchema = createInsertSchema(hrPerformanceGoals).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type HrAnnouncement = typeof hrAnnouncements.$inferSelect;
+export type InsertHrAnnouncement = typeof hrAnnouncements.$inferInsert;
+export const insertHrAnnouncementSchema = createInsertSchema(hrAnnouncements).omit({ id: true, createdAt: true });
+
+export type HrSelfServiceRequest = typeof hrSelfServiceRequests.$inferSelect;
+export type InsertHrSelfServiceRequest = typeof hrSelfServiceRequests.$inferInsert;
+export const insertHrSelfServiceRequestSchema = createInsertSchema(hrSelfServiceRequests).omit({ id: true, createdAt: true, updatedAt: true });
