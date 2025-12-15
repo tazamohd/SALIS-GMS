@@ -8886,3 +8886,297 @@ export const insertGamificationBadgeAwardSchema = createInsertSchema(gamificatio
 export type LeaderboardSnapshot = typeof leaderboardSnapshots.$inferSelect;
 export type InsertLeaderboardSnapshot = typeof leaderboardSnapshots.$inferInsert;
 export const insertLeaderboardSnapshotSchema = createInsertSchema(leaderboardSnapshots).omit({ id: true, generatedAt: true });
+
+// ============================================================================
+// B2B PARTS NETWORK MODULE - Supplier/Dealer/Garage Marketplace
+// ============================================================================
+
+// Network Members - Suppliers, Dealers, Stores, Authorized Sellers
+export const partsNetworkMembers = pgTable("parts_network_members", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id),
+  garageId: uuid("garage_id").references(() => garages.id),
+  supplierId: uuid("supplier_id").references(() => suppliers.id),
+  
+  // Member type and info
+  memberType: varchar("member_type", { length: 50 }).notNull(), // "supplier", "dealer", "store", "authorized_seller", "garage_keeper"
+  companyName: varchar("company_name", { length: 255 }).notNull(),
+  companyNameAr: varchar("company_name_ar", { length: 255 }), // Arabic name
+  tradeLicense: varchar("trade_license", { length: 100 }),
+  vatNumber: varchar("vat_number", { length: 50 }),
+  
+  // Contact info
+  contactPerson: varchar("contact_person", { length: 255 }),
+  email: varchar("email", { length: 255 }),
+  phone: varchar("phone", { length: 50 }),
+  whatsapp: varchar("whatsapp", { length: 50 }),
+  
+  // Location
+  address: text("address"),
+  city: varchar("city", { length: 100 }),
+  region: varchar("region", { length: 100 }), // Region/Province
+  country: varchar("country", { length: 100 }).default("Saudi Arabia"),
+  coordinates: jsonb("coordinates"), // { lat, lng }
+  
+  // Specialization
+  specializedBrands: jsonb("specialized_brands"), // Array of brand names they specialize in
+  partCategories: jsonb("part_categories"), // Array of categories they handle
+  vehicleTypes: jsonb("vehicle_types"), // Types of vehicles they serve
+  
+  // Verification
+  isVerified: boolean("is_verified").default(false),
+  verifiedAt: timestamp("verified_at"),
+  verificationDocuments: jsonb("verification_documents"), // Array of document URLs
+  
+  // Rating and performance
+  rating: decimal("rating", { precision: 3, scale: 2 }).default("0.00"),
+  totalQuotations: integer("total_quotations").default(0),
+  responseRate: decimal("response_rate", { precision: 5, scale: 2 }).default("0.00"),
+  avgResponseTimeHours: decimal("avg_response_time_hours", { precision: 5, scale: 2 }),
+  
+  // Settings
+  autoAcceptQuotations: boolean("auto_accept_quotations").default(false),
+  notificationPreferences: jsonb("notification_preferences"),
+  deliveryRadius: integer("delivery_radius"), // km
+  minOrderValue: decimal("min_order_value", { precision: 10, scale: 2 }),
+  
+  isActive: boolean("is_active").default(true),
+  joinedAt: timestamp("joined_at").defaultNow(),
+  lastActiveAt: timestamp("last_active_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Quotation Requests - From Garage Keepers to Suppliers
+export const partsQuotationRequests = pgTable("parts_quotation_requests", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  requestNumber: varchar("request_number", { length: 50 }).notNull().unique(),
+  
+  // Requester info
+  requesterId: uuid("requester_id").notNull().references(() => partsNetworkMembers.id),
+  garageId: uuid("garage_id").references(() => garages.id),
+  
+  // Part details
+  partNumber: varchar("part_number", { length: 100 }),
+  partName: varchar("part_name", { length: 255 }).notNull(),
+  partNameAr: varchar("part_name_ar", { length: 255 }),
+  brand: varchar("brand", { length: 100 }),
+  alternativeBrands: jsonb("alternative_brands"), // Array of acceptable alternative brands
+  quantity: integer("quantity").notNull().default(1),
+  
+  // Vehicle info for compatibility
+  vehicleMake: varchar("vehicle_make", { length: 100 }),
+  vehicleModel: varchar("vehicle_model", { length: 100 }),
+  vehicleYear: integer("vehicle_year"),
+  vehicleVin: varchar("vehicle_vin", { length: 50 }),
+  
+  // Request settings
+  urgency: varchar("urgency", { length: 20 }).default("normal"), // "urgent", "normal", "low"
+  expiresAt: timestamp("expires_at"), // When the request expires
+  deliveryPreference: varchar("delivery_preference", { length: 50 }).default("pickup"), // "pickup", "delivery", "both"
+  preferredDeliveryLocation: text("preferred_delivery_location"),
+  
+  // Targeting
+  targetBrands: jsonb("target_brands"), // Specific supplier brands to target
+  targetMemberTypes: jsonb("target_member_types"), // ["supplier", "dealer"]
+  targetRegions: jsonb("target_regions"), // Specific regions to send to
+  
+  // Media
+  images: jsonb("images"), // Array of image URLs of the part
+  documents: jsonb("documents"), // Spec sheets, etc.
+  notes: text("notes"),
+  
+  // Status tracking
+  status: varchar("status", { length: 30 }).default("open"), // "open", "pending_responses", "reviewing", "ordered", "cancelled", "expired"
+  selectedResponseId: uuid("selected_response_id"),
+  
+  // Stats
+  viewCount: integer("view_count").default(0),
+  responseCount: integer("response_count").default(0),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Quotation Responses - From Suppliers to Garage Keepers
+export const partsQuotationResponses = pgTable("parts_quotation_responses", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  requestId: uuid("request_id").notNull().references(() => partsQuotationRequests.id),
+  responderId: uuid("responder_id").notNull().references(() => partsNetworkMembers.id),
+  
+  // Part offer details
+  offeredPartNumber: varchar("offered_part_number", { length: 100 }),
+  offeredPartName: varchar("offered_part_name", { length: 255 }).notNull(),
+  offeredBrand: varchar("offered_brand", { length: 100 }),
+  partCondition: varchar("part_condition", { length: 30 }).default("new"), // "new", "refurbished", "used"
+  warranty: varchar("warranty", { length: 100 }),
+  
+  // Pricing
+  unitPrice: decimal("unit_price", { precision: 10, scale: 2 }).notNull(),
+  currency: varchar("currency", { length: 10 }).default("SAR"),
+  discountPercent: decimal("discount_percent", { precision: 5, scale: 2 }).default("0"),
+  totalPrice: decimal("total_price", { precision: 10, scale: 2 }).notNull(),
+  vatIncluded: boolean("vat_included").default(true),
+  
+  // Quantity and availability
+  availableQuantity: integer("available_quantity").notNull(),
+  minOrderQuantity: integer("min_order_quantity").default(1),
+  
+  // Delivery
+  deliveryOption: varchar("delivery_option", { length: 30 }).default("pickup"), // "pickup", "delivery", "both"
+  deliveryCost: decimal("delivery_cost", { precision: 10, scale: 2 }).default("0"),
+  estimatedDeliveryDays: integer("estimated_delivery_days"),
+  pickupLocation: text("pickup_location"),
+  
+  // Validity
+  validUntil: timestamp("valid_until"),
+  
+  // Media and notes
+  images: jsonb("images"),
+  notes: text("notes"),
+  
+  // Status
+  status: varchar("status", { length: 30 }).default("submitted"), // "submitted", "viewed", "selected", "rejected", "expired"
+  viewedAt: timestamp("viewed_at"),
+  selectedAt: timestamp("selected_at"),
+  rejectedAt: timestamp("rejected_at"),
+  rejectionReason: text("rejection_reason"),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Quotation Messages - Communication between parties
+export const partsQuotationMessages = pgTable("parts_quotation_messages", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  requestId: uuid("request_id").notNull().references(() => partsQuotationRequests.id),
+  responseId: uuid("response_id").references(() => partsQuotationResponses.id),
+  
+  senderId: uuid("sender_id").notNull().references(() => partsNetworkMembers.id),
+  receiverId: uuid("receiver_id").notNull().references(() => partsNetworkMembers.id),
+  
+  messageType: varchar("message_type", { length: 30 }).default("text"), // "text", "image", "document", "price_update", "counter_offer"
+  content: text("content").notNull(),
+  attachments: jsonb("attachments"), // Array of attachment URLs
+  
+  // For counter offers
+  counterOfferPrice: decimal("counter_offer_price", { precision: 10, scale: 2 }),
+  counterOfferQuantity: integer("counter_offer_quantity"),
+  
+  isRead: boolean("is_read").default(false),
+  readAt: timestamp("read_at"),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Parts Network Notifications
+export const partsNetworkNotifications = pgTable("parts_network_notifications", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  memberId: uuid("member_id").notNull().references(() => partsNetworkMembers.id),
+  
+  notificationType: varchar("notification_type", { length: 50 }).notNull(), // "new_request", "new_response", "new_message", "request_selected", "request_expired"
+  title: varchar("title", { length: 255 }).notNull(),
+  titleAr: varchar("title_ar", { length: 255 }),
+  content: text("content"),
+  contentAr: text("content_ar"),
+  
+  referenceType: varchar("reference_type", { length: 30 }), // "request", "response", "message"
+  referenceId: uuid("reference_id"),
+  
+  isRead: boolean("is_read").default(false),
+  readAt: timestamp("read_at"),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Parts Network Orders - When a quotation is accepted
+export const partsNetworkOrders = pgTable("parts_network_orders", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  orderNumber: varchar("order_number", { length: 50 }).notNull().unique(),
+  
+  requestId: uuid("request_id").notNull().references(() => partsQuotationRequests.id),
+  responseId: uuid("response_id").notNull().references(() => partsQuotationResponses.id),
+  buyerId: uuid("buyer_id").notNull().references(() => partsNetworkMembers.id),
+  sellerId: uuid("seller_id").notNull().references(() => partsNetworkMembers.id),
+  
+  // Order details
+  quantity: integer("quantity").notNull(),
+  unitPrice: decimal("unit_price", { precision: 10, scale: 2 }).notNull(),
+  subtotal: decimal("subtotal", { precision: 10, scale: 2 }).notNull(),
+  vatAmount: decimal("vat_amount", { precision: 10, scale: 2 }).default("0"),
+  deliveryCost: decimal("delivery_cost", { precision: 10, scale: 2 }).default("0"),
+  totalAmount: decimal("total_amount", { precision: 10, scale: 2 }).notNull(),
+  currency: varchar("currency", { length: 10 }).default("SAR"),
+  
+  // Delivery
+  deliveryMethod: varchar("delivery_method", { length: 30 }), // "pickup", "delivery"
+  deliveryAddress: text("delivery_address"),
+  expectedDeliveryDate: timestamp("expected_delivery_date"),
+  actualDeliveryDate: timestamp("actual_delivery_date"),
+  
+  // Status
+  status: varchar("status", { length: 30 }).default("pending"), // "pending", "confirmed", "processing", "shipped", "delivered", "cancelled"
+  paymentStatus: varchar("payment_status", { length: 30 }).default("pending"), // "pending", "paid", "partial", "refunded"
+  
+  // Tracking
+  trackingNumber: varchar("tracking_number", { length: 100 }),
+  trackingUrl: varchar("tracking_url", { length: 500 }),
+  
+  notes: text("notes"),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Type exports for B2B Parts Network
+export type PartsNetworkMember = typeof partsNetworkMembers.$inferSelect;
+export type InsertPartsNetworkMember = typeof partsNetworkMembers.$inferInsert;
+export const insertPartsNetworkMemberSchema = createInsertSchema(partsNetworkMembers).omit({
+  id: true,
+  rating: true,
+  totalQuotations: true,
+  responseRate: true,
+  joinedAt: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type PartsQuotationRequest = typeof partsQuotationRequests.$inferSelect;
+export type InsertPartsQuotationRequest = typeof partsQuotationRequests.$inferInsert;
+export const insertPartsQuotationRequestSchema = createInsertSchema(partsQuotationRequests).omit({
+  id: true,
+  viewCount: true,
+  responseCount: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type PartsQuotationResponse = typeof partsQuotationResponses.$inferSelect;
+export type InsertPartsQuotationResponse = typeof partsQuotationResponses.$inferInsert;
+export const insertPartsQuotationResponseSchema = createInsertSchema(partsQuotationResponses).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type PartsQuotationMessage = typeof partsQuotationMessages.$inferSelect;
+export type InsertPartsQuotationMessage = typeof partsQuotationMessages.$inferInsert;
+export const insertPartsQuotationMessageSchema = createInsertSchema(partsQuotationMessages).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type PartsNetworkNotification = typeof partsNetworkNotifications.$inferSelect;
+export type InsertPartsNetworkNotification = typeof partsNetworkNotifications.$inferInsert;
+export const insertPartsNetworkNotificationSchema = createInsertSchema(partsNetworkNotifications).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type PartsNetworkOrder = typeof partsNetworkOrders.$inferSelect;
+export type InsertPartsNetworkOrder = typeof partsNetworkOrders.$inferInsert;
+export const insertPartsNetworkOrderSchema = createInsertSchema(partsNetworkOrders).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
