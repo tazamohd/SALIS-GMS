@@ -76,6 +76,7 @@ import TowingAssistance from "@/pages/TowingAssistance";
 import LoanerVehicles from "@/pages/LoanerVehicles";
 import VendorSupplierPortal from "@/pages/VendorSupplierPortal";
 import MarketingAutomation from "@/pages/MarketingAutomation";
+import MarketingHub from "@/pages/MarketingHub";
 import CustomerLoyalty from "@/pages/CustomerLoyalty";
 import DocumentManagement from "@/pages/DocumentManagement";
 import FranchiseManagement from "@/pages/FranchiseManagement";
@@ -408,6 +409,11 @@ function Router() {
       <Route path="/marketing-automation">
         <Layout>
           <MarketingAutomation />
+        </Layout>
+      </Route>
+      <Route path="/marketing-hub">
+        <Layout>
+          <MarketingHub />
         </Layout>
       </Route>
       <Route path="/customer-loyalty">

@@ -1,6 +1,7 @@
 import { sql } from "drizzle-orm";
 import {
   boolean,
+  date,
   decimal,
   doublePrecision,
   index,
@@ -9177,6 +9178,229 @@ export type PartsNetworkOrder = typeof partsNetworkOrders.$inferSelect;
 export type InsertPartsNetworkOrder = typeof partsNetworkOrders.$inferInsert;
 export const insertPartsNetworkOrderSchema = createInsertSchema(partsNetworkOrders).omit({
   id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+// =====================================
+// Marketing Platform Hub
+// =====================================
+
+// Marketing Providers (Google Ads, Facebook, Instagram, Twitter/X, LinkedIn, TikTok, etc.)
+export const marketingProviders = pgTable("marketing_providers", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  name: varchar("name", { length: 100 }).notNull(), // "Google Ads", "Facebook Ads", etc.
+  code: varchar("code", { length: 50 }).notNull().unique(), // "google_ads", "facebook", etc.
+  type: varchar("type", { length: 50 }).notNull(), // "search", "social", "display", "video"
+  iconUrl: varchar("icon_url", { length: 500 }),
+  websiteUrl: varchar("website_url", { length: 500 }),
+  capabilities: jsonb("capabilities").default([]), // ["search_ads", "display_ads", "video_ads", "retargeting"]
+  authType: varchar("auth_type", { length: 50 }).default("api_key"), // "api_key", "oauth", "both"
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Marketing Accounts - connections to external platforms
+export const marketingAccounts = pgTable("marketing_accounts", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id),
+  providerId: uuid("provider_id")
+    .references(() => marketingProviders.id)
+    .notNull(),
+  accountName: varchar("account_name", { length: 255 }).notNull(),
+  accountId: varchar("account_id", { length: 255 }), // External account ID
+  status: varchar("status", { length: 50 }).default("pending"), // "pending", "connected", "disconnected", "error", "suspended"
+  credentials: jsonb("credentials").default({}), // Encrypted API keys/tokens (placeholder)
+  settings: jsonb("settings").default({}), // Account-specific settings
+  lastSyncAt: timestamp("last_sync_at"),
+  syncStatus: varchar("sync_status", { length: 50 }).default("never"), // "never", "syncing", "success", "failed"
+  totalSpend: decimal("total_spend", { precision: 12, scale: 2 }).default("0.00"),
+  monthlyBudget: decimal("monthly_budget", { precision: 12, scale: 2 }),
+  currency: varchar("currency", { length: 10 }).default("USD"),
+  notes: text("notes"),
+  createdBy: varchar("created_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Ad Campaigns - campaigns across all platforms
+export const marketingAdCampaigns = pgTable("marketing_ad_campaigns", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  accountId: uuid("account_id")
+    .references(() => marketingAccounts.id)
+    .notNull(),
+  campaignName: varchar("campaign_name", { length: 255 }).notNull(),
+  externalCampaignId: varchar("external_campaign_id", { length: 255 }),
+  objective: varchar("objective", { length: 100 }), // "awareness", "traffic", "engagement", "leads", "conversions", "sales"
+  status: varchar("status", { length: 50 }).default("draft"), // "draft", "pending_review", "active", "paused", "completed", "rejected"
+  budget: decimal("budget", { precision: 12, scale: 2 }),
+  budgetType: varchar("budget_type", { length: 50 }).default("daily"), // "daily", "lifetime", "monthly"
+  spentAmount: decimal("spent_amount", { precision: 12, scale: 2 }).default("0.00"),
+  startDate: timestamp("start_date"),
+  endDate: timestamp("end_date"),
+  targetAudience: jsonb("target_audience").default({}), // Demographics, interests, locations
+  adContent: jsonb("ad_content").default({}), // Headlines, descriptions, images, videos
+  impressions: integer("impressions").default(0),
+  clicks: integer("clicks").default(0),
+  conversions: integer("conversions").default(0),
+  ctr: decimal("ctr", { precision: 8, scale: 4 }).default("0.00"), // Click-through rate
+  cpc: decimal("cpc", { precision: 8, scale: 4 }).default("0.00"), // Cost per click
+  cpm: decimal("cpm", { precision: 8, scale: 4 }).default("0.00"), // Cost per mille
+  conversionRate: decimal("conversion_rate", { precision: 8, scale: 4 }).default("0.00"),
+  lastSyncAt: timestamp("last_sync_at"),
+  createdBy: varchar("created_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Marketing Spend Snapshots - daily performance metrics
+export const marketingSpendSnapshots = pgTable("marketing_spend_snapshots", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  accountId: uuid("account_id")
+    .references(() => marketingAccounts.id)
+    .notNull(),
+  campaignId: uuid("campaign_id").references(() => marketingAdCampaigns.id),
+  snapshotDate: date("snapshot_date").notNull(),
+  spend: decimal("spend", { precision: 12, scale: 2 }).default("0.00"),
+  impressions: integer("impressions").default(0),
+  clicks: integer("clicks").default(0),
+  conversions: integer("conversions").default(0),
+  ctr: decimal("ctr", { precision: 8, scale: 4 }).default("0.00"),
+  cpc: decimal("cpc", { precision: 8, scale: 4 }).default("0.00"),
+  revenue: decimal("revenue", { precision: 12, scale: 2 }).default("0.00"),
+  roas: decimal("roas", { precision: 8, scale: 4 }).default("0.00"), // Return on ad spend
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Marketing Tasks/Workflows - for tracking account setup, compliance, etc.
+export const marketingTasks = pgTable("marketing_tasks", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  accountId: uuid("account_id").references(() => marketingAccounts.id),
+  campaignId: uuid("campaign_id").references(() => marketingAdCampaigns.id),
+  taskType: varchar("task_type", { length: 100 }).notNull(), // "account_setup", "creative_review", "budget_review", "compliance_check"
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description"),
+  status: varchar("status", { length: 50 }).default("pending"), // "pending", "in_progress", "completed", "cancelled"
+  priority: varchar("priority", { length: 20 }).default("medium"), // "low", "medium", "high", "urgent"
+  dueDate: timestamp("due_date"),
+  assignedTo: varchar("assigned_to").references(() => users.id),
+  completedAt: timestamp("completed_at"),
+  completedBy: varchar("completed_by").references(() => users.id),
+  createdBy: varchar("created_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Marketing Notes - audit trail and comments
+export const marketingNotes = pgTable("marketing_notes", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  accountId: uuid("account_id").references(() => marketingAccounts.id),
+  campaignId: uuid("campaign_id").references(() => marketingAdCampaigns.id),
+  noteType: varchar("note_type", { length: 50 }).default("general"), // "general", "performance", "issue", "action"
+  content: text("content").notNull(),
+  attachments: jsonb("attachments").default([]),
+  createdBy: varchar("created_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Marketing Creative Assets
+export const marketingCreatives = pgTable("marketing_creatives", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  accountId: uuid("account_id").references(() => marketingAccounts.id),
+  campaignId: uuid("campaign_id").references(() => marketingAdCampaigns.id),
+  name: varchar("name", { length: 255 }).notNull(),
+  type: varchar("type", { length: 50 }).notNull(), // "image", "video", "carousel", "text"
+  format: varchar("format", { length: 50 }), // "1080x1080", "1200x628", "1920x1080", etc.
+  fileUrl: varchar("file_url", { length: 1000 }),
+  thumbnailUrl: varchar("thumbnail_url", { length: 1000 }),
+  headline: varchar("headline", { length: 500 }),
+  description: text("description"),
+  callToAction: varchar("call_to_action", { length: 100 }),
+  status: varchar("status", { length: 50 }).default("draft"), // "draft", "pending_review", "approved", "rejected", "active"
+  performance: jsonb("performance").default({}), // clicks, impressions, ctr for this creative
+  createdBy: varchar("created_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Type exports for Marketing Platform
+export type MarketingProvider = typeof marketingProviders.$inferSelect;
+export type InsertMarketingProvider = typeof marketingProviders.$inferInsert;
+export const insertMarketingProviderSchema = createInsertSchema(marketingProviders).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type MarketingAccount = typeof marketingAccounts.$inferSelect;
+export type InsertMarketingAccount = typeof marketingAccounts.$inferInsert;
+export const insertMarketingAccountSchema = createInsertSchema(marketingAccounts).omit({
+  id: true,
+  totalSpend: true,
+  lastSyncAt: true,
+  syncStatus: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type MarketingAdCampaign = typeof marketingAdCampaigns.$inferSelect;
+export type InsertMarketingAdCampaign = typeof marketingAdCampaigns.$inferInsert;
+export const insertMarketingAdCampaignSchema = createInsertSchema(marketingAdCampaigns).omit({
+  id: true,
+  spentAmount: true,
+  impressions: true,
+  clicks: true,
+  conversions: true,
+  ctr: true,
+  cpc: true,
+  cpm: true,
+  conversionRate: true,
+  lastSyncAt: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type MarketingSpendSnapshot = typeof marketingSpendSnapshots.$inferSelect;
+export type InsertMarketingSpendSnapshot = typeof marketingSpendSnapshots.$inferInsert;
+export const insertMarketingSpendSnapshotSchema = createInsertSchema(marketingSpendSnapshots).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type MarketingTask = typeof marketingTasks.$inferSelect;
+export type InsertMarketingTask = typeof marketingTasks.$inferInsert;
+export const insertMarketingTaskSchema = createInsertSchema(marketingTasks).omit({
+  id: true,
+  completedAt: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type MarketingNote = typeof marketingNotes.$inferSelect;
+export type InsertMarketingNote = typeof marketingNotes.$inferInsert;
+export const insertMarketingNoteSchema = createInsertSchema(marketingNotes).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type MarketingCreative = typeof marketingCreatives.$inferSelect;
+export type InsertMarketingCreative = typeof marketingCreatives.$inferInsert;
+export const insertMarketingCreativeSchema = createInsertSchema(marketingCreatives).omit({
+  id: true,
+  performance: true,
   createdAt: true,
   updatedAt: true,
 });

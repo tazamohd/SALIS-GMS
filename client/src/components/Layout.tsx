@@ -297,6 +297,7 @@ export function Layout({ children }: LayoutProps) {
     {
       label: "Customer Experience & Growth",
       items: [
+        { path: "/marketing-hub", icon: Megaphone, label: "Marketing Hub" },
         { path: "/marketing-automation", icon: Mail, label: "Marketing Automation" },
         { path: "/email-marketing-campaigns", icon: Mail, label: "Email Marketing" },
         { path: "/customer-loyalty", icon: Award, label: "Customer Loyalty" },
