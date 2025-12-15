@@ -7,12 +7,9 @@ import {
   Package,
   Send,
   Inbox,
-  MessageSquare,
   Building2,
-  Bell,
   ShoppingCart,
   BarChart3,
-  Settings,
   ArrowLeft,
   Menu,
   X,
@@ -58,12 +55,6 @@ const navigationItems = [
     icon: BarChart3,
   },
   {
-    title: "Messages",
-    titleAr: "الرسائل",
-    href: "/parts-network/messages",
-    icon: MessageSquare,
-  },
-  {
     title: "Orders",
     titleAr: "الطلبات",
     href: "/parts-network/orders",
@@ -74,18 +65,6 @@ const navigationItems = [
     titleAr: "أعضاء الشبكة",
     href: "/parts-network/members",
     icon: Building2,
-  },
-  {
-    title: "Notifications",
-    titleAr: "الإشعارات",
-    href: "/parts-network/notifications",
-    icon: Bell,
-  },
-  {
-    title: "Settings",
-    titleAr: "الإعدادات",
-    href: "/parts-network/settings",
-    icon: Settings,
   },
 ];
 

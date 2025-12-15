@@ -218,6 +218,7 @@ export function Layout({ children }: LayoutProps) {
         { path: "/purchase-orders", icon: ShoppingCart, label: t("nav.purchaseOrders") },
         { path: "/parts-marketplace", icon: ShoppingCart, label: "Parts Marketplace" },
         { path: "/parts-supply-network", icon: Network, label: "Parts Network" },
+        { path: "/parts-network", icon: Package, label: "B2B Parts Network" },
         { path: "/barcode-scanner", icon: Scan, label: "Barcode Scanner" },
         { path: "/internal-warehouse", icon: Warehouse, label: "Internal Warehouse" },
       ],
