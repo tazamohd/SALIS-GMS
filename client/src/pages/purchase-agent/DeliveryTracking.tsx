@@ -20,8 +20,10 @@ import {
   Navigation,
   Eye,
   MessageSquare,
+  Radio,
 } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Link } from "wouter";
 
 interface DeliveryRecord {
   id: number;
@@ -365,6 +367,18 @@ export default function DeliveryTracking() {
                       </div>
 
                       <div className="flex flex-col gap-2">
+                        {(delivery.status === "dispatched" || delivery.status === "in_transit" || delivery.status === "arrived") && (
+                          <Link href={`/purchase-agent/delivery-tracking/${delivery.id}`}>
+                            <Button
+                              size="sm"
+                              className="w-full bg-green-600 hover:bg-green-700"
+                              data-testid={`button-track-live-${delivery.id}`}
+                            >
+                              <Radio className="h-4 w-4 mr-1 animate-pulse" />
+                              Track Live
+                            </Button>
+                          </Link>
+                        )}
                         <Dialog>
                           <DialogTrigger asChild>
                             <Button

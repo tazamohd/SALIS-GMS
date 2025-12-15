@@ -51,6 +51,7 @@ import PurchaseAgentTaskInbox from "@/pages/purchase-agent/TaskInbox";
 import PurchaseAgentQuotationManagement from "@/pages/purchase-agent/QuotationManagement";
 import PurchaseAgentPaymentTracking from "@/pages/purchase-agent/PaymentTracking";
 import PurchaseAgentDeliveryTracking from "@/pages/purchase-agent/DeliveryTracking";
+import PurchaseAgentLiveDeliveryTracking from "@/pages/purchase-agent/LiveDeliveryTracking";
 import Notifications from "@/pages/Notifications";
 import Landing from "@/pages/Landing";
 import PublicTracking from "@/pages/PublicTracking";
@@ -554,6 +555,11 @@ function Router() {
       <Route path="/purchase-agent/delivery">
         <PurchaseAgentLayout>
           <PurchaseAgentDeliveryTracking />
+        </PurchaseAgentLayout>
+      </Route>
+      <Route path="/purchase-agent/delivery-tracking/:id">
+        <PurchaseAgentLayout>
+          <PurchaseAgentLiveDeliveryTracking />
         </PurchaseAgentLayout>
       </Route>
       <Route path="/purchase-agent/orders">
