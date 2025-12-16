@@ -10753,19 +10753,42 @@ export class DatabaseStorage implements IStorage {
   }
 
   async startBaySession(bayId: string, vehicleId?: string, jobCardId?: string): Promise<BayOccupancySession> {
-    await db.update(serviceBays)
-      .set({ status: 'occupied', updatedAt: new Date() })
-      .where(eq(serviceBays.id, bayId));
+    // First, atomically close any existing open sessions on this bay
+    // This uses a single UPDATE statement to prevent race conditions
+    await db.update(bayOccupancySessions)
+      .set({ endTime: new Date() })
+      .where(and(
+        eq(bayOccupancySessions.bayId, bayId),
+        isNull(bayOccupancySessions.endTime)
+      ));
     
-    const [session] = await db.insert(bayOccupancySessions).values({
-      bayId,
-      vehicleId: vehicleId || null,
-      jobCardId: jobCardId || null,
-      startTime: new Date(),
-      sessionType: 'service',
-    }).returning();
-    
-    return session;
+    try {
+      // Insert new session first
+      const [session] = await db.insert(bayOccupancySessions).values({
+        bayId,
+        vehicleId: vehicleId || null,
+        jobCardId: jobCardId || null,
+        startTime: new Date(),
+        sessionType: 'service',
+      }).returning();
+      
+      if (!session) {
+        throw new Error('Failed to create bay session');
+      }
+      
+      // Update bay status only after successful session creation
+      await db.update(serviceBays)
+        .set({ status: 'occupied', updatedAt: new Date() })
+        .where(eq(serviceBays.id, bayId));
+      
+      return session;
+    } catch (error) {
+      // On any failure, ensure bay is set back to available
+      await db.update(serviceBays)
+        .set({ status: 'available', updatedAt: new Date() })
+        .where(eq(serviceBays.id, bayId));
+      throw error;
+    }
   }
 
   async endBaySession(sessionId: string): Promise<BayOccupancySession | null> {
