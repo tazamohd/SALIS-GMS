@@ -10081,30 +10081,6 @@ export const inventoryForecasts = pgTable("inventory_forecasts", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-export const autoReorderRules = pgTable("auto_reorder_rules", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
-  garageId: uuid("garage_id").references(() => garages.id).notNull(),
-  partId: uuid("part_id").references(() => inventoryItems.id),
-  categoryId: uuid("category_id").references(() => partCategories.id),
-  ruleName: varchar("rule_name", { length: 255 }).notNull(),
-  ruleType: varchar("rule_type", { length: 100 }).default("reorder_point"), // "reorder_point", "periodic", "forecast_based", "min_max"
-  reorderPoint: integer("reorder_point"), // Trigger when stock falls below
-  reorderQuantity: integer("reorder_quantity"),
-  safetyStockDays: integer("safety_stock_days").default(7),
-  leadTimeDays: integer("lead_time_days").default(3),
-  minOrderQuantity: integer("min_order_quantity").default(1),
-  maxOrderQuantity: integer("max_order_quantity"),
-  preferredSupplierId: uuid("preferred_supplier_id").references(() => suppliers.id),
-  autoApproveThreshold: decimal("auto_approve_threshold", { precision: 10, scale: 2 }), // Auto-approve if under this amount
-  requiresApproval: boolean("requires_approval").default(true),
-  notifyOnTrigger: boolean("notify_on_trigger").default(true),
-  isActive: boolean("is_active").default(true),
-  lastTriggeredAt: timestamp("last_triggered_at"),
-  createdBy: varchar("created_by").references(() => users.id),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
-
 export const replenishmentOrders = pgTable("replenishment_orders", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
   garageId: uuid("garage_id").references(() => garages.id).notNull(),
@@ -10189,21 +10165,6 @@ export const loyaltyAccounts = pgTable("loyalty_accounts", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-export const loyaltyTransactions = pgTable("loyalty_transactions", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
-  accountId: uuid("account_id").references(() => loyaltyAccounts.id).notNull(),
-  garageId: uuid("garage_id").references(() => garages.id).notNull(),
-  transactionType: varchar("transaction_type", { length: 50 }).notNull(), // "earn", "redeem", "expire", "adjust", "bonus", "referral"
-  points: integer("points").notNull(), // Positive for earn, negative for redeem
-  balanceAfter: integer("balance_after").notNull(),
-  referenceType: varchar("reference_type", { length: 50 }), // "invoice", "job_card", "offer", "referral", "manual"
-  referenceId: varchar("reference_id"),
-  description: varchar("description", { length: 500 }),
-  expiresAt: timestamp("expires_at"),
-  processedBy: varchar("processed_by").references(() => users.id),
-  createdAt: timestamp("created_at").defaultNow(),
-});
-
 export const loyaltyOffers = pgTable("loyalty_offers", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
   garageId: uuid("garage_id").references(() => garages.id).notNull(),
@@ -10230,22 +10191,6 @@ export const loyaltyOffers = pgTable("loyalty_offers", {
   createdBy: varchar("created_by").references(() => users.id),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
-});
-
-export const loyaltyRedemptions = pgTable("loyalty_redemptions", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
-  accountId: uuid("account_id").references(() => loyaltyAccounts.id).notNull(),
-  offerId: uuid("offer_id").references(() => loyaltyOffers.id).notNull(),
-  garageId: uuid("garage_id").references(() => garages.id).notNull(),
-  transactionId: uuid("transaction_id").references(() => loyaltyTransactions.id),
-  invoiceId: uuid("invoice_id").references(() => invoices.id),
-  jobCardId: uuid("job_card_id").references(() => jobCards.id),
-  pointsUsed: integer("points_used").notNull(),
-  discountApplied: decimal("discount_applied", { precision: 10, scale: 2 }),
-  status: varchar("status", { length: 50 }).default("pending"), // "pending", "applied", "cancelled", "expired"
-  redeemedAt: timestamp("redeemed_at").defaultNow(),
-  appliedAt: timestamp("applied_at"),
-  createdAt: timestamp("created_at").defaultNow(),
 });
 
 // ==========================================
@@ -10443,10 +10388,6 @@ export type InventoryForecast = typeof inventoryForecasts.$inferSelect;
 export type InsertInventoryForecast = typeof inventoryForecasts.$inferInsert;
 export const insertInventoryForecastSchema = createInsertSchema(inventoryForecasts).omit({ id: true, createdAt: true });
 
-export type AutoReorderRule = typeof autoReorderRules.$inferSelect;
-export type InsertAutoReorderRule = typeof autoReorderRules.$inferInsert;
-export const insertAutoReorderRuleSchema = createInsertSchema(autoReorderRules).omit({ id: true, createdAt: true, updatedAt: true });
-
 export type ReplenishmentOrder = typeof replenishmentOrders.$inferSelect;
 export type InsertReplenishmentOrder = typeof replenishmentOrders.$inferInsert;
 export const insertReplenishmentOrderSchema = createInsertSchema(replenishmentOrders).omit({ id: true, createdAt: true, updatedAt: true });
@@ -10458,10 +10399,6 @@ export const insertLoyaltyTierSchema = createInsertSchema(loyaltyTiers).omit({ i
 export type LoyaltyAccount = typeof loyaltyAccounts.$inferSelect;
 export type InsertLoyaltyAccount = typeof loyaltyAccounts.$inferInsert;
 export const insertLoyaltyAccountSchema = createInsertSchema(loyaltyAccounts).omit({ id: true, createdAt: true, updatedAt: true });
-
-export type LoyaltyTransaction = typeof loyaltyTransactions.$inferSelect;
-export type InsertLoyaltyTransaction = typeof loyaltyTransactions.$inferInsert;
-export const insertLoyaltyTransactionSchema = createInsertSchema(loyaltyTransactions).omit({ id: true, createdAt: true });
 
 export type LoyaltyOffer = typeof loyaltyOffers.$inferSelect;
 export type InsertLoyaltyOffer = typeof loyaltyOffers.$inferInsert;
