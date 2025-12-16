@@ -669,6 +669,36 @@ import {
   type InsertServiceBay,
   type BayOccupancySession,
   type InsertBayOccupancySession,
+  inventoryForecasts,
+  replenishmentOrders,
+  loyaltyTiers,
+  loyaltyAccounts,
+  loyaltyOffers,
+  workshopResources,
+  calendarAppointments,
+  arWorkInstructions,
+  arSessionLogs,
+  arDevicePairings,
+  type InventoryForecast,
+  type InsertInventoryForecast,
+  type ReplenishmentOrder,
+  type InsertReplenishmentOrder,
+  type LoyaltyTier,
+  type InsertLoyaltyTier,
+  type LoyaltyAccount,
+  type InsertLoyaltyAccount,
+  type LoyaltyOffer,
+  type InsertLoyaltyOffer,
+  type WorkshopResource,
+  type InsertWorkshopResource,
+  type CalendarAppointment,
+  type InsertCalendarAppointment,
+  type ArWorkInstruction,
+  type InsertArWorkInstruction,
+  type ArSessionLog,
+  type InsertArSessionLog,
+  type ArDevicePairing,
+  type InsertArDevicePairing,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, or, inArray, and, gte, lte, ilike, sql, isNull, gt } from "drizzle-orm";
@@ -1903,6 +1933,64 @@ export interface IStorage {
   acknowledgeIotAlert(id: string, userId: string): Promise<any>;
   resolveIotAlert(id: string, userId: string, resolution: string, jobCardId?: string): Promise<any>;
   processAlertRules(sensorId: string, readingValue: number): Promise<any[]>;
+
+  // Automated Inventory Reordering Module
+  getInventoryForecasts(garageId: string): Promise<InventoryForecast[]>;
+  getInventoryForecast(id: string): Promise<InventoryForecast | undefined>;
+  createInventoryForecast(data: InsertInventoryForecast): Promise<InventoryForecast>;
+  getReplenishmentOrders(garageId?: string, status?: string): Promise<ReplenishmentOrder[]>;
+  getReplenishmentOrder(id: string): Promise<ReplenishmentOrder | undefined>;
+  createReplenishmentOrder(data: InsertReplenishmentOrder): Promise<ReplenishmentOrder>;
+  updateReplenishmentOrder(id: string, data: Partial<ReplenishmentOrder>): Promise<ReplenishmentOrder>;
+  approveReplenishmentOrder(id: string, userId: string): Promise<ReplenishmentOrder>;
+
+  // Customer Loyalty Program Module
+  getLoyaltyTiers(garageId: string): Promise<LoyaltyTier[]>;
+  getLoyaltyTier(id: string): Promise<LoyaltyTier | undefined>;
+  createLoyaltyTier(data: InsertLoyaltyTier): Promise<LoyaltyTier>;
+  updateLoyaltyTier(id: string, data: Partial<LoyaltyTier>): Promise<LoyaltyTier>;
+  deleteLoyaltyTier(id: string): Promise<void>;
+  getLoyaltyAccounts(garageId?: string): Promise<LoyaltyAccount[]>;
+  getLoyaltyAccount(id: string): Promise<LoyaltyAccount | undefined>;
+  getLoyaltyAccountByCustomer(customerId: string): Promise<LoyaltyAccount | undefined>;
+  createLoyaltyAccount(data: InsertLoyaltyAccount): Promise<LoyaltyAccount>;
+  updateLoyaltyAccount(id: string, data: Partial<LoyaltyAccount>): Promise<LoyaltyAccount>;
+  addLoyaltyPoints(accountId: string, points: number): Promise<LoyaltyAccount>;
+  redeemLoyaltyPoints(accountId: string, points: number): Promise<LoyaltyAccount>;
+  getLoyaltyOffers(garageId?: string, isActive?: boolean): Promise<LoyaltyOffer[]>;
+  getLoyaltyOffer(id: string): Promise<LoyaltyOffer | undefined>;
+  createLoyaltyOffer(data: InsertLoyaltyOffer): Promise<LoyaltyOffer>;
+  updateLoyaltyOffer(id: string, data: Partial<LoyaltyOffer>): Promise<LoyaltyOffer>;
+  deleteLoyaltyOffer(id: string): Promise<void>;
+
+  // Workshop Calendar Module
+  getWorkshopResources(garageId: string): Promise<WorkshopResource[]>;
+  getWorkshopResource(id: string): Promise<WorkshopResource | undefined>;
+  createWorkshopResource(data: InsertWorkshopResource): Promise<WorkshopResource>;
+  updateWorkshopResource(id: string, data: Partial<WorkshopResource>): Promise<WorkshopResource>;
+  deleteWorkshopResource(id: string): Promise<void>;
+  getCalendarAppointments(garageId: string, startDate?: Date, endDate?: Date): Promise<CalendarAppointment[]>;
+  getCalendarAppointment(id: string): Promise<CalendarAppointment | undefined>;
+  createCalendarAppointment(data: InsertCalendarAppointment): Promise<CalendarAppointment>;
+  updateCalendarAppointment(id: string, data: Partial<CalendarAppointment>): Promise<CalendarAppointment>;
+  deleteCalendarAppointment(id: string): Promise<void>;
+  moveCalendarAppointment(id: string, newStart: Date, newEnd: Date, resourceId?: string): Promise<CalendarAppointment>;
+
+  // AR Overlay Module
+  getArWorkInstructions(garageId?: string): Promise<ArWorkInstruction[]>;
+  getArWorkInstruction(id: string): Promise<ArWorkInstruction | undefined>;
+  createArWorkInstruction(data: InsertArWorkInstruction): Promise<ArWorkInstruction>;
+  updateArWorkInstruction(id: string, data: Partial<ArWorkInstruction>): Promise<ArWorkInstruction>;
+  deleteArWorkInstruction(id: string): Promise<void>;
+  getArSessionLogs(garageId: string, technicianId?: string): Promise<ArSessionLog[]>;
+  getArSessionLog(id: string): Promise<ArSessionLog | undefined>;
+  createArSessionLog(data: InsertArSessionLog): Promise<ArSessionLog>;
+  updateArSessionLog(id: string, data: Partial<ArSessionLog>): Promise<ArSessionLog>;
+  getArDevicePairings(garageId: string): Promise<ArDevicePairing[]>;
+  getArDevicePairing(id: string): Promise<ArDevicePairing | undefined>;
+  createArDevicePairing(data: InsertArDevicePairing): Promise<ArDevicePairing>;
+  updateArDevicePairing(id: string, data: Partial<ArDevicePairing>): Promise<ArDevicePairing>;
+  deleteArDevicePairing(id: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -10696,6 +10784,365 @@ export class DatabaseStorage implements IStorage {
       .returning();
     
     return updatedSession;
+  }
+
+  // Automated Inventory Reordering Module
+  async getInventoryForecasts(garageId: string): Promise<InventoryForecast[]> {
+    return await db.select().from(inventoryForecasts)
+      .where(eq(inventoryForecasts.garageId, garageId))
+      .orderBy(desc(inventoryForecasts.forecastDate));
+  }
+
+  async getInventoryForecast(id: string): Promise<InventoryForecast | undefined> {
+    const [forecast] = await db.select().from(inventoryForecasts)
+      .where(eq(inventoryForecasts.id, id));
+    return forecast;
+  }
+
+  async createInventoryForecast(data: InsertInventoryForecast): Promise<InventoryForecast> {
+    const [forecast] = await db.insert(inventoryForecasts).values(data).returning();
+    return forecast;
+  }
+
+  async getReplenishmentOrders(garageId?: string, status?: string): Promise<ReplenishmentOrder[]> {
+    let query = db.select().from(replenishmentOrders);
+    const conditions = [];
+    if (garageId) conditions.push(eq(replenishmentOrders.garageId, garageId));
+    if (status) conditions.push(eq(replenishmentOrders.status, status));
+    if (conditions.length > 0) {
+      query = query.where(and(...conditions)) as any;
+    }
+    return await query.orderBy(desc(replenishmentOrders.createdAt));
+  }
+
+  async getReplenishmentOrder(id: string): Promise<ReplenishmentOrder | undefined> {
+    const [order] = await db.select().from(replenishmentOrders)
+      .where(eq(replenishmentOrders.id, id));
+    return order;
+  }
+
+  async createReplenishmentOrder(data: InsertReplenishmentOrder): Promise<ReplenishmentOrder> {
+    const [order] = await db.insert(replenishmentOrders).values(data).returning();
+    return order;
+  }
+
+  async updateReplenishmentOrder(id: string, data: Partial<ReplenishmentOrder>): Promise<ReplenishmentOrder> {
+    const [order] = await db.update(replenishmentOrders)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(replenishmentOrders.id, id))
+      .returning();
+    return order;
+  }
+
+  async approveReplenishmentOrder(id: string, userId: string): Promise<ReplenishmentOrder> {
+    const [order] = await db.update(replenishmentOrders)
+      .set({ status: 'approved', approvedBy: userId, approvedAt: new Date(), updatedAt: new Date() })
+      .where(eq(replenishmentOrders.id, id))
+      .returning();
+    return order;
+  }
+
+  // Customer Loyalty Program Module
+  async getLoyaltyTiers(garageId: string): Promise<LoyaltyTier[]> {
+    return await db.select().from(loyaltyTiers)
+      .where(eq(loyaltyTiers.garageId, garageId))
+      .orderBy(loyaltyTiers.sortOrder);
+  }
+
+  async getLoyaltyTier(id: string): Promise<LoyaltyTier | undefined> {
+    const [tier] = await db.select().from(loyaltyTiers)
+      .where(eq(loyaltyTiers.id, id));
+    return tier;
+  }
+
+  async createLoyaltyTier(data: InsertLoyaltyTier): Promise<LoyaltyTier> {
+    const [tier] = await db.insert(loyaltyTiers).values(data).returning();
+    return tier;
+  }
+
+  async updateLoyaltyTier(id: string, data: Partial<LoyaltyTier>): Promise<LoyaltyTier> {
+    const [tier] = await db.update(loyaltyTiers)
+      .set(data)
+      .where(eq(loyaltyTiers.id, id))
+      .returning();
+    return tier;
+  }
+
+  async deleteLoyaltyTier(id: string): Promise<void> {
+    await db.delete(loyaltyTiers).where(eq(loyaltyTiers.id, id));
+  }
+
+  async getLoyaltyAccounts(garageId?: string): Promise<LoyaltyAccount[]> {
+    if (garageId) {
+      return await db.select().from(loyaltyAccounts)
+        .where(eq(loyaltyAccounts.garageId, garageId))
+        .orderBy(desc(loyaltyAccounts.currentPoints));
+    }
+    return await db.select().from(loyaltyAccounts)
+      .orderBy(desc(loyaltyAccounts.currentPoints));
+  }
+
+  async getLoyaltyAccount(id: string): Promise<LoyaltyAccount | undefined> {
+    const [account] = await db.select().from(loyaltyAccounts)
+      .where(eq(loyaltyAccounts.id, id));
+    return account;
+  }
+
+  async getLoyaltyAccountByCustomer(customerId: string): Promise<LoyaltyAccount | undefined> {
+    const [account] = await db.select().from(loyaltyAccounts)
+      .where(eq(loyaltyAccounts.customerId, customerId));
+    return account;
+  }
+
+  async createLoyaltyAccount(data: InsertLoyaltyAccount): Promise<LoyaltyAccount> {
+    const [account] = await db.insert(loyaltyAccounts).values(data).returning();
+    return account;
+  }
+
+  async updateLoyaltyAccount(id: string, data: Partial<LoyaltyAccount>): Promise<LoyaltyAccount> {
+    const [account] = await db.update(loyaltyAccounts)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(loyaltyAccounts.id, id))
+      .returning();
+    return account;
+  }
+
+  async addLoyaltyPoints(accountId: string, points: number): Promise<LoyaltyAccount> {
+    const [account] = await db.select().from(loyaltyAccounts)
+      .where(eq(loyaltyAccounts.id, accountId));
+    if (!account) throw new Error('Loyalty account not found');
+    
+    const [updated] = await db.update(loyaltyAccounts)
+      .set({
+        currentPoints: (account.currentPoints || 0) + points,
+        totalPointsEarned: (account.totalPointsEarned || 0) + points,
+        updatedAt: new Date()
+      })
+      .where(eq(loyaltyAccounts.id, accountId))
+      .returning();
+    return updated;
+  }
+
+  async redeemLoyaltyPoints(accountId: string, points: number): Promise<LoyaltyAccount> {
+    const [account] = await db.select().from(loyaltyAccounts)
+      .where(eq(loyaltyAccounts.id, accountId));
+    if (!account) throw new Error('Loyalty account not found');
+    if ((account.currentPoints || 0) < points) throw new Error('Insufficient points');
+    
+    const [updated] = await db.update(loyaltyAccounts)
+      .set({
+        currentPoints: (account.currentPoints || 0) - points,
+        totalPointsRedeemed: (account.totalPointsRedeemed || 0) + points,
+        updatedAt: new Date()
+      })
+      .where(eq(loyaltyAccounts.id, accountId))
+      .returning();
+    return updated;
+  }
+
+  async getLoyaltyOffers(garageId?: string, isActive?: boolean): Promise<LoyaltyOffer[]> {
+    const conditions = [];
+    if (garageId) conditions.push(eq(loyaltyOffers.garageId, garageId));
+    if (isActive !== undefined) conditions.push(eq(loyaltyOffers.isActive, isActive));
+    
+    if (conditions.length > 0) {
+      return await db.select().from(loyaltyOffers)
+        .where(and(...conditions))
+        .orderBy(desc(loyaltyOffers.createdAt));
+    }
+    return await db.select().from(loyaltyOffers)
+      .orderBy(desc(loyaltyOffers.createdAt));
+  }
+
+  async getLoyaltyOffer(id: string): Promise<LoyaltyOffer | undefined> {
+    const [offer] = await db.select().from(loyaltyOffers)
+      .where(eq(loyaltyOffers.id, id));
+    return offer;
+  }
+
+  async createLoyaltyOffer(data: InsertLoyaltyOffer): Promise<LoyaltyOffer> {
+    const [offer] = await db.insert(loyaltyOffers).values(data).returning();
+    return offer;
+  }
+
+  async updateLoyaltyOffer(id: string, data: Partial<LoyaltyOffer>): Promise<LoyaltyOffer> {
+    const [offer] = await db.update(loyaltyOffers)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(loyaltyOffers.id, id))
+      .returning();
+    return offer;
+  }
+
+  async deleteLoyaltyOffer(id: string): Promise<void> {
+    await db.delete(loyaltyOffers).where(eq(loyaltyOffers.id, id));
+  }
+
+  // Workshop Calendar Module
+  async getWorkshopResources(garageId: string): Promise<WorkshopResource[]> {
+    return await db.select().from(workshopResources)
+      .where(eq(workshopResources.garageId, garageId));
+  }
+
+  async getWorkshopResource(id: string): Promise<WorkshopResource | undefined> {
+    const [resource] = await db.select().from(workshopResources)
+      .where(eq(workshopResources.id, id));
+    return resource;
+  }
+
+  async createWorkshopResource(data: InsertWorkshopResource): Promise<WorkshopResource> {
+    const [resource] = await db.insert(workshopResources).values(data).returning();
+    return resource;
+  }
+
+  async updateWorkshopResource(id: string, data: Partial<WorkshopResource>): Promise<WorkshopResource> {
+    const [resource] = await db.update(workshopResources)
+      .set(data)
+      .where(eq(workshopResources.id, id))
+      .returning();
+    return resource;
+  }
+
+  async deleteWorkshopResource(id: string): Promise<void> {
+    await db.delete(workshopResources).where(eq(workshopResources.id, id));
+  }
+
+  async getCalendarAppointments(garageId: string, startDate?: Date, endDate?: Date): Promise<CalendarAppointment[]> {
+    const conditions = [eq(calendarAppointments.garageId, garageId)];
+    if (startDate) conditions.push(gte(calendarAppointments.startTime, startDate));
+    if (endDate) conditions.push(lte(calendarAppointments.endTime, endDate));
+    
+    return await db.select().from(calendarAppointments)
+      .where(and(...conditions))
+      .orderBy(calendarAppointments.startTime);
+  }
+
+  async getCalendarAppointment(id: string): Promise<CalendarAppointment | undefined> {
+    const [appointment] = await db.select().from(calendarAppointments)
+      .where(eq(calendarAppointments.id, id));
+    return appointment;
+  }
+
+  async createCalendarAppointment(data: InsertCalendarAppointment): Promise<CalendarAppointment> {
+    const [appointment] = await db.insert(calendarAppointments).values(data).returning();
+    return appointment;
+  }
+
+  async updateCalendarAppointment(id: string, data: Partial<CalendarAppointment>): Promise<CalendarAppointment> {
+    const [appointment] = await db.update(calendarAppointments)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(calendarAppointments.id, id))
+      .returning();
+    return appointment;
+  }
+
+  async deleteCalendarAppointment(id: string): Promise<void> {
+    await db.delete(calendarAppointments).where(eq(calendarAppointments.id, id));
+  }
+
+  async moveCalendarAppointment(id: string, newStart: Date, newEnd: Date, resourceId?: string): Promise<CalendarAppointment> {
+    const updateData: Partial<CalendarAppointment> = {
+      startTime: newStart,
+      endTime: newEnd,
+      updatedAt: new Date()
+    };
+    if (resourceId) updateData.resourceId = resourceId;
+    
+    const [appointment] = await db.update(calendarAppointments)
+      .set(updateData)
+      .where(eq(calendarAppointments.id, id))
+      .returning();
+    return appointment;
+  }
+
+  // AR Overlay Module
+  async getArWorkInstructions(garageId?: string): Promise<ArWorkInstruction[]> {
+    if (garageId) {
+      return await db.select().from(arWorkInstructions)
+        .where(or(eq(arWorkInstructions.garageId, garageId), eq(arWorkInstructions.isGlobal, true)))
+        .orderBy(desc(arWorkInstructions.usageCount));
+    }
+    return await db.select().from(arWorkInstructions)
+      .orderBy(desc(arWorkInstructions.usageCount));
+  }
+
+  async getArWorkInstruction(id: string): Promise<ArWorkInstruction | undefined> {
+    const [instruction] = await db.select().from(arWorkInstructions)
+      .where(eq(arWorkInstructions.id, id));
+    return instruction;
+  }
+
+  async createArWorkInstruction(data: InsertArWorkInstruction): Promise<ArWorkInstruction> {
+    const [instruction] = await db.insert(arWorkInstructions).values(data).returning();
+    return instruction;
+  }
+
+  async updateArWorkInstruction(id: string, data: Partial<ArWorkInstruction>): Promise<ArWorkInstruction> {
+    const [instruction] = await db.update(arWorkInstructions)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(arWorkInstructions.id, id))
+      .returning();
+    return instruction;
+  }
+
+  async deleteArWorkInstruction(id: string): Promise<void> {
+    await db.delete(arWorkInstructions).where(eq(arWorkInstructions.id, id));
+  }
+
+  async getArSessionLogs(garageId: string, technicianId?: string): Promise<ArSessionLog[]> {
+    const conditions = [eq(arSessionLogs.garageId, garageId)];
+    if (technicianId) conditions.push(eq(arSessionLogs.technicianId, technicianId));
+    
+    return await db.select().from(arSessionLogs)
+      .where(and(...conditions))
+      .orderBy(desc(arSessionLogs.sessionStartTime));
+  }
+
+  async getArSessionLog(id: string): Promise<ArSessionLog | undefined> {
+    const [session] = await db.select().from(arSessionLogs)
+      .where(eq(arSessionLogs.id, id));
+    return session;
+  }
+
+  async createArSessionLog(data: InsertArSessionLog): Promise<ArSessionLog> {
+    const [session] = await db.insert(arSessionLogs).values(data).returning();
+    return session;
+  }
+
+  async updateArSessionLog(id: string, data: Partial<ArSessionLog>): Promise<ArSessionLog> {
+    const [session] = await db.update(arSessionLogs)
+      .set(data)
+      .where(eq(arSessionLogs.id, id))
+      .returning();
+    return session;
+  }
+
+  async getArDevicePairings(garageId: string): Promise<ArDevicePairing[]> {
+    return await db.select().from(arDevicePairings)
+      .where(eq(arDevicePairings.garageId, garageId))
+      .orderBy(desc(arDevicePairings.lastConnectedAt));
+  }
+
+  async getArDevicePairing(id: string): Promise<ArDevicePairing | undefined> {
+    const [pairing] = await db.select().from(arDevicePairings)
+      .where(eq(arDevicePairings.id, id));
+    return pairing;
+  }
+
+  async createArDevicePairing(data: InsertArDevicePairing): Promise<ArDevicePairing> {
+    const [pairing] = await db.insert(arDevicePairings).values(data).returning();
+    return pairing;
+  }
+
+  async updateArDevicePairing(id: string, data: Partial<ArDevicePairing>): Promise<ArDevicePairing> {
+    const [pairing] = await db.update(arDevicePairings)
+      .set(data)
+      .where(eq(arDevicePairings.id, id))
+      .returning();
+    return pairing;
+  }
+
+  async deleteArDevicePairing(id: string): Promise<void> {
+    await db.delete(arDevicePairings).where(eq(arDevicePairings.id, id));
   }
 }
 

@@ -19736,6 +19736,495 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ==========================================
+  // Automated Inventory Reordering API
+  // ==========================================
+  
+  app.get('/api/inventory-forecasts', isAuthenticated, async (req: any, res) => {
+    try {
+      const { garageId } = req.query;
+      if (!garageId) return res.status(400).json({ message: "garageId is required" });
+      const forecasts = await storage.getInventoryForecasts(garageId as string);
+      res.json(forecasts);
+    } catch (error: any) {
+      console.error("Error fetching inventory forecasts:", error);
+      res.status(500).json({ message: "Failed to fetch inventory forecasts" });
+    }
+  });
+
+  app.post('/api/inventory-forecasts', isAuthenticated, async (req: any, res) => {
+    try {
+      const forecast = await storage.createInventoryForecast(req.body);
+      res.status(201).json(forecast);
+    } catch (error: any) {
+      console.error("Error creating inventory forecast:", error);
+      res.status(500).json({ message: "Failed to create inventory forecast" });
+    }
+  });
+
+  app.get('/api/replenishment-orders', isAuthenticated, async (req: any, res) => {
+    try {
+      const { garageId, status } = req.query;
+      const orders = await storage.getReplenishmentOrders(garageId as string, status as string);
+      res.json(orders);
+    } catch (error: any) {
+      console.error("Error fetching replenishment orders:", error);
+      res.status(500).json({ message: "Failed to fetch replenishment orders" });
+    }
+  });
+
+  app.get('/api/replenishment-orders/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const order = await storage.getReplenishmentOrder(req.params.id);
+      if (!order) return res.status(404).json({ message: "Order not found" });
+      res.json(order);
+    } catch (error: any) {
+      console.error("Error fetching replenishment order:", error);
+      res.status(500).json({ message: "Failed to fetch replenishment order" });
+    }
+  });
+
+  app.post('/api/replenishment-orders', isAuthenticated, async (req: any, res) => {
+    try {
+      const order = await storage.createReplenishmentOrder(req.body);
+      res.status(201).json(order);
+    } catch (error: any) {
+      console.error("Error creating replenishment order:", error);
+      res.status(500).json({ message: "Failed to create replenishment order" });
+    }
+  });
+
+  app.patch('/api/replenishment-orders/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const order = await storage.updateReplenishmentOrder(req.params.id, req.body);
+      res.json(order);
+    } catch (error: any) {
+      console.error("Error updating replenishment order:", error);
+      res.status(500).json({ message: "Failed to update replenishment order" });
+    }
+  });
+
+  app.post('/api/replenishment-orders/:id/approve', isAuthenticated, async (req: any, res) => {
+    try {
+      const order = await storage.approveReplenishmentOrder(req.params.id, req.user?.id || 'system');
+      res.json(order);
+    } catch (error: any) {
+      console.error("Error approving replenishment order:", error);
+      res.status(500).json({ message: "Failed to approve replenishment order" });
+    }
+  });
+
+  // ==========================================
+  // Customer Loyalty Program API
+  // ==========================================
+
+  app.get('/api/loyalty-tiers', isAuthenticated, async (req: any, res) => {
+    try {
+      const { garageId } = req.query;
+      if (!garageId) return res.status(400).json({ message: "garageId is required" });
+      const tiers = await storage.getLoyaltyTiers(garageId as string);
+      res.json(tiers);
+    } catch (error: any) {
+      console.error("Error fetching loyalty tiers:", error);
+      res.status(500).json({ message: "Failed to fetch loyalty tiers" });
+    }
+  });
+
+  app.post('/api/loyalty-tiers', isAuthenticated, async (req: any, res) => {
+    try {
+      const tier = await storage.createLoyaltyTier(req.body);
+      res.status(201).json(tier);
+    } catch (error: any) {
+      console.error("Error creating loyalty tier:", error);
+      res.status(500).json({ message: "Failed to create loyalty tier" });
+    }
+  });
+
+  app.patch('/api/loyalty-tiers/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const tier = await storage.updateLoyaltyTier(req.params.id, req.body);
+      res.json(tier);
+    } catch (error: any) {
+      console.error("Error updating loyalty tier:", error);
+      res.status(500).json({ message: "Failed to update loyalty tier" });
+    }
+  });
+
+  app.delete('/api/loyalty-tiers/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      await storage.deleteLoyaltyTier(req.params.id);
+      res.status(204).send();
+    } catch (error: any) {
+      console.error("Error deleting loyalty tier:", error);
+      res.status(500).json({ message: "Failed to delete loyalty tier" });
+    }
+  });
+
+  app.get('/api/loyalty-accounts', isAuthenticated, async (req: any, res) => {
+    try {
+      const { garageId } = req.query;
+      const accounts = await storage.getLoyaltyAccounts(garageId as string);
+      res.json(accounts);
+    } catch (error: any) {
+      console.error("Error fetching loyalty accounts:", error);
+      res.status(500).json({ message: "Failed to fetch loyalty accounts" });
+    }
+  });
+
+  app.get('/api/loyalty-accounts/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const account = await storage.getLoyaltyAccount(req.params.id);
+      if (!account) return res.status(404).json({ message: "Account not found" });
+      res.json(account);
+    } catch (error: any) {
+      console.error("Error fetching loyalty account:", error);
+      res.status(500).json({ message: "Failed to fetch loyalty account" });
+    }
+  });
+
+  app.post('/api/loyalty-accounts', isAuthenticated, async (req: any, res) => {
+    try {
+      const account = await storage.createLoyaltyAccount(req.body);
+      res.status(201).json(account);
+    } catch (error: any) {
+      console.error("Error creating loyalty account:", error);
+      res.status(500).json({ message: "Failed to create loyalty account" });
+    }
+  });
+
+  app.patch('/api/loyalty-accounts/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const account = await storage.updateLoyaltyAccount(req.params.id, req.body);
+      res.json(account);
+    } catch (error: any) {
+      console.error("Error updating loyalty account:", error);
+      res.status(500).json({ message: "Failed to update loyalty account" });
+    }
+  });
+
+  app.post('/api/loyalty-accounts/:id/add-points', isAuthenticated, async (req: any, res) => {
+    try {
+      const { points } = req.body;
+      const account = await storage.addLoyaltyPoints(req.params.id, points);
+      res.json(account);
+    } catch (error: any) {
+      console.error("Error adding loyalty points:", error);
+      res.status(500).json({ message: error.message || "Failed to add loyalty points" });
+    }
+  });
+
+  app.post('/api/loyalty-accounts/:id/redeem-points', isAuthenticated, async (req: any, res) => {
+    try {
+      const { points } = req.body;
+      const account = await storage.redeemLoyaltyPoints(req.params.id, points);
+      res.json(account);
+    } catch (error: any) {
+      console.error("Error redeeming loyalty points:", error);
+      res.status(500).json({ message: error.message || "Failed to redeem loyalty points" });
+    }
+  });
+
+  app.get('/api/loyalty-offers', isAuthenticated, async (req: any, res) => {
+    try {
+      const { garageId, isActive } = req.query;
+      const offers = await storage.getLoyaltyOffers(garageId as string, isActive === 'true');
+      res.json(offers);
+    } catch (error: any) {
+      console.error("Error fetching loyalty offers:", error);
+      res.status(500).json({ message: "Failed to fetch loyalty offers" });
+    }
+  });
+
+  app.get('/api/loyalty-offers/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const offer = await storage.getLoyaltyOffer(req.params.id);
+      if (!offer) return res.status(404).json({ message: "Offer not found" });
+      res.json(offer);
+    } catch (error: any) {
+      console.error("Error fetching loyalty offer:", error);
+      res.status(500).json({ message: "Failed to fetch loyalty offer" });
+    }
+  });
+
+  app.post('/api/loyalty-offers', isAuthenticated, async (req: any, res) => {
+    try {
+      const offer = await storage.createLoyaltyOffer(req.body);
+      res.status(201).json(offer);
+    } catch (error: any) {
+      console.error("Error creating loyalty offer:", error);
+      res.status(500).json({ message: "Failed to create loyalty offer" });
+    }
+  });
+
+  app.patch('/api/loyalty-offers/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const offer = await storage.updateLoyaltyOffer(req.params.id, req.body);
+      res.json(offer);
+    } catch (error: any) {
+      console.error("Error updating loyalty offer:", error);
+      res.status(500).json({ message: "Failed to update loyalty offer" });
+    }
+  });
+
+  app.delete('/api/loyalty-offers/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      await storage.deleteLoyaltyOffer(req.params.id);
+      res.status(204).send();
+    } catch (error: any) {
+      console.error("Error deleting loyalty offer:", error);
+      res.status(500).json({ message: "Failed to delete loyalty offer" });
+    }
+  });
+
+  // ==========================================
+  // Workshop Calendar API
+  // ==========================================
+
+  app.get('/api/workshop-resources', isAuthenticated, async (req: any, res) => {
+    try {
+      const { garageId } = req.query;
+      if (!garageId) return res.status(400).json({ message: "garageId is required" });
+      const resources = await storage.getWorkshopResources(garageId as string);
+      res.json(resources);
+    } catch (error: any) {
+      console.error("Error fetching workshop resources:", error);
+      res.status(500).json({ message: "Failed to fetch workshop resources" });
+    }
+  });
+
+  app.post('/api/workshop-resources', isAuthenticated, async (req: any, res) => {
+    try {
+      const resource = await storage.createWorkshopResource(req.body);
+      res.status(201).json(resource);
+    } catch (error: any) {
+      console.error("Error creating workshop resource:", error);
+      res.status(500).json({ message: "Failed to create workshop resource" });
+    }
+  });
+
+  app.patch('/api/workshop-resources/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const resource = await storage.updateWorkshopResource(req.params.id, req.body);
+      res.json(resource);
+    } catch (error: any) {
+      console.error("Error updating workshop resource:", error);
+      res.status(500).json({ message: "Failed to update workshop resource" });
+    }
+  });
+
+  app.delete('/api/workshop-resources/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      await storage.deleteWorkshopResource(req.params.id);
+      res.status(204).send();
+    } catch (error: any) {
+      console.error("Error deleting workshop resource:", error);
+      res.status(500).json({ message: "Failed to delete workshop resource" });
+    }
+  });
+
+  app.get('/api/calendar-appointments', isAuthenticated, async (req: any, res) => {
+    try {
+      const { garageId, startDate, endDate } = req.query;
+      if (!garageId) return res.status(400).json({ message: "garageId is required" });
+      const appointments = await storage.getCalendarAppointments(
+        garageId as string,
+        startDate ? new Date(startDate as string) : undefined,
+        endDate ? new Date(endDate as string) : undefined
+      );
+      res.json(appointments);
+    } catch (error: any) {
+      console.error("Error fetching calendar appointments:", error);
+      res.status(500).json({ message: "Failed to fetch calendar appointments" });
+    }
+  });
+
+  app.get('/api/calendar-appointments/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const appointment = await storage.getCalendarAppointment(req.params.id);
+      if (!appointment) return res.status(404).json({ message: "Appointment not found" });
+      res.json(appointment);
+    } catch (error: any) {
+      console.error("Error fetching calendar appointment:", error);
+      res.status(500).json({ message: "Failed to fetch calendar appointment" });
+    }
+  });
+
+  app.post('/api/calendar-appointments', isAuthenticated, async (req: any, res) => {
+    try {
+      const appointment = await storage.createCalendarAppointment(req.body);
+      res.status(201).json(appointment);
+    } catch (error: any) {
+      console.error("Error creating calendar appointment:", error);
+      res.status(500).json({ message: "Failed to create calendar appointment" });
+    }
+  });
+
+  app.patch('/api/calendar-appointments/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const appointment = await storage.updateCalendarAppointment(req.params.id, req.body);
+      res.json(appointment);
+    } catch (error: any) {
+      console.error("Error updating calendar appointment:", error);
+      res.status(500).json({ message: "Failed to update calendar appointment" });
+    }
+  });
+
+  app.delete('/api/calendar-appointments/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      await storage.deleteCalendarAppointment(req.params.id);
+      res.status(204).send();
+    } catch (error: any) {
+      console.error("Error deleting calendar appointment:", error);
+      res.status(500).json({ message: "Failed to delete calendar appointment" });
+    }
+  });
+
+  app.post('/api/calendar-appointments/:id/move', isAuthenticated, async (req: any, res) => {
+    try {
+      const { startTime, endTime, resourceId } = req.body;
+      const appointment = await storage.moveCalendarAppointment(
+        req.params.id,
+        new Date(startTime),
+        new Date(endTime),
+        resourceId
+      );
+      res.json(appointment);
+    } catch (error: any) {
+      console.error("Error moving calendar appointment:", error);
+      res.status(500).json({ message: "Failed to move calendar appointment" });
+    }
+  });
+
+  // ==========================================
+  // AR Overlay API
+  // ==========================================
+
+  app.get('/api/ar-instructions', isAuthenticated, async (req: any, res) => {
+    try {
+      const { garageId } = req.query;
+      const instructions = await storage.getArWorkInstructions(garageId as string);
+      res.json(instructions);
+    } catch (error: any) {
+      console.error("Error fetching AR instructions:", error);
+      res.status(500).json({ message: "Failed to fetch AR instructions" });
+    }
+  });
+
+  app.get('/api/ar-instructions/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const instruction = await storage.getArWorkInstruction(req.params.id);
+      if (!instruction) return res.status(404).json({ message: "Instruction not found" });
+      res.json(instruction);
+    } catch (error: any) {
+      console.error("Error fetching AR instruction:", error);
+      res.status(500).json({ message: "Failed to fetch AR instruction" });
+    }
+  });
+
+  app.post('/api/ar-instructions', isAuthenticated, async (req: any, res) => {
+    try {
+      const instruction = await storage.createArWorkInstruction(req.body);
+      res.status(201).json(instruction);
+    } catch (error: any) {
+      console.error("Error creating AR instruction:", error);
+      res.status(500).json({ message: "Failed to create AR instruction" });
+    }
+  });
+
+  app.patch('/api/ar-instructions/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const instruction = await storage.updateArWorkInstruction(req.params.id, req.body);
+      res.json(instruction);
+    } catch (error: any) {
+      console.error("Error updating AR instruction:", error);
+      res.status(500).json({ message: "Failed to update AR instruction" });
+    }
+  });
+
+  app.delete('/api/ar-instructions/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      await storage.deleteArWorkInstruction(req.params.id);
+      res.status(204).send();
+    } catch (error: any) {
+      console.error("Error deleting AR instruction:", error);
+      res.status(500).json({ message: "Failed to delete AR instruction" });
+    }
+  });
+
+  app.get('/api/ar-sessions', isAuthenticated, async (req: any, res) => {
+    try {
+      const { garageId, technicianId } = req.query;
+      if (!garageId) return res.status(400).json({ message: "garageId is required" });
+      const sessions = await storage.getArSessionLogs(garageId as string, technicianId as string);
+      res.json(sessions);
+    } catch (error: any) {
+      console.error("Error fetching AR sessions:", error);
+      res.status(500).json({ message: "Failed to fetch AR sessions" });
+    }
+  });
+
+  app.post('/api/ar-sessions', isAuthenticated, async (req: any, res) => {
+    try {
+      const session = await storage.createArSessionLog(req.body);
+      res.status(201).json(session);
+    } catch (error: any) {
+      console.error("Error creating AR session:", error);
+      res.status(500).json({ message: "Failed to create AR session" });
+    }
+  });
+
+  app.patch('/api/ar-sessions/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const session = await storage.updateArSessionLog(req.params.id, req.body);
+      res.json(session);
+    } catch (error: any) {
+      console.error("Error updating AR session:", error);
+      res.status(500).json({ message: "Failed to update AR session" });
+    }
+  });
+
+  app.get('/api/ar-devices', isAuthenticated, async (req: any, res) => {
+    try {
+      const { garageId } = req.query;
+      if (!garageId) return res.status(400).json({ message: "garageId is required" });
+      const devices = await storage.getArDevicePairings(garageId as string);
+      res.json(devices);
+    } catch (error: any) {
+      console.error("Error fetching AR devices:", error);
+      res.status(500).json({ message: "Failed to fetch AR devices" });
+    }
+  });
+
+  app.post('/api/ar-devices', isAuthenticated, async (req: any, res) => {
+    try {
+      const device = await storage.createArDevicePairing(req.body);
+      res.status(201).json(device);
+    } catch (error: any) {
+      console.error("Error creating AR device pairing:", error);
+      res.status(500).json({ message: "Failed to create AR device pairing" });
+    }
+  });
+
+  app.patch('/api/ar-devices/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const device = await storage.updateArDevicePairing(req.params.id, req.body);
+      res.json(device);
+    } catch (error: any) {
+      console.error("Error updating AR device:", error);
+      res.status(500).json({ message: "Failed to update AR device" });
+    }
+  });
+
+  app.delete('/api/ar-devices/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      await storage.deleteArDevicePairing(req.params.id);
+      res.status(204).send();
+    } catch (error: any) {
+      console.error("Error deleting AR device:", error);
+      res.status(500).json({ message: "Failed to delete AR device" });
+    }
+  });
+
   const httpServer = createServer(app);
   
   // Initialize WebSocket server for chat
