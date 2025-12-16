@@ -10006,3 +10006,487 @@ export const insertHrAnnouncementSchema = createInsertSchema(hrAnnouncements).om
 export type HrSelfServiceRequest = typeof hrSelfServiceRequests.$inferSelect;
 export type InsertHrSelfServiceRequest = typeof hrSelfServiceRequests.$inferInsert;
 export const insertHrSelfServiceRequestSchema = createInsertSchema(hrSelfServiceRequests).omit({ id: true, createdAt: true, updatedAt: true });
+
+// ==========================================
+// MODULE: Real-Time Service Bay Dashboard
+// ==========================================
+
+export const serviceBays = pgTable("service_bays", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  branchId: uuid("branch_id").references(() => branches.id),
+  bayNumber: varchar("bay_number", { length: 50 }).notNull(),
+  bayName: varchar("bay_name", { length: 255 }),
+  bayType: varchar("bay_type", { length: 100 }).default("general"), // "general", "alignment", "paint", "body", "quick_service", "heavy_duty"
+  capacity: integer("capacity").default(1), // Number of vehicles
+  equipment: jsonb("equipment").default([]), // List of equipment in bay
+  hourlyRate: decimal("hourly_rate", { precision: 10, scale: 2 }),
+  status: varchar("status", { length: 50 }).default("available"), // "available", "occupied", "maintenance", "reserved", "offline"
+  currentVehicleId: uuid("current_vehicle_id").references(() => vehicles.id),
+  currentJobCardId: uuid("current_job_card_id").references(() => jobCards.id),
+  currentTechnicianId: varchar("current_technician_id").references(() => users.id),
+  occupiedSince: timestamp("occupied_since"),
+  estimatedCompletionTime: timestamp("estimated_completion_time"),
+  sortOrder: integer("sort_order").default(0),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const bayOccupancySessions = pgTable("bay_occupancy_sessions", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  bayId: uuid("bay_id").references(() => serviceBays.id).notNull(),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  vehicleId: uuid("vehicle_id").references(() => vehicles.id),
+  jobCardId: uuid("job_card_id").references(() => jobCards.id),
+  technicianId: varchar("technician_id").references(() => users.id),
+  serviceType: varchar("service_type", { length: 255 }),
+  startTime: timestamp("start_time").notNull().defaultNow(),
+  endTime: timestamp("end_time"),
+  estimatedDuration: integer("estimated_duration"), // minutes
+  actualDuration: integer("actual_duration"), // minutes
+  status: varchar("status", { length: 50 }).default("in_progress"), // "in_progress", "completed", "paused", "cancelled"
+  pauseReason: text("pause_reason"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const bayTelemetryEvents = pgTable("bay_telemetry_events", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  bayId: uuid("bay_id").references(() => serviceBays.id).notNull(),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  eventType: varchar("event_type", { length: 100 }).notNull(), // "vehicle_entered", "vehicle_exited", "tool_activated", "lift_raised", "status_change"
+  eventData: jsonb("event_data").default({}),
+  sensorId: varchar("sensor_id", { length: 100 }),
+  timestamp: timestamp("timestamp").notNull().defaultNow(),
+});
+
+// ==========================================
+// MODULE: Automated Inventory Reordering with Predictive Demand
+// ==========================================
+
+export const inventoryForecasts = pgTable("inventory_forecasts", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  partId: uuid("part_id").references(() => inventoryItems.id).notNull(),
+  forecastDate: date("forecast_date").notNull(),
+  predictedDemand: integer("predicted_demand").notNull(),
+  confidenceScore: decimal("confidence_score", { precision: 5, scale: 2 }), // 0-100%
+  forecastMethod: varchar("forecast_method", { length: 100 }), // "moving_average", "exponential_smoothing", "ai_model", "seasonal"
+  historicalDataPoints: integer("historical_data_points"),
+  seasonalFactor: decimal("seasonal_factor", { precision: 5, scale: 3 }),
+  trendFactor: decimal("trend_factor", { precision: 5, scale: 3 }),
+  actualDemand: integer("actual_demand"), // Filled in after the fact
+  variancePercentage: decimal("variance_percentage", { precision: 5, scale: 2 }),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const autoReorderRules = pgTable("auto_reorder_rules", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  partId: uuid("part_id").references(() => inventoryItems.id),
+  categoryId: uuid("category_id").references(() => partCategories.id),
+  ruleName: varchar("rule_name", { length: 255 }).notNull(),
+  ruleType: varchar("rule_type", { length: 100 }).default("reorder_point"), // "reorder_point", "periodic", "forecast_based", "min_max"
+  reorderPoint: integer("reorder_point"), // Trigger when stock falls below
+  reorderQuantity: integer("reorder_quantity"),
+  safetyStockDays: integer("safety_stock_days").default(7),
+  leadTimeDays: integer("lead_time_days").default(3),
+  minOrderQuantity: integer("min_order_quantity").default(1),
+  maxOrderQuantity: integer("max_order_quantity"),
+  preferredSupplierId: uuid("preferred_supplier_id").references(() => suppliers.id),
+  autoApproveThreshold: decimal("auto_approve_threshold", { precision: 10, scale: 2 }), // Auto-approve if under this amount
+  requiresApproval: boolean("requires_approval").default(true),
+  notifyOnTrigger: boolean("notify_on_trigger").default(true),
+  isActive: boolean("is_active").default(true),
+  lastTriggeredAt: timestamp("last_triggered_at"),
+  createdBy: varchar("created_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const replenishmentOrders = pgTable("replenishment_orders", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  orderNumber: varchar("order_number", { length: 100 }).unique().notNull(),
+  ruleId: uuid("rule_id").references(() => autoReorderRules.id),
+  supplierId: uuid("supplier_id").references(() => suppliers.id),
+  triggerType: varchar("trigger_type", { length: 100 }), // "auto", "manual", "forecast", "emergency"
+  status: varchar("status", { length: 50 }).default("pending_approval"), // "pending_approval", "approved", "ordered", "shipped", "received", "cancelled"
+  totalItems: integer("total_items").default(0),
+  totalAmount: decimal("total_amount", { precision: 12, scale: 2 }).default("0"),
+  expectedDeliveryDate: date("expected_delivery_date"),
+  actualDeliveryDate: date("actual_delivery_date"),
+  approvedBy: varchar("approved_by").references(() => users.id),
+  approvedAt: timestamp("approved_at"),
+  orderedAt: timestamp("ordered_at"),
+  receivedAt: timestamp("received_at"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const replenishmentOrderItems = pgTable("replenishment_order_items", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  orderId: uuid("order_id").references(() => replenishmentOrders.id).notNull(),
+  partId: uuid("part_id").references(() => inventoryItems.id).notNull(),
+  quantityOrdered: integer("quantity_ordered").notNull(),
+  quantityReceived: integer("quantity_received").default(0),
+  unitCost: decimal("unit_cost", { precision: 10, scale: 2 }),
+  totalCost: decimal("total_cost", { precision: 10, scale: 2 }),
+  currentStock: integer("current_stock"), // Stock level at time of order
+  reorderPoint: integer("reorder_point"), // Rule setting at time of order
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// ==========================================
+// MODULE: Customer Loyalty Program
+// ==========================================
+
+export const loyaltyTiers = pgTable("loyalty_tiers", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  tierName: varchar("tier_name", { length: 100 }).notNull(), // "Bronze", "Silver", "Gold", "Platinum"
+  tierNameAr: varchar("tier_name_ar", { length: 100 }),
+  minPoints: integer("min_points").notNull().default(0),
+  maxPoints: integer("max_points"),
+  pointsMultiplier: decimal("points_multiplier", { precision: 3, scale: 2 }).default("1.00"), // 1.0x, 1.5x, 2.0x
+  discountPercentage: decimal("discount_percentage", { precision: 5, scale: 2 }).default("0"),
+  freeServices: jsonb("free_services").default([]), // List of free service IDs
+  priorityBooking: boolean("priority_booking").default(false),
+  exclusiveOffers: boolean("exclusive_offers").default(false),
+  freeInspection: boolean("free_inspection").default(false),
+  dedicatedAdvisor: boolean("dedicated_advisor").default(false),
+  color: varchar("color", { length: 50 }), // Tier badge color
+  icon: varchar("icon", { length: 100 }),
+  sortOrder: integer("sort_order").default(0),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const loyaltyAccounts = pgTable("loyalty_accounts", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  customerId: varchar("customer_id").references(() => users.id).notNull(),
+  tierId: uuid("tier_id").references(() => loyaltyTiers.id),
+  membershipNumber: varchar("membership_number", { length: 50 }).unique(),
+  totalPointsEarned: integer("total_points_earned").default(0),
+  totalPointsRedeemed: integer("total_points_redeemed").default(0),
+  currentPoints: integer("current_points").default(0),
+  lifetimeSpend: decimal("lifetime_spend", { precision: 12, scale: 2 }).default("0"),
+  totalVisits: integer("total_visits").default(0),
+  lastVisitDate: timestamp("last_visit_date"),
+  referralCode: varchar("referral_code", { length: 50 }).unique(),
+  referredBy: uuid("referred_by").references(() => loyaltyAccounts.id),
+  referralCount: integer("referral_count").default(0),
+  birthdayMonth: integer("birthday_month"),
+  preferredContactMethod: varchar("preferred_contact_method", { length: 50 }), // "email", "sms", "whatsapp"
+  optInMarketing: boolean("opt_in_marketing").default(true),
+  status: varchar("status", { length: 50 }).default("active"), // "active", "suspended", "expired"
+  enrolledAt: timestamp("enrolled_at").defaultNow(),
+  tierUpgradeDate: timestamp("tier_upgrade_date"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const loyaltyTransactions = pgTable("loyalty_transactions", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  accountId: uuid("account_id").references(() => loyaltyAccounts.id).notNull(),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  transactionType: varchar("transaction_type", { length: 50 }).notNull(), // "earn", "redeem", "expire", "adjust", "bonus", "referral"
+  points: integer("points").notNull(), // Positive for earn, negative for redeem
+  balanceAfter: integer("balance_after").notNull(),
+  referenceType: varchar("reference_type", { length: 50 }), // "invoice", "job_card", "offer", "referral", "manual"
+  referenceId: varchar("reference_id"),
+  description: varchar("description", { length: 500 }),
+  expiresAt: timestamp("expires_at"),
+  processedBy: varchar("processed_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const loyaltyOffers = pgTable("loyalty_offers", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  offerName: varchar("offer_name", { length: 255 }).notNull(),
+  offerNameAr: varchar("offer_name_ar", { length: 255 }),
+  description: text("description"),
+  descriptionAr: text("description_ar"),
+  offerType: varchar("offer_type", { length: 100 }).notNull(), // "points_discount", "percentage_off", "free_service", "bonus_points", "bundle"
+  pointsCost: integer("points_cost"), // Points required to redeem
+  discountValue: decimal("discount_value", { precision: 10, scale: 2 }),
+  discountPercentage: decimal("discount_percentage", { precision: 5, scale: 2 }),
+  minimumSpend: decimal("minimum_spend", { precision: 10, scale: 2 }),
+  applicableServices: jsonb("applicable_services").default([]),
+  tierRestriction: uuid("tier_restriction").references(() => loyaltyTiers.id), // Minimum tier required
+  usageLimit: integer("usage_limit"), // Max total uses
+  usagePerCustomer: integer("usage_per_customer").default(1),
+  currentUsageCount: integer("current_usage_count").default(0),
+  validFrom: timestamp("valid_from"),
+  validUntil: timestamp("valid_until"),
+  imageUrl: varchar("image_url", { length: 500 }),
+  termsAndConditions: text("terms_and_conditions"),
+  isPersonalized: boolean("is_personalized").default(false),
+  isActive: boolean("is_active").default(true),
+  createdBy: varchar("created_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const loyaltyRedemptions = pgTable("loyalty_redemptions", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  accountId: uuid("account_id").references(() => loyaltyAccounts.id).notNull(),
+  offerId: uuid("offer_id").references(() => loyaltyOffers.id).notNull(),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  transactionId: uuid("transaction_id").references(() => loyaltyTransactions.id),
+  invoiceId: uuid("invoice_id").references(() => invoices.id),
+  jobCardId: uuid("job_card_id").references(() => jobCards.id),
+  pointsUsed: integer("points_used").notNull(),
+  discountApplied: decimal("discount_applied", { precision: 10, scale: 2 }),
+  status: varchar("status", { length: 50 }).default("pending"), // "pending", "applied", "cancelled", "expired"
+  redeemedAt: timestamp("redeemed_at").defaultNow(),
+  appliedAt: timestamp("applied_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// ==========================================
+// MODULE: Interactive Workshop Calendar
+// ==========================================
+
+export const workshopResources = pgTable("workshop_resources", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  resourceType: varchar("resource_type", { length: 100 }).notNull(), // "technician", "bay", "equipment", "lift"
+  resourceId: varchar("resource_id").notNull(), // Reference to user, bay, or equipment ID
+  resourceName: varchar("resource_name", { length: 255 }).notNull(),
+  color: varchar("color", { length: 50 }), // Calendar display color
+  capacity: integer("capacity").default(1), // Concurrent appointments
+  skills: jsonb("skills").default([]), // For technicians: list of skill IDs
+  availability: jsonb("availability").default({}), // Weekly availability schedule
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const calendarAppointments = pgTable("calendar_appointments", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  appointmentId: uuid("appointment_id").references(() => appointments.id),
+  jobCardId: uuid("job_card_id").references(() => jobCards.id),
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description"),
+  customerId: varchar("customer_id").references(() => users.id),
+  customerName: varchar("customer_name", { length: 255 }),
+  vehicleInfo: jsonb("vehicle_info"),
+  serviceType: varchar("service_type", { length: 255 }),
+  startTime: timestamp("start_time").notNull(),
+  endTime: timestamp("end_time").notNull(),
+  allDay: boolean("all_day").default(false),
+  resourceId: uuid("resource_id").references(() => workshopResources.id),
+  bayId: uuid("bay_id").references(() => serviceBays.id),
+  technicianId: varchar("technician_id").references(() => users.id),
+  status: varchar("status", { length: 50 }).default("scheduled"), // "scheduled", "confirmed", "in_progress", "completed", "cancelled", "no_show"
+  priority: varchar("priority", { length: 20 }).default("normal"),
+  isRecurring: boolean("is_recurring").default(false),
+  recurringPattern: jsonb("recurring_pattern"), // {frequency, interval, endDate, daysOfWeek}
+  parentAppointmentId: uuid("parent_appointment_id"),
+  conflictResolved: boolean("conflict_resolved").default(false),
+  lockedBy: varchar("locked_by").references(() => users.id),
+  lockedAt: timestamp("locked_at"),
+  lockExpiresAt: timestamp("lock_expires_at"),
+  googleCalendarEventId: varchar("google_calendar_event_id", { length: 255 }),
+  syncedWithGoogle: boolean("synced_with_google").default(false),
+  lastSyncedAt: timestamp("last_synced_at"),
+  createdBy: varchar("created_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const calendarActivityLog = pgTable("calendar_activity_log", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  appointmentId: uuid("appointment_id").references(() => calendarAppointments.id).notNull(),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  action: varchar("action", { length: 100 }).notNull(), // "created", "updated", "moved", "resized", "cancelled", "rescheduled"
+  previousData: jsonb("previous_data"),
+  newData: jsonb("new_data"),
+  changeReason: text("change_reason"),
+  performedBy: varchar("performed_by").references(() => users.id),
+  performedAt: timestamp("performed_at").defaultNow(),
+});
+
+export const calendarConflicts = pgTable("calendar_conflicts", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  appointment1Id: uuid("appointment_1_id").references(() => calendarAppointments.id).notNull(),
+  appointment2Id: uuid("appointment_2_id").references(() => calendarAppointments.id).notNull(),
+  conflictType: varchar("conflict_type", { length: 100 }), // "time_overlap", "resource_double_booked", "capacity_exceeded"
+  resourceId: uuid("resource_id").references(() => workshopResources.id),
+  severity: varchar("severity", { length: 20 }).default("warning"), // "warning", "error"
+  resolved: boolean("resolved").default(false),
+  resolvedBy: varchar("resolved_by").references(() => users.id),
+  resolvedAt: timestamp("resolved_at"),
+  resolutionNote: text("resolution_note"),
+  detectedAt: timestamp("detected_at").defaultNow(),
+});
+
+// ==========================================
+// MODULE: Augmented Reality for Mechanics
+// ==========================================
+
+export const arAssets = pgTable("ar_assets", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id),
+  assetName: varchar("asset_name", { length: 255 }).notNull(),
+  assetType: varchar("asset_type", { length: 100 }).notNull(), // "3d_model", "overlay", "annotation", "video", "animation"
+  fileUrl: varchar("file_url", { length: 1000 }).notNull(),
+  thumbnailUrl: varchar("thumbnail_url", { length: 1000 }),
+  fileFormat: varchar("file_format", { length: 50 }), // "glb", "gltf", "fbx", "obj", "mp4"
+  fileSize: integer("file_size"), // bytes
+  vehicleMake: varchar("vehicle_make", { length: 100 }),
+  vehicleModel: varchar("vehicle_model", { length: 100 }),
+  vehicleYearStart: integer("vehicle_year_start"),
+  vehicleYearEnd: integer("vehicle_year_end"),
+  componentCategory: varchar("component_category", { length: 100 }), // "engine", "transmission", "brakes", "suspension", "electrical"
+  componentName: varchar("component_name", { length: 255 }),
+  partNumber: varchar("part_number", { length: 100 }),
+  metadata: jsonb("metadata").default({}),
+  isGlobal: boolean("is_global").default(false), // Available to all garages
+  isActive: boolean("is_active").default(true),
+  uploadedBy: varchar("uploaded_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const arWorkInstructions = pgTable("ar_work_instructions", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id),
+  instructionName: varchar("instruction_name", { length: 255 }).notNull(),
+  instructionNameAr: varchar("instruction_name_ar", { length: 255 }),
+  description: text("description"),
+  descriptionAr: text("description_ar"),
+  serviceType: varchar("service_type", { length: 255 }),
+  vehicleMake: varchar("vehicle_make", { length: 100 }),
+  vehicleModel: varchar("vehicle_model", { length: 100 }),
+  vehicleYearStart: integer("vehicle_year_start"),
+  vehicleYearEnd: integer("vehicle_year_end"),
+  difficultyLevel: varchar("difficulty_level", { length: 50 }), // "beginner", "intermediate", "advanced", "expert"
+  estimatedDuration: integer("estimated_duration"), // minutes
+  requiredTools: jsonb("required_tools").default([]),
+  requiredParts: jsonb("required_parts").default([]),
+  safetyWarnings: jsonb("safety_warnings").default([]),
+  steps: jsonb("steps").default([]), // [{stepNumber, title, description, assetId, duration, hints}]
+  totalSteps: integer("total_steps").default(0),
+  completionRate: decimal("completion_rate", { precision: 5, scale: 2 }), // Average completion rate
+  averageRating: decimal("average_rating", { precision: 3, scale: 2 }),
+  usageCount: integer("usage_count").default(0),
+  isGlobal: boolean("is_global").default(false),
+  isActive: boolean("is_active").default(true),
+  version: integer("version").default(1),
+  createdBy: varchar("created_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const arSessionLogs = pgTable("ar_session_logs", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  technicianId: varchar("technician_id").references(() => users.id).notNull(),
+  jobCardId: uuid("job_card_id").references(() => jobCards.id),
+  instructionId: uuid("instruction_id").references(() => arWorkInstructions.id),
+  deviceType: varchar("device_type", { length: 100 }), // "headset", "tablet", "phone", "smart_glasses"
+  deviceModel: varchar("device_model", { length: 255 }),
+  sessionStartTime: timestamp("session_start_time").notNull().defaultNow(),
+  sessionEndTime: timestamp("session_end_time"),
+  totalDuration: integer("total_duration"), // seconds
+  stepsCompleted: integer("steps_completed").default(0),
+  totalSteps: integer("total_steps"),
+  completionPercentage: decimal("completion_percentage", { precision: 5, scale: 2 }),
+  pauseCount: integer("pause_count").default(0),
+  helpRequestCount: integer("help_request_count").default(0),
+  errorCount: integer("error_count").default(0),
+  stepTimings: jsonb("step_timings").default([]), // [{stepNumber, startTime, endTime, duration}]
+  feedbackRating: integer("feedback_rating"), // 1-5
+  feedbackComment: text("feedback_comment"),
+  status: varchar("status", { length: 50 }).default("in_progress"), // "in_progress", "completed", "paused", "abandoned"
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const arDevicePairings = pgTable("ar_device_pairings", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  technicianId: varchar("technician_id").references(() => users.id).notNull(),
+  deviceId: varchar("device_id", { length: 255 }).notNull().unique(),
+  deviceType: varchar("device_type", { length: 100 }).notNull(),
+  deviceName: varchar("device_name", { length: 255 }),
+  deviceModel: varchar("device_model", { length: 255 }),
+  osVersion: varchar("os_version", { length: 100 }),
+  appVersion: varchar("app_version", { length: 50 }),
+  pushToken: varchar("push_token", { length: 500 }),
+  isActive: boolean("is_active").default(true),
+  lastConnectedAt: timestamp("last_connected_at"),
+  pairedAt: timestamp("paired_at").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Type exports for new modules
+export type ServiceBay = typeof serviceBays.$inferSelect;
+export type InsertServiceBay = typeof serviceBays.$inferInsert;
+export const insertServiceBaySchema = createInsertSchema(serviceBays).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type BayOccupancySession = typeof bayOccupancySessions.$inferSelect;
+export type InsertBayOccupancySession = typeof bayOccupancySessions.$inferInsert;
+export const insertBayOccupancySessionSchema = createInsertSchema(bayOccupancySessions).omit({ id: true, createdAt: true });
+
+export type BayTelemetryEvent = typeof bayTelemetryEvents.$inferSelect;
+export type InsertBayTelemetryEvent = typeof bayTelemetryEvents.$inferInsert;
+export const insertBayTelemetryEventSchema = createInsertSchema(bayTelemetryEvents).omit({ id: true });
+
+export type InventoryForecast = typeof inventoryForecasts.$inferSelect;
+export type InsertInventoryForecast = typeof inventoryForecasts.$inferInsert;
+export const insertInventoryForecastSchema = createInsertSchema(inventoryForecasts).omit({ id: true, createdAt: true });
+
+export type AutoReorderRule = typeof autoReorderRules.$inferSelect;
+export type InsertAutoReorderRule = typeof autoReorderRules.$inferInsert;
+export const insertAutoReorderRuleSchema = createInsertSchema(autoReorderRules).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type ReplenishmentOrder = typeof replenishmentOrders.$inferSelect;
+export type InsertReplenishmentOrder = typeof replenishmentOrders.$inferInsert;
+export const insertReplenishmentOrderSchema = createInsertSchema(replenishmentOrders).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type LoyaltyTier = typeof loyaltyTiers.$inferSelect;
+export type InsertLoyaltyTier = typeof loyaltyTiers.$inferInsert;
+export const insertLoyaltyTierSchema = createInsertSchema(loyaltyTiers).omit({ id: true, createdAt: true });
+
+export type LoyaltyAccount = typeof loyaltyAccounts.$inferSelect;
+export type InsertLoyaltyAccount = typeof loyaltyAccounts.$inferInsert;
+export const insertLoyaltyAccountSchema = createInsertSchema(loyaltyAccounts).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type LoyaltyTransaction = typeof loyaltyTransactions.$inferSelect;
+export type InsertLoyaltyTransaction = typeof loyaltyTransactions.$inferInsert;
+export const insertLoyaltyTransactionSchema = createInsertSchema(loyaltyTransactions).omit({ id: true, createdAt: true });
+
+export type LoyaltyOffer = typeof loyaltyOffers.$inferSelect;
+export type InsertLoyaltyOffer = typeof loyaltyOffers.$inferInsert;
+export const insertLoyaltyOfferSchema = createInsertSchema(loyaltyOffers).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type WorkshopResource = typeof workshopResources.$inferSelect;
+export type InsertWorkshopResource = typeof workshopResources.$inferInsert;
+export const insertWorkshopResourceSchema = createInsertSchema(workshopResources).omit({ id: true, createdAt: true });
+
+export type CalendarAppointment = typeof calendarAppointments.$inferSelect;
+export type InsertCalendarAppointment = typeof calendarAppointments.$inferInsert;
+export const insertCalendarAppointmentSchema = createInsertSchema(calendarAppointments).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type ArAsset = typeof arAssets.$inferSelect;
+export type InsertArAsset = typeof arAssets.$inferInsert;
+export const insertArAssetSchema = createInsertSchema(arAssets).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type ArWorkInstruction = typeof arWorkInstructions.$inferSelect;
+export type InsertArWorkInstruction = typeof arWorkInstructions.$inferInsert;
+export const insertArWorkInstructionSchema = createInsertSchema(arWorkInstructions).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type ArSessionLog = typeof arSessionLogs.$inferSelect;
+export type InsertArSessionLog = typeof arSessionLogs.$inferInsert;
+export const insertArSessionLogSchema = createInsertSchema(arSessionLogs).omit({ id: true, createdAt: true });
+
+export type ArDevicePairing = typeof arDevicePairings.$inferSelect;
+export type InsertArDevicePairing = typeof arDevicePairings.$inferInsert;
+export const insertArDevicePairingSchema = createInsertSchema(arDevicePairings).omit({ id: true, createdAt: true });
