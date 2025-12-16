@@ -1,0 +1,83 @@
+# 1. إنشاء ملف لزراعة المستخدمين (Seed Users)
+cat > scripts/seed-users.ts << 'EOF'
+import { db } from "../server/db";
+import { users } from "@shared/schema";
+import { eq } from "drizzle-orm";
+import bcrypt from "bcrypt";
+
+async function seedUsers() {
+  console.log("🌱 Starting User Seeding Process...");
+
+  // قائمة المستخدمين الذين نريد إنشاءهم لتغطية كافة الاختبارات
+  const usersToCreate = [
+    { 
+      username: "admin", 
+      password: "admin123", 
+      role: "admin", 
+      fullName: "System Administrator" 
+    },
+    { 
+      username: "tech", 
+      password: "tech123", 
+      role: "technician", 
+      fullName: "Senior Technician" 
+    },
+    { 
+      username: "client", 
+      password: "client123", 
+      role: "customer", 
+      fullName: "Valued Customer" 
+    },
+    { 
+      username: "agent", 
+      password: "agent123", 
+      role: "purchase_agent", 
+      fullName: "Inventory Agent" 
+    }
+  ];
+
+  for (const u of usersToCreate) {
+    try {
+      // 1. التحقق مما إذا كان المستخدم موجوداً مسبقاً
+      const existingUser = await db.select().from(users).where(eq(users.username, u.username));
+      
+      if (existingUser.length > 0) {
+        console.log(`⚠️  User '${u.username}' already exists. Skipping.`);
+        continue;
+      }
+
+      // 2. تشفير كلمة المرور (أهم خطوة للأمان)
+      const hashedPassword = await bcrypt.hash(u.password, 10);
+
+      // 3. إدخال المستخدم في قاعدة البيانات
+      await db.insert(users).values({
+        username: u.username,
+        password: hashedPassword,
+        role: u.role,
+        fullName: u.fullName,
+        isAdmin: u.role === "admin", // تعيين صلاحية الأدمن
+        active: true
+      });
+
+      console.log(`✅ Created user: ${u.username} (Role: ${u.role})`);
+    } catch (error) {
+      console.error(`❌ Failed to create ${u.username}:`, error);
+    }
+  }
+
+  console.log("\n🎉 Seeding Complete! You can now login.");
+  process.exit(0);
+}
+
+seedUsers().catch((err) => {
+  console.error("Fatal Error:", err);
+  process.exit(1);
+});
+EOF
+
+# 2. تثبيت مكتبة bcrypt إذا لم تكن مثبتة (لضمان عدم حدوث خطأ)
+npm install bcrypt
+npm install -D @types/bcrypt
+
+# 3. تشغيل السكربت لإنشاء المستخدمين فعلياً
+npx tsx scripts/seed-users.ts
