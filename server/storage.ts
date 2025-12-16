@@ -10753,18 +10753,29 @@ export class DatabaseStorage implements IStorage {
   }
 
   async startBaySession(bayId: string, vehicleId?: string, jobCardId?: string): Promise<BayOccupancySession> {
-    // First, atomically close any existing open sessions on this bay
-    // This uses a single UPDATE statement to prevent race conditions
-    await db.update(bayOccupancySessions)
-      .set({ endTime: new Date() })
-      .where(and(
-        eq(bayOccupancySessions.bayId, bayId),
-        isNull(bayOccupancySessions.endTime)
-      ));
-    
-    try {
-      // Insert new session first
-      const [session] = await db.insert(bayOccupancySessions).values({
+    // Use a transaction to ensure atomicity and prevent race conditions
+    return await db.transaction(async (tx) => {
+      // Lock the service bay row by updating updatedAt first
+      // This creates an exclusive row lock, preventing concurrent session starts
+      const [lockedBay] = await tx.update(serviceBays)
+        .set({ updatedAt: new Date() })
+        .where(eq(serviceBays.id, bayId))
+        .returning();
+      
+      if (!lockedBay) {
+        throw new Error('Service bay not found');
+      }
+      
+      // Close any existing open sessions on this bay (now safely locked)
+      await tx.update(bayOccupancySessions)
+        .set({ endTime: new Date() })
+        .where(and(
+          eq(bayOccupancySessions.bayId, bayId),
+          isNull(bayOccupancySessions.endTime)
+        ));
+      
+      // Insert new session
+      const [session] = await tx.insert(bayOccupancySessions).values({
         bayId,
         vehicleId: vehicleId || null,
         jobCardId: jobCardId || null,
@@ -10776,19 +10787,13 @@ export class DatabaseStorage implements IStorage {
         throw new Error('Failed to create bay session');
       }
       
-      // Update bay status only after successful session creation
-      await db.update(serviceBays)
+      // Update bay status to occupied
+      await tx.update(serviceBays)
         .set({ status: 'occupied', updatedAt: new Date() })
         .where(eq(serviceBays.id, bayId));
       
       return session;
-    } catch (error) {
-      // On any failure, ensure bay is set back to available
-      await db.update(serviceBays)
-        .set({ status: 'available', updatedAt: new Date() })
-        .where(eq(serviceBays.id, bayId));
-      throw error;
-    }
+    });
   }
 
   async endBaySession(sessionId: string): Promise<BayOccupancySession | null> {
