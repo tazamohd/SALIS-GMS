@@ -10068,7 +10068,7 @@ export const bayTelemetryEvents = pgTable("bay_telemetry_events", {
 export const inventoryForecasts = pgTable("inventory_forecasts", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
   garageId: uuid("garage_id").references(() => garages.id).notNull(),
-  partId: uuid("part_id").references(() => inventoryItems.id).notNull(),
+  partId: uuid("part_id").references(() => spareParts.id).notNull(),
   forecastDate: date("forecast_date").notNull(),
   predictedDemand: integer("predicted_demand").notNull(),
   confidenceScore: decimal("confidence_score", { precision: 5, scale: 2 }), // 0-100%
@@ -10105,7 +10105,7 @@ export const replenishmentOrders = pgTable("replenishment_orders", {
 export const replenishmentOrderItems = pgTable("replenishment_order_items", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
   orderId: uuid("order_id").references(() => replenishmentOrders.id).notNull(),
-  partId: uuid("part_id").references(() => inventoryItems.id).notNull(),
+  partId: uuid("part_id").references(() => spareParts.id).notNull(),
   quantityOrdered: integer("quantity_ordered").notNull(),
   quantityReceived: integer("quantity_received").default(0),
   unitCost: decimal("unit_cost", { precision: 10, scale: 2 }),

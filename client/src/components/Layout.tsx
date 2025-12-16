@@ -73,6 +73,9 @@ import {
   Megaphone,
   CreditCard,
   FolderTree,
+  PackageSearch,
+  Crown,
+  ScanLine,
   Scale,
   Banknote,
   Calculator,
@@ -145,6 +148,9 @@ export function Layout({ children }: LayoutProps) {
       items: [
         { path: "/dashboard", icon: Home, label: t("nav.dashboard") },
         { path: "/kpi-dashboard", icon: Target, label: "KPI Dashboard" },
+        { path: "/service-bay-dashboard", icon: Wrench, label: "Service Bay Monitor" },
+        { path: "/automated-reordering", icon: PackageSearch, label: "Auto Reordering" },
+        { path: "/loyalty-program", icon: Crown, label: "Loyalty Program" },
       ],
     },
     {
@@ -195,6 +201,7 @@ export function Layout({ children }: LayoutProps) {
         { path: "/job-cards", icon: Wrench, label: t("nav.jobCards") },
         { path: "/tasks", icon: ClipboardCheck, label: t("nav.tasks") },
         { path: "/service-templates", icon: ClipboardList, label: t("nav.serviceTemplates") },
+        { path: "/workshop-calendar", icon: Calendar, label: "Workshop Calendar" },
         { path: "/ai-scheduling", icon: Calendar, label: "AI Scheduling" },
         { path: "/smart-assignment", icon: Brain, label: "Smart Assignment" },
         { path: "/estimates", icon: Receipt, label: t("nav.estimates") },
@@ -352,6 +359,7 @@ export function Layout({ children }: LayoutProps) {
       label: "Emerging Technologies",
       items: [
         { path: "/ar-repair-guide", icon: Monitor, label: "AR Repair Guide" },
+        { path: "/ar-overlay", icon: ScanLine, label: "AR Overlay" },
         { path: "/vr-showroom", icon: Monitor, label: "VR Showroom" },
         { path: "/drone-inspection", icon: Camera, label: "Drone Inspection" },
         { path: "/wearable-integration", icon: TabletSmartphone, label: "Wearable Devices" },

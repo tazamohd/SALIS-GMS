@@ -663,6 +663,12 @@ import {
   type InsertComplianceAudit,
   type ComplianceTask,
   type InsertComplianceTask,
+  serviceBays,
+  bayOccupancySessions,
+  type ServiceBay,
+  type InsertServiceBay,
+  type BayOccupancySession,
+  type InsertBayOccupancySession,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, or, inArray, and, gte, lte, ilike, sql, isNull, gt } from "drizzle-orm";
@@ -10552,6 +10558,144 @@ export class DatabaseStorage implements IStorage {
       totalStorageUsed: totalSize,
       lastBackupDate: completed[0]?.completedAt || null,
     };
+  }
+
+  // ==========================================
+  // SERVICE BAY DASHBOARD METHODS
+  // ==========================================
+
+  async getServiceBays(garageId?: string): Promise<ServiceBay[]> {
+    if (garageId) {
+      return await db.select().from(serviceBays)
+        .where(eq(serviceBays.garageId, garageId))
+        .orderBy(serviceBays.bayNumber);
+    }
+    return await db.select().from(serviceBays).orderBy(serviceBays.bayNumber);
+  }
+
+  async getServiceBaysWithSessions(garageId?: string): Promise<any[]> {
+    const bays = await this.getServiceBays(garageId);
+    
+    const baysWithSessions = await Promise.all(bays.map(async (bay) => {
+      const activeSessions = await db.select().from(bayOccupancySessions)
+        .where(and(
+          eq(bayOccupancySessions.bayId, bay.id),
+          isNull(bayOccupancySessions.endTime)
+        ))
+        .orderBy(desc(bayOccupancySessions.startTime))
+        .limit(1);
+      
+      const currentSession = activeSessions[0];
+      
+      let sessionWithDetails = null;
+      if (currentSession) {
+        let vehicle = null;
+        let jobCard = null;
+        
+        if (currentSession.vehicleId) {
+          const [v] = await db.select().from(vehicles)
+            .where(eq(vehicles.id, currentSession.vehicleId));
+          vehicle = v;
+        }
+        
+        if (currentSession.jobCardId) {
+          const [jc] = await db.select().from(jobCards)
+            .where(eq(jobCards.id, currentSession.jobCardId));
+          jobCard = jc;
+        }
+        
+        sessionWithDetails = { ...currentSession, vehicle, jobCard };
+      }
+      
+      return { ...bay, currentSession: sessionWithDetails };
+    }));
+    
+    return baysWithSessions;
+  }
+
+  async getServiceBayStatistics(garageId?: string): Promise<any> {
+    const bays = await this.getServiceBays(garageId);
+    const totalBays = bays.length;
+    const occupiedBays = bays.filter(b => b.status === 'occupied').length;
+    const availableBays = bays.filter(b => b.status === 'available').length;
+    const maintenanceBays = bays.filter(b => b.status === 'maintenance').length;
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    let completedSessionsQuery = db.select().from(bayOccupancySessions)
+      .where(gte(bayOccupancySessions.endTime, today));
+    
+    const completedSessions = await completedSessionsQuery;
+    
+    let totalDuration = 0;
+    let completedCount = 0;
+    for (const session of completedSessions) {
+      if (session.startTime && session.endTime) {
+        const start = new Date(session.startTime);
+        const end = new Date(session.endTime);
+        totalDuration += (end.getTime() - start.getTime()) / 60000;
+        completedCount++;
+      }
+    }
+    
+    const avgSessionDuration = completedCount > 0 ? Math.round(totalDuration / completedCount) : 0;
+    
+    return {
+      totalBays,
+      occupiedBays,
+      availableBays,
+      maintenanceBays,
+      avgSessionDuration,
+      todayCompletedSessions: completedCount,
+    };
+  }
+
+  async createServiceBay(data: InsertServiceBay): Promise<ServiceBay> {
+    const [bay] = await db.insert(serviceBays).values(data).returning();
+    return bay;
+  }
+
+  async updateServiceBayStatus(bayId: string, status: string): Promise<ServiceBay | null> {
+    const [bay] = await db.update(serviceBays)
+      .set({ status, updatedAt: new Date() })
+      .where(eq(serviceBays.id, bayId))
+      .returning();
+    return bay || null;
+  }
+
+  async startBaySession(bayId: string, vehicleId?: string, jobCardId?: string): Promise<BayOccupancySession> {
+    await db.update(serviceBays)
+      .set({ status: 'occupied', updatedAt: new Date() })
+      .where(eq(serviceBays.id, bayId));
+    
+    const [session] = await db.insert(bayOccupancySessions).values({
+      bayId,
+      vehicleId: vehicleId || null,
+      jobCardId: jobCardId || null,
+      startTime: new Date(),
+      sessionType: 'service',
+    }).returning();
+    
+    return session;
+  }
+
+  async endBaySession(sessionId: string): Promise<BayOccupancySession | null> {
+    const [session] = await db.select().from(bayOccupancySessions)
+      .where(eq(bayOccupancySessions.id, sessionId));
+    
+    if (!session) return null;
+    
+    await db.update(serviceBays)
+      .set({ status: 'available', updatedAt: new Date() })
+      .where(eq(serviceBays.id, session.bayId));
+    
+    const [updatedSession] = await db.update(bayOccupancySessions)
+      .set({ endTime: new Date() })
+      .where(eq(bayOccupancySessions.id, sessionId))
+      .returning();
+    
+    return updatedSession;
   }
 }
 

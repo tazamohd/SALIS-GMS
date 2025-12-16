@@ -131,6 +131,11 @@ import LicensePlateRecognition from "@/pages/LicensePlateRecognition";
 import EmergingTechnologies from "@/pages/EmergingTechnologies";
 import NextGenTechnologies from "@/pages/NextGenTechnologies";
 import IoTDashboard from "@/pages/IoTDashboard";
+import ServiceBayDashboard from "@/pages/ServiceBayDashboard";
+import AutomatedReordering from "@/pages/AutomatedReordering";
+import LoyaltyProgram from "@/pages/LoyaltyProgram";
+import WorkshopCalendar from "@/pages/WorkshopCalendar";
+import AROverlay from "@/pages/AROverlay";
 import ComputerVisionQC from "@/pages/ComputerVisionQC";
 import SmartPartsRecommender from "@/pages/SmartPartsRecommender";
 import DigitalTwinViewer from "@/pages/DigitalTwinViewer";
@@ -1098,6 +1103,31 @@ function Router() {
       <Route path="/iot-dashboard">
         <Layout>
           <IoTDashboard />
+        </Layout>
+      </Route>
+      <Route path="/service-bay-dashboard">
+        <Layout>
+          <ServiceBayDashboard />
+        </Layout>
+      </Route>
+      <Route path="/automated-reordering">
+        <Layout>
+          <AutomatedReordering />
+        </Layout>
+      </Route>
+      <Route path="/loyalty-program">
+        <Layout>
+          <LoyaltyProgram />
+        </Layout>
+      </Route>
+      <Route path="/workshop-calendar">
+        <Layout>
+          <WorkshopCalendar />
+        </Layout>
+      </Route>
+      <Route path="/ar-overlay">
+        <Layout>
+          <AROverlay />
         </Layout>
       </Route>
       <Route path="/computer-vision-qc">

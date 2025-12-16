@@ -19648,6 +19648,94 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ==========================================
+  // SERVICE BAY DASHBOARD ROUTES
+  // ==========================================
+  
+  app.get('/api/service-bays', isAuthenticated, async (req: any, res) => {
+    try {
+      const { garageId } = req.query;
+      const bays = await storage.getServiceBays(garageId as string);
+      res.json(bays);
+    } catch (error: any) {
+      console.error("Error fetching service bays:", error);
+      res.status(500).json({ message: "Failed to fetch service bays" });
+    }
+  });
+
+  app.get('/api/service-bays/with-sessions', isAuthenticated, async (req: any, res) => {
+    try {
+      const { garageId } = req.query;
+      const baysWithSessions = await storage.getServiceBaysWithSessions(garageId as string);
+      res.json(baysWithSessions);
+    } catch (error: any) {
+      console.error("Error fetching service bays with sessions:", error);
+      res.status(500).json({ message: "Failed to fetch service bays with sessions" });
+    }
+  });
+
+  app.get('/api/service-bays/statistics', isAuthenticated, async (req: any, res) => {
+    try {
+      const { garageId } = req.query;
+      const statistics = await storage.getServiceBayStatistics(garageId as string);
+      res.json(statistics);
+    } catch (error: any) {
+      console.error("Error fetching service bay statistics:", error);
+      res.status(500).json({ message: "Failed to fetch service bay statistics" });
+    }
+  });
+
+  app.post('/api/service-bays', isAuthenticated, async (req: any, res) => {
+    try {
+      const bay = await storage.createServiceBay(req.body);
+      res.status(201).json(bay);
+    } catch (error: any) {
+      console.error("Error creating service bay:", error);
+      res.status(500).json({ message: "Failed to create service bay" });
+    }
+  });
+
+  app.patch('/api/service-bays/:id/status', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const { status } = req.body;
+      const bay = await storage.updateServiceBayStatus(id, status);
+      if (!bay) {
+        return res.status(404).json({ message: "Service bay not found" });
+      }
+      res.json(bay);
+    } catch (error: any) {
+      console.error("Error updating service bay status:", error);
+      res.status(500).json({ message: "Failed to update service bay status" });
+    }
+  });
+
+  app.post('/api/service-bays/:bayId/sessions', isAuthenticated, async (req: any, res) => {
+    try {
+      const { bayId } = req.params;
+      const { vehicleId, jobCardId } = req.body;
+      const session = await storage.startBaySession(bayId, vehicleId, jobCardId);
+      res.status(201).json(session);
+    } catch (error: any) {
+      console.error("Error starting bay session:", error);
+      res.status(500).json({ message: "Failed to start bay session" });
+    }
+  });
+
+  app.patch('/api/service-bays/sessions/:sessionId/end', isAuthenticated, async (req: any, res) => {
+    try {
+      const { sessionId } = req.params;
+      const session = await storage.endBaySession(sessionId);
+      if (!session) {
+        return res.status(404).json({ message: "Session not found" });
+      }
+      res.json(session);
+    } catch (error: any) {
+      console.error("Error ending bay session:", error);
+      res.status(500).json({ message: "Failed to end bay session" });
+    }
+  });
+
   const httpServer = createServer(app);
   
   // Initialize WebSocket server for chat
