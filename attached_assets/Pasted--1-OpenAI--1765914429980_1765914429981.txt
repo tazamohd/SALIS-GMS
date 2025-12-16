@@ -1,0 +1,69 @@
+# 1. إصلاح توافقية OpenAI (لضمان عمل الذكاء الاصطناعي)
+# نقوم بإضافة كود في بداية السيرفر لنسخ المفتاح إذا كان موجوداً باسم آخر
+sed -i '1i if (!process.env.OPENAI_API_KEY && process.env.AI_INTEGRATIONS_OPENAI_API_KEY) { process.env.OPENAI_API_KEY = process.env.AI_INTEGRATIONS_OPENAI_API_KEY; }' server/index.ts
+
+# 2. إنشاء ملف المصادقة الجديد (Clean Auth Module)
+# هذا الملف سيتعامل مع تسجيل الدخول بشكل منفصل وآمن
+cat > server/routes/auth.ts << 'EOF'
+import { Router } from "express";
+import passport from "passport";
+import { db } from "../db";
+import { users } from "@shared/schema";
+import { eq } from "drizzle-orm";
+
+const router = Router();
+
+// مسار تسجيل الدخول
+router.post("/login", passport.authenticate("local"), (req, res) => {
+  res.status(200).json(req.user);
+});
+
+// مسار تسجيل الخروج
+router.post("/logout", (req, res, next) => {
+  req.logout((err) => {
+    if (err) return next(err);
+    res.status(200).json({ message: "Logged out successfully" });
+  });
+});
+
+// مسار جلب المستخدم الحالي
+router.get("/user", (req, res) => {
+  if (req.isAuthenticated()) {
+    return res.json(req.user);
+  }
+  res.status(401).json({ message: "Not authenticated" });
+});
+
+export const authRoutes = router;
+EOF
+
+# 3. إنشاء "مدير المسارات" (The Hybrid Router)
+# هذا الملف هو العقل المدبر الجديد: يشغل المسارات الجديدة أولاً، ثم القديمة
+cat > server/routes/index.ts << 'EOF'
+import { Express } from "express";
+import { authRoutes } from "./auth";
+// نستورد الملف القديم الضخم لنضمن عمل باقي النظام
+import { registerRoutes as registerLegacyRoutes } from "../routes";
+
+export function registerRoutes(app: Express) {
+  console.log("🔄 Initializing Hybrid Router...");
+
+  // 1. الأولوية للمسارات الجديدة (New Modules)
+  app.use("/api", authRoutes);
+  console.log("✅ Auth Module Loaded");
+
+  // 2. تشغيل المسارات القديمة (Legacy Monolith)
+  // أي مسار لم يتم التعامل معه أعلاه، سيذهب للملف القديم
+  registerLegacyRoutes(app);
+  console.log("⚠️ Legacy Routes Loaded (Background)");
+}
+EOF
+
+# 4. تحديث نقطة دخول السيرفر لاستخدام النظام الجديد
+# نبحث عن استيراد المسارات القديم ونستبدله بالجديد
+sed -i 's|import { registerRoutes } from "./routes";|import { registerRoutes } from "./routes/index";|g' server/index.ts
+
+echo "✅ Core Repair Applied Successfully!"
+echo "   - OpenAI Key Patched"
+echo "   - Auth Module Created"
+echo "   - Hybrid Router Activated"

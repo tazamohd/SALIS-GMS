@@ -1,12 +1,16 @@
 import { Express } from "express";
-// سنقوم باستيراد الوحدات هنا تدريجياً
-// import { authRoutes } from "./auth";
-// import { vehicleRoutes } from "./vehicles";
+import { Server } from "http";
+import { authRoutes } from "./auth";
+import { registerRoutes as registerLegacyRoutes } from "../routes";
 
-export function registerRoutes(app: Express) {
-  // هنا سنقوم بتفعيل الوحدات
-  // app.use("/api/auth", authRoutes);
+export async function registerRoutes(app: Express): Promise<Server> {
+  console.log("🔄 Initializing Hybrid Router...");
+
+  app.use("/api", authRoutes);
+  console.log("✅ Auth Module Loaded");
+
+  const server = await registerLegacyRoutes(app);
+  console.log("⚠️ Legacy Routes Loaded (Background)");
   
-  // مؤقتاً: سنحتفظ بالكود القديم في مكانه حتى ننقله
-  console.log("Routes registration started...");
+  return server;
 }

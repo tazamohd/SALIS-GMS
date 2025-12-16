@@ -17,7 +17,7 @@ SALIS AUTO is a world-class automotive ERP platform designed for efficient garag
 The application uses a full-stack architecture with clear client-server separation.
 
 **Frontend**: React 18 with Vite, `wouter` for routing, `TanStack Query` for state management, and `shadcn/ui` (Radix UI) for components, adhering to the Figma design.
-**Backend**: Express server written in TypeScript.
+**Backend**: Express server written in TypeScript with a hybrid routing architecture. New modular routes are loaded from `server/routes/` (e.g., `auth.ts`) with priority, then legacy routes from `server/routes.ts` are loaded as fallback. OpenAI API key compatibility is handled automatically by mapping `AI_INTEGRATIONS_OPENAI_API_KEY` to `OPENAI_API_KEY`.
 **Authentication**: Custom email/password authentication with comprehensive role-based access control (RBAC).
 **Database**: PostgreSQL with Drizzle ORM, comprising **170+ comprehensive modules with 307+ tables**.
 **RBAC System**: 24 professional roles, 70 staff users across departments, granular permissions for 151+ resources. Role-based sidebar navigation filtering implemented via `roleNavigationMap` in Layout.tsx. Welcome page at `/welcome` routes users to their role-specific portal (technician → /technician-portal, HR → /hr-management, etc.).
