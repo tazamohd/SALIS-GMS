@@ -54,6 +54,7 @@ import PurchaseAgentDeliveryTracking from "@/pages/purchase-agent/DeliveryTracki
 import PurchaseAgentLiveDeliveryTracking from "@/pages/purchase-agent/LiveDeliveryTracking";
 import Notifications from "@/pages/Notifications";
 import Landing from "@/pages/Landing";
+import WelcomePage from "@/pages/WelcomePage";
 import PublicTracking from "@/pages/PublicTracking";
 import Calendar from "@/pages/Calendar";
 import FinancialSettings from "@/pages/FinancialSettings";
@@ -303,6 +304,9 @@ function Router() {
           <CustomerCommunications />
         </CustomerPortalLayout>
       </Route>
+
+      {/* Welcome Page - Role-based routing */}
+      <Route path="/welcome" component={WelcomePage} />
 
       {/* Garage Management Routes */}
       <Route path="/old-dashboard" component={LoginDashboard} />
