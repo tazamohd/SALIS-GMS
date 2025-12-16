@@ -112,15 +112,7 @@ const mockSelfServiceRequests = [
 
 export default function HRManagement() {
   const { user } = useAuth();
-  const garageId = user?.garageId;
-
-  if (!garageId) {
-    return (
-      <div className="p-6">
-        <div className="text-center">Please log in to access HR Management.</div>
-      </div>
-    );
-  }
+  const garageId = user?.garageId || 'default';
 
   const tabs: TabConfig[] = [
     { id: 'employees', label: 'Employees', icon: Users, content: <EmployeesTab garageId={garageId} /> },
