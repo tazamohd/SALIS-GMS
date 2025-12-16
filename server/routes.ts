@@ -583,9 +583,16 @@ const licensePlateScanSchema = z.object({
   matchedAutomatically: z.boolean().optional(),
 });
 
+// Track if auth has been set up to prevent double initialization
+let authInitialized = false;
+export function markAuthInitialized() { authInitialized = true; }
+
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Auth middleware
-  await setupAuth(app);
+  // Auth middleware (skip if already initialized by hybrid router)
+  if (!authInitialized) {
+    await setupAuth(app);
+    authInitialized = true;
+  }
 
   // Audit logging middleware (applied after auth so user is available)
   app.use(auditLog);
