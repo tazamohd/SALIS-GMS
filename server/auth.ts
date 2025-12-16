@@ -92,12 +92,19 @@ export async function setupAuth(app: Express) {
   });
 }
 
+// Feature flag for auth bypass during development
+const AUTH_BYPASS_ENABLED = process.env.AUTH_BYPASS === 'true';
+
 export const isAuthenticated: RequestHandler = (req, res, next) => {
-  // TEMPORARILY DISABLED: Authentication bypass for development testing
-  // To re-enable: uncomment the check below and remove the next() call
-  // if (req.isAuthenticated()) {
-  //   return next();
-  // }
-  // res.status(401).json({ message: "Unauthorized" });
-  return next();
+  if (req.isAuthenticated()) {
+    return next();
+  }
+  
+  // Development bypass - disabled by default for security
+  if (AUTH_BYPASS_ENABLED) {
+    console.warn('Auth bypass enabled - development only');
+    return next();
+  }
+  
+  res.status(401).json({ message: "Unauthorized" });
 };

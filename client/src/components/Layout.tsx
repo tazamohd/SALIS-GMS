@@ -388,9 +388,62 @@ export function Layout({ children }: LayoutProps) {
     },
   ];
 
+  // Role-based navigation filtering
+  const roleNavigationMap: Record<string, string[]> = {
+    // Technicians only see operational groups
+    'technician': ['Dashboard & Overview', 'Service Execution & Operations', 'Parts & Inventory'],
+    // Purchase Agents see inventory and supplier groups
+    'Purchase Agent': ['Dashboard & Overview', 'Parts & Inventory', 'Billing & Payments'],
+    // Call Center sees customer-related groups
+    'Call Center Agent': ['Dashboard & Overview', 'Customer Intake & Appointments', 'Customer Experience & Growth', 'AI & Automation Hub'],
+    // HR roles see team management
+    'HR Manager': ['Dashboard & Overview', 'Team & HR Management', 'Billing & Payments'],
+    'HR Officer': ['Dashboard & Overview', 'Team & HR Management'],
+    // Accountants see financial groups
+    'Accountant': ['Dashboard & Overview', 'Billing & Payments', 'Analytics & Business Intelligence'],
+    // Service Advisors see customer and service groups
+    'Service Advisor': ['Dashboard & Overview', 'Customer Intake & Appointments', 'Vehicle Management', 'Service Planning & Scheduling', 'Billing & Payments'],
+    // Admin and Super Admin see everything
+    'admin': [],
+    'Super Admin': [],
+    'Administrator': [],
+  };
+
+  // Filter navigation based on user role
+  const userRoles = (user as any)?.roles || [];
+  const userType = (user as any)?.userType || '';
+  
+  // Determine which groups to show based on role
+  const getAllowedGroups = (): string[] => {
+    // Admin types see everything
+    if (userType === 'admin' || userRoles.includes('Super Admin') || userRoles.includes('Administrator')) {
+      return []; // Empty means show all
+    }
+    
+    // Check for specific role restrictions
+    for (const role of userRoles) {
+      if (roleNavigationMap[role]) {
+        return roleNavigationMap[role];
+      }
+    }
+    
+    // Check userType
+    if (roleNavigationMap[userType]) {
+      return roleNavigationMap[userType];
+    }
+    
+    // Default: show all (for testing/development)
+    return [];
+  };
+
+  const allowedGroups = getAllowedGroups();
+  const filteredNavGroups = allowedGroups.length > 0 
+    ? navGroups.filter(group => allowedGroups.includes(group.label || ''))
+    : navGroups;
+
   // Track which groups are expanded
   const [expandedGroups, setExpandedGroups] = useState<string[]>(
-    navGroups.map((group) => group.label || ''), // All groups expanded by default
+    filteredNavGroups.map((group) => group.label || ''), // All groups expanded by default
   );
 
   const toggleGroup = (groupLabel: string) => {
@@ -429,7 +482,7 @@ export function Layout({ children }: LayoutProps) {
           {/* Navigation - Compact */}
           <nav className="flex-1 p-3 overflow-y-auto">
             <div className="space-y-0.5">
-              {navGroups.map((group) => {
+              {filteredNavGroups.map((group) => {
                 const groupLabel = group.label || '';
                 const isExpanded = expandedGroups.includes(groupLabel);
                 const hasActiveItem = group.items.some(

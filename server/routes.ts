@@ -654,20 +654,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
     try {
       const user = req.user;
-      // If no user (auth bypassed), return a mock admin user
       if (!user) {
-        return res.json({
-          id: 'default-user',
-          email: 'admin@salisauto.com',
-          firstName: 'Admin',
-          lastName: 'User',
-          userType: 'admin',
-          isActive: true,
-          garageId: null
-        });
+        return res.status(401).json({ message: "Not authenticated" });
       }
+      
+      // Get user roles for RBAC
+      const userRoles = await storage.getUserRoles(user.id);
+      const roles = userRoles.map((ur: any) => ur.role?.name).filter(Boolean);
+      
+      // Determine primary portal based on user type or role
+      let primaryPortal = '/dashboard';
+      if (user.userType === 'technician') primaryPortal = '/technician-portal';
+      else if (roles.includes('Purchase Agent')) primaryPortal = '/purchase-agent';
+      else if (roles.includes('Call Center Agent')) primaryPortal = '/call-center';
+      else if (roles.includes('HR Manager') || roles.includes('HR Officer')) primaryPortal = '/hr-management';
+      
       const { password: _, ...userWithoutPassword } = user;
-      res.json(userWithoutPassword);
+      res.json({
+        ...userWithoutPassword,
+        roles,
+        primaryPortal,
+        permissions: roles.length > 0 ? ['read', 'write'] : ['read'] // Simplified permissions
+      });
     } catch (error) {
       console.error("Error fetching user:", error);
       res.status(500).json({ message: "Failed to fetch user" });
