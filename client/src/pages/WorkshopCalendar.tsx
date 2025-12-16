@@ -168,7 +168,7 @@ export default function WorkshopCalendar() {
             </Button>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="outline" onClick={() => setIsDragMode(!isDragMode)}>
+            <Button variant="outline" onClick={() => setIsDragMode(!isDragMode)} data-testid="button-toggle-drag">
               <GripVertical className="w-4 h-4 mr-2" />
               {isDragMode ? "Exit Drag Mode" : "Enable Drag"}
             </Button>
@@ -272,7 +272,7 @@ export default function WorkshopCalendar() {
               {resources.filter(r => r.type === "technician").map(tech => (
                 <div key={tech.id} className="flex items-center justify-between text-sm">
                   <span>{tech.name}</span>
-                  <Badge variant="outline" className="text-green-600">Available</Badge>
+                  <Badge variant="outline" className="text-green-600" data-testid={`badge-tech-status-${tech.id}`}>Available</Badge>
                 </div>
               ))}
             </CardContent>
@@ -291,7 +291,7 @@ export default function WorkshopCalendar() {
                 return (
                   <div key={bay.id} className="flex items-center justify-between text-sm">
                     <span>{bay.name}</span>
-                    <Badge variant={bayEvents.length > 0 ? "default" : "outline"}>
+                    <Badge variant={bayEvents.length > 0 ? "default" : "outline"} data-testid={`badge-bay-status-${bay.id}`}>
                       {bayEvents.length > 0 ? "Occupied" : "Available"}
                     </Badge>
                   </div>
@@ -337,13 +337,13 @@ export default function WorkshopCalendar() {
               </div>
               <div className="flex items-center gap-2">
                 <Label className="text-muted-foreground">Status:</Label>
-                <Badge className={getStatusColor(selectedEvent.status)}>{selectedEvent.status}</Badge>
+                <Badge className={getStatusColor(selectedEvent.status)} data-testid="badge-event-status">{selectedEvent.status}</Badge>
               </div>
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsEventDialogOpen(false)}>Close</Button>
-            <Button>Edit Appointment</Button>
+            <Button variant="outline" onClick={() => setIsEventDialogOpen(false)} data-testid="button-close-event">Close</Button>
+            <Button data-testid="button-edit-appointment">Edit Appointment</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

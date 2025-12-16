@@ -237,7 +237,7 @@ export default function ServiceBayDashboard() {
                 ))}
               </SelectContent>
             </Select>
-            <Badge variant={isConnected ? "default" : "destructive"} className="flex items-center gap-1">
+            <Badge variant={isConnected ? "default" : "destructive"} className="flex items-center gap-1" data-testid="badge-connection-status">
               <Zap className="w-3 h-3" />
               {isConnected ? "Live" : "Disconnected"}
             </Badge>
@@ -265,44 +265,44 @@ export default function ServiceBayDashboard() {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium">Overall Occupancy</span>
-                <span className="text-sm text-muted-foreground">{occupancyRate}%</span>
+                <span className="text-sm text-muted-foreground" data-testid="text-occupancy-rate">{occupancyRate}%</span>
               </div>
-              <Progress value={occupancyRate} className="h-3" />
+              <Progress value={occupancyRate} className="h-3" data-testid="progress-occupancy" />
               <div className="grid grid-cols-2 md:grid-cols-5 gap-4 pt-4">
-                <div className="text-center">
+                <div className="text-center" data-testid="stat-available">
                   <div className="flex items-center justify-center gap-1 text-green-500 mb-1">
                     <CheckCircle2 className="w-4 h-4" />
                     <span className="text-sm font-medium">Available</span>
                   </div>
-                  <span className="text-2xl font-bold">{statistics?.availableBays || 0}</span>
+                  <span className="text-2xl font-bold" data-testid="text-available-count">{statistics?.availableBays || 0}</span>
                 </div>
-                <div className="text-center">
+                <div className="text-center" data-testid="stat-occupied">
                   <div className="flex items-center justify-center gap-1 text-blue-500 mb-1">
                     <Car className="w-4 h-4" />
                     <span className="text-sm font-medium">Occupied</span>
                   </div>
-                  <span className="text-2xl font-bold">{statistics?.occupiedBays || 0}</span>
+                  <span className="text-2xl font-bold" data-testid="text-occupied-count">{statistics?.occupiedBays || 0}</span>
                 </div>
-                <div className="text-center">
+                <div className="text-center" data-testid="stat-maintenance">
                   <div className="flex items-center justify-center gap-1 text-yellow-500 mb-1">
                     <Wrench className="w-4 h-4" />
                     <span className="text-sm font-medium">Maintenance</span>
                   </div>
-                  <span className="text-2xl font-bold">{statistics?.maintenanceBays || 0}</span>
+                  <span className="text-2xl font-bold" data-testid="text-maintenance-count">{statistics?.maintenanceBays || 0}</span>
                 </div>
-                <div className="text-center">
+                <div className="text-center" data-testid="stat-avg-time">
                   <div className="flex items-center justify-center gap-1 text-purple-500 mb-1">
                     <Timer className="w-4 h-4" />
                     <span className="text-sm font-medium">Avg. Time</span>
                   </div>
-                  <span className="text-2xl font-bold">{formatDuration(statistics?.avgSessionDuration || 0)}</span>
+                  <span className="text-2xl font-bold" data-testid="text-avg-duration">{formatDuration(statistics?.avgSessionDuration || 0)}</span>
                 </div>
-                <div className="text-center">
+                <div className="text-center" data-testid="stat-today">
                   <div className="flex items-center justify-center gap-1 text-indigo-500 mb-1">
                     <TrendingUp className="w-4 h-4" />
                     <span className="text-sm font-medium">Today</span>
                   </div>
-                  <span className="text-2xl font-bold">{statistics?.todayCompletedSessions || 0}</span>
+                  <span className="text-2xl font-bold" data-testid="text-today-count">{statistics?.todayCompletedSessions || 0}</span>
                 </div>
               </div>
             </div>

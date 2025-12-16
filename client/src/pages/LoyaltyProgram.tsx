@@ -111,45 +111,45 @@ export default function LoyaltyProgram() {
   const overviewTab = (
     <div className="space-y-6" data-testid="loyalty-overview">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
+        <Card data-testid="card-total-members">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Total Members</p>
-                <p className="text-3xl font-bold">{totalMembers}</p>
+                <p className="text-3xl font-bold" data-testid="text-members-count">{totalMembers}</p>
               </div>
               <Users className="w-8 h-8 text-blue-500" />
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card data-testid="card-active-offers">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Active Offers</p>
-                <p className="text-3xl font-bold">{totalActiveOffers}</p>
+                <p className="text-3xl font-bold" data-testid="text-offers-count">{totalActiveOffers}</p>
               </div>
               <Gift className="w-8 h-8 text-purple-500" />
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card data-testid="card-redemptions">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Redemptions</p>
-                <p className="text-3xl font-bold">{totalRedemptions}</p>
+                <p className="text-3xl font-bold" data-testid="text-redemptions-count">{totalRedemptions}</p>
               </div>
               <Ticket className="w-8 h-8 text-green-500" />
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card data-testid="card-avg-points">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Avg. Points</p>
-                <p className="text-3xl font-bold">2,450</p>
+                <p className="text-3xl font-bold" data-testid="text-avg-points">2,450</p>
               </div>
               <Star className="w-8 h-8 text-yellow-500" />
             </div>
@@ -297,7 +297,7 @@ export default function LoyaltyProgram() {
                   </p>
                 </div>
                 <div>
-                  <Button variant="ghost" size="sm">View</Button>
+                  <Button variant="ghost" size="sm" data-testid={`button-view-member-${member.id}`}>View</Button>
                 </div>
               </div>
             ))}
@@ -349,8 +349,8 @@ export default function LoyaltyProgram() {
                 </div>
               </div>
               <div className="flex gap-2 mt-4">
-                <Button variant="outline" size="sm" className="flex-1">Edit</Button>
-                <Button variant="outline" size="sm" className="flex-1">Deactivate</Button>
+                <Button variant="outline" size="sm" className="flex-1" data-testid={`button-edit-offer-${offer.id}`}>Edit</Button>
+                <Button variant="outline" size="sm" className="flex-1" data-testid={`button-deactivate-offer-${offer.id}`}>Deactivate</Button>
               </div>
             </CardContent>
           </Card>
@@ -383,8 +383,8 @@ export default function LoyaltyProgram() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsOfferDialogOpen(false)}>Cancel</Button>
-            <Button onClick={() => setIsOfferDialogOpen(false)}>Create Offer</Button>
+            <Button variant="outline" onClick={() => setIsOfferDialogOpen(false)} data-testid="button-cancel-offer">Cancel</Button>
+            <Button onClick={() => setIsOfferDialogOpen(false)} data-testid="button-create-offer">Create Offer</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -402,11 +402,11 @@ export default function LoyaltyProgram() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <Label>Points per SAR Spent</Label>
-              <Input type="number" defaultValue="1" />
+              <Input type="number" defaultValue="1" data-testid="input-points-per-sar" />
             </div>
             <div>
               <Label>Points Expiry (months)</Label>
-              <Input type="number" defaultValue="24" />
+              <Input type="number" defaultValue="24" data-testid="input-points-expiry" />
             </div>
           </div>
           <div className="flex items-center justify-between p-4 border rounded-lg">
@@ -414,14 +414,14 @@ export default function LoyaltyProgram() {
               <p className="font-medium">Birthday Bonus Points</p>
               <p className="text-sm text-muted-foreground">Award bonus points on customer birthdays</p>
             </div>
-            <Input type="number" defaultValue="100" className="w-24" />
+            <Input type="number" defaultValue="100" className="w-24" data-testid="input-birthday-bonus" />
           </div>
           <div className="flex items-center justify-between p-4 border rounded-lg">
             <div>
               <p className="font-medium">Referral Bonus</p>
               <p className="text-sm text-muted-foreground">Points for referring new customers</p>
             </div>
-            <Input type="number" defaultValue="250" className="w-24" />
+            <Input type="number" defaultValue="250" className="w-24" data-testid="input-referral-bonus" />
           </div>
         </CardContent>
       </Card>

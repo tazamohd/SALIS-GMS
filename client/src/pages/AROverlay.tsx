@@ -133,45 +133,45 @@ export default function AROverlay() {
   const overviewTab = (
     <div className="space-y-6" data-testid="ar-overview">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
+        <Card data-testid="card-connected-devices">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Connected Devices</p>
-                <p className="text-3xl font-bold">{connectedDevices}/{devices.length}</p>
+                <p className="text-3xl font-bold" data-testid="text-connected-count">{connectedDevices}/{devices.length}</p>
               </div>
               <Wifi className="w-8 h-8 text-green-500" />
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card data-testid="card-active-sessions">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Active Sessions</p>
-                <p className="text-3xl font-bold">{activeSessions.length}</p>
+                <p className="text-3xl font-bold" data-testid="text-sessions-count">{activeSessions.length}</p>
               </div>
               <Eye className="w-8 h-8 text-blue-500" />
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card data-testid="card-weekly-sessions">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Weekly Sessions</p>
-                <p className="text-3xl font-bold">{totalSessions}</p>
+                <p className="text-3xl font-bold" data-testid="text-weekly-count">{totalSessions}</p>
               </div>
               <ScanLine className="w-8 h-8 text-purple-500" />
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card data-testid="card-instructions-count">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Instructions</p>
-                <p className="text-3xl font-bold">{instructions.length}</p>
+                <p className="text-3xl font-bold" data-testid="text-instructions-count">{instructions.length}</p>
               </div>
               <Layers className="w-8 h-8 text-yellow-500" />
             </div>
@@ -198,7 +198,7 @@ export default function AROverlay() {
                         <p className="font-medium">{session.technicianName}</p>
                         <p className="text-sm text-muted-foreground">{session.instructionTitle}</p>
                       </div>
-                      <Badge variant={session.status === "active" ? "default" : "secondary"}>
+                      <Badge variant={session.status === "active" ? "default" : "secondary"} data-testid={`badge-session-status-${session.id}`}>
                         {session.status === "active" ? <Play className="w-3 h-3 mr-1" /> : <Pause className="w-3 h-3 mr-1" />}
                         {session.status}
                       </Badge>
@@ -209,7 +209,7 @@ export default function AROverlay() {
                         <span>Progress</span>
                         <span>{session.completionRate}%</span>
                       </div>
-                      <Progress value={session.completionRate} className="h-2" />
+                      <Progress value={session.completionRate} className="h-2" data-testid={`progress-session-${session.id}`} />
                     </div>
                     <div className="flex items-center justify-between mt-2 text-xs text-muted-foreground">
                       <span>Started: {session.startTime}</span>
@@ -262,7 +262,7 @@ export default function AROverlay() {
           </div>
           <div className="flex items-center gap-2">
             <span className="text-sm text-muted-foreground">Live Preview</span>
-            <Switch checked={showLivePreview} onCheckedChange={setShowLivePreview} />
+            <Switch checked={showLivePreview} onCheckedChange={setShowLivePreview} data-testid="switch-live-preview" />
           </div>
         </CardHeader>
         <CardContent>
@@ -324,7 +324,7 @@ export default function AROverlay() {
                       <p className="text-sm text-muted-foreground">{device.technicianName}</p>
                     </div>
                   </div>
-                  <Badge variant={device.status === "connected" ? "default" : device.status === "pairing" ? "secondary" : "outline"}>
+                  <Badge variant={device.status === "connected" ? "default" : device.status === "pairing" ? "secondary" : "outline"} data-testid={`badge-device-status-${device.id}`}>
                     {device.status === "connected" && <Wifi className="w-3 h-3 mr-1" />}
                     {device.status === "disconnected" && <WifiOff className="w-3 h-3 mr-1" />}
                     {device.status}
@@ -394,8 +394,8 @@ export default function AROverlay() {
                 </div>
               </div>
               <div className="flex gap-2 mt-4">
-                <Button variant="outline" size="sm" className="flex-1">Preview</Button>
-                <Button size="sm" className="flex-1">Launch</Button>
+                <Button variant="outline" size="sm" className="flex-1" data-testid={`button-preview-instruction-${instruction.id}`}>Preview</Button>
+                <Button size="sm" className="flex-1" data-testid={`button-launch-instruction-${instruction.id}`}>Launch</Button>
               </div>
             </CardContent>
           </Card>

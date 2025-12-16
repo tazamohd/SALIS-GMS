@@ -107,45 +107,45 @@ export default function AutomatedReordering() {
   const overviewTab = (
     <div className="space-y-6" data-testid="auto-reorder-overview">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
+        <Card data-testid="card-critical-stock">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Critical Stock</p>
-                <p className="text-3xl font-bold text-red-500">{criticalItems.length}</p>
+                <p className="text-3xl font-bold text-red-500" data-testid="text-critical-count">{criticalItems.length}</p>
               </div>
               <AlertTriangle className="w-8 h-8 text-red-500" />
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card data-testid="card-low-stock">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Low Stock</p>
-                <p className="text-3xl font-bold text-yellow-500">{lowStockItems.length}</p>
+                <p className="text-3xl font-bold text-yellow-500" data-testid="text-lowstock-count">{lowStockItems.length}</p>
               </div>
               <Package className="w-8 h-8 text-yellow-500" />
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card data-testid="card-pending-orders">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Pending Orders</p>
-                <p className="text-3xl font-bold">{pendingOrders.length}</p>
+                <p className="text-3xl font-bold" data-testid="text-pending-count">{pendingOrders.length}</p>
               </div>
               <ShoppingCart className="w-8 h-8 text-blue-500" />
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card data-testid="card-forecast-accuracy">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Forecast Accuracy</p>
-                <p className="text-3xl font-bold text-green-500">94%</p>
+                <p className="text-3xl font-bold text-green-500" data-testid="text-accuracy">94%</p>
               </div>
               <Brain className="w-8 h-8 text-green-500" />
             </div>
@@ -280,7 +280,7 @@ export default function AutomatedReordering() {
             <CardTitle>Reorder Rules</CardTitle>
             <CardDescription>Configure automatic reordering rules for inventory items</CardDescription>
           </div>
-          <Button data-testid="button-add-rule">
+          <Button data-testid="button-add-reorder-rule">
             <Settings className="w-4 h-4 mr-2" />
             Add Rule
           </Button>
@@ -290,7 +290,7 @@ export default function AutomatedReordering() {
             {stockLevelData.map((item, idx) => (
               <div key={idx} className="p-4 border rounded-lg flex items-center justify-between" data-testid={`rule-item-${idx}`}>
                 <div className="flex items-center gap-4">
-                  <Switch checked={true} />
+                  <Switch checked={true} data-testid={`switch-rule-active-${idx}`} />
                   <div>
                     <p className="font-medium">{item.name}</p>
                     <p className="text-sm text-muted-foreground">
@@ -300,7 +300,7 @@ export default function AutomatedReordering() {
                 </div>
                 <div className="flex items-center gap-4">
                   <Badge variant="outline">Auto-approve: Off</Badge>
-                  <Button variant="ghost" size="sm">Edit</Button>
+                  <Button variant="ghost" size="sm" data-testid={`button-edit-rule-${idx}`}>Edit</Button>
                 </div>
               </div>
             ))}
