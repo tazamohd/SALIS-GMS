@@ -1,6 +1,36 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import { db } from "./db";
+import { eq, and, desc, sql } from "drizzle-orm";
+import {
+  hrDepartments,
+  hrPositions,
+  hrEmployeeProfiles,
+  hrLeaveTypes,
+  hrLeaveBalances,
+  hrLeaveRequests,
+  hrJobPostings,
+  hrCandidates,
+  hrBenefitPlans,
+  hrBenefitEnrollments,
+  hrPerformanceReviews,
+  hrAnnouncements,
+  hrSelfServiceRequests,
+  insertHrDepartmentSchema,
+  insertHrPositionSchema,
+  insertHrEmployeeProfileSchema,
+  insertHrLeaveTypeSchema,
+  insertHrLeaveBalanceSchema,
+  insertHrLeaveRequestSchema,
+  insertHrJobPostingSchema,
+  insertHrCandidateSchema,
+  insertHrBenefitPlanSchema,
+  insertHrBenefitEnrollmentSchema,
+  insertHrPerformanceReviewSchema,
+  insertHrAnnouncementSchema,
+  insertHrSelfServiceRequestSchema,
+} from "@shared/schema";
 import rateLimit from "express-rate-limit";
 import { setupAuth, isAuthenticated, hashPassword } from "./auth";
 import passport from "passport";
@@ -18971,6 +19001,638 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error("Error restoring backup:", error);
       res.status(500).json({ message: "Failed to restore backup" });
+    }
+  });
+
+  // ==========================================
+  // HR MODULE API ROUTES
+  // ==========================================
+
+  // HR Departments
+  app.get('/api/hr/departments', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user?.garageId;
+      const departments = await db.select().from(hrDepartments)
+        .where(garageId ? eq(hrDepartments.garageId, garageId) : undefined)
+        .orderBy(hrDepartments.name);
+      res.json(departments);
+    } catch (error: any) {
+      console.error("Error fetching HR departments:", error);
+      res.status(500).json({ message: "Failed to fetch departments" });
+    }
+  });
+
+  app.post('/api/hr/departments', isAuthenticated, async (req: any, res) => {
+    try {
+      const validation = insertHrDepartmentSchema.safeParse(req.body);
+      if (!validation.success) {
+        return res.status(400).json(sanitizeZodError(validation.error));
+      }
+      const [department] = await db.insert(hrDepartments).values(validation.data).returning();
+      res.status(201).json(department);
+    } catch (error: any) {
+      console.error("Error creating HR department:", error);
+      res.status(500).json({ message: "Failed to create department" });
+    }
+  });
+
+  app.patch('/api/hr/departments/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const [updated] = await db.update(hrDepartments)
+        .set({ ...req.body, updatedAt: new Date() })
+        .where(eq(hrDepartments.id, id))
+        .returning();
+      if (!updated) {
+        return res.status(404).json({ message: "Department not found" });
+      }
+      res.json(updated);
+    } catch (error: any) {
+      console.error("Error updating HR department:", error);
+      res.status(500).json({ message: "Failed to update department" });
+    }
+  });
+
+  app.delete('/api/hr/departments/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      await db.delete(hrDepartments).where(eq(hrDepartments.id, id));
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error("Error deleting HR department:", error);
+      res.status(500).json({ message: "Failed to delete department" });
+    }
+  });
+
+  // HR Positions
+  app.get('/api/hr/positions', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user?.garageId;
+      const positions = await db.select().from(hrPositions)
+        .where(garageId ? eq(hrPositions.garageId, garageId) : undefined)
+        .orderBy(hrPositions.title);
+      res.json(positions);
+    } catch (error: any) {
+      console.error("Error fetching HR positions:", error);
+      res.status(500).json({ message: "Failed to fetch positions" });
+    }
+  });
+
+  app.post('/api/hr/positions', isAuthenticated, async (req: any, res) => {
+    try {
+      const validation = insertHrPositionSchema.safeParse(req.body);
+      if (!validation.success) {
+        return res.status(400).json(sanitizeZodError(validation.error));
+      }
+      const [position] = await db.insert(hrPositions).values(validation.data).returning();
+      res.status(201).json(position);
+    } catch (error: any) {
+      console.error("Error creating HR position:", error);
+      res.status(500).json({ message: "Failed to create position" });
+    }
+  });
+
+  app.patch('/api/hr/positions/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const [updated] = await db.update(hrPositions)
+        .set(req.body)
+        .where(eq(hrPositions.id, id))
+        .returning();
+      if (!updated) {
+        return res.status(404).json({ message: "Position not found" });
+      }
+      res.json(updated);
+    } catch (error: any) {
+      console.error("Error updating HR position:", error);
+      res.status(500).json({ message: "Failed to update position" });
+    }
+  });
+
+  app.delete('/api/hr/positions/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      await db.delete(hrPositions).where(eq(hrPositions.id, id));
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error("Error deleting HR position:", error);
+      res.status(500).json({ message: "Failed to delete position" });
+    }
+  });
+
+  // HR Employee Profiles
+  app.get('/api/hr/employees', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user?.garageId;
+      const employees = await db.select().from(hrEmployeeProfiles)
+        .where(garageId ? eq(hrEmployeeProfiles.garageId, garageId) : undefined)
+        .orderBy(desc(hrEmployeeProfiles.createdAt));
+      res.json(employees);
+    } catch (error: any) {
+      console.error("Error fetching HR employees:", error);
+      res.status(500).json({ message: "Failed to fetch employees" });
+    }
+  });
+
+  app.get('/api/hr/employees/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const [employee] = await db.select().from(hrEmployeeProfiles)
+        .where(eq(hrEmployeeProfiles.id, id));
+      if (!employee) {
+        return res.status(404).json({ message: "Employee not found" });
+      }
+      res.json(employee);
+    } catch (error: any) {
+      console.error("Error fetching HR employee:", error);
+      res.status(500).json({ message: "Failed to fetch employee" });
+    }
+  });
+
+  app.post('/api/hr/employees', isAuthenticated, async (req: any, res) => {
+    try {
+      const validation = insertHrEmployeeProfileSchema.safeParse(req.body);
+      if (!validation.success) {
+        return res.status(400).json(sanitizeZodError(validation.error));
+      }
+      const [employee] = await db.insert(hrEmployeeProfiles).values(validation.data).returning();
+      res.status(201).json(employee);
+    } catch (error: any) {
+      console.error("Error creating HR employee:", error);
+      res.status(500).json({ message: "Failed to create employee" });
+    }
+  });
+
+  app.patch('/api/hr/employees/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const [updated] = await db.update(hrEmployeeProfiles)
+        .set({ ...req.body, updatedAt: new Date() })
+        .where(eq(hrEmployeeProfiles.id, id))
+        .returning();
+      if (!updated) {
+        return res.status(404).json({ message: "Employee not found" });
+      }
+      res.json(updated);
+    } catch (error: any) {
+      console.error("Error updating HR employee:", error);
+      res.status(500).json({ message: "Failed to update employee" });
+    }
+  });
+
+  app.delete('/api/hr/employees/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      await db.delete(hrEmployeeProfiles).where(eq(hrEmployeeProfiles.id, id));
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error("Error deleting HR employee:", error);
+      res.status(500).json({ message: "Failed to delete employee" });
+    }
+  });
+
+  // HR Leave Types
+  app.get('/api/hr/leave-types', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user?.garageId;
+      const leaveTypes = await db.select().from(hrLeaveTypes)
+        .where(garageId ? eq(hrLeaveTypes.garageId, garageId) : undefined)
+        .orderBy(hrLeaveTypes.name);
+      res.json(leaveTypes);
+    } catch (error: any) {
+      console.error("Error fetching leave types:", error);
+      res.status(500).json({ message: "Failed to fetch leave types" });
+    }
+  });
+
+  app.post('/api/hr/leave-types', isAuthenticated, async (req: any, res) => {
+    try {
+      const validation = insertHrLeaveTypeSchema.safeParse(req.body);
+      if (!validation.success) {
+        return res.status(400).json(sanitizeZodError(validation.error));
+      }
+      const [leaveType] = await db.insert(hrLeaveTypes).values(validation.data).returning();
+      res.status(201).json(leaveType);
+    } catch (error: any) {
+      console.error("Error creating leave type:", error);
+      res.status(500).json({ message: "Failed to create leave type" });
+    }
+  });
+
+  // HR Leave Balances
+  app.get('/api/hr/leave-balances/:employeeId', isAuthenticated, async (req: any, res) => {
+    try {
+      const { employeeId } = req.params;
+      const balances = await db.select().from(hrLeaveBalances)
+        .where(eq(hrLeaveBalances.employeeId, employeeId))
+        .orderBy(desc(hrLeaveBalances.year));
+      res.json(balances);
+    } catch (error: any) {
+      console.error("Error fetching leave balances:", error);
+      res.status(500).json({ message: "Failed to fetch leave balances" });
+    }
+  });
+
+  app.post('/api/hr/leave-balances', isAuthenticated, async (req: any, res) => {
+    try {
+      const validation = insertHrLeaveBalanceSchema.safeParse(req.body);
+      if (!validation.success) {
+        return res.status(400).json(sanitizeZodError(validation.error));
+      }
+      const [balance] = await db.insert(hrLeaveBalances).values(validation.data).returning();
+      res.status(201).json(balance);
+    } catch (error: any) {
+      console.error("Error creating leave balance:", error);
+      res.status(500).json({ message: "Failed to create leave balance" });
+    }
+  });
+
+  app.patch('/api/hr/leave-balances/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const [updated] = await db.update(hrLeaveBalances)
+        .set({ ...req.body, updatedAt: new Date() })
+        .where(eq(hrLeaveBalances.id, id))
+        .returning();
+      if (!updated) {
+        return res.status(404).json({ message: "Leave balance not found" });
+      }
+      res.json(updated);
+    } catch (error: any) {
+      console.error("Error updating leave balance:", error);
+      res.status(500).json({ message: "Failed to update leave balance" });
+    }
+  });
+
+  // HR Leave Requests
+  app.get('/api/hr/leave-requests', isAuthenticated, async (req: any, res) => {
+    try {
+      const { employeeId, status } = req.query;
+      let query = db.select().from(hrLeaveRequests);
+      
+      if (employeeId) {
+        query = query.where(eq(hrLeaveRequests.employeeId, employeeId as string)) as any;
+      }
+      if (status) {
+        query = query.where(eq(hrLeaveRequests.status, status as string)) as any;
+      }
+      
+      const requests = await query.orderBy(desc(hrLeaveRequests.createdAt));
+      res.json(requests);
+    } catch (error: any) {
+      console.error("Error fetching leave requests:", error);
+      res.status(500).json({ message: "Failed to fetch leave requests" });
+    }
+  });
+
+  app.post('/api/hr/leave-requests', isAuthenticated, async (req: any, res) => {
+    try {
+      const validation = insertHrLeaveRequestSchema.safeParse(req.body);
+      if (!validation.success) {
+        return res.status(400).json(sanitizeZodError(validation.error));
+      }
+      const [request] = await db.insert(hrLeaveRequests).values(validation.data).returning();
+      res.status(201).json(request);
+    } catch (error: any) {
+      console.error("Error creating leave request:", error);
+      res.status(500).json({ message: "Failed to create leave request" });
+    }
+  });
+
+  app.patch('/api/hr/leave-requests/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const updateData: any = { ...req.body, updatedAt: new Date() };
+      
+      if (req.body.status === 'approved') {
+        updateData.approvedBy = req.user?.id;
+        updateData.approvedAt = new Date();
+      }
+      
+      const [updated] = await db.update(hrLeaveRequests)
+        .set(updateData)
+        .where(eq(hrLeaveRequests.id, id))
+        .returning();
+      if (!updated) {
+        return res.status(404).json({ message: "Leave request not found" });
+      }
+      res.json(updated);
+    } catch (error: any) {
+      console.error("Error updating leave request:", error);
+      res.status(500).json({ message: "Failed to update leave request" });
+    }
+  });
+
+  // HR Job Postings
+  app.get('/api/hr/job-postings', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user?.garageId;
+      const { status } = req.query;
+      let query = db.select().from(hrJobPostings);
+      
+      if (garageId) {
+        query = query.where(eq(hrJobPostings.garageId, garageId)) as any;
+      }
+      if (status) {
+        query = query.where(eq(hrJobPostings.status, status as string)) as any;
+      }
+      
+      const postings = await query.orderBy(desc(hrJobPostings.createdAt));
+      res.json(postings);
+    } catch (error: any) {
+      console.error("Error fetching job postings:", error);
+      res.status(500).json({ message: "Failed to fetch job postings" });
+    }
+  });
+
+  app.post('/api/hr/job-postings', isAuthenticated, async (req: any, res) => {
+    try {
+      const validation = insertHrJobPostingSchema.safeParse(req.body);
+      if (!validation.success) {
+        return res.status(400).json(sanitizeZodError(validation.error));
+      }
+      const data = { ...validation.data, createdBy: req.user?.id };
+      const [posting] = await db.insert(hrJobPostings).values(data).returning();
+      res.status(201).json(posting);
+    } catch (error: any) {
+      console.error("Error creating job posting:", error);
+      res.status(500).json({ message: "Failed to create job posting" });
+    }
+  });
+
+  app.patch('/api/hr/job-postings/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const updateData: any = { ...req.body, updatedAt: new Date() };
+      
+      if (req.body.status === 'open' && !req.body.publishedAt) {
+        updateData.publishedAt = new Date();
+      }
+      
+      const [updated] = await db.update(hrJobPostings)
+        .set(updateData)
+        .where(eq(hrJobPostings.id, id))
+        .returning();
+      if (!updated) {
+        return res.status(404).json({ message: "Job posting not found" });
+      }
+      res.json(updated);
+    } catch (error: any) {
+      console.error("Error updating job posting:", error);
+      res.status(500).json({ message: "Failed to update job posting" });
+    }
+  });
+
+  // HR Candidates
+  app.get('/api/hr/candidates', isAuthenticated, async (req: any, res) => {
+    try {
+      const { jobPostingId, stage } = req.query;
+      let query = db.select().from(hrCandidates);
+      
+      if (jobPostingId) {
+        query = query.where(eq(hrCandidates.jobPostingId, jobPostingId as string)) as any;
+      }
+      if (stage) {
+        query = query.where(eq(hrCandidates.stage, stage as string)) as any;
+      }
+      
+      const candidates = await query.orderBy(desc(hrCandidates.createdAt));
+      res.json(candidates);
+    } catch (error: any) {
+      console.error("Error fetching candidates:", error);
+      res.status(500).json({ message: "Failed to fetch candidates" });
+    }
+  });
+
+  app.post('/api/hr/candidates', isAuthenticated, async (req: any, res) => {
+    try {
+      const validation = insertHrCandidateSchema.safeParse(req.body);
+      if (!validation.success) {
+        return res.status(400).json(sanitizeZodError(validation.error));
+      }
+      const [candidate] = await db.insert(hrCandidates).values(validation.data).returning();
+      res.status(201).json(candidate);
+    } catch (error: any) {
+      console.error("Error creating candidate:", error);
+      res.status(500).json({ message: "Failed to create candidate" });
+    }
+  });
+
+  app.patch('/api/hr/candidates/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const [updated] = await db.update(hrCandidates)
+        .set({ ...req.body, updatedAt: new Date() })
+        .where(eq(hrCandidates.id, id))
+        .returning();
+      if (!updated) {
+        return res.status(404).json({ message: "Candidate not found" });
+      }
+      res.json(updated);
+    } catch (error: any) {
+      console.error("Error updating candidate:", error);
+      res.status(500).json({ message: "Failed to update candidate" });
+    }
+  });
+
+  // HR Benefit Plans
+  app.get('/api/hr/benefit-plans', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user?.garageId;
+      const plans = await db.select().from(hrBenefitPlans)
+        .where(garageId ? eq(hrBenefitPlans.garageId, garageId) : undefined)
+        .orderBy(hrBenefitPlans.name);
+      res.json(plans);
+    } catch (error: any) {
+      console.error("Error fetching benefit plans:", error);
+      res.status(500).json({ message: "Failed to fetch benefit plans" });
+    }
+  });
+
+  app.post('/api/hr/benefit-plans', isAuthenticated, async (req: any, res) => {
+    try {
+      const validation = insertHrBenefitPlanSchema.safeParse(req.body);
+      if (!validation.success) {
+        return res.status(400).json(sanitizeZodError(validation.error));
+      }
+      const [plan] = await db.insert(hrBenefitPlans).values(validation.data).returning();
+      res.status(201).json(plan);
+    } catch (error: any) {
+      console.error("Error creating benefit plan:", error);
+      res.status(500).json({ message: "Failed to create benefit plan" });
+    }
+  });
+
+  // HR Benefit Enrollments
+  app.get('/api/hr/benefit-enrollments/:employeeId', isAuthenticated, async (req: any, res) => {
+    try {
+      const { employeeId } = req.params;
+      const enrollments = await db.select().from(hrBenefitEnrollments)
+        .where(eq(hrBenefitEnrollments.employeeId, employeeId));
+      res.json(enrollments);
+    } catch (error: any) {
+      console.error("Error fetching benefit enrollments:", error);
+      res.status(500).json({ message: "Failed to fetch benefit enrollments" });
+    }
+  });
+
+  app.post('/api/hr/benefit-enrollments', isAuthenticated, async (req: any, res) => {
+    try {
+      const validation = insertHrBenefitEnrollmentSchema.safeParse(req.body);
+      if (!validation.success) {
+        return res.status(400).json(sanitizeZodError(validation.error));
+      }
+      const [enrollment] = await db.insert(hrBenefitEnrollments).values(validation.data).returning();
+      res.status(201).json(enrollment);
+    } catch (error: any) {
+      console.error("Error creating benefit enrollment:", error);
+      res.status(500).json({ message: "Failed to create benefit enrollment" });
+    }
+  });
+
+  // HR Performance Reviews
+  app.get('/api/hr/performance-reviews', isAuthenticated, async (req: any, res) => {
+    try {
+      const { employeeId, status } = req.query;
+      let query = db.select().from(hrPerformanceReviews);
+      
+      if (employeeId) {
+        query = query.where(eq(hrPerformanceReviews.employeeId, employeeId as string)) as any;
+      }
+      if (status) {
+        query = query.where(eq(hrPerformanceReviews.status, status as string)) as any;
+      }
+      
+      const reviews = await query.orderBy(desc(hrPerformanceReviews.createdAt));
+      res.json(reviews);
+    } catch (error: any) {
+      console.error("Error fetching performance reviews:", error);
+      res.status(500).json({ message: "Failed to fetch performance reviews" });
+    }
+  });
+
+  app.post('/api/hr/performance-reviews', isAuthenticated, async (req: any, res) => {
+    try {
+      const validation = insertHrPerformanceReviewSchema.safeParse(req.body);
+      if (!validation.success) {
+        return res.status(400).json(sanitizeZodError(validation.error));
+      }
+      const [review] = await db.insert(hrPerformanceReviews).values(validation.data).returning();
+      res.status(201).json(review);
+    } catch (error: any) {
+      console.error("Error creating performance review:", error);
+      res.status(500).json({ message: "Failed to create performance review" });
+    }
+  });
+
+  app.patch('/api/hr/performance-reviews/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const updateData: any = { ...req.body, updatedAt: new Date() };
+      
+      if (req.body.status === 'completed') {
+        updateData.completedAt = new Date();
+      }
+      
+      const [updated] = await db.update(hrPerformanceReviews)
+        .set(updateData)
+        .where(eq(hrPerformanceReviews.id, id))
+        .returning();
+      if (!updated) {
+        return res.status(404).json({ message: "Performance review not found" });
+      }
+      res.json(updated);
+    } catch (error: any) {
+      console.error("Error updating performance review:", error);
+      res.status(500).json({ message: "Failed to update performance review" });
+    }
+  });
+
+  // HR Announcements
+  app.get('/api/hr/announcements', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user?.garageId;
+      const announcements = await db.select().from(hrAnnouncements)
+        .where(garageId ? eq(hrAnnouncements.garageId, garageId) : undefined)
+        .orderBy(desc(hrAnnouncements.createdAt));
+      res.json(announcements);
+    } catch (error: any) {
+      console.error("Error fetching HR announcements:", error);
+      res.status(500).json({ message: "Failed to fetch announcements" });
+    }
+  });
+
+  app.post('/api/hr/announcements', isAuthenticated, async (req: any, res) => {
+    try {
+      const validation = insertHrAnnouncementSchema.safeParse(req.body);
+      if (!validation.success) {
+        return res.status(400).json(sanitizeZodError(validation.error));
+      }
+      const data = { ...validation.data, createdBy: req.user?.id };
+      const [announcement] = await db.insert(hrAnnouncements).values(data).returning();
+      res.status(201).json(announcement);
+    } catch (error: any) {
+      console.error("Error creating HR announcement:", error);
+      res.status(500).json({ message: "Failed to create announcement" });
+    }
+  });
+
+  // HR Self Service Requests
+  app.get('/api/hr/self-service-requests', isAuthenticated, async (req: any, res) => {
+    try {
+      const { employeeId, status } = req.query;
+      let query = db.select().from(hrSelfServiceRequests);
+      
+      if (employeeId) {
+        query = query.where(eq(hrSelfServiceRequests.employeeId, employeeId as string)) as any;
+      }
+      if (status) {
+        query = query.where(eq(hrSelfServiceRequests.status, status as string)) as any;
+      }
+      
+      const requests = await query.orderBy(desc(hrSelfServiceRequests.createdAt));
+      res.json(requests);
+    } catch (error: any) {
+      console.error("Error fetching self-service requests:", error);
+      res.status(500).json({ message: "Failed to fetch self-service requests" });
+    }
+  });
+
+  app.post('/api/hr/self-service-requests', isAuthenticated, async (req: any, res) => {
+    try {
+      const validation = insertHrSelfServiceRequestSchema.safeParse(req.body);
+      if (!validation.success) {
+        return res.status(400).json(sanitizeZodError(validation.error));
+      }
+      const [request] = await db.insert(hrSelfServiceRequests).values(validation.data).returning();
+      res.status(201).json(request);
+    } catch (error: any) {
+      console.error("Error creating self-service request:", error);
+      res.status(500).json({ message: "Failed to create self-service request" });
+    }
+  });
+
+  app.patch('/api/hr/self-service-requests/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const updateData: any = { ...req.body, updatedAt: new Date() };
+      
+      if (['approved', 'rejected', 'completed'].includes(req.body.status)) {
+        updateData.processedBy = req.user?.id;
+        updateData.processedAt = new Date();
+      }
+      
+      const [updated] = await db.update(hrSelfServiceRequests)
+        .set(updateData)
+        .where(eq(hrSelfServiceRequests.id, id))
+        .returning();
+      if (!updated) {
+        return res.status(404).json({ message: "Self-service request not found" });
+      }
+      res.json(updated);
+    } catch (error: any) {
+      console.error("Error updating self-service request:", error);
+      res.status(500).json({ message: "Failed to update self-service request" });
     }
   });
 
