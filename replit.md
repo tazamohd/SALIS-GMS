@@ -20,7 +20,8 @@ The application uses a full-stack architecture with clear client-server separati
 **Backend**: Express server written in TypeScript.
 **Authentication**: Custom email/password authentication with comprehensive role-based access control (RBAC).
 **Database**: PostgreSQL with Drizzle ORM, comprising **170+ comprehensive modules with 307+ tables**.
-**RBAC System**: 24 professional roles, 70 staff users across departments, granular permissions for 151+ resources.
+**RBAC System**: 24 professional roles, 70 staff users across departments, granular permissions for 151+ resources. Role-based sidebar navigation filtering implemented via `roleNavigationMap` in Layout.tsx. Welcome page at `/welcome` routes users to their role-specific portal (technician → /technician-portal, HR → /hr-management, etc.).
+**Security Notes (Production)**: AUTH_BYPASS=true is set for development only. Disable for production. HR module queries use optional garage-based filtering - in development mode without garageId, returns all records. Production deployments must enforce garageId for tenant isolation.
 **Real-Time Features**: WebSocket server (`/ws/chat`) for in-app chat support, live notifications, and call center real-time updates with session-based authentication.
 
 **UI/UX Decisions**: The design preserves the Figma aesthetic, ensures responsiveness, and uses a consistent component-based approach with a monochrome design system based on the SALIS AUTO brand. It supports PWA, mobile-responsive navigation, and WCAG 2.1 AA accessibility features, including an offline mode. A pure grayscale design is enforced with distinct light and dark modes.

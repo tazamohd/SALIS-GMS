@@ -19020,9 +19020,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/hr/departments', isAuthenticated, async (req: any, res) => {
     try {
       const garageId = req.user?.garageId;
-      const departments = await db.select().from(hrDepartments)
-        .where(garageId ? eq(hrDepartments.garageId, garageId) : undefined)
-        .orderBy(hrDepartments.name);
+      // In development/auth bypass mode, return all departments if no garageId
+      // In production, this should require garageId for tenant isolation
+      let query = db.select().from(hrDepartments);
+      if (garageId) {
+        query = query.where(eq(hrDepartments.garageId, garageId)) as typeof query;
+      }
+      const departments = await query.orderBy(hrDepartments.name);
       res.json(departments);
     } catch (error: any) {
       console.error("Error fetching HR departments:", error);
