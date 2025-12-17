@@ -556,10 +556,11 @@ export function Layout({ children }: LayoutProps) {
                       className="w-full"
                       data-testid={`nav-group-${groupLabel.toLowerCase().replace(/\s+/g, "-")}`}
                     >
-                      <div className="flex items-center justify-between pl-3 pr-2 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-salis-gray-dark transition-colors group">
-                        <span className="font-poppins font-bold text-sm uppercase text-gray-700 dark:text-gray-300 tracking-wider leading-tight">
+                      <div className="flex items-center justify-start gap-2 pl-2 pr-2 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-salis-gray-dark transition-colors group">
+                        <span className="font-poppins font-bold text-sm uppercase text-gray-700 dark:text-gray-300 tracking-wider leading-tight text-left">
                           {groupLabel}
                         </span>
+                        <div className="flex-1" />
                         {isExpanded ? (
                           <ChevronDown className="w-3 h-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-300" />
                         ) : (
