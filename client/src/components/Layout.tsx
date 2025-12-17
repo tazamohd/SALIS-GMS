@@ -508,7 +508,7 @@ export function Layout({ children }: LayoutProps) {
                       data-testid={`nav-group-${groupLabel.toLowerCase().replace(/\s+/g, "-")}`}
                     >
                       <div className="flex items-center justify-between pl-3 pr-2 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-salis-gray-dark transition-colors group">
-                        <span className="font-poppins font-bold text-[10px] uppercase text-gray-700 dark:text-gray-300 tracking-wider leading-tight">
+                        <span className="font-poppins font-bold text-sm uppercase text-gray-700 dark:text-gray-300 tracking-wider leading-tight">
                           {groupLabel}
                         </span>
                         {isExpanded ? (
