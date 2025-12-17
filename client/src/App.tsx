@@ -3,6 +3,7 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider, useQuery } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { AuthProvider } from "@/hooks/useAuth";
 import NotFound from "@/pages/not-found";
 
 import { LoginDashboard } from "@/pages/LoginDashboard";
@@ -1375,12 +1376,14 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <UndoRedoProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Router />
-        </TooltipProvider>
-      </UndoRedoProvider>
+      <AuthProvider>
+        <UndoRedoProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Router />
+          </TooltipProvider>
+        </UndoRedoProvider>
+      </AuthProvider>
     </QueryClientProvider>
   );
 }
