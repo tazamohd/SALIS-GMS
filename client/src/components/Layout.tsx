@@ -79,6 +79,7 @@ import {
   Scale,
   Banknote,
   Calculator,
+  GripVertical,
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -111,6 +112,43 @@ export function Layout({ children }: LayoutProps) {
   const [quickActionsOpen, setQuickActionsOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { t } = useTranslation();
+  
+  // Resizable sidebar state - default 280px, stored in localStorage
+  const [sidebarWidth, setSidebarWidth] = useState(() => {
+    const saved = localStorage.getItem('sidebarWidth');
+    return saved ? parseInt(saved, 10) : 280;
+  });
+  const [isResizing, setIsResizing] = useState(false);
+
+  // Handle sidebar resize
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isResizing) return;
+      const newWidth = Math.min(Math.max(e.clientX, 200), 400); // Min 200px, Max 400px
+      setSidebarWidth(newWidth);
+    };
+
+    const handleMouseUp = () => {
+      if (isResizing) {
+        setIsResizing(false);
+        localStorage.setItem('sidebarWidth', sidebarWidth.toString());
+      }
+    };
+
+    if (isResizing) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+      document.body.style.cursor = 'col-resize';
+      document.body.style.userSelect = 'none';
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+  }, [isResizing, sidebarWidth]);
 
   // Get user settings for keyboard shortcuts
   const { data: settings } = useQuery<UserSettings>({
@@ -478,15 +516,26 @@ export function Layout({ children }: LayoutProps) {
           />
         )}
 
-        {/* Sidebar - Compact Design */}
+        {/* Sidebar - Resizable Design */}
         <aside
           className={`
-        fixed lg:static inset-y-0 left-0 z-50
-        w-56 bg-white dark:bg-salis-black border-r border-gray-200 dark:border-salis-gray-dark flex flex-col
+        fixed lg:static inset-y-0 left-0 z-50 relative
+        bg-white dark:bg-salis-black border-r border-gray-200 dark:border-salis-gray-dark flex flex-col
         transition-transform duration-300 ease-in-out
         ${mobileMenuOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
       `}
+          style={{ width: `${sidebarWidth}px` }}
         >
+          {/* Resize Handle */}
+          <div
+            className="absolute right-0 top-0 bottom-0 w-1 cursor-col-resize hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors z-10 hidden lg:block"
+            onMouseDown={() => setIsResizing(true)}
+            data-testid="sidebar-resize-handle"
+          >
+            <div className="absolute right-0 top-1/2 -translate-y-1/2 -translate-x-1/2 p-1 rounded bg-gray-200 dark:bg-gray-700 opacity-0 hover:opacity-100 transition-opacity">
+              <GripVertical className="w-3 h-3 text-gray-500" />
+            </div>
+          </div>
           {/* Navigation - Compact */}
           <nav className="flex-1 p-3 overflow-y-auto">
             <div className="space-y-0.5">
