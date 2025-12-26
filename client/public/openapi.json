@@ -1,0 +1,742 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "SALIS AUTO API",
+    "description": "Automotive ERP Platform API for garage operations management. This API provides access to customer management, vehicle tracking, job cards, inventory, invoicing, and analytics features.",
+    "version": "1.0.0",
+    "contact": {
+      "name": "SALIS AUTO Support",
+      "url": "https://salisauto.net",
+      "email": "support@salisauto.net"
+    },
+    "license": {
+      "name": "Proprietary",
+      "url": "https://salisauto.net/license"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://salisauto.net",
+      "description": "Production server"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Authentication",
+      "description": "User authentication and session management"
+    },
+    {
+      "name": "Customers",
+      "description": "Customer management operations"
+    },
+    {
+      "name": "Vehicles",
+      "description": "Vehicle registry and service history"
+    },
+    {
+      "name": "Appointments",
+      "description": "Appointment scheduling and management"
+    },
+    {
+      "name": "Job Cards",
+      "description": "Work order and job card management"
+    },
+    {
+      "name": "Inventory",
+      "description": "Spare parts and inventory management"
+    },
+    {
+      "name": "Invoices",
+      "description": "Billing and invoice management"
+    },
+    {
+      "name": "Technicians",
+      "description": "Technician management and assignments"
+    },
+    {
+      "name": "Analytics",
+      "description": "Reports and business intelligence"
+    },
+    {
+      "name": "Public",
+      "description": "Public endpoints (no authentication required)"
+    }
+  ],
+  "paths": {
+    "/api/public/track/{token}": {
+      "get": {
+        "tags": ["Public"],
+        "summary": "Track job status publicly",
+        "description": "Allows customers to track their vehicle service status using a tracking token",
+        "operationId": "trackJobPublic",
+        "parameters": [
+          {
+            "name": "token",
+            "in": "path",
+            "required": true,
+            "description": "Unique tracking token provided to the customer",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Job tracking information",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobTrackingInfo"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Tracking token not found"
+          }
+        }
+      }
+    },
+    "/api/login": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "User login",
+        "description": "Authenticate user with email and password",
+        "operationId": "login",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid credentials"
+          }
+        }
+      }
+    },
+    "/api/customers": {
+      "get": {
+        "tags": ["Customers"],
+        "summary": "List all customers",
+        "description": "Retrieve a list of all customers in the system",
+        "operationId": "listCustomers",
+        "security": [{"sessionAuth": []}],
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "description": "Search by name, email, or phone",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Maximum number of results",
+            "schema": {
+              "type": "integer",
+              "default": 50
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of customers",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Customer"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      },
+      "post": {
+        "tags": ["Customers"],
+        "summary": "Create a new customer",
+        "operationId": "createCustomer",
+        "security": [{"sessionAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CustomerInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Customer created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Customer"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/vehicles": {
+      "get": {
+        "tags": ["Vehicles"],
+        "summary": "List all vehicles",
+        "operationId": "listVehicles",
+        "security": [{"sessionAuth": []}],
+        "responses": {
+          "200": {
+            "description": "List of vehicles",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Vehicle"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/appointments": {
+      "get": {
+        "tags": ["Appointments"],
+        "summary": "List appointments",
+        "operationId": "listAppointments",
+        "security": [{"sessionAuth": []}],
+        "parameters": [
+          {
+            "name": "date",
+            "in": "query",
+            "description": "Filter by date (YYYY-MM-DD)",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Filter by status",
+            "schema": {
+              "type": "string",
+              "enum": ["scheduled", "confirmed", "in-progress", "completed", "cancelled"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of appointments",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Appointment"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/job-cards": {
+      "get": {
+        "tags": ["Job Cards"],
+        "summary": "List job cards",
+        "operationId": "listJobCards",
+        "security": [{"sessionAuth": []}],
+        "responses": {
+          "200": {
+            "description": "List of job cards",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/JobCard"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/invoices": {
+      "get": {
+        "tags": ["Invoices"],
+        "summary": "List invoices",
+        "operationId": "listInvoices",
+        "security": [{"sessionAuth": []}],
+        "responses": {
+          "200": {
+            "description": "List of invoices",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Invoice"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/spare-parts": {
+      "get": {
+        "tags": ["Inventory"],
+        "summary": "List spare parts",
+        "operationId": "listSpareParts",
+        "security": [{"sessionAuth": []}],
+        "responses": {
+          "200": {
+            "description": "List of spare parts",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SparePart"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/technicians": {
+      "get": {
+        "tags": ["Technicians"],
+        "summary": "List technicians",
+        "operationId": "listTechnicians",
+        "security": [{"sessionAuth": []}],
+        "responses": {
+          "200": {
+            "description": "List of technicians",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Technician"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/reports": {
+      "get": {
+        "tags": ["Analytics"],
+        "summary": "List available reports",
+        "operationId": "listReports",
+        "security": [{"sessionAuth": []}],
+        "responses": {
+          "200": {
+            "description": "List of reports",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Report"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "sessionAuth": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "connect.sid",
+        "description": "Session-based authentication using cookies"
+      },
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Bearer token authentication for API clients"
+      }
+    },
+    "schemas": {
+      "LoginRequest": {
+        "type": "object",
+        "required": ["email", "password"],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "admin@salisauto.com"
+          },
+          "password": {
+            "type": "string",
+            "format": "password"
+          }
+        }
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "name": {
+            "type": "string"
+          },
+          "userType": {
+            "type": "string",
+            "enum": ["admin", "staff", "customer"]
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "Customer": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          },
+          "customerType": {
+            "type": "string",
+            "enum": ["individual", "business", "fleet"]
+          }
+        }
+      },
+      "CustomerInput": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          },
+          "customerType": {
+            "type": "string",
+            "enum": ["individual", "business", "fleet"],
+            "default": "individual"
+          }
+        }
+      },
+      "Vehicle": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "customerId": {
+            "type": "integer"
+          },
+          "make": {
+            "type": "string"
+          },
+          "model": {
+            "type": "string"
+          },
+          "year": {
+            "type": "integer"
+          },
+          "vin": {
+            "type": "string"
+          },
+          "licensePlate": {
+            "type": "string"
+          },
+          "color": {
+            "type": "string"
+          },
+          "mileage": {
+            "type": "integer"
+          }
+        }
+      },
+      "Appointment": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "customerId": {
+            "type": "integer"
+          },
+          "vehicleId": {
+            "type": "integer"
+          },
+          "scheduledAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["scheduled", "confirmed", "in-progress", "completed", "cancelled"]
+          },
+          "serviceType": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          }
+        }
+      },
+      "JobCard": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "jobNumber": {
+            "type": "string"
+          },
+          "customerId": {
+            "type": "integer"
+          },
+          "vehicleId": {
+            "type": "integer"
+          },
+          "technicianId": {
+            "type": "integer"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["pending", "in-progress", "waiting-parts", "completed", "delivered"]
+          },
+          "priority": {
+            "type": "string",
+            "enum": ["low", "normal", "high", "urgent"]
+          },
+          "description": {
+            "type": "string"
+          },
+          "estimatedCost": {
+            "type": "number"
+          },
+          "actualCost": {
+            "type": "number"
+          }
+        }
+      },
+      "Invoice": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "invoiceNumber": {
+            "type": "string"
+          },
+          "customerId": {
+            "type": "integer"
+          },
+          "jobCardId": {
+            "type": "integer"
+          },
+          "subtotal": {
+            "type": "number"
+          },
+          "tax": {
+            "type": "number"
+          },
+          "total": {
+            "type": "number"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["draft", "sent", "paid", "overdue", "cancelled"]
+          },
+          "dueDate": {
+            "type": "string",
+            "format": "date"
+          }
+        }
+      },
+      "SparePart": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "partNumber": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "integer"
+          },
+          "unitPrice": {
+            "type": "number"
+          },
+          "reorderLevel": {
+            "type": "integer"
+          }
+        }
+      },
+      "Technician": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "userId": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "specializations": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "certifications": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "hourlyRate": {
+            "type": "number"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["available", "busy", "off-duty"]
+          }
+        }
+      },
+      "Report": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      },
+      "JobTrackingInfo": {
+        "type": "object",
+        "properties": {
+          "jobNumber": {
+            "type": "string"
+          },
+          "vehicleInfo": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "statusDescription": {
+            "type": "string"
+          },
+          "estimatedCompletion": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "events": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "timestamp": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "description": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

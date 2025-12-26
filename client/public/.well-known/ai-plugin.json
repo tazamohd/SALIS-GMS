@@ -1,0 +1,17 @@
+{
+  "schema_version": "v1",
+  "name_for_human": "SALIS AUTO",
+  "name_for_model": "salis_auto",
+  "description_for_human": "Automotive ERP platform for garage operations - manage jobs, customers, vehicles, inventory, and billing.",
+  "description_for_model": "SALIS AUTO is a comprehensive automotive ERP (Enterprise Resource Planning) platform designed for garage and automotive service operations. It provides APIs and interfaces for managing: (1) Customer information and CRM, (2) Vehicle records and service history, (3) Job cards and work orders, (4) Appointments and scheduling, (5) Inventory and spare parts, (6) Invoicing and payments, (7) Technician management, (8) Analytics and reports. The platform supports multi-tenant franchise operations, Saudi Arabia compliance (ZATCA e-invoicing), and includes AI features for predictive maintenance and smart scheduling. Use this plugin to query information about automotive services, garage management best practices, or to understand the SALIS AUTO platform capabilities.",
+  "auth": {
+    "type": "none"
+  },
+  "api": {
+    "type": "openapi",
+    "url": "https://salisauto.net/openapi.json"
+  },
+  "logo_url": "https://salisauto.net/logo.png",
+  "contact_email": "support@salisauto.net",
+  "legal_info_url": "https://salisauto.net/legal"
+}
