@@ -9,7 +9,7 @@
   },
   "api": {
     "type": "openapi",
-    "url": "https://salisauto.net/openapi.json"
+    "url": "https://salisauto.net/.well-known/openapi.json"
   },
   "logo_url": "https://salisauto.net/logo.png",
   "contact_email": "support@salisauto.net",

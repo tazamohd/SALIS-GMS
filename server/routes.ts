@@ -597,6 +597,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Audit logging middleware (applied after auth so user is available)
   app.use(auditLog);
 
+  // CORS configuration for AI systems (ChatGPT, OpenAI API, Gemini, etc.)
+  app.use((req, res, next) => {
+    const allowedOrigins = [
+      'https://chat.openai.com',
+      'https://api.openai.com',
+      'https://chatgpt.com',
+      'https://gemini.google.com',
+      'https://bard.google.com',
+      'https://claude.ai',
+      'https://perplexity.ai'
+    ];
+    const origin = req.headers.origin;
+    if (origin && allowedOrigins.includes(origin)) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+      res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+      res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Accept');
+      res.setHeader('Access-Control-Max-Age', '86400');
+    }
+    if (req.method === 'OPTIONS') {
+      return res.status(204).end();
+    }
+    next();
+  });
+
   // AI Accessibility Routes - serve robots.txt, sitemap.xml, openapi.json, and .well-known files
   // These routes make the site accessible to ChatGPT, Gemini, and other AI models
   const publicDir = process.cwd() + '/client/public';
@@ -616,6 +640,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.get('/openapi.json', (req, res) => {
+    res.type('application/json');
+    res.sendFile('openapi.json', { root: publicDir }, (err) => {
+      if (err) res.status(404).json({ error: 'OpenAPI spec not found' });
+    });
+  });
+
+  // Also serve at /.well-known/openapi.json for AI plugin standard
+  app.get('/.well-known/openapi.json', (req, res) => {
     res.type('application/json');
     res.sendFile('openapi.json', { root: publicDir }, (err) => {
       if (err) res.status(404).json({ error: 'OpenAPI spec not found' });

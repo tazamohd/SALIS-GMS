@@ -36,6 +36,12 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://salisauto.net/.well-known/openapi.json</loc>
+    <lastmod>2024-12-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://salisauto.net/.well-known/ai-plugin.json</loc>
     <lastmod>2024-12-26</lastmod>
     <changefreq>monthly</changefreq>
