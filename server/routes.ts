@@ -611,9 +611,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const origin = req.headers.origin;
     if (origin && allowedOrigins.includes(origin)) {
       res.setHeader('Access-Control-Allow-Origin', origin);
-      res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-      res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Accept');
+      res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
+      res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Accept, X-Requested-With');
       res.setHeader('Access-Control-Max-Age', '86400');
+      res.setHeader('Vary', 'Origin');
     }
     if (req.method === 'OPTIONS') {
       return res.status(204).end();
