@@ -599,57 +599,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // AI Accessibility Routes - serve robots.txt, sitemap.xml, openapi.json, and .well-known files
   // These routes make the site accessible to ChatGPT, Gemini, and other AI models
-  const path = require('path');
-  const fs = require('fs');
+  const publicDir = process.cwd() + '/client/public';
   
   app.get('/robots.txt', (req, res) => {
     res.type('text/plain');
-    const robotsPath = path.join(process.cwd(), 'client/public/robots.txt');
-    if (fs.existsSync(robotsPath)) {
-      res.sendFile(robotsPath);
-    } else {
-      res.send('User-agent: *\nAllow: /');
-    }
+    res.sendFile('robots.txt', { root: publicDir }, (err) => {
+      if (err) res.send('User-agent: *\nAllow: /');
+    });
   });
 
   app.get('/sitemap.xml', (req, res) => {
     res.type('application/xml');
-    const sitemapPath = path.join(process.cwd(), 'client/public/sitemap.xml');
-    if (fs.existsSync(sitemapPath)) {
-      res.sendFile(sitemapPath);
-    } else {
-      res.status(404).send('Sitemap not found');
-    }
+    res.sendFile('sitemap.xml', { root: publicDir }, (err) => {
+      if (err) res.status(404).send('Sitemap not found');
+    });
   });
 
   app.get('/openapi.json', (req, res) => {
     res.type('application/json');
-    const openapiPath = path.join(process.cwd(), 'client/public/openapi.json');
-    if (fs.existsSync(openapiPath)) {
-      res.sendFile(openapiPath);
-    } else {
-      res.status(404).json({ error: 'OpenAPI spec not found' });
-    }
+    res.sendFile('openapi.json', { root: publicDir }, (err) => {
+      if (err) res.status(404).json({ error: 'OpenAPI spec not found' });
+    });
   });
 
   app.get('/.well-known/llms.txt', (req, res) => {
     res.type('text/plain');
-    const llmsPath = path.join(process.cwd(), 'client/public/.well-known/llms.txt');
-    if (fs.existsSync(llmsPath)) {
-      res.sendFile(llmsPath);
-    } else {
-      res.status(404).send('LLMs.txt not found');
-    }
+    res.sendFile('.well-known/llms.txt', { root: publicDir }, (err) => {
+      if (err) res.status(404).send('LLMs.txt not found');
+    });
   });
 
   app.get('/.well-known/ai-plugin.json', (req, res) => {
     res.type('application/json');
-    const pluginPath = path.join(process.cwd(), 'client/public/.well-known/ai-plugin.json');
-    if (fs.existsSync(pluginPath)) {
-      res.sendFile(pluginPath);
-    } else {
-      res.status(404).json({ error: 'AI plugin manifest not found' });
-    }
+    res.sendFile('.well-known/ai-plugin.json', { root: publicDir }, (err) => {
+      if (err) res.status(404).json({ error: 'AI plugin manifest not found' });
+    });
   });
 
   // Auth routes
