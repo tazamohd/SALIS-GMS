@@ -3634,6 +3634,159 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Secure invoice creation from job card - server-side calculation only
+  app.post('/api/invoices/from-job/:jobId', isAuthenticated, async (req: any, res) => {
+    try {
+      const { jobCards, taskAssignments, jobCardParts, spareParts, invoices, invoiceItems } = await import("@shared/schema");
+      const { eq, sql } = await import("drizzle-orm");
+      const { db } = await import("./db");
+      
+      const { jobId } = req.params;
+      const userId = req.user?.id || 'default-user';
+      const TAX_RATE = 0.15; // Saudi Arabia VAT 15%
+      const DEFAULT_LABOR_RATE = 75; // Default hourly labor rate
+      
+      // 1. Fetch the job card
+      const [jobCard] = await db.select().from(jobCards).where(eq(jobCards.id, jobId));
+      if (!jobCard) {
+        return res.status(404).json({ message: "Job card not found" });
+      }
+      
+      // 2. Fetch all task assignments for labor calculation
+      const tasks = await db.select().from(taskAssignments).where(eq(taskAssignments.jobCardId, jobId));
+      
+      // Calculate labor cost: sum of (actualMinutes or estimatedMinutes) * hourly rate / 60
+      let laborMinutes = 0;
+      for (const task of tasks) {
+        laborMinutes += task.actualMinutes || task.estimatedMinutes || 0;
+      }
+      // If no task minutes, fall back to job card estimated/actual hours
+      if (laborMinutes === 0) {
+        const hours = parseFloat(jobCard.actualHours?.toString() || jobCard.estimatedHours?.toString() || "0");
+        laborMinutes = hours * 60;
+      }
+      const laborCost = (laborMinutes / 60) * DEFAULT_LABOR_RATE;
+      
+      // 3. Fetch all job card parts with their prices
+      const parts = await db.select({
+        id: jobCardParts.id,
+        quantity: jobCardParts.quantity,
+        unitPrice: jobCardParts.unitPrice,
+        lineTotal: jobCardParts.lineTotal,
+        sparePartId: jobCardParts.sparePartId,
+      }).from(jobCardParts).where(eq(jobCardParts.jobCardId, jobId));
+      
+      // Calculate parts cost: sum of (quantity * unitPrice) or use pre-calculated lineTotal
+      let partsCost = 0;
+      const partLineItems: Array<{
+        itemType: string;
+        description: string;
+        quantity: number;
+        unitPrice: string;
+        lineTotal: string;
+        taxRate: string;
+      }> = [];
+      
+      for (const part of parts) {
+        const qty = part.quantity || 1;
+        const price = parseFloat(part.unitPrice?.toString() || part.lineTotal?.toString() || "0");
+        const lineTotal = part.lineTotal ? parseFloat(part.lineTotal.toString()) : qty * price;
+        partsCost += lineTotal;
+        
+        // Get part name for invoice item
+        const [partInfo] = await db.select({ name: spareParts.name }).from(spareParts).where(eq(spareParts.id, part.sparePartId));
+        
+        partLineItems.push({
+          itemType: 'part',
+          description: partInfo?.name || 'Spare Part',
+          quantity: qty,
+          unitPrice: price.toFixed(2),
+          lineTotal: lineTotal.toFixed(2),
+          taxRate: (TAX_RATE * 100).toFixed(2),
+        });
+      }
+      
+      // 4. Calculate totals (server-side only - never trust frontend)
+      const subtotal = laborCost + partsCost;
+      const taxAmount = subtotal * TAX_RATE;
+      const totalAmount = subtotal + taxAmount;
+      
+      // 5. Generate invoice number
+      const invoiceNumber = `INV-${Date.now()}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+      
+      // 6. Create invoice with server-calculated values
+      const dueDate = new Date();
+      dueDate.setDate(dueDate.getDate() + 30); // 30 days payment term
+      
+      const [newInvoice] = await db.insert(invoices).values({
+        invoiceNumber,
+        garageId: jobCard.garageId,
+        customerId: jobCard.customerId || userId,
+        vehicleId: null,
+        jobCardId: jobId,
+        invoiceDate: new Date(),
+        dueDate,
+        status: 'draft',
+        subtotal: subtotal.toFixed(2),
+        taxAmount: taxAmount.toFixed(2),
+        discountAmount: "0",
+        totalAmount: totalAmount.toFixed(2),
+        paidAmount: "0",
+        balanceAmount: totalAmount.toFixed(2),
+        notes: `Invoice generated from Job Card: ${jobCard.jobNumber}`,
+        createdBy: userId,
+      }).returning();
+      
+      // 7. Create invoice line items
+      const lineItems = [];
+      
+      // Add labor line item if there's labor cost
+      if (laborCost > 0) {
+        lineItems.push({
+          invoiceId: newInvoice.id,
+          itemType: 'labor',
+          description: `Labor: ${(laborMinutes / 60).toFixed(1)} hours @ $${DEFAULT_LABOR_RATE}/hr`,
+          quantity: 1,
+          unitPrice: laborCost.toFixed(2),
+          lineTotal: laborCost.toFixed(2),
+          taxRate: (TAX_RATE * 100).toFixed(2),
+        });
+      }
+      
+      // Add parts line items
+      for (const partItem of partLineItems) {
+        lineItems.push({
+          invoiceId: newInvoice.id,
+          ...partItem,
+        });
+      }
+      
+      if (lineItems.length > 0) {
+        await db.insert(invoiceItems).values(lineItems);
+      }
+      
+      // Return invoice with calculation breakdown
+      res.status(201).json({
+        invoice: newInvoice,
+        breakdown: {
+          laborCost: laborCost.toFixed(2),
+          laborMinutes,
+          laborRate: DEFAULT_LABOR_RATE,
+          partsCost: partsCost.toFixed(2),
+          partsCount: parts.length,
+          subtotal: subtotal.toFixed(2),
+          taxRate: TAX_RATE,
+          taxAmount: taxAmount.toFixed(2),
+          totalAmount: totalAmount.toFixed(2),
+        },
+        items: lineItems,
+      });
+    } catch (error) {
+      console.error("Error creating invoice from job card:", error);
+      res.status(500).json({ message: "Failed to create invoice from job card" });
+    }
+  });
+
   app.patch('/api/invoices/:id', isAuthenticated, async (req, res) => {
     try {
       const { insertInvoiceSchema } = await import("@shared/schema");
