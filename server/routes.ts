@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { db } from "./db";
-import { eq, and, desc, sql } from "drizzle-orm";
+import { eq, and, desc, sql, count } from "drizzle-orm";
 import {
   hrDepartments,
   hrPositions,
@@ -33,6 +33,7 @@ import {
   jobCardParts,
   sparePartInventories,
   jobCards,
+  invoices,
 } from "@shared/schema";
 import rateLimit from "express-rate-limit";
 import { setupAuth, isAuthenticated, hashPassword } from "./auth";
@@ -20638,6 +20639,76 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error("Error deleting AR device:", error);
       res.status(500).json({ message: "Failed to delete AR device" });
+    }
+  });
+
+  // Dashboard Stats API - Real database aggregations
+  app.get('/api/stats/dashboard', isAuthenticated, async (req: any, res) => {
+    try {
+      // Query 1: Count jobs grouped by status (uses static imports)
+      const jobStatusCounts = await db
+        .select({
+          status: jobCards.status,
+          count: count(),
+        })
+        .from(jobCards)
+        .groupBy(jobCards.status);
+      
+      // Transform to frontend-friendly format
+      const jobStatusData = jobStatusCounts.map(row => ({
+        name: row.status.charAt(0).toUpperCase() + row.status.slice(1).replace(/_/g, ' '),
+        value: Number(row.count),
+        status: row.status,
+      }));
+      
+      // Query 2: Sum invoice totals grouped by month (last 12 months)
+      // Use NULLIF and REGEXP_REPLACE to safely parse varchar amounts with potential symbols
+      const revenueByMonth = await db
+        .select({
+          month: sql<string>`TO_CHAR(${invoices.invoiceDate}, 'Mon')`,
+          monthNum: sql<number>`EXTRACT(MONTH FROM ${invoices.invoiceDate})`,
+          year: sql<number>`EXTRACT(YEAR FROM ${invoices.invoiceDate})`,
+          revenue: sql<string>`COALESCE(SUM(NULLIF(REGEXP_REPLACE(${invoices.totalAmount}, '[^0-9.]', '', 'g'), '')::DECIMAL), 0)`,
+        })
+        .from(invoices)
+        .where(sql`${invoices.invoiceDate} >= NOW() - INTERVAL '12 months'`)
+        .groupBy(
+          sql`TO_CHAR(${invoices.invoiceDate}, 'Mon')`,
+          sql`EXTRACT(MONTH FROM ${invoices.invoiceDate})`,
+          sql`EXTRACT(YEAR FROM ${invoices.invoiceDate})`
+        )
+        .orderBy(
+          sql`EXTRACT(YEAR FROM ${invoices.invoiceDate})`,
+          sql`EXTRACT(MONTH FROM ${invoices.invoiceDate})`
+        );
+      
+      // Transform to frontend-friendly format with fallback for empty data
+      const revenueData = revenueByMonth.length > 0 
+        ? revenueByMonth.map(row => ({
+            month: row.month,
+            revenue: parseFloat(row.revenue) || 0,
+          }))
+        : [
+            { month: 'Jan', revenue: 0 },
+            { month: 'Feb', revenue: 0 },
+            { month: 'Mar', revenue: 0 },
+          ];
+      
+      res.json({
+        jobStatus: jobStatusData.length > 0 ? jobStatusData : [
+          { name: 'Pending', value: 0, status: 'pending' },
+          { name: 'In Progress', value: 0, status: 'in_progress' },
+          { name: 'Completed', value: 0, status: 'completed' },
+        ],
+        revenue: revenueData,
+      });
+    } catch (error: any) {
+      console.error("Error fetching dashboard stats:", error);
+      res.status(500).json({ 
+        message: "Failed to fetch dashboard stats",
+        jobStatus: [],
+        revenue: [],
+      });
     }
   });
 
