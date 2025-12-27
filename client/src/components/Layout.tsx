@@ -322,7 +322,7 @@ export function Layout({ children }: LayoutProps) {
                                   ? "bg-salis-black dark:bg-white text-white dark:text-salis-black shadow-md"
                                   : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-salis-gray-dark hover:text-salis-black dark:hover:text-white"
                               }`}
-                              data-testid={`nav-${item.label.toLowerCase().replace(/\s+/g, "-")}`}
+                              data-testid={`nav-item-${item.label.toLowerCase().replace(/\s+/g, "-")}`}
                             >
                               <Icon className="w-3.5 h-3.5 flex-shrink-0" />
                               <span className="font-poppins font-medium text-xs truncate">

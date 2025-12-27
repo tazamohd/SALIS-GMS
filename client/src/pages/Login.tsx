@@ -99,7 +99,7 @@ export default function Login() {
               type="submit" 
               className="w-full bg-salis-orange hover:bg-salis-orange-dark text-white font-poppins"
               disabled={loginMutation.isPending}
-              data-testid="button-login"
+              data-testid="login-submit"
             >
               {loginMutation.isPending ? "Signing in..." : "Sign In"}
             </Button>

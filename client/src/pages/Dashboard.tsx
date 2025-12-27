@@ -139,9 +139,10 @@ export function Dashboard() {
   const totalInventoryItems = sparePartInventories.length || 1;
   const inventoryPercentage = Math.round((inStockParts / totalInventoryItems) * 100);
 
-  const role = (user as any)?.role || (user as User | undefined)?.userType || 'technician';
+  const role = ((user as any)?.role?.toUpperCase() || (user as User | undefined)?.userType?.toUpperCase() || 'TECHNICIAN');
+  const isTechnician = role === 'TECHNICIAN';
   
-  const metrics = role === 'admin' || role === 'manager' ? [
+  const metrics = role === 'ADMIN' || role === 'MANAGER' ? [
     { label: 'Total Revenue', value: `$${totalRevenue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, icon: DollarSign, color: 'text-green-600 dark:text-green-400' },
     { label: 'Active Customers', value: activeCustomersCount.toString(), icon: Users, color: 'text-blue-600 dark:text-blue-400' },
     { label: 'Parts Inventory', value: `${inventoryPercentage}%`, icon: Package, color: 'text-purple-600 dark:text-purple-400' },
@@ -156,7 +157,7 @@ export function Dashboard() {
   return (
     <DashboardPage
       title={t('dashboard.title')}
-      description={`${t('common.welcome')} ${(user as User | undefined)?.fullName || (user as any)?.name}`}
+      description={`${t('common.welcome')} ${(user as any)?.fullName || (user as any)?.username || (user as any)?.displayName || (user as any)?.email?.split('@')[0] || 'User'}`}
       icon={BarChart3}
       metrics={metrics}
     >
@@ -230,82 +231,84 @@ export function Dashboard() {
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <Card className="border border-gray-200 dark:border-salis-gray-dark bg-white dark:bg-salis-black" data-testid="card-revenue-chart">
-          <CardHeader className="pb-2">
-            <CardTitle className="font-montserrat text-base text-gray-900 dark:text-white flex items-center gap-2">
-              <TrendingUp className="w-4 h-4" />
-              Revenue per Month
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {statsLoading ? (
-              <div className="h-[200px] flex items-center justify-center text-gray-500">Loading...</div>
-            ) : dashboardStats?.revenue && dashboardStats.revenue.length > 0 ? (
-              <ResponsiveContainer width="100%" height={200}>
-                <BarChart data={dashboardStats.revenue}>
-                  <XAxis dataKey="month" tick={{ fontSize: 11 }} stroke="#9ca3af" />
-                  <YAxis tick={{ fontSize: 11 }} stroke="#9ca3af" tickFormatter={(v) => `$${v.toLocaleString()}`} />
-                  <Tooltip 
-                    formatter={(value: number) => [`$${value.toLocaleString()}`, 'Revenue']}
-                    contentStyle={{ backgroundColor: '#1f2937', border: 'none', borderRadius: '8px' }}
-                    labelStyle={{ color: '#fff' }}
-                  />
-                  <Bar dataKey="revenue" fill={BAR_COLOR} radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            ) : (
-              <div className="h-[200px] flex items-center justify-center text-gray-500 dark:text-gray-400 text-sm">
-                No revenue data available
-              </div>
-            )}
-          </CardContent>
-        </Card>
+      {!isTechnician && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+          <Card className="border border-gray-200 dark:border-salis-gray-dark bg-white dark:bg-salis-black" data-testid="card-revenue-chart">
+            <CardHeader className="pb-2">
+              <CardTitle className="font-montserrat text-base text-gray-900 dark:text-white flex items-center gap-2">
+                <TrendingUp className="w-4 h-4" />
+                Revenue per Month
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {statsLoading ? (
+                <div className="h-[200px] flex items-center justify-center text-gray-500">Loading...</div>
+              ) : dashboardStats?.revenue && dashboardStats.revenue.length > 0 ? (
+                <ResponsiveContainer width="100%" height={200}>
+                  <BarChart data={dashboardStats.revenue}>
+                    <XAxis dataKey="month" tick={{ fontSize: 11 }} stroke="#9ca3af" />
+                    <YAxis tick={{ fontSize: 11 }} stroke="#9ca3af" tickFormatter={(v) => `$${v.toLocaleString()}`} />
+                    <Tooltip 
+                      formatter={(value: number) => [`$${value.toLocaleString()}`, 'Revenue']}
+                      contentStyle={{ backgroundColor: '#1f2937', border: 'none', borderRadius: '8px' }}
+                      labelStyle={{ color: '#fff' }}
+                    />
+                    <Bar dataKey="revenue" fill={BAR_COLOR} radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="h-[200px] flex items-center justify-center text-gray-500 dark:text-gray-400 text-sm">
+                  No revenue data available
+                </div>
+              )}
+            </CardContent>
+          </Card>
 
-        <Card className="border border-gray-200 dark:border-salis-gray-dark bg-white dark:bg-salis-black" data-testid="card-status-chart">
-          <CardHeader className="pb-2">
-            <CardTitle className="font-montserrat text-base text-gray-900 dark:text-white flex items-center gap-2">
-              <BarChart3 className="w-4 h-4" />
-              Jobs by Status
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {statsLoading ? (
-              <div className="h-[200px] flex items-center justify-center text-gray-500">Loading...</div>
-            ) : dashboardStats?.jobStatus && dashboardStats.jobStatus.length > 0 ? (
-              <ResponsiveContainer width="100%" height={200}>
-                <PieChart>
-                  <Pie
-                    data={dashboardStats.jobStatus}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={40}
-                    outerRadius={70}
-                    paddingAngle={2}
-                    dataKey="value"
-                    nameKey="name"
-                    label={({ name, value }) => `${name}: ${value}`}
-                    labelLine={false}
-                  >
-                    {dashboardStats.jobStatus.map((_, index) => (
-                      <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip 
-                    contentStyle={{ backgroundColor: '#1f2937', border: 'none', borderRadius: '8px' }}
-                    labelStyle={{ color: '#fff' }}
-                  />
-                  <Legend wrapperStyle={{ fontSize: '11px' }} />
-                </PieChart>
-              </ResponsiveContainer>
-            ) : (
-              <div className="h-[200px] flex items-center justify-center text-gray-500 dark:text-gray-400 text-sm">
-                No job status data available
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
+          <Card className="border border-gray-200 dark:border-salis-gray-dark bg-white dark:bg-salis-black" data-testid="card-status-chart">
+            <CardHeader className="pb-2">
+              <CardTitle className="font-montserrat text-base text-gray-900 dark:text-white flex items-center gap-2">
+                <BarChart3 className="w-4 h-4" />
+                Jobs by Status
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {statsLoading ? (
+                <div className="h-[200px] flex items-center justify-center text-gray-500">Loading...</div>
+              ) : dashboardStats?.jobStatus && dashboardStats.jobStatus.length > 0 ? (
+                <ResponsiveContainer width="100%" height={200}>
+                  <PieChart>
+                    <Pie
+                      data={dashboardStats.jobStatus}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={40}
+                      outerRadius={70}
+                      paddingAngle={2}
+                      dataKey="value"
+                      nameKey="name"
+                      label={({ name, value }) => `${name}: ${value}`}
+                      labelLine={false}
+                    >
+                      {dashboardStats.jobStatus.map((_, index) => (
+                        <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip 
+                      contentStyle={{ backgroundColor: '#1f2937', border: 'none', borderRadius: '8px' }}
+                      labelStyle={{ color: '#fff' }}
+                    />
+                    <Legend wrapperStyle={{ fontSize: '11px' }} />
+                  </PieChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="h-[200px] flex items-center justify-center text-gray-500 dark:text-gray-400 text-sm">
+                  No job status data available
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
       <Card className="border border-gray-200 dark:border-salis-gray-dark bg-white dark:bg-salis-black" data-testid="card-tasks">
         <CardContent className="p-5">
