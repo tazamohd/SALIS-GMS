@@ -88,8 +88,6 @@ import DiagnosticsOBDHub from "@/pages/DiagnosticsOBDHub";
 import OEMSoftwareSubscriptions from "@/pages/OEMSoftwareSubscriptions";
 import AIChatbot from "@/pages/AIChatbot";
 import AIChatbotAssistant from "@/pages/AIChatbotAssistant";
-import BlockchainServiceHistory from "@/pages/BlockchainServiceHistory";
-import SmartContracts from "@/pages/SmartContracts";
 import PredictiveMaintenance from "@/pages/PredictiveMaintenance";
 import PredictiveDiagnostics from "@/pages/PredictiveDiagnostics";
 import SmartPartsRecommendations from "@/pages/SmartPartsRecommendations";
@@ -136,12 +134,10 @@ import ServiceBayDashboard from "@/pages/ServiceBayDashboard";
 import AutomatedReordering from "@/pages/AutomatedReordering";
 import LoyaltyProgram from "@/pages/LoyaltyProgram";
 import WorkshopCalendar from "@/pages/WorkshopCalendar";
-import AROverlay from "@/pages/AROverlay";
 import ComputerVisionQC from "@/pages/ComputerVisionQC";
 import SmartPartsRecommender from "@/pages/SmartPartsRecommender";
 import DigitalTwinViewer from "@/pages/DigitalTwinViewer";
 import DroneInspection from "@/pages/DroneInspection";
-import ARRepairGuide from "@/pages/ARRepairGuide";
 import MLFraudDetection from "@/pages/MLFraudDetection";
 import EdgeComputingDiagnostics from "@/pages/EdgeComputingDiagnostics";
 import TireManagement from "@/pages/TireManagement";
@@ -171,7 +167,6 @@ import DataBackup from "@/pages/DataBackup";
 import DashboardWidgets from "@/pages/DashboardWidgets";
 import Vehicles from "@/pages/Vehicles";
 import VoiceCommandInterface from "@/pages/VoiceCommandInterface";
-import VRShowroom from "@/pages/VRShowroom";
 import WearableIntegration from "@/pages/WearableIntegration";
 import BankAccountManagement from "@/pages/BankAccountManagement";
 import InternalWarehouse from "@/pages/InternalWarehouse";
@@ -881,16 +876,6 @@ function Router() {
           <AIChatbotAssistant />
         </Layout>
       </Route>
-      <Route path="/blockchain-service-history">
-        <Layout>
-          <BlockchainServiceHistory />
-        </Layout>
-      </Route>
-      <Route path="/smart-contracts">
-        <Layout>
-          <SmartContracts />
-        </Layout>
-      </Route>
       <Route path="/predictive-maintenance">
         <Layout>
           <PredictiveMaintenance />
@@ -1126,11 +1111,6 @@ function Router() {
           <WorkshopCalendar />
         </Layout>
       </Route>
-      <Route path="/ar-overlay">
-        <Layout>
-          <AROverlay />
-        </Layout>
-      </Route>
       <Route path="/computer-vision-qc">
         <Layout>
           <ComputerVisionQC />
@@ -1149,11 +1129,6 @@ function Router() {
       <Route path="/drone-inspection">
         <Layout>
           <DroneInspection />
-        </Layout>
-      </Route>
-      <Route path="/ar-repair-guide">
-        <Layout>
-          <ARRepairGuide />
         </Layout>
       </Route>
       <Route path="/ml-fraud-detection">
@@ -1254,11 +1229,6 @@ function Router() {
       <Route path="/voice-command-interface">
         <Layout>
           <VoiceCommandInterface />
-        </Layout>
-      </Route>
-      <Route path="/vr-showroom">
-        <Layout>
-          <VRShowroom />
         </Layout>
       </Route>
       <Route path="/wearable-integration">

@@ -156,14 +156,6 @@ export function QuickActionsModal({ open, onOpenChange }: QuickActionsModalProps
       keywords: ["smart", "ai", "inventory", "forecast", "prediction", "demand", "stock"],
     },
     {
-      id: "smart-contracts",
-      label: "Smart Contracts",
-      description: "Blockchain-based service agreements",
-      icon: Zap,
-      path: "/smart-contracts",
-      keywords: ["smart", "contracts", "blockchain", "agreement", "service", "digital"],
-    },
-    {
       id: "customer-portal",
       label: "Customer Portal",
       description: "Access the customer self-service portal",
