@@ -37,6 +37,7 @@ import {
 } from "@shared/schema";
 import rateLimit from "express-rate-limit";
 import { setupAuth, isAuthenticated, hashPassword } from "./auth";
+import { requireRole } from "./middleware/requireRole";
 import passport from "passport";
 import { emailService } from "./services/emailService";
 import { smsService } from "./services/smsService";
@@ -773,6 +774,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching garages:", error);
       res.status(500).json({ message: "Failed to fetch garages" });
+    }
+  });
+
+  app.get('/api/garages/:id', isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const garage = await storage.getGarageById(id);
+      if (!garage) {
+        return res.status(404).json({ message: "Garage not found" });
+      }
+      res.json(garage);
+    } catch (error) {
+      console.error("Error fetching garage:", error);
+      res.status(500).json({ message: "Failed to fetch garage" });
     }
   });
 
@@ -3865,7 +3880,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/invoices/:id', isAuthenticated, async (req, res) => {
+  app.delete('/api/invoices/:id', isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req, res) => {
     try {
       const { id } = req.params;
       await storage.deleteInvoice(id);

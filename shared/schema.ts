@@ -54,6 +54,8 @@ export const garages = pgTable("garages", {
   workingHours: varchar("working_hours", { length: 255 }),
   isActive: boolean("is_active").default(true),
   createdAt: timestamp("created_at").defaultNow(),
+  // Subscription plan for feature gating: STARTER, PRO, ENTERPRISE
+  subscriptionPlan: varchar("subscription_plan", { length: 50 }).default("STARTER"),
 });
 
 // Branches
@@ -99,6 +101,8 @@ export const users = pgTable("users", {
   firstName: varchar("first_name"),
   lastName: varchar("last_name"),
   updatedAt: timestamp("updated_at").defaultNow(),
+  // Role for access control: ADMIN, MANAGER, ADVISOR, TECHNICIAN, ACCOUNTANT
+  role: varchar("role", { length: 50 }).default("ADVISOR"),
 });
 
 // User Role Branch (Many-to-Many relationship)

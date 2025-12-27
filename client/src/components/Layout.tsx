@@ -100,7 +100,14 @@ import { useState, useEffect } from "react";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import type { UserSettings } from "@shared/schema";
+import type { UserSettings, Garage } from "@shared/schema";
+import { 
+  navigationConfig, 
+  filterNavigationByAccess,
+  type NavGroup,
+  type UserRole,
+  type SubscriptionPlan
+} from "@/config/navigation";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -155,6 +162,9 @@ export function Layout({ children }: LayoutProps) {
     queryKey: ["/api/settings"],
   });
 
+  // Subscription plan is now included in user object from /api/user endpoint
+  // No separate fetch needed - plan is available immediately
+
   // Enable global keyboard shortcuts
   useKeyboardShortcuts(settings?.enableKeyboardShortcuts ?? true);
 
@@ -179,112 +189,33 @@ export function Layout({ children }: LayoutProps) {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  // Streamlined navigation - Core features top-level, minimal bloat
-  const navGroups = [
-    {
-      label: "Daily Operations",
-      items: [
-        { path: "/dashboard", icon: Home, label: "Dashboard" },
-        { path: "/job-cards", icon: ClipboardList, label: "Job Cards" },
-        { path: "/appointments", icon: Calendar, label: "Calendar" },
-      ],
-    },
-    {
-      label: "Customers & Vehicles",
-      items: [
-        { path: "/customers", icon: UserIcon, label: "Customers" },
-        { path: "/vehicles", icon: Car, label: "Vehicles" },
-      ],
-    },
-    {
-      label: "Inventory",
-      items: [
-        { path: "/inventory-management", icon: Package, label: "Stock" },
-        { path: "/purchase-orders", icon: ShoppingCart, label: "Orders" },
-        { path: "/suppliers", icon: Truck, label: "Suppliers" },
-      ],
-    },
-    {
-      label: "Billing",
-      items: [
-        { path: "/invoices", icon: FileText, label: "Invoices" },
-        { path: "/expense-tracking", icon: Receipt, label: "Expenses" },
-      ],
-    },
-    {
-      label: "Team",
-      items: [
-        { path: "/technician-portal", icon: Users, label: "Technicians" },
-        { path: "/hr-management", icon: UserCog, label: "HR" },
-      ],
-    },
-    {
-      label: "Reports",
-      items: [
-        { path: "/kpi-dashboard", icon: BarChart3, label: "KPIs" },
-        { path: "/general-ledger", icon: BookOpen, label: "Accounting" },
-      ],
-    },
-    {
-      label: "Settings",
-      items: [
-        { path: "/settings", icon: SettingsIcon, label: "Preferences" },
-      ],
-    },
-  ];
-
-  // Role-based navigation filtering (updated for streamlined nav)
-  const roleNavigationMap: Record<string, string[]> = {
-    // Technicians see daily ops, inventory, and team (for technician portal)
-    'technician': ['Daily Operations', 'Inventory', 'Team'],
-    // Purchase Agents see inventory and billing
-    'Purchase Agent': ['Daily Operations', 'Inventory', 'Billing'],
-    // Call Center sees customers and daily ops
-    'Call Center Agent': ['Daily Operations', 'Customers & Vehicles'],
-    // HR roles see team, billing and settings
-    'HR Manager': ['Daily Operations', 'Team', 'Billing', 'Reports', 'Settings'],
-    'HR Officer': ['Daily Operations', 'Team', 'Settings'],
-    // Accountants see billing and reports
-    'Accountant': ['Daily Operations', 'Billing', 'Reports'],
-    // Service Advisors see operations, customers, and billing
-    'Service Advisor': ['Daily Operations', 'Customers & Vehicles', 'Billing', 'Inventory'],
-    // Admin and Super Admin see everything
-    'admin': [],
-    'Super Admin': [],
-    'Administrator': [],
-  };
-
-  // Filter navigation based on user role
-  const userRoles = (user as any)?.roles || [];
-  const userType = (user as any)?.userType || '';
+  // Get user role and plan for filtering navigation
+  const userRole: UserRole = ((user as any)?.role?.toUpperCase() || 
+    ((user as any)?.userType === 'admin' ? 'ADMIN' : 'ADVISOR')) as UserRole;
   
-  // Determine which groups to show based on role
-  const getAllowedGroups = (): string[] => {
-    // Admin types see everything
-    if (userType === 'admin' || userRoles.includes('Super Admin') || userRoles.includes('Administrator')) {
-      return []; // Empty means show all
-    }
-    
-    // Check for specific role restrictions
-    for (const role of userRoles) {
-      if (roleNavigationMap[role]) {
-        return roleNavigationMap[role];
-      }
-    }
-    
-    // Check userType
-    if (roleNavigationMap[userType]) {
-      return roleNavigationMap[userType];
-    }
-    
-    // Default: show all (for testing/development)
-    return [];
-  };
+  // Subscription plan comes from user object (included by /api/user endpoint)
+  const rawPlan = (user as any)?.subscriptionPlan;
+  const normalizedPlan = rawPlan ? rawPlan.toUpperCase() : null;
+  const userPlan: SubscriptionPlan = (normalizedPlan && ['STARTER', 'PRO', 'ENTERPRISE'].includes(normalizedPlan)) 
+    ? normalizedPlan as SubscriptionPlan 
+    : 'STARTER';
+  
+  // Filter navigation based on role and plan - no loading state needed since plan is in user object
+  const filteredNavigation = filterNavigationByAccess(navigationConfig, userRole, userPlan);
+  
+  // Convert to legacy format for backwards compatibility with existing sidebar rendering
+  const navGroups = filteredNavigation.map((group: NavGroup) => ({
+    label: group.title,
+    items: group.items 
+      ? group.items.map((item) => ({
+          path: item.href,
+          icon: group.icon,
+          label: item.title,
+        })) 
+      : [{ path: group.href!, icon: group.icon, label: group.title }],
+  }));
 
-  const allowedGroups = getAllowedGroups();
-  const filteredNavGroups = allowedGroups.length > 0 
-    ? navGroups.filter(group => allowedGroups.includes(group.label || ''))
-    : navGroups;
+  const filteredNavGroups = navGroups;
 
   // Track which groups are expanded
   const [expandedGroups, setExpandedGroups] = useState<string[]>(

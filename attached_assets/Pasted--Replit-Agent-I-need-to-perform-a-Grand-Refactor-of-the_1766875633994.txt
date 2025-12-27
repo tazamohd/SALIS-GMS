@@ -1,0 +1,94 @@
+@Replit Agent
+
+I need to perform a "Grand Refactor" of the SalisAuto application to transform it from a template into a secure, production-ready SaaS ERP.
+
+Execute the following 5 Phases strictly in order.
+
+==================================================
+PHASE 1: DATABASE & SCHEMA (The Foundation)
+==================================================
+**File:** `shared/schema.ts` (or `server/db/schema.ts`)
+
+1. Update `users` table:
+   - Add column `role` (text/enum). Values: `['ADMIN', 'MANAGER', 'ADVISOR', 'TECHNICIAN', 'ACCOUNTANT']`. Default: `'ADVISOR'`.
+2. Update `tenants` (or organization) table:
+   - Add column `subscription_plan` (text/enum). Values: `['STARTER', 'PRO', 'ENTERPRISE']`. Default: `'STARTER'`.
+3. Run Migrations: Ensure database is synced.
+
+==================================================
+PHASE 2: BACKEND LOGIC (Security & Integrity)
+==================================================
+**File:** `server/routes.ts` & `server/middleware/auth.ts`
+
+1. **Inventory Deduction Logic:**
+   - In `PATCH /api/jobs/:id`: Check if status changes to 'COMPLETED'.
+   - If yes: Query `job_parts`, loop through items, and `UPDATE inventory SET quantity = quantity - used_qty`.
+2. **Dashboard Stats API:**
+   - Create `GET /api/stats/dashboard`.
+   - Return real data: `{ revenue_monthly: number, jobs_by_status: { pending: 5, active: 2 } }`.
+   - Ensure it queries the DB, not static JSON.
+3. **Role Middleware:**
+   - Create `requireRole(roles[])`. Use it to protect sensitive routes (e.g., DELETE /invoices requires 'ADMIN').
+
+==================================================
+PHASE 3: NAVIGATION RE-ARCHITECTURE (The Map)
+==================================================
+**File:** `client/src/config/navigation.ts`
+
+Replace the existing `navigationConfig` with this precise "6-Group" structure.
+Note the addition of `roles` and `minPlan` fields.
+
+```typescript
+export const navigationConfig = [
+  {
+    title: "Dashboard",
+    href: "/",
+    icon: "LayoutDashboard",
+    roles: ['ADMIN', 'MANAGER', 'ADVISOR', 'ACCOUNTANT'] // Techs don't see this
+  },
+  {
+    title: "Operations",
+    icon: "Wrench",
+    items: [
+      { title: "Job Cards", href: "/job-cards", roles: ['ADMIN', 'MANAGER', 'ADVISOR', 'TECHNICIAN'] },
+      { title: "Appointments", href: "/appointments", roles: ['ADMIN', 'MANAGER', 'ADVISOR'] },
+      { title: "Technicians", href: "/technicians", roles: ['ADMIN', 'MANAGER'] }
+    ]
+  },
+  {
+    title: "Inventory",
+    icon: "Package",
+    minPlan: "PRO", // Locked for Starter
+    items: [
+      { title: "Stock List", href: "/inventory" },
+      { title: "Purchase Orders", href: "/purchase-orders" },
+      { title: "Suppliers", href: "/suppliers" }
+    ]
+  },
+  {
+    title: "CRM",
+    icon: "Users",
+    items: [
+      { title: "Customers", href: "/customers" },
+      { title: "Vehicles", href: "/vehicles" }
+    ]
+  },
+  {
+    title: "Finance",
+    icon: "BadgeDollarSign",
+    roles: ['ADMIN', 'ACCOUNTANT'], // Hidden from Advisors/Techs
+    items: [
+      { title: "Invoices", href: "/invoices" },
+      { title: "Expenses", href: "/expenses", minPlan: "PRO" },
+      { title: "Accounting", href: "/finance/general-ledger", minPlan: "ENTERPRISE" }
+    ]
+  },
+  {
+    title: "System",
+    icon: "Settings",
+    items: [
+      { title: "Settings", href: "/settings" }
+    ]
+  }
+];
+// NOTE: "Blockchain", "AR", "Drone" are intentionally REMOVED.

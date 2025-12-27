@@ -6,6 +6,7 @@ import { eq } from "drizzle-orm";
 
 const router = Router();
 
+// Subscription plan is now included in req.user via passport.deserializeUser
 router.post("/login", passport.authenticate("local"), (req, res) => {
   res.status(200).json(req.user);
 });

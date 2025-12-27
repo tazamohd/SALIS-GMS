@@ -6,6 +6,9 @@ import connectPg from "connect-pg-simple";
 import bcrypt from "bcrypt";
 import { storage } from "./storage";
 import type { User } from "@shared/schema";
+import { db } from "./db";
+import { garages } from "@shared/schema";
+import { eq } from "drizzle-orm";
 
 const SALT_ROUNDS = 10;
 
@@ -85,7 +88,28 @@ export async function setupAuth(app: Express) {
       if (!user) {
         return done(null, false);
       }
-      done(null, user);
+      
+      // Debug log to verify user properties
+      console.log('deserializeUser - user garageId:', (user as any).garageId, 'role:', (user as any).role);
+      
+      // Enrich user with subscription plan from garage (Drizzle returns camelCase)
+      let subscriptionPlan = 'STARTER';
+      const garageId = (user as any).garageId;
+      if (garageId) {
+        try {
+          const [garage] = await db.select().from(garages).where(eq(garages.id, garageId));
+          console.log('deserializeUser - garage found:', garage ? 'yes' : 'no', 'subscriptionPlan:', (garage as any)?.subscriptionPlan);
+          if (garage && (garage as any).subscriptionPlan) {
+            subscriptionPlan = (garage as any).subscriptionPlan;
+          }
+        } catch (garageError) {
+          console.error('Error fetching garage for subscription plan:', garageError);
+        }
+      }
+      
+      const enrichedUser = { ...user, subscriptionPlan };
+      console.log('deserializeUser - enriched subscriptionPlan:', subscriptionPlan);
+      done(null, enrichedUser);
     } catch (error) {
       done(null, false);
     }
