@@ -41,7 +41,7 @@ export default function Home() {
               </Avatar>
               <div>
                 <CardTitle className="text-2xl">
-                  Welcome back{user?.firstName ? `, ${user.firstName}` : ''}!
+                  Welcome back, {user?.firstName || user?.fullName?.split(' ')[0] || user?.email?.split('@')[0] || 'User'}!
                 </CardTitle>
                 <CardDescription>
                   {user?.email || 'Manage your account and settings below'}

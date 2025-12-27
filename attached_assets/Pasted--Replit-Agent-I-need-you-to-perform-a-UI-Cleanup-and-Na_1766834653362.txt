@@ -1,0 +1,67 @@
+@Replit Agent
+
+I need you to perform a UI Cleanup and Navigation Refactor. Please follow these steps exactly:
+
+1. FIX DASHBOARD HEADER
+   - File: `client/src/pages/dashboard.tsx` (or `Dashboard.tsx`)
+   - Issue: The header displays "Welcome... undefined".
+   - Action: Find the heading displaying the user's name. Change the code to safely handle missing data.
+   - Code change: Replace `{user.name}` with `{user?.username || user?.displayName || 'User'}`.
+
+2. REFACTOR SIDEBAR NAVIGATION
+   - File: `client/src/config/navigation.ts` (or wherever `navItems` / `sidebar-data` is defined).
+   - Action: Replace the current flat list of 50+ items with this structured Grouped Configuration:
+
+   export const navigationConfig = [
+     {
+       title: "Overview",
+       items: [
+         { title: "Dashboard", href: "/", icon: "LayoutDashboard" },
+         { title: "KPIs", href: "/kpi", icon: "BarChart" }
+       ]
+     },
+     {
+       title: "Operations",
+       items: [
+         { title: "Job Cards", href: "/job-cards", icon: "ClipboardList" },
+         { title: "Appointments", href: "/appointments", icon: "Calendar" },
+         { title: "Technicians", href: "/technicians", icon: "Users" }
+       ]
+     },
+     {
+       title: "Inventory & Parts",
+       items: [
+         { title: "Stock List", href: "/inventory", icon: "Package" },
+         { title: "Orders", href: "/purchase-orders", icon: "ShoppingCart" },
+         { title: "Suppliers", href: "/suppliers", icon: "Truck" }
+       ]
+     },
+     {
+       title: "Finance",
+       items: [
+         { title: "Invoices", href: "/invoices", icon: "FileText" },
+         { title: "Expenses", href: "/expenses", icon: "Receipt" },
+         { title: "Accounting", href: "/finance/general-ledger", icon: "BookOpen" }
+       ]
+     },
+     {
+       title: "CRM",
+       items: [
+         { title: "Customers", href: "/customers", icon: "User" },
+         { title: "Vehicles", href: "/vehicles", icon: "Car" }
+       ]
+     },
+     {
+       title: "System",
+       items: [
+         { title: "Settings", href: "/settings", icon: "Settings" }
+       ]
+     }
+   ];
+
+3. UPDATE SIDEBAR COMPONENT
+   - File: `client/src/components/layouts/sidebar.tsx`
+   - Action: Update the rendering loop to map through these "groups" (Overview, Operations, etc.) and render a separator or heading between them.
+   - Requirement: Ensure no Arabic text suffixes (like "Assets - الاصول") are hardcoded; use the clean titles from the config above.
+
+Confirm when the Dashboard header is fixed and the Sidebar is grouped.
