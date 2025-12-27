@@ -3637,13 +3637,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Secure invoice creation from job card - server-side calculation only
   app.post('/api/invoices/from-job/:jobId', isAuthenticated, async (req: any, res) => {
     try {
-      const { jobCards, taskAssignments, jobCardParts, spareParts, invoices, invoiceItems } = await import("@shared/schema");
+      const { jobCards, taskAssignments, jobCardParts, spareParts, invoices, invoiceItems, saudiTaxCompliance, technicianProfiles } = await import("@shared/schema");
       const { eq, sql } = await import("drizzle-orm");
       const { db } = await import("./db");
       
       const { jobId } = req.params;
       const userId = req.user?.id || 'default-user';
-      const TAX_RATE = 0.15; // Saudi Arabia VAT 15%
+      const DEFAULT_TAX_RATE = 0.15; // Saudi Arabia VAT 15% default
       const DEFAULT_LABOR_RATE = 75; // Default hourly labor rate
       
       // 1. Fetch the job card
@@ -3652,7 +3652,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Job card not found" });
       }
       
-      // 2. Fetch all task assignments for labor calculation
+      // 2. Fetch garage tax settings from saudiTaxCompliance
+      let taxRate = DEFAULT_TAX_RATE;
+      const [taxSettings] = await db.select({
+        vatRate: saudiTaxCompliance.vatRate,
+        isVatRegistered: saudiTaxCompliance.isVatRegistered,
+      }).from(saudiTaxCompliance).where(eq(saudiTaxCompliance.garageId, jobCard.garageId));
+      
+      if (taxSettings?.isVatRegistered && taxSettings.vatRate) {
+        const storedRate = parseFloat(taxSettings.vatRate);
+        // Handle both formats: stored as percentage (15.00) or decimal (0.15)
+        taxRate = storedRate > 1 ? storedRate / 100 : storedRate;
+      }
+      
+      // 3. Fetch technician hourly rate if assigned
+      let laborRate = DEFAULT_LABOR_RATE;
+      let laborRateFromTechnician = false;
+      if (jobCard.assignedTo) {
+        const [techProfile] = await db.select({
+          hourlyRate: technicianProfiles.hourlyRate,
+        }).from(technicianProfiles).where(eq(technicianProfiles.userId, jobCard.assignedTo));
+        
+        if (techProfile?.hourlyRate) {
+          laborRate = parseFloat(techProfile.hourlyRate);
+          laborRateFromTechnician = true;
+        }
+      }
+      
+      // 4. Fetch all task assignments for labor calculation
       const tasks = await db.select().from(taskAssignments).where(eq(taskAssignments.jobCardId, jobId));
       
       // Calculate labor cost: sum of (actualMinutes or estimatedMinutes) * hourly rate / 60
@@ -3665,9 +3692,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const hours = parseFloat(jobCard.actualHours?.toString() || jobCard.estimatedHours?.toString() || "0");
         laborMinutes = hours * 60;
       }
-      const laborCost = (laborMinutes / 60) * DEFAULT_LABOR_RATE;
+      const laborCost = (laborMinutes / 60) * laborRate;
       
-      // 3. Fetch all job card parts with their prices
+      // 5. Fetch all job card parts with their prices
       const parts = await db.select({
         id: jobCardParts.id,
         quantity: jobCardParts.quantity,
@@ -3702,19 +3729,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
           quantity: qty,
           unitPrice: price.toFixed(2),
           lineTotal: lineTotal.toFixed(2),
-          taxRate: (TAX_RATE * 100).toFixed(2),
+          taxRate: (taxRate * 100).toFixed(2),
         });
       }
       
-      // 4. Calculate totals (server-side only - never trust frontend)
+      // 6. Calculate totals (server-side only - never trust frontend)
       const subtotal = laborCost + partsCost;
-      const taxAmount = subtotal * TAX_RATE;
+      const taxAmount = subtotal * taxRate;
       const totalAmount = subtotal + taxAmount;
       
-      // 5. Generate invoice number
+      // 7. Generate invoice number
       const invoiceNumber = `INV-${Date.now()}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
       
-      // 6. Create invoice with server-calculated values
+      // 8. Create invoice with server-calculated values
       const dueDate = new Date();
       dueDate.setDate(dueDate.getDate() + 30); // 30 days payment term
       
@@ -3737,7 +3764,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         createdBy: userId,
       }).returning();
       
-      // 7. Create invoice line items
+      // 9. Create invoice line items
       const lineItems = [];
       
       // Add labor line item if there's labor cost
@@ -3745,11 +3772,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         lineItems.push({
           invoiceId: newInvoice.id,
           itemType: 'labor',
-          description: `Labor: ${(laborMinutes / 60).toFixed(1)} hours @ $${DEFAULT_LABOR_RATE}/hr`,
+          description: `Labor: ${(laborMinutes / 60).toFixed(1)} hours @ $${laborRate}/hr`,
           quantity: 1,
           unitPrice: laborCost.toFixed(2),
           lineTotal: laborCost.toFixed(2),
-          taxRate: (TAX_RATE * 100).toFixed(2),
+          taxRate: (taxRate * 100).toFixed(2),
         });
       }
       
@@ -3765,19 +3792,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
         await db.insert(invoiceItems).values(lineItems);
       }
       
-      // Return invoice with calculation breakdown
+      // Return invoice with calculation breakdown (shows configurable rates used)
       res.status(201).json({
         invoice: newInvoice,
         breakdown: {
           laborCost: laborCost.toFixed(2),
           laborMinutes,
-          laborRate: DEFAULT_LABOR_RATE,
+          laborRate, // From technicianProfiles or default
           partsCost: partsCost.toFixed(2),
           partsCount: parts.length,
           subtotal: subtotal.toFixed(2),
-          taxRate: TAX_RATE,
+          taxRate, // From saudiTaxCompliance or default
+          taxRatePercent: (taxRate * 100).toFixed(2),
           taxAmount: taxAmount.toFixed(2),
           totalAmount: totalAmount.toFixed(2),
+          configSource: {
+            taxRateSource: taxSettings?.isVatRegistered ? 'saudiTaxCompliance' : 'default',
+            laborRateSource: laborRateFromTechnician ? 'technicianProfiles' : 'default',
+          },
         },
         items: lineItems,
       });

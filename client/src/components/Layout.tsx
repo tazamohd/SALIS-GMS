@@ -179,69 +179,75 @@ export function Layout({ children }: LayoutProps) {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  // Simplified navigation groups for cleaner UI
+  // Streamlined navigation - Core features top-level, minimal bloat
   const navGroups = [
     {
-      label: "Overview",
+      label: "Daily Operations",
       items: [
         { path: "/dashboard", icon: Home, label: "Dashboard" },
-        { path: "/kpi-dashboard", icon: BarChart3, label: "KPIs" },
-      ],
-    },
-    {
-      label: "Operations",
-      items: [
         { path: "/job-cards", icon: ClipboardList, label: "Job Cards" },
-        { path: "/appointments", icon: Calendar, label: "Appointments" },
-        { path: "/technician-portal", icon: Users, label: "Technicians" },
+        { path: "/appointments", icon: Calendar, label: "Calendar" },
       ],
     },
     {
-      label: "Inventory & Parts",
-      items: [
-        { path: "/inventory-management", icon: Package, label: "Stock List" },
-        { path: "/purchase-orders", icon: ShoppingCart, label: "Orders" },
-        { path: "/suppliers", icon: Truck, label: "Suppliers" },
-      ],
-    },
-    {
-      label: "Finance",
-      items: [
-        { path: "/invoices", icon: FileText, label: "Invoices" },
-        { path: "/expense-tracking", icon: Receipt, label: "Expenses" },
-        { path: "/general-ledger", icon: BookOpen, label: "Accounting" },
-      ],
-    },
-    {
-      label: "CRM",
+      label: "Customers & Vehicles",
       items: [
         { path: "/customers", icon: UserIcon, label: "Customers" },
         { path: "/vehicles", icon: Car, label: "Vehicles" },
       ],
     },
     {
-      label: "System",
+      label: "Inventory",
       items: [
-        { path: "/settings", icon: SettingsIcon, label: "Settings" },
+        { path: "/inventory-management", icon: Package, label: "Stock" },
+        { path: "/purchase-orders", icon: ShoppingCart, label: "Orders" },
+        { path: "/suppliers", icon: Truck, label: "Suppliers" },
+      ],
+    },
+    {
+      label: "Billing",
+      items: [
+        { path: "/invoices", icon: FileText, label: "Invoices" },
+        { path: "/expense-tracking", icon: Receipt, label: "Expenses" },
+      ],
+    },
+    {
+      label: "Team",
+      items: [
+        { path: "/technician-portal", icon: Users, label: "Technicians" },
+        { path: "/hr-management", icon: UserCog, label: "HR" },
+      ],
+    },
+    {
+      label: "Reports",
+      items: [
+        { path: "/kpi-dashboard", icon: BarChart3, label: "KPIs" },
+        { path: "/general-ledger", icon: BookOpen, label: "Accounting" },
+      ],
+    },
+    {
+      label: "Settings",
+      items: [
+        { path: "/settings", icon: SettingsIcon, label: "Preferences" },
       ],
     },
   ];
 
-  // Role-based navigation filtering (updated for simplified nav)
+  // Role-based navigation filtering (updated for streamlined nav)
   const roleNavigationMap: Record<string, string[]> = {
-    // Technicians see operations and inventory
-    'technician': ['Overview', 'Operations', 'Inventory & Parts'],
-    // Purchase Agents see inventory and finance
-    'Purchase Agent': ['Overview', 'Inventory & Parts', 'Finance'],
-    // Call Center sees CRM
-    'Call Center Agent': ['Overview', 'CRM', 'Operations'],
-    // HR roles see system
-    'HR Manager': ['Overview', 'Finance', 'System'],
-    'HR Officer': ['Overview', 'System'],
-    // Accountants see finance
-    'Accountant': ['Overview', 'Finance'],
-    // Service Advisors see operations and CRM
-    'Service Advisor': ['Overview', 'Operations', 'CRM', 'Finance'],
+    // Technicians see daily ops, inventory, and team (for technician portal)
+    'technician': ['Daily Operations', 'Inventory', 'Team'],
+    // Purchase Agents see inventory and billing
+    'Purchase Agent': ['Daily Operations', 'Inventory', 'Billing'],
+    // Call Center sees customers and daily ops
+    'Call Center Agent': ['Daily Operations', 'Customers & Vehicles'],
+    // HR roles see team, billing and settings
+    'HR Manager': ['Daily Operations', 'Team', 'Billing', 'Reports', 'Settings'],
+    'HR Officer': ['Daily Operations', 'Team', 'Settings'],
+    // Accountants see billing and reports
+    'Accountant': ['Daily Operations', 'Billing', 'Reports'],
+    // Service Advisors see operations, customers, and billing
+    'Service Advisor': ['Daily Operations', 'Customers & Vehicles', 'Billing', 'Inventory'],
     // Admin and Super Admin see everything
     'admin': [],
     'Super Admin': [],
