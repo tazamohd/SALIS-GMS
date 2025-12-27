@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SALIS AUTO - Enterprise Automotive ERP Platform</title>
+  <meta name="description" content="SALIS AUTO is a world-class automotive ERP platform for garage operations. Features franchise management, OBD diagnostics, multi-currency support, AI-powered maintenance predictions, and 156+ comprehensive modules.">
+  <meta name="keywords" content="automotive ERP, garage management, car repair software, vehicle diagnostics, fleet management, auto shop software">
+  <meta name="author" content="SALIS AUTO">
+  <meta name="robots" content="index, follow">
+  
+  <!-- Open Graph -->
+  <meta property="og:title" content="SALIS AUTO - Enterprise Automotive ERP Platform">
+  <meta property="og:description" content="World-class automotive ERP platform with 156+ modules for garage operations at scale.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://salisauto.replit.app">
+  <meta property="og:image" content="/logo.png">
+  
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="SALIS AUTO - Enterprise Automotive ERP">
+  <meta name="twitter:description" content="World-class automotive ERP platform with 156+ modules for garage operations.">
+  
+  <!-- Canonical -->
+  <link rel="canonical" href="https://salisauto.replit.app">
+  
+  <!-- JSON-LD Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "SALIS AUTO",
+    "applicationCategory": "BusinessApplication",
+    "operatingSystem": "Web",
+    "description": "Enterprise automotive ERP platform for garage operations with 156+ comprehensive modules including franchise management, OBD diagnostics, AI-powered predictions, and multi-currency support.",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "featureList": [
+      "Customer Management",
+      "Vehicle Tracking",
+      "Job Card Management",
+      "Inventory Control",
+      "Invoice Generation",
+      "Appointment Scheduling",
+      "OBD Diagnostics Integration",
+      "AI-Powered Maintenance Predictions",
+      "Multi-Currency Support",
+      "Franchise Management",
+      "Real-Time Service Bay Dashboard",
+      "Customer Loyalty Programs",
+      "Workshop Calendar",
+      "AR Overlay for Mechanics"
+    ]
+  }
+  </script>
+  
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+      color: #f0f0f0;
+      min-height: 100vh;
+    }
+    .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+    header { 
+      padding: 40px 0; 
+      border-bottom: 1px solid #333;
+      text-align: center;
+    }
+    .logo { font-size: 3rem; font-weight: 800; color: #fff; letter-spacing: 2px; }
+    .logo span { color: #666; }
+    .tagline { color: #888; margin-top: 10px; font-size: 1.2rem; }
+    
+    .hero { padding: 60px 0; text-align: center; }
+    .hero h1 { font-size: 2.5rem; margin-bottom: 20px; }
+    .hero p { font-size: 1.1rem; color: #aaa; max-width: 800px; margin: 0 auto 30px; line-height: 1.8; }
+    
+    .stats { 
+      display: grid; 
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+      gap: 30px; 
+      margin: 50px 0;
+    }
+    .stat { 
+      background: #1a1a1a; 
+      border: 1px solid #333; 
+      border-radius: 12px; 
+      padding: 30px; 
+      text-align: center;
+    }
+    .stat-number { font-size: 3rem; font-weight: 700; color: #fff; }
+    .stat-label { color: #888; margin-top: 5px; }
+    
+    .features { padding: 60px 0; }
+    .features h2 { text-align: center; font-size: 2rem; margin-bottom: 40px; }
+    .feature-grid { 
+      display: grid; 
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+      gap: 25px;
+    }
+    .feature { 
+      background: #1a1a1a; 
+      border: 1px solid #333; 
+      border-radius: 12px; 
+      padding: 25px;
+    }
+    .feature h3 { font-size: 1.2rem; margin-bottom: 10px; color: #fff; }
+    .feature p { color: #888; line-height: 1.6; }
+    
+    .modules { padding: 60px 0; background: #0f0f0f; margin: 40px -20px; padding-left: 20px; padding-right: 20px; }
+    .modules h2 { text-align: center; font-size: 2rem; margin-bottom: 40px; }
+    .module-categories { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+    .category { background: #1a1a1a; border: 1px solid #333; border-radius: 8px; padding: 20px; }
+    .category h4 { color: #fff; margin-bottom: 10px; font-size: 1.1rem; }
+    .category ul { list-style: none; }
+    .category li { color: #888; padding: 5px 0; font-size: 0.9rem; }
+    .category li:before { content: "• "; color: #555; }
+    
+    .api-section { padding: 60px 0; }
+    .api-section h2 { text-align: center; font-size: 2rem; margin-bottom: 20px; }
+    .api-section p { text-align: center; color: #888; margin-bottom: 30px; }
+    .api-endpoints { background: #0a0a0a; border: 1px solid #333; border-radius: 8px; padding: 20px; font-family: monospace; }
+    .endpoint { padding: 10px; border-bottom: 1px solid #222; }
+    .endpoint:last-child { border-bottom: none; }
+    .method { display: inline-block; width: 60px; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; margin-right: 10px; }
+    .method.get { background: #1a472a; color: #4ade80; }
+    .method.post { background: #422006; color: #fb923c; }
+    .endpoint-path { color: #60a5fa; }
+    .endpoint-desc { color: #666; margin-left: 10px; }
+    
+    footer { 
+      border-top: 1px solid #333; 
+      padding: 40px 0; 
+      text-align: center;
+      color: #666;
+    }
+    footer a { color: #888; text-decoration: none; margin: 0 15px; }
+    footer a:hover { color: #fff; }
+    
+    .cta { 
+      display: inline-block; 
+      background: #fff; 
+      color: #000; 
+      padding: 15px 40px; 
+      border-radius: 8px; 
+      font-weight: 600; 
+      text-decoration: none;
+      margin-top: 20px;
+    }
+    .cta:hover { background: #eee; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">SALIS <span>AUTO</span></div>
+      <p class="tagline">Enterprise Automotive ERP Platform</p>
+    </header>
+    
+    <section class="hero">
+      <h1>World-Class Garage Management at Scale</h1>
+      <p>SALIS AUTO is a comprehensive automotive ERP platform designed for efficient garage operations. It offers enterprise-grade features including franchise management, OBD diagnostics integration, OEM software licensing, global multi-currency/multi-language support, and a B2B spare parts supply network.</p>
+      <a href="/app" class="cta">Launch Application</a>
+    </section>
+    
+    <section class="stats">
+      <div class="stat">
+        <div class="stat-number">156+</div>
+        <div class="stat-label">Comprehensive Modules</div>
+      </div>
+      <div class="stat">
+        <div class="stat-number">320+</div>
+        <div class="stat-label">Database Tables</div>
+      </div>
+      <div class="stat">
+        <div class="stat-number">18</div>
+        <div class="stat-label">Navigation Groups</div>
+      </div>
+      <div class="stat">
+        <div class="stat-number">24</div>
+        <div class="stat-label">Professional Roles</div>
+      </div>
+    </section>
+    
+    <section class="features">
+      <h2>Platform Features</h2>
+      <div class="feature-grid">
+        <article class="feature">
+          <h3>Real-Time Service Bay Dashboard</h3>
+          <p>Live bay status monitoring with WebSocket updates, technician assignments, and job progress tracking for optimal workshop efficiency.</p>
+        </article>
+        <article class="feature">
+          <h3>AI-Powered Inventory Management</h3>
+          <p>Automated reordering with predictive demand forecasting, supplier integration, and smart stock level optimization.</p>
+        </article>
+        <article class="feature">
+          <h3>Customer Loyalty Program</h3>
+          <p>Points accumulation, tier progression (Bronze/Silver/Gold/Platinum), rewards redemption, and referral bonuses.</p>
+        </article>
+        <article class="feature">
+          <h3>Interactive Workshop Calendar</h3>
+          <p>Visual calendar with drag-and-drop job scheduling, technician availability tracking, and resource allocation.</p>
+        </article>
+        <article class="feature">
+          <h3>Augmented Reality for Mechanics</h3>
+          <p>AR-assisted repair guides, parts identification, and step-by-step visual instructions for complex repairs.</p>
+        </article>
+        <article class="feature">
+          <h3>OBD Diagnostics Integration</h3>
+          <p>Real-time vehicle diagnostics, fault code reading, live sensor data, and automated diagnostic reports.</p>
+        </article>
+        <article class="feature">
+          <h3>Multi-Franchise Management</h3>
+          <p>Centralized command center for franchise networks with KPI tracking, revenue sharing, and performance analytics.</p>
+        </article>
+        <article class="feature">
+          <h3>Saudi Arabia Compliance</h3>
+          <p>Full VAT, ZATCA E-Invoicing, Zakat integration, Hijri calendar, Arabic language, and TRN validation support.</p>
+        </article>
+      </div>
+    </section>
+    
+    <section class="modules">
+      <h2>Complete Module Catalog</h2>
+      <div class="module-categories">
+        <div class="category">
+          <h4>Customer & Appointments</h4>
+          <ul>
+            <li>Customer Profiles & CRM</li>
+            <li>Appointment Scheduling</li>
+            <li>Service Reminders</li>
+            <li>Customer Portal</li>
+            <li>Feedback Collection</li>
+          </ul>
+        </div>
+        <div class="category">
+          <h4>Vehicle Management</h4>
+          <ul>
+            <li>Vehicle Registry</li>
+            <li>Service History</li>
+            <li>Mileage Tracking</li>
+            <li>Fleet Management</li>
+            <li>Loaner Vehicles</li>
+          </ul>
+        </div>
+        <div class="category">
+          <h4>Service Operations</h4>
+          <ul>
+            <li>Job Card Management</li>
+            <li>Work Order Tracking</li>
+            <li>Technician Assignment</li>
+            <li>Quality Control</li>
+            <li>Service Bay Monitor</li>
+          </ul>
+        </div>
+        <div class="category">
+          <h4>Parts & Inventory</h4>
+          <ul>
+            <li>Parts Catalog</li>
+            <li>Stock Management</li>
+            <li>Purchase Orders</li>
+            <li>Supplier Network</li>
+            <li>Auto-Reordering</li>
+          </ul>
+        </div>
+        <div class="category">
+          <h4>Billing & Finance</h4>
+          <ul>
+            <li>Invoice Generation</li>
+            <li>Payment Processing</li>
+            <li>Quotations</li>
+            <li>Expense Tracking</li>
+            <li>Financial Reports</li>
+          </ul>
+        </div>
+        <div class="category">
+          <h4>Analytics & AI</h4>
+          <ul>
+            <li>Business Intelligence</li>
+            <li>Predictive Maintenance</li>
+            <li>Smart Recommendations</li>
+            <li>Performance Analytics</li>
+            <li>AI Chatbot</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+    
+    <section class="api-section">
+      <h2>Public API</h2>
+      <p>Access our platform data via RESTful API endpoints</p>
+      <div class="api-endpoints">
+        <div class="endpoint">
+          <span class="method get">GET</span>
+          <span class="endpoint-path">/api/public/info</span>
+          <span class="endpoint-desc">- Platform information and statistics</span>
+        </div>
+        <div class="endpoint">
+          <span class="method get">GET</span>
+          <span class="endpoint-path">/api/public/features</span>
+          <span class="endpoint-desc">- List of platform features</span>
+        </div>
+        <div class="endpoint">
+          <span class="method get">GET</span>
+          <span class="endpoint-path">/api/public/modules</span>
+          <span class="endpoint-desc">- Complete module catalog</span>
+        </div>
+        <div class="endpoint">
+          <span class="method get">GET</span>
+          <span class="endpoint-path">/api/public/services</span>
+          <span class="endpoint-desc">- Available service types</span>
+        </div>
+        <div class="endpoint">
+          <span class="method get">GET</span>
+          <span class="endpoint-path">/api/public/stats</span>
+          <span class="endpoint-desc">- Platform statistics</span>
+        </div>
+        <div class="endpoint">
+          <span class="method get">GET</span>
+          <span class="endpoint-path">/openapi.json</span>
+          <span class="endpoint-desc">- OpenAPI specification</span>
+        </div>
+      </div>
+    </section>
+    
+    <footer>
+      <p>&copy; 2025 SALIS AUTO. Enterprise Automotive ERP Platform.</p>
+      <nav style="margin-top: 20px;">
+        <a href="/app">Application</a>
+        <a href="/api/public/info">API</a>
+        <a href="/openapi.json">OpenAPI</a>
+        <a href="/sitemap.xml">Sitemap</a>
+        <a href="/robots.txt">Robots</a>
+      </nav>
+    </footer>
+  </div>
+</body>
+</html>

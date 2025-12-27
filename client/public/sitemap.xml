@@ -1,53 +1,96 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <!-- Public Marketing Pages -->
+  <!-- Landing Page (SSR for bots) -->
   <url>
-    <loc>https://salisauto.net/</loc>
+    <loc>https://salisauto.replit.app/</loc>
     <lastmod>2024-12-26</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://salisauto.net/login</loc>
+    <loc>https://salisauto.replit.app/?ssr=true</loc>
     <lastmod>2024-12-26</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
   </url>
 
-  <!-- Public Documentation & Knowledge Base -->
+  <!-- Public Static Landing Page -->
   <url>
-    <loc>https://salisauto.net/api-docs</loc>
+    <loc>https://salisauto.replit.app/public/index.html</loc>
     <lastmod>2024-12-26</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
 
+  <!-- Public API Endpoints (No Auth Required) -->
+  <url>
+    <loc>https://salisauto.replit.app/api/public/info</loc>
+    <lastmod>2024-12-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://salisauto.replit.app/api/public/features</loc>
+    <lastmod>2024-12-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://salisauto.replit.app/api/public/modules</loc>
+    <lastmod>2024-12-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://salisauto.replit.app/api/public/services</loc>
+    <lastmod>2024-12-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://salisauto.replit.app/api/public/stats</loc>
+    <lastmod>2024-12-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://salisauto.replit.app/api/public/health</loc>
+    <lastmod>2024-12-26</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+
   <!-- AI Accessibility Files -->
   <url>
-    <loc>https://salisauto.net/.well-known/llms.txt</loc>
+    <loc>https://salisauto.replit.app/.well-known/llms.txt</loc>
     <lastmod>2024-12-26</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://salisauto.net/openapi.json</loc>
+    <loc>https://salisauto.replit.app/openapi.json</loc>
     <lastmod>2024-12-26</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://salisauto.net/.well-known/openapi.json</loc>
+    <loc>https://salisauto.replit.app/.well-known/openapi.json</loc>
     <lastmod>2024-12-26</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://salisauto.net/.well-known/ai-plugin.json</loc>
+    <loc>https://salisauto.replit.app/.well-known/ai-plugin.json</loc>
     <lastmod>2024-12-26</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
-  <!-- Note: Authenticated app routes (dashboard, customers, vehicles, etc.) 
-       are intentionally excluded from this sitemap as they require login -->
+  <!-- Application Entry Points -->
+  <url>
+    <loc>https://salisauto.replit.app/login</loc>
+    <lastmod>2024-12-26</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
 </urlset>

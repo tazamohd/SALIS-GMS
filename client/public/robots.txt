@@ -1,82 +1,102 @@
 # SALIS AUTO - Robots.txt
-# Website: salisauto.net
-# AI-Friendly Configuration
+# Website: salisauto.replit.app
+# AI-Friendly Configuration - Full Bot Access
 
 # Allow all standard search engine crawlers
 User-agent: *
 Allow: /
-Disallow: /api/
-Disallow: /admin/
-Disallow: /dashboard
-Disallow: /settings
-Disallow: /profile
-Disallow: /login
-Disallow: /register
-Disallow: /logout
+Allow: /api/public/
+Allow: /public/
+Allow: /.well-known/
+Allow: /openapi.json
+Allow: /sitemap.xml
+Disallow: /api/login
+Disallow: /api/logout
+Disallow: /api/register
+Disallow: /api/user
+Disallow: /api/hr/
+Disallow: /api/admin/
 Crawl-delay: 1
 
-# OpenAI GPTBot - Allow for ChatGPT accessibility
+# OpenAI GPTBot - Full Access for ChatGPT
 User-agent: GPTBot
 Allow: /
-Allow: /docs/
-Allow: /api-docs/
+Allow: /api/public/
+Allow: /public/
 Allow: /.well-known/
-Disallow: /api/
-Disallow: /admin/
-Disallow: /dashboard
-Disallow: /settings
-Disallow: /profile
-Disallow: /login
-Disallow: /register
-Crawl-delay: 2
+Allow: /openapi.json
+Allow: /sitemap.xml
+Disallow: /api/login
+Disallow: /api/logout
+Crawl-delay: 1
+
+# ChatGPT User Agent
+User-agent: ChatGPT-User
+Allow: /
+Allow: /api/public/
+Allow: /public/
+Allow: /.well-known/
+Allow: /openapi.json
+Crawl-delay: 1
 
 # Google Gemini / Bard
 User-agent: Google-Extended
 Allow: /
-Allow: /docs/
-Allow: /api-docs/
+Allow: /api/public/
+Allow: /public/
 Allow: /.well-known/
-Disallow: /api/
-Disallow: /admin/
-Disallow: /dashboard
-Disallow: /settings
-Disallow: /profile
-Disallow: /login
-Disallow: /register
-Crawl-delay: 2
+Allow: /openapi.json
+Crawl-delay: 1
 
 # Anthropic Claude
 User-agent: anthropic-ai
 Allow: /
-Allow: /docs/
+Allow: /api/public/
+Allow: /public/
 Allow: /.well-known/
-Disallow: /api/
-Disallow: /admin/
-Disallow: /dashboard
-Crawl-delay: 2
+Allow: /openapi.json
+Crawl-delay: 1
+
+User-agent: ClaudeBot
+Allow: /
+Allow: /api/public/
+Allow: /public/
+Allow: /.well-known/
+Allow: /openapi.json
+Crawl-delay: 1
 
 # Perplexity AI
 User-agent: PerplexityBot
 Allow: /
-Allow: /docs/
+Allow: /api/public/
+Allow: /public/
 Allow: /.well-known/
-Disallow: /api/
-Disallow: /admin/
-Disallow: /dashboard
-Crawl-delay: 2
+Allow: /openapi.json
+Crawl-delay: 1
 
 # Common Crawl (used by many AI models)
 User-agent: CCBot
 Allow: /
-Allow: /docs/
-Disallow: /api/
-Disallow: /admin/
-Disallow: /dashboard
-Crawl-delay: 5
+Allow: /api/public/
+Allow: /public/
+Allow: /.well-known/
+Crawl-delay: 2
+
+# Microsoft Bing
+User-agent: Bingbot
+Allow: /
+Allow: /api/public/
+Allow: /public/
+Crawl-delay: 1
 
 # Sitemap location
-Sitemap: https://salisauto.net/sitemap.xml
+Sitemap: https://salisauto.replit.app/sitemap.xml
 
 # LLMs.txt location (AI-specific metadata)
 # See: https://llmstxt.org/
 # Available at: /.well-known/llms.txt
+
+# Public API Documentation
+# OpenAPI Spec: /openapi.json
+# AI Plugin: /.well-known/ai-plugin.json
+# Public APIs: /api/public/*
