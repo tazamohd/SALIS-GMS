@@ -21,6 +21,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import { StatusBadge } from "@/components/ui/status-badge";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useForm } from "react-hook-form";
@@ -30,14 +31,6 @@ import type { JobCard, Garage, User as UserType, InsertJobCard, TechnicianProfil
 import { insertJobCardSchema } from "@shared/schema";
 import { StandardPageLayout } from "@/components/layouts";
 import { EmptyState } from "@/components/ui/empty-state";
-
-const statusColors = {
-  pending: "bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300",
-  assigned: "bg-gray-100 dark:bg-salis-gray-dark text-gray-900 dark:text-white",
-  in_progress: "bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white",
-  completed: "bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200",
-  cancelled: "bg-gray-100 text-gray-800 dark:bg-salis-gray-dark dark:text-gray-300",
-};
 
 const priorityColors = {
   low: "bg-gray-100 text-gray-800 dark:bg-salis-gray-dark dark:text-gray-300",
@@ -316,9 +309,7 @@ export function JobCards() {
                         <p className="text-xs text-gray-900 dark:text-white/50">{vehicle?.licensePlate}</p>
                       </div>
                       <div className="flex flex-col gap-1">
-                        <Badge className={statusColors[jobCard.status as keyof typeof statusColors]}>
-                          {jobCard.status}
-                        </Badge>
+                        <StatusBadge status={jobCard.status} />
                         <Badge className={priorityColors[jobCard.priority as keyof typeof priorityColors]}>
                           {jobCard.priority}
                         </Badge>
@@ -643,9 +634,7 @@ export function JobCards() {
                 <div>
                   <Label className="text-gray-600">Status</Label>
                   <div className="mt-1">
-                    <Badge className={statusColors[selectedJobCard.status as keyof typeof statusColors]}>
-                      {selectedJobCard.status}
-                    </Badge>
+                    <StatusBadge status={selectedJobCard.status} />
                   </div>
                 </div>
                 <div>

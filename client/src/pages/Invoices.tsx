@@ -2,7 +2,7 @@ import { useState } from "react";
 import { FileText, Plus, Building2 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { StandardTablePage } from "@/components/layouts";
-import { Badge } from "@/components/ui/badge";
+import { StatusBadge } from "@/components/ui/status-badge";
 import { CreateInvoiceDialog } from "@/components/CreateInvoiceDialog";
 import { InvoiceDetailsDialog } from "@/components/InvoiceDetailsDialog";
 import type { Invoice, Garage, User } from "@shared/schema";
@@ -34,16 +34,6 @@ export function Invoices() {
     queryKey: ['/api/customers'],
   });
 
-  const getStatusColor = (status: string) => {
-    const colors: Record<string, string> = {
-      draft: "bg-gray-100 dark:bg-salis-gray-dark text-gray-800 dark:text-gray-300",
-      sent: "bg-gray-100 dark:bg-salis-gray-dark text-gray-900 dark:text-white",
-      paid: "bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200",
-      overdue: "bg-salis-black dark:bg-white text-white dark:text-salis-black",
-      cancelled: "bg-gray-100 dark:bg-salis-gray-dark text-gray-600 dark:text-gray-400",
-    };
-    return colors[status] || "bg-gray-100 dark:bg-salis-gray-dark text-gray-800 dark:text-gray-300";
-  };
 
   const columns: Column<Invoice>[] = [
     {
@@ -106,9 +96,7 @@ export function Invoices() {
       key: "status",
       label: "Status",
       render: (invoice) => (
-        <Badge className={`capitalize ${getStatusColor(invoice.status)}`}>
-          {invoice.status}
-        </Badge>
+        <StatusBadge status={invoice.status} />
       ),
     },
     {
