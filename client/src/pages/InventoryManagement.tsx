@@ -42,6 +42,7 @@ import {
 } from "@/components/ui/select";
 import { BarcodeScanner } from "@/components/BarcodeScanner";
 import { TabsPageLayout } from "@/components/layouts/TabsPageLayout";
+import { EmptyState } from "@/components/ui/empty-state";
 
 export default function InventoryManagement() {
   const { toast } = useToast();
@@ -61,7 +62,7 @@ export default function InventoryManagement() {
     }
   }, [garages, selectedGarageId]);
 
-  const { data: spareParts = [] } = useQuery<any[]>({
+  const { data: spareParts = [], isLoading: isSparePartsLoading } = useQuery<any[]>({
     queryKey: ["/api/spare-parts"],
   });
 
@@ -165,47 +166,64 @@ export default function InventoryManagement() {
           <CardDescription className="text-gray-900 dark:text-white/60">Quick overview of parts inventory</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="relative mb-4">
-            <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-900 dark:text-white/60 h-4 w-4" />
-            <Input
-              placeholder="Search parts..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
-              data-testid="input-search-parts"
+          {isSparePartsLoading ? (
+            <div className="text-center py-12">
+              <div className="animate-spin w-8 h-8 border-4 border-gray-900 dark:border-white border-t-transparent rounded-full mx-auto mb-4"></div>
+              <p className="text-gray-900 dark:text-white/60">Loading inventory...</p>
+            </div>
+          ) : spareParts.length === 0 ? (
+            <EmptyState
+              title="No Parts Found"
+              description="Get started by adding items to your stock."
+              actionLabel="Scan Barcode"
+              onAction={() => setIsScannerOpen(true)}
+              testId="inventory-empty"
             />
-          </div>
-          <Table>
-            <TableHeader className="bg-gray-100 dark:bg-salis-gray-dark">
-              <TableRow className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-salis-gray-dark">
-                <TableHead className="text-gray-900 dark:text-white">Part Name</TableHead>
-                <TableHead className="text-gray-900 dark:text-white">SKU</TableHead>
-                <TableHead className="text-gray-900 dark:text-white">Category</TableHead>
-                <TableHead className="text-gray-900 dark:text-white">Stock Status</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {spareParts
-                .filter((part: any) =>
-                  searchQuery === "" ||
-                  part.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                  part.sku.toLowerCase().includes(searchQuery.toLowerCase())
-                )
-                .slice(0, 10)
-                .map((part: any) => (
-                  <TableRow key={part.id} data-testid={`row-part-${part.id}`}>
-                    <TableCell className="font-medium">{part.name}</TableCell>
-                    <TableCell className="text-gray-900 dark:text-white">{part.sku}</TableCell>
-                    <TableCell className="text-gray-900 dark:text-white">
-                      <Badge variant="outline">{part.category}</Badge>
-                    </TableCell>
-                    <TableCell className="text-gray-900 dark:text-white">
-                      <Badge variant="secondary">In Stock</Badge>
-                    </TableCell>
+          ) : (
+            <>
+              <div className="relative mb-4">
+                <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-900 dark:text-white/60 h-4 w-4" />
+                <Input
+                  placeholder="Search parts..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10"
+                  data-testid="input-search-parts"
+                />
+              </div>
+              <Table>
+                <TableHeader className="bg-gray-100 dark:bg-salis-gray-dark">
+                  <TableRow className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-salis-gray-dark">
+                    <TableHead className="text-gray-900 dark:text-white">Part Name</TableHead>
+                    <TableHead className="text-gray-900 dark:text-white">SKU</TableHead>
+                    <TableHead className="text-gray-900 dark:text-white">Category</TableHead>
+                    <TableHead className="text-gray-900 dark:text-white">Stock Status</TableHead>
                   </TableRow>
-                ))}
-            </TableBody>
-          </Table>
+                </TableHeader>
+                <TableBody>
+                  {spareParts
+                    .filter((part: any) =>
+                      searchQuery === "" ||
+                      part.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                      part.sku.toLowerCase().includes(searchQuery.toLowerCase())
+                    )
+                    .slice(0, 10)
+                    .map((part: any) => (
+                      <TableRow key={part.id} data-testid={`row-part-${part.id}`}>
+                        <TableCell className="font-medium">{part.name}</TableCell>
+                        <TableCell className="text-gray-900 dark:text-white">{part.sku}</TableCell>
+                        <TableCell className="text-gray-900 dark:text-white">
+                          <Badge variant="outline">{part.category}</Badge>
+                        </TableCell>
+                        <TableCell className="text-gray-900 dark:text-white">
+                          <Badge variant="secondary">In Stock</Badge>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                </TableBody>
+              </Table>
+            </>
+          )}
         </CardContent>
       </Card>
     </div>

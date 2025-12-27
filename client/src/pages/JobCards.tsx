@@ -29,6 +29,7 @@ import { z } from "zod";
 import type { JobCard, Garage, User as UserType, InsertJobCard, TechnicianProfile } from "@shared/schema";
 import { insertJobCardSchema } from "@shared/schema";
 import { StandardPageLayout } from "@/components/layouts";
+import { EmptyState } from "@/components/ui/empty-state";
 
 const statusColors = {
   pending: "bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300",
@@ -287,13 +288,13 @@ export function JobCards() {
             <p className="text-gray-900 dark:text-white/60">Loading job cards...</p>
           </div>
         ) : filteredJobCards.length === 0 ? (
-          <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
-            <CardContent className="text-center py-12">
-              <Wrench className="w-12 h-12 text-gray-400 dark:text-gray-600 mx-auto mb-4" />
-              <p className="text-gray-600 dark:text-gray-400">No job cards found</p>
-              <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">Create your first job card to get started</p>
-            </CardContent>
-          </Card>
+          <EmptyState
+            title="No Job Cards Found"
+            description="Get started by creating your first service job card."
+            actionLabel="Create Job Card"
+            onAction={() => setIsCreateOpen(true)}
+            testId="job-cards-empty"
+          />
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredJobCards.map((jobCard) => {
