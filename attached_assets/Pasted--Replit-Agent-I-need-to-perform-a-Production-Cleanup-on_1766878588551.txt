@@ -1,0 +1,62 @@
+@Replit Agent
+
+I need to perform a "Production Cleanup" on the SalisAuto application to fix critical UI and Logic defects found in QA.
+
+Please execute the following 4 tasks strictly in order:
+
+---
+
+TASK 1: NAVIGATION CLEANUP (CRITICAL UI)
+Context: The Sidebar is currently unusable due to 100+ items, mixed languages, and non-functional "placeholder" features.
+Action:
+1. Open `client/src/config/navigation.ts` (or `sidebar-data.ts`).
+2. Replace the entire navigation structure with this strictly consolidated version:
+   ```typescript
+   export const navigationConfig = [
+     {
+       title: "Overview",
+       items: [
+         { title: "Dashboard", href: "/", icon: "LayoutDashboard" },
+         { title: "KPIs", href: "/kpi", icon: "BarChart" }
+       ]
+     },
+     {
+       title: "Operations",
+       items: [
+         { title: "Job Cards", href: "/job-cards", icon: "ClipboardList" },
+         { title: "Appointments", href: "/appointments", icon: "Calendar" },
+         { title: "Technicians", href: "/technicians", icon: "Users" }
+       ]
+     },
+     {
+       title: "Inventory",
+       items: [
+         { title: "Stock List", href: "/inventory", icon: "Package" },
+         { title: "Orders", href: "/purchase-orders", icon: "ShoppingCart" },
+         { title: "Suppliers", href: "/suppliers", icon: "Truck" }
+       ]
+     },
+     {
+       title: "Finance",
+       items: [
+         { title: "Invoices", href: "/invoices", icon: "FileText" },
+         { title: "Expenses", href: "/expenses", icon: "Receipt" },
+         // Consolidated Accounting - English Only
+         { title: "General Ledger", href: "/finance/general-ledger", icon: "Book" },
+         { title: "Balance Sheet", href: "/finance/balance-sheet", icon: "Scale" }
+       ]
+     },
+     {
+       title: "CRM",
+       items: [
+         { title: "Customers", href: "/customers", icon: "User" },
+         { title: "Vehicles", href: "/vehicles", icon: "Car" }
+       ]
+     },
+     {
+       title: "System",
+       items: [
+         { title: "Settings", href: "/settings", icon: "Settings" }
+       ]
+     }
+   ];

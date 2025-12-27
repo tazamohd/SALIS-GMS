@@ -1,19 +1,19 @@
 import {
   LayoutDashboard,
-  Wrench,
-  Package,
-  Users,
-  BadgeDollarSign,
-  Settings,
+  BarChart3,
   ClipboardList,
   Calendar,
-  UserCog,
+  Users,
+  Package,
   ShoppingCart,
   Truck,
-  Car,
   FileText,
   Receipt,
   BookOpen,
+  Scale,
+  User,
+  Car,
+  Settings,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -23,6 +23,7 @@ export type SubscriptionPlan = 'STARTER' | 'PRO' | 'ENTERPRISE';
 export interface NavItem {
   title: string;
   href: string;
+  icon?: LucideIcon;
   roles?: UserRole[];
   minPlan?: SubscriptionPlan;
 }
@@ -38,53 +39,55 @@ export interface NavGroup {
 
 export const navigationConfig: NavGroup[] = [
   {
-    title: "Dashboard",
-    href: "/dashboard",
+    title: "Overview",
     icon: LayoutDashboard,
-    roles: ['ADMIN', 'MANAGER', 'ADVISOR', 'ACCOUNTANT'],
+    items: [
+      { title: "Dashboard", href: "/", icon: LayoutDashboard },
+      { title: "KPIs", href: "/kpi-dashboard", icon: BarChart3 },
+    ],
   },
   {
     title: "Operations",
-    icon: Wrench,
+    icon: ClipboardList,
     items: [
-      { title: "Job Cards", href: "/job-cards", roles: ['ADMIN', 'MANAGER', 'ADVISOR', 'TECHNICIAN'] },
-      { title: "Appointments", href: "/appointments", roles: ['ADMIN', 'MANAGER', 'ADVISOR'] },
-      { title: "Technicians", href: "/technician-portal", roles: ['ADMIN', 'MANAGER'] },
+      { title: "Job Cards", href: "/job-cards", icon: ClipboardList },
+      { title: "Appointments", href: "/appointments", icon: Calendar },
+      { title: "Technicians", href: "/technician-portal", icon: Users },
     ],
   },
   {
     title: "Inventory",
     icon: Package,
-    minPlan: "PRO",
     items: [
-      { title: "Stock List", href: "/inventory-management" },
-      { title: "Purchase Orders", href: "/purchase-orders" },
-      { title: "Suppliers", href: "/suppliers" },
-    ],
-  },
-  {
-    title: "CRM",
-    icon: Users,
-    items: [
-      { title: "Customers", href: "/customers" },
-      { title: "Vehicles", href: "/vehicles" },
+      { title: "Stock List", href: "/inventory-management", icon: Package },
+      { title: "Orders", href: "/purchase-orders", icon: ShoppingCart },
+      { title: "Suppliers", href: "/suppliers", icon: Truck },
     ],
   },
   {
     title: "Finance",
-    icon: BadgeDollarSign,
-    roles: ['ADMIN', 'ACCOUNTANT'],
+    icon: FileText,
+    roles: ['ADMIN', 'MANAGER', 'ACCOUNTANT'],
     items: [
-      { title: "Invoices", href: "/invoices" },
-      { title: "Expenses", href: "/expense-tracking", minPlan: "PRO" },
-      { title: "Accounting", href: "/general-ledger", minPlan: "ENTERPRISE" },
+      { title: "Invoices", href: "/invoices", icon: FileText },
+      { title: "Expenses", href: "/expense-tracking", icon: Receipt },
+      { title: "General Ledger", href: "/general-ledger", icon: BookOpen },
+      { title: "Balance Sheet", href: "/balance-sheet", icon: Scale },
+    ],
+  },
+  {
+    title: "CRM",
+    icon: User,
+    items: [
+      { title: "Customers", href: "/customers", icon: User },
+      { title: "Vehicles", href: "/vehicles", icon: Car },
     ],
   },
   {
     title: "System",
     icon: Settings,
     items: [
-      { title: "Settings", href: "/settings" },
+      { title: "Settings", href: "/settings", icon: Settings },
     ],
   },
 ];
