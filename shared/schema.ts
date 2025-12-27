@@ -393,6 +393,37 @@ export const jobTrackingEvents = pgTable("job_tracking_events", {
   visibleEventsIdx: index("job_tracking_events_visible_idx").on(table.jobCardId).where(sql`${table.isVisibleToCustomer} = true`),
 }));
 
+// Job Card Parts - tracks parts used in a job card
+export const jobCardParts = pgTable("job_card_parts", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  jobCardId: uuid("job_card_id")
+    .notNull()
+    .references(() => jobCards.id, { onDelete: "cascade" }),
+  sparePartId: uuid("spare_part_id")
+    .notNull()
+    .references(() => spareParts.id),
+  sparePartInventoryId: uuid("spare_part_inventory_id")
+    .references(() => sparePartInventories.id),
+  quantity: integer("quantity").notNull().default(1),
+  unitPrice: decimal("unit_price", { precision: 10, scale: 2 }),
+  lineTotal: decimal("line_total", { precision: 10, scale: 2 }),
+  isDeducted: boolean("is_deducted").default(false),
+  deductedAt: timestamp("deducted_at"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type JobCardPart = typeof jobCardParts.$inferSelect;
+export type InsertJobCardPart = typeof jobCardParts.$inferInsert;
+export const insertJobCardPartSchema = createInsertSchema(jobCardParts).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 // Service Templates - for common service types
 export const serviceTemplates = pgTable("service_templates", {
   id: uuid("id")

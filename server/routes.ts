@@ -30,6 +30,9 @@ import {
   insertHrPerformanceReviewSchema,
   insertHrAnnouncementSchema,
   insertHrSelfServiceRequestSchema,
+  jobCardParts,
+  sparePartInventories,
+  jobCards,
 } from "@shared/schema";
 import rateLimit from "express-rate-limit";
 import { setupAuth, isAuthenticated, hashPassword } from "./auth";
@@ -933,11 +936,160 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch('/api/job-cards/:id', isAuthenticated, async (req, res) => {
     try {
       const { id } = req.params;
+      const newStatus = req.body.status;
+      
+      // If status is changing to 'completed', handle inventory deduction and status update atomically
+      if (newStatus === 'completed') {
+        // Get current job card to check existing status
+        const currentJobCard = await storage.getJobCard(id);
+        if (!currentJobCard) {
+          return res.status(404).json({ message: "Job card not found" });
+        }
+        
+        // Only deduct inventory if transitioning TO completed (not already completed)
+        if (currentJobCard.status !== 'completed') {
+          // Use transaction for atomic inventory deduction AND job card update
+          const updatedJobCard = await db.transaction(async (tx) => {
+            // Get all parts associated with this job card
+            const jobParts = await tx.select().from(jobCardParts).where(eq(jobCardParts.jobCardId, id));
+            
+            // First pass: verify sufficient stock for all parts
+            for (const part of jobParts) {
+              if (!part.isDeducted && part.sparePartInventoryId) {
+                const [inventory] = await tx.select().from(sparePartInventories)
+                  .where(eq(sparePartInventories.id, part.sparePartInventoryId));
+                
+                if (!inventory) {
+                  throw new Error(`Inventory record not found for part ID: ${part.sparePartId}`);
+                }
+                
+                const currentStock = inventory.stockQuantity || 0;
+                if (currentStock < part.quantity) {
+                  throw new Error(`Insufficient stock for part. Available: ${currentStock}, Required: ${part.quantity}`);
+                }
+              }
+            }
+            
+            // Second pass: deduct inventory for each part
+            for (const part of jobParts) {
+              if (!part.isDeducted && part.sparePartInventoryId) {
+                // Deduct from spare part inventory
+                await tx.update(sparePartInventories)
+                  .set({
+                    stockQuantity: sql`${sparePartInventories.stockQuantity} - ${part.quantity}`,
+                    updatedAt: new Date(),
+                  })
+                  .where(eq(sparePartInventories.id, part.sparePartInventoryId));
+                
+                // Mark part as deducted
+                await tx.update(jobCardParts)
+                  .set({
+                    isDeducted: true,
+                    deductedAt: new Date(),
+                    updatedAt: new Date(),
+                  })
+                  .where(eq(jobCardParts.id, part.id));
+              }
+            }
+            
+            // Update job card status within the same transaction
+            const [updated] = await tx.update(jobCards)
+              .set({
+                ...req.body,
+                completedAt: new Date(),
+                updatedAt: new Date(),
+              })
+              .where(eq(jobCards.id, id))
+              .returning();
+            
+            return updated;
+          });
+          
+          console.log(`Inventory updated for Job ID: ${id}`);
+          return res.json(updatedJobCard);
+        }
+      }
+      
+      // For non-completion status updates, use storage method
       const updatedJobCard = await storage.updateJobCard(id, req.body);
       res.json(updatedJobCard);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error updating job card:", error);
+      if (error.message?.includes('Insufficient stock') || error.message?.includes('Inventory record not found')) {
+        return res.status(400).json({ message: error.message });
+      }
       res.status(500).json({ message: "Failed to update job card" });
+    }
+  });
+
+  // Job Card Parts routes - Track parts used in a job
+  app.get('/api/job-cards/:jobCardId/parts', isAuthenticated, async (req, res) => {
+    try {
+      const { jobCardId } = req.params;
+      const parts = await db.select().from(jobCardParts).where(eq(jobCardParts.jobCardId, jobCardId));
+      res.json(parts);
+    } catch (error) {
+      console.error("Error fetching job card parts:", error);
+      res.status(500).json({ message: "Failed to fetch job card parts" });
+    }
+  });
+
+  app.post('/api/job-cards/:jobCardId/parts', isAuthenticated, async (req, res) => {
+    try {
+      const { jobCardId } = req.params;
+      
+      // Validate request body
+      const addPartSchema = z.object({
+        sparePartId: z.string().uuid(),
+        sparePartInventoryId: z.string().uuid(),
+        quantity: z.number().int().min(1, "Quantity must be at least 1"),
+        unitPrice: z.string().optional(),
+        notes: z.string().optional(),
+      });
+      
+      const validationResult = addPartSchema.safeParse(req.body);
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          message: "Validation error", 
+          errors: validationResult.error.errors 
+        });
+      }
+      
+      const { sparePartId, sparePartInventoryId, quantity, unitPrice, notes } = validationResult.data;
+      const lineTotal = unitPrice ? (parseFloat(unitPrice) * quantity).toFixed(2) : null;
+      
+      const [newPart] = await db.insert(jobCardParts).values({
+        jobCardId,
+        sparePartId,
+        sparePartInventoryId,
+        quantity,
+        unitPrice,
+        lineTotal,
+        notes,
+      }).returning();
+      
+      res.status(201).json(newPart);
+    } catch (error) {
+      console.error("Error adding part to job card:", error);
+      res.status(500).json({ message: "Failed to add part to job card" });
+    }
+  });
+
+  app.delete('/api/job-cards/:jobCardId/parts/:partId', isAuthenticated, async (req, res) => {
+    try {
+      const { partId } = req.params;
+      
+      // Check if part was already deducted
+      const [existingPart] = await db.select().from(jobCardParts).where(eq(jobCardParts.id, partId));
+      if (existingPart?.isDeducted) {
+        return res.status(400).json({ message: "Cannot remove part that has already been deducted from inventory" });
+      }
+      
+      await db.delete(jobCardParts).where(eq(jobCardParts.id, partId));
+      res.json({ message: "Part removed from job card" });
+    } catch (error) {
+      console.error("Error removing part from job card:", error);
+      res.status(500).json({ message: "Failed to remove part from job card" });
     }
   });
 
