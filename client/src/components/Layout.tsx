@@ -315,10 +315,19 @@ export function Layout({ children }: LayoutProps) {
         fixed lg:static inset-y-0 left-0 z-50 relative
         bg-white dark:bg-salis-black border-r border-gray-200 dark:border-salis-gray-dark flex flex-col
         transition-transform duration-300 ease-in-out
+        w-[280px] max-w-[85vw] lg:max-w-none
         ${mobileMenuOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
       `}
-          style={{ width: `${sidebarWidth}px` }}
+          style={{ ['--sidebar-width' as string]: `${sidebarWidth}px` }}
         >
+          <style>{`
+            @media (min-width: 1024px) {
+              aside[style*="--sidebar-width"] {
+                width: var(--sidebar-width) !important;
+                max-width: none !important;
+              }
+            }
+          `}</style>
           {/* Resize Handle */}
           <div
             className="absolute right-0 top-0 bottom-0 w-1 cursor-col-resize hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors z-10 hidden lg:block"
@@ -370,6 +379,7 @@ export function Layout({ children }: LayoutProps) {
                         return (
                           <Link key={item.path} href={item.path}>
                             <div
+                              onClick={() => setMobileMenuOpen(false)}
                               className={`flex items-center gap-2 pl-6 pr-3 py-1.5 rounded-md transition-all duration-200 cursor-pointer ${
                                 isActive
                                   ? "bg-salis-black dark:bg-white text-white dark:text-salis-black shadow-md"
