@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -133,6 +134,7 @@ const mockChecklists: VehicleChecklistData[] = [
 ];
 
 export default function VehicleChecklist() {
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [selectedChecklist, setSelectedChecklist] = useState<VehicleChecklistData | null>(null);
@@ -160,9 +162,9 @@ export default function VehicleChecklist() {
 
   const getStatusLabel = (status: string) => {
     const labelMap: Record<string, string> = {
-      in_progress: "In Progress",
-      completed: "Completed",
-      pending_review: "Pending Review",
+      in_progress: t('common.inProgress', 'In Progress'),
+      completed: t('common.completed', 'Completed'),
+      pending_review: t('vehicles.pendingReview', 'Pending Review'),
     };
     return labelMap[status] || status;
   };
@@ -192,14 +194,13 @@ export default function VehicleChecklist() {
 
   return (
     <div className="p-6 space-y-6 bg-gray-50 dark:bg-salis-gray-dark/30 min-h-screen">
-      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="font-montserrat font-bold text-2xl text-gray-900 dark:text-white">
-            Vehicle Checklist
+            {t('vehicles.vehicleChecklist', 'Vehicle Checklist')}
           </h1>
           <p className="font-poppins text-sm text-gray-600 dark:text-gray-400 mt-1">
-            Comprehensive vehicle inspection checklists for quality assurance
+            {t('vehicles.comprehensiveVehicleInspectionChecklists', 'Comprehensive vehicle inspection checklists for quality assurance')}
           </p>
         </div>
         <Dialog open={isNewChecklistOpen} onOpenChange={setIsNewChecklistOpen}>
@@ -209,21 +210,21 @@ export default function VehicleChecklist() {
               data-testid="button-new-checklist"
             >
               <Plus className="w-4 h-4 mr-2" />
-              New Checklist
+              {t('vehicles.newChecklist', 'New Checklist')}
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-md">
             <DialogHeader>
-              <DialogTitle className="font-montserrat">Start New Checklist</DialogTitle>
+              <DialogTitle className="font-montserrat">{t('vehicles.startNewChecklist', 'Start New Checklist')}</DialogTitle>
             </DialogHeader>
             <div className="space-y-4 pt-4">
               <div>
                 <label className="font-poppins text-sm text-gray-700 dark:text-gray-300">
-                  Select Vehicle
+                  {t('vehicles.selectVehicle', 'Select Vehicle')}
                 </label>
                 <Select>
                   <SelectTrigger className="mt-1">
-                    <SelectValue placeholder="Choose a vehicle" />
+                    <SelectValue placeholder={t('vehicles.chooseVehicle', 'Choose a vehicle')} />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="v1">ABC-1234 - Toyota Camry 2023</SelectItem>
@@ -234,11 +235,11 @@ export default function VehicleChecklist() {
               </div>
               <div>
                 <label className="font-poppins text-sm text-gray-700 dark:text-gray-300">
-                  Assign Technician
+                  {t('vehicles.assignTechnician', 'Assign Technician')}
                 </label>
                 <Select>
                   <SelectTrigger className="mt-1">
-                    <SelectValue placeholder="Choose a technician" />
+                    <SelectValue placeholder={t('vehicles.chooseTechnician', 'Choose a technician')} />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="t1">Ahmed Hassan</SelectItem>
@@ -251,24 +252,23 @@ export default function VehicleChecklist() {
                 className="w-full bg-gray-900 hover:bg-gray-800 dark:bg-white dark:hover:bg-gray-100 text-white dark:text-gray-900"
                 onClick={() => {
                   setIsNewChecklistOpen(false);
-                  toast({ title: "Checklist created", description: "New vehicle checklist has been started" });
+                  toast({ title: t('vehicles.checklistCreated', 'Checklist created'), description: t('vehicles.newVehicleChecklistStarted', 'New vehicle checklist has been started') });
                 }}
               >
-                Start Checklist
+                {t('vehicles.startChecklist', 'Start Checklist')}
               </Button>
             </div>
           </DialogContent>
         </Dialog>
       </div>
 
-      {/* Filters */}
       <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
         <CardContent className="p-4">
           <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
             <div className="relative flex-1 max-w-md">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <Input
-                placeholder="Search by plate, vehicle, or technician..."
+                placeholder={t('vehicles.searchByPlateVehicleTechnician', 'Search by plate, vehicle, or technician...')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10 font-poppins"
@@ -277,13 +277,13 @@ export default function VehicleChecklist() {
             </div>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="w-[180px]" data-testid="select-status-filter">
-                <SelectValue placeholder="Filter by status" />
+                <SelectValue placeholder={t('vehicles.filterByStatus', 'Filter by status')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="in_progress">In Progress</SelectItem>
-                <SelectItem value="completed">Completed</SelectItem>
-                <SelectItem value="pending_review">Pending Review</SelectItem>
+                <SelectItem value="all">{t('vehicles.allStatus', 'All Status')}</SelectItem>
+                <SelectItem value="in_progress">{t('common.inProgress', 'In Progress')}</SelectItem>
+                <SelectItem value="completed">{t('common.completed', 'Completed')}</SelectItem>
+                <SelectItem value="pending_review">{t('vehicles.pendingReview', 'Pending Review')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -291,10 +291,9 @@ export default function VehicleChecklist() {
       </Card>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Checklists List */}
         <div className="lg:col-span-1 space-y-4">
           <h2 className="font-poppins font-semibold text-sm text-gray-700 dark:text-gray-300 uppercase tracking-wider">
-            Recent Checklists ({filteredChecklists.length})
+            {t('vehicles.recentChecklists', 'Recent Checklists')} ({filteredChecklists.length})
           </h2>
           {filteredChecklists.map((checklist) => {
             const stats = getCompletionStats(checklist.items);
@@ -330,10 +329,9 @@ export default function VehicleChecklist() {
                     <Calendar className="w-3 h-3" />
                     <span className="font-poppins">{format(new Date(checklist.checklistDate), "MMM dd, yyyy")}</span>
                   </div>
-                  {/* Progress bar */}
                   <div className="mt-3">
                     <div className="flex justify-between text-xs font-poppins text-gray-600 dark:text-gray-400 mb-1">
-                      <span>Progress</span>
+                      <span>{t('vehicles.progress', 'Progress')}</span>
                       <span>{stats.percentage}%</span>
                     </div>
                     <div className="w-full bg-gray-200 dark:bg-salis-gray-dark rounded-full h-2">
@@ -349,7 +347,6 @@ export default function VehicleChecklist() {
           })}
         </div>
 
-        {/* Checklist Details */}
         <div className="lg:col-span-2">
           {selectedChecklist ? (
             <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
@@ -358,7 +355,7 @@ export default function VehicleChecklist() {
                   <div>
                     <CardTitle className="font-montserrat text-xl text-gray-900 dark:text-white flex items-center gap-2">
                       <ClipboardList className="w-5 h-5" />
-                      {selectedChecklist.vehiclePlate} - Inspection Checklist
+                      {selectedChecklist.vehiclePlate} - {t('vehicles.inspectionChecklist', 'Inspection Checklist')}
                     </CardTitle>
                     <p className="font-poppins text-sm text-gray-600 dark:text-gray-400 mt-1">
                       {selectedChecklist.vehicleMake} {selectedChecklist.vehicleModel}
@@ -372,7 +369,7 @@ export default function VehicleChecklist() {
                       data-testid="button-print-checklist"
                     >
                       <Printer className="w-4 h-4 mr-1" />
-                      Print
+                      {t('common.print', 'Print')}
                     </Button>
                     <Button
                       size="sm"
@@ -380,11 +377,10 @@ export default function VehicleChecklist() {
                       data-testid="button-save-checklist"
                     >
                       <Save className="w-4 h-4 mr-1" />
-                      Save
+                      {t('common.save', 'Save')}
                     </Button>
                   </div>
                 </div>
-                {/* Stats */}
                 <div className="flex gap-4 mt-4">
                   {(() => {
                     const stats = getCompletionStats(selectedChecklist.items);
@@ -394,19 +390,19 @@ export default function VehicleChecklist() {
                           <div className="font-montserrat font-bold text-2xl text-gray-900 dark:text-white">
                             {stats.completed}/{stats.total}
                           </div>
-                          <div className="font-poppins text-xs text-gray-600 dark:text-gray-400">Inspected</div>
+                          <div className="font-poppins text-xs text-gray-600 dark:text-gray-400">{t('vehicles.inspected', 'Inspected')}</div>
                         </div>
                         <div className="text-center">
                           <div className="font-montserrat font-bold text-2xl text-green-600 dark:text-green-400">
                             {stats.passed}
                           </div>
-                          <div className="font-poppins text-xs text-gray-600 dark:text-gray-400">Passed</div>
+                          <div className="font-poppins text-xs text-gray-600 dark:text-gray-400">{t('vehicles.passed', 'Passed')}</div>
                         </div>
                         <div className="text-center">
                           <div className="font-montserrat font-bold text-2xl text-red-600 dark:text-red-400">
                             {stats.failed}
                           </div>
-                          <div className="font-poppins text-xs text-gray-600 dark:text-gray-400">Failed</div>
+                          <div className="font-poppins text-xs text-gray-600 dark:text-gray-400">{t('vehicles.failed', 'Failed')}</div>
                         </div>
                       </>
                     );
@@ -434,7 +430,7 @@ export default function VehicleChecklist() {
                               </p>
                               {item.notes && (
                                 <p className="font-poppins text-xs text-red-600 dark:text-red-400 mt-1">
-                                  Note: {item.notes}
+                                  {t('common.notes', 'Note')}: {item.notes}
                                 </p>
                               )}
                             </div>
@@ -443,10 +439,10 @@ export default function VehicleChecklist() {
                                 <SelectValue />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value="pending">Pending</SelectItem>
-                                <SelectItem value="pass">Pass</SelectItem>
-                                <SelectItem value="fail">Fail</SelectItem>
-                                <SelectItem value="na">N/A</SelectItem>
+                                <SelectItem value="pending">{t('common.pending', 'Pending')}</SelectItem>
+                                <SelectItem value="pass">{t('vehicles.pass', 'Pass')}</SelectItem>
+                                <SelectItem value="fail">{t('vehicles.fail', 'Fail')}</SelectItem>
+                                <SelectItem value="na">{t('vehicles.notApplicable', 'N/A')}</SelectItem>
                               </SelectContent>
                             </Select>
                           </div>
@@ -461,10 +457,10 @@ export default function VehicleChecklist() {
               <div className="text-center p-8">
                 <ClipboardList className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
                 <h3 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white mb-2">
-                  Select a Checklist
+                  {t('vehicles.selectChecklist', 'Select a Checklist')}
                 </h3>
                 <p className="font-poppins text-sm text-gray-600 dark:text-gray-400">
-                  Choose a vehicle checklist from the list to view and edit inspection items
+                  {t('vehicles.chooseVehicleChecklistToViewEdit', 'Choose a vehicle checklist from the list to view and edit inspection items')}
                 </p>
               </div>
             </Card>

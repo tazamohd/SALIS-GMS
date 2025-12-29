@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -107,6 +108,7 @@ interface InventoryTransfer {
 }
 
 export default function InternalWarehouse() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [isLocationDialogOpen, setIsLocationDialogOpen] = useState(false);
   const [isZoneDialogOpen, setIsZoneDialogOpen] = useState(false);
@@ -184,10 +186,10 @@ export default function InternalWarehouse() {
       setIsLocationDialogOpen(false);
       setEditingLocationId(null);
       locationForm.reset();
-      toast({ title: editingLocationId ? "Location updated" : "Location created" });
+      toast({ title: editingLocationId ? t('inventory.locationUpdated', 'Location updated') : t('inventory.locationCreated', 'Location created') });
     },
     onError: () => {
-      toast({ title: "Error saving location", variant: "destructive" });
+      toast({ title: t('inventory.errorSavingLocation', 'Error saving location'), variant: "destructive" });
     },
   });
 
@@ -199,10 +201,10 @@ export default function InternalWarehouse() {
       queryClient.invalidateQueries({ queryKey: ["/api/warehouse-zones"] });
       setIsZoneDialogOpen(false);
       zoneForm.reset();
-      toast({ title: "Zone created" });
+      toast({ title: t('inventory.zoneCreated', 'Zone created') });
     },
     onError: () => {
-      toast({ title: "Error creating zone", variant: "destructive" });
+      toast({ title: t('inventory.errorCreatingZone', 'Error creating zone'), variant: "destructive" });
     },
   });
 
@@ -215,10 +217,10 @@ export default function InternalWarehouse() {
       queryClient.invalidateQueries({ queryKey: ["/api/warehouse-locations"] });
       setIsTransferDialogOpen(false);
       transferForm.reset();
-      toast({ title: "Transfer completed" });
+      toast({ title: t('inventory.transferCompleted', 'Transfer completed') });
     },
     onError: () => {
-      toast({ title: "Error completing transfer", variant: "destructive" });
+      toast({ title: t('inventory.errorCompletingTransfer', 'Error completing transfer'), variant: "destructive" });
     },
   });
 
@@ -241,7 +243,7 @@ export default function InternalWarehouse() {
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
             <Input
-              placeholder="Search locations..."
+              placeholder={t('inventory.searchLocations', 'Search locations...')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10 w-64"
@@ -250,10 +252,10 @@ export default function InternalWarehouse() {
           </div>
           <Select value={selectedZone} onValueChange={setSelectedZone}>
             <SelectTrigger className="w-48" data-testid="select-zone-filter">
-              <SelectValue placeholder="All Zones" />
+              <SelectValue placeholder={t('inventory.allZones', 'All Zones')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Zones</SelectItem>
+              <SelectItem value="all">{t('inventory.allZones', 'All Zones')}</SelectItem>
               {zones.map((zone) => (
                 <SelectItem key={zone.id} value={zone.zoneCode}>
                   {zone.zoneName}
@@ -264,14 +266,14 @@ export default function InternalWarehouse() {
         </div>
         <Button onClick={() => setIsLocationDialogOpen(true)} data-testid="button-add-location">
           <Plus className="h-4 w-4 mr-2" />
-          Add Location
+          {t('inventory.addLocation', 'Add Location')}
         </Button>
       </div>
 
       <div className="grid grid-cols-4 gap-4">
         <Card data-testid="card-total-locations">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500">Total Locations</CardTitle>
+            <CardTitle className="text-sm font-medium text-gray-500">{t('inventory.totalLocations', 'Total Locations')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{totalLocations}</div>
@@ -279,7 +281,7 @@ export default function InternalWarehouse() {
         </Card>
         <Card data-testid="card-active-locations">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500">Active Locations</CardTitle>
+            <CardTitle className="text-sm font-medium text-gray-500">{t('inventory.activeLocations', 'Active Locations')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{activeLocations}</div>
@@ -287,15 +289,15 @@ export default function InternalWarehouse() {
         </Card>
         <Card data-testid="card-total-capacity">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500">Total Capacity</CardTitle>
+            <CardTitle className="text-sm font-medium text-gray-500">{t('inventory.totalCapacity', 'Total Capacity')}</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{totalCapacity} units</div>
+            <div className="text-2xl font-bold">{totalCapacity} {t('inventory.units', 'units')}</div>
           </CardContent>
         </Card>
         <Card data-testid="card-occupancy">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500">Current Occupancy</CardTitle>
+            <CardTitle className="text-sm font-medium text-gray-500">{t('inventory.currentOccupancy', 'Current Occupancy')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
@@ -307,12 +309,12 @@ export default function InternalWarehouse() {
 
       {locationsLoading ? (
         <Card>
-          <CardContent className="py-8 text-center">Loading locations...</CardContent>
+          <CardContent className="py-8 text-center">{t('inventory.loadingLocations', 'Loading locations...')}</CardContent>
         </Card>
       ) : filteredLocations.length === 0 ? (
         <Card>
           <CardContent className="py-8 text-center text-gray-500">
-            No warehouse locations found. Add your first location to get started.
+            {t('inventory.noWarehouseLocations', 'No warehouse locations found. Add your first location to get started.')}
           </CardContent>
         </Card>
       ) : (
@@ -320,15 +322,15 @@ export default function InternalWarehouse() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Location Code</TableHead>
-                <TableHead>Name</TableHead>
-                <TableHead>Zone</TableHead>
-                <TableHead>Position</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Capacity</TableHead>
-                <TableHead>Occupancy</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Actions</TableHead>
+                <TableHead>{t('inventory.locationCode', 'Location Code')}</TableHead>
+                <TableHead>{t('common.name', 'Name')}</TableHead>
+                <TableHead>{t('inventory.zone', 'Zone')}</TableHead>
+                <TableHead>{t('inventory.position', 'Position')}</TableHead>
+                <TableHead>{t('common.type', 'Type')}</TableHead>
+                <TableHead>{t('inventory.capacity', 'Capacity')}</TableHead>
+                <TableHead>{t('inventory.occupancy', 'Occupancy')}</TableHead>
+                <TableHead>{t('common.status', 'Status')}</TableHead>
+                <TableHead>{t('common.actions', 'Actions')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -361,7 +363,7 @@ export default function InternalWarehouse() {
                   </TableCell>
                   <TableCell>
                     <Badge variant={location.isActive ? "default" : "secondary"}>
-                      {location.isActive ? "Active" : "Inactive"}
+                      {location.isActive ? t('common.active', 'Active') : t('common.inactive', 'Inactive')}
                     </Badge>
                   </TableCell>
                   <TableCell>
@@ -392,21 +394,21 @@ export default function InternalWarehouse() {
   const zonesTab = (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h3 className="text-lg font-medium">Warehouse Zones</h3>
+        <h3 className="text-lg font-medium">{t('inventory.warehouseZones', 'Warehouse Zones')}</h3>
         <Button onClick={() => setIsZoneDialogOpen(true)} data-testid="button-add-zone">
           <Plus className="h-4 w-4 mr-2" />
-          Add Zone
+          {t('inventory.addZone', 'Add Zone')}
         </Button>
       </div>
 
       {zonesLoading ? (
         <Card>
-          <CardContent className="py-8 text-center">Loading zones...</CardContent>
+          <CardContent className="py-8 text-center">{t('inventory.loadingZones', 'Loading zones...')}</CardContent>
         </Card>
       ) : zones.length === 0 ? (
         <Card>
           <CardContent className="py-8 text-center text-gray-500">
-            No zones configured. Add zones to organize your warehouse.
+            {t('inventory.noZonesConfigured', 'No zones configured. Add zones to organize your warehouse.')}
           </CardContent>
         </Card>
       ) : (
@@ -420,21 +422,21 @@ export default function InternalWarehouse() {
                       <Grid3X3 className="h-5 w-5" />
                       {zone.zoneName}
                     </CardTitle>
-                    <CardDescription>Code: {zone.zoneCode}</CardDescription>
+                    <CardDescription>{t('inventory.code', 'Code')}: {zone.zoneCode}</CardDescription>
                   </div>
                   <Badge variant={zone.isActive ? "default" : "secondary"}>
-                    {zone.isActive ? "Active" : "Inactive"}
+                    {zone.isActive ? t('common.active', 'Active') : t('common.inactive', 'Inactive')}
                   </Badge>
                 </div>
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-500">Temperature</span>
+                    <span className="text-gray-500">{t('inventory.temperature', 'Temperature')}</span>
                     <span className="capitalize font-medium">{zone.temperature}</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-500">Locations</span>
+                    <span className="text-gray-500">{t('inventory.locations', 'Locations')}</span>
                     <span className="font-medium">
                       {locations.filter(l => l.zone === zone.zoneCode).length}
                     </span>

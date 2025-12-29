@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { Bell, Mail, MessageSquare, CheckCircle, XCircle, Trash2, Settings } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,6 +13,7 @@ import { NotificationPreferences } from "@/components/NotificationPreferences";
 import { TabsPageLayout } from "@/components/layouts/TabsPageLayout";
 
 export default function Notifications() {
+  const { t } = useTranslation();
   const [selectedTab, setSelectedTab] = useState("all");
   const [showPreferences, setShowPreferences] = useState(false);
   const { toast } = useToast();
@@ -36,8 +38,8 @@ export default function Notifications() {
       queryClient.invalidateQueries({ queryKey: ['/api/notifications'] });
       queryClient.invalidateQueries({ queryKey: ['/api/notifications/unread-count'] });
       toast({
-        title: "Notification deleted",
-        description: "The notification has been removed.",
+        title: t('notifications.notificationDeleted', 'Notification deleted'),
+        description: t('notifications.notificationRemoved', 'The notification has been removed.'),
       });
     },
   });
@@ -113,7 +115,7 @@ export default function Notifications() {
         <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
           <CardContent className="flex flex-col items-center justify-center py-12">
             <Bell className="h-12 w-12 text-gray-300 mb-4" />
-            <p className="text-gray-900 dark:text-white/60">No notifications to display</p>
+            <p className="text-gray-900 dark:text-white/60">{t('notifications.noNotificationsToDisplay', 'No notifications to display')}</p>
           </CardContent>
         </Card>
       );
@@ -156,7 +158,7 @@ export default function Notifications() {
                       onClick={() => handleMarkAsRead(notification.id)}
                       data-testid={`button-mark-read-${notification.id}`}
                     >
-                      Mark as read
+                      {t('notifications.markAsRead', 'Mark as read')}
                     </Button>
                   )}
                   <Button
@@ -183,11 +185,11 @@ export default function Notifications() {
                 </span>
                 {notification.sentAt && (
                   <span>
-                    Sent {formatDistanceToNow(new Date(notification.sentAt), { addSuffix: true })}
+                    {t('notifications.sent', 'Sent')} {formatDistanceToNow(new Date(notification.sentAt), { addSuffix: true })}
                   </span>
                 )}
                 {notification.status === 'failed' && notification.failureReason && (
-                  <span className="text-gray-700 dark:text-gray-300">Failed: {notification.failureReason}</span>
+                  <span className="text-gray-700 dark:text-gray-300">{t('common.failed', 'Failed')}: {notification.failureReason}</span>
                 )}
               </div>
             </CardContent>
@@ -206,7 +208,7 @@ export default function Notifications() {
           className="mb-4"
           data-testid="button-back-to-notifications"
         >
-          ← Back to Notifications
+          ← {t('notifications.backToNotifications', 'Back to Notifications')}
         </Button>
         <NotificationPreferences />
       </div>
@@ -215,11 +217,11 @@ export default function Notifications() {
 
   return (
     <TabsPageLayout
-      title="Notifications"
-      description="Manage your notifications and alerts"
+      title={t('notifications.title', 'Notifications')}
+      description={t('notifications.description', 'Manage your notifications and alerts')}
       icon={Bell}
       primaryAction={{
-        label: "Preferences",
+        label: t('notifications.preferences', 'Preferences'),
         icon: Settings,
         onClick: () => setShowPreferences(true),
         variant: "outline",
@@ -228,25 +230,25 @@ export default function Notifications() {
       tabs={[
         {
           id: "all",
-          label: "All",
+          label: t('common.all', 'All'),
           badge: notifications.length,
           content: renderNotificationList(getFilteredNotifications("all")),
         },
         {
           id: "unread",
-          label: "Unread",
+          label: t('notifications.unread', 'Unread'),
           badge: unreadCount,
           content: renderNotificationList(getFilteredNotifications("unread")),
         },
         {
           id: "email",
-          label: "Email",
+          label: t('notifications.email', 'Email'),
           badge: emailCount,
           content: renderNotificationList(getFilteredNotifications("email")),
         },
         {
           id: "in-app",
-          label: "In-App",
+          label: t('notifications.inApp', 'In-App'),
           badge: inAppCount,
           content: renderNotificationList(getFilteredNotifications("in-app")),
         },

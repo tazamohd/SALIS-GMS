@@ -1,6 +1,7 @@
 import { Clock, AlertCircle, CheckCircle, Wrench, Search, ClipboardList } from "lucide-react";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -11,6 +12,7 @@ import { DashboardPage } from "@/components/layouts";
 import type { JobCard } from "@shared/schema";
 
 export function TasksManagement() {
+  const { t } = useTranslation();
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [priorityFilter, setPriorityFilter] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -29,13 +31,11 @@ export function TasksManagement() {
     retry: false,
   });
 
-  // Calculate stats
   const checkInCount = (jobCards?.filter(jc => jc.status === 'pending') ?? []).length;
   const repairCount = (jobCards?.filter(jc => jc.status === 'in_progress') ?? []).length;
   const qualityCheckCount = (jobCards?.filter(jc => jc.status === 'completed') ?? []).length;
   const completionCount = (jobCards?.filter(jc => jc.status === 'delivered') ?? []).length;
 
-  // Filter tasks
   const allFilteredTasks = jobCards?.filter(task => {
     const matchesStatus = statusFilter === 'all' || task.status === statusFilter;
     const matchesPriority = priorityFilter === 'all' || task.priority === priorityFilter;
@@ -46,7 +46,6 @@ export function TasksManagement() {
     return matchesStatus && matchesPriority && matchesSearch;
   }) || [];
 
-  // Pagination logic
   const totalPages = Math.ceil(allFilteredTasks.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
@@ -58,7 +57,6 @@ export function TasksManagement() {
     }
   };
 
-  // Reset to page 1 when filters change
   const handleFilterChange = (type: 'status' | 'priority' | 'search', value: string) => {
     setCurrentPage(1);
     if (type === 'status') setStatusFilter(value);
@@ -77,6 +75,17 @@ export function TasksManagement() {
     return statusColors[status] || 'bg-gray-100 dark:bg-salis-gray-dark text-gray-700 dark:text-gray-300';
   };
 
+  const getStatusLabel = (status: string) => {
+    const labelMap: Record<string, string> = {
+      pending: t('tasks.status.pending', 'Pending'),
+      in_progress: t('tasks.status.inProgress', 'In Progress'),
+      completed: t('tasks.status.completed', 'Completed'),
+      delivered: t('tasks.status.delivered', 'Delivered'),
+      cancelled: t('tasks.status.cancelled', 'Cancelled'),
+    };
+    return labelMap[status] || status;
+  };
+
   const getPriorityBadge = (priority: string) => {
     const priorityColors: { [key: string]: string } = {
       'high': 'bg-salis-black dark:bg-white text-white dark:text-salis-black',
@@ -86,48 +95,56 @@ export function TasksManagement() {
     return priorityColors[priority] || 'bg-gray-100 dark:bg-salis-gray-dark text-gray-700 dark:text-gray-300';
   };
 
+  const getPriorityLabel = (priority: string) => {
+    const labelMap: Record<string, string> = {
+      high: t('tasks.priority.high', 'High'),
+      medium: t('tasks.priority.medium', 'Medium'),
+      low: t('tasks.priority.low', 'Low'),
+    };
+    return labelMap[priority] || priority;
+  };
+
   const metrics = [
-    { label: "check-in", value: checkInCount.toString(), icon: Clock, color: "text-gray-700 dark:text-gray-300" },
-    { label: "Repair", value: repairCount.toString(), icon: Wrench, color: "text-gray-900 dark:text-white" },
-    { label: "Quality Check", value: qualityCheckCount.toString(), icon: AlertCircle, color: "text-gray-900 dark:text-white" },
-    { label: "Completion", value: completionCount.toString(), icon: CheckCircle, color: "text-gray-800 dark:text-gray-200" },
+    { label: t('tasks.checkIn', 'Check-in'), value: checkInCount.toString(), icon: Clock, color: "text-gray-700 dark:text-gray-300" },
+    { label: t('tasks.repair', 'Repair'), value: repairCount.toString(), icon: Wrench, color: "text-gray-900 dark:text-white" },
+    { label: t('tasks.qualityCheck', 'Quality Check'), value: qualityCheckCount.toString(), icon: AlertCircle, color: "text-gray-900 dark:text-white" },
+    { label: t('tasks.completion', 'Completion'), value: completionCount.toString(), icon: CheckCircle, color: "text-gray-800 dark:text-gray-200" },
   ];
 
   return (
     <DashboardPage
-      title="Tasks Management"
-      description="Manage and track all service tasks"
+      title={t('tasks.title', 'Tasks Management')}
+      description={t('tasks.description', 'Manage and track all service tasks')}
       icon={ClipboardList}
       metrics={metrics}
     >
 
-      {/* Filters */}
       <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark border mb-6">
         <CardContent className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <Select value={statusFilter} onValueChange={(value) => handleFilterChange('status', value)}>
               <SelectTrigger data-testid="select-status">
-                <SelectValue placeholder="Status" />
+                <SelectValue placeholder={t('common.status', 'Status')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="in_progress">In Progress</SelectItem>
-                <SelectItem value="completed">Completed</SelectItem>
-                <SelectItem value="delivered">Delivered</SelectItem>
-                <SelectItem value="cancelled">Cancelled</SelectItem>
+                <SelectItem value="all">{t('tasks.allStatus', 'All Status')}</SelectItem>
+                <SelectItem value="pending">{t('tasks.status.pending', 'Pending')}</SelectItem>
+                <SelectItem value="in_progress">{t('tasks.status.inProgress', 'In Progress')}</SelectItem>
+                <SelectItem value="completed">{t('tasks.status.completed', 'Completed')}</SelectItem>
+                <SelectItem value="delivered">{t('tasks.status.delivered', 'Delivered')}</SelectItem>
+                <SelectItem value="cancelled">{t('tasks.status.cancelled', 'Cancelled')}</SelectItem>
               </SelectContent>
             </Select>
 
             <Select value={priorityFilter} onValueChange={(value) => handleFilterChange('priority', value)}>
               <SelectTrigger data-testid="select-priority">
-                <SelectValue placeholder="Priority" />
+                <SelectValue placeholder={t('tasks.priority', 'Priority')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Priority</SelectItem>
-                <SelectItem value="high">High</SelectItem>
-                <SelectItem value="medium">Medium</SelectItem>
-                <SelectItem value="low">Low</SelectItem>
+                <SelectItem value="all">{t('tasks.allPriority', 'All Priority')}</SelectItem>
+                <SelectItem value="high">{t('tasks.priority.high', 'High')}</SelectItem>
+                <SelectItem value="medium">{t('tasks.priority.medium', 'Medium')}</SelectItem>
+                <SelectItem value="low">{t('tasks.priority.low', 'Low')}</SelectItem>
               </SelectContent>
             </Select>
 
@@ -135,7 +152,7 @@ export function TasksManagement() {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-900 dark:text-white/60" />
               <Input
                 type="text"
-                placeholder="Search"
+                placeholder={t('common.search', 'Search')}
                 value={searchQuery}
                 onChange={(e) => handleFilterChange('search', e.target.value)}
                 className="pl-10 border-gray-200 dark:border-salis-gray-dark"
@@ -146,32 +163,31 @@ export function TasksManagement() {
         </CardContent>
       </Card>
 
-      {/* Tasks Table */}
       <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark border">
         <CardContent className="p-6">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-200 dark:border-salis-gray-dark">
-                  <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white/60">Task ID</th>
-                  <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white/60">Customer Name</th>
-                  <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white/60">Service Type</th>
-                  <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white/60">Status</th>
-                  <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white/60">Due Date/Time</th>
-                  <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white/60">Priority</th>
-                  <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white/60">Action</th>
+                  <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white/60">{t('tasks.taskId', 'Task ID')}</th>
+                  <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white/60">{t('tasks.customerName', 'Customer Name')}</th>
+                  <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white/60">{t('tasks.serviceType', 'Service Type')}</th>
+                  <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white/60">{t('common.status', 'Status')}</th>
+                  <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white/60">{t('tasks.dueDateTime', 'Due Date/Time')}</th>
+                  <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white/60">{t('tasks.priority', 'Priority')}</th>
+                  <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white/60">{t('common.actions', 'Action')}</th>
                 </tr>
               </thead>
               <tbody>
                 {isLoading ? (
                   <tr>
                     <td colSpan={7} className="py-8 text-center">
-                      <div className="animate-pulse">Loading...</div>
+                      <div className="animate-pulse">{t('common.loading', 'Loading...')}</div>
                     </td>
                   </tr>
                 ) : filteredTasks.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="py-8 text-center text-gray-900 dark:text-white/60">No tasks available</td>
+                    <td colSpan={7} className="py-8 text-center text-gray-900 dark:text-white/60">{t('tasks.noTasks', 'No tasks available')}</td>
                   </tr>
                 ) : (
                   filteredTasks.map((task) => (
@@ -180,22 +196,22 @@ export function TasksManagement() {
                         #{task.id}
                       </td>
                       <td className="py-4 px-4 font-['Poppins',Helvetica] font-normal text-sm text-gray-900 dark:text-white">
-                        {(task.vehicleInfo as any)?.owner || 'N/A'}
+                        {(task.vehicleInfo as any)?.owner || t('common.notAvailable', 'N/A')}
                       </td>
                       <td className="py-4 px-4 font-['Poppins',Helvetica] font-normal text-sm text-gray-900 dark:text-white">
                         {task.serviceType}
                       </td>
                       <td className="py-4 px-4">
                         <Badge className={`${getStatusBadge(task.status)} border-0`} data-testid={`badge-status-${task.id}`}>
-                          {task.status}
+                          {getStatusLabel(task.status)}
                         </Badge>
                       </td>
                       <td className="py-4 px-4 font-['Poppins',Helvetica] font-normal text-sm text-gray-900 dark:text-white/60">
-                        {task.createdAt ? new Date(task.createdAt).toLocaleString() : 'N/A'}
+                        {task.createdAt ? new Date(task.createdAt).toLocaleString() : t('common.notAvailable', 'N/A')}
                       </td>
                       <td className="py-4 px-4">
                         <Badge className={`${getPriorityBadge(task.priority)} border-0`} data-testid={`badge-priority-${task.id}`}>
-                          {task.priority}
+                          {getPriorityLabel(task.priority)}
                         </Badge>
                       </td>
                       <td className="py-4 px-4">
@@ -205,7 +221,7 @@ export function TasksManagement() {
                           onClick={() => handleViewTask(task)}
                           data-testid={`button-view-${task.id}`}
                         >
-                          View
+                          {t('common.view', 'View')}
                         </Button>
                       </td>
                     </tr>
@@ -215,7 +231,6 @@ export function TasksManagement() {
             </table>
           </div>
 
-          {/* Pagination */}
           {totalPages > 0 && (
             <div className="flex items-center justify-between mt-6">
               <Button 
@@ -225,7 +240,7 @@ export function TasksManagement() {
                 disabled={currentPage === 1}
                 data-testid="button-previous"
               >
-                Previous
+                {t('common.previous', 'Previous')}
               </Button>
               <div className="flex gap-2">
                 {Array.from({ length: Math.min(totalPages, 10) }, (_, i) => i + 1).map((page) => (
@@ -248,7 +263,7 @@ export function TasksManagement() {
                 disabled={currentPage === totalPages}
                 data-testid="button-next"
               >
-                Next
+                {t('common.next', 'Next')}
               </Button>
             </div>
           )}

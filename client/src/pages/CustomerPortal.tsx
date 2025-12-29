@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,6 +21,7 @@ interface Customer {
 }
 
 export default function CustomerPortal() {
+  const { t } = useTranslation();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [token, setToken] = useState<string | null>(null);
   const [customer, setCustomer] = useState<Customer | null>(null);
@@ -55,8 +57,8 @@ export default function CustomerPortal() {
     localStorage.removeItem('portal_token');
     localStorage.removeItem('portal_customer');
     toast({
-      title: "Session Expired",
-      description: "Please log in again",
+      title: t('auth.sessionExpired', 'Session Expired'),
+      description: t('auth.pleaseLogInAgain', 'Please log in again'),
       variant: "destructive",
     });
   };
@@ -70,11 +72,11 @@ export default function CustomerPortal() {
     
     if (response.status === 401 || response.status === 403) {
       forceLogout();
-      throw new Error('Session expired or unauthorized');
+      throw new Error(t('auth.sessionExpiredOrUnauthorized', 'Session expired or unauthorized'));
     }
     
     if (!response.ok) {
-      throw new Error('Failed to fetch');
+      throw new Error(t('common.failedToFetch', 'Failed to fetch'));
     }
     
     return response.json();
@@ -100,8 +102,8 @@ export default function CustomerPortal() {
     } catch (error) {
       console.error('Error fetching data:', error);
       toast({
-        title: "Error",
-        description: "Failed to load your data",
+        title: t('common.error', 'Error'),
+        description: t('customers.portal.failedToLoadData', 'Failed to load your data'),
         variant: "destructive",
       });
     }
@@ -122,7 +124,7 @@ export default function CustomerPortal() {
       
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.message || 'Login failed');
+        throw new Error(error.message || t('auth.loginFailed', 'Login failed'));
       }
       
       const data = await response.json();
@@ -137,13 +139,13 @@ export default function CustomerPortal() {
       await fetchAllData(data.token);
       
       toast({
-        title: "Welcome!",
-        description: `Logged in as ${data.customer.fullName}`,
+        title: t('customers.portal.welcome', 'Welcome!'),
+        description: t('customers.portal.loggedInAs', 'Logged in as') + ` ${data.customer.fullName}`,
       });
     } catch (error: any) {
       toast({
-        title: "Login Failed",
-        description: error.message || "Invalid credentials",
+        title: t('auth.loginFailed', 'Login Failed'),
+        description: error.message || t('auth.invalidCredentials', 'Invalid credentials'),
         variant: "destructive",
       });
     } finally {
@@ -170,8 +172,8 @@ export default function CustomerPortal() {
       localStorage.removeItem('portal_token');
       localStorage.removeItem('portal_customer');
       toast({
-        title: "Logged Out",
-        description: "You have been logged out successfully",
+        title: t('auth.loggedOut', 'Logged Out'),
+        description: t('auth.loggedOutSuccessfully', 'You have been logged out successfully'),
       });
     }
   };
@@ -188,19 +190,19 @@ export default function CustomerPortal() {
       });
       
       if (!response.ok) {
-        throw new Error('Failed to approve estimate');
+        throw new Error(t('customers.portal.failedToApproveEstimate', 'Failed to approve estimate'));
       }
       
       await fetchAllData(token);
       
       toast({
-        title: "Estimate Approved",
-        description: "The estimate has been approved successfully",
+        title: t('customers.portal.estimateApproved', 'Estimate Approved'),
+        description: t('customers.portal.estimateApprovedDescription', 'The estimate has been approved successfully'),
       });
     } catch (error) {
       toast({
-        title: "Error",
-        description: "Failed to approve estimate",
+        title: t('common.error', 'Error'),
+        description: t('customers.portal.failedToApproveEstimate', 'Failed to approve estimate'),
         variant: "destructive",
       });
     }
@@ -208,14 +210,14 @@ export default function CustomerPortal() {
 
   const getStatusBadge = (status: string) => {
     const statusConfig: Record<string, { label: string; variant: any }> = {
-      pending: { label: "Pending", variant: "secondary" },
-      confirmed: { label: "Confirmed", variant: "default" },
-      completed: { label: "Completed", variant: "outline" },
-      cancelled: { label: "Cancelled", variant: "destructive" },
-      approved: { label: "Approved", variant: "default" },
-      draft: { label: "Draft", variant: "secondary" },
-      paid: { label: "Paid", variant: "default" },
-      unpaid: { label: "Unpaid", variant: "destructive" },
+      pending: { label: t('common.pending', 'Pending'), variant: "secondary" },
+      confirmed: { label: t('common.confirmed', 'Confirmed'), variant: "default" },
+      completed: { label: t('common.completed', 'Completed'), variant: "outline" },
+      cancelled: { label: t('common.cancelled', 'Cancelled'), variant: "destructive" },
+      approved: { label: t('common.approved', 'Approved'), variant: "default" },
+      draft: { label: t('common.draft', 'Draft'), variant: "secondary" },
+      paid: { label: t('common.paid', 'Paid'), variant: "default" },
+      unpaid: { label: t('common.unpaid', 'Unpaid'), variant: "destructive" },
     };
     
     const config = statusConfig[status] || { label: status, variant: "secondary" };
@@ -233,14 +235,14 @@ export default function CustomerPortal() {
               </div>
             </div>
             <div className="text-center">
-              <CardTitle className="text-2xl font-montserrat font-semibold">Customer Portal</CardTitle>
-              <CardDescription>Access your service history and appointments</CardDescription>
+              <CardTitle className="text-2xl font-montserrat font-semibold">{t('customers.portal.title', 'Customer Portal')}</CardTitle>
+              <CardDescription>{t('customers.portal.description', 'Access your service history and appointments')}</CardDescription>
             </div>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleLogin} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">{t('auth.email', 'Email')}</Label>
                 <Input
                   id="email"
                   type="email"
@@ -252,7 +254,7 @@ export default function CustomerPortal() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">{t('auth.password', 'Password')}</Label>
                 <Input
                   id="password"
                   type="password"
@@ -269,7 +271,7 @@ export default function CustomerPortal() {
                 disabled={isLoading}
                 data-testid="button-login"
               >
-                {isLoading ? "Logging in..." : "Login"}
+                {isLoading ? t('auth.loggingIn', 'Logging in...') : t('auth.login', 'Login')}
               </Button>
             </form>
           </CardContent>
@@ -281,12 +283,12 @@ export default function CustomerPortal() {
   const appointmentsTab = (
     <Card>
       <CardHeader>
-        <CardTitle>Your Appointments</CardTitle>
-        <CardDescription>View and manage your service appointments</CardDescription>
+        <CardTitle>{t('customers.portal.yourAppointments', 'Your Appointments')}</CardTitle>
+        <CardDescription>{t('customers.portal.manageAppointments', 'View and manage your service appointments')}</CardDescription>
       </CardHeader>
       <CardContent>
         {appointments.length === 0 ? (
-          <p className="text-center text-salis-gray py-8">No appointments found</p>
+          <p className="text-center text-salis-gray py-8">{t('customers.portal.noAppointments', 'No appointments found')}</p>
         ) : (
           <div className="space-y-4">
             {appointments.map((appt: any) => (
@@ -297,7 +299,7 @@ export default function CustomerPortal() {
               >
                 <div className="flex justify-between items-start">
                   <div>
-                    <p className="font-semibold">{appt.serviceType || 'Service Appointment'}</p>
+                    <p className="font-semibold">{appt.serviceType || t('customers.portal.serviceAppointment', 'Service Appointment')}</p>
                     <p className="text-sm text-salis-gray">
                       {new Date(appt.appointmentDate).toLocaleDateString()} at{' '}
                       {appt.appointmentTime}
@@ -319,12 +321,12 @@ export default function CustomerPortal() {
   const vehiclesTab = (
     <Card>
       <CardHeader>
-        <CardTitle>Your Vehicles</CardTitle>
-        <CardDescription>Manage your registered vehicles</CardDescription>
+        <CardTitle>{t('customers.portal.yourVehicles', 'Your Vehicles')}</CardTitle>
+        <CardDescription>{t('customers.portal.manageVehicles', 'Manage your registered vehicles')}</CardDescription>
       </CardHeader>
       <CardContent>
         {vehicles.length === 0 ? (
-          <p className="text-center text-salis-gray py-8">No vehicles found</p>
+          <p className="text-center text-salis-gray py-8">{t('customers.portal.noVehicles', 'No vehicles found')}</p>
         ) : (
           <div className="grid gap-4 md:grid-cols-2">
             {vehicles.map((vehicle: any) => (
@@ -359,12 +361,12 @@ export default function CustomerPortal() {
   const historyTab = (
     <Card>
       <CardHeader>
-        <CardTitle>Service History</CardTitle>
-        <CardDescription>View your complete service records</CardDescription>
+        <CardTitle>{t('customers.portal.serviceHistory', 'Service History')}</CardTitle>
+        <CardDescription>{t('customers.portal.viewServiceRecords', 'View your complete service records')}</CardDescription>
       </CardHeader>
       <CardContent>
         {serviceHistory.length === 0 ? (
-          <p className="text-center text-salis-gray py-8">No service history found</p>
+          <p className="text-center text-salis-gray py-8">{t('customers.portal.noServiceHistory', 'No service history found')}</p>
         ) : (
           <div className="space-y-4">
             {serviceHistory.map((record: any) => (
@@ -403,12 +405,12 @@ export default function CustomerPortal() {
   const estimatesTab = (
     <Card>
       <CardHeader>
-        <CardTitle>Estimates</CardTitle>
-        <CardDescription>Review and approve service estimates</CardDescription>
+        <CardTitle>{t('customers.portal.estimates', 'Estimates')}</CardTitle>
+        <CardDescription>{t('customers.portal.reviewEstimates', 'Review and approve service estimates')}</CardDescription>
       </CardHeader>
       <CardContent>
         {estimates.length === 0 ? (
-          <p className="text-center text-salis-gray py-8">No estimates found</p>
+          <p className="text-center text-salis-gray py-8">{t('customers.portal.noEstimates', 'No estimates found')}</p>
         ) : (
           <div className="space-y-4">
             {estimates.map((est: any) => (
@@ -448,7 +450,7 @@ export default function CustomerPortal() {
                       data-testid={`button-approve-${est.estimate.id}`}
                     >
                       <CheckCircle className="w-4 h-4 mr-2" />
-                      Approve Estimate
+                      {t('customers.portal.approveEstimate', 'Approve Estimate')}
                     </Button>
                   </>
                 )}
@@ -463,12 +465,12 @@ export default function CustomerPortal() {
   const invoicesTab = (
     <Card>
       <CardHeader>
-        <CardTitle>Invoices</CardTitle>
-        <CardDescription>View your service invoices</CardDescription>
+        <CardTitle>{t('customers.portal.invoices', 'Invoices')}</CardTitle>
+        <CardDescription>{t('customers.portal.viewInvoices', 'View your service invoices')}</CardDescription>
       </CardHeader>
       <CardContent>
         {invoices.length === 0 ? (
-          <p className="text-center text-salis-gray py-8">No invoices found</p>
+          <p className="text-center text-salis-gray py-8">{t('customers.portal.noInvoices', 'No invoices found')}</p>
         ) : (
           <div className="space-y-4">
             {invoices.map((inv: any) => (
@@ -503,12 +505,12 @@ export default function CustomerPortal() {
   const paymentsTab = (
     <Card>
       <CardHeader>
-        <CardTitle>Payment History</CardTitle>
-        <CardDescription>View all your payment transactions</CardDescription>
+        <CardTitle>{t('customers.portal.paymentHistory', 'Payment History')}</CardTitle>
+        <CardDescription>{t('customers.portal.viewPayments', 'View all your payment transactions')}</CardDescription>
       </CardHeader>
       <CardContent>
         {payments.length === 0 ? (
-          <p className="text-center text-salis-gray py-8">No payments found</p>
+          <p className="text-center text-salis-gray py-8">{t('customers.portal.noPayments', 'No payments found')}</p>
         ) : (
           <div className="space-y-4">
             {payments.map((payment: any) => (
@@ -545,11 +547,11 @@ export default function CustomerPortal() {
 
   return (
     <TabsPageLayout
-      title={`Welcome, ${customer?.fullName}`}
-      description={customer?.email || "Customer Portal"}
+      title={`${t('customers.portal.welcomeUser', 'Welcome')}, ${customer?.fullName}`}
+      description={customer?.email || t('customers.portal.title', 'Customer Portal')}
       icon={Car}
       primaryAction={{
-        label: "Logout",
+        label: t('auth.logout', 'Logout'),
         icon: LogOut,
         onClick: handleLogout,
         variant: "outline",
@@ -558,37 +560,37 @@ export default function CustomerPortal() {
       tabs={[
         {
           id: "appointments",
-          label: "Appointments",
+          label: t('nav.appointments', 'Appointments'),
           icon: Calendar,
           content: appointmentsTab,
         },
         {
           id: "vehicles",
-          label: "Vehicles",
+          label: t('nav.vehicles', 'Vehicles'),
           icon: Car,
           content: vehiclesTab,
         },
         {
           id: "history",
-          label: "History",
+          label: t('customers.portal.history', 'History'),
           icon: History,
           content: historyTab,
         },
         {
           id: "estimates",
-          label: "Estimates",
+          label: t('nav.estimates', 'Estimates'),
           icon: FileText,
           content: estimatesTab,
         },
         {
           id: "invoices",
-          label: "Invoices",
+          label: t('nav.invoices', 'Invoices'),
           icon: FileText,
           content: invoicesTab,
         },
         {
           id: "payments",
-          label: "Payments",
+          label: t('customers.portal.payments', 'Payments'),
           icon: CreditCard,
           content: paymentsTab,
         },

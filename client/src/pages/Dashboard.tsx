@@ -143,15 +143,15 @@ export function Dashboard() {
   const isTechnician = role === 'TECHNICIAN';
   
   const metrics = role === 'ADMIN' || role === 'MANAGER' ? [
-    { label: 'Total Revenue', value: `$${totalRevenue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, icon: DollarSign, color: 'text-green-600 dark:text-green-400' },
-    { label: 'Active Customers', value: activeCustomersCount.toString(), icon: Users, color: 'text-blue-600 dark:text-blue-400' },
-    { label: 'Parts Inventory', value: `${inventoryPercentage}%`, icon: Package, color: 'text-purple-600 dark:text-purple-400' },
-    { label: 'Check-In', value: checkInCount.toString(), icon: Clock, color: 'text-yellow-600 dark:text-yellow-400' },
+    { label: t('dashboard.totalRevenue', 'Total Revenue'), value: `$${totalRevenue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, icon: DollarSign, color: 'text-green-600 dark:text-green-400' },
+    { label: t('dashboard.activeCustomers', 'Active Customers'), value: activeCustomersCount.toString(), icon: Users, color: 'text-blue-600 dark:text-blue-400' },
+    { label: t('dashboard.partsInventory', 'Parts Inventory'), value: `${inventoryPercentage}%`, icon: Package, color: 'text-purple-600 dark:text-purple-400' },
+    { label: t('dashboard.checkIn', 'Check-In'), value: checkInCount.toString(), icon: Clock, color: 'text-yellow-600 dark:text-yellow-400' },
   ] : [
-    { label: 'My Tasks', value: repairCount.toString(), icon: Wrench, color: 'text-orange-600 dark:text-orange-400' },
-    { label: 'Completed Today', value: qualityCheckCount.toString(), icon: CheckCircle, color: 'text-green-600 dark:text-green-400' },
-    { label: 'Pending', value: checkInCount.toString(), icon: Clock, color: 'text-yellow-600 dark:text-yellow-400' },
-    { label: 'Delivered', value: completionCount.toString(), icon: BarChart3, color: 'text-blue-600 dark:text-blue-400' },
+    { label: t('dashboard.myTasks', 'My Tasks'), value: repairCount.toString(), icon: Wrench, color: 'text-orange-600 dark:text-orange-400' },
+    { label: t('dashboard.completedToday', 'Completed Today'), value: qualityCheckCount.toString(), icon: CheckCircle, color: 'text-green-600 dark:text-green-400' },
+    { label: t('common.pending', 'Pending'), value: checkInCount.toString(), icon: Clock, color: 'text-yellow-600 dark:text-yellow-400' },
+    { label: t('dashboard.delivered', 'Delivered'), value: completionCount.toString(), icon: BarChart3, color: 'text-blue-600 dark:text-blue-400' },
   ];
 
   return (
@@ -206,26 +206,26 @@ export function Dashboard() {
       <Card className="border border-gray-200 dark:border-salis-gray-dark mb-6 bg-white dark:bg-salis-black" data-testid="card-summary">
         <CardContent className="p-5">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">Task Overview</h2>
-            <Badge variant="outline" className="text-xs">All Time</Badge>
+            <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">{t('dashboard.taskOverview', 'Task Overview')}</h2>
+            <Badge variant="outline" className="text-xs">{t('dashboard.allTime', 'All Time')}</Badge>
           </div>
           
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="text-center">
               <p className="text-3xl font-montserrat font-bold text-gray-900 dark:text-white">{jobCards?.length || 0}</p>
-              <p className="text-xs font-poppins text-gray-600 dark:text-gray-400 mt-1">Total Jobs</p>
+              <p className="text-xs font-poppins text-gray-600 dark:text-gray-400 mt-1">{t('dashboard.totalJobs', 'Total Jobs')}</p>
             </div>
             <div className="text-center">
               <p className="text-3xl font-montserrat font-bold text-gray-900 dark:text-white">{invoices.length}</p>
-              <p className="text-xs font-poppins text-gray-600 dark:text-gray-400 mt-1">Total Invoices</p>
+              <p className="text-xs font-poppins text-gray-600 dark:text-gray-400 mt-1">{t('dashboard.totalInvoices', 'Total Invoices')}</p>
             </div>
             <div className="text-center">
               <p className="text-3xl font-montserrat font-bold text-gray-900 dark:text-white">{activeCustomersCount}</p>
-              <p className="text-xs font-poppins text-gray-600 dark:text-gray-400 mt-1">Customers</p>
+              <p className="text-xs font-poppins text-gray-600 dark:text-gray-400 mt-1">{t('dashboard.customers', 'Customers')}</p>
             </div>
             <div className="text-center">
               <p className="text-3xl font-montserrat font-bold text-gray-900 dark:text-white">{spareParts.length}</p>
-              <p className="text-xs font-poppins text-gray-600 dark:text-gray-400 mt-1">Parts in Catalog</p>
+              <p className="text-xs font-poppins text-gray-600 dark:text-gray-400 mt-1">{t('dashboard.partsCatalog', 'Parts in Catalog')}</p>
             </div>
           </div>
         </CardContent>
@@ -237,12 +237,12 @@ export function Dashboard() {
             <CardHeader className="pb-2">
               <CardTitle className="font-montserrat text-base text-gray-900 dark:text-white flex items-center gap-2">
                 <TrendingUp className="w-4 h-4" />
-                Revenue per Month
+                {t('dashboard.revenuePerMonth', 'Revenue per Month')}
               </CardTitle>
             </CardHeader>
             <CardContent>
               {statsLoading ? (
-                <div className="h-[200px] flex items-center justify-center text-gray-500">Loading...</div>
+                <div className="h-[200px] flex items-center justify-center text-gray-500">{t('common.loading')}</div>
               ) : dashboardStats?.revenue && dashboardStats.revenue.length > 0 ? (
                 <ResponsiveContainer width="100%" height={200}>
                   <BarChart data={dashboardStats.revenue}>
@@ -258,7 +258,7 @@ export function Dashboard() {
                 </ResponsiveContainer>
               ) : (
                 <div className="h-[200px] flex items-center justify-center text-gray-500 dark:text-gray-400 text-sm">
-                  No revenue data available
+                  {t('dashboard.noRevenueData', 'No revenue data available')}
                 </div>
               )}
             </CardContent>
@@ -268,12 +268,12 @@ export function Dashboard() {
             <CardHeader className="pb-2">
               <CardTitle className="font-montserrat text-base text-gray-900 dark:text-white flex items-center gap-2">
                 <BarChart3 className="w-4 h-4" />
-                Jobs by Status
+                {t('dashboard.jobsByStatus', 'Jobs by Status')}
               </CardTitle>
             </CardHeader>
             <CardContent>
               {statsLoading ? (
-                <div className="h-[200px] flex items-center justify-center text-gray-500">Loading...</div>
+                <div className="h-[200px] flex items-center justify-center text-gray-500">{t('common.loading')}</div>
               ) : dashboardStats?.jobStatus && dashboardStats.jobStatus.length > 0 ? (
                 <ResponsiveContainer width="100%" height={200}>
                   <PieChart>
@@ -302,7 +302,7 @@ export function Dashboard() {
                 </ResponsiveContainer>
               ) : (
                 <div className="h-[200px] flex items-center justify-center text-gray-500 dark:text-gray-400 text-sm">
-                  No job status data available
+                  {t('dashboard.noJobStatusData', 'No job status data available')}
                 </div>
               )}
             </CardContent>
@@ -325,14 +325,14 @@ export function Dashboard() {
             <table className="w-full text-sm">
               <thead className="bg-gray-50 dark:bg-salis-gray-dark/50">
                 <tr className="border-b border-gray-200 dark:border-salis-gray-dark">
-                  <th className="text-left py-3 px-4 font-poppins font-semibold text-xs text-gray-700 dark:text-gray-300">ID</th>
-                  <th className="text-left py-3 px-4 font-poppins font-semibold text-xs text-gray-700 dark:text-gray-300">Service</th>
-                  <th className="text-left py-3 px-4 font-poppins font-semibold text-xs text-gray-700 dark:text-gray-300">Customer</th>
-                  <th className="text-left py-3 px-4 font-poppins font-semibold text-xs text-gray-700 dark:text-gray-300">Vehicle</th>
-                  <th className="text-left py-3 px-4 font-poppins font-semibold text-xs text-gray-700 dark:text-gray-300">Status</th>
-                  <th className="text-left py-3 px-4 font-poppins font-semibold text-xs text-gray-700 dark:text-gray-300">Priority</th>
-                  <th className="text-left py-3 px-4 font-poppins font-semibold text-xs text-gray-700 dark:text-gray-300">Date</th>
-                  <th className="text-left py-3 px-4 font-poppins font-semibold text-xs text-gray-700 dark:text-gray-300">Action</th>
+                  <th className="text-left py-3 px-4 font-poppins font-semibold text-xs text-gray-700 dark:text-gray-300">{t('table.id', 'ID')}</th>
+                  <th className="text-left py-3 px-4 font-poppins font-semibold text-xs text-gray-700 dark:text-gray-300">{t('table.service', 'Service')}</th>
+                  <th className="text-left py-3 px-4 font-poppins font-semibold text-xs text-gray-700 dark:text-gray-300">{t('table.customer', 'Customer')}</th>
+                  <th className="text-left py-3 px-4 font-poppins font-semibold text-xs text-gray-700 dark:text-gray-300">{t('table.vehicle', 'Vehicle')}</th>
+                  <th className="text-left py-3 px-4 font-poppins font-semibold text-xs text-gray-700 dark:text-gray-300">{t('common.status', 'Status')}</th>
+                  <th className="text-left py-3 px-4 font-poppins font-semibold text-xs text-gray-700 dark:text-gray-300">{t('table.priority', 'Priority')}</th>
+                  <th className="text-left py-3 px-4 font-poppins font-semibold text-xs text-gray-700 dark:text-gray-300">{t('common.date', 'Date')}</th>
+                  <th className="text-left py-3 px-4 font-poppins font-semibold text-xs text-gray-700 dark:text-gray-300">{t('common.actions', 'Action')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -390,7 +390,7 @@ export function Dashboard() {
                             className="h-7 px-3 text-xs"
                             data-testid={`button-view-${task.id}`}
                           >
-                            View
+                            {t('common.view', 'View')}
                           </Button>
                         </td>
                       </tr>
@@ -411,7 +411,7 @@ export function Dashboard() {
                 className="h-8 px-3 text-xs"
                 data-testid="button-previous"
               >
-                ← Prev
+                ← {t('common.previous', 'Prev')}
               </Button>
               <div className="flex gap-1">
                 {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => i + 1).map((page) => (
@@ -435,7 +435,7 @@ export function Dashboard() {
                 className="h-8 px-3 text-xs"
                 data-testid="button-next"
               >
-                Next →
+                {t('common.next', 'Next')} →
               </Button>
             </div>
           )}

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { queryClient, apiRequest } from "@/lib/queryClient";
@@ -18,6 +19,7 @@ import { insertSupplierSchema } from "@shared/schema";
 import { StandardPageLayout } from "@/components/layouts";
 
 export default function Suppliers() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
@@ -63,13 +65,13 @@ export default function Suppliers() {
       setIsCreateOpen(false);
       form.reset();
       toast({
-        title: "Success",
-        description: "Supplier created successfully",
+        title: t('common.success', 'Success'),
+        description: t('inventory.supplierCreated', 'Supplier created successfully'),
       });
     } catch (error) {
       toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to create supplier",
+        title: t('common.error', 'Error'),
+        description: error instanceof Error ? error.message : t('inventory.failedToCreateSupplier', 'Failed to create supplier'),
         variant: "destructive",
       });
     }
@@ -86,13 +88,13 @@ export default function Suppliers() {
       setSelectedSupplier(null);
       form.reset();
       toast({
-        title: "Success",
-        description: "Supplier updated successfully",
+        title: t('common.success', 'Success'),
+        description: t('inventory.supplierUpdated', 'Supplier updated successfully'),
       });
     } catch (error) {
       toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to update supplier",
+        title: t('common.error', 'Error'),
+        description: error instanceof Error ? error.message : t('inventory.failedToUpdateSupplier', 'Failed to update supplier'),
         variant: "destructive",
       });
     }
@@ -106,13 +108,13 @@ export default function Suppliers() {
       setIsDetailsOpen(false);
       setSelectedSupplier(null);
       toast({
-        title: "Success",
-        description: "Supplier deleted successfully",
+        title: t('common.success', 'Success'),
+        description: t('inventory.supplierDeleted', 'Supplier deleted successfully'),
       });
     } catch (error) {
       toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to delete supplier",
+        title: t('common.error', 'Error'),
+        description: error instanceof Error ? error.message : t('inventory.failedToDeleteSupplier', 'Failed to delete supplier'),
         variant: "destructive",
       });
     }
@@ -146,12 +148,12 @@ export default function Suppliers() {
   return (
     <>
       <StandardPageLayout
-        title="Suppliers"
-        description="Manage your supplier network"
+        title={t('inventory.suppliers', 'Suppliers')}
+        description={t('inventory.manageSupplierNetwork', 'Manage your supplier network')}
         icon={Building2}
         headerAction={
           <Button onClick={() => setIsCreateOpen(true)} data-testid="button-create-supplier">
-            <Plus className="mr-2 h-4 w-4" /> Add Supplier
+            <Plus className="mr-2 h-4 w-4" /> {t('inventory.addSupplier', 'Add Supplier')}
           </Button>
         }
       >
@@ -159,7 +161,7 @@ export default function Suppliers() {
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-900 dark:text-white/60" />
           <Input
-            placeholder="Search by name, contact person, or email..."
+            placeholder={t('inventory.searchSuppliers', 'Search by name, contact person, or email...')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10"
@@ -172,12 +174,12 @@ export default function Suppliers() {
         <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
           <CardContent className="flex flex-col items-center justify-center py-12">
             <Building2 className="h-12 w-12 text-destructive mb-4" />
-            <p className="text-lg font-medium mb-2">Failed to load suppliers</p>
+            <p className="text-lg font-medium mb-2">{t('inventory.failedToLoadSuppliers', 'Failed to load suppliers')}</p>
             <p className="text-gray-900 dark:text-white/60 mb-4">
               {error instanceof Error ? error.message : "An error occurred"}
             </p>
             <Button onClick={() => queryClient.invalidateQueries({ queryKey: ["/api/suppliers"] })} data-testid="button-retry">
-              Retry
+              {t('common.retry', 'Retry')}
             </Button>
           </CardContent>
         </Card>
@@ -203,13 +205,13 @@ export default function Suppliers() {
         <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
           <CardContent className="flex flex-col items-center justify-center py-12">
             <Building2 className="h-12 w-12 text-gray-900 dark:text-white/60 mb-4" />
-            <p className="text-lg font-medium mb-2">No suppliers found</p>
+            <p className="text-lg font-medium mb-2">{t('inventory.noSuppliersFound', 'No suppliers found')}</p>
             <p className="text-gray-900 dark:text-white/60 mb-4">
-              {searchQuery ? "Try adjusting your search" : "Get started by creating your first supplier"}
+              {searchQuery ? t('inventory.tryAdjustingSearch', 'Try adjusting your search') : t('inventory.getStartedAddingSupplier', 'Get started by creating your first supplier')}
             </p>
             {!searchQuery && (
               <Button onClick={() => setIsCreateOpen(true)} data-testid="button-create-first">
-                <Plus className="mr-2 h-4 w-4" /> Add Supplier
+                <Plus className="mr-2 h-4 w-4" /> {t('inventory.addSupplier', 'Add Supplier')}
               </Button>
             )}
           </CardContent>
@@ -236,7 +238,7 @@ export default function Suppliers() {
                     )}
                   </div>
                   <Badge variant={supplier.isActive ? "default" : "secondary"} data-testid={`badge-status-${supplier.id}`}>
-                    {supplier.isActive ? "Active" : "Inactive"}
+                    {supplier.isActive ? t('common.active', 'Active') : t('common.inactive', 'Inactive')}
                   </Badge>
                 </div>
               </CardHeader>
@@ -277,8 +279,8 @@ export default function Suppliers() {
       <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Create New Supplier</DialogTitle>
-            <DialogDescription>Add a new supplier to your network</DialogDescription>
+            <DialogTitle>{t('inventory.createNewSupplier', 'Create New Supplier')}</DialogTitle>
+            <DialogDescription>{t('inventory.addNewSupplierDesc', 'Add a new supplier to your network')}</DialogDescription>
           </DialogHeader>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(createSupplier)} className="space-y-4">
@@ -288,9 +290,9 @@ export default function Suppliers() {
                   name="name"
                   render={({ field }) => (
                     <FormItem className="col-span-2">
-                      <FormLabel>Supplier Name *</FormLabel>
+                      <FormLabel>{t('inventory.supplierName', 'Supplier Name')} *</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder="ABC Auto Parts" data-testid="input-name" />
+                        <Input {...field} placeholder={t('inventory.supplierNamePlaceholder', 'ABC Auto Parts')} data-testid="input-name" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -302,9 +304,9 @@ export default function Suppliers() {
                   name="contactPerson"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Contact Person</FormLabel>
+                      <FormLabel>{t('inventory.contactPerson', 'Contact Person')}</FormLabel>
                       <FormControl>
-                        <Input {...field} value={field.value ?? ""} placeholder="John Doe" data-testid="input-contact-person" />
+                        <Input {...field} value={field.value ?? ""} placeholder={t('inventory.contactPersonPlaceholder', 'John Doe')} data-testid="input-contact-person" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -316,9 +318,9 @@ export default function Suppliers() {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email</FormLabel>
+                      <FormLabel>{t('auth.email', 'Email')}</FormLabel>
                       <FormControl>
-                        <Input {...field} value={field.value ?? ""} type="email" placeholder="contact@supplier.com" data-testid="input-email" />
+                        <Input {...field} value={field.value ?? ""} type="email" placeholder={t('inventory.emailPlaceholder', 'contact@supplier.com')} data-testid="input-email" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -330,9 +332,9 @@ export default function Suppliers() {
                   name="phone"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Phone</FormLabel>
+                      <FormLabel>{t('inventory.phone', 'Phone')}</FormLabel>
                       <FormControl>
-                        <Input {...field} value={field.value ?? ""} placeholder="+1 234 567 8900" data-testid="input-phone" />
+                        <Input {...field} value={field.value ?? ""} placeholder={t('inventory.phonePlaceholder', '+1 234 567 8900')} data-testid="input-phone" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -344,9 +346,9 @@ export default function Suppliers() {
                   name="taxId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Tax ID</FormLabel>
+                      <FormLabel>{t('inventory.taxId', 'Tax ID')}</FormLabel>
                       <FormControl>
-                        <Input {...field} value={field.value ?? ""} placeholder="TAX123456" data-testid="input-tax-id" />
+                        <Input {...field} value={field.value ?? ""} placeholder={t('inventory.taxIdPlaceholder', 'TAX123456')} data-testid="input-tax-id" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -358,9 +360,9 @@ export default function Suppliers() {
                   name="address"
                   render={({ field }) => (
                     <FormItem className="col-span-2">
-                      <FormLabel>Address</FormLabel>
+                      <FormLabel>{t('inventory.address', 'Address')}</FormLabel>
                       <FormControl>
-                        <Textarea {...field} value={field.value ?? ""} placeholder="123 Main Street" rows={2} data-testid="input-address" />
+                        <Textarea {...field} value={field.value ?? ""} placeholder={t('inventory.addressPlaceholder', '123 Main Street')} rows={2} data-testid="input-address" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -372,9 +374,9 @@ export default function Suppliers() {
                   name="city"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>City</FormLabel>
+                      <FormLabel>{t('inventory.city', 'City')}</FormLabel>
                       <FormControl>
-                        <Input {...field} value={field.value ?? ""} placeholder="New York" data-testid="input-city" />
+                        <Input {...field} value={field.value ?? ""} placeholder={t('inventory.cityPlaceholder', 'New York')} data-testid="input-city" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -386,9 +388,9 @@ export default function Suppliers() {
                   name="country"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Country</FormLabel>
+                      <FormLabel>{t('inventory.country', 'Country')}</FormLabel>
                       <FormControl>
-                        <Input {...field} value={field.value ?? ""} placeholder="USA" data-testid="input-country" />
+                        <Input {...field} value={field.value ?? ""} placeholder={t('inventory.countryPlaceholder', 'USA')} data-testid="input-country" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -400,19 +402,19 @@ export default function Suppliers() {
                   name="paymentTerms"
                   render={({ field }) => (
                     <FormItem className="col-span-2">
-                      <FormLabel>Payment Terms</FormLabel>
+                      <FormLabel>{t('inventory.paymentTerms', 'Payment Terms')}</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value ?? undefined}>
                         <FormControl>
                           <SelectTrigger data-testid="select-payment-terms">
-                            <SelectValue placeholder="Select payment terms" />
+                            <SelectValue placeholder={t('inventory.selectPaymentTerms', 'Select payment terms')} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="net30">Net 30</SelectItem>
-                          <SelectItem value="net60">Net 60</SelectItem>
-                          <SelectItem value="cod">Cash on Delivery</SelectItem>
-                          <SelectItem value="immediate">Immediate</SelectItem>
-                          <SelectItem value="advance">Advance Payment</SelectItem>
+                          <SelectItem value="net30">{t('inventory.net30', 'Net 30')}</SelectItem>
+                          <SelectItem value="net60">{t('inventory.net60', 'Net 60')}</SelectItem>
+                          <SelectItem value="cod">{t('inventory.cashOnDelivery', 'Cash on Delivery')}</SelectItem>
+                          <SelectItem value="immediate">{t('inventory.immediate', 'Immediate')}</SelectItem>
+                          <SelectItem value="advance">{t('inventory.advancePayment', 'Advance Payment')}</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -425,9 +427,9 @@ export default function Suppliers() {
                   name="notes"
                   render={({ field }) => (
                     <FormItem className="col-span-2">
-                      <FormLabel>Notes</FormLabel>
+                      <FormLabel>{t('common.notes', 'Notes')}</FormLabel>
                       <FormControl>
-                        <Textarea {...field} value={field.value ?? ""} placeholder="Additional information" rows={3} data-testid="input-notes" />
+                        <Textarea {...field} value={field.value ?? ""} placeholder={t('inventory.additionalInfo', 'Additional information')} rows={3} data-testid="input-notes" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -437,9 +439,9 @@ export default function Suppliers() {
 
               <div className="flex justify-end gap-2">
                 <Button type="button" variant="outline" onClick={() => setIsCreateOpen(false)} data-testid="button-cancel">
-                  Cancel
+                  {t('common.cancel', 'Cancel')}
                 </Button>
-                <Button type="submit" data-testid="button-submit">Create Supplier</Button>
+                <Button type="submit" data-testid="button-submit">{t('inventory.createSupplier', 'Create Supplier')}</Button>
               </div>
             </form>
           </Form>
@@ -449,8 +451,8 @@ export default function Suppliers() {
       <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Edit Supplier</DialogTitle>
-            <DialogDescription>Update supplier information</DialogDescription>
+            <DialogTitle>{t('inventory.editSupplier', 'Edit Supplier')}</DialogTitle>
+            <DialogDescription>{t('inventory.updateSupplierInfo', 'Update supplier information')}</DialogDescription>
           </DialogHeader>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(updateSupplier)} className="space-y-4">
@@ -460,9 +462,9 @@ export default function Suppliers() {
                   name="name"
                   render={({ field }) => (
                     <FormItem className="col-span-2">
-                      <FormLabel>Supplier Name *</FormLabel>
+                      <FormLabel>{t('inventory.supplierName', 'Supplier Name')} *</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder="ABC Auto Parts" data-testid="input-edit-name" />
+                        <Input {...field} placeholder={t('inventory.supplierNamePlaceholder', 'ABC Auto Parts')} data-testid="input-edit-name" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -474,9 +476,9 @@ export default function Suppliers() {
                   name="contactPerson"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Contact Person</FormLabel>
+                      <FormLabel>{t('inventory.contactPerson', 'Contact Person')}</FormLabel>
                       <FormControl>
-                        <Input {...field} value={field.value ?? ""} placeholder="John Doe" data-testid="input-edit-contact-person" />
+                        <Input {...field} value={field.value ?? ""} placeholder={t('inventory.contactPersonPlaceholder', 'John Doe')} data-testid="input-edit-contact-person" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -488,9 +490,9 @@ export default function Suppliers() {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email</FormLabel>
+                      <FormLabel>{t('auth.email', 'Email')}</FormLabel>
                       <FormControl>
-                        <Input {...field} value={field.value ?? ""} type="email" placeholder="contact@supplier.com" data-testid="input-edit-email" />
+                        <Input {...field} value={field.value ?? ""} type="email" placeholder={t('inventory.emailPlaceholder', 'contact@supplier.com')} data-testid="input-edit-email" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -502,9 +504,9 @@ export default function Suppliers() {
                   name="phone"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Phone</FormLabel>
+                      <FormLabel>{t('inventory.phone', 'Phone')}</FormLabel>
                       <FormControl>
-                        <Input {...field} value={field.value ?? ""} placeholder="+1 234 567 8900" data-testid="input-edit-phone" />
+                        <Input {...field} value={field.value ?? ""} placeholder={t('inventory.phonePlaceholder', '+1 234 567 8900')} data-testid="input-edit-phone" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -516,9 +518,9 @@ export default function Suppliers() {
                   name="taxId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Tax ID</FormLabel>
+                      <FormLabel>{t('inventory.taxId', 'Tax ID')}</FormLabel>
                       <FormControl>
-                        <Input {...field} value={field.value ?? ""} placeholder="TAX123456" data-testid="input-edit-tax-id" />
+                        <Input {...field} value={field.value ?? ""} placeholder={t('inventory.taxIdPlaceholder', 'TAX123456')} data-testid="input-edit-tax-id" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -530,9 +532,9 @@ export default function Suppliers() {
                   name="address"
                   render={({ field }) => (
                     <FormItem className="col-span-2">
-                      <FormLabel>Address</FormLabel>
+                      <FormLabel>{t('inventory.address', 'Address')}</FormLabel>
                       <FormControl>
-                        <Textarea {...field} value={field.value ?? ""} placeholder="123 Main Street" rows={2} data-testid="input-edit-address" />
+                        <Textarea {...field} value={field.value ?? ""} placeholder={t('inventory.addressPlaceholder', '123 Main Street')} rows={2} data-testid="input-edit-address" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -544,9 +546,9 @@ export default function Suppliers() {
                   name="city"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>City</FormLabel>
+                      <FormLabel>{t('inventory.city', 'City')}</FormLabel>
                       <FormControl>
-                        <Input {...field} value={field.value ?? ""} placeholder="New York" data-testid="input-edit-city" />
+                        <Input {...field} value={field.value ?? ""} placeholder={t('inventory.cityPlaceholder', 'New York')} data-testid="input-edit-city" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -558,9 +560,9 @@ export default function Suppliers() {
                   name="country"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Country</FormLabel>
+                      <FormLabel>{t('inventory.country', 'Country')}</FormLabel>
                       <FormControl>
-                        <Input {...field} value={field.value ?? ""} placeholder="USA" data-testid="input-edit-country" />
+                        <Input {...field} value={field.value ?? ""} placeholder={t('inventory.countryPlaceholder', 'USA')} data-testid="input-edit-country" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -572,19 +574,19 @@ export default function Suppliers() {
                   name="paymentTerms"
                   render={({ field }) => (
                     <FormItem className="col-span-2">
-                      <FormLabel>Payment Terms</FormLabel>
+                      <FormLabel>{t('inventory.paymentTerms', 'Payment Terms')}</FormLabel>
                       <Select onValueChange={field.onChange} value={field.value ?? undefined}>
                         <FormControl>
                           <SelectTrigger data-testid="select-edit-payment-terms">
-                            <SelectValue placeholder="Select payment terms" />
+                            <SelectValue placeholder={t('inventory.selectPaymentTerms', 'Select payment terms')} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="net30">Net 30</SelectItem>
-                          <SelectItem value="net60">Net 60</SelectItem>
-                          <SelectItem value="cod">Cash on Delivery</SelectItem>
-                          <SelectItem value="immediate">Immediate</SelectItem>
-                          <SelectItem value="advance">Advance Payment</SelectItem>
+                          <SelectItem value="net30">{t('inventory.net30', 'Net 30')}</SelectItem>
+                          <SelectItem value="net60">{t('inventory.net60', 'Net 60')}</SelectItem>
+                          <SelectItem value="cod">{t('inventory.cashOnDelivery', 'Cash on Delivery')}</SelectItem>
+                          <SelectItem value="immediate">{t('inventory.immediate', 'Immediate')}</SelectItem>
+                          <SelectItem value="advance">{t('inventory.advancePayment', 'Advance Payment')}</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -597,9 +599,9 @@ export default function Suppliers() {
                   name="notes"
                   render={({ field }) => (
                     <FormItem className="col-span-2">
-                      <FormLabel>Notes</FormLabel>
+                      <FormLabel>{t('common.notes', 'Notes')}</FormLabel>
                       <FormControl>
-                        <Textarea {...field} value={field.value ?? ""} placeholder="Additional information" rows={3} data-testid="input-edit-notes" />
+                        <Textarea {...field} value={field.value ?? ""} placeholder={t('inventory.additionalInfo', 'Additional information')} rows={3} data-testid="input-edit-notes" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -609,9 +611,9 @@ export default function Suppliers() {
 
               <div className="flex justify-end gap-2">
                 <Button type="button" variant="outline" onClick={() => setIsEditOpen(false)} data-testid="button-edit-cancel">
-                  Cancel
+                  {t('common.cancel', 'Cancel')}
                 </Button>
-                <Button type="submit" data-testid="button-edit-submit">Update Supplier</Button>
+                <Button type="submit" data-testid="button-edit-submit">{t('inventory.updateSupplier', 'Update Supplier')}</Button>
               </div>
             </form>
           </Form>
@@ -621,67 +623,67 @@ export default function Suppliers() {
       <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Supplier Details</DialogTitle>
-            <DialogDescription>View supplier information</DialogDescription>
+            <DialogTitle>{t('inventory.supplierDetails', 'Supplier Details')}</DialogTitle>
+            <DialogDescription>{t('inventory.viewSupplierInfo', 'View supplier information')}</DialogDescription>
           </DialogHeader>
           {selectedSupplier && (
             <div className="space-y-6">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-sm font-medium text-gray-900 dark:text-white/60">Supplier Name</p>
+                  <p className="text-sm font-medium text-gray-900 dark:text-white/60">{t('inventory.supplierName', 'Supplier Name')}</p>
                   <p className="text-base" data-testid="detail-name">{selectedSupplier.name}</p>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-900 dark:text-white/60">Status</p>
+                  <p className="text-sm font-medium text-gray-900 dark:text-white/60">{t('common.status', 'Status')}</p>
                   <Badge variant={selectedSupplier.isActive ? "default" : "secondary"} data-testid="detail-status">
-                    {selectedSupplier.isActive ? "Active" : "Inactive"}
+                    {selectedSupplier.isActive ? t('common.active', 'Active') : t('common.inactive', 'Inactive')}
                   </Badge>
                 </div>
                 {selectedSupplier.contactPerson && (
                   <div>
-                    <p className="text-sm font-medium text-gray-900 dark:text-white/60">Contact Person</p>
+                    <p className="text-sm font-medium text-gray-900 dark:text-white/60">{t('inventory.contactPerson', 'Contact Person')}</p>
                     <p className="text-base" data-testid="detail-contact-person">{selectedSupplier.contactPerson}</p>
                   </div>
                 )}
                 {selectedSupplier.email && (
                   <div>
-                    <p className="text-sm font-medium text-gray-900 dark:text-white/60">Email</p>
+                    <p className="text-sm font-medium text-gray-900 dark:text-white/60">{t('auth.email', 'Email')}</p>
                     <p className="text-base" data-testid="detail-email">{selectedSupplier.email}</p>
                   </div>
                 )}
                 {selectedSupplier.phone && (
                   <div>
-                    <p className="text-sm font-medium text-gray-900 dark:text-white/60">Phone</p>
+                    <p className="text-sm font-medium text-gray-900 dark:text-white/60">{t('inventory.phone', 'Phone')}</p>
                     <p className="text-base" data-testid="detail-phone">{selectedSupplier.phone}</p>
                   </div>
                 )}
                 {selectedSupplier.taxId && (
                   <div>
-                    <p className="text-sm font-medium text-gray-900 dark:text-white/60">Tax ID</p>
+                    <p className="text-sm font-medium text-gray-900 dark:text-white/60">{t('inventory.taxId', 'Tax ID')}</p>
                     <p className="text-base" data-testid="detail-tax-id">{selectedSupplier.taxId}</p>
                   </div>
                 )}
                 {selectedSupplier.address && (
                   <div className="col-span-2">
-                    <p className="text-sm font-medium text-gray-900 dark:text-white/60">Address</p>
+                    <p className="text-sm font-medium text-gray-900 dark:text-white/60">{t('inventory.address', 'Address')}</p>
                     <p className="text-base" data-testid="detail-address">{selectedSupplier.address}</p>
                   </div>
                 )}
                 {selectedSupplier.city && (
                   <div>
-                    <p className="text-sm font-medium text-gray-900 dark:text-white/60">City</p>
+                    <p className="text-sm font-medium text-gray-900 dark:text-white/60">{t('inventory.city', 'City')}</p>
                     <p className="text-base" data-testid="detail-city">{selectedSupplier.city}</p>
                   </div>
                 )}
                 {selectedSupplier.country && (
                   <div>
-                    <p className="text-sm font-medium text-gray-900 dark:text-white/60">Country</p>
+                    <p className="text-sm font-medium text-gray-900 dark:text-white/60">{t('inventory.country', 'Country')}</p>
                     <p className="text-base" data-testid="detail-country">{selectedSupplier.country}</p>
                   </div>
                 )}
                 {selectedSupplier.paymentTerms && (
                   <div>
-                    <p className="text-sm font-medium text-gray-900 dark:text-white/60">Payment Terms</p>
+                    <p className="text-sm font-medium text-gray-900 dark:text-white/60">{t('inventory.paymentTerms', 'Payment Terms')}</p>
                     <p className="text-base" data-testid="detail-payment-terms">
                       {selectedSupplier.paymentTerms.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
                     </p>
@@ -690,7 +692,7 @@ export default function Suppliers() {
               </div>
               {selectedSupplier.notes && (
                 <div>
-                  <p className="text-sm font-medium text-gray-900 dark:text-white/60">Notes</p>
+                  <p className="text-sm font-medium text-gray-900 dark:text-white/60">{t('common.notes', 'Notes')}</p>
                   <p className="text-base whitespace-pre-wrap" data-testid="detail-notes">{selectedSupplier.notes}</p>
                 </div>
               )}
@@ -700,14 +702,14 @@ export default function Suppliers() {
                   onClick={() => deleteSupplier(selectedSupplier.id)}
                   data-testid="button-delete"
                 >
-                  <Trash2 className="mr-2 h-4 w-4" /> Delete Supplier
+                  <Trash2 className="mr-2 h-4 w-4" /> {t('inventory.deleteSupplier', 'Delete Supplier')}
                 </Button>
                 <div className="flex gap-2">
                   <Button variant="outline" onClick={() => handleEdit(selectedSupplier)} data-testid="button-edit">
-                    <Pencil className="mr-2 h-4 w-4" /> Edit
+                    <Pencil className="mr-2 h-4 w-4" /> {t('common.edit', 'Edit')}
                   </Button>
                   <Button variant="outline" onClick={() => setIsDetailsOpen(false)} data-testid="button-close">
-                    Close
+                    {t('common.close', 'Close')}
                   </Button>
                 </div>
               </div>

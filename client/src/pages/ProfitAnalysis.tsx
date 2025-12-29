@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TabsPageLayout } from "@/components/layouts/TabsPageLayout";
 import type { TabConfig } from "@/components/layouts/TabsPageLayout";
@@ -38,6 +39,7 @@ import {
 const COLORS = ["#000000", "#4B5563", "#6B7280", "#9CA3AF", "#D1D5DB"];
 
 export default function ProfitAnalysis() {
+  const { t } = useTranslation();
   const [periodType, setPeriodType] = useState("monthly");
 
   const { data: profitData } = useQuery({
@@ -45,20 +47,20 @@ export default function ProfitAnalysis() {
   });
 
   const monthlyProfit = [
-    { month: "Jan", revenue: 45000, costs: 32000, profit: 13000, margin: 28.9 },
-    { month: "Feb", revenue: 52000, costs: 35000, profit: 17000, margin: 32.7 },
-    { month: "Mar", revenue: 48000, costs: 33000, profit: 15000, margin: 31.3 },
-    { month: "Apr", revenue: 61000, costs: 38000, profit: 23000, margin: 37.7 },
-    { month: "May", revenue: 55000, costs: 36000, profit: 19000, margin: 34.5 },
-    { month: "Jun", revenue: 67000, costs: 40000, profit: 27000, margin: 40.3 },
+    { month: t('months.jan', 'Jan'), revenue: 45000, costs: 32000, profit: 13000, margin: 28.9 },
+    { month: t('months.feb', 'Feb'), revenue: 52000, costs: 35000, profit: 17000, margin: 32.7 },
+    { month: t('months.mar', 'Mar'), revenue: 48000, costs: 33000, profit: 15000, margin: 31.3 },
+    { month: t('months.apr', 'Apr'), revenue: 61000, costs: 38000, profit: 23000, margin: 37.7 },
+    { month: t('months.may', 'May'), revenue: 55000, costs: 36000, profit: 19000, margin: 34.5 },
+    { month: t('months.jun', 'Jun'), revenue: 67000, costs: 40000, profit: 27000, margin: 40.3 },
   ];
 
   const serviceTypeProfitability = [
-    { service: "Oil Change", revenue: 35000, cost: 18000, profit: 17000, margin: 48.6 },
-    { service: "Brake Service", revenue: 48000, cost: 28000, profit: 20000, margin: 41.7 },
-    { service: "Tire Rotation", revenue: 22000, cost: 12000, profit: 10000, margin: 45.5 },
-    { service: "Diagnostics", revenue: 41000, cost: 15000, profit: 26000, margin: 63.4 },
-    { service: "Engine Repair", revenue: 78000, cost: 52000, profit: 26000, margin: 33.3 },
+    { service: t('analytics.oilChange', 'Oil Change'), revenue: 35000, cost: 18000, profit: 17000, margin: 48.6 },
+    { service: t('analytics.brakeService', 'Brake Service'), revenue: 48000, cost: 28000, profit: 20000, margin: 41.7 },
+    { service: t('analytics.tireRotation', 'Tire Rotation'), revenue: 22000, cost: 12000, profit: 10000, margin: 45.5 },
+    { service: t('analytics.diagnostics', 'Diagnostics'), revenue: 41000, cost: 15000, profit: 26000, margin: 63.4 },
+    { service: t('analytics.engineRepair', 'Engine Repair'), revenue: 78000, cost: 52000, profit: 26000, margin: 33.3 },
   ];
 
   const technicianPerformance = [
@@ -69,10 +71,10 @@ export default function ProfitAnalysis() {
   ];
 
   const costBreakdown = [
-    { name: "Labor", value: 45 },
-    { name: "Parts", value: 35 },
-    { name: "Overhead", value: 15 },
-    { name: "Other", value: 5 },
+    { name: t('analytics.labor', 'Labor'), value: 45 },
+    { name: t('analytics.parts', 'Parts'), value: 35 },
+    { name: t('analytics.overhead', 'Overhead'), value: 15 },
+    { name: t('analytics.other', 'Other'), value: 5 },
   ];
 
   const topCustomers = [
@@ -90,10 +92,10 @@ export default function ProfitAnalysis() {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="daily">Daily</SelectItem>
-            <SelectItem value="weekly">Weekly</SelectItem>
-            <SelectItem value="monthly">Monthly</SelectItem>
-            <SelectItem value="quarterly">Quarterly</SelectItem>
+            <SelectItem value="daily">{t('analytics.daily', 'Daily')}</SelectItem>
+            <SelectItem value="weekly">{t('analytics.weekly', 'Weekly')}</SelectItem>
+            <SelectItem value="monthly">{t('analytics.monthly', 'Monthly')}</SelectItem>
+            <SelectItem value="quarterly">{t('analytics.quarterly', 'Quarterly')}</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -103,11 +105,11 @@ export default function ProfitAnalysis() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Total Revenue</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('analytics.totalRevenue', 'Total Revenue')}</p>
                 <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">
                   $328,000
                 </h3>
-                <p className="text-sm text-green-600 mt-1">+12.5% vs last period</p>
+                <p className="text-sm text-green-600 mt-1">+12.5% {t('analytics.vsLastPeriod', 'vs last period')}</p>
               </div>
               <DollarSign className="h-12 w-12 text-green-600" />
             </div>
@@ -118,11 +120,11 @@ export default function ProfitAnalysis() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Total Costs</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('analytics.totalCosts', 'Total Costs')}</p>
                 <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">
                   $214,000
                 </h3>
-                <p className="text-sm text-orange-600 mt-1">+8.2% vs last period</p>
+                <p className="text-sm text-orange-600 mt-1">+8.2% {t('analytics.vsLastPeriod', 'vs last period')}</p>
               </div>
               <TrendingUp className="h-12 w-12 text-orange-600" />
             </div>
@@ -133,11 +135,11 @@ export default function ProfitAnalysis() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Net Profit</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('analytics.netProfit', 'Net Profit')}</p>
                 <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">
                   $114,000
                 </h3>
-                <p className="text-sm text-green-600 mt-1">+18.9% vs last period</p>
+                <p className="text-sm text-green-600 mt-1">+18.9% {t('analytics.vsLastPeriod', 'vs last period')}</p>
               </div>
               <BarChart3 className="h-12 w-12 text-blue-600" />
             </div>
@@ -148,11 +150,11 @@ export default function ProfitAnalysis() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Profit Margin</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('analytics.profitMargin', 'Profit Margin')}</p>
                 <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">
                   34.8%
                 </h3>
-                <p className="text-sm text-green-600 mt-1">+2.3% vs last period</p>
+                <p className="text-sm text-green-600 mt-1">+2.3% {t('analytics.vsLastPeriod', 'vs last period')}</p>
               </div>
               <Percent className="h-12 w-12 text-purple-600" />
             </div>
@@ -162,7 +164,7 @@ export default function ProfitAnalysis() {
 
       <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
         <CardHeader>
-          <CardTitle>Profit Trend</CardTitle>
+          <CardTitle>{t('analytics.profitTrend', 'Profit Trend')}</CardTitle>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={300}>
@@ -173,8 +175,8 @@ export default function ProfitAnalysis() {
               <YAxis yAxisId="right" orientation="right" />
               <Tooltip />
               <Legend />
-              <Line yAxisId="left" type="monotone" dataKey="profit" stroke="#000000" name="Net Profit" strokeWidth={2} />
-              <Line yAxisId="right" type="monotone" dataKey="margin" stroke="#6B7280" name="Margin %" strokeWidth={2} />
+              <Line yAxisId="left" type="monotone" dataKey="profit" stroke="#000000" name={t('analytics.netProfit', 'Net Profit')} strokeWidth={2} />
+              <Line yAxisId="right" type="monotone" dataKey="margin" stroke="#6B7280" name={t('analytics.marginPercent', 'Margin %')} strokeWidth={2} />
             </LineChart>
           </ResponsiveContainer>
         </CardContent>
@@ -185,12 +187,12 @@ export default function ProfitAnalysis() {
   const tabs: TabConfig[] = [
     {
       id: "service",
-      label: "By Service Type",
+      label: t('analytics.byServiceType', 'By Service Type'),
       icon: Wrench,
       content: (
         <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
           <CardHeader>
-            <CardTitle>Service Type Profitability</CardTitle>
+            <CardTitle>{t('analytics.serviceTypeProfitability', 'Service Type Profitability')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -203,14 +205,14 @@ export default function ProfitAnalysis() {
                   <div className="flex-1">
                     <h3 className="font-semibold text-gray-900 dark:text-white">{service.service}</h3>
                     <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                      Revenue: ${service.revenue.toLocaleString()} | Cost: ${service.cost.toLocaleString()}
+                      {t('analytics.revenue', 'Revenue')}: ${service.revenue.toLocaleString()} | {t('analytics.cost', 'Cost')}: ${service.cost.toLocaleString()}
                     </p>
                   </div>
                   <div className="text-right">
                     <p className="font-bold text-lg text-gray-900 dark:text-white">
                       ${service.profit.toLocaleString()}
                     </p>
-                    <p className="text-sm text-green-600">{service.margin.toFixed(1)}% margin</p>
+                    <p className="text-sm text-green-600">{service.margin.toFixed(1)}% {t('analytics.margin', 'margin')}</p>
                   </div>
                 </div>
               ))}
@@ -221,12 +223,12 @@ export default function ProfitAnalysis() {
     },
     {
       id: "technician",
-      label: "By Technician",
+      label: t('analytics.byTechnician', 'By Technician'),
       icon: Users,
       content: (
         <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
           <CardHeader>
-            <CardTitle>Technician Performance</CardTitle>
+            <CardTitle>{t('analytics.technicianPerformance', 'Technician Performance')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -243,7 +245,7 @@ export default function ProfitAnalysis() {
                     <div>
                       <h3 className="font-semibold text-gray-900 dark:text-white">{tech.name}</h3>
                       <p className="text-sm text-gray-600 dark:text-gray-400">
-                        {tech.jobs} jobs completed
+                        {tech.jobs} {t('analytics.jobsCompleted', 'jobs completed')}
                       </p>
                     </div>
                   </div>
@@ -251,7 +253,7 @@ export default function ProfitAnalysis() {
                     <p className="font-bold text-lg text-gray-900 dark:text-white">
                       ${tech.revenue.toLocaleString()}
                     </p>
-                    <p className="text-sm text-green-600">{tech.avgMargin.toFixed(1)}% avg margin</p>
+                    <p className="text-sm text-green-600">{tech.avgMargin.toFixed(1)}% {t('analytics.avgMargin', 'avg margin')}</p>
                   </div>
                 </div>
               ))}
@@ -262,12 +264,12 @@ export default function ProfitAnalysis() {
     },
     {
       id: "customer",
-      label: "By Customer",
+      label: t('analytics.byCustomer', 'By Customer'),
       icon: Users,
       content: (
         <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
           <CardHeader>
-            <CardTitle>Top Customers by Revenue</CardTitle>
+            <CardTitle>{t('analytics.topCustomersByRevenue', 'Top Customers by Revenue')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -284,7 +286,7 @@ export default function ProfitAnalysis() {
                     <div>
                       <h3 className="font-semibold text-gray-900 dark:text-white">{customer.name}</h3>
                       <p className="text-sm text-gray-600 dark:text-gray-400">
-                        {customer.visits} visits | LTV: ${customer.ltv.toLocaleString()}
+                        {customer.visits} {t('analytics.visits', 'visits')} | {t('analytics.ltv', 'LTV')}: ${customer.ltv.toLocaleString()}
                       </p>
                     </div>
                   </div>
@@ -292,7 +294,7 @@ export default function ProfitAnalysis() {
                     <p className="font-bold text-lg text-gray-900 dark:text-white">
                       ${customer.revenue.toLocaleString()}
                     </p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">This period</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">{t('analytics.thisPeriod', 'This period')}</p>
                   </div>
                 </div>
               ))}
@@ -303,13 +305,13 @@ export default function ProfitAnalysis() {
     },
     {
       id: "costs",
-      label: "Cost Breakdown",
+      label: t('analytics.costBreakdown', 'Cost Breakdown'),
       icon: PieChart,
       content: (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
             <CardHeader>
-              <CardTitle>Cost Distribution</CardTitle>
+              <CardTitle>{t('analytics.costDistribution', 'Cost Distribution')}</CardTitle>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={250}>
@@ -336,24 +338,24 @@ export default function ProfitAnalysis() {
 
           <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
             <CardHeader>
-              <CardTitle>Cost Details</CardTitle>
+              <CardTitle>{t('analytics.costDetails', 'Cost Details')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 <div className="flex justify-between items-center pb-3 border-b border-gray-200 dark:border-gray-800">
-                  <span className="text-gray-600 dark:text-gray-400">Labor Costs</span>
+                  <span className="text-gray-600 dark:text-gray-400">{t('analytics.laborCosts', 'Labor Costs')}</span>
                   <span className="font-semibold text-gray-900 dark:text-white">$96,300 (45%)</span>
                 </div>
                 <div className="flex justify-between items-center pb-3 border-b border-gray-200 dark:border-gray-800">
-                  <span className="text-gray-600 dark:text-gray-400">Parts Costs</span>
+                  <span className="text-gray-600 dark:text-gray-400">{t('analytics.partsCosts', 'Parts Costs')}</span>
                   <span className="font-semibold text-gray-900 dark:text-white">$74,900 (35%)</span>
                 </div>
                 <div className="flex justify-between items-center pb-3 border-b border-gray-200 dark:border-gray-800">
-                  <span className="text-gray-600 dark:text-gray-400">Overhead</span>
+                  <span className="text-gray-600 dark:text-gray-400">{t('analytics.overhead', 'Overhead')}</span>
                   <span className="font-semibold text-gray-900 dark:text-white">$32,100 (15%)</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-600 dark:text-gray-400">Other Expenses</span>
+                  <span className="text-gray-600 dark:text-gray-400">{t('analytics.otherExpenses', 'Other Expenses')}</span>
                   <span className="font-semibold text-gray-900 dark:text-white">$10,700 (5%)</span>
                 </div>
               </div>
@@ -366,8 +368,8 @@ export default function ProfitAnalysis() {
 
   return (
     <TabsPageLayout
-      title="💰 Profit Margin Analysis"
-      description="Detailed profitability insights by service, technician, and customer"
+      title={t('nav.profit_analysis', '💰 Profit Margin Analysis')}
+      description={t('analytics.profitAnalysisDescription', 'Detailed profitability insights by service, technician, and customer')}
       icon={BarChart3}
       tabs={tabs}
       defaultTab="service"

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { DashboardPage } from "@/components/layouts";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,6 +12,7 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
 export default function DigitalVehicleWalkaround() {
+  const { t } = useTranslation();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [selectedWalkaround, setSelectedWalkaround] = useState<any>(null);
   const [formData, setFormData] = useState({
@@ -34,7 +36,7 @@ export default function DigitalVehicleWalkaround() {
       return await apiRequest("/api/digital-walkaround", "POST", data);
     },
     onSuccess: () => {
-      toast({ title: "Walkaround created", description: "Vehicle inspection saved successfully." });
+      toast({ title: t('vehicles.walkaroundCreated', 'Walkaround created'), description: t('vehicles.vehicleInspectionSavedSuccessfully', 'Vehicle inspection saved successfully.') });
       setIsCreateDialogOpen(false);
       setFormData({ jobCardId: "", vehicleId: "", technicianId: "", walkaroundType: "pre_service", mileageReading: "", fuelLevel: "1/2" });
       queryClient.invalidateQueries({ queryKey: ["/api/vehicle-walkarounds"] });
@@ -61,16 +63,16 @@ export default function DigitalVehicleWalkaround() {
   const getWalkaroundTypeBadge = (type: string) => {
     return (
       <Badge variant={type === "pre_service" ? "secondary" : "default"}>
-        {type === "pre_service" ? "Pre-Service" : type === "post_service" ? "Post-Service" : type || "Unknown"}
+        {type === "pre_service" ? t('vehicles.preService', 'Pre-Service') : type === "post_service" ? t('vehicles.postService', 'Post-Service') : type || t('common.unknown', 'Unknown')}
       </Badge>
     );
   };
 
   const metrics = [
-    { label: "Total Walkarounds", value: stats.totalWalkarounds, icon: Camera, color: "text-blue-600" },
-    { label: "Completed Today", value: stats.completedToday, icon: CheckCircle, color: "text-green-600" },
-    { label: "Pending Signature", value: stats.pendingSignature, icon: FileText, color: "text-yellow-600" },
-    { label: "Damage Reported", value: stats.damageReported, icon: AlertTriangle, color: "text-red-600" },
+    { label: t('vehicles.totalWalkarounds', 'Total Walkarounds'), value: stats.totalWalkarounds, icon: Camera, color: "text-blue-600" },
+    { label: t('vehicles.completedToday', 'Completed Today'), value: stats.completedToday, icon: CheckCircle, color: "text-green-600" },
+    { label: t('vehicles.pendingSignature', 'Pending Signature'), value: stats.pendingSignature, icon: FileText, color: "text-yellow-600" },
+    { label: t('vehicles.damageReported', 'Damage Reported'), value: stats.damageReported, icon: AlertTriangle, color: "text-red-600" },
   ];
 
   if (isLoading) {
@@ -86,8 +88,8 @@ export default function DigitalVehicleWalkaround() {
 
   return (
     <DashboardPage
-      title="📸 Digital Vehicle Walkaround"
-      description="Document vehicle condition with photos and annotations"
+      title={t('vehicles.digitalVehicleWalkaround', '📸 Digital Vehicle Walkaround')}
+      description={t('vehicles.documentVehicleConditionWithPhotos', 'Document vehicle condition with photos and annotations')}
       icon={Camera}
       metrics={metrics}
     >
@@ -95,32 +97,32 @@ export default function DigitalVehicleWalkaround() {
         <DialogTrigger asChild>
           <Button data-testid="button-create-walkaround" className="mb-6">
             <Plus className="h-4 w-4 mr-2" />
-            New Walkaround
+            {t('vehicles.newWalkaround', 'New Walkaround')}
           </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Create Vehicle Walkaround</DialogTitle>
+            <DialogTitle>{t('vehicles.createVehicleWalkaround', 'Create Vehicle Walkaround')}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="text-sm font-medium">Job Card ID</label>
+                <label className="text-sm font-medium">{t('vehicles.jobCardId', 'Job Card ID')}</label>
                 <input
                   type="text"
                   className="w-full mt-1 px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md"
-                  placeholder="Enter job card ID"
+                  placeholder={t('vehicles.enterJobCardId', 'Enter job card ID')}
                   value={formData.jobCardId}
                   onChange={(e) => setFormData({ ...formData, jobCardId: e.target.value })}
                   data-testid="input-job-card"
                 />
               </div>
               <div>
-                <label className="text-sm font-medium">Vehicle ID</label>
+                <label className="text-sm font-medium">{t('vehicles.vehicleId', 'Vehicle ID')}</label>
                 <input
                   type="text"
                   className="w-full mt-1 px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md"
-                  placeholder="Enter vehicle ID"
+                  placeholder={t('vehicles.enterVehicleId', 'Enter vehicle ID')}
                   value={formData.vehicleId}
                   onChange={(e) => setFormData({ ...formData, vehicleId: e.target.value })}
                   data-testid="input-vehicle-id"
@@ -129,32 +131,32 @@ export default function DigitalVehicleWalkaround() {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="text-sm font-medium">Technician ID</label>
+                <label className="text-sm font-medium">{t('vehicles.technicianId', 'Technician ID')}</label>
                 <input
                   type="text"
                   className="w-full mt-1 px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md"
-                  placeholder="Enter technician ID"
+                  placeholder={t('vehicles.enterTechnicianId', 'Enter technician ID')}
                   value={formData.technicianId}
                   onChange={(e) => setFormData({ ...formData, technicianId: e.target.value })}
                   data-testid="input-technician-id"
                 />
               </div>
               <div>
-                <label className="text-sm font-medium">Type</label>
+                <label className="text-sm font-medium">{t('common.type', 'Type')}</label>
                 <select
                   className="w-full mt-1 px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md"
                   value={formData.walkaroundType}
                   onChange={(e) => setFormData({ ...formData, walkaroundType: e.target.value })}
                   data-testid="select-type"
                 >
-                  <option value="pre_service">Pre-Service</option>
-                  <option value="post_service">Post-Service</option>
+                  <option value="pre_service">{t('vehicles.preService', 'Pre-Service')}</option>
+                  <option value="post_service">{t('vehicles.postService', 'Post-Service')}</option>
                 </select>
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="text-sm font-medium">Mileage</label>
+                <label className="text-sm font-medium">{t('vehicles.mileage', 'Mileage')}</label>
                 <input
                   type="number"
                   className="w-full mt-1 px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md"
@@ -165,7 +167,7 @@ export default function DigitalVehicleWalkaround() {
                 />
               </div>
               <div>
-                <label className="text-sm font-medium">Fuel Level</label>
+                <label className="text-sm font-medium">{t('vehicles.fuelLevel', 'Fuel Level')}</label>
                 <select
                   className="w-full mt-1 px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md"
                   value={formData.fuelLevel}
@@ -175,7 +177,7 @@ export default function DigitalVehicleWalkaround() {
                   <option value="1/4">1/4</option>
                   <option value="1/2">1/2</option>
                   <option value="3/4">3/4</option>
-                  <option value="full">Full</option>
+                  <option value="full">{t('vehicles.full', 'Full')}</option>
                 </select>
               </div>
             </div>
@@ -183,7 +185,7 @@ export default function DigitalVehicleWalkaround() {
               className="w-full"
               onClick={() => {
                 if (!formData.jobCardId || !formData.vehicleId || !formData.technicianId) {
-                  toast({ title: "Validation error", description: "Please fill in all required fields", variant: "destructive" });
+                  toast({ title: t('common.error', 'Validation error'), description: t('vehicles.pleaseFillAllRequiredFields', 'Please fill in all required fields'), variant: "destructive" });
                   return;
                 }
                 createWalkaround.mutate({
@@ -199,7 +201,7 @@ export default function DigitalVehicleWalkaround() {
               disabled={createWalkaround.isPending}
               data-testid="button-save-walkaround"
             >
-              {createWalkaround.isPending ? "Saving..." : "Save Walkaround"}
+              {createWalkaround.isPending ? t('common.saving', 'Saving...') : t('vehicles.saveWalkaround', 'Save Walkaround')}
             </Button>
           </div>
         </DialogContent>
@@ -211,14 +213,14 @@ export default function DigitalVehicleWalkaround() {
             <div className="text-center">
               <AlertCircle className="h-16 w-16 mx-auto mb-4 text-gray-400" />
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                No Vehicle Walkarounds
+                {t('vehicles.noVehicleWalkarounds', 'No Vehicle Walkarounds')}
               </h3>
               <p className="text-gray-600 dark:text-gray-400 mb-4">
-                No digital walkarounds found. Create your first inspection to get started.
+                {t('vehicles.noDigitalWalkaroundsFoundCreateFirst', 'No digital walkarounds found. Create your first inspection to get started.')}
               </p>
               <Button onClick={() => setIsCreateDialogOpen(true)} data-testid="button-create-first">
                 <Plus className="h-4 w-4 mr-2" />
-                Create First Walkaround
+                {t('vehicles.createFirstWalkaround', 'Create First Walkaround')}
               </Button>
             </div>
           </CardContent>
@@ -243,21 +245,21 @@ export default function DigitalVehicleWalkaround() {
                     <div>
                       <div className="flex items-center gap-3 mb-2">
                         <h3 className="font-semibold text-gray-900 dark:text-white">
-                          {walkaround.jobCardNumber || "Job Card N/A"}
+                          {walkaround.jobCardNumber || t('vehicles.jobCardNA', 'Job Card N/A')}
                         </h3>
                         {getWalkaroundTypeBadge(walkaround.walkaroundType)}
                         {walkaround.signedAt && (
                           <Badge variant="default">
-                            <CheckCircle className="h-3 w-3 mr-1" /> Signed
+                            <CheckCircle className="h-3 w-3 mr-1" /> {t('vehicles.signed', 'Signed')}
                           </Badge>
                         )}
                       </div>
                       <p className="text-sm text-gray-600 dark:text-gray-400">
-                        {walkaround.customerName || "Customer N/A"} - {walkaround.vehicle || "Vehicle N/A"}
+                        {walkaround.customerName || t('vehicles.customerNA', 'Customer N/A')} - {walkaround.vehicle || t('vehicles.vehicleNA', 'Vehicle N/A')}
                       </p>
                     </div>
                     <span className="text-sm text-gray-600 dark:text-gray-400">
-                      {walkaround.createdAt ? new Date(walkaround.createdAt).toLocaleString() : "Date N/A"}
+                      {walkaround.createdAt ? new Date(walkaround.createdAt).toLocaleString() : t('vehicles.dateNA', 'Date N/A')}
                     </span>
                   </div>
                 </CardHeader>
@@ -265,11 +267,11 @@ export default function DigitalVehicleWalkaround() {
                   <Tabs defaultValue="photos" className="space-y-4">
                     <TabsList className="bg-gray-100 dark:bg-salis-gray-dark">
                       <TabsTrigger value="photos" data-testid={`tab-photos-${walkaround.id || index}`}>
-                        Photos ({photos.length})
+                        {t('vehicles.photos', 'Photos')} ({photos.length})
                       </TabsTrigger>
-                      <TabsTrigger value="details" data-testid={`tab-details-${walkaround.id || index}`}>Details</TabsTrigger>
+                      <TabsTrigger value="details" data-testid={`tab-details-${walkaround.id || index}`}>{t('common.details', 'Details')}</TabsTrigger>
                       <TabsTrigger value="damage" data-testid={`tab-damage-${walkaround.id || index}`}>
-                        Damage Report ({damagePrevious.length + damageNew.length})
+                        {t('vehicles.damageReport', 'Damage Report')} ({damagePrevious.length + damageNew.length})
                       </TabsTrigger>
                     </TabsList>
 
@@ -283,7 +285,7 @@ export default function DigitalVehicleWalkaround() {
                               data-testid={`photo-${photoIndex}`}
                             >
                               {photo.url ? (
-                                <img src={photo.url} alt={photo.angle || "Photo"} className="w-full h-32 object-cover" />
+                                <img src={photo.url} alt={photo.angle || t('vehicles.photo', 'Photo')} className="w-full h-32 object-cover" />
                               ) : (
                                 <div className="w-full h-32 bg-gray-200 dark:bg-gray-800 flex items-center justify-center">
                                   <Camera className="h-8 w-8 text-gray-400" />
@@ -293,42 +295,42 @@ export default function DigitalVehicleWalkaround() {
                                 <Image className="h-8 w-8 text-white" />
                               </div>
                               <div className="absolute bottom-0 left-0 right-0 bg-black/75 text-white text-xs p-1 text-center capitalize">
-                                {photo.angle ? photo.angle.replace("_", " ") : "Photo"}
+                                {photo.angle ? photo.angle.replace("_", " ") : t('vehicles.photo', 'Photo')}
                               </div>
                             </div>
                           ))}
                         </div>
                       ) : (
-                        <p className="text-sm text-gray-600 dark:text-gray-400">No photos available</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">{t('vehicles.noPhotosAvailable', 'No photos available')}</p>
                       )}
                     </TabsContent>
 
                     <TabsContent value="details">
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                         <div>
-                          <span className="text-gray-600 dark:text-gray-400">Technician:</span>
+                          <span className="text-gray-600 dark:text-gray-400">{t('vehicles.technician', 'Technician')}:</span>
                           <p className="font-medium text-gray-900 dark:text-white">
-                            {walkaround.technicianName || "Not available"}
+                            {walkaround.technicianName || t('common.notAvailable', 'Not available')}
                           </p>
                         </div>
                         <div>
-                          <span className="text-gray-600 dark:text-gray-400">Mileage:</span>
+                          <span className="text-gray-600 dark:text-gray-400">{t('vehicles.mileage', 'Mileage')}:</span>
                           <p className="font-medium text-gray-900 dark:text-white">
                             {walkaround.mileageReading 
-                              ? `${walkaround.mileageReading.toLocaleString()} miles`
-                              : "Not recorded"}
+                              ? `${walkaround.mileageReading.toLocaleString()} ${t('vehicles.miles', 'miles')}`
+                              : t('vehicles.notRecorded', 'Not recorded')}
                           </p>
                         </div>
                         <div>
-                          <span className="text-gray-600 dark:text-gray-400">Fuel Level:</span>
+                          <span className="text-gray-600 dark:text-gray-400">{t('vehicles.fuelLevel', 'Fuel Level')}:</span>
                           <p className="font-medium text-gray-900 dark:text-white">
-                            {walkaround.fuelLevel || "Not recorded"}
+                            {walkaround.fuelLevel || t('vehicles.notRecorded', 'Not recorded')}
                           </p>
                         </div>
                         <div>
-                          <span className="text-gray-600 dark:text-gray-400">Interior:</span>
+                          <span className="text-gray-600 dark:text-gray-400">{t('vehicles.interior', 'Interior')}:</span>
                           <p className="font-medium text-gray-900 dark:text-white capitalize">
-                            {walkaround.interiorCondition || "Not recorded"}
+                            {walkaround.interiorCondition || t('vehicles.notRecorded', 'Not recorded')}
                           </p>
                         </div>
                       </div>
@@ -338,7 +340,7 @@ export default function DigitalVehicleWalkaround() {
                       <div className="space-y-4">
                         {damagePrevious.length > 0 && (
                           <div>
-                            <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Previously Noted Damage</h4>
+                            <h4 className="font-semibold text-gray-900 dark:text-white mb-2">{t('vehicles.previouslyNotedDamage', 'Previously Noted Damage')}</h4>
                             <ul className="space-y-1">
                               {damagePrevious.map((damage: string, dmgIndex: number) => (
                                 <li key={`prev-${dmgIndex}`} className="text-sm text-gray-600 dark:text-gray-400 flex items-start gap-2">
@@ -353,7 +355,7 @@ export default function DigitalVehicleWalkaround() {
                           <div>
                             <h4 className="font-semibold text-red-600 mb-2 flex items-center gap-2">
                               <AlertTriangle className="h-4 w-4" />
-                              New Damage Identified
+                              {t('vehicles.newDamageIdentified', 'New Damage Identified')}
                             </h4>
                             <ul className="space-y-1">
                               {damageNew.map((damage: string, dmgIndex: number) => (
@@ -368,7 +370,7 @@ export default function DigitalVehicleWalkaround() {
                         {damagePrevious.length === 0 && damageNew.length === 0 && (
                           <p className="text-sm text-green-600 flex items-center gap-2">
                             <CheckCircle className="h-4 w-4" />
-                            No damage reported
+                            {t('vehicles.noDamageReported', 'No damage reported')}
                           </p>
                         )}
                       </div>

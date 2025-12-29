@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,6 +31,7 @@ const refundSchema = z.object({
 type RefundFormData = z.infer<typeof refundSchema>;
 
 export default function RefundManagement() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [selectedGarageId, setSelectedGarageId] = useState<string>("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -152,8 +154,8 @@ export default function RefundManagement() {
 
   return (
     <StandardPageLayout
-      title="Refund Management"
-      description="Manage customer refunds with approval workflow"
+      title={t('payments.refunds.title', 'Refund Management')}
+      description={t('payments.refunds.description', 'Manage customer refunds with approval workflow')}
       icon={DollarSign}
     >
       <div className="flex gap-2 items-center mb-6">
@@ -173,13 +175,13 @@ export default function RefundManagement() {
             <DialogTrigger asChild>
               <Button onClick={() => refundForm.reset()} data-testid="button-create-refund">
                 <Plus className="h-4 w-4 mr-2" />
-                Create Refund
+                {t('payments.refunds.createRefund', 'Create Refund')}
               </Button>
             </DialogTrigger>
             <DialogContent data-testid="dialog-refund-form">
               <DialogHeader>
-                <DialogTitle>Create Refund Request</DialogTitle>
-                <DialogDescription>Initiate a refund for a customer invoice</DialogDescription>
+                <DialogTitle>{t('payments.refunds.createRefundRequest', 'Create Refund Request')}</DialogTitle>
+                <DialogDescription>{t('payments.refunds.initiateRefund', 'Initiate a refund for a customer invoice')}</DialogDescription>
               </DialogHeader>
               <Form {...refundForm}>
                 <form onSubmit={refundForm.handleSubmit((data) => createRefundMutation.mutate(data))} className="space-y-4">
@@ -188,17 +190,17 @@ export default function RefundManagement() {
                     name="invoiceId"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Invoice</FormLabel>
+                        <FormLabel>{t('invoices.invoice', 'Invoice')}</FormLabel>
                         <Select onValueChange={field.onChange} value={field.value}>
                           <FormControl>
                             <SelectTrigger data-testid="select-refund-invoice">
-                              <SelectValue placeholder="Select invoice" />
+                              <SelectValue placeholder={t('payments.refunds.selectInvoice', 'Select invoice')} />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
                             {invoices.map((invoice) => (
                               <SelectItem key={invoice.id} value={invoice.id} data-testid={`select-invoice-${invoice.id}`}>
-                                Invoice #{invoice.id.slice(0, 8)} - ${invoice.totalAmount}
+                                {t('invoices.invoice', 'Invoice')} #{invoice.id.slice(0, 8)} - ${invoice.totalAmount}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -212,7 +214,7 @@ export default function RefundManagement() {
                     name="amount"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Refund Amount</FormLabel>
+                        <FormLabel>{t('payments.refunds.refundAmount', 'Refund Amount')}</FormLabel>
                         <FormControl>
                           <Input type="number" step="0.01" placeholder="0.00" {...field} data-testid="input-refund-amount" />
                         </FormControl>
@@ -225,9 +227,9 @@ export default function RefundManagement() {
                     name="reason"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Reason</FormLabel>
+                        <FormLabel>{t('payments.refunds.reason', 'Reason')}</FormLabel>
                         <FormControl>
-                          <Input placeholder="e.g., Customer dissatisfaction" {...field} data-testid="input-refund-reason" />
+                          <Input placeholder={t('payments.refunds.reasonPlaceholder', 'e.g., Customer dissatisfaction')} {...field} data-testid="input-refund-reason" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -238,7 +240,7 @@ export default function RefundManagement() {
                     name="refundMethod"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Refund Method</FormLabel>
+                        <FormLabel>{t('payments.refunds.refundMethod', 'Refund Method')}</FormLabel>
                         <Select onValueChange={field.onChange} value={field.value}>
                           <FormControl>
                             <SelectTrigger data-testid="select-refund-method">
@@ -246,10 +248,10 @@ export default function RefundManagement() {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="original" data-testid="select-method-original">Original Payment Method</SelectItem>
-                            <SelectItem value="store_credit" data-testid="select-method-credit">Store Credit</SelectItem>
-                            <SelectItem value="cash" data-testid="select-method-cash">Cash</SelectItem>
-                            <SelectItem value="check" data-testid="select-method-check">Check</SelectItem>
+                            <SelectItem value="original" data-testid="select-method-original">{t('payments.refunds.methods.original', 'Original Payment Method')}</SelectItem>
+                            <SelectItem value="store_credit" data-testid="select-method-credit">{t('payments.refunds.methods.storeCredit', 'Store Credit')}</SelectItem>
+                            <SelectItem value="cash" data-testid="select-method-cash">{t('payments.methods.cash', 'Cash')}</SelectItem>
+                            <SelectItem value="check" data-testid="select-method-check">{t('payments.methods.check', 'Check')}</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -261,9 +263,9 @@ export default function RefundManagement() {
                     name="notes"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Notes (Optional)</FormLabel>
+                        <FormLabel>{t('payments.refunds.notesOptional', 'Notes (Optional)')}</FormLabel>
                         <FormControl>
-                          <Textarea placeholder="Additional notes..." {...field} data-testid="textarea-refund-notes" />
+                          <Textarea placeholder={t('payments.refunds.notesPlaceholder', 'Additional notes...')} {...field} data-testid="textarea-refund-notes" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -271,7 +273,7 @@ export default function RefundManagement() {
                   />
                   <DialogFooter>
                     <Button type="submit" disabled={createRefundMutation.isPending} data-testid="button-submit-refund">
-                      {createRefundMutation.isPending ? "Creating..." : "Create Refund"}
+                      {createRefundMutation.isPending ? t('common.creating', 'Creating...') : t('payments.refunds.createRefund', 'Create Refund')}
                     </Button>
                   </DialogFooter>
                 </form>
@@ -297,27 +299,27 @@ export default function RefundManagement() {
 
       <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
         <CardHeader>
-          <CardTitle className="text-gray-900 dark:text-white">Refund Requests</CardTitle>
-          <CardDescription className="text-gray-900 dark:text-white/60">Review and process customer refund requests</CardDescription>
+          <CardTitle className="text-gray-900 dark:text-white">{t('payments.refunds.refundRequests', 'Refund Requests')}</CardTitle>
+          <CardDescription className="text-gray-900 dark:text-white/60">{t('payments.refunds.reviewAndProcess', 'Review and process customer refund requests')}</CardDescription>
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <div className="text-center py-8 text-gray-900 dark:text-white/60">Loading...</div>
+            <div className="text-center py-8 text-gray-900 dark:text-white/60">{t('common.loading', 'Loading...')}</div>
           ) : refunds.length === 0 ? (
             <div className="text-center py-8 text-gray-900 dark:text-white/60" data-testid="text-no-refunds">
-              No refund requests found
+              {t('payments.refunds.noRefundsFound', 'No refund requests found')}
             </div>
           ) : (
             <Table>
               <TableHeader className="bg-gray-100 dark:bg-salis-gray-dark">
                 <TableRow className="border-b border-gray-200 dark:border-salis-gray-dark hover:bg-gray-100 dark:hover:bg-salis-gray-dark">
-                  <TableHead className="text-gray-900 dark:text-white">Invoice</TableHead>
-                  <TableHead className="text-gray-900 dark:text-white">Amount</TableHead>
-                  <TableHead className="text-gray-900 dark:text-white">Reason</TableHead>
-                  <TableHead className="text-gray-900 dark:text-white">Method</TableHead>
-                  <TableHead className="text-gray-900 dark:text-white">Requested</TableHead>
-                  <TableHead className="text-gray-900 dark:text-white">Status</TableHead>
-                  <TableHead className="text-gray-900 dark:text-white">Actions</TableHead>
+                  <TableHead className="text-gray-900 dark:text-white">{t('invoices.invoice', 'Invoice')}</TableHead>
+                  <TableHead className="text-gray-900 dark:text-white">{t('common.amount', 'Amount')}</TableHead>
+                  <TableHead className="text-gray-900 dark:text-white">{t('payments.refunds.reason', 'Reason')}</TableHead>
+                  <TableHead className="text-gray-900 dark:text-white">{t('payments.refunds.method', 'Method')}</TableHead>
+                  <TableHead className="text-gray-900 dark:text-white">{t('payments.refunds.requested', 'Requested')}</TableHead>
+                  <TableHead className="text-gray-900 dark:text-white">{t('common.status', 'Status')}</TableHead>
+                  <TableHead className="text-gray-900 dark:text-white">{t('common.actions', 'Actions')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -352,7 +354,7 @@ export default function RefundManagement() {
                             data-testid={`button-approve-refund-${refund.id}`}
                           >
                             <CheckCircle className="h-4 w-4 mr-1" />
-                            Approve
+                            {t('payments.refunds.approve', 'Approve')}
                           </Button>
                         )}
                         {refund.status === "approved" && (
@@ -364,7 +366,7 @@ export default function RefundManagement() {
                             data-testid={`button-process-refund-${refund.id}`}
                           >
                             <DollarSign className="h-4 w-4 mr-1" />
-                            Process
+                            {t('payments.refunds.process', 'Process')}
                           </Button>
                         )}
                       </div>

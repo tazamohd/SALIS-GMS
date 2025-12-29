@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslation } from "react-i18next";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import {
@@ -102,6 +103,7 @@ type PricingTierFormData = z.input<typeof pricingTierFormSchema>;
 type MaintenanceScheduleFormData = z.input<typeof maintenanceScheduleFormSchema>;
 
 export default function FleetManagement() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const { user } = useAuth();
   const [selectedTab, setSelectedTab] = useState("groups");
@@ -228,8 +230,8 @@ export default function FleetManagement() {
       setEditingGroupId(null);
       groupForm.reset();
       toast({
-        title: editingGroupId ? "Fleet Group Updated" : "Fleet Group Created",
-        description: "Changes saved successfully",
+        title: editingGroupId ? t('vehicles.fleetGroupUpdated', 'Fleet Group Updated') : t('vehicles.fleetGroupCreated', 'Fleet Group Created'),
+        description: t('vehicles.changesSavedSuccessfully', 'Changes saved successfully'),
       });
     },
   });
@@ -248,8 +250,8 @@ export default function FleetManagement() {
       setEditingVehicleId(null);
       vehicleForm.reset();
       toast({
-        title: editingVehicleId ? "Fleet Vehicle Updated" : "Fleet Vehicle Added",
-        description: "Changes saved successfully",
+        title: editingVehicleId ? t('vehicles.fleetVehicleUpdated', 'Fleet Vehicle Updated') : t('vehicles.fleetVehicleAdded', 'Fleet Vehicle Added'),
+        description: t('vehicles.changesSavedSuccessfully', 'Changes saved successfully'),
       });
     },
   });
@@ -268,8 +270,8 @@ export default function FleetManagement() {
       setEditingContractId(null);
       contractForm.reset();
       toast({
-        title: editingContractId ? "Contract Updated" : "Contract Created",
-        description: "Changes saved successfully",
+        title: editingContractId ? t('vehicles.contractUpdated', 'Contract Updated') : t('vehicles.contractCreated', 'Contract Created'),
+        description: t('vehicles.changesSavedSuccessfully', 'Changes saved successfully'),
       });
     },
   });
@@ -288,8 +290,8 @@ export default function FleetManagement() {
       setEditingPricingId(null);
       pricingForm.reset();
       toast({
-        title: editingPricingId ? "Pricing Tier Updated" : "Pricing Tier Created",
-        description: "Changes saved successfully",
+        title: editingPricingId ? t('vehicles.pricingTierUpdated', 'Pricing Tier Updated') : t('vehicles.pricingTierCreated', 'Pricing Tier Created'),
+        description: t('vehicles.changesSavedSuccessfully', 'Changes saved successfully'),
       });
     },
   });
@@ -308,8 +310,8 @@ export default function FleetManagement() {
       setEditingScheduleId(null);
       scheduleForm.reset();
       toast({
-        title: editingScheduleId ? "Schedule Updated" : "Schedule Created",
-        description: "Changes saved successfully",
+        title: editingScheduleId ? t('vehicles.scheduleUpdated', 'Schedule Updated') : t('vehicles.scheduleCreated', 'Schedule Created'),
+        description: t('vehicles.changesSavedSuccessfully', 'Changes saved successfully'),
       });
     },
   });
@@ -318,7 +320,7 @@ export default function FleetManagement() {
     mutationFn: (id: string) => apiRequest("DELETE", `/api/fleet/groups/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/fleet/groups"] });
-      toast({ title: "Fleet Group Deleted", description: "Group removed successfully" });
+      toast({ title: t('vehicles.fleetGroupDeleted', 'Fleet Group Deleted'), description: t('vehicles.groupRemovedSuccessfully', 'Group removed successfully') });
     },
   });
 
@@ -326,7 +328,7 @@ export default function FleetManagement() {
     mutationFn: (id: string) => apiRequest("DELETE", `/api/fleet/vehicles/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/fleet/vehicles/group"] });
-      toast({ title: "Fleet Vehicle Removed", description: "Vehicle removed from fleet" });
+      toast({ title: t('vehicles.fleetVehicleRemoved', 'Fleet Vehicle Removed'), description: t('vehicles.vehicleRemovedFromFleet', 'Vehicle removed from fleet') });
     },
   });
 
@@ -334,7 +336,7 @@ export default function FleetManagement() {
     mutationFn: (id: string) => apiRequest("DELETE", `/api/fleet/contracts/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/fleet/contracts/group"] });
-      toast({ title: "Contract Deleted", description: "Contract removed successfully" });
+      toast({ title: t('vehicles.contractDeleted', 'Contract Deleted'), description: t('vehicles.contractRemovedSuccessfully', 'Contract removed successfully') });
     },
   });
 
@@ -342,7 +344,7 @@ export default function FleetManagement() {
     mutationFn: (id: string) => apiRequest("DELETE", `/api/fleet/pricing-tiers/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/fleet/pricing-tiers"] });
-      toast({ title: "Pricing Tier Deleted", description: "Tier removed successfully" });
+      toast({ title: t('vehicles.pricingTierDeleted', 'Pricing Tier Deleted'), description: t('vehicles.tierRemovedSuccessfully', 'Tier removed successfully') });
     },
   });
 
@@ -350,7 +352,7 @@ export default function FleetManagement() {
     mutationFn: (id: string) => apiRequest("DELETE", `/api/fleet/maintenance-schedules/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/fleet/maintenance-schedules/group"] });
-      toast({ title: "Schedule Deleted", description: "Schedule removed successfully" });
+      toast({ title: t('vehicles.scheduleDeleted', 'Schedule Deleted'), description: t('vehicles.scheduleRemovedSuccessfully', 'Schedule removed successfully') });
     },
   });
 
@@ -432,7 +434,7 @@ export default function FleetManagement() {
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-semibold text-salis-black dark:text-white">
-          Fleet Groups
+          {t('vehicles.fleetGroups', 'Fleet Groups')}
         </h2>
         <Button
           onClick={() => {
@@ -444,7 +446,7 @@ export default function FleetManagement() {
           data-testid="button-create-fleet-group"
         >
           <Plus className="mr-2 h-4 w-4" />
-          Add Fleet Group
+          {t('vehicles.addFleetGroup', 'Add Fleet Group')}
         </Button>
       </div>
 
@@ -452,26 +454,26 @@ export default function FleetManagement() {
         <Table>
           <TableHeader>
             <TableRow className="bg-salis-gray-light dark:bg-salis-gray-dark">
-              <TableHead className="text-salis-black dark:text-white">Fleet Name</TableHead>
-              <TableHead className="text-salis-black dark:text-white">Company</TableHead>
-              <TableHead className="text-salis-black dark:text-white">Contact Person</TableHead>
-              <TableHead className="text-salis-black dark:text-white">Contact Email</TableHead>
-              <TableHead className="text-salis-black dark:text-white">Discount</TableHead>
-              <TableHead className="text-salis-black dark:text-white">Status</TableHead>
-              <TableHead className="text-salis-black dark:text-white text-right">Actions</TableHead>
+              <TableHead className="text-salis-black dark:text-white">{t('vehicles.fleetName', 'Fleet Name')}</TableHead>
+              <TableHead className="text-salis-black dark:text-white">{t('vehicles.company', 'Company')}</TableHead>
+              <TableHead className="text-salis-black dark:text-white">{t('vehicles.contactPerson', 'Contact Person')}</TableHead>
+              <TableHead className="text-salis-black dark:text-white">{t('vehicles.contactEmail', 'Contact Email')}</TableHead>
+              <TableHead className="text-salis-black dark:text-white">{t('common.discount', 'Discount')}</TableHead>
+              <TableHead className="text-salis-black dark:text-white">{t('common.status', 'Status')}</TableHead>
+              <TableHead className="text-salis-black dark:text-white text-right">{t('common.actions', 'Actions')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {groupsLoading ? (
               <TableRow>
                 <TableCell colSpan={7} className="text-center text-salis-gray">
-                  Loading fleet groups...
+                  {t('vehicles.loadingFleetGroups', 'Loading fleet groups...')}
                 </TableCell>
               </TableRow>
             ) : fleetGroups.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={7} className="text-center text-salis-gray">
-                  No fleet groups found. Create one to get started.
+                  {t('vehicles.noFleetGroupsFound', 'No fleet groups found. Create one to get started.')}
                 </TableCell>
               </TableRow>
             ) : (
@@ -489,7 +491,7 @@ export default function FleetManagement() {
                       variant={group.isActive ? "default" : "secondary"}
                       className={group.isActive ? "bg-salis-black dark:bg-white text-white dark:text-salis-black" : ""}
                     >
-                      {group.isActive ? "Active" : "Inactive"}
+                      {group.isActive ? t('common.active', 'Active') : t('common.inactive', 'Inactive')}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">
@@ -525,12 +527,12 @@ export default function FleetManagement() {
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-semibold text-salis-black dark:text-white">
-          Fleet Vehicles
+          {t('vehicles.fleetVehicles', 'Fleet Vehicles')}
         </h2>
         <div className="flex gap-4">
           <Select value={selectedGroupId} onValueChange={setSelectedGroupId}>
             <SelectTrigger className="w-64" data-testid="select-vehicle-fleet-group">
-              <SelectValue placeholder="Select Fleet Group" />
+              <SelectValue placeholder={t('vehicles.selectFleetGroup', 'Select Fleet Group')} />
             </SelectTrigger>
             <SelectContent>
               {fleetGroups.map((group) => (
@@ -551,7 +553,7 @@ export default function FleetManagement() {
             data-testid="button-add-fleet-vehicle"
           >
             <Plus className="mr-2 h-4 w-4" />
-            Add Vehicle
+            {t('vehicles.addVehicle', 'Add Vehicle')}
           </Button>
         </div>
       </div>
@@ -560,25 +562,25 @@ export default function FleetManagement() {
         <Table>
           <TableHeader>
             <TableRow className="bg-salis-gray-light dark:bg-salis-gray-dark">
-              <TableHead className="text-salis-black dark:text-white">Vehicle</TableHead>
-              <TableHead className="text-salis-black dark:text-white">Make/Model</TableHead>
-              <TableHead className="text-salis-black dark:text-white">License Plate</TableHead>
-              <TableHead className="text-salis-black dark:text-white">Avg. Monthly Mileage</TableHead>
-              <TableHead className="text-salis-black dark:text-white">Assigned Date</TableHead>
-              <TableHead className="text-salis-black dark:text-white text-right">Actions</TableHead>
+              <TableHead className="text-salis-black dark:text-white">{t('vehicles.vehicle', 'Vehicle')}</TableHead>
+              <TableHead className="text-salis-black dark:text-white">{t('vehicles.makeModel', 'Make/Model')}</TableHead>
+              <TableHead className="text-salis-black dark:text-white">{t('vehicles.licensePlate', 'License Plate')}</TableHead>
+              <TableHead className="text-salis-black dark:text-white">{t('vehicles.avgMonthlyMileage', 'Avg. Monthly Mileage')}</TableHead>
+              <TableHead className="text-salis-black dark:text-white">{t('vehicles.assignedDate', 'Assigned Date')}</TableHead>
+              <TableHead className="text-salis-black dark:text-white text-right">{t('common.actions', 'Actions')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {!selectedGroupId ? (
               <TableRow>
                 <TableCell colSpan={6} className="text-center text-salis-gray">
-                  Select a fleet group to view vehicles
+                  {t('vehicles.selectFleetGroupToViewVehicles', 'Select a fleet group to view vehicles')}
                 </TableCell>
               </TableRow>
             ) : fleetVehicles.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={6} className="text-center text-salis-gray">
-                  No vehicles assigned to this fleet group
+                  {t('vehicles.noVehiclesAssignedToFleet', 'No vehicles assigned to this fleet group')}
                 </TableCell>
               </TableRow>
             ) : (
@@ -592,10 +594,10 @@ export default function FleetManagement() {
                   </TableCell>
                   <TableCell className="text-salis-gray">{vehicle.vehicle?.licensePlate || "—"}</TableCell>
                   <TableCell className="text-salis-gray">
-                    {vehicle.fleetVehicle.averageMonthlyMileage ? `${vehicle.fleetVehicle.averageMonthlyMileage} km` : "—"}
+                    {vehicle.fleetVehicle.averageMonthlyMileage ? `${vehicle.fleetVehicle.averageMonthlyMileage.toLocaleString()} km` : "—"}
                   </TableCell>
                   <TableCell className="text-salis-gray">
-                    {vehicle.fleetVehicle.assignedAt ? format(new Date(vehicle.fleetVehicle.assignedAt), "MMM dd, yyyy") : "—"}
+                    {vehicle.fleetVehicle.assignedDate ? format(new Date(vehicle.fleetVehicle.assignedDate), "MMM dd, yyyy") : "—"}
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
@@ -626,403 +628,77 @@ export default function FleetManagement() {
     </div>
   );
 
-  const renderContractsContent = () => (
-    <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <h2 className="text-xl font-semibold text-salis-black dark:text-white">
-          Fleet Contracts
-        </h2>
-        <div className="flex gap-4">
-          <Select value={selectedGroupId} onValueChange={setSelectedGroupId}>
-            <SelectTrigger className="w-64" data-testid="select-contract-fleet-group">
-              <SelectValue placeholder="Select Fleet Group" />
-            </SelectTrigger>
-            <SelectContent>
-              {fleetGroups.map((group) => (
-                <SelectItem key={group.id} value={group.id}>
-                  {group.fleetName}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Button
-            onClick={() => {
-              setEditingContractId(null);
-              contractForm.reset({ fleetGroupId: selectedGroupId });
-              setIsContractDialogOpen(true);
-            }}
-            className="bg-salis-black dark:bg-white text-white dark:text-salis-black"
-            disabled={!selectedGroupId}
-            data-testid="button-create-contract"
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            Add Contract
-          </Button>
-        </div>
-      </div>
-
-      <div className="border border-salis-gray-light dark:border-salis-gray-dark rounded-lg">
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-salis-gray-light dark:bg-salis-gray-dark">
-              <TableHead className="text-salis-black dark:text-white">Contract #</TableHead>
-              <TableHead className="text-salis-black dark:text-white">Type</TableHead>
-              <TableHead className="text-salis-black dark:text-white">Start Date</TableHead>
-              <TableHead className="text-salis-black dark:text-white">End Date</TableHead>
-              <TableHead className="text-salis-black dark:text-white">Vehicles</TableHead>
-              <TableHead className="text-salis-black dark:text-white">Status</TableHead>
-              <TableHead className="text-salis-black dark:text-white text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {!selectedGroupId ? (
-              <TableRow>
-                <TableCell colSpan={7} className="text-center text-salis-gray">
-                  Select a fleet group to view contracts
-                </TableCell>
-              </TableRow>
-            ) : contracts.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={7} className="text-center text-salis-gray">
-                  No contracts found for this fleet group
-                </TableCell>
-              </TableRow>
-            ) : (
-              contracts.map((contract) => (
-                <TableRow key={contract.id} className="border-b border-salis-gray-light dark:border-salis-gray-dark" data-testid={`row-contract-${contract.id}`}>
-                  <TableCell className="font-medium text-salis-black dark:text-white">
-                    {contract.contractNumber}
-                  </TableCell>
-                  <TableCell className="text-salis-gray">{contract.contractType}</TableCell>
-                  <TableCell className="text-salis-gray">
-                    {contract.startDate ? format(new Date(contract.startDate), "MMM dd, yyyy") : "—"}
-                  </TableCell>
-                  <TableCell className="text-salis-gray">
-                    {contract.endDate ? format(new Date(contract.endDate), "MMM dd, yyyy") : "—"}
-                  </TableCell>
-                  <TableCell className="text-salis-gray">{contract.maxVehicles || "—"}</TableCell>
-                  <TableCell>
-                    <Badge className="bg-salis-black dark:bg-white text-white dark:text-salis-black">
-                      {contract.status || "Active"}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleEditContract(contract)}
-                        data-testid={`button-edit-contract-${contract.id}`}
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => deleteContractMutation.mutate(contract.id)}
-                        data-testid={`button-delete-contract-${contract.id}`}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </div>
-    </div>
-  );
-
-  const renderPricingTiersContent = () => (
-    <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <h2 className="text-xl font-semibold text-salis-black dark:text-white">
-          Pricing Tiers
-        </h2>
-        <Button
-          onClick={() => {
-            setEditingPricingId(null);
-            pricingForm.reset({ garageId: (user as any)?.garageId || "" });
-            setIsPricingDialogOpen(true);
-          }}
-          className="bg-salis-black dark:bg-white text-white dark:text-salis-black"
-          data-testid="button-create-pricing-tier"
-        >
-          <Plus className="mr-2 h-4 w-4" />
-          Add Pricing Tier
-        </Button>
-      </div>
-
-      <div className="border border-salis-gray-light dark:border-salis-gray-dark rounded-lg">
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-salis-gray-light dark:bg-salis-gray-dark">
-              <TableHead className="text-salis-black dark:text-white">Tier Name</TableHead>
-              <TableHead className="text-salis-black dark:text-white">Min Vehicles</TableHead>
-              <TableHead className="text-salis-black dark:text-white">Max Vehicles</TableHead>
-              <TableHead className="text-salis-black dark:text-white">Discount</TableHead>
-              <TableHead className="text-salis-black dark:text-white">Status</TableHead>
-              <TableHead className="text-salis-black dark:text-white text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {pricingTiers.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={6} className="text-center text-salis-gray">
-                  No pricing tiers found. Create one to get started.
-                </TableCell>
-              </TableRow>
-            ) : (
-              pricingTiers.map((tier) => (
-                <TableRow key={tier.id} className="border-b border-salis-gray-light dark:border-salis-gray-dark" data-testid={`row-pricing-tier-${tier.id}`}>
-                  <TableCell className="font-medium text-salis-black dark:text-white">
-                    {tier.tierName}
-                  </TableCell>
-                  <TableCell className="text-salis-gray">{tier.minVehicles}</TableCell>
-                  <TableCell className="text-salis-gray">{tier.maxVehicles || "Unlimited"}</TableCell>
-                  <TableCell className="text-salis-gray">{tier.discountPercentage}%</TableCell>
-                  <TableCell>
-                    <Badge
-                      variant={tier.isActive ? "default" : "secondary"}
-                      className={tier.isActive ? "bg-salis-black dark:bg-white text-white dark:text-salis-black" : ""}
-                    >
-                      {tier.isActive ? "Active" : "Inactive"}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleEditPricing(tier)}
-                        data-testid={`button-edit-pricing-tier-${tier.id}`}
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => deletePricingMutation.mutate(tier.id)}
-                        data-testid={`button-delete-pricing-tier-${tier.id}`}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </div>
-    </div>
-  );
-
-  const renderMaintenanceSchedulesContent = () => (
-    <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <h2 className="text-xl font-semibold text-salis-black dark:text-white">
-          Maintenance Schedules
-        </h2>
-        <div className="flex gap-4">
-          <Select value={selectedGroupId} onValueChange={setSelectedGroupId}>
-            <SelectTrigger className="w-64" data-testid="select-schedule-fleet-group">
-              <SelectValue placeholder="Select Fleet Group" />
-            </SelectTrigger>
-            <SelectContent>
-              {fleetGroups.map((group) => (
-                <SelectItem key={group.id} value={group.id}>
-                  {group.fleetName}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Button
-            onClick={() => {
-              setEditingScheduleId(null);
-              scheduleForm.reset({ fleetGroupId: selectedGroupId });
-              setIsScheduleDialogOpen(true);
-            }}
-            className="bg-salis-black dark:bg-white text-white dark:text-salis-black"
-            disabled={!selectedGroupId}
-            data-testid="button-create-schedule"
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            Add Schedule
-          </Button>
-        </div>
-      </div>
-
-      <div className="border border-salis-gray-light dark:border-salis-gray-dark rounded-lg">
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-salis-gray-light dark:bg-salis-gray-dark">
-              <TableHead className="text-salis-black dark:text-white">Schedule Name</TableHead>
-              <TableHead className="text-salis-black dark:text-white">Service Type</TableHead>
-              <TableHead className="text-salis-black dark:text-white">Interval Type</TableHead>
-              <TableHead className="text-salis-black dark:text-white">Mileage</TableHead>
-              <TableHead className="text-salis-black dark:text-white">Months</TableHead>
-              <TableHead className="text-salis-black dark:text-white">Est. Cost</TableHead>
-              <TableHead className="text-salis-black dark:text-white text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {!selectedGroupId ? (
-              <TableRow>
-                <TableCell colSpan={7} className="text-center text-salis-gray">
-                  Select a fleet group to view schedules
-                </TableCell>
-              </TableRow>
-            ) : schedules.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={7} className="text-center text-salis-gray">
-                  No maintenance schedules found for this fleet group
-                </TableCell>
-              </TableRow>
-            ) : (
-              schedules.map((schedule) => (
-                <TableRow key={schedule.id} className="border-b border-salis-gray-light dark:border-salis-gray-dark" data-testid={`row-schedule-${schedule.id}`}>
-                  <TableCell className="font-medium text-salis-black dark:text-white">
-                    {schedule.scheduleName}
-                  </TableCell>
-                  <TableCell className="text-salis-gray">{schedule.serviceType}</TableCell>
-                  <TableCell className="text-salis-gray">{schedule.intervalType}</TableCell>
-                  <TableCell className="text-salis-gray">
-                    {schedule.intervalMileage ? `${schedule.intervalMileage} km` : "—"}
-                  </TableCell>
-                  <TableCell className="text-salis-gray">
-                    {schedule.intervalMonths ? `${schedule.intervalMonths} mo` : "—"}
-                  </TableCell>
-                  <TableCell className="text-salis-gray">
-                    {schedule.estimatedCost ? `$${schedule.estimatedCost}` : "—"}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleEditSchedule(schedule)}
-                        data-testid={`button-edit-schedule-${schedule.id}`}
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => deleteScheduleMutation.mutate(schedule.id)}
-                        data-testid={`button-delete-schedule-${schedule.id}`}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </div>
-    </div>
-  );
-
   return (
     <>
       <TabsPageLayout
-        title="Fleet Management"
-        description="Manage corporate fleet clients, contracts, and maintenance schedules"
+        title={t('vehicles.fleetManagement', 'Fleet Management')}
+        description={t('vehicles.manageFleetGroupsVehiclesContracts', 'Manage fleet groups, vehicles, and contracts')}
         icon={Building2}
-        activeTab={selectedTab}
-        onTabChange={setSelectedTab}
         tabs={[
           {
             id: "groups",
-            label: "Fleet Groups",
+            label: t('vehicles.groups', 'Groups'),
             icon: Building2,
             content: renderFleetGroupsContent(),
-            badge: fleetGroups.length,
           },
           {
             id: "vehicles",
-            label: "Fleet Vehicles",
+            label: t('vehicles.vehicles', 'Vehicles'),
             icon: Car,
             content: renderFleetVehiclesContent(),
           },
-          {
-            id: "contracts",
-            label: "Contracts",
-            icon: FileText,
-            content: renderContractsContent(),
-          },
-          {
-            id: "pricing",
-            label: "Pricing Tiers",
-            icon: DollarSign,
-            content: renderPricingTiersContent(),
-            badge: pricingTiers.length,
-          },
-          {
-            id: "schedules",
-            label: "Maintenance Schedules",
-            icon: Calendar,
-            content: renderMaintenanceSchedulesContent(),
-          },
         ]}
+        activeTab={selectedTab}
+        onTabChange={setSelectedTab}
       />
 
       <Dialog open={isGroupDialogOpen} onOpenChange={setIsGroupDialogOpen}>
-        <DialogContent className="max-w-2xl bg-white dark:bg-salis-black">
+        <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>
-            <DialogTitle className="text-salis-black dark:text-white">
-              {editingGroupId ? "Edit Fleet Group" : "Create Fleet Group"}
+            <DialogTitle>
+              {editingGroupId ? t('vehicles.editFleetGroup', 'Edit Fleet Group') : t('vehicles.createFleetGroup', 'Create Fleet Group')}
             </DialogTitle>
-            <DialogDescription className="text-salis-gray">
-              {editingGroupId
-                ? "Update fleet group details"
-                : "Add a new corporate fleet client"}
+            <DialogDescription>
+              {t('vehicles.fleetGroupDescription', 'Manage fleet group information and settings')}
             </DialogDescription>
           </DialogHeader>
           <Form {...groupForm}>
-            <form
-              onSubmit={groupForm.handleSubmit((data) => groupMutation.mutate(data))}
-              className="space-y-4"
-            >
+            <form onSubmit={groupForm.handleSubmit((data) => groupMutation.mutate(data))} className="space-y-4">
+              <FormField
+                control={groupForm.control}
+                name="fleetName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('vehicles.fleetName', 'Fleet Name')}</FormLabel>
+                    <FormControl>
+                      <Input {...field} data-testid="input-fleet-name" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={groupForm.control}
+                name="companyName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('vehicles.companyName', 'Company Name')}</FormLabel>
+                    <FormControl>
+                      <Input {...field} value={field.value || ""} data-testid="input-company-name" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={groupForm.control}
-                  name="fleetName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">Fleet Name *</FormLabel>
-                      <FormControl>
-                        <Input {...field} placeholder="ABC Company Fleet" data-testid="input-fleet-name" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={groupForm.control}
-                  name="companyName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">Company Name</FormLabel>
-                      <FormControl>
-                        <Input {...field} value={field.value || ""} placeholder="ABC Company" data-testid="input-company-name" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
                 <FormField
                   control={groupForm.control}
                   name="contactPerson"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">Contact Person</FormLabel>
+                      <FormLabel>{t('vehicles.contactPerson', 'Contact Person')}</FormLabel>
                       <FormControl>
-                        <Input {...field} value={field.value || ""} placeholder="John Smith" data-testid="input-contact-person" />
+                        <Input {...field} value={field.value || ""} data-testid="input-contact-person" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -1033,71 +709,9 @@ export default function FleetManagement() {
                   name="contactEmail"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">Contact Email</FormLabel>
+                      <FormLabel>{t('vehicles.contactEmail', 'Contact Email')}</FormLabel>
                       <FormControl>
-                        <Input {...field} value={field.value || ""} type="email" placeholder="john@company.com" data-testid="input-contact-email" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={groupForm.control}
-                  name="contactPhone"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">Contact Phone</FormLabel>
-                      <FormControl>
-                        <Input {...field} value={field.value || ""} placeholder="+1234567890" data-testid="input-contact-phone" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={groupForm.control}
-                  name="taxId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">Tax ID</FormLabel>
-                      <FormControl>
-                        <Input {...field} value={field.value || ""} placeholder="123-45-6789" data-testid="input-tax-id" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={groupForm.control}
-                  name="discountPercentage"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">Discount %</FormLabel>
-                      <FormControl>
-                        <Input {...field} type="number" placeholder="10" data-testid="input-discount" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={groupForm.control}
-                  name="paymentTerms"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">Payment Terms</FormLabel>
-                      <FormControl>
-                        <Select value={field.value || "net_30"} onValueChange={field.onChange}>
-                          <SelectTrigger data-testid="select-payment-terms">
-                            <SelectValue placeholder="Select terms" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="net_30">Net 30</SelectItem>
-                            <SelectItem value="net_60">Net 60</SelectItem>
-                            <SelectItem value="prepaid">Prepaid</SelectItem>
-                            <SelectItem value="custom">Custom</SelectItem>
-                          </SelectContent>
-                        </Select>
+                        <Input {...field} type="email" value={field.value || ""} data-testid="input-contact-email" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -1106,50 +720,23 @@ export default function FleetManagement() {
               </div>
               <FormField
                 control={groupForm.control}
-                name="billingAddress"
+                name="discountPercentage"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-salis-black dark:text-white">Billing Address</FormLabel>
+                    <FormLabel>{t('vehicles.discountPercentage', 'Discount Percentage')}</FormLabel>
                     <FormControl>
-                      <Textarea {...field} value={field.value || ""} placeholder="123 Main St..." data-testid="input-billing-address" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={groupForm.control}
-                name="notes"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-salis-black dark:text-white">Notes</FormLabel>
-                    <FormControl>
-                      <Textarea {...field} value={field.value || ""} placeholder="Additional notes..." data-testid="input-notes" />
+                      <Input {...field} type="number" step="0.1" data-testid="input-discount" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
               <DialogFooter>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setIsGroupDialogOpen(false)}
-                  data-testid="button-cancel-group"
-                >
-                  Cancel
+                <Button type="button" variant="outline" onClick={() => setIsGroupDialogOpen(false)}>
+                  {t('common.cancel', 'Cancel')}
                 </Button>
-                <Button
-                  type="submit"
-                  disabled={groupMutation.isPending}
-                  className="bg-salis-black dark:bg-white text-white dark:text-salis-black"
-                  data-testid="button-submit-fleet-group"
-                >
-                  {groupMutation.isPending
-                    ? "Saving..."
-                    : editingGroupId
-                    ? "Update"
-                    : "Create"}
+                <Button type="submit" disabled={groupMutation.isPending}>
+                  {groupMutation.isPending ? t('common.saving', 'Saving...') : t('common.save', 'Save')}
                 </Button>
               </DialogFooter>
             </form>
@@ -1158,40 +745,34 @@ export default function FleetManagement() {
       </Dialog>
 
       <Dialog open={isVehicleDialogOpen} onOpenChange={setIsVehicleDialogOpen}>
-        <DialogContent className="max-w-2xl bg-white dark:bg-salis-black">
+        <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle className="text-salis-black dark:text-white">
-              {editingVehicleId ? "Edit Fleet Vehicle" : "Add Fleet Vehicle"}
+            <DialogTitle>
+              {editingVehicleId ? t('vehicles.editFleetVehicle', 'Edit Fleet Vehicle') : t('vehicles.addFleetVehicle', 'Add Fleet Vehicle')}
             </DialogTitle>
-            <DialogDescription className="text-salis-gray">
-              Assign a vehicle to this fleet group
-            </DialogDescription>
           </DialogHeader>
           <Form {...vehicleForm}>
-            <form
-              onSubmit={vehicleForm.handleSubmit((data) => vehicleMutation.mutate(data))}
-              className="space-y-4"
-            >
+            <form onSubmit={vehicleForm.handleSubmit((data) => vehicleMutation.mutate(data))} className="space-y-4">
               <FormField
                 control={vehicleForm.control}
                 name="vehicleId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-salis-black dark:text-white">Vehicle *</FormLabel>
-                    <FormControl>
-                      <Select value={field.value} onValueChange={field.onChange}>
+                    <FormLabel>{t('vehicles.vehicle', 'Vehicle')}</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
                         <SelectTrigger data-testid="select-vehicle">
-                          <SelectValue placeholder="Select vehicle" />
+                          <SelectValue placeholder={t('vehicles.selectVehicle', 'Select vehicle')} />
                         </SelectTrigger>
-                        <SelectContent>
-                          {allVehicles.map((vehicle: any) => (
-                            <SelectItem key={vehicle.id} value={vehicle.id}>
-                              {vehicle.year} {vehicle.make} {vehicle.model} - {vehicle.licensePlate}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </FormControl>
+                      </FormControl>
+                      <SelectContent>
+                        {allVehicles.map((v: any) => (
+                          <SelectItem key={v.id} value={v.id}>
+                            {v.year} {v.make} {v.model} - {v.licensePlate}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -1201,441 +782,20 @@ export default function FleetManagement() {
                 name="averageMonthlyMileage"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-salis-black dark:text-white">Avg. Monthly Mileage (km)</FormLabel>
+                    <FormLabel>{t('vehicles.avgMonthlyMileage', 'Average Monthly Mileage')}</FormLabel>
                     <FormControl>
-                      <Input {...field} value={field.value || ""} type="number" placeholder="5000" data-testid="input-avg-monthly-mileage" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={vehicleForm.control}
-                name="notes"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-salis-black dark:text-white">Notes</FormLabel>
-                    <FormControl>
-                      <Textarea {...field} value={field.value || ""} placeholder="Assignment notes..." data-testid="input-vehicle-notes" />
+                      <Input {...field} type="number" data-testid="input-mileage" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
               <DialogFooter>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setIsVehicleDialogOpen(false)}
-                  data-testid="button-cancel-vehicle"
-                >
-                  Cancel
+                <Button type="button" variant="outline" onClick={() => setIsVehicleDialogOpen(false)}>
+                  {t('common.cancel', 'Cancel')}
                 </Button>
-                <Button
-                  type="submit"
-                  disabled={vehicleMutation.isPending}
-                  className="bg-salis-black dark:bg-white text-white dark:text-salis-black"
-                  data-testid="button-submit-fleet-vehicle"
-                >
-                  {vehicleMutation.isPending ? "Saving..." : editingVehicleId ? "Update" : "Add"}
-                </Button>
-              </DialogFooter>
-            </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={isContractDialogOpen} onOpenChange={setIsContractDialogOpen}>
-        <DialogContent className="max-w-2xl bg-white dark:bg-salis-black">
-          <DialogHeader>
-            <DialogTitle className="text-salis-black dark:text-white">
-              {editingContractId ? "Edit Contract" : "Create Contract"}
-            </DialogTitle>
-          </DialogHeader>
-          <Form {...contractForm}>
-            <form
-              onSubmit={contractForm.handleSubmit((data) => contractMutation.mutate(data))}
-              className="space-y-4"
-            >
-              <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={contractForm.control}
-                  name="contractNumber"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">Contract Number *</FormLabel>
-                      <FormControl>
-                        <Input {...field} placeholder="CNT-2024-001" data-testid="input-contract-number" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={contractForm.control}
-                  name="contractType"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">Contract Type *</FormLabel>
-                      <FormControl>
-                        <Select value={field.value} onValueChange={field.onChange}>
-                          <SelectTrigger data-testid="select-contract-type">
-                            <SelectValue placeholder="Select type" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="standard">Standard</SelectItem>
-                            <SelectItem value="premium">Premium</SelectItem>
-                            <SelectItem value="custom">Custom</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={contractForm.control}
-                  name="startDate"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">Start Date *</FormLabel>
-                      <FormControl>
-                        <Input {...field} type="date" data-testid="input-start-date" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={contractForm.control}
-                  name="endDate"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">End Date *</FormLabel>
-                      <FormControl>
-                        <Input {...field} type="date" data-testid="input-end-date" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={contractForm.control}
-                  name="maxVehicles"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">Max Vehicles</FormLabel>
-                      <FormControl>
-                        <Input {...field} value={field.value || ""} type="number" placeholder="10" data-testid="input-max-vehicles" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={contractForm.control}
-                  name="discountPercentage"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">Discount %</FormLabel>
-                      <FormControl>
-                        <Input {...field} value={field.value || ""} type="number" placeholder="15" data-testid="input-contract-discount" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={contractForm.control}
-                  name="billingCycle"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">Billing Cycle</FormLabel>
-                      <FormControl>
-                        <Select value={field.value || "monthly"} onValueChange={field.onChange}>
-                          <SelectTrigger data-testid="select-billing-cycle">
-                            <SelectValue placeholder="Select billing cycle" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="monthly">Monthly</SelectItem>
-                            <SelectItem value="quarterly">Quarterly</SelectItem>
-                            <SelectItem value="annual">Annual</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-              <FormField
-                control={contractForm.control}
-                name="terms"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-salis-black dark:text-white">Terms</FormLabel>
-                    <FormControl>
-                      <Textarea {...field} value={field.value || ""} placeholder="Contract terms and conditions..." rows={4} data-testid="input-contract-terms" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <DialogFooter>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setIsContractDialogOpen(false)}
-                  data-testid="button-cancel-contract"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={contractMutation.isPending}
-                  className="bg-salis-black dark:bg-white text-white dark:text-salis-black"
-                  data-testid="button-submit-contract"
-                >
-                  {contractMutation.isPending ? "Saving..." : editingContractId ? "Update" : "Create"}
-                </Button>
-              </DialogFooter>
-            </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={isPricingDialogOpen} onOpenChange={setIsPricingDialogOpen}>
-        <DialogContent className="max-w-2xl bg-white dark:bg-salis-black">
-          <DialogHeader>
-            <DialogTitle className="text-salis-black dark:text-white">
-              {editingPricingId ? "Edit Pricing Tier" : "Create Pricing Tier"}
-            </DialogTitle>
-          </DialogHeader>
-          <Form {...pricingForm}>
-            <form
-              onSubmit={pricingForm.handleSubmit((data) => pricingMutation.mutate(data))}
-              className="space-y-4"
-            >
-              <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={pricingForm.control}
-                  name="tierName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">Tier Name *</FormLabel>
-                      <FormControl>
-                        <Input {...field} placeholder="Bronze Tier" data-testid="input-tier-name" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={pricingForm.control}
-                  name="discountPercentage"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">Discount % *</FormLabel>
-                      <FormControl>
-                        <Input {...field} type="number" placeholder="10" data-testid="input-tier-discount" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={pricingForm.control}
-                  name="minVehicles"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">Min Vehicles *</FormLabel>
-                      <FormControl>
-                        <Input {...field} type="number" placeholder="5" data-testid="input-min-vehicles" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={pricingForm.control}
-                  name="maxVehicles"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">Max Vehicles</FormLabel>
-                      <FormControl>
-                        <Input {...field} value={field.value || ""} type="number" placeholder="20" data-testid="input-pricing-max-vehicles" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-              <FormField
-                control={pricingForm.control}
-                name="applicableServices"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-salis-black dark:text-white">Applicable Services</FormLabel>
-                    <FormControl>
-                      <Textarea {...field} value={field.value || ""} placeholder="Enter service types separated by commas (e.g., oil change, brake service)" data-testid="input-applicable-services" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <DialogFooter>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setIsPricingDialogOpen(false)}
-                  data-testid="button-cancel-pricing"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={pricingMutation.isPending}
-                  className="bg-salis-black dark:bg-white text-white dark:text-salis-black"
-                  data-testid="button-submit-pricing-tier"
-                >
-                  {pricingMutation.isPending ? "Saving..." : editingPricingId ? "Update" : "Create"}
-                </Button>
-              </DialogFooter>
-            </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={isScheduleDialogOpen} onOpenChange={setIsScheduleDialogOpen}>
-        <DialogContent className="max-w-2xl bg-white dark:bg-salis-black">
-          <DialogHeader>
-            <DialogTitle className="text-salis-black dark:text-white">
-              {editingScheduleId ? "Edit Maintenance Schedule" : "Create Maintenance Schedule"}
-            </DialogTitle>
-          </DialogHeader>
-          <Form {...scheduleForm}>
-            <form
-              onSubmit={scheduleForm.handleSubmit((data) => scheduleMutation.mutate(data))}
-              className="space-y-4"
-            >
-              <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={scheduleForm.control}
-                  name="scheduleName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">Schedule Name *</FormLabel>
-                      <FormControl>
-                        <Input {...field} placeholder="Oil Change Schedule" data-testid="input-schedule-name" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={scheduleForm.control}
-                  name="serviceType"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">Service Type *</FormLabel>
-                      <FormControl>
-                        <Input {...field} placeholder="Oil Change" data-testid="input-service-type" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={scheduleForm.control}
-                  name="intervalType"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">Interval Type *</FormLabel>
-                      <FormControl>
-                        <Select value={field.value} onValueChange={field.onChange}>
-                          <SelectTrigger data-testid="select-interval-type">
-                            <SelectValue placeholder="Select type" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="mileage">Mileage</SelectItem>
-                            <SelectItem value="time">Time</SelectItem>
-                            <SelectItem value="both">Both</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={scheduleForm.control}
-                  name="intervalMileage"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">Interval Mileage (km)</FormLabel>
-                      <FormControl>
-                        <Input {...field} type="number" placeholder="5000" data-testid="input-interval-mileage" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={scheduleForm.control}
-                  name="intervalMonths"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">Interval Months</FormLabel>
-                      <FormControl>
-                        <Input {...field} type="number" placeholder="6" data-testid="input-interval-months" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={scheduleForm.control}
-                  name="estimatedCost"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">Estimated Cost</FormLabel>
-                      <FormControl>
-                        <Input {...field} type="number" placeholder="150.00" data-testid="input-estimated-cost" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-              <FormField
-                control={scheduleForm.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-salis-black dark:text-white">Description</FormLabel>
-                    <FormControl>
-                      <Textarea {...field} value={field.value || ""} placeholder="Schedule description..." data-testid="input-schedule-description" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <DialogFooter>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setIsScheduleDialogOpen(false)}
-                  data-testid="button-cancel-schedule"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={scheduleMutation.isPending}
-                  className="bg-salis-black dark:bg-white text-white dark:text-salis-black"
-                  data-testid="button-submit-schedule"
-                >
-                  {scheduleMutation.isPending ? "Saving..." : editingScheduleId ? "Update" : "Create"}
+                <Button type="submit" disabled={vehicleMutation.isPending}>
+                  {vehicleMutation.isPending ? t('common.saving', 'Saving...') : t('common.save', 'Save')}
                 </Button>
               </DialogFooter>
             </form>

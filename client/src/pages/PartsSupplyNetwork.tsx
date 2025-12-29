@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { Network, Users, Package, Truck, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -17,6 +18,7 @@ import { insertNetworkPartnerSchema, insertFulfillmentOrderSchema } from "@share
 import { TabsPageLayout } from "@/components/layouts";
 
 export default function PartsSupplyNetwork() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [showPartnerDialog, setShowPartnerDialog] = useState(false);
   const [showOrderDialog, setShowOrderDialog] = useState(false);
@@ -37,12 +39,12 @@ export default function PartsSupplyNetwork() {
 
   const createPartnerMutation = useMutation({
     mutationFn: (data: InsertNetworkPartner) => apiRequest("/api/network-partners", "POST", data),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/network-partners"] }); setShowPartnerDialog(false); toast({ title: "Partner created" }); },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/network-partners"] }); setShowPartnerDialog(false); toast({ title: t('inventory.partnerCreated', 'Partner created') }); },
   });
 
   const createOrderMutation = useMutation({
     mutationFn: (data: InsertFulfillmentOrder) => apiRequest("/api/fulfillment-orders", "POST", data),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/fulfillment-orders"] }); setShowOrderDialog(false); toast({ title: "Order created" }); },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/fulfillment-orders"] }); setShowOrderDialog(false); toast({ title: t('inventory.orderCreated', 'Order created') }); },
   });
 
   const getPartnerTypeBadge = (type: string) => {
@@ -80,15 +82,15 @@ export default function PartsSupplyNetwork() {
   const tabs = [
     {
       id: "partners",
-      label: "Network Partners",
+      label: t('inventory.networkPartners', 'Network Partners'),
       icon: Users,
       content: (
         <div className="space-y-4">
           <div className="flex justify-between items-center">
-            <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">Network Partners</h2>
+            <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">{t('inventory.networkPartners', 'Network Partners')}</h2>
             <Button onClick={() => { partnerForm.reset(); setShowPartnerDialog(true); }} data-testid="button-add-partner">
               <Plus className="h-4 w-4 mr-2" />
-              Add Partner
+              {t('inventory.addPartner', 'Add Partner')}
             </Button>
           </div>
 
@@ -97,10 +99,10 @@ export default function PartsSupplyNetwork() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Partner Name</TableHead>
-                    <TableHead>Type</TableHead>
-                    <TableHead>Country</TableHead>
-                    <TableHead>Status</TableHead>
+                    <TableHead>{t('inventory.partnerName', 'Partner Name')}</TableHead>
+                    <TableHead>{t('common.type', 'Type')}</TableHead>
+                    <TableHead>{t('inventory.country', 'Country')}</TableHead>
+                    <TableHead>{t('common.status', 'Status')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -125,15 +127,15 @@ export default function PartsSupplyNetwork() {
     },
     {
       id: "orders",
-      label: "Fulfillment Orders",
+      label: t('inventory.fulfillmentOrders', 'Fulfillment Orders'),
       icon: Package,
       content: (
         <div className="space-y-4">
           <div className="flex justify-between items-center">
-            <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">Fulfillment Orders</h2>
+            <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">{t('inventory.fulfillmentOrders', 'Fulfillment Orders')}</h2>
             <Button onClick={() => { orderForm.reset(); setShowOrderDialog(true); }} data-testid="button-add-order">
               <Plus className="h-4 w-4 mr-2" />
-              Create Order
+              {t('inventory.createOrder', 'Create Order')}
             </Button>
           </div>
 
@@ -142,10 +144,10 @@ export default function PartsSupplyNetwork() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Order #</TableHead>
-                    <TableHead>Partner</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Date</TableHead>
+                    <TableHead>{t('inventory.orderNumber', 'Order #')}</TableHead>
+                    <TableHead>{t('inventory.partner', 'Partner')}</TableHead>
+                    <TableHead>{t('common.status', 'Status')}</TableHead>
+                    <TableHead>{t('common.date', 'Date')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -166,12 +168,12 @@ export default function PartsSupplyNetwork() {
     },
     {
       id: "shipments",
-      label: "Shipments",
+      label: t('inventory.shipments', 'Shipments'),
       icon: Truck,
       content: (
         <div className="space-y-4">
           <div className="flex justify-between items-center">
-            <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">Shipment Tracking</h2>
+            <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">{t('inventory.shipmentTracking', 'Shipment Tracking')}</h2>
           </div>
 
           <Card className="border border-gray-200 dark:border-salis-gray-dark bg-white dark:bg-salis-black">
@@ -179,10 +181,10 @@ export default function PartsSupplyNetwork() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Order #</TableHead>
-                    <TableHead>Event Type</TableHead>
-                    <TableHead>Location</TableHead>
-                    <TableHead>Timestamp</TableHead>
+                    <TableHead>{t('inventory.orderNumber', 'Order #')}</TableHead>
+                    <TableHead>{t('inventory.eventType', 'Event Type')}</TableHead>
+                    <TableHead>{t('inventory.location', 'Location')}</TableHead>
+                    <TableHead>{t('inventory.timestamp', 'Timestamp')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -203,12 +205,12 @@ export default function PartsSupplyNetwork() {
     },
     {
       id: "warehouses",
-      label: "Warehouses",
+      label: t('inventory.warehouses', 'Warehouses'),
       icon: Network,
       content: (
         <div className="space-y-4">
           <div className="flex justify-between items-center">
-            <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">Warehouse Network</h2>
+            <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">{t('inventory.warehouseNetwork', 'Warehouse Network')}</h2>
           </div>
 
           <Card className="border border-gray-200 dark:border-salis-gray-dark bg-white dark:bg-salis-black">
@@ -216,10 +218,10 @@ export default function PartsSupplyNetwork() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Code</TableHead>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Location</TableHead>
-                    <TableHead>Status</TableHead>
+                    <TableHead>{t('inventory.code', 'Code')}</TableHead>
+                    <TableHead>{t('common.name', 'Name')}</TableHead>
+                    <TableHead>{t('inventory.location', 'Location')}</TableHead>
+                    <TableHead>{t('common.status', 'Status')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>

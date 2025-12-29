@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { AnalyticsPage } from "@/components/layouts";
 import { 
@@ -64,10 +65,10 @@ function StarRating({ rating }: { rating: number }) {
 
 function SentimentBadge({ sentiment, score }: { sentiment: string; score?: number }) {
   const config: Record<string, { icon: typeof ThumbsUp; color: string; label: string }> = {
-    positive: { icon: ThumbsUp, color: "bg-green-500/10 text-green-600 dark:text-green-400", label: "Positive" },
-    neutral: { icon: Minus, color: "bg-yellow-500/10 text-yellow-600 dark:text-yellow-400", label: "Neutral" },
-    negative: { icon: ThumbsDown, color: "bg-red-500/10 text-red-600 dark:text-red-400", label: "Negative" },
-    unanalyzed: { icon: Brain, color: "bg-gray-500/10 text-gray-600 dark:text-gray-400", label: "Unanalyzed" },
+    positive: { icon: ThumbsUp, color: "bg-green-500/10 text-green-600 dark:text-green-400", label: "إيجابي" },
+    neutral: { icon: Minus, color: "bg-yellow-500/10 text-yellow-600 dark:text-yellow-400", label: "محايد" },
+    negative: { icon: ThumbsDown, color: "bg-red-500/10 text-red-600 dark:text-red-400", label: "سلبي" },
+    unanalyzed: { icon: Brain, color: "bg-gray-500/10 text-gray-600 dark:text-gray-400", label: "غير محلل" },
   };
 
   const { icon: Icon, color, label } = config[sentiment] || config.unanalyzed;
@@ -84,6 +85,7 @@ function SentimentBadge({ sentiment, score }: { sentiment: string; score?: numbe
 }
 
 export default function CustomerFeedback() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [selectedSentiment, setSelectedSentiment] = useState("all");
   const [selectedRating, setSelectedRating] = useState("all");
@@ -111,14 +113,14 @@ export default function CustomerFeedback() {
       queryClient.invalidateQueries({ queryKey: ['/api/feedback'] });
       queryClient.invalidateQueries({ queryKey: ['/api/feedback/analytics'] });
       toast({
-        title: "Sentiment Analyzed",
-        description: "The feedback has been analyzed successfully.",
+        title: t('customers.feedback.sentimentAnalyzed', 'Sentiment Analyzed'),
+        description: t('customers.feedback.feedbackAnalyzedSuccess', 'The feedback has been analyzed successfully.'),
       });
     },
     onError: () => {
       toast({
-        title: "Analysis Failed",
-        description: "Could not analyze the feedback. Please try again.",
+        title: t('customers.feedback.analysisFailed', 'Analysis Failed'),
+        description: t('customers.feedback.couldNotAnalyze', 'Could not analyze the feedback. Please try again.'),
         variant: "destructive",
       });
     },
@@ -132,14 +134,14 @@ export default function CustomerFeedback() {
       queryClient.invalidateQueries({ queryKey: ['/api/feedback'] });
       queryClient.invalidateQueries({ queryKey: ['/api/feedback/analytics'] });
       toast({
-        title: "Bulk Analysis Complete",
-        description: `Analyzed ${data.analyzed} feedback entries.`,
+        title: t('customers.feedback.bulkAnalysisComplete', 'Bulk Analysis Complete'),
+        description: t('customers.feedback.analyzedEntries', 'Analyzed {{count}} feedback entries.', { count: data.analyzed }),
       });
     },
     onError: () => {
       toast({
-        title: "Bulk Analysis Failed",
-        description: "Could not analyze all feedback. Please try again.",
+        title: t('customers.feedback.bulkAnalysisFailed', 'Bulk Analysis Failed'),
+        description: t('customers.feedback.couldNotAnalyzeAll', 'Could not analyze all feedback. Please try again.'),
         variant: "destructive",
       });
     },
@@ -154,14 +156,14 @@ export default function CustomerFeedback() {
       setResponseDialogOpen(false);
       setResponseText("");
       toast({
-        title: "Response Sent",
-        description: "Your response has been saved successfully.",
+        title: t('customers.feedback.responseSent', 'Response Sent'),
+        description: t('customers.feedback.responseSavedSuccess', 'Your response has been saved successfully.'),
       });
     },
     onError: () => {
       toast({
-        title: "Response Failed",
-        description: "Could not send response. Please try again.",
+        title: t('customers.feedback.responseFailed', 'Response Failed'),
+        description: t('customers.feedback.couldNotSendResponse', 'Could not send response. Please try again.'),
         variant: "destructive",
       });
     },
@@ -177,14 +179,14 @@ export default function CustomerFeedback() {
       setFlagDialogOpen(false);
       setFlagReason("");
       toast({
-        title: "Feedback Flagged",
-        description: "The feedback has been flagged for review.",
+        title: t('customers.feedback.feedbackFlagged', 'Feedback Flagged'),
+        description: t('customers.feedback.flaggedForReview', 'The feedback has been flagged for review.'),
       });
     },
     onError: () => {
       toast({
-        title: "Flag Failed",
-        description: "Could not flag feedback. Please try again.",
+        title: t('customers.feedback.flagFailed', 'Flag Failed'),
+        description: t('customers.feedback.couldNotFlag', 'Could not flag feedback. Please try again.'),
         variant: "destructive",
       });
     },
@@ -198,8 +200,8 @@ export default function CustomerFeedback() {
       queryClient.invalidateQueries({ queryKey: ['/api/feedback'] });
       queryClient.invalidateQueries({ queryKey: ['/api/feedback/analytics'] });
       toast({
-        title: "Flag Removed",
-        description: "The feedback flag has been removed.",
+        title: t('customers.feedback.flagRemoved', 'Flag Removed'),
+        description: t('customers.feedback.flagRemovedDescription', 'The feedback flag has been removed.'),
       });
     },
   });
@@ -246,29 +248,29 @@ export default function CustomerFeedback() {
   const filters = [
     {
       id: "sentiment",
-      label: "Sentiment",
+      label: t('customers.feedback.sentiment', 'Sentiment'),
       type: "select" as const,
       options: [
-        { value: "all", label: "All Sentiments" },
-        { value: "positive", label: "Positive" },
-        { value: "neutral", label: "Neutral" },
-        { value: "negative", label: "Negative" },
-        { value: "unanalyzed", label: "Unanalyzed" },
+        { value: "all", label: t('customers.feedback.allSentiments', 'All Sentiments') },
+        { value: "positive", label: t('customers.feedback.positive', 'Positive') },
+        { value: "neutral", label: t('customers.feedback.neutral', 'Neutral') },
+        { value: "negative", label: t('customers.feedback.negative', 'Negative') },
+        { value: "unanalyzed", label: t('customers.feedback.unanalyzed', 'Unanalyzed') },
       ],
       value: selectedSentiment,
       onChange: setSelectedSentiment,
     },
     {
       id: "rating",
-      label: "Rating",
+      label: t('customers.feedback.rating', 'Rating'),
       type: "select" as const,
       options: [
-        { value: "all", label: "All Ratings" },
-        { value: "5", label: "5 Stars" },
-        { value: "4", label: "4 Stars" },
-        { value: "3", label: "3 Stars" },
-        { value: "2", label: "2 Stars" },
-        { value: "1", label: "1 Star" },
+        { value: "all", label: t('customers.feedback.allRatings', 'All Ratings') },
+        { value: "5", label: t('customers.feedback.fiveStars', '5 Stars') },
+        { value: "4", label: t('customers.feedback.fourStars', '4 Stars') },
+        { value: "3", label: t('customers.feedback.threeStars', '3 Stars') },
+        { value: "2", label: t('customers.feedback.twoStars', '2 Stars') },
+        { value: "1", label: t('customers.feedback.oneStar', '1 Star') },
       ],
       value: selectedRating,
       onChange: setSelectedRating,
@@ -277,14 +279,14 @@ export default function CustomerFeedback() {
 
   const actions = [
     {
-      label: "Analyze All",
+      label: t('customers.feedback.analyzeAll', 'Analyze All'),
       icon: Brain,
       onClick: () => analyzeAllMutation.mutate(),
       variant: "outline" as const,
       disabled: analyzeAllMutation.isPending,
     },
     {
-      label: "Refresh",
+      label: t('common.refresh', 'Refresh'),
       icon: RefreshCw,
       onClick: () => refetch(),
       variant: "outline" as const,
@@ -293,25 +295,25 @@ export default function CustomerFeedback() {
 
   const stats = [
     {
-      title: "Total Feedback",
+      title: t('customers.feedback.totalFeedback', 'Total Feedback'),
       value: analytics?.totalFeedback?.toString() || "0",
       icon: MessageSquare,
       trend: { value: 12, isPositive: true },
     },
     {
-      title: "Average Rating",
+      title: t('customers.feedback.averageRating', 'Average Rating'),
       value: analytics?.avgOverallRating || "0.00",
       icon: Star,
       trend: { value: 0.2, isPositive: true },
     },
     {
-      title: "Positive Sentiment",
+      title: t('customers.feedback.positiveSentiment', 'Positive Sentiment'),
       value: `${analytics?.sentimentCounts?.positive || 0}`,
       icon: ThumbsUp,
       trend: { value: 5, isPositive: true },
     },
     {
-      title: "Pending Response",
+      title: t('customers.feedback.pendingResponse', 'Pending Response'),
       value: analytics?.pendingResponseCount?.toString() || "0",
       icon: Clock,
       trend: { value: 3, isPositive: false },
@@ -320,8 +322,8 @@ export default function CustomerFeedback() {
 
   return (
     <AnalyticsPage
-      title="Customer Feedback"
-      description="Analyze customer feedback with AI-powered sentiment analysis"
+      title={t('customers.feedback.title', 'Customer Feedback')}
+      description={t('customers.feedback.description', 'Analyze customer feedback with AI-powered sentiment analysis')}
       stats={stats}
       filters={filters}
       actions={actions}
@@ -329,17 +331,17 @@ export default function CustomerFeedback() {
     >
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <TabsList className="bg-gray-100 dark:bg-salis-gray-dark/50">
-          <TabsTrigger value="overview" data-testid="tab-overview">Overview</TabsTrigger>
-          <TabsTrigger value="feedback" data-testid="tab-feedback">All Feedback</TabsTrigger>
-          <TabsTrigger value="sentiment" data-testid="tab-sentiment">Sentiment Analysis</TabsTrigger>
-          <TabsTrigger value="flagged" data-testid="tab-flagged">Flagged ({analytics?.flaggedCount || 0})</TabsTrigger>
+          <TabsTrigger value="overview" data-testid="tab-overview">{t('customers.feedback.overview', 'Overview')}</TabsTrigger>
+          <TabsTrigger value="feedback" data-testid="tab-feedback">{t('customers.feedback.allFeedback', 'All Feedback')}</TabsTrigger>
+          <TabsTrigger value="sentiment" data-testid="tab-sentiment">{t('customers.feedback.sentimentAnalysis', 'Sentiment Analysis')}</TabsTrigger>
+          <TabsTrigger value="flagged" data-testid="tab-flagged">{t('customers.feedback.flagged', 'Flagged')} ({analytics?.flaggedCount || 0})</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             <Card className="bg-gray-50 dark:bg-salis-gray-dark/30 border-gray-200 dark:border-salis-gray-dark">
               <CardHeader>
-                <CardTitle className="text-base font-medium">Sentiment Distribution</CardTitle>
+                <CardTitle className="text-base font-medium">{t('customers.feedback.sentimentDistribution', 'Sentiment Distribution')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={200}>
@@ -378,7 +380,7 @@ export default function CustomerFeedback() {
 
             <Card className="bg-gray-50 dark:bg-salis-gray-dark/30 border-gray-200 dark:border-salis-gray-dark">
               <CardHeader>
-                <CardTitle className="text-base font-medium">Rating Distribution</CardTitle>
+                <CardTitle className="text-base font-medium">{t('customers.feedback.ratingDistribution', 'Rating Distribution')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={200}>
@@ -400,7 +402,7 @@ export default function CustomerFeedback() {
 
             <Card className="bg-gray-50 dark:bg-salis-gray-dark/30 border-gray-200 dark:border-salis-gray-dark">
               <CardHeader>
-                <CardTitle className="text-base font-medium">Category Ratings</CardTitle>
+                <CardTitle className="text-base font-medium">{t('customers.feedback.categoryRatings', 'Category Ratings')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 {categoryData.map((cat: any) => (
@@ -418,8 +420,8 @@ export default function CustomerFeedback() {
 
           <Card className="bg-gray-50 dark:bg-salis-gray-dark/30 border-gray-200 dark:border-salis-gray-dark">
             <CardHeader>
-              <CardTitle className="text-base font-medium">Recent Feedback</CardTitle>
-              <CardDescription>Latest customer feedback submissions</CardDescription>
+              <CardTitle className="text-base font-medium">{t('customers.feedback.recentFeedback', 'Recent Feedback')}</CardTitle>
+              <CardDescription>{t('customers.feedback.latestSubmissions', 'Latest customer feedback submissions')}</CardDescription>
             </CardHeader>
             <CardContent>
               <ScrollArea className="h-[400px] pr-4">
@@ -458,7 +460,7 @@ export default function CustomerFeedback() {
             <div className="relative flex-1 max-w-md">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
               <Input
-                placeholder="Search by customer name or comment..."
+                placeholder={t('customers.feedback.searchPlaceholder', 'Search by customer name or comment...')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-9 bg-white dark:bg-salis-gray-dark"
@@ -493,8 +495,8 @@ export default function CustomerFeedback() {
           <Card className="bg-gray-50 dark:bg-salis-gray-dark/30 border-gray-200 dark:border-salis-gray-dark">
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
-                <CardTitle className="text-base font-medium">AI Sentiment Analysis</CardTitle>
-                <CardDescription>Powered by GPT-4 for accurate sentiment detection</CardDescription>
+                <CardTitle className="text-base font-medium">{t('customers.feedback.aiSentimentAnalysis', 'AI Sentiment Analysis')}</CardTitle>
+                <CardDescription>{t('customers.feedback.poweredByGPT', 'Powered by GPT-4 for accurate sentiment detection')}</CardDescription>
               </div>
               <Button 
                 onClick={() => analyzeAllMutation.mutate()}
@@ -504,7 +506,7 @@ export default function CustomerFeedback() {
                 data-testid="button-analyze-all"
               >
                 <Brain className="h-4 w-4 mr-2" />
-                {analyzeAllMutation.isPending ? "Analyzing..." : "Analyze All Unprocessed"}
+                {analyzeAllMutation.isPending ? t('customers.feedback.analyzing', 'Analyzing...') : t('customers.feedback.analyzeAllUnprocessed', 'Analyze All Unprocessed')}
               </Button>
             </CardHeader>
             <CardContent>
@@ -538,7 +540,7 @@ export default function CustomerFeedback() {
               </div>
 
               <div className="space-y-3">
-                <h4 className="font-medium">Feedback by Sentiment</h4>
+                <h4 className="font-medium">{t('customers.feedback.feedbackBySentiment', 'Feedback by Sentiment')}</h4>
                 {['positive', 'neutral', 'negative'].map((sentiment) => {
                   const items = feedbackData.filter((f: any) => f.feedback?.sentiment === sentiment);
                   return (
@@ -584,9 +586,9 @@ export default function CustomerFeedback() {
             <CardHeader>
               <CardTitle className="text-base font-medium flex items-center gap-2">
                 <AlertTriangle className="h-5 w-5 text-yellow-500" />
-                Flagged Feedback
+                {t('customers.feedback.flaggedFeedback', 'Flagged Feedback')}
               </CardTitle>
-              <CardDescription>Feedback marked for review or moderation</CardDescription>
+              <CardDescription>{t('customers.feedback.flaggedDescription', 'Feedback marked for review or moderation')}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -611,7 +613,7 @@ export default function CustomerFeedback() {
                 {feedbackData.filter((f: any) => f.feedback?.isFlagged).length === 0 && (
                   <div className="text-center py-8 text-gray-500">
                     <CheckCircle className="h-12 w-12 mx-auto mb-3 opacity-50 text-green-500" />
-                    <p>No flagged feedback. All clear!</p>
+                    <p>{t('customers.feedback.noFlaggedFeedback', 'No flagged feedback. All clear!')}</p>
                   </div>
                 )}
               </div>
@@ -623,7 +625,7 @@ export default function CustomerFeedback() {
       <Dialog open={responseDialogOpen} onOpenChange={setResponseDialogOpen}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle>Respond to Feedback</DialogTitle>
+            <DialogTitle>{t('customers.feedback.respondToFeedback', 'Respond to Feedback')}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             {selectedFeedback && (
@@ -640,10 +642,10 @@ export default function CustomerFeedback() {
               </div>
             )}
             <div>
-              <Label htmlFor="response">Your Response</Label>
+              <Label htmlFor="response">{t('customers.feedback.yourResponse', 'Your Response')}</Label>
               <Textarea
                 id="response"
-                placeholder="Type your response to this feedback..."
+                placeholder={t('customers.feedback.typePlaceholder', 'Type your response to this feedback...')}
                 value={responseText}
                 onChange={(e) => setResponseText(e.target.value)}
                 rows={4}
@@ -653,7 +655,7 @@ export default function CustomerFeedback() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setResponseDialogOpen(false)}>
-              Cancel
+              {t('common.cancel', 'Cancel')}
             </Button>
             <Button 
               onClick={() => selectedFeedback && respondMutation.mutate({ 
@@ -664,7 +666,7 @@ export default function CustomerFeedback() {
               data-testid="button-send-response"
             >
               <Send className="h-4 w-4 mr-2" />
-              {respondMutation.isPending ? "Sending..." : "Send Response"}
+              {respondMutation.isPending ? t('customers.feedback.sending', 'Sending...') : t('customers.feedback.sendResponse', 'Send Response')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -673,28 +675,28 @@ export default function CustomerFeedback() {
       <Dialog open={flagDialogOpen} onOpenChange={setFlagDialogOpen}>
         <DialogContent className="sm:max-w-[400px]">
           <DialogHeader>
-            <DialogTitle>Flag Feedback</DialogTitle>
+            <DialogTitle>{t('customers.feedback.flagFeedbackTitle', 'Flag Feedback')}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label htmlFor="flag-reason">Reason for Flagging</Label>
+              <Label htmlFor="flag-reason">{t('customers.feedback.reasonForFlagging', 'Reason for Flagging')}</Label>
               <Select value={flagReason} onValueChange={setFlagReason}>
                 <SelectTrigger data-testid="select-flag-reason">
-                  <SelectValue placeholder="Select a reason" />
+                  <SelectValue placeholder={t('customers.feedback.selectReason', 'Select a reason')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="inappropriate">Inappropriate Content</SelectItem>
-                  <SelectItem value="spam">Spam or Fake</SelectItem>
-                  <SelectItem value="review-needed">Needs Management Review</SelectItem>
-                  <SelectItem value="complaint">Serious Complaint</SelectItem>
-                  <SelectItem value="follow-up">Requires Follow-up</SelectItem>
+                  <SelectItem value="inappropriate">{t('customers.feedback.inappropriateContent', 'Inappropriate Content')}</SelectItem>
+                  <SelectItem value="spam">{t('customers.feedback.spamOrFake', 'Spam or Fake')}</SelectItem>
+                  <SelectItem value="review-needed">{t('customers.feedback.needsManagementReview', 'Needs Management Review')}</SelectItem>
+                  <SelectItem value="complaint">{t('customers.feedback.seriousComplaint', 'Serious Complaint')}</SelectItem>
+                  <SelectItem value="follow-up">{t('customers.feedback.requiresFollowUp', 'Requires Follow-up')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setFlagDialogOpen(false)}>
-              Cancel
+              {t('common.cancel', 'Cancel')}
             </Button>
             <Button 
               variant="destructive"
@@ -706,7 +708,7 @@ export default function CustomerFeedback() {
               data-testid="button-confirm-flag"
             >
               <Flag className="h-4 w-4 mr-2" />
-              {flagMutation.isPending ? "Flagging..." : "Flag Feedback"}
+              {flagMutation.isPending ? t('customers.feedback.flagging', 'Flagging...') : t('customers.feedback.flagFeedbackButton', 'Flag Feedback')}
             </Button>
           </DialogFooter>
         </DialogContent>

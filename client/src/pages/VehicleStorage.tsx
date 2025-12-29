@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslation } from "react-i18next";
 import { z } from "zod";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -44,6 +45,7 @@ type FacilityFormData = z.infer<typeof facilitySchema>;
 type AssignmentFormData = z.infer<typeof assignmentSchema>;
 
 export default function VehicleStorage() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [selectedTab, setSelectedTab] = useState("facilities");
   const [isFacilityDialogOpen, setIsFacilityDialogOpen] = useState(false);
@@ -90,12 +92,12 @@ export default function VehicleStorage() {
     mutationFn: (data: FacilityFormData) => apiRequest("POST", "/api/storage-facilities", data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/storage-facilities"] });
-      toast({ title: "Success", description: "Storage facility created" });
+      toast({ title: t('common.success', 'Success'), description: t('vehicles.storageFacilityCreated', 'Storage facility created') });
       setIsFacilityDialogOpen(false);
       facilityForm.reset();
     },
     onError: () => {
-      toast({ title: "Error", description: "Failed to create facility", variant: "destructive" });
+      toast({ title: t('common.error', 'Error'), description: t('vehicles.failedToCreateFacility', 'Failed to create facility'), variant: "destructive" });
     }
   });
 
@@ -104,28 +106,28 @@ export default function VehicleStorage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/vehicle-storage-assignments"] });
       queryClient.invalidateQueries({ queryKey: ["/api/storage-facilities"] });
-      toast({ title: "Success", description: "Vehicle assigned to storage" });
+      toast({ title: t('common.success', 'Success'), description: t('vehicles.vehicleAssignedToStorage', 'Vehicle assigned to storage') });
       setIsAssignmentDialogOpen(false);
       assignmentForm.reset();
     },
     onError: () => {
-      toast({ title: "Error", description: "Failed to create assignment", variant: "destructive" });
+      toast({ title: t('common.error', 'Error'), description: t('vehicles.failedToCreateAssignment', 'Failed to create assignment'), variant: "destructive" });
     }
   });
 
   const facilitiesTabContent = (
     <Card className="border-salis-gray-light dark:border-salis-gray-dark bg-white dark:bg-[#010101]">
       <CardHeader>
-        <CardTitle className="font-montserrat text-salis-black dark:text-white">Storage Facilities</CardTitle>
+        <CardTitle className="font-montserrat text-salis-black dark:text-white">{t('vehicles.storageFacilities', 'Storage Facilities')}</CardTitle>
         <CardDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
-          Manage storage facilities and capacity
+          {t('vehicles.manageFacilitiesAndCapacity', 'Manage storage facilities and capacity')}
         </CardDescription>
       </CardHeader>
       <CardContent>
         {facilitiesLoading ? (
-          <p className="text-salis-gray font-poppins" data-testid="text-loading">Loading facilities...</p>
+          <p className="text-salis-gray font-poppins" data-testid="text-loading">{t('vehicles.loadingFacilities', 'Loading facilities...')}</p>
         ) : facilities.length === 0 ? (
-          <p className="text-salis-gray font-poppins" data-testid="text-no-facilities">No storage facilities found</p>
+          <p className="text-salis-gray font-poppins" data-testid="text-no-facilities">{t('vehicles.noStorageFacilitiesFound', 'No storage facilities found')}</p>
         ) : (
           <div className="grid gap-4">
             {facilities.map((facility: any) => (
@@ -143,21 +145,21 @@ export default function VehicleStorage() {
                             {facility.address}
                           </p>
                           <p className="text-salis-gray dark:text-salis-gray-light font-poppins mt-1" data-testid={`text-contact-${facility.id}`}>
-                            Contact: {facility.contactPerson || "N/A"}
+                            {t('vehicles.contact', 'Contact')}: {facility.contactPerson || t('common.notAvailable', 'N/A')}
                           </p>
                           {facility.phone && (
                             <p className="text-salis-gray dark:text-salis-gray-light font-poppins" data-testid={`text-phone-${facility.id}`}>
-                              Phone: {facility.phone}
+                              {t('vehicles.phone', 'Phone')}: {facility.phone}
                             </p>
                           )}
                         </div>
                         <div>
-                          <p className="text-salis-gray dark:text-salis-gray-light font-poppins">Capacity</p>
+                          <p className="text-salis-gray dark:text-salis-gray-light font-poppins">{t('vehicles.capacity', 'Capacity')}</p>
                           <p className="text-lg font-semibold text-salis-black dark:text-white" data-testid={`text-capacity-${facility.id}`}>
-                            {facility.availableSpaces} / {facility.totalSpaces} available
+                            {facility.availableSpaces} / {facility.totalSpaces} {t('vehicles.available', 'available')}
                           </p>
                           <p className="text-sm text-salis-gray dark:text-salis-gray-light font-poppins mt-1" data-testid={`text-rate-${facility.id}`}>
-                            ${facility.monthlyRate.toFixed(2)}/month
+                            ${facility.monthlyRate.toFixed(2)}/{t('vehicles.month', 'month')}
                           </p>
                         </div>
                       </div>
@@ -181,43 +183,43 @@ export default function VehicleStorage() {
           data-testid="button-create-assignment"
         >
           <Car className="mr-2 h-4 w-4" />
-          Assign Vehicle
+          {t('vehicles.assignVehicle', 'Assign Vehicle')}
         </Button>
       </div>
       <Card className="border-salis-gray-light dark:border-salis-gray-dark bg-white dark:bg-[#010101]">
         <CardHeader>
-          <CardTitle className="font-montserrat text-salis-black dark:text-white">Vehicle Assignments</CardTitle>
+          <CardTitle className="font-montserrat text-salis-black dark:text-white">{t('vehicles.vehicleAssignments', 'Vehicle Assignments')}</CardTitle>
           <CardDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
-            Active and past vehicle storage assignments
+            {t('vehicles.activeAndPastStorageAssignments', 'Active and past vehicle storage assignments')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           {assignmentsLoading ? (
-            <p className="text-salis-gray font-poppins" data-testid="text-loading-assignments">Loading assignments...</p>
+            <p className="text-salis-gray font-poppins" data-testid="text-loading-assignments">{t('vehicles.loadingAssignments', 'Loading assignments...')}</p>
           ) : assignments.length === 0 ? (
-            <p className="text-salis-gray font-poppins" data-testid="text-no-assignments">No vehicle assignments found</p>
+            <p className="text-salis-gray font-poppins" data-testid="text-no-assignments">{t('vehicles.noVehicleAssignmentsFound', 'No vehicle assignments found')}</p>
           ) : (
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Space Number</TableHead>
-                  <TableHead>Vehicle</TableHead>
-                  <TableHead>Start Date</TableHead>
-                  <TableHead>End Date</TableHead>
-                  <TableHead>Monthly Rate</TableHead>
-                  <TableHead>Status</TableHead>
+                  <TableHead>{t('vehicles.spaceNumber', 'Space Number')}</TableHead>
+                  <TableHead>{t('vehicles.vehicle', 'Vehicle')}</TableHead>
+                  <TableHead>{t('vehicles.startDate', 'Start Date')}</TableHead>
+                  <TableHead>{t('vehicles.endDate', 'End Date')}</TableHead>
+                  <TableHead>{t('vehicles.monthlyRate', 'Monthly Rate')}</TableHead>
+                  <TableHead>{t('common.status', 'Status')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {assignments.map((assignment: any) => (
                   <TableRow key={assignment.id} data-testid={`row-assignment-${assignment.id}`}>
                     <TableCell className="font-medium" data-testid={`text-space-${assignment.id}`}>{assignment.spaceNumber}</TableCell>
-                    <TableCell data-testid={`text-vehicle-${assignment.id}`}>{assignment.vehicleId || "N/A"}</TableCell>
+                    <TableCell data-testid={`text-vehicle-${assignment.id}`}>{assignment.vehicleId || t('common.notAvailable', 'N/A')}</TableCell>
                     <TableCell data-testid={`text-start-${assignment.id}`}>
                       {new Date(assignment.startDate).toLocaleDateString()}
                     </TableCell>
                     <TableCell data-testid={`text-end-${assignment.id}`}>
-                      {assignment.endDate ? new Date(assignment.endDate).toLocaleDateString() : "Ongoing"}
+                      {assignment.endDate ? new Date(assignment.endDate).toLocaleDateString() : t('vehicles.ongoing', 'Ongoing')}
                     </TableCell>
                     <TableCell data-testid={`text-monthly-rate-${assignment.id}`}>${assignment.monthlyRate.toFixed(2)}</TableCell>
                     <TableCell>
@@ -238,11 +240,11 @@ export default function VehicleStorage() {
   return (
     <>
       <TabsPageLayout
-        title="Vehicle Storage Management"
-        description="Manage storage facilities and vehicle assignments"
+        title={t('vehicles.vehicleStorageManagement', 'Vehicle Storage Management')}
+        description={t('vehicles.manageFacilitiesAndAssignments', 'Manage storage facilities and vehicle assignments')}
         icon={Warehouse}
         primaryAction={{
-          label: "Add Facility",
+          label: t('vehicles.addFacility', 'Add Facility'),
           icon: Warehouse,
           onClick: () => setIsFacilityDialogOpen(true),
           testId: "button-create-facility"
@@ -250,13 +252,13 @@ export default function VehicleStorage() {
         tabs={[
           {
             id: "facilities",
-            label: "Facilities",
+            label: t('vehicles.facilities', 'Facilities'),
             icon: Warehouse,
             content: facilitiesTabContent
           },
           {
             id: "assignments",
-            label: "Assignments",
+            label: t('vehicles.assignments', 'Assignments'),
             icon: Car,
             content: assignmentsTabContent
           }
@@ -268,9 +270,9 @@ export default function VehicleStorage() {
       <Dialog open={isFacilityDialogOpen} onOpenChange={setIsFacilityDialogOpen}>
         <DialogContent className="bg-white dark:bg-salis-black">
           <DialogHeader>
-            <DialogTitle className="font-montserrat text-salis-black dark:text-white">Add Storage Facility</DialogTitle>
+            <DialogTitle className="font-montserrat text-salis-black dark:text-white">{t('vehicles.addStorageFacility', 'Add Storage Facility')}</DialogTitle>
             <DialogDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
-              Create a new storage facility
+              {t('vehicles.createNewStorageFacility', 'Create a new storage facility')}
             </DialogDescription>
           </DialogHeader>
           <Form {...facilityForm}>
@@ -280,9 +282,9 @@ export default function VehicleStorage() {
                 name="facilityName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Facility Name</FormLabel>
+                    <FormLabel>{t('vehicles.facilityName', 'Facility Name')}</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="Downtown Storage" data-testid="input-facility-name" />
+                      <Input {...field} placeholder={t('vehicles.facilityNamePlaceholder', 'Downtown Storage')} data-testid="input-facility-name" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -293,9 +295,9 @@ export default function VehicleStorage() {
                 name="address"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Address</FormLabel>
+                    <FormLabel>{t('vehicles.address', 'Address')}</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="123 Storage St, City, State" data-testid="input-address" />
+                      <Input {...field} placeholder={t('vehicles.addressPlaceholder', '123 Storage St, City, State')} data-testid="input-address" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -307,7 +309,7 @@ export default function VehicleStorage() {
                   name="totalSpaces"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Total Spaces</FormLabel>
+                      <FormLabel>{t('vehicles.totalSpaces', 'Total Spaces')}</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -325,7 +327,7 @@ export default function VehicleStorage() {
                   name="availableSpaces"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Available Spaces</FormLabel>
+                      <FormLabel>{t('vehicles.availableSpaces', 'Available Spaces')}</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -344,7 +346,7 @@ export default function VehicleStorage() {
                 name="monthlyRate"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Monthly Rate</FormLabel>
+                    <FormLabel>{t('vehicles.monthlyRate', 'Monthly Rate')}</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
@@ -364,7 +366,7 @@ export default function VehicleStorage() {
                   name="contactPerson"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Contact Person</FormLabel>
+                      <FormLabel>{t('vehicles.contactPerson', 'Contact Person')}</FormLabel>
                       <FormControl>
                         <Input {...field} placeholder="John Doe" data-testid="input-contact-person" />
                       </FormControl>
@@ -377,7 +379,7 @@ export default function VehicleStorage() {
                   name="phone"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Phone</FormLabel>
+                      <FormLabel>{t('vehicles.phone', 'Phone')}</FormLabel>
                       <FormControl>
                         <Input {...field} placeholder="+1 (555) 123-4567" data-testid="input-phone" />
                       </FormControl>
@@ -388,7 +390,7 @@ export default function VehicleStorage() {
               </div>
               <DialogFooter>
                 <Button type="submit" disabled={createFacilityMutation.isPending} data-testid="button-submit-facility">
-                  {createFacilityMutation.isPending ? "Creating..." : "Create Facility"}
+                  {createFacilityMutation.isPending ? t('vehicles.creating', 'Creating...') : t('vehicles.createFacility', 'Create Facility')}
                 </Button>
               </DialogFooter>
             </form>
@@ -399,9 +401,9 @@ export default function VehicleStorage() {
       <Dialog open={isAssignmentDialogOpen} onOpenChange={setIsAssignmentDialogOpen}>
         <DialogContent className="bg-white dark:bg-salis-black">
           <DialogHeader>
-            <DialogTitle className="font-montserrat text-salis-black dark:text-white">Assign Vehicle to Storage</DialogTitle>
+            <DialogTitle className="font-montserrat text-salis-black dark:text-white">{t('vehicles.assignVehicleToStorage', 'Assign Vehicle to Storage')}</DialogTitle>
             <DialogDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
-              Create a new storage assignment
+              {t('vehicles.createNewStorageAssignment', 'Create a new storage assignment')}
             </DialogDescription>
           </DialogHeader>
           <Form {...assignmentForm}>
@@ -411,11 +413,11 @@ export default function VehicleStorage() {
                 name="facilityId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Facility</FormLabel>
+                    <FormLabel>{t('vehicles.facility', 'Facility')}</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger data-testid="select-facility">
-                          <SelectValue placeholder="Select facility" />
+                          <SelectValue placeholder={t('vehicles.selectFacility', 'Select facility')} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -435,7 +437,7 @@ export default function VehicleStorage() {
                 name="spaceNumber"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Space Number</FormLabel>
+                    <FormLabel>{t('vehicles.spaceNumber', 'Space Number')}</FormLabel>
                     <FormControl>
                       <Input {...field} placeholder="A-101" data-testid="input-space-number" />
                     </FormControl>
@@ -448,9 +450,9 @@ export default function VehicleStorage() {
                 name="vehicleId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Vehicle ID (optional)</FormLabel>
+                    <FormLabel>{t('vehicles.vehicleIdOptional', 'Vehicle ID (optional)')}</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="Vehicle identifier" data-testid="input-vehicle-id" />
+                      <Input {...field} placeholder={t('vehicles.vehicleIdentifier', 'Vehicle identifier')} data-testid="input-vehicle-id" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -462,7 +464,7 @@ export default function VehicleStorage() {
                   name="startDate"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Start Date</FormLabel>
+                      <FormLabel>{t('vehicles.startDate', 'Start Date')}</FormLabel>
                       <FormControl>
                         <Input {...field} type="date" data-testid="input-start-date" />
                       </FormControl>
@@ -475,7 +477,7 @@ export default function VehicleStorage() {
                   name="endDate"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>End Date (optional)</FormLabel>
+                      <FormLabel>{t('vehicles.endDateOptional', 'End Date (optional)')}</FormLabel>
                       <FormControl>
                         <Input {...field} type="date" data-testid="input-end-date" />
                       </FormControl>
@@ -489,7 +491,7 @@ export default function VehicleStorage() {
                 name="monthlyRate"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Monthly Rate</FormLabel>
+                    <FormLabel>{t('vehicles.monthlyRate', 'Monthly Rate')}</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
@@ -508,9 +510,9 @@ export default function VehicleStorage() {
                 name="notes"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Notes (optional)</FormLabel>
+                    <FormLabel>{t('vehicles.notesOptional', 'Notes (optional)')}</FormLabel>
                     <FormControl>
-                      <Textarea {...field} placeholder="Additional information..." data-testid="input-assignment-notes" />
+                      <Textarea {...field} placeholder={t('vehicles.additionalInformation', 'Additional information...')} data-testid="input-assignment-notes" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -518,7 +520,7 @@ export default function VehicleStorage() {
               />
               <DialogFooter>
                 <Button type="submit" disabled={createAssignmentMutation.isPending} data-testid="button-submit-assignment">
-                  {createAssignmentMutation.isPending ? "Assigning..." : "Assign Vehicle"}
+                  {createAssignmentMutation.isPending ? t('vehicles.assigning', 'Assigning...') : t('vehicles.assignVehicle', 'Assign Vehicle')}
                 </Button>
               </DialogFooter>
             </form>

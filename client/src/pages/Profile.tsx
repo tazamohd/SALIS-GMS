@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -11,6 +12,7 @@ import { User as UserIcon, Save, X } from "lucide-react";
 import type { User } from "@shared/schema";
 
 export function Profile() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const { data: user, isLoading } = useQuery<User>({
     queryKey: ['/api/auth/user'],
@@ -22,16 +24,16 @@ export function Profile() {
 
   const handleSave = () => {
     toast({
-      title: "Success",
-      description: "Profile updated successfully",
+      title: t('common.success', 'Success'),
+      description: t('profile.profileUpdatedSuccessfully', 'Profile updated successfully'),
     });
     setIsEditing(false);
   };
 
   const handleChangePassword = () => {
     toast({
-      title: "Success",
-      description: "Password changed successfully",
+      title: t('common.success', 'Success'),
+      description: t('profile.passwordChangedSuccessfully', 'Password changed successfully'),
     });
     setIsChangingPassword(false);
   };
@@ -39,8 +41,8 @@ export function Profile() {
   if (isLoading) {
     return (
       <StandardPageLayout
-        title="My Profile"
-        description="Manage your profile information and settings"
+        title={t('profile.myProfile', 'My Profile')}
+        description={t('profile.manageProfileInfo', 'Manage your profile information and settings')}
         icon={UserIcon}
       >
         <div className="animate-pulse space-y-4">
@@ -53,18 +55,18 @@ export function Profile() {
 
   return (
     <StandardPageLayout
-      title="My Profile"
-      description="Manage your profile information and settings"
+      title={t('profile.myProfile', 'My Profile')}
+      description={t('profile.manageProfileInfo', 'Manage your profile information and settings')}
       icon={UserIcon}
       actions={!isChangingPassword ? [
         {
-          label: isEditing ? 'Cancel' : 'Edit Profile',
+          label: isEditing ? t('common.cancel', 'Cancel') : t('profile.editProfile', 'Edit Profile'),
           onClick: () => setIsEditing(!isEditing),
           variant: 'outline' as const,
           icon: isEditing ? X : undefined,
         },
         ...(isEditing ? [{
-          label: 'Save',
+          label: t('common.save', 'Save'),
           onClick: handleSave,
           icon: Save,
         }] : [])
@@ -74,12 +76,12 @@ export function Profile() {
       {/* Personal Details */}
       <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark border border-gray-200 dark:border-salis-gray-dark mb-6">
         <CardContent className="p-6">
-          <h2 className="font-['Poppins',Helvetica] font-semibold text-lg text-gray-900 dark:text-white mb-6">Personal Details</h2>
+          <h2 className="font-['Poppins',Helvetica] font-semibold text-lg text-gray-900 dark:text-white mb-6">{t('profile.personalDetails', 'Personal Details')}</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div>
               <Label className="font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white mb-2 block">
-                Full Name
+                {t('profile.fullName', 'Full Name')}
               </Label>
               <Input
                 defaultValue={user?.fullName || "John Doe"}
@@ -91,7 +93,7 @@ export function Profile() {
 
             <div>
               <Label className="font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white mb-2 block">
-                Email
+                {t('profile.email', 'Email')}
               </Label>
               <Input
                 defaultValue={user?.email || "example@email.com"}
@@ -104,7 +106,7 @@ export function Profile() {
 
           <div className="mb-4">
             <Label className="font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white mb-2 block">
-              Mobile Number
+              {t('profile.mobileNumber', 'Mobile Number')}
             </Label>
             <Input
               defaultValue="+971 51 234 5678"
@@ -115,7 +117,7 @@ export function Profile() {
           </div>
 
           <Button variant="ghost" className="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100" data-testid="button-add-phone">
-            + Add an additional phone number
+            + {t('profile.addAdditionalPhone', 'Add an additional phone number')}
           </Button>
         </CardContent>
       </Card>
@@ -123,12 +125,12 @@ export function Profile() {
       {/* Role and Specialization */}
       <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark border border-gray-200 dark:border-salis-gray-dark mb-6">
         <CardContent className="p-6">
-          <h2 className="font-['Poppins',Helvetica] font-semibold text-lg text-gray-900 dark:text-white mb-6">Role and Specialization</h2>
+          <h2 className="font-['Poppins',Helvetica] font-semibold text-lg text-gray-900 dark:text-white mb-6">{t('profile.roleAndSpecialization', 'Role and Specialization')}</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div>
               <Label className="font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white mb-2 block">
-                Job Title
+                {t('profile.jobTitle', 'Job Title')}
               </Label>
               <Input
                 defaultValue="Senior Mechanic"
@@ -140,7 +142,7 @@ export function Profile() {
 
             <div>
               <Label className="font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white mb-2 block">
-                Specialization
+                {t('profile.specialization', 'Specialization')}
               </Label>
               <Input
                 defaultValue="Engine Repair, Electrical Systems, Diagnostics"
@@ -153,7 +155,7 @@ export function Profile() {
 
           <div>
             <Label className="font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white mb-2 block">
-              Certifications
+              {t('profile.certifications', 'Certifications')}
             </Label>
             <Input
               defaultValue="ASE, EV Technician"
@@ -168,45 +170,45 @@ export function Profile() {
       {/* Availability */}
       <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark border border-gray-200 dark:border-salis-gray-dark mb-6">
         <CardContent className="p-6">
-          <h2 className="font-['Poppins',Helvetica] font-semibold text-lg text-gray-900 dark:text-white mb-6">Availability</h2>
+          <h2 className="font-['Poppins',Helvetica] font-semibold text-lg text-gray-900 dark:text-white mb-6">{t('profile.availability', 'Availability')}</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div>
               <Label className="font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white mb-2 block">
-                From
+                {t('common.from', 'From')}
               </Label>
               <Select disabled={!isEditing} defaultValue="sunday">
                 <SelectTrigger data-testid="select-from-day">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="sunday">Sunday</SelectItem>
-                  <SelectItem value="monday">Monday</SelectItem>
-                  <SelectItem value="tuesday">Tuesday</SelectItem>
-                  <SelectItem value="wednesday">Wednesday</SelectItem>
-                  <SelectItem value="thursday">Thursday</SelectItem>
-                  <SelectItem value="friday">Friday</SelectItem>
-                  <SelectItem value="saturday">Saturday</SelectItem>
+                  <SelectItem value="sunday">{t('profile.sunday', 'Sunday')}</SelectItem>
+                  <SelectItem value="monday">{t('profile.monday', 'Monday')}</SelectItem>
+                  <SelectItem value="tuesday">{t('profile.tuesday', 'Tuesday')}</SelectItem>
+                  <SelectItem value="wednesday">{t('profile.wednesday', 'Wednesday')}</SelectItem>
+                  <SelectItem value="thursday">{t('profile.thursday', 'Thursday')}</SelectItem>
+                  <SelectItem value="friday">{t('profile.friday', 'Friday')}</SelectItem>
+                  <SelectItem value="saturday">{t('profile.saturday', 'Saturday')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div>
               <Label className="font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white mb-2 block">
-                To
+                {t('common.to', 'To')}
               </Label>
               <Select disabled={!isEditing} defaultValue="tuesday">
                 <SelectTrigger data-testid="select-to-day">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="sunday">Sunday</SelectItem>
-                  <SelectItem value="monday">Monday</SelectItem>
-                  <SelectItem value="tuesday">Tuesday</SelectItem>
-                  <SelectItem value="wednesday">Wednesday</SelectItem>
-                  <SelectItem value="thursday">Thursday</SelectItem>
-                  <SelectItem value="friday">Friday</SelectItem>
-                  <SelectItem value="saturday">Saturday</SelectItem>
+                  <SelectItem value="sunday">{t('profile.sunday', 'Sunday')}</SelectItem>
+                  <SelectItem value="monday">{t('profile.monday', 'Monday')}</SelectItem>
+                  <SelectItem value="tuesday">{t('profile.tuesday', 'Tuesday')}</SelectItem>
+                  <SelectItem value="wednesday">{t('profile.wednesday', 'Wednesday')}</SelectItem>
+                  <SelectItem value="thursday">{t('profile.thursday', 'Thursday')}</SelectItem>
+                  <SelectItem value="friday">{t('profile.friday', 'Friday')}</SelectItem>
+                  <SelectItem value="saturday">{t('profile.saturday', 'Saturday')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -215,7 +217,7 @@ export function Profile() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <Label className="font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white mb-2 block">
-                Work hours
+                {t('profile.workHours', 'Work hours')}
               </Label>
               <Input
                 defaultValue="ASE, EV Technician"
@@ -227,16 +229,16 @@ export function Profile() {
 
             <div>
               <Label className="font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white mb-2 block">
-                Current Status
+                {t('profile.currentStatus', 'Current Status')}
               </Label>
               <Select disabled={!isEditing} defaultValue="available">
                 <SelectTrigger data-testid="select-current-status">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="available">Available</SelectItem>
-                  <SelectItem value="busy">Busy</SelectItem>
-                  <SelectItem value="off">Off Duty</SelectItem>
+                  <SelectItem value="available">{t('profile.available', 'Available')}</SelectItem>
+                  <SelectItem value="busy">{t('profile.busy', 'Busy')}</SelectItem>
+                  <SelectItem value="off">{t('profile.offDuty', 'Off Duty')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -248,13 +250,13 @@ export function Profile() {
       <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark border border-gray-200 dark:border-salis-gray-dark mb-6">
         <CardContent className="p-6">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="font-['Poppins',Helvetica] font-semibold text-lg text-gray-900 dark:text-white">Change Password</h2>
+            <h2 className="font-['Poppins',Helvetica] font-semibold text-lg text-gray-900 dark:text-white">{t('profile.changePassword', 'Change Password')}</h2>
             <Button
               variant="outline"
               onClick={() => setIsChangingPassword(!isChangingPassword)}
               data-testid="button-toggle-password"
             >
-              {isChangingPassword ? 'Cancel' : 'Change Password'}
+              {isChangingPassword ? t('common.cancel', 'Cancel') : t('profile.changePassword', 'Change Password')}
             </Button>
           </div>
 
@@ -262,11 +264,11 @@ export function Profile() {
             <div className="space-y-4">
               <div>
                 <Label className="font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white mb-2 block">
-                  Current Password
+                  {t('profile.currentPassword', 'Current Password')}
                 </Label>
                 <Input
                   type="password"
-                  placeholder="Enter Current password"
+                  placeholder={t('profile.enterCurrentPassword', 'Enter Current password')}
                   className="border-gray-200 dark:border-salis-gray-dark"
                   data-testid="input-current-password"
                 />
@@ -274,7 +276,7 @@ export function Profile() {
 
               <div>
                 <Label className="font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white mb-2 block">
-                  New Password
+                  {t('profile.newPassword', 'New Password')}
                 </Label>
                 <Input
                   type="password"
@@ -286,7 +288,7 @@ export function Profile() {
 
               <div>
                 <Label className="font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white mb-2 block">
-                  Confirm Password
+                  {t('profile.confirmPassword', 'Confirm Password')}
                 </Label>
                 <Input
                   type="password"
@@ -298,10 +300,10 @@ export function Profile() {
 
               <div className="flex gap-4 pt-4">
                 <Button variant="outline" onClick={() => setIsChangingPassword(false)} data-testid="button-cancel-password">
-                  Cancel
+                  {t('common.cancel', 'Cancel')}
                 </Button>
                 <Button onClick={handleChangePassword} data-testid="button-save-password">
-                  Save
+                  {t('common.save', 'Save')}
                 </Button>
               </div>
             </div>

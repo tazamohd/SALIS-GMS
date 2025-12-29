@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
@@ -22,6 +23,7 @@ import { useState } from "react";
 import { DashboardPage } from "@/components/layouts";
 
 export default function KPIDashboard() {
+  const { t } = useTranslation();
   const [timeRange, setTimeRange] = useState("30d");
 
   const { data: jobCardsData, isLoading: isLoadingJobCards } = useQuery({ queryKey: ["/api/job-cards"] });
@@ -85,7 +87,6 @@ export default function KPIDashboard() {
   const customerSatisfaction = 4.6;
   const npsScore = 72;
 
-  // Month-over-month comparison
   const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
   const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
   const lastMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59);
@@ -164,11 +165,11 @@ export default function KPIDashboard() {
   });
 
   const serviceTypes = [
-    { name: 'Oil Change', value: 35, color: '#3b82f6' },
-    { name: 'Brake Service', value: 25, color: '#10b981' },
-    { name: 'Tire Service', value: 20, color: '#f59e0b' },
-    { name: 'Diagnostics', value: 12, color: '#8b5cf6' },
-    { name: 'Other', value: 8, color: '#6b7280' },
+    { name: t('analytics.oilChange', 'Oil Change'), value: 35, color: '#3b82f6' },
+    { name: t('analytics.brakeService', 'Brake Service'), value: 25, color: '#10b981' },
+    { name: t('analytics.tireService', 'Tire Service'), value: 20, color: '#f59e0b' },
+    { name: t('analytics.diagnostics', 'Diagnostics'), value: 12, color: '#8b5cf6' },
+    { name: t('analytics.other', 'Other'), value: 8, color: '#6b7280' },
   ];
 
   const techPerformance = technicians
@@ -179,7 +180,7 @@ export default function KPIDashboard() {
         return sum + (isNaN(cost) ? 0 : cost * 0.65);
       }, 0);
       return {
-        name: tech.fullName || tech.name || 'Unknown',
+        name: tech.fullName || tech.name || t('common.unknown', 'Unknown'),
         jobs: techJobs.length,
         revenue: techRevenue,
         efficiency: techJobs.length > 0 ? Math.min(100, 75 + Math.random() * 25) : 0,
@@ -191,7 +192,7 @@ export default function KPIDashboard() {
 
   const metrics = [
     {
-      label: "Total Revenue",
+      label: t('analytics.totalRevenue', 'Total Revenue'),
       value: `$${totalRevenue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
       icon: DollarSign,
       color: "text-blue-600",
@@ -201,7 +202,7 @@ export default function KPIDashboard() {
       },
     },
     {
-      label: "Jobs Completed",
+      label: t('analytics.jobsCompleted', 'Jobs Completed'),
       value: completedJobs,
       icon: CheckCircle,
       color: "text-green-600",
@@ -211,25 +212,25 @@ export default function KPIDashboard() {
       },
     },
     {
-      label: "Avg Job Value",
+      label: t('analytics.avgJobValue', 'Avg Job Value'),
       value: `$${avgJobValue.toFixed(2)}`,
       icon: Target,
       color: "text-purple-600",
-      trend: { value: `${completionRate.toFixed(1)}% rate`, isPositive: true },
+      trend: { value: `${completionRate.toFixed(1)}% ${t('analytics.rate', 'rate')}`, isPositive: true },
     },
     {
-      label: "Total Labor Cost",
+      label: t('analytics.totalLaborCost', 'Total Labor Cost'),
       value: `$${totalLabor.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
       icon: Users,
       color: "text-orange-600",
-      trend: { value: `${completionRate.toFixed(1)}% complete`, isPositive: true },
+      trend: { value: `${completionRate.toFixed(1)}% ${t('common.completed', 'complete')}`, isPositive: true },
     },
   ];
 
   return (
     <DashboardPage
-      title="KPI Dashboard"
-      description="Real-time business intelligence and performance metrics"
+      title={t('nav.kpi_dashboard', 'KPI Dashboard')}
+      description={t('analytics.kpiDescription', 'Real-time business intelligence and performance metrics')}
       icon={BarChart3}
       metrics={metrics}
     >
@@ -237,7 +238,7 @@ export default function KPIDashboard() {
         <Card className="bg-white dark:bg-salis-black">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Avg Completion Time</p>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">{t('analytics.avgCompletionTime', 'Avg Completion Time')}</p>
               <Clock className="h-5 w-5 text-blue-600" />
             </div>
             <p className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -249,7 +250,7 @@ export default function KPIDashboard() {
         <Card className="bg-white dark:bg-salis-black">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Customer Satisfaction</p>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">{t('analytics.customerSatisfaction', 'Customer Satisfaction')}</p>
               <Star className="h-5 w-5 text-yellow-500" />
             </div>
             <p className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -261,7 +262,7 @@ export default function KPIDashboard() {
         <Card className="bg-white dark:bg-salis-black">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">NPS Score</p>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">{t('analytics.npsScore', 'NPS Score')}</p>
               <Award className="h-5 w-5 text-green-600" />
             </div>
             <p className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -273,10 +274,10 @@ export default function KPIDashboard() {
 
       <Tabs defaultValue="revenue" className="space-y-6" data-testid="tabs-analytics">
         <TabsList className="bg-white dark:bg-salis-black">
-          <TabsTrigger value="revenue" data-testid="tab-revenue">Revenue Trends</TabsTrigger>
-          <TabsTrigger value="services" data-testid="tab-services">Service Mix</TabsTrigger>
-          <TabsTrigger value="technicians" data-testid="tab-technicians">Technician Performance</TabsTrigger>
-          <TabsTrigger value="efficiency" data-testid="tab-efficiency">Operational Efficiency</TabsTrigger>
+          <TabsTrigger value="revenue" data-testid="tab-revenue">{t('analytics.revenueTrends', 'Revenue Trends')}</TabsTrigger>
+          <TabsTrigger value="services" data-testid="tab-services">{t('analytics.serviceMix', 'Service Mix')}</TabsTrigger>
+          <TabsTrigger value="technicians" data-testid="tab-technicians">{t('analytics.technicianPerformance', 'Technician Performance')}</TabsTrigger>
+          <TabsTrigger value="efficiency" data-testid="tab-efficiency">{t('analytics.operationalEfficiency', 'Operational Efficiency')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="revenue">
@@ -284,7 +285,7 @@ export default function KPIDashboard() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Activity className="h-5 w-5 text-blue-600" />
-                Revenue Trend - Last 30 Days
+                {t('analytics.revenueTrendLast30Days', 'Revenue Trend - Last 30 Days')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -325,13 +326,13 @@ export default function KPIDashboard() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <TrendingUp className="h-5 w-5 text-green-600" />
-                Month-over-Month Comparison
+                {t('analytics.monthOverMonthComparison', 'Month-over-Month Comparison')}
               </CardTitle>
             </CardHeader>
             <CardContent>
               {isLoadingJobCards || isLoadingInvoices ? (
                 <div className="flex items-center justify-center h-[350px]">
-                  <p className="text-gray-500 dark:text-gray-400" data-testid="text-loading">Loading comparison data...</p>
+                  <p className="text-gray-500 dark:text-gray-400" data-testid="text-loading">{t('analytics.loadingComparisonData', 'Loading comparison data...')}</p>
                 </div>
               ) : (
                 <>
@@ -351,26 +352,26 @@ export default function KPIDashboard() {
                         }}
                       />
                       <Legend />
-                      <Bar dataKey="revenue" fill="#3b82f6" name="Revenue" />
-                      <Bar dataKey="jobs" fill="#10b981" name="Jobs" />
-                      <Bar dataKey="labor" fill="#f59e0b" name="Labor Cost" />
+                      <Bar dataKey="revenue" fill="#3b82f6" name={t('analytics.revenue', 'Revenue')} />
+                      <Bar dataKey="jobs" fill="#10b981" name={t('analytics.jobs', 'Jobs')} />
+                      <Bar dataKey="labor" fill="#f59e0b" name={t('analytics.laborCost', 'Labor Cost')} />
                     </BarChart>
                   </ResponsiveContainer>
                   <div className="grid grid-cols-3 gap-4 mt-4">
                     <div className="text-center p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg" data-testid="card-revenue-change">
-                      <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Revenue Change</p>
+                      <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">{t('analytics.revenueChange', 'Revenue Change')}</p>
                       <p className={`text-lg font-bold ${revenueChange >= 0 ? 'text-green-600' : 'text-red-600'}`} data-testid="text-revenue-change">
                         {revenueChange >= 0 ? '+' : ''}{revenueChange.toFixed(1)}%
                       </p>
                     </div>
                     <div className="text-center p-3 bg-green-50 dark:bg-green-900/20 rounded-lg" data-testid="card-jobs-change">
-                      <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Jobs Change</p>
+                      <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">{t('analytics.jobsChange', 'Jobs Change')}</p>
                       <p className={`text-lg font-bold ${jobsChange >= 0 ? 'text-green-600' : 'text-red-600'}`} data-testid="text-jobs-change">
                         {jobsChange >= 0 ? '+' : ''}{jobsChange.toFixed(1)}%
                       </p>
                     </div>
                     <div className="text-center p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg" data-testid="card-labor-total">
-                      <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">This Month Labor</p>
+                      <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">{t('analytics.thisMonthLabor', 'This Month Labor')}</p>
                       <p className="text-lg font-bold text-gray-900 dark:text-white" data-testid="text-labor-total">
                         ${(monthlyComparison[1]?.labor || 0).toLocaleString('en-US', { maximumFractionDigits: 0 })}
                       </p>
@@ -388,7 +389,7 @@ export default function KPIDashboard() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <PieChart className="h-5 w-5 text-green-600" />
-                  Service Type Distribution
+                  {t('analytics.serviceTypeDistribution', 'Service Type Distribution')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -418,7 +419,7 @@ export default function KPIDashboard() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <BarChart3 className="h-5 w-5 text-purple-600" />
-                  Revenue by Service Type
+                  {t('analytics.revenueByServiceType', 'Revenue by Service Type')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -455,7 +456,7 @@ export default function KPIDashboard() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Wrench className="h-5 w-5 text-orange-600" />
-                Top Performing Technicians
+                {t('analytics.topPerformingTechnicians', 'Top Performing Technicians')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -475,8 +476,8 @@ export default function KPIDashboard() {
                     }}
                   />
                   <Legend />
-                  <Bar dataKey="jobs" fill="#3b82f6" name="Jobs Completed" />
-                  <Bar dataKey="revenue" fill="#10b981" name="Revenue ($)" />
+                  <Bar dataKey="jobs" fill="#3b82f6" name={t('analytics.jobsCompleted', 'Jobs Completed')} />
+                  <Bar dataKey="revenue" fill="#10b981" name={t('analytics.revenueAmount', 'Revenue ($)')} />
                 </BarChart>
               </ResponsiveContainer>
             </CardContent>
@@ -487,62 +488,62 @@ export default function KPIDashboard() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Card className="bg-white dark:bg-salis-black">
               <CardHeader>
-                <CardTitle>Labor Efficiency Metrics</CardTitle>
+                <CardTitle>{t('analytics.laborEfficiencyMetrics', 'Labor Efficiency Metrics')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Labor Cost</span>
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('analytics.laborCost', 'Labor Cost')}</span>
                     <span className="text-lg font-bold text-blue-600">${totalLabor.toLocaleString()}</span>
                   </div>
-                  <p className="text-xs text-gray-600 dark:text-gray-400">Total labor revenue in period</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">{t('analytics.totalLaborRevenueInPeriod', 'Total labor revenue in period')}</p>
                 </div>
 
                 <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Labor Gross Profit</span>
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('analytics.laborGrossProfit', 'Labor Gross Profit')}</span>
                     <span className="text-lg font-bold text-green-600">68%</span>
                   </div>
-                  <p className="text-xs text-gray-600 dark:text-gray-400">Average margin on labor</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">{t('analytics.averageMarginOnLabor', 'Average margin on labor')}</p>
                 </div>
 
                 <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Bay Utilization</span>
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('analytics.bayUtilization', 'Bay Utilization')}</span>
                     <span className="text-lg font-bold text-purple-600">82%</span>
                   </div>
-                  <p className="text-xs text-gray-600 dark:text-gray-400">Service bay efficiency</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">{t('analytics.serviceBayEfficiency', 'Service bay efficiency')}</p>
                 </div>
               </CardContent>
             </Card>
 
             <Card className="bg-white dark:bg-salis-black">
               <CardHeader>
-                <CardTitle>Parts & Inventory Metrics</CardTitle>
+                <CardTitle>{t('analytics.partsInventoryMetrics', 'Parts & Inventory Metrics')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="p-4 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Parts Revenue</span>
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('analytics.partsRevenue', 'Parts Revenue')}</span>
                     <span className="text-lg font-bold text-orange-600">${totalParts.toLocaleString()}</span>
                   </div>
-                  <p className="text-xs text-gray-600 dark:text-gray-400">Total parts sold in period</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">{t('analytics.totalPartsSoldInPeriod', 'Total parts sold in period')}</p>
                 </div>
 
                 <div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-lg">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Parts Markup</span>
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('analytics.partsMarkup', 'Parts Markup')}</span>
                     <span className="text-lg font-bold text-red-600">42%</span>
                   </div>
-                  <p className="text-xs text-gray-600 dark:text-gray-400">Average parts margin</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">{t('analytics.averagePartsMargin', 'Average parts margin')}</p>
                 </div>
 
                 <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Inventory Turnover</span>
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('analytics.inventoryTurnover', 'Inventory Turnover')}</span>
                     <span className="text-lg font-bold text-yellow-600">4.2x</span>
                   </div>
-                  <p className="text-xs text-gray-600 dark:text-gray-400">Annual turnover rate</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">{t('analytics.annualTurnoverRate', 'Annual turnover rate')}</p>
                 </div>
               </CardContent>
             </Card>

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { TabsPageLayout, TabConfig } from "@/components/layouts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,6 +13,7 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
 export default function PartsMarketplace() {
+  const { t } = useTranslation();
   const [isOrderDialogOpen, setIsOrderDialogOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const { toast } = useToast();
@@ -25,7 +27,7 @@ export default function PartsMarketplace() {
       return await apiRequest("/api/marketplace/orders", "POST", data);
     },
     onSuccess: () => {
-      toast({ title: "Order placed", description: "Your parts order has been submitted." });
+      toast({ title: t('inventory.orderPlaced', 'Order placed'), description: t('inventory.partsOrderSubmitted', 'Your parts order has been submitted.') });
       setIsOrderDialogOpen(false);
       queryClient.invalidateQueries({ queryKey: ["/api/marketplace/orders"] });
     },
@@ -143,7 +145,7 @@ export default function PartsMarketplace() {
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Total Orders</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">{t('inventory.totalOrders', 'Total Orders')}</p>
               <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">{stats.totalOrders}</h3>
             </div>
             <Package className="h-12 w-12 text-blue-600" />
@@ -154,7 +156,7 @@ export default function PartsMarketplace() {
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Active Orders</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">{t('inventory.activeOrders', 'Active Orders')}</p>
               <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">{stats.activeOrders}</h3>
             </div>
             <ShoppingCart className="h-12 w-12 text-green-600" />
@@ -165,7 +167,7 @@ export default function PartsMarketplace() {
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Total Spent</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">{t('inventory.totalSpent', 'Total Spent')}</p>
               <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">${stats.totalSpent.toLocaleString()}</h3>
             </div>
             <DollarSign className="h-12 w-12 text-purple-600" />
@@ -176,7 +178,7 @@ export default function PartsMarketplace() {
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Avg Delivery</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">{t('inventory.avgDelivery', 'Avg Delivery')}</p>
               <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">{stats.avgDeliveryTime} days</h3>
             </div>
             <Truck className="h-12 w-12 text-orange-600" />
@@ -203,14 +205,14 @@ export default function PartsMarketplace() {
                 {getStatusBadge(order.orderStatus)}
               </div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm text-gray-600 dark:text-gray-400">
-                <div><span className="font-medium">PN:</span> {order.partNumber}</div>
-                <div><span className="font-medium">Quantity:</span> {order.quantity}</div>
-                <div><span className="font-medium">Seller:</span> {order.sellerName} ({order.sellerRating}★)</div>
-                <div><span className="font-medium">Total:</span> ${order.totalPrice}</div>
+                <div><span className="font-medium">{t('inventory.pn', 'PN')}:</span> {order.partNumber}</div>
+                <div><span className="font-medium">{t('common.quantity', 'Quantity')}:</span> {order.quantity}</div>
+                <div><span className="font-medium">{t('inventory.seller', 'Seller')}:</span> {order.sellerName} ({order.sellerRating}★)</div>
+                <div><span className="font-medium">{t('inventory.total', 'Total')}:</span> ${order.totalPrice}</div>
               </div>
               {order.trackingNumber && (
                 <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
-                  Tracking: <code className="bg-gray-200 dark:bg-gray-800 px-1 rounded">{order.trackingNumber}</code>
+                  {t('inventory.tracking', 'Tracking')}: <code className="bg-gray-200 dark:bg-gray-800 px-1 rounded">{order.trackingNumber}</code>
                 </p>
               )}
               {order.estimatedDelivery && order.orderStatus !== "delivered" && (
@@ -233,22 +235,22 @@ export default function PartsMarketplace() {
   const tabs: TabConfig[] = [
     {
       id: "all",
-      label: "All Orders",
+      label: t('inventory.allOrders', 'All Orders'),
       icon: Package,
       content: (
         <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
-          <CardHeader><CardTitle>All Orders</CardTitle></CardHeader>
+          <CardHeader><CardTitle>{t('inventory.allOrders', 'All Orders')}</CardTitle></CardHeader>
           <CardContent>{renderOrders()}</CardContent>
         </Card>
       ),
     },
     {
       id: "active",
-      label: "Active",
+      label: t('common.active', 'Active'),
       icon: Truck,
       content: (
         <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
-          <CardHeader><CardTitle>Active Orders</CardTitle></CardHeader>
+          <CardHeader><CardTitle>{t('inventory.activeOrders', 'Active Orders')}</CardTitle></CardHeader>
           <CardContent>
             {renderOrders((o) => o.orderStatus !== "delivered" && o.orderStatus !== "cancelled")}
           </CardContent>
@@ -257,11 +259,11 @@ export default function PartsMarketplace() {
     },
     {
       id: "delivered",
-      label: "Delivered",
+      label: t('inventory.delivered', 'Delivered'),
       icon: Package,
       content: (
         <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
-          <CardHeader><CardTitle>Delivered Orders</CardTitle></CardHeader>
+          <CardHeader><CardTitle>{t('inventory.deliveredOrders', 'Delivered Orders')}</CardTitle></CardHeader>
           <CardContent>
             {renderOrders((o) => o.orderStatus === "delivered")}
           </CardContent>
@@ -272,11 +274,11 @@ export default function PartsMarketplace() {
 
   return (
     <TabsPageLayout
-      title="Parts Marketplace"
-      description="Order parts from eBay Motors, Amazon, and RockAuto"
+      title={t('inventory.partsMarketplace', 'Parts Marketplace')}
+      description={t('inventory.partsMarketplaceDesc', 'Order parts from eBay Motors, Amazon, and RockAuto')}
       icon={ShoppingCart}
       primaryAction={{
-        label: "Place Order",
+        label: t('inventory.placeOrder', 'Place Order'),
         icon: Plus,
         onClick: () => setIsOrderDialogOpen(true),
         testId: "button-place-order",
@@ -288,12 +290,12 @@ export default function PartsMarketplace() {
       <Dialog open={isOrderDialogOpen} onOpenChange={setIsOrderDialogOpen}>
         <DialogContent className="sm:max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Search & Order Parts</DialogTitle>
+            <DialogTitle>{t('inventory.searchOrderParts', 'Search & Order Parts')}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="flex gap-2">
               <Input
-                placeholder="Search by part number or name..."
+                placeholder={t('inventory.searchByPartNumberOrName', 'Search by part number or name...')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="flex-1"
@@ -322,7 +324,7 @@ export default function PartsMarketplace() {
                         <Star className="h-3 w-3 fill-current" /> {result.sellerRating}
                       </span>
                       {result.inStock && (
-                        <Badge variant="secondary" className="text-xs">In Stock</Badge>
+                        <Badge variant="secondary" className="text-xs">{t('inventory.inStock', 'In Stock')}</Badge>
                       )}
                     </div>
                   </div>

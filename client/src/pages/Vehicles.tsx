@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslation } from "react-i18next";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { type Vehicle, type InsertVehicle, insertVehicleSchema } from "@shared/schema";
 import { StandardPageLayout } from "@/components/layouts";
@@ -36,6 +37,7 @@ import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/useAuth";
 
 export default function Vehicles() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const { user } = useAuth();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -80,16 +82,16 @@ export default function Vehicles() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/vehicles'] });
       toast({
-        title: "Success",
-        description: "Vehicle added successfully",
+        title: t('common.success', 'Success'),
+        description: t('vehicles.vehicleAddedSuccessfully', 'Vehicle added successfully'),
       });
       setIsDialogOpen(false);
       form.reset();
     },
     onError: (error: any) => {
       toast({
-        title: "Error",
-        description: error.message || "Failed to add vehicle",
+        title: t('common.error', 'Error'),
+        description: error.message || t('vehicles.failedToAddVehicle', 'Failed to add vehicle'),
         variant: "destructive",
       });
     },
@@ -102,8 +104,8 @@ export default function Vehicles() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/vehicles'] });
       toast({
-        title: "Success",
-        description: "Vehicle updated successfully",
+        title: t('common.success', 'Success'),
+        description: t('vehicles.vehicleUpdatedSuccessfully', 'Vehicle updated successfully'),
       });
       setIsDialogOpen(false);
       setEditingVehicle(null);
@@ -111,8 +113,8 @@ export default function Vehicles() {
     },
     onError: (error: any) => {
       toast({
-        title: "Error",
-        description: error.message || "Failed to update vehicle",
+        title: t('common.error', 'Error'),
+        description: error.message || t('vehicles.failedToUpdateVehicle', 'Failed to update vehicle'),
         variant: "destructive",
       });
     },
@@ -125,14 +127,14 @@ export default function Vehicles() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/vehicles'] });
       toast({
-        title: "Success",
-        description: "Vehicle deleted successfully",
+        title: t('common.success', 'Success'),
+        description: t('vehicles.vehicleDeletedSuccessfully', 'Vehicle deleted successfully'),
       });
     },
     onError: (error: any) => {
       toast({
-        title: "Error",
-        description: error.message || "Failed to delete vehicle",
+        title: t('common.error', 'Error'),
+        description: error.message || t('vehicles.failedToDeleteVehicle', 'Failed to delete vehicle'),
         variant: "destructive",
       });
     },
@@ -153,7 +155,7 @@ export default function Vehicles() {
   };
 
   const handleDelete = (id: string) => {
-    if (confirm("Are you sure you want to delete this vehicle?")) {
+    if (confirm(t('vehicles.confirmDeleteVehicle', 'Are you sure you want to delete this vehicle?'))) {
       deleteMutation.mutate(id);
     }
   };
@@ -201,13 +203,13 @@ export default function Vehicles() {
           data-testid="button-add-vehicle"
         >
           <Plus className="w-4 h-4 mr-2" />
-          Add Vehicle
+          {t('vehicles.addVehicle', 'Add Vehicle')}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[600px]" data-testid="modal-vehicle-form">
         <DialogHeader>
           <DialogTitle className="font-['Poppins',Helvetica] font-semibold text-xl text-gray-900 dark:text-white">
-            {editingVehicle ? "Edit Vehicle" : "Add New Vehicle"}
+            {editingVehicle ? t('vehicles.editVehicle', 'Edit Vehicle') : t('vehicles.addNewVehicle', 'Add New Vehicle')}
           </DialogTitle>
         </DialogHeader>
 
@@ -218,11 +220,11 @@ export default function Vehicles() {
               name="customerId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Customer *</FormLabel>
+                  <FormLabel>{t('vehicles.customer', 'Customer')} *</FormLabel>
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger data-testid="select-customer">
-                        <SelectValue placeholder="Select customer" />
+                        <SelectValue placeholder={t('vehicles.selectCustomer', 'Select customer')} />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -244,7 +246,7 @@ export default function Vehicles() {
                 name="make"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Make *</FormLabel>
+                    <FormLabel>{t('vehicles.make', 'Make')} *</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
@@ -262,7 +264,7 @@ export default function Vehicles() {
                 name="model"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Model *</FormLabel>
+                    <FormLabel>{t('vehicles.model', 'Model')} *</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
@@ -282,7 +284,7 @@ export default function Vehicles() {
                 name="year"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Year *</FormLabel>
+                    <FormLabel>{t('vehicles.year', 'Year')} *</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
@@ -302,7 +304,7 @@ export default function Vehicles() {
                 name="licensePlate"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>License Plate *</FormLabel>
+                    <FormLabel>{t('vehicles.licensePlate', 'License Plate')} *</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
@@ -322,7 +324,7 @@ export default function Vehicles() {
                 name="vin"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>VIN</FormLabel>
+                    <FormLabel>{t('vehicles.vin', 'VIN')}</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
@@ -341,11 +343,11 @@ export default function Vehicles() {
                 name="color"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Color</FormLabel>
+                    <FormLabel>{t('vehicles.color', 'Color')}</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
-                        placeholder="White"
+                        placeholder={t('vehicles.white', 'White')}
                         value={field.value || ""}
                         data-testid="input-color"
                       />
@@ -362,18 +364,18 @@ export default function Vehicles() {
                 name="engineType"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Engine Type</FormLabel>
+                    <FormLabel>{t('vehicles.engineType', 'Engine Type')}</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value || ""}>
                       <FormControl>
                         <SelectTrigger data-testid="select-engine-type">
-                          <SelectValue placeholder="Select engine type" />
+                          <SelectValue placeholder={t('vehicles.selectEngineType', 'Select engine type')} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="gasoline">Gasoline</SelectItem>
-                        <SelectItem value="diesel">Diesel</SelectItem>
-                        <SelectItem value="electric">Electric</SelectItem>
-                        <SelectItem value="hybrid">Hybrid</SelectItem>
+                        <SelectItem value="gasoline">{t('vehicles.gasoline', 'Gasoline')}</SelectItem>
+                        <SelectItem value="diesel">{t('vehicles.diesel', 'Diesel')}</SelectItem>
+                        <SelectItem value="electric">{t('vehicles.electric', 'Electric')}</SelectItem>
+                        <SelectItem value="hybrid">{t('vehicles.hybrid', 'Hybrid')}</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -386,16 +388,16 @@ export default function Vehicles() {
                 name="transmissionType"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Transmission</FormLabel>
+                    <FormLabel>{t('vehicles.transmission', 'Transmission')}</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value || ""}>
                       <FormControl>
                         <SelectTrigger data-testid="select-transmission">
-                          <SelectValue placeholder="Select transmission" />
+                          <SelectValue placeholder={t('vehicles.selectTransmission', 'Select transmission')} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="automatic">Automatic</SelectItem>
-                        <SelectItem value="manual">Manual</SelectItem>
+                        <SelectItem value="automatic">{t('vehicles.automatic', 'Automatic')}</SelectItem>
+                        <SelectItem value="manual">{t('vehicles.manual', 'Manual')}</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -409,7 +411,7 @@ export default function Vehicles() {
               name="mileage"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Mileage</FormLabel>
+                  <FormLabel>{t('vehicles.mileage', 'Mileage')}</FormLabel>
                   <FormControl>
                     <Input
                       {...field}
@@ -430,11 +432,11 @@ export default function Vehicles() {
               name="notes"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Notes</FormLabel>
+                  <FormLabel>{t('common.notes', 'Notes')}</FormLabel>
                   <FormControl>
                     <Textarea
                       {...field}
-                      placeholder="Additional notes..."
+                      placeholder={t('vehicles.additionalNotes', 'Additional notes...')}
                       value={field.value || ""}
                       data-testid="input-notes"
                     />
@@ -451,7 +453,7 @@ export default function Vehicles() {
                 onClick={handleDialogClose}
                 data-testid="button-cancel"
               >
-                Cancel
+                {t('common.cancel', 'Cancel')}
               </Button>
               <Button
                 type="submit"
@@ -459,7 +461,7 @@ export default function Vehicles() {
                 disabled={createMutation.isPending || updateMutation.isPending}
                 data-testid="button-save-vehicle"
               >
-                {createMutation.isPending || updateMutation.isPending ? "Saving..." : "Save Vehicle"}
+                {createMutation.isPending || updateMutation.isPending ? t('common.saving', 'Saving...') : t('vehicles.saveVehicle', 'Save Vehicle')}
               </Button>
             </div>
           </form>
@@ -471,8 +473,8 @@ export default function Vehicles() {
   if (isLoading) {
     return (
       <StandardPageLayout
-        title="Vehicles"
-        description="Manage customer vehicles and service history"
+        title={t('vehicles.title', 'Vehicles')}
+        description={t('vehicles.description', 'Manage customer vehicles and service history')}
         icon={Car}
         actionButtons={actionButtons}
       >
@@ -485,8 +487,8 @@ export default function Vehicles() {
 
   return (
     <StandardPageLayout
-      title="Vehicles"
-      description="Manage customer vehicles and service history"
+      title={t('vehicles.title', 'Vehicles')}
+      description={t('vehicles.description', 'Manage customer vehicles and service history')}
       icon={Car}
       actionButtons={actionButtons}
     >
@@ -495,7 +497,7 @@ export default function Vehicles() {
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-600 dark:text-gray-400" />
           <Input
             type="text"
-            placeholder="Search vehicles..."
+            placeholder={t('vehicles.searchVehicles', 'Search vehicles...')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10 border-gray-200 dark:border-salis-gray-dark"
@@ -507,7 +509,7 @@ export default function Vehicles() {
           <div className="text-center py-12">
             <Car className="w-12 h-12 mx-auto text-gray-600 dark:text-gray-400 mb-4" />
             <p className="font-['Poppins',Helvetica] text-gray-600 dark:text-gray-400">
-              {searchQuery ? "No vehicles found matching your search" : "No vehicles added yet"}
+              {searchQuery ? t('vehicles.noVehiclesMatchingSearch', 'No vehicles found matching your search') : t('vehicles.noVehiclesYet', 'No vehicles added yet')}
             </p>
           </div>
         ) : (
@@ -536,26 +538,26 @@ export default function Vehicles() {
                       </div>
                     </div>
                     {vehicle.isActive && (
-                      <Badge className="bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100">Active</Badge>
+                      <Badge className="bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100">{t('common.active', 'Active')}</Badge>
                     )}
                   </div>
 
                   <div className="space-y-2 mb-4">
                     <div className="flex justify-between">
-                      <span className="font-['Poppins',Helvetica] text-sm text-gray-600 dark:text-gray-400">Owner:</span>
+                      <span className="font-['Poppins',Helvetica] text-sm text-gray-600 dark:text-gray-400">{t('vehicles.owner', 'Owner')}:</span>
                       <span className="font-['Poppins',Helvetica] text-sm text-gray-900 dark:text-white">
-                        {customer?.fullName || "Unknown"}
+                        {customer?.fullName || t('common.unknown', 'Unknown')}
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="font-['Poppins',Helvetica] text-sm text-gray-600 dark:text-gray-400">License:</span>
+                      <span className="font-['Poppins',Helvetica] text-sm text-gray-600 dark:text-gray-400">{t('vehicles.license', 'License')}:</span>
                       <span className="font-['Poppins',Helvetica] text-sm text-gray-900 dark:text-white font-medium">
                         {vehicle.licensePlate}
                       </span>
                     </div>
                     {vehicle.vin && (
                       <div className="flex justify-between">
-                        <span className="font-['Poppins',Helvetica] text-sm text-gray-600 dark:text-gray-400">VIN:</span>
+                        <span className="font-['Poppins',Helvetica] text-sm text-gray-600 dark:text-gray-400">{t('vehicles.vin', 'VIN')}:</span>
                         <span className="font-['Poppins',Helvetica] text-sm text-gray-900 dark:text-white truncate max-w-[150px]">
                           {vehicle.vin}
                         </span>
@@ -563,7 +565,7 @@ export default function Vehicles() {
                     )}
                     {vehicle.mileage && vehicle.mileage > 0 && (
                       <div className="flex justify-between">
-                        <span className="font-['Poppins',Helvetica] text-sm text-gray-600 dark:text-gray-400">Mileage:</span>
+                        <span className="font-['Poppins',Helvetica] text-sm text-gray-600 dark:text-gray-400">{t('vehicles.mileage', 'Mileage')}:</span>
                         <span className="font-['Poppins',Helvetica] text-sm text-gray-900 dark:text-white">
                           {vehicle.mileage.toLocaleString()} km
                         </span>
@@ -571,7 +573,7 @@ export default function Vehicles() {
                     )}
                     {vehicle.engineType && (
                       <div className="flex justify-between">
-                        <span className="font-['Poppins',Helvetica] text-sm text-gray-600 dark:text-gray-400">Engine:</span>
+                        <span className="font-['Poppins',Helvetica] text-sm text-gray-600 dark:text-gray-400">{t('vehicles.engine', 'Engine')}:</span>
                         <span className="font-['Poppins',Helvetica] text-sm text-gray-900 dark:text-white capitalize">
                           {vehicle.engineType}
                         </span>
@@ -588,7 +590,7 @@ export default function Vehicles() {
                       data-testid={`button-edit-${vehicle.id}`}
                     >
                       <Edit className="w-4 h-4 mr-2" />
-                      Edit
+                      {t('common.edit', 'Edit')}
                     </Button>
                     <Button
                       variant="outline"
@@ -598,7 +600,7 @@ export default function Vehicles() {
                       data-testid={`button-delete-${vehicle.id}`}
                     >
                       <Trash2 className="w-4 h-4 mr-2" />
-                      Delete
+                      {t('common.delete', 'Delete')}
                     </Button>
                   </div>
                 </div>

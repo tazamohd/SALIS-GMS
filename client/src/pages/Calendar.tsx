@@ -4,6 +4,7 @@ import { Calendar as BigCalendar, dateFnsLocalizer, View, SlotInfo } from 'react
 import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop';
 import { format, parse, startOfWeek, getDay, addDays, startOfMonth, endOfMonth } from 'date-fns';
 import { enUS } from 'date-fns/locale/en-US';
+import { useTranslation } from "react-i18next";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -47,6 +48,7 @@ interface CalendarEvent {
 }
 
 export default function Calendar() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [view, setView] = useState<View>('month');
   const [date, setDate] = useState(new Date());
@@ -119,13 +121,13 @@ export default function Calendar() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/appointments'] });
       toast({
-        title: "Appointment Updated",
-        description: "The appointment has been rescheduled successfully.",
+        title: t('calendar.appointmentUpdated', 'Appointment Updated'),
+        description: t('calendar.rescheduledSuccess', 'The appointment has been rescheduled successfully.'),
       });
     },
     onError: (error) => {
       toast({
-        title: "Error",
+        title: t('common.error', 'Error'),
         description: error.message,
         variant: "destructive",
       });
@@ -181,15 +183,15 @@ export default function Calendar() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/appointments'] });
       toast({
-        title: "Appointment Created",
-        description: "The appointment has been created successfully.",
+        title: t('calendar.appointmentCreated', 'Appointment Created'),
+        description: t('calendar.createdSuccess', 'The appointment has been created successfully.'),
       });
       setCreateDialogOpen(false);
       form.reset();
     },
     onError: (error) => {
       toast({
-        title: "Error",
+        title: t('common.error', 'Error'),
         description: error.message,
         variant: "destructive",
       });
@@ -261,8 +263,8 @@ export default function Calendar() {
   const handleEventDrop = useCallback(({ event, start, end }: { event: CalendarEvent; start: Date; end: Date }) => {
     if (event.type !== 'appointment') {
       toast({
-        title: "Cannot Move Event",
-        description: "Only appointments can be rescheduled via drag-and-drop.",
+        title: t('calendar.cannotMoveEvent', 'Cannot Move Event'),
+        description: t('calendar.onlyAppointmentsCanBeRescheduled', 'Only appointments can be rescheduled via drag-and-drop.'),
         variant: "destructive",
       });
       return;
@@ -276,7 +278,7 @@ export default function Calendar() {
         duration,
       },
     });
-  }, [updateAppointmentMutation, toast]);
+  }, [updateAppointmentMutation, toast, t]);
 
   const handleEventResize = useCallback(({ event, start, end }: { event: CalendarEvent; start: Date; end: Date }) => {
     if (event.type !== 'appointment') {
@@ -320,19 +322,19 @@ export default function Calendar() {
 
   return (
     <StandardPageLayout
-      title="Scheduling & Calendar"
-      description="Visual calendar view with drag-and-drop scheduling"
+      title={t('calendar.title', 'Scheduling & Calendar')}
+      description={t('calendar.description', 'Visual calendar view with drag-and-drop scheduling')}
       icon={CalendarIcon}
     >
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark p-4">
           <div className="flex items-center gap-2 mb-2">
             <CalendarIcon className="h-5 w-5 text-gray-700 dark:text-gray-300" />
-            <h3 className="font-semibold">Filter by Garage</h3>
+            <h3 className="font-semibold">{t('calendar.filterByGarage', 'Filter by Garage')}</h3>
           </div>
           <Select value={selectedGarageId} onValueChange={setSelectedGarageId}>
             <SelectTrigger data-testid="select-garage">
-              <SelectValue placeholder="Select garage" />
+              <SelectValue placeholder={t('calendar.selectGarage', 'Select garage')} />
             </SelectTrigger>
             <SelectContent>
               {garages.map((garage: any) => (
@@ -347,14 +349,14 @@ export default function Calendar() {
         <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark p-4">
           <div className="flex items-center gap-2 mb-2">
             <Users className="h-5 w-5 text-gray-700 dark:text-gray-300" />
-            <h3 className="font-semibold">Filter by Technician</h3>
+            <h3 className="font-semibold">{t('calendar.filterByTechnician', 'Filter by Technician')}</h3>
           </div>
           <Select value={selectedTechnicianId} onValueChange={setSelectedTechnicianId}>
             <SelectTrigger data-testid="select-technician">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Technicians</SelectItem>
+              <SelectItem value="all">{t('calendar.allTechnicians', 'All Technicians')}</SelectItem>
               {technicians.map((tech) => (
                 <SelectItem key={tech.id} value={tech.id}>
                   {tech.fullName || tech.email}
@@ -367,17 +369,17 @@ export default function Calendar() {
         <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark p-4">
           <div className="flex items-center gap-2 mb-2">
             <Clock className="h-5 w-5 text-gray-700 dark:text-gray-300" />
-            <h3 className="font-semibold">View Mode</h3>
+            <h3 className="font-semibold">{t('calendar.viewMode', 'View Mode')}</h3>
           </div>
           <Select value={view} onValueChange={(v) => handleViewChange(v as View)}>
             <SelectTrigger data-testid="select-view">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="month">Month</SelectItem>
-              <SelectItem value="week">Week</SelectItem>
-              <SelectItem value="day">Day</SelectItem>
-              <SelectItem value="agenda">Agenda</SelectItem>
+              <SelectItem value="month">{t('calendar.month', 'Month')}</SelectItem>
+              <SelectItem value="week">{t('calendar.week', 'Week')}</SelectItem>
+              <SelectItem value="day">{t('calendar.day', 'Day')}</SelectItem>
+              <SelectItem value="agenda">{t('calendar.agenda', 'Agenda')}</SelectItem>
             </SelectContent>
           </Select>
         </Card>
@@ -387,9 +389,9 @@ export default function Calendar() {
         <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark p-12">
           <div className="text-center">
             <AlertCircle className="h-12 w-12 text-gray-900 dark:text-white/50 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold mb-2">Select a Garage</h3>
+            <h3 className="text-lg font-semibold mb-2">{t('calendar.selectAGarage', 'Select a Garage')}</h3>
             <p className="text-gray-900 dark:text-white/70">
-              Please select a garage from the dropdown above to view the calendar
+              {t('calendar.pleaseSelectGarage', 'Please select a garage from the dropdown above to view the calendar')}
             </p>
           </div>
         </Card>
@@ -428,33 +430,33 @@ export default function Calendar() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle data-testid="text-event-title">
-              {selectedEvent?.type === 'appointment' ? 'Appointment Details' : 'Event Details'}
+              {selectedEvent?.type === 'appointment' ? t('calendar.appointmentDetails', 'Appointment Details') : t('calendar.eventDetails', 'Event Details')}
             </DialogTitle>
             <DialogDescription>
               {selectedEvent && (
                 <div className="space-y-2 mt-4">
                   <div>
-                    <span className="font-semibold">Title:</span> {selectedEvent.title}
+                    <span className="font-semibold">{t('calendar.eventTitle', 'Title')}:</span> {selectedEvent.title}
                   </div>
                   <div>
-                    <span className="font-semibold">Start:</span> {format(selectedEvent.start, 'PPp')}
+                    <span className="font-semibold">{t('calendar.start', 'Start')}:</span> {format(selectedEvent.start, 'PPp')}
                   </div>
                   <div>
-                    <span className="font-semibold">End:</span> {format(selectedEvent.end, 'PPp')}
+                    <span className="font-semibold">{t('calendar.end', 'End')}:</span> {format(selectedEvent.end, 'PPp')}
                   </div>
                   {selectedEvent.type === 'appointment' && selectedEvent.resource && (
                     <>
                       <div>
-                        <span className="font-semibold">Customer:</span> {selectedEvent.resource.customerName}
+                        <span className="font-semibold">{t('calendar.customer', 'Customer')}:</span> {selectedEvent.resource.customerName}
                       </div>
                       <div>
-                        <span className="font-semibold">Phone:</span> {selectedEvent.resource.customerPhone}
+                        <span className="font-semibold">{t('calendar.phone', 'Phone')}:</span> {selectedEvent.resource.customerPhone}
                       </div>
                       <div>
-                        <span className="font-semibold">Service:</span> {selectedEvent.resource.serviceType}
+                        <span className="font-semibold">{t('calendar.service', 'Service')}:</span> {selectedEvent.resource.serviceType}
                       </div>
                       <div>
-                        <span className="font-semibold">Status:</span>{' '}
+                        <span className="font-semibold">{t('common.status', 'Status')}:</span>{' '}
                         <span className={`px-2 py-1 rounded text-xs ${
                           selectedEvent.resource.status === 'completed' ? 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100' :
                           selectedEvent.resource.status === 'cancelled' ? 'bg-gray-300 dark:bg-gray-600 text-gray-900 dark:text-gray-100' :
@@ -475,9 +477,9 @@ export default function Calendar() {
       <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle data-testid="text-create-appointment-title">Create Appointment</DialogTitle>
+            <DialogTitle data-testid="text-create-appointment-title">{t('calendar.createAppointment', 'Create Appointment')}</DialogTitle>
             <DialogDescription>
-              {selectedSlot && `Selected time: ${format(selectedSlot.start, 'PPp')}`}
+              {selectedSlot && `${t('calendar.selectedTime', 'Selected time')}: ${format(selectedSlot.start, 'PPp')}`}
             </DialogDescription>
           </DialogHeader>
           <Form {...form}>
@@ -488,7 +490,7 @@ export default function Calendar() {
                   name="customerId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Customer</FormLabel>
+                      <FormLabel>{t('calendar.customer', 'Customer')}</FormLabel>
                       <Select onValueChange={(value) => {
                         field.onChange(value);
                         const customer = customers.find(c => c.id === value);
@@ -500,7 +502,7 @@ export default function Calendar() {
                       }} value={field.value}>
                         <FormControl>
                           <SelectTrigger data-testid="select-customer">
-                            <SelectValue placeholder="Select customer" />
+                            <SelectValue placeholder={t('calendar.selectCustomer', 'Select customer')} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -521,11 +523,11 @@ export default function Calendar() {
                   name="vehicleId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Vehicle (Optional)</FormLabel>
+                      <FormLabel>{t('calendar.vehicleOptional', 'Vehicle (Optional)')}</FormLabel>
                       <Select onValueChange={field.onChange} value={field.value || ''}>
                         <FormControl>
                           <SelectTrigger data-testid="select-vehicle">
-                            <SelectValue placeholder="Select vehicle" />
+                            <SelectValue placeholder={t('calendar.selectVehicle', 'Select vehicle')} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -546,9 +548,9 @@ export default function Calendar() {
                   name="serviceType"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Service Type</FormLabel>
+                      <FormLabel>{t('calendar.serviceType', 'Service Type')}</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder="Oil Change, Brake Service, etc." data-testid="input-service-type" />
+                        <Input {...field} placeholder={t('calendar.serviceTypePlaceholder', 'Oil Change, Brake Service, etc.')} data-testid="input-service-type" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -560,11 +562,11 @@ export default function Calendar() {
                   name="assignedTo"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Assign To</FormLabel>
+                      <FormLabel>{t('calendar.assignTo', 'Assign To')}</FormLabel>
                       <Select onValueChange={field.onChange} value={field.value || ''}>
                         <FormControl>
                           <SelectTrigger data-testid="select-technician-assign">
-                            <SelectValue placeholder="Select technician" />
+                            <SelectValue placeholder={t('calendar.selectTechnician', 'Select technician')} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -585,7 +587,7 @@ export default function Calendar() {
                   name="duration"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Duration (minutes)</FormLabel>
+                      <FormLabel>{t('calendar.durationMinutes', 'Duration (minutes)')}</FormLabel>
                       <FormControl>
                         <Input 
                           {...field} 
@@ -604,7 +606,7 @@ export default function Calendar() {
                   name="status"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Status</FormLabel>
+                      <FormLabel>{t('common.status', 'Status')}</FormLabel>
                       <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
                           <SelectTrigger data-testid="select-status">
@@ -612,8 +614,8 @@ export default function Calendar() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="scheduled">Scheduled</SelectItem>
-                          <SelectItem value="confirmed">Confirmed</SelectItem>
+                          <SelectItem value="scheduled">{t('calendar.status.scheduled', 'Scheduled')}</SelectItem>
+                          <SelectItem value="confirmed">{t('calendar.status.confirmed', 'Confirmed')}</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -627,9 +629,9 @@ export default function Calendar() {
                 name="notes"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Notes (Optional)</FormLabel>
+                    <FormLabel>{t('calendar.notesOptional', 'Notes (Optional)')}</FormLabel>
                     <FormControl>
-                      <Textarea {...field} placeholder="Additional notes..." data-testid="input-notes" />
+                      <Textarea {...field} placeholder={t('calendar.notesPlaceholder', 'Additional notes...')} data-testid="input-notes" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -643,14 +645,14 @@ export default function Calendar() {
                   onClick={() => setCreateDialogOpen(false)}
                   data-testid="button-cancel"
                 >
-                  Cancel
+                  {t('common.cancel', 'Cancel')}
                 </Button>
                 <Button 
                   type="submit" 
                   disabled={createAppointmentMutation.isPending}
                   data-testid="button-create"
                 >
-                  {createAppointmentMutation.isPending ? "Creating..." : "Create Appointment"}
+                  {createAppointmentMutation.isPending ? t('calendar.creating', 'Creating...') : t('calendar.createAppointment', 'Create Appointment')}
                 </Button>
               </DialogFooter>
             </form>

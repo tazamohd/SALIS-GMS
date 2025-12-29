@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { StandardPageLayout } from "@/components/layouts/StandardPageLayout";
 import { Card, CardContent } from "@/components/ui/card";
@@ -45,6 +46,7 @@ const formSchema = insertToolSchema.extend({
 type FormData = z.infer<typeof formSchema>;
 
 export default function Tools() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [selectedToolType, setSelectedToolType] = useState<string>("all");
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
@@ -82,13 +84,13 @@ export default function Tools() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/tools"] });
-      toast({ title: "Tool created successfully" });
+      toast({ title: t('inventory.toolCreatedSuccessfully', 'Tool created successfully') });
       setCreateDialogOpen(false);
       form.reset();
     },
     onError: (error: any) => {
       toast({
-        title: "Error creating tool",
+        title: t('inventory.errorCreatingTool', 'Error creating tool'),
         description: error.message,
         variant: "destructive",
       });
@@ -120,12 +122,12 @@ export default function Tools() {
 
   return (
     <StandardPageLayout
-      title="Tools Management"
-      description="Manage tools and equipment inventory"
+      title={t('inventory.toolsManagement', 'Tools Management')}
+      description={t('inventory.manageToolsDesc', 'Manage tools and equipment inventory')}
       icon={Wrench}
       actions={[
         {
-          label: "Add Tool",
+          label: t('inventory.addTool', 'Add Tool'),
           icon: Plus,
           onClick: () => setCreateDialogOpen(true),
         },
@@ -134,25 +136,25 @@ export default function Tools() {
       <div className="flex gap-4 mb-6">
         <Select value={selectedToolType} onValueChange={setSelectedToolType}>
           <SelectTrigger className="w-[200px]" data-testid="filter-tool-type">
-            <SelectValue placeholder="All Tool Types" />
+            <SelectValue placeholder={t('inventory.allToolTypes', 'All Tool Types')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Tool Types</SelectItem>
-            <SelectItem value="diagnostic">Diagnostic</SelectItem>
-            <SelectItem value="mechanical">Mechanical</SelectItem>
-            <SelectItem value="electrical">Electrical</SelectItem>
+            <SelectItem value="all">{t('inventory.allToolTypes', 'All Tool Types')}</SelectItem>
+            <SelectItem value="diagnostic">{t('inventory.diagnostic', 'Diagnostic')}</SelectItem>
+            <SelectItem value="mechanical">{t('inventory.mechanical', 'Mechanical')}</SelectItem>
+            <SelectItem value="electrical">{t('inventory.electrical', 'Electrical')}</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
       {isLoading ? (
         <div className="text-center py-12" data-testid="loading-state">
-          <p className="text-gray-900 dark:text-white/60">Loading tools...</p>
+          <p className="text-gray-900 dark:text-white/60">{t('inventory.loadingTools', 'Loading tools...')}</p>
         </div>
       ) : isError ? (
         <div className="text-center py-12" data-testid="error-state">
-          <p className="text-gray-800 dark:text-gray-200 font-semibold">Error loading tools</p>
-          <p className="text-sm text-gray-900 dark:text-white/60 mt-2">{error instanceof Error ? error.message : "Please try again later"}</p>
+          <p className="text-gray-800 dark:text-gray-200 font-semibold">{t('inventory.errorLoadingTools', 'Error loading tools')}</p>
+          <p className="text-sm text-gray-900 dark:text-white/60 mt-2">{error instanceof Error ? error.message : t('common.tryAgainLater', 'Please try again later')}</p>
         </div>
       ) : filteredTools && filteredTools.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -175,13 +177,13 @@ export default function Tools() {
                   <div className="flex flex-col gap-2 text-sm text-gray-900 dark:text-white/60">
                     {tool.brand && (
                       <div className="flex justify-between" data-testid={`text-brand-${tool.id}`}>
-                        <span className="font-medium">Brand:</span>
+                        <span className="font-medium">{t('inventory.brand', 'Brand')}:</span>
                         <span>{tool.brand}</span>
                       </div>
                     )}
                     {tool.manufacturer && (
                       <div className="flex justify-between" data-testid={`text-manufacturer-${tool.id}`}>
-                        <span className="font-medium">Manufacturer:</span>
+                        <span className="font-medium">{t('inventory.manufacturer', 'Manufacturer')}:</span>
                         <span>{tool.manufacturer}</span>
                       </div>
                     )}
@@ -189,16 +191,16 @@ export default function Tools() {
                   <div className="flex items-center gap-2">
                     {tool.isActive ? (
                       <Badge variant="outline" className="bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
-                        <CheckCircle className="h-3 w-3 mr-1" /> Active
+                        <CheckCircle className="h-3 w-3 mr-1" /> {t('common.active', 'Active')}
                       </Badge>
                     ) : (
                       <Badge variant="outline" className="bg-gray-100 dark:bg-salis-gray-dark text-gray-700 dark:bg-gray-950 dark:text-gray-300">
-                        <XCircle className="h-3 w-3 mr-1" /> Inactive
+                        <XCircle className="h-3 w-3 mr-1" /> {t('common.inactive', 'Inactive')}
                       </Badge>
                     )}
                     {tool.isGlobal && (
                       <Badge variant="outline" className="bg-gray-300 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
-                        Global
+                        {t('inventory.global', 'Global')}
                       </Badge>
                     )}
                   </div>
@@ -209,17 +211,17 @@ export default function Tools() {
         </div>
       ) : (
         <div className="text-center py-12" data-testid="empty-state">
-          <p className="text-gray-900 dark:text-white/60">No tools found</p>
-          <p className="text-sm text-gray-900 dark:text-white/60 mt-2">Add your first tool to get started</p>
+          <p className="text-gray-900 dark:text-white/60">{t('inventory.noToolsFound', 'No tools found')}</p>
+          <p className="text-sm text-gray-900 dark:text-white/60 mt-2">{t('inventory.addFirstTool', 'Add your first tool to get started')}</p>
         </div>
       )}
 
       <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Add New Tool</DialogTitle>
+            <DialogTitle>{t('inventory.addNewTool', 'Add New Tool')}</DialogTitle>
             <DialogDescription>
-              Add a new tool or equipment to the inventory
+              {t('inventory.addToolDesc', 'Add a new tool or equipment to the inventory')}
             </DialogDescription>
           </DialogHeader>
           <Form {...form}>

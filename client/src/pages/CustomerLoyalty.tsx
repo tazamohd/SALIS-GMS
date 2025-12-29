@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -42,6 +43,7 @@ type ProgramFormData = z.infer<typeof programSchema>;
 type RewardFormData = z.infer<typeof rewardSchema>;
 
 export default function CustomerLoyalty() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [isCreateProgramDialogOpen, setIsCreateProgramDialogOpen] = useState(false);
   const [isCreateRewardDialogOpen, setIsCreateRewardDialogOpen] = useState(false);
@@ -98,12 +100,12 @@ export default function CustomerLoyalty() {
     mutationFn: (data: ProgramFormData) => apiRequest("POST", "/api/loyalty-programs", data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/loyalty-programs"] });
-      toast({ title: "Success", description: "Loyalty program created successfully" });
+      toast({ title: t('common.success', 'Success'), description: t('customers.loyalty.programCreated', 'Loyalty program created successfully') });
       setIsCreateProgramDialogOpen(false);
       programForm.reset();
     },
     onError: () => {
-      toast({ title: "Error", description: "Failed to create loyalty program", variant: "destructive" });
+      toast({ title: t('common.error', 'Error'), description: t('customers.loyalty.failedToCreateProgram', 'Failed to create loyalty program'), variant: "destructive" });
     }
   });
 
@@ -111,12 +113,12 @@ export default function CustomerLoyalty() {
     mutationFn: (data: RewardFormData) => apiRequest("POST", "/api/loyalty-rewards", data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/loyalty-programs", selectedProgram?.id, "rewards"] });
-      toast({ title: "Success", description: "Reward created successfully" });
+      toast({ title: t('common.success', 'Success'), description: t('customers.loyalty.rewardCreated', 'Reward created successfully') });
       setIsCreateRewardDialogOpen(false);
       rewardForm.reset();
     },
     onError: () => {
-      toast({ title: "Error", description: "Failed to create reward", variant: "destructive" });
+      toast({ title: t('common.error', 'Error'), description: t('customers.loyalty.failedToCreateReward', 'Failed to create reward'), variant: "destructive" });
     }
   });
 
@@ -124,7 +126,7 @@ export default function CustomerLoyalty() {
     mutationFn: (id: string) => apiRequest("DELETE", `/api/loyalty-programs/${id}`, undefined),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/loyalty-programs"] });
-      toast({ title: "Success", description: "Program deleted successfully" });
+      toast({ title: t('common.success', 'Success'), description: t('customers.loyalty.programDeleted', 'Program deleted successfully') });
     }
   });
 
@@ -149,21 +151,21 @@ export default function CustomerLoyalty() {
   const tabs: TabConfig[] = [
     {
       id: "programs",
-      label: "Programs",
+      label: t('customers.loyalty.programs', 'Programs'),
       icon: Award,
       content: (
         <Card className="border-salis-gray-light dark:border-salis-gray-dark bg-white dark:bg-[#010101]">
           <CardHeader>
-            <CardTitle className="font-montserrat text-salis-black dark:text-white">Loyalty Programs</CardTitle>
+            <CardTitle className="font-montserrat text-salis-black dark:text-white">{t('customers.loyalty.programs', 'Loyalty Programs')}</CardTitle>
             <CardDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
-              Configure and manage your loyalty programs
+              {t('customers.loyalty.configurePrograms', 'Configure and manage your loyalty programs')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             {programsLoading ? (
-              <p className="text-salis-gray font-poppins" data-testid="text-loading">Loading programs...</p>
+              <p className="text-salis-gray font-poppins" data-testid="text-loading">{t('common.loading', 'Loading programs...')}</p>
             ) : programs.length === 0 ? (
-              <p className="text-salis-gray font-poppins" data-testid="text-no-programs">No loyalty programs found</p>
+              <p className="text-salis-gray font-poppins" data-testid="text-no-programs">{t('customers.loyalty.noPrograms', 'No loyalty programs found')}</p>
             ) : (
               <div className="grid gap-4">
                 {programs.map((program: any) => (
@@ -182,21 +184,21 @@ export default function CustomerLoyalty() {
                               {program.name}
                             </h3>
                             <Badge className={program.isActive ? "bg-salis-black text-white" : "bg-salis-gray-light text-salis-black"} data-testid={`badge-active-${program.id}`}>
-                              {program.isActive ? "Active" : "Inactive"}
+                              {program.isActive ? t('common.active', 'Active') : t('common.inactive', 'Inactive')}
                             </Badge>
                           </div>
                           <p className="text-sm text-salis-gray dark:text-salis-gray-light font-poppins mb-3" data-testid={`text-program-description-${program.id}`}>
-                            {program.description || "No description"}
+                            {program.description || t('customers.loyalty.noDescription', 'No description')}
                           </p>
                           <div className="flex items-center gap-6 text-sm">
                             <div>
-                              <p className="text-salis-gray dark:text-salis-gray-light font-poppins">Points Per $1</p>
+                              <p className="text-salis-gray dark:text-salis-gray-light font-poppins">{t('customers.loyalty.pointsPerDollar', 'Points Per $1')}</p>
                               <p className="font-semibold text-salis-black dark:text-white" data-testid={`text-points-per-dollar-${program.id}`}>
                                 {program.pointsPerDollar}
                               </p>
                             </div>
                             <div>
-                              <p className="text-salis-gray dark:text-salis-gray-light font-poppins">Membership Tiers</p>
+                              <p className="text-salis-gray dark:text-salis-gray-light font-poppins">{t('customers.loyalty.membershipTiers', 'Membership Tiers')}</p>
                               <div className="flex gap-1 mt-1">
                                 {program.tiers && Array.isArray(program.tiers) && program.tiers.map((tier: any, idx: number) => (
                                   <Badge key={idx} className={getTierBadge(tier.name)} data-testid={`badge-tier-${tier.name}-${program.id}`}>
@@ -212,14 +214,14 @@ export default function CustomerLoyalty() {
                           variant="outline"
                           onClick={(e) => {
                             e.stopPropagation();
-                            if (confirm("Delete this program?")) {
+                            if (confirm(t('customers.loyalty.deleteConfirm', 'Delete this program?'))) {
                               deleteProgramMutation.mutate(program.id);
                             }
                           }}
                           className="border-salis-gray-light dark:border-salis-gray-dark"
                           data-testid={`button-delete-program-${program.id}`}
                         >
-                          Delete
+                          {t('common.delete', 'Delete')}
                         </Button>
                       </div>
                     </CardContent>
@@ -233,19 +235,19 @@ export default function CustomerLoyalty() {
     },
     {
       id: "members",
-      label: "Members",
+      label: t('customers.loyalty.members', 'Members'),
       icon: Users,
       content: (
         <Card className="border-salis-gray-light dark:border-salis-gray-dark bg-white dark:bg-[#010101]">
           <CardHeader>
-            <CardTitle className="font-montserrat text-salis-black dark:text-white">Loyalty Members</CardTitle>
+            <CardTitle className="font-montserrat text-salis-black dark:text-white">{t('customers.loyalty.members', 'Loyalty Members')}</CardTitle>
             <CardDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
-              View and manage customer loyalty accounts
+              {t('customers.loyalty.manageMemberAccounts', 'View and manage customer loyalty accounts')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             {accounts.length === 0 ? (
-              <p className="text-salis-gray font-poppins" data-testid="text-no-members">No loyalty members found</p>
+              <p className="text-salis-gray font-poppins" data-testid="text-no-members">{t('customers.loyalty.noMembers', 'No loyalty members found')}</p>
             ) : (
               <div className="grid gap-4">
                 {accounts.map((account: any) => (
@@ -264,7 +266,7 @@ export default function CustomerLoyalty() {
                           </div>
                         </div>
                         <div className="text-right">
-                          <p className="text-sm text-salis-gray dark:text-salis-gray-light font-poppins">Total Earned</p>
+                          <p className="text-sm text-salis-gray dark:text-salis-gray-light font-poppins">{t('customers.loyalty.totalEarned', 'Total Earned')}</p>
                           <p className="font-semibold text-salis-black dark:text-white" data-testid={`text-member-total-${account.id}`}>
                             {account.totalPointsEarned ?? 0} pts
                           </p>
@@ -281,15 +283,15 @@ export default function CustomerLoyalty() {
     },
     {
       id: "rewards",
-      label: "Rewards",
+      label: t('customers.loyalty.rewards', 'Rewards'),
       icon: Gift,
       content: (
         <Card className="border-salis-gray-light dark:border-salis-gray-dark bg-white dark:bg-[#010101]">
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
-              <CardTitle className="font-montserrat text-salis-black dark:text-white">Loyalty Rewards</CardTitle>
+              <CardTitle className="font-montserrat text-salis-black dark:text-white">{t('customers.loyalty.loyaltyRewards', 'Loyalty Rewards')}</CardTitle>
               <CardDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
-                {selectedProgram ? `Rewards for: ${selectedProgram.name}` : "Select a program to manage rewards"}
+                {selectedProgram ? `${t('customers.loyalty.rewardsFor', 'Rewards for')}: ${selectedProgram.name}` : t('customers.loyalty.selectProgramToManage', 'Select a program to manage rewards')}
               </CardDescription>
             </div>
             {selectedProgram && (
@@ -299,17 +301,17 @@ export default function CustomerLoyalty() {
                 data-testid="button-create-reward"
               >
                 <Gift className="mr-2 h-4 w-4" />
-                Add Reward
+                {t('customers.loyalty.addReward', 'Add Reward')}
               </Button>
             )}
           </CardHeader>
           <CardContent>
             {!selectedProgram ? (
               <p className="text-salis-gray font-poppins text-center py-8" data-testid="text-no-program-selected">
-                Select a program from the Programs tab to manage its rewards
+                {t('customers.loyalty.selectProgramFromTab', 'Select a program from the Programs tab to manage its rewards')}
               </p>
             ) : rewards.length === 0 ? (
-              <p className="text-salis-gray font-poppins" data-testid="text-no-rewards">No rewards found</p>
+              <p className="text-salis-gray font-poppins" data-testid="text-no-rewards">{t('customers.loyalty.noRewards', 'No rewards found')}</p>
             ) : (
               <div className="grid gap-4 md:grid-cols-2">
                 {rewards.map((reward: any) => (
@@ -323,21 +325,21 @@ export default function CustomerLoyalty() {
                           </h3>
                         </div>
                         <Badge className={reward.isActive ? "bg-salis-black text-white" : "bg-salis-gray-light text-salis-black"} data-testid={`badge-reward-active-${reward.id}`}>
-                          {reward.isActive ? "Active" : "Inactive"}
+                          {reward.isActive ? t('common.active', 'Active') : t('common.inactive', 'Inactive')}
                         </Badge>
                       </div>
                       <p className="text-sm text-salis-gray dark:text-salis-gray-light font-poppins mb-3" data-testid={`text-reward-description-${reward.id}`}>
-                        {reward.description || "No description"}
+                        {reward.description || t('customers.loyalty.noDescription', 'No description')}
                       </p>
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-xs text-salis-gray dark:text-salis-gray-light font-poppins">Cost</p>
+                          <p className="text-xs text-salis-gray dark:text-salis-gray-light font-poppins">{t('customers.loyalty.cost', 'Cost')}</p>
                           <p className="text-lg font-bold text-salis-black dark:text-white" data-testid={`text-reward-cost-${reward.id}`}>
                             {reward.pointsCost} pts
                           </p>
                         </div>
                         <div className="text-right">
-                          <p className="text-xs text-salis-gray dark:text-salis-gray-light font-poppins">Value</p>
+                          <p className="text-xs text-salis-gray dark:text-salis-gray-light font-poppins">{t('customers.loyalty.value', 'Value')}</p>
                           <p className="text-lg font-bold text-salis-black dark:text-white" data-testid={`text-reward-value-${reward.id}`}>
                             ${reward.value}
                           </p>
@@ -354,19 +356,19 @@ export default function CustomerLoyalty() {
     },
     {
       id: "redemptions",
-      label: "Redemptions",
+      label: t('customers.loyalty.redemptions', 'Redemptions'),
       icon: CreditCard,
       content: (
         <Card className="border-salis-gray-light dark:border-salis-gray-dark bg-white dark:bg-[#010101]">
           <CardHeader>
-            <CardTitle className="font-montserrat text-salis-black dark:text-white">Reward Redemptions</CardTitle>
+            <CardTitle className="font-montserrat text-salis-black dark:text-white">{t('customers.loyalty.rewardRedemptions', 'Reward Redemptions')}</CardTitle>
             <CardDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
-              Track and manage customer reward redemptions
+              {t('customers.loyalty.trackRedemptions', 'Track and manage customer reward redemptions')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             {redemptions.length === 0 ? (
-              <p className="text-salis-gray font-poppins" data-testid="text-no-redemptions">No redemptions found</p>
+              <p className="text-salis-gray font-poppins" data-testid="text-no-redemptions">{t('customers.loyalty.noRedemptions', 'No redemptions found')}</p>
             ) : (
               <div className="grid gap-4">
                 {redemptions.map((redemption: any) => (
@@ -380,7 +382,7 @@ export default function CustomerLoyalty() {
                               {redemption.redemptionCode}
                             </p>
                             <p className="text-sm text-salis-gray dark:text-salis-gray-light font-poppins">
-                              {redemption.pointsRedeemed} points redeemed
+                              {redemption.pointsRedeemed} {t('customers.loyalty.pointsRedeemed', 'points redeemed')}
                             </p>
                           </div>
                         </div>
@@ -402,11 +404,11 @@ export default function CustomerLoyalty() {
   return (
     <>
       <TabsPageLayout
-        title="Customer Loyalty Program"
-        description="Manage loyalty programs, rewards, points, and customer memberships"
+        title={t('customers.loyalty.title', 'Customer Loyalty Program')}
+        description={t('customers.loyalty.description', 'Manage loyalty programs, rewards, points, and customer memberships')}
         icon={Award}
         primaryAction={{
-          label: "Create Program",
+          label: t('customers.loyalty.createProgram', 'Create Program'),
           icon: Award,
           onClick: () => setIsCreateProgramDialogOpen(true),
           testId: "button-create-program",
@@ -418,9 +420,9 @@ export default function CustomerLoyalty() {
       <Dialog open={isCreateProgramDialogOpen} onOpenChange={setIsCreateProgramDialogOpen}>
         <DialogContent className="sm:max-w-[600px] bg-white dark:bg-[#010101] border-salis-gray-light dark:border-salis-gray-dark">
           <DialogHeader>
-            <DialogTitle className="font-montserrat text-salis-black dark:text-white">Create Loyalty Program</DialogTitle>
+            <DialogTitle className="font-montserrat text-salis-black dark:text-white">{t('customers.loyalty.createProgramTitle', 'Create Loyalty Program')}</DialogTitle>
             <DialogDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
-              Set up a new customer loyalty program with tiers and benefits
+              {t('customers.loyalty.createProgramDescription', 'Set up a new customer loyalty program with tiers and benefits')}
             </DialogDescription>
           </DialogHeader>
           <Form {...programForm}>
@@ -430,7 +432,7 @@ export default function CustomerLoyalty() {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-salis-black dark:text-white font-poppins">Program Name</FormLabel>
+                    <FormLabel className="text-salis-black dark:text-white font-poppins">{t('customers.loyalty.programName', 'Program Name')}</FormLabel>
                     <FormControl>
                       <Input {...field} placeholder="VIP Rewards Program" data-testid="input-program-name" className="bg-white dark:bg-[#010101]" />
                     </FormControl>
@@ -444,7 +446,7 @@ export default function CustomerLoyalty() {
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-salis-black dark:text-white font-poppins">Description</FormLabel>
+                    <FormLabel className="text-salis-black dark:text-white font-poppins">{t('common.description', 'Description')}</FormLabel>
                     <FormControl>
                       <Textarea {...field} placeholder="Earn points with every service..." rows={3} data-testid="input-program-description" className="bg-white dark:bg-[#010101]" />
                     </FormControl>
@@ -458,7 +460,7 @@ export default function CustomerLoyalty() {
                 name="pointsPerDollar"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-salis-black dark:text-white font-poppins">Points Per Dollar</FormLabel>
+                    <FormLabel className="text-salis-black dark:text-white font-poppins">{t('customers.loyalty.pointsPerDollar', 'Points Per Dollar')}</FormLabel>
                     <FormControl>
                       <Input 
                         {...field} 
@@ -482,7 +484,7 @@ export default function CustomerLoyalty() {
                   className="border-salis-gray-light dark:border-salis-gray-dark"
                   data-testid="button-cancel-program"
                 >
-                  Cancel
+                  {t('common.cancel', 'Cancel')}
                 </Button>
                 <Button
                   type="submit"
@@ -490,7 +492,7 @@ export default function CustomerLoyalty() {
                   className="bg-salis-black hover:bg-salis-gray-dark text-white"
                   data-testid="button-submit-program"
                 >
-                  {createProgramMutation.isPending ? "Creating..." : "Create Program"}
+                  {createProgramMutation.isPending ? t('common.creating', 'Creating...') : t('customers.loyalty.createProgram', 'Create Program')}
                 </Button>
               </DialogFooter>
             </form>
@@ -501,9 +503,9 @@ export default function CustomerLoyalty() {
       <Dialog open={isCreateRewardDialogOpen} onOpenChange={setIsCreateRewardDialogOpen}>
         <DialogContent className="sm:max-w-[600px] bg-white dark:bg-[#010101] border-salis-gray-light dark:border-salis-gray-dark">
           <DialogHeader>
-            <DialogTitle className="font-montserrat text-salis-black dark:text-white">Add Reward</DialogTitle>
+            <DialogTitle className="font-montserrat text-salis-black dark:text-white">{t('customers.loyalty.addReward', 'Add Reward')}</DialogTitle>
             <DialogDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
-              Create a new reward for {selectedProgram?.name}
+              {t('customers.loyalty.createRewardFor', 'Create a new reward for')} {selectedProgram?.name}
             </DialogDescription>
           </DialogHeader>
           <Form {...rewardForm}>
@@ -513,7 +515,7 @@ export default function CustomerLoyalty() {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-salis-black dark:text-white font-poppins">Reward Name</FormLabel>
+                    <FormLabel className="text-salis-black dark:text-white font-poppins">{t('customers.loyalty.rewardName', 'Reward Name')}</FormLabel>
                     <FormControl>
                       <Input {...field} placeholder="$10 Service Discount" data-testid="input-reward-name" className="bg-white dark:bg-[#010101]" />
                     </FormControl>
@@ -527,18 +529,18 @@ export default function CustomerLoyalty() {
                 name="rewardType"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-salis-black dark:text-white font-poppins">Reward Type</FormLabel>
+                    <FormLabel className="text-salis-black dark:text-white font-poppins">{t('customers.loyalty.rewardType', 'Reward Type')}</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger data-testid="select-reward-type">
-                          <SelectValue placeholder="Select type" />
+                          <SelectValue placeholder={t('customers.loyalty.selectType', 'Select type')} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="discount">Discount</SelectItem>
-                        <SelectItem value="service">Free Service</SelectItem>
-                        <SelectItem value="product">Product</SelectItem>
-                        <SelectItem value="cashback">Cashback</SelectItem>
+                        <SelectItem value="discount">{t('customers.loyalty.discount', 'Discount')}</SelectItem>
+                        <SelectItem value="service">{t('customers.loyalty.freeService', 'Free Service')}</SelectItem>
+                        <SelectItem value="product">{t('customers.loyalty.product', 'Product')}</SelectItem>
+                        <SelectItem value="cashback">{t('customers.loyalty.cashback', 'Cashback')}</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -552,7 +554,7 @@ export default function CustomerLoyalty() {
                   name="pointsCost"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white font-poppins">Points Cost</FormLabel>
+                      <FormLabel className="text-salis-black dark:text-white font-poppins">{t('customers.loyalty.pointsCost', 'Points Cost')}</FormLabel>
                       <FormControl>
                         <Input 
                           {...field} 
@@ -573,7 +575,7 @@ export default function CustomerLoyalty() {
                   name="value"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white font-poppins">Value ($)</FormLabel>
+                      <FormLabel className="text-salis-black dark:text-white font-poppins">{t('customers.loyalty.valueDollar', 'Value ($)')}</FormLabel>
                       <FormControl>
                         <Input 
                           {...field} 
@@ -598,7 +600,7 @@ export default function CustomerLoyalty() {
                   className="border-salis-gray-light dark:border-salis-gray-dark"
                   data-testid="button-cancel-reward"
                 >
-                  Cancel
+                  {t('common.cancel', 'Cancel')}
                 </Button>
                 <Button
                   type="submit"
@@ -606,7 +608,7 @@ export default function CustomerLoyalty() {
                   className="bg-salis-black hover:bg-salis-gray-dark text-white"
                   data-testid="button-submit-reward"
                 >
-                  {createRewardMutation.isPending ? "Creating..." : "Add Reward"}
+                  {createRewardMutation.isPending ? t('common.creating', 'Creating...') : t('customers.loyalty.addReward', 'Add Reward')}
                 </Button>
               </DialogFooter>
             </form>

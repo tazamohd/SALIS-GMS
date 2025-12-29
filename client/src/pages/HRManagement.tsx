@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "@/hooks/useAuth";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -110,27 +111,34 @@ const mockSelfServiceRequests = [
   { id: "3", employee: "Omar Khalid", type: "info_update", subject: "Update Bank Account Details", status: "pending", date: "2024-12-14" },
 ];
 
+const mockTrainings = [
+  { id: "1", name: "Advanced Engine Diagnostics", provider: "Toyota Academy", duration: "3 days", type: "Technical", enrolled: 8, status: "active" },
+  { id: "2", name: "Customer Service Excellence", provider: "Internal Training", duration: "1 day", type: "Soft Skills", enrolled: 15, status: "active" },
+  { id: "3", name: "Safety and Compliance", provider: "OSHA Certified", duration: "2 days", type: "Compliance", enrolled: 25, status: "upcoming" },
+];
+
 export default function HRManagement() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const garageId = user?.garageId || 'default';
 
   const tabs: TabConfig[] = [
-    { id: 'employees', label: 'Employees', icon: Users, content: <EmployeesTab garageId={garageId} /> },
-    { id: 'attendance', label: 'Attendance', icon: Clock, content: <AttendanceTab garageId={garageId} /> },
-    { id: 'leave', label: 'Leave', icon: CalendarDays, content: <LeaveManagementTab garageId={garageId} /> },
-    { id: 'payroll', label: 'Payroll', icon: DollarSign, content: <PayrollTab garageId={garageId} /> },
-    { id: 'performance', label: 'Performance', icon: Target, content: <PerformanceTab garageId={garageId} /> },
-    { id: 'training', label: 'Training', icon: GraduationCap, content: <TrainingTab garageId={garageId} /> },
-    { id: 'recruitment', label: 'Recruitment', icon: UserPlus, content: <RecruitmentTab garageId={garageId} /> },
-    { id: 'benefits', label: 'Benefits', icon: Gift, content: <BenefitsTab garageId={garageId} /> },
-    { id: 'organization', label: 'Organization', icon: Building2, content: <OrganizationTab garageId={garageId} /> },
-    { id: 'self-service', label: 'Self-Service', icon: ClipboardCheck, content: <SelfServiceTab garageId={garageId} /> },
+    { id: 'employees', label: t('hr.employees', 'Employees'), icon: Users, content: <EmployeesTab garageId={garageId} /> },
+    { id: 'attendance', label: t('hr.attendance', 'Attendance'), icon: Clock, content: <AttendanceTab garageId={garageId} /> },
+    { id: 'leave', label: t('hr.leave', 'Leave'), icon: CalendarDays, content: <LeaveManagementTab garageId={garageId} /> },
+    { id: 'payroll', label: t('hr.payroll', 'Payroll'), icon: DollarSign, content: <PayrollTab garageId={garageId} /> },
+    { id: 'performance', label: t('hr.performance', 'Performance'), icon: Target, content: <PerformanceTab garageId={garageId} /> },
+    { id: 'training', label: t('hr.training', 'Training'), icon: GraduationCap, content: <TrainingTab garageId={garageId} /> },
+    { id: 'recruitment', label: t('hr.recruitment', 'Recruitment'), icon: UserPlus, content: <RecruitmentTab garageId={garageId} /> },
+    { id: 'benefits', label: t('hr.benefits', 'Benefits'), icon: Gift, content: <BenefitsTab garageId={garageId} /> },
+    { id: 'organization', label: t('hr.organization', 'Organization'), icon: Building2, content: <OrganizationTab garageId={garageId} /> },
+    { id: 'self-service', label: t('hr.selfService', 'Self-Service'), icon: ClipboardCheck, content: <SelfServiceTab garageId={garageId} /> },
   ];
 
   return (
     <TabsPageLayout
-      title="Human Resources"
-      description="Complete HR management: employees, attendance, leave, payroll, recruitment, benefits, and more"
+      title={t('hr.title', 'Human Resources')}
+      description={t('hr.description', 'Complete HR management: employees, attendance, leave, payroll, recruitment, benefits, and more')}
       icon={Users}
       tabs={tabs}
       defaultTab="employees"
@@ -139,6 +147,7 @@ export default function HRManagement() {
 }
 
 function EmployeesTab({ garageId }: { garageId: string }) {
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDepartment, setSelectedDepartment] = useState("all");
   const [showAddDialog, setShowAddDialog] = useState(false);
@@ -169,7 +178,7 @@ function EmployeesTab({ garageId }: { garageId: string }) {
               </div>
               <div>
                 <p className="text-2xl font-bold" data-testid="text-total-employees">43</p>
-                <p className="text-sm text-muted-foreground">Total Employees</p>
+                <p className="text-sm text-muted-foreground">{t('hr.totalEmployees', 'Total Employees')}</p>
               </div>
             </div>
           </CardContent>
@@ -182,7 +191,7 @@ function EmployeesTab({ garageId }: { garageId: string }) {
               </div>
               <div>
                 <p className="text-2xl font-bold" data-testid="text-active-employees">38</p>
-                <p className="text-sm text-muted-foreground">Active</p>
+                <p className="text-sm text-muted-foreground">{t('common.active', 'Active')}</p>
               </div>
             </div>
           </CardContent>
@@ -195,7 +204,7 @@ function EmployeesTab({ garageId }: { garageId: string }) {
               </div>
               <div>
                 <p className="text-2xl font-bold" data-testid="text-on-leave">3</p>
-                <p className="text-sm text-muted-foreground">On Leave</p>
+                <p className="text-sm text-muted-foreground">{t('hr.onLeave', 'On Leave')}</p>
               </div>
             </div>
           </CardContent>
@@ -208,7 +217,7 @@ function EmployeesTab({ garageId }: { garageId: string }) {
               </div>
               <div>
                 <p className="text-2xl font-bold" data-testid="text-new-hires">2</p>
-                <p className="text-sm text-muted-foreground">New This Month</p>
+                <p className="text-sm text-muted-foreground">{t('hr.newThisMonth', 'New This Month')}</p>
               </div>
             </div>
           </CardContent>
@@ -219,20 +228,20 @@ function EmployeesTab({ garageId }: { garageId: string }) {
         <CardHeader>
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
-              <CardTitle>Employee Directory</CardTitle>
-              <CardDescription>Manage all employees in your organization</CardDescription>
+              <CardTitle>{t('hr.employeeDirectory', 'Employee Directory')}</CardTitle>
+              <CardDescription>{t('hr.manageAllEmployees', 'Manage all employees in your organization')}</CardDescription>
             </div>
             <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
               <DialogTrigger asChild>
                 <Button data-testid="button-add-employee">
                   <Plus className="h-4 w-4 mr-2" />
-                  Add Employee
+                  {t('hr.addEmployee', 'Add Employee')}
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-2xl">
                 <DialogHeader>
-                  <DialogTitle>Add New Employee</DialogTitle>
-                  <DialogDescription>Enter the employee details to add them to the system</DialogDescription>
+                  <DialogTitle>{t('hr.addNewEmployee', 'Add New Employee')}</DialogTitle>
+                  <DialogDescription>{t('hr.enterEmployeeDetails', 'Enter the employee details to add them to the system')}</DialogDescription>
                 </DialogHeader>
                 <EmployeeForm onSuccess={() => setShowAddDialog(false)} />
               </DialogContent>
@@ -244,7 +253,7 @@ function EmployeesTab({ garageId }: { garageId: string }) {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search employees..."
+                placeholder={t('hr.searchEmployees', 'Search employees...')}
                 className="pl-9"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -253,10 +262,10 @@ function EmployeesTab({ garageId }: { garageId: string }) {
             </div>
             <Select value={selectedDepartment} onValueChange={setSelectedDepartment}>
               <SelectTrigger className="w-[180px]" data-testid="select-department-filter">
-                <SelectValue placeholder="All Departments" />
+                <SelectValue placeholder={t('hr.allDepartments', 'All Departments')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Departments</SelectItem>
+                <SelectItem value="all">{t('hr.allDepartments', 'All Departments')}</SelectItem>
                 {mockDepartments.map(dept => (
                   <SelectItem key={dept.id} value={dept.name}>{dept.name}</SelectItem>
                 ))}
@@ -268,12 +277,12 @@ function EmployeesTab({ garageId }: { garageId: string }) {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Employee</TableHead>
-                  <TableHead>Department</TableHead>
-                  <TableHead>Position</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Hire Date</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead>{t('hr.employee', 'Employee')}</TableHead>
+                  <TableHead>{t('hr.department', 'Department')}</TableHead>
+                  <TableHead>{t('hr.position', 'Position')}</TableHead>
+                  <TableHead>{t('common.status', 'Status')}</TableHead>
+                  <TableHead>{t('hr.hireDate', 'Hire Date')}</TableHead>
+                  <TableHead className="text-right">{t('common.actions', 'Actions')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -323,29 +332,30 @@ function EmployeesTab({ garageId }: { garageId: string }) {
 }
 
 function EmployeeForm({ onSuccess }: { onSuccess: () => void }) {
+  const { t } = useTranslation();
   return (
     <div className="grid grid-cols-2 gap-4">
       <div>
-        <Label htmlFor="firstName">First Name</Label>
-        <Input id="firstName" placeholder="Enter first name" data-testid="input-first-name" />
+        <Label htmlFor="firstName">{t('hr.firstName', 'First Name')}</Label>
+        <Input id="firstName" placeholder={t('hr.enterFirstName', 'Enter first name')} data-testid="input-first-name" />
       </div>
       <div>
-        <Label htmlFor="lastName">Last Name</Label>
-        <Input id="lastName" placeholder="Enter last name" data-testid="input-last-name" />
+        <Label htmlFor="lastName">{t('hr.lastName', 'Last Name')}</Label>
+        <Input id="lastName" placeholder={t('hr.enterLastName', 'Enter last name')} data-testid="input-last-name" />
       </div>
       <div>
-        <Label htmlFor="email">Email</Label>
+        <Label htmlFor="email">{t('hr.email', 'Email')}</Label>
         <Input id="email" type="email" placeholder="email@example.com" data-testid="input-email" />
       </div>
       <div>
-        <Label htmlFor="phone">Phone</Label>
+        <Label htmlFor="phone">{t('hr.phone', 'Phone')}</Label>
         <Input id="phone" placeholder="+966 5X XXX XXXX" data-testid="input-phone" />
       </div>
       <div>
-        <Label htmlFor="department">Department</Label>
+        <Label htmlFor="department">{t('hr.department', 'Department')}</Label>
         <Select>
           <SelectTrigger data-testid="select-department">
-            <SelectValue placeholder="Select department" />
+            <SelectValue placeholder={t('hr.selectDepartment', 'Select department')} />
           </SelectTrigger>
           <SelectContent>
             {mockDepartments.map(dept => (
@@ -355,20 +365,20 @@ function EmployeeForm({ onSuccess }: { onSuccess: () => void }) {
         </Select>
       </div>
       <div>
-        <Label htmlFor="position">Position</Label>
-        <Input id="position" placeholder="Job title" data-testid="input-position" />
+        <Label htmlFor="position">{t('hr.position', 'Position')}</Label>
+        <Input id="position" placeholder={t('hr.jobTitle', 'Job title')} data-testid="input-position" />
       </div>
       <div>
-        <Label htmlFor="hireDate">Hire Date</Label>
+        <Label htmlFor="hireDate">{t('hr.hireDate', 'Hire Date')}</Label>
         <Input id="hireDate" type="date" data-testid="input-hire-date" />
       </div>
       <div>
-        <Label htmlFor="salary">Base Salary (SAR)</Label>
+        <Label htmlFor="salary">{t('hr.baseSalary', 'Base Salary (SAR)')}</Label>
         <Input id="salary" type="number" placeholder="0.00" data-testid="input-salary" />
       </div>
       <div className="col-span-2">
         <Button className="w-full" onClick={onSuccess} data-testid="button-submit-employee">
-          Add Employee
+          {t('hr.addEmployee', 'Add Employee')}
         </Button>
       </div>
     </div>
@@ -376,6 +386,7 @@ function EmployeeForm({ onSuccess }: { onSuccess: () => void }) {
 }
 
 function AttendanceTab({ garageId }: { garageId: string }) {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [selectedEmployee, setSelectedEmployee] = useState<string>("all");
   const [isClockedIn, setIsClockedIn] = useState(false);
@@ -400,7 +411,7 @@ function AttendanceTab({ garageId }: { garageId: string }) {
               </div>
               <div>
                 <p className="text-2xl font-bold" data-testid="text-present-today">35</p>
-                <p className="text-sm text-muted-foreground">Present Today</p>
+                <p className="text-sm text-muted-foreground">{t('hr.presentToday', 'Present Today')}</p>
               </div>
             </div>
           </CardContent>
@@ -413,7 +424,7 @@ function AttendanceTab({ garageId }: { garageId: string }) {
               </div>
               <div>
                 <p className="text-2xl font-bold" data-testid="text-absent-today">5</p>
-                <p className="text-sm text-muted-foreground">Absent</p>
+                <p className="text-sm text-muted-foreground">{t('hr.absent', 'Absent')}</p>
               </div>
             </div>
           </CardContent>
@@ -426,7 +437,7 @@ function AttendanceTab({ garageId }: { garageId: string }) {
               </div>
               <div>
                 <p className="text-2xl font-bold" data-testid="text-late-today">3</p>
-                <p className="text-sm text-muted-foreground">Late Arrivals</p>
+                <p className="text-sm text-muted-foreground">{t('hr.lateArrivals', 'Late Arrivals')}</p>
               </div>
             </div>
           </CardContent>
@@ -439,7 +450,7 @@ function AttendanceTab({ garageId }: { garageId: string }) {
               </div>
               <div>
                 <p className="text-2xl font-bold" data-testid="text-on-leave-today">3</p>
-                <p className="text-sm text-muted-foreground">On Leave</p>
+                <p className="text-sm text-muted-foreground">{t('hr.onLeave', 'On Leave')}</p>
               </div>
             </div>
           </CardContent>
@@ -448,30 +459,30 @@ function AttendanceTab({ garageId }: { garageId: string }) {
 
       <Card>
         <CardHeader>
-          <CardTitle>Quick Actions</CardTitle>
-          <CardDescription>Manage your attendance</CardDescription>
+          <CardTitle>{t('common.quick_actions', 'Quick Actions')}</CardTitle>
+          <CardDescription>{t('hr.manageAttendance', 'Manage your attendance')}</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-wrap gap-2">
           {!isClockedIn ? (
             <Button onClick={() => setIsClockedIn(true)} data-testid="button-clock-in">
               <Play className="h-4 w-4 mr-2" />
-              Clock In
+              {t('hr.clockIn', 'Clock In')}
             </Button>
           ) : (
             <>
               <Button onClick={() => setIsClockedIn(false)} variant="destructive" data-testid="button-clock-out">
                 <StopCircle className="h-4 w-4 mr-2" />
-                Clock Out
+                {t('hr.clockOut', 'Clock Out')}
               </Button>
               {!isOnBreak ? (
                 <Button onClick={() => setIsOnBreak(true)} variant="outline" data-testid="button-start-break">
                   <Pause className="h-4 w-4 mr-2" />
-                  Start Break
+                  {t('hr.startBreak', 'Start Break')}
                 </Button>
               ) : (
                 <Button onClick={() => setIsOnBreak(false)} variant="outline" data-testid="button-end-break">
                   <Play className="h-4 w-4 mr-2" />
-                  End Break
+                  {t('hr.endBreak', 'End Break')}
                 </Button>
               )}
             </>
@@ -483,51 +494,40 @@ function AttendanceTab({ garageId }: { garageId: string }) {
         <CardHeader>
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
-              <CardTitle>Attendance Records</CardTitle>
-              <CardDescription>Today's attendance summary</CardDescription>
+              <CardTitle>{t('hr.attendanceRecords', 'Attendance Records')}</CardTitle>
+              <CardDescription>{t('hr.todayAttendance', "Today's attendance log")}</CardDescription>
             </div>
-            <Select value={selectedEmployee} onValueChange={setSelectedEmployee}>
-              <SelectTrigger className="w-[200px]" data-testid="select-employee-filter">
-                <SelectValue placeholder="All Employees" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Employees</SelectItem>
-                {mockEmployees.map(emp => (
-                  <SelectItem key={emp.id} value={emp.id}>{emp.firstName} {emp.lastName}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
           </div>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Employee</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>Clock In</TableHead>
-                <TableHead>Clock Out</TableHead>
-                <TableHead>Total Hours</TableHead>
-                <TableHead>Status</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {mockAttendance.map((record) => (
-                <TableRow key={record.id} data-testid={`attendance-row-${record.id}`}>
-                  <TableCell className="font-medium">{record.employee}</TableCell>
-                  <TableCell>{record.date}</TableCell>
-                  <TableCell>{record.clockIn}</TableCell>
-                  <TableCell>{record.clockOut}</TableCell>
-                  <TableCell>{record.totalHours}</TableCell>
-                  <TableCell>
-                    <Badge variant={record.status === "present" ? "default" : "destructive"}>
-                      {record.status}
-                    </Badge>
-                  </TableCell>
+          <div className="rounded-md border">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>{t('hr.employee', 'Employee')}</TableHead>
+                  <TableHead>{t('hr.clockIn', 'Clock In')}</TableHead>
+                  <TableHead>{t('hr.clockOut', 'Clock Out')}</TableHead>
+                  <TableHead>{t('hr.totalHours', 'Total Hours')}</TableHead>
+                  <TableHead>{t('common.status', 'Status')}</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {mockAttendance.map((record) => (
+                  <TableRow key={record.id}>
+                    <TableCell className="font-medium">{record.employee}</TableCell>
+                    <TableCell>{record.clockIn}</TableCell>
+                    <TableCell>{record.clockOut}</TableCell>
+                    <TableCell>{record.totalHours}</TableCell>
+                    <TableCell>
+                      <Badge variant={record.status === "present" ? "default" : "destructive"}>
+                        {record.status}
+                      </Badge>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         </CardContent>
       </Card>
     </div>
@@ -535,14 +535,15 @@ function AttendanceTab({ garageId }: { garageId: string }) {
 }
 
 function LeaveManagementTab({ garageId }: { garageId: string }) {
+  const { t } = useTranslation();
   const [showRequestDialog, setShowRequestDialog] = useState(false);
 
-  const getStatusIcon = (status: string) => {
+  const getStatusColor = (status: string) => {
     switch (status) {
-      case "approved": return <CheckCircle className="h-4 w-4 text-green-500" />;
-      case "rejected": return <XCircle className="h-4 w-4 text-red-500" />;
-      case "pending": return <Clock4 className="h-4 w-4 text-yellow-500" />;
-      default: return <AlertCircle className="h-4 w-4 text-gray-500" />;
+      case "approved": return "bg-green-500/10 text-green-600";
+      case "pending": return "bg-yellow-500/10 text-yellow-600";
+      case "rejected": return "bg-red-500/10 text-red-600";
+      default: return "bg-gray-500/10";
     }
   };
 
@@ -552,12 +553,12 @@ function LeaveManagementTab({ garageId }: { garageId: string }) {
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-green-500/10">
-                <CalendarDays className="h-5 w-5 text-green-600 dark:text-green-400" />
+              <div className="p-2 rounded-lg bg-blue-500/10">
+                <CalendarDays className="h-5 w-5 text-blue-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold" data-testid="text-available-leave">14</p>
-                <p className="text-sm text-muted-foreground">Days Available</p>
+                <p className="text-2xl font-bold">18</p>
+                <p className="text-sm text-muted-foreground">{t('hr.availableDays', 'Available Days')}</p>
               </div>
             </div>
           </CardContent>
@@ -565,12 +566,25 @@ function LeaveManagementTab({ garageId }: { garageId: string }) {
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-blue-500/10">
-                <Clock4 className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+              <div className="p-2 rounded-lg bg-yellow-500/10">
+                <Clock4 className="h-5 w-5 text-yellow-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold" data-testid="text-pending-requests">4</p>
-                <p className="text-sm text-muted-foreground">Pending Requests</p>
+                <p className="text-2xl font-bold">4</p>
+                <p className="text-sm text-muted-foreground">{t('hr.pendingRequests', 'Pending Requests')}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-green-500/10">
+                <CheckCircle className="h-5 w-5 text-green-600" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold">3</p>
+                <p className="text-sm text-muted-foreground">{t('hr.usedThisMonth', 'Used This Month')}</p>
               </div>
             </div>
           </CardContent>
@@ -579,118 +593,104 @@ function LeaveManagementTab({ garageId }: { garageId: string }) {
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-lg bg-purple-500/10">
-                <CheckCircle className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                <Users className="h-5 w-5 text-purple-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold" data-testid="text-approved-leaves">12</p>
-                <p className="text-sm text-muted-foreground">Approved This Year</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-orange-500/10">
-                <Users className="h-5 w-5 text-orange-600 dark:text-orange-400" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold" data-testid="text-on-leave-now">3</p>
-                <p className="text-sm text-muted-foreground">Currently On Leave</p>
+                <p className="text-2xl font-bold">3</p>
+                <p className="text-sm text-muted-foreground">{t('hr.onLeaveToday', 'On Leave Today')}</p>
               </div>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <div className="flex justify-between items-center">
-              <div>
-                <CardTitle>Leave Requests</CardTitle>
-                <CardDescription>Manage employee leave requests</CardDescription>
-              </div>
-              <Dialog open={showRequestDialog} onOpenChange={setShowRequestDialog}>
-                <DialogTrigger asChild>
-                  <Button data-testid="button-request-leave">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Request Leave
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Request Leave</DialogTitle>
-                    <DialogDescription>Submit a new leave request</DialogDescription>
-                  </DialogHeader>
-                  <div className="space-y-4">
-                    <div>
-                      <Label>Leave Type</Label>
-                      <Select>
-                        <SelectTrigger data-testid="select-leave-type">
-                          <SelectValue placeholder="Select leave type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {mockLeaveTypes.map(type => (
-                            <SelectItem key={type.id} value={type.id}>{type.name}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <Label>Start Date</Label>
-                        <Input type="date" data-testid="input-start-date" />
-                      </div>
-                      <div>
-                        <Label>End Date</Label>
-                        <Input type="date" data-testid="input-end-date" />
-                      </div>
-                    </div>
-                    <div>
-                      <Label>Reason</Label>
-                      <Textarea placeholder="Enter reason for leave" data-testid="input-reason" />
-                    </div>
-                    <Button className="w-full" onClick={() => setShowRequestDialog(false)} data-testid="button-submit-leave">
-                      Submit Request
-                    </Button>
-                  </div>
-                </DialogContent>
-              </Dialog>
+      <Card>
+        <CardHeader>
+          <div className="flex justify-between items-center">
+            <div>
+              <CardTitle>{t('hr.leaveRequests', 'Leave Requests')}</CardTitle>
+              <CardDescription>{t('hr.manageLeaveRequests', 'Manage leave requests and approvals')}</CardDescription>
             </div>
-          </CardHeader>
-          <CardContent>
+            <Dialog open={showRequestDialog} onOpenChange={setShowRequestDialog}>
+              <DialogTrigger asChild>
+                <Button data-testid="button-request-leave">
+                  <Plus className="h-4 w-4 mr-2" />
+                  {t('hr.requestLeave', 'Request Leave')}
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>{t('hr.newLeaveRequest', 'New Leave Request')}</DialogTitle>
+                  <DialogDescription>{t('hr.submitLeaveRequest', 'Submit a new leave request')}</DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div>
+                    <Label>{t('hr.leaveType', 'Leave Type')}</Label>
+                    <Select>
+                      <SelectTrigger data-testid="select-leave-type">
+                        <SelectValue placeholder={t('hr.selectLeaveType', 'Select type')} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {mockLeaveTypes.map(type => (
+                          <SelectItem key={type.id} value={type.id}>{type.name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label>{t('hr.startDate', 'Start Date')}</Label>
+                      <Input type="date" data-testid="input-leave-start" />
+                    </div>
+                    <div>
+                      <Label>{t('hr.endDate', 'End Date')}</Label>
+                      <Input type="date" data-testid="input-leave-end" />
+                    </div>
+                  </div>
+                  <div>
+                    <Label>{t('hr.reason', 'Reason')}</Label>
+                    <Textarea placeholder={t('hr.enterReason', 'Enter reason for leave...')} data-testid="input-leave-reason" />
+                  </div>
+                  <Button className="w-full" onClick={() => setShowRequestDialog(false)} data-testid="button-submit-leave">
+                    {t('hr.submitRequest', 'Submit Request')}
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="rounded-md border">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Employee</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Dates</TableHead>
-                  <TableHead>Days</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead>{t('hr.employee', 'Employee')}</TableHead>
+                  <TableHead>{t('common.type', 'Type')}</TableHead>
+                  <TableHead>{t('hr.dates', 'Dates')}</TableHead>
+                  <TableHead>{t('hr.days', 'Days')}</TableHead>
+                  <TableHead>{t('common.status', 'Status')}</TableHead>
+                  <TableHead className="text-right">{t('common.actions', 'Actions')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {mockLeaveRequests.map((request) => (
-                  <TableRow key={request.id} data-testid={`leave-request-${request.id}`}>
+                  <TableRow key={request.id}>
                     <TableCell className="font-medium">{request.employee}</TableCell>
                     <TableCell>{request.type}</TableCell>
                     <TableCell>{request.startDate} - {request.endDate}</TableCell>
                     <TableCell>{request.days}</TableCell>
                     <TableCell>
-                      <div className="flex items-center gap-2">
-                        {getStatusIcon(request.status)}
-                        <span className="capitalize">{request.status}</span>
-                      </div>
+                      <Badge className={getStatusColor(request.status)} variant="secondary">
+                        {request.status}
+                      </Badge>
                     </TableCell>
                     <TableCell className="text-right">
                       {request.status === "pending" && (
                         <div className="flex justify-end gap-2">
-                          <Button variant="outline" size="sm" className="text-green-600" data-testid={`button-approve-${request.id}`}>
+                          <Button variant="ghost" size="sm" className="text-green-600">
                             <CheckCircle className="h-4 w-4" />
                           </Button>
-                          <Button variant="outline" size="sm" className="text-red-600" data-testid={`button-reject-${request.id}`}>
+                          <Button variant="ghost" size="sm" className="text-red-600">
                             <XCircle className="h-4 w-4" />
                           </Button>
                         </div>
@@ -700,48 +700,15 @@ function LeaveManagementTab({ garageId }: { garageId: string }) {
                 ))}
               </TableBody>
             </Table>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Leave Types</CardTitle>
-            <CardDescription>Available leave categories</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {mockLeaveTypes.map(type => (
-              <div key={type.id} className="flex items-center justify-between p-3 rounded-lg border" data-testid={`leave-type-${type.id}`}>
-                <div className="flex items-center gap-3">
-                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: type.color }} />
-                  <div>
-                    <div className="font-medium">{type.name}</div>
-                    <div className="text-sm text-muted-foreground">{type.nameAr}</div>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div className="font-medium">{type.defaultDays} days</div>
-                  <Badge variant={type.isPaid ? "default" : "secondary"} className="text-xs">
-                    {type.isPaid ? "Paid" : "Unpaid"}
-                  </Badge>
-                </div>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
-      </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
 
 function PayrollTab({ garageId }: { garageId: string }) {
-  const mockPayrollData = [
-    { id: "1", employee: "Mohammed Al-Rashid", baseSalary: 12000, allowances: 2500, deductions: 1200, netSalary: 13300, status: "processed" },
-    { id: "2", employee: "Ahmed Hassan", baseSalary: 8000, allowances: 1500, deductions: 800, netSalary: 8700, status: "processed" },
-    { id: "3", employee: "Fatima Abdullah", baseSalary: 15000, allowances: 3000, deductions: 1500, netSalary: 16500, status: "pending" },
-    { id: "4", employee: "Omar Khalid", baseSalary: 7000, allowances: 1200, deductions: 700, netSalary: 7500, status: "processed" },
-    { id: "5", employee: "Sara Ibrahim", baseSalary: 10000, allowances: 2000, deductions: 1000, netSalary: 11000, status: "pending" },
-  ];
-
+  const { t } = useTranslation();
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -749,11 +716,11 @@ function PayrollTab({ garageId }: { garageId: string }) {
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-lg bg-green-500/10">
-                <DollarSign className="h-5 w-5 text-green-600 dark:text-green-400" />
+                <DollarSign className="h-5 w-5 text-green-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold" data-testid="text-total-payroll">520,000</p>
-                <p className="text-sm text-muted-foreground">Total Payroll (SAR)</p>
+                <p className="text-2xl font-bold">285,000</p>
+                <p className="text-sm text-muted-foreground">{t('hr.monthlyPayroll', 'Monthly Payroll (SAR)')}</p>
               </div>
             </div>
           </CardContent>
@@ -762,11 +729,11 @@ function PayrollTab({ garageId }: { garageId: string }) {
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-lg bg-blue-500/10">
-                <TrendingUp className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                <Users className="h-5 w-5 text-blue-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold" data-testid="text-avg-salary">12,093</p>
-                <p className="text-sm text-muted-foreground">Average Salary (SAR)</p>
+                <p className="text-2xl font-bold">43</p>
+                <p className="text-sm text-muted-foreground">{t('hr.activePayroll', 'Active on Payroll')}</p>
               </div>
             </div>
           </CardContent>
@@ -775,11 +742,11 @@ function PayrollTab({ garageId }: { garageId: string }) {
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-lg bg-yellow-500/10">
-                <Clock4 className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
+                <Clock4 className="h-5 w-5 text-yellow-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold" data-testid="text-pending-payroll">8</p>
-                <p className="text-sm text-muted-foreground">Pending Processing</p>
+                <p className="text-2xl font-bold">5</p>
+                <p className="text-sm text-muted-foreground">{t('hr.pendingPayments', 'Pending Payments')}</p>
               </div>
             </div>
           </CardContent>
@@ -788,11 +755,11 @@ function PayrollTab({ garageId }: { garageId: string }) {
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-lg bg-purple-500/10">
-                <CheckCircle className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                <Calendar className="h-5 w-5 text-purple-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold" data-testid="text-processed-payroll">35</p>
-                <p className="text-sm text-muted-foreground">Processed This Month</p>
+                <p className="text-2xl font-bold">28th</p>
+                <p className="text-sm text-muted-foreground">{t('hr.nextPayday', 'Next Payday')}</p>
               </div>
             </div>
           </CardContent>
@@ -803,50 +770,19 @@ function PayrollTab({ garageId }: { garageId: string }) {
         <CardHeader>
           <div className="flex justify-between items-center">
             <div>
-              <CardTitle>December 2024 Payroll</CardTitle>
-              <CardDescription>Monthly salary processing</CardDescription>
+              <CardTitle>{t('hr.payrollSummary', 'Payroll Summary')}</CardTitle>
+              <CardDescription>{t('hr.currentMonthPayroll', 'Current month payroll overview')}</CardDescription>
             </div>
-            <div className="flex gap-2">
-              <Button variant="outline" data-testid="button-export-payroll">
-                <FileText className="h-4 w-4 mr-2" />
-                Export
-              </Button>
-              <Button data-testid="button-run-payroll">
-                <DollarSign className="h-4 w-4 mr-2" />
-                Run Payroll
-              </Button>
-            </div>
+            <Button data-testid="button-run-payroll">
+              <Play className="h-4 w-4 mr-2" />
+              {t('hr.runPayroll', 'Run Payroll')}
+            </Button>
           </div>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Employee</TableHead>
-                <TableHead className="text-right">Base Salary</TableHead>
-                <TableHead className="text-right">Allowances</TableHead>
-                <TableHead className="text-right">Deductions</TableHead>
-                <TableHead className="text-right">Net Salary</TableHead>
-                <TableHead>Status</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {mockPayrollData.map((row) => (
-                <TableRow key={row.id} data-testid={`payroll-row-${row.id}`}>
-                  <TableCell className="font-medium">{row.employee}</TableCell>
-                  <TableCell className="text-right">{row.baseSalary.toLocaleString()} SAR</TableCell>
-                  <TableCell className="text-right text-green-600">+{row.allowances.toLocaleString()} SAR</TableCell>
-                  <TableCell className="text-right text-red-600">-{row.deductions.toLocaleString()} SAR</TableCell>
-                  <TableCell className="text-right font-bold">{row.netSalary.toLocaleString()} SAR</TableCell>
-                  <TableCell>
-                    <Badge variant={row.status === "processed" ? "default" : "secondary"}>
-                      {row.status}
-                    </Badge>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+          <div className="text-center py-8 text-muted-foreground">
+            {t('hr.payrollIntegration', 'Payroll data will be displayed here. Connect to your payroll system for live data.')}
+          </div>
         </CardContent>
       </Card>
     </div>
@@ -854,50 +790,19 @@ function PayrollTab({ garageId }: { garageId: string }) {
 }
 
 function PerformanceTab({ garageId }: { garageId: string }) {
-  const mockReviews = [
-    { id: "1", employee: "Mohammed Al-Rashid", period: "Q4 2024", rating: 4.5, status: "completed", reviewer: "Fatima Abdullah" },
-    { id: "2", employee: "Ahmed Hassan", period: "Q4 2024", rating: 4.0, status: "in_progress", reviewer: "Mohammed Al-Rashid" },
-    { id: "3", employee: "Omar Khalid", period: "Q4 2024", rating: 3.5, status: "pending", reviewer: "Mohammed Al-Rashid" },
-  ];
-
+  const { t } = useTranslation();
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-purple-500/10">
-                <Target className="h-5 w-5 text-purple-600 dark:text-purple-400" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold" data-testid="text-avg-rating">4.2</p>
-                <p className="text-sm text-muted-foreground">Avg Rating</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
               <div className="p-2 rounded-lg bg-green-500/10">
-                <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
+                <TrendingUp className="h-5 w-5 text-green-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold" data-testid="text-completed-reviews">28</p>
-                <p className="text-sm text-muted-foreground">Completed Reviews</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-yellow-500/10">
-                <Clock4 className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold" data-testid="text-pending-reviews">15</p>
-                <p className="text-sm text-muted-foreground">Pending Reviews</p>
+                <p className="text-2xl font-bold">87%</p>
+                <p className="text-sm text-muted-foreground">{t('hr.avgPerformance', 'Avg. Performance')}</p>
               </div>
             </div>
           </CardContent>
@@ -906,11 +811,37 @@ function PerformanceTab({ garageId }: { garageId: string }) {
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-lg bg-blue-500/10">
-                <Star className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                <Target className="h-5 w-5 text-blue-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold" data-testid="text-top-performers">5</p>
-                <p className="text-sm text-muted-foreground">Top Performers</p>
+                <p className="text-2xl font-bold">156</p>
+                <p className="text-sm text-muted-foreground">{t('hr.goalsSet', 'Goals Set')}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-purple-500/10">
+                <Star className="h-5 w-5 text-purple-600" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold">12</p>
+                <p className="text-sm text-muted-foreground">{t('hr.topPerformers', 'Top Performers')}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-yellow-500/10">
+                <ClipboardCheck className="h-5 w-5 text-yellow-600" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold">8</p>
+                <p className="text-sm text-muted-foreground">{t('hr.pendingReviews', 'Pending Reviews')}</p>
               </div>
             </div>
           </CardContent>
@@ -921,40 +852,18 @@ function PerformanceTab({ garageId }: { garageId: string }) {
         <CardHeader>
           <div className="flex justify-between items-center">
             <div>
-              <CardTitle>Performance Reviews</CardTitle>
-              <CardDescription>Q4 2024 review cycle</CardDescription>
+              <CardTitle>{t('hr.performanceReviews', 'Performance Reviews')}</CardTitle>
+              <CardDescription>{t('hr.employeePerformanceTracking', 'Track employee performance and goals')}</CardDescription>
             </div>
-            <Button data-testid="button-start-review">
+            <Button data-testid="button-create-review">
               <Plus className="h-4 w-4 mr-2" />
-              Start Review
+              {t('hr.createReview', 'Create Review')}
             </Button>
           </div>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {mockReviews.map((review) => (
-              <Card key={review.id} data-testid={`review-card-${review.id}`}>
-                <CardHeader className="pb-2">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <CardTitle className="text-base">{review.employee}</CardTitle>
-                      <CardDescription>{review.period}</CardDescription>
-                    </div>
-                    <Badge variant={review.status === "completed" ? "default" : "secondary"}>
-                      {review.status.replace("_", " ")}
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center gap-2 mb-2">
-                    <Star className="h-5 w-5 fill-yellow-500 text-yellow-500" />
-                    <span className="text-2xl font-bold">{review.rating}</span>
-                    <span className="text-muted-foreground">/5.0</span>
-                  </div>
-                  <p className="text-sm text-muted-foreground">Reviewed by: {review.reviewer}</p>
-                </CardContent>
-              </Card>
-            ))}
+          <div className="text-center py-8 text-muted-foreground">
+            {t('hr.performanceData', 'Performance review data will be displayed here.')}
           </div>
         </CardContent>
       </Card>
@@ -963,13 +872,7 @@ function PerformanceTab({ garageId }: { garageId: string }) {
 }
 
 function TrainingTab({ garageId }: { garageId: string }) {
-  const mockTrainings = [
-    { id: "1", name: "Advanced Diagnostics", provider: "Bosch Academy", duration: "40 hours", type: "Technical", enrolled: 8, status: "active" },
-    { id: "2", name: "Customer Service Excellence", provider: "Internal", duration: "16 hours", type: "Soft Skills", enrolled: 15, status: "active" },
-    { id: "3", name: "EV Maintenance Basics", provider: "Tesla Training", duration: "24 hours", type: "Technical", enrolled: 5, status: "upcoming" },
-    { id: "4", name: "Safety Protocols", provider: "OSHA", duration: "8 hours", type: "Compliance", enrolled: 43, status: "completed" },
-  ];
-
+  const { t } = useTranslation();
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -981,7 +884,7 @@ function TrainingTab({ garageId }: { garageId: string }) {
               </div>
               <div>
                 <p className="text-2xl font-bold" data-testid="text-active-programs">12</p>
-                <p className="text-sm text-muted-foreground">Active Programs</p>
+                <p className="text-sm text-muted-foreground">{t('hr.activePrograms', 'Active Programs')}</p>
               </div>
             </div>
           </CardContent>
@@ -994,7 +897,7 @@ function TrainingTab({ garageId }: { garageId: string }) {
               </div>
               <div>
                 <p className="text-2xl font-bold" data-testid="text-enrolled">71</p>
-                <p className="text-sm text-muted-foreground">Enrolled</p>
+                <p className="text-sm text-muted-foreground">{t('hr.enrolled', 'Enrolled')}</p>
               </div>
             </div>
           </CardContent>
@@ -1007,7 +910,7 @@ function TrainingTab({ garageId }: { garageId: string }) {
               </div>
               <div>
                 <p className="text-2xl font-bold" data-testid="text-certifications">156</p>
-                <p className="text-sm text-muted-foreground">Certifications Earned</p>
+                <p className="text-sm text-muted-foreground">{t('hr.certificationsEarned', 'Certifications Earned')}</p>
               </div>
             </div>
           </CardContent>
@@ -1020,7 +923,7 @@ function TrainingTab({ garageId }: { garageId: string }) {
               </div>
               <div>
                 <p className="text-2xl font-bold" data-testid="text-training-hours">2,450</p>
-                <p className="text-sm text-muted-foreground">Hours This Year</p>
+                <p className="text-sm text-muted-foreground">{t('hr.hoursThisYear', 'Hours This Year')}</p>
               </div>
             </div>
           </CardContent>
@@ -1031,12 +934,12 @@ function TrainingTab({ garageId }: { garageId: string }) {
         <CardHeader>
           <div className="flex justify-between items-center">
             <div>
-              <CardTitle>Training Programs</CardTitle>
-              <CardDescription>Available courses and certifications</CardDescription>
+              <CardTitle>{t('hr.trainingPrograms', 'Training Programs')}</CardTitle>
+              <CardDescription>{t('hr.availableCourses', 'Available courses and certifications')}</CardDescription>
             </div>
             <Button data-testid="button-add-training">
               <Plus className="h-4 w-4 mr-2" />
-              Add Program
+              {t('hr.addProgram', 'Add Program')}
             </Button>
           </div>
         </CardHeader>
@@ -1057,8 +960,8 @@ function TrainingTab({ garageId }: { garageId: string }) {
                 </CardHeader>
                 <CardContent>
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Duration: {training.duration}</span>
-                    <span className="text-muted-foreground">{training.enrolled} enrolled</span>
+                    <span className="text-muted-foreground">{t('hr.duration', 'Duration')}: {training.duration}</span>
+                    <span className="text-muted-foreground">{training.enrolled} {t('hr.enrolled', 'enrolled')}</span>
                   </div>
                   <Badge variant="outline" className="mt-2">{training.type}</Badge>
                 </CardContent>
@@ -1072,6 +975,7 @@ function TrainingTab({ garageId }: { garageId: string }) {
 }
 
 function RecruitmentTab({ garageId }: { garageId: string }) {
+  const { t } = useTranslation();
   const [showPostDialog, setShowPostDialog] = useState(false);
 
   const getStageColor = (stage: string) => {
@@ -1095,7 +999,7 @@ function RecruitmentTab({ garageId }: { garageId: string }) {
               </div>
               <div>
                 <p className="text-2xl font-bold" data-testid="text-open-positions">5</p>
-                <p className="text-sm text-muted-foreground">Open Positions</p>
+                <p className="text-sm text-muted-foreground">{t('hr.openPositions', 'Open Positions')}</p>
               </div>
             </div>
           </CardContent>
@@ -1108,7 +1012,7 @@ function RecruitmentTab({ garageId }: { garageId: string }) {
               </div>
               <div>
                 <p className="text-2xl font-bold" data-testid="text-total-applicants">45</p>
-                <p className="text-sm text-muted-foreground">Total Applicants</p>
+                <p className="text-sm text-muted-foreground">{t('hr.totalApplicants', 'Total Applicants')}</p>
               </div>
             </div>
           </CardContent>
@@ -1121,7 +1025,7 @@ function RecruitmentTab({ garageId }: { garageId: string }) {
               </div>
               <div>
                 <p className="text-2xl font-bold" data-testid="text-interviews-scheduled">8</p>
-                <p className="text-sm text-muted-foreground">Interviews Scheduled</p>
+                <p className="text-sm text-muted-foreground">{t('hr.interviewsScheduled', 'Interviews Scheduled')}</p>
               </div>
             </div>
           </CardContent>
@@ -1134,7 +1038,7 @@ function RecruitmentTab({ garageId }: { garageId: string }) {
               </div>
               <div>
                 <p className="text-2xl font-bold" data-testid="text-hired-this-month">2</p>
-                <p className="text-sm text-muted-foreground">Hired This Month</p>
+                <p className="text-sm text-muted-foreground">{t('hr.hiredThisMonth', 'Hired This Month')}</p>
               </div>
             </div>
           </CardContent>
@@ -1146,31 +1050,31 @@ function RecruitmentTab({ garageId }: { garageId: string }) {
           <CardHeader>
             <div className="flex justify-between items-center">
               <div>
-                <CardTitle>Job Postings</CardTitle>
-                <CardDescription>Active job openings</CardDescription>
+                <CardTitle>{t('hr.jobPostings', 'Job Postings')}</CardTitle>
+                <CardDescription>{t('hr.activeJobOpenings', 'Active job openings')}</CardDescription>
               </div>
               <Dialog open={showPostDialog} onOpenChange={setShowPostDialog}>
                 <DialogTrigger asChild>
                   <Button data-testid="button-create-posting">
                     <Plus className="h-4 w-4 mr-2" />
-                    New Posting
+                    {t('hr.newPosting', 'New Posting')}
                   </Button>
                 </DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
-                    <DialogTitle>Create Job Posting</DialogTitle>
-                    <DialogDescription>Add a new job opening</DialogDescription>
+                    <DialogTitle>{t('hr.createJobPosting', 'Create Job Posting')}</DialogTitle>
+                    <DialogDescription>{t('hr.addNewJobOpening', 'Add a new job opening')}</DialogDescription>
                   </DialogHeader>
                   <div className="space-y-4">
                     <div>
-                      <Label>Job Title</Label>
-                      <Input placeholder="e.g., Senior Technician" data-testid="input-job-title" />
+                      <Label>{t('hr.jobTitle', 'Job Title')}</Label>
+                      <Input placeholder={t('hr.jobTitlePlaceholder', 'e.g., Senior Technician')} data-testid="input-job-title" />
                     </div>
                     <div>
-                      <Label>Department</Label>
+                      <Label>{t('hr.department', 'Department')}</Label>
                       <Select>
                         <SelectTrigger data-testid="select-job-department">
-                          <SelectValue placeholder="Select department" />
+                          <SelectValue placeholder={t('hr.selectDepartment', 'Select department')} />
                         </SelectTrigger>
                         <SelectContent>
                           {mockDepartments.map(dept => (
@@ -1181,20 +1085,20 @@ function RecruitmentTab({ garageId }: { garageId: string }) {
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <Label>Min Salary (SAR)</Label>
+                        <Label>{t('hr.minSalary', 'Min Salary (SAR)')}</Label>
                         <Input type="number" placeholder="5000" data-testid="input-min-salary" />
                       </div>
                       <div>
-                        <Label>Max Salary (SAR)</Label>
+                        <Label>{t('hr.maxSalary', 'Max Salary (SAR)')}</Label>
                         <Input type="number" placeholder="10000" data-testid="input-max-salary" />
                       </div>
                     </div>
                     <div>
-                      <Label>Description</Label>
-                      <Textarea placeholder="Job description..." data-testid="input-job-description" />
+                      <Label>{t('common.description', 'Description')}</Label>
+                      <Textarea placeholder={t('hr.jobDescriptionPlaceholder', 'Job description...')} data-testid="input-job-description" />
                     </div>
                     <Button className="w-full" onClick={() => setShowPostDialog(false)} data-testid="button-submit-posting">
-                      Create Posting
+                      {t('hr.createPosting', 'Create Posting')}
                     </Button>
                   </div>
                 </DialogContent>
@@ -1215,7 +1119,7 @@ function RecruitmentTab({ garageId }: { garageId: string }) {
                 </div>
                 <div className="flex justify-between text-sm text-muted-foreground">
                   <span>{job.salary}</span>
-                  <span>{job.applicants} applicants</span>
+                  <span>{job.applicants} {t('hr.applicants', 'applicants')}</span>
                 </div>
               </div>
             ))}
@@ -1224,8 +1128,8 @@ function RecruitmentTab({ garageId }: { garageId: string }) {
 
         <Card>
           <CardHeader>
-            <CardTitle>Candidate Pipeline</CardTitle>
-            <CardDescription>Track applicants through hiring stages</CardDescription>
+            <CardTitle>{t('hr.candidatePipeline', 'Candidate Pipeline')}</CardTitle>
+            <CardDescription>{t('hr.trackApplicants', 'Track applicants through hiring stages')}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
             {mockCandidates.map((candidate) => (
@@ -1260,6 +1164,7 @@ function RecruitmentTab({ garageId }: { garageId: string }) {
 }
 
 function BenefitsTab({ garageId }: { garageId: string }) {
+  const { t } = useTranslation();
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -1271,7 +1176,7 @@ function BenefitsTab({ garageId }: { garageId: string }) {
               </div>
               <div>
                 <p className="text-2xl font-bold" data-testid="text-benefit-plans">8</p>
-                <p className="text-sm text-muted-foreground">Benefit Plans</p>
+                <p className="text-sm text-muted-foreground">{t('hr.benefitPlans', 'Benefit Plans')}</p>
               </div>
             </div>
           </CardContent>
@@ -1284,7 +1189,7 @@ function BenefitsTab({ garageId }: { garageId: string }) {
               </div>
               <div>
                 <p className="text-2xl font-bold" data-testid="text-enrolled-benefits">121</p>
-                <p className="text-sm text-muted-foreground">Total Enrollments</p>
+                <p className="text-sm text-muted-foreground">{t('hr.totalEnrollments', 'Total Enrollments')}</p>
               </div>
             </div>
           </CardContent>
@@ -1297,7 +1202,7 @@ function BenefitsTab({ garageId }: { garageId: string }) {
               </div>
               <div>
                 <p className="text-2xl font-bold" data-testid="text-monthly-cost">85,000</p>
-                <p className="text-sm text-muted-foreground">Monthly Cost (SAR)</p>
+                <p className="text-sm text-muted-foreground">{t('hr.monthlyCostSar', 'Monthly Cost (SAR)')}</p>
               </div>
             </div>
           </CardContent>
@@ -1308,12 +1213,12 @@ function BenefitsTab({ garageId }: { garageId: string }) {
         <CardHeader>
           <div className="flex justify-between items-center">
             <div>
-              <CardTitle>Benefit Plans</CardTitle>
-              <CardDescription>Available employee benefits</CardDescription>
+              <CardTitle>{t('hr.benefitPlans', 'Benefit Plans')}</CardTitle>
+              <CardDescription>{t('hr.availableBenefits', 'Available employee benefits')}</CardDescription>
             </div>
             <Button data-testid="button-add-benefit">
               <Plus className="h-4 w-4 mr-2" />
-              Add Plan
+              {t('hr.addPlan', 'Add Plan')}
             </Button>
           </div>
         </CardHeader>
@@ -1333,16 +1238,16 @@ function BenefitsTab({ garageId }: { garageId: string }) {
                 <CardContent>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Coverage:</span>
+                      <span className="text-muted-foreground">{t('hr.coverage', 'Coverage')}:</span>
                       <span>{plan.coverage}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Cost:</span>
+                      <span className="text-muted-foreground">{t('hr.cost', 'Cost')}:</span>
                       <span>{plan.cost}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Enrolled:</span>
-                      <span>{plan.enrolled} employees</span>
+                      <span className="text-muted-foreground">{t('hr.enrolled', 'Enrolled')}:</span>
+                      <span>{plan.enrolled} {t('hr.employeesCount', 'employees')}</span>
                     </div>
                   </div>
                 </CardContent>
@@ -1356,6 +1261,7 @@ function BenefitsTab({ garageId }: { garageId: string }) {
 }
 
 function OrganizationTab({ garageId }: { garageId: string }) {
+  const { t } = useTranslation();
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -1367,7 +1273,7 @@ function OrganizationTab({ garageId }: { garageId: string }) {
               </div>
               <div>
                 <p className="text-2xl font-bold" data-testid="text-departments">5</p>
-                <p className="text-sm text-muted-foreground">Departments</p>
+                <p className="text-sm text-muted-foreground">{t('hr.departments', 'Departments')}</p>
               </div>
             </div>
           </CardContent>
@@ -1380,7 +1286,7 @@ function OrganizationTab({ garageId }: { garageId: string }) {
               </div>
               <div>
                 <p className="text-2xl font-bold" data-testid="text-positions">18</p>
-                <p className="text-sm text-muted-foreground">Positions</p>
+                <p className="text-sm text-muted-foreground">{t('hr.positions', 'Positions')}</p>
               </div>
             </div>
           </CardContent>
@@ -1393,7 +1299,7 @@ function OrganizationTab({ garageId }: { garageId: string }) {
               </div>
               <div>
                 <p className="text-2xl font-bold" data-testid="text-total-headcount">43</p>
-                <p className="text-sm text-muted-foreground">Total Headcount</p>
+                <p className="text-sm text-muted-foreground">{t('hr.totalHeadcount', 'Total Headcount')}</p>
               </div>
             </div>
           </CardContent>
@@ -1404,12 +1310,12 @@ function OrganizationTab({ garageId }: { garageId: string }) {
         <CardHeader>
           <div className="flex justify-between items-center">
             <div>
-              <CardTitle>Departments</CardTitle>
-              <CardDescription>Organizational structure</CardDescription>
+              <CardTitle>{t('hr.departments', 'Departments')}</CardTitle>
+              <CardDescription>{t('hr.organizationalStructure', 'Organizational structure')}</CardDescription>
             </div>
             <Button data-testid="button-add-department">
               <Plus className="h-4 w-4 mr-2" />
-              Add Department
+              {t('hr.addDepartment', 'Add Department')}
             </Button>
           </div>
         </CardHeader>
@@ -1429,15 +1335,15 @@ function OrganizationTab({ garageId }: { garageId: string }) {
                 <CardContent>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Manager:</span>
+                      <span className="text-muted-foreground">{t('hr.manager', 'Manager')}:</span>
                       <span>{dept.manager}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Employees:</span>
+                      <span className="text-muted-foreground">{t('hr.employees', 'Employees')}:</span>
                       <span>{dept.employeeCount}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Budget:</span>
+                      <span className="text-muted-foreground">{t('hr.budget', 'Budget')}:</span>
                       <span>{dept.budget.toLocaleString()} SAR</span>
                     </div>
                   </div>
@@ -1450,8 +1356,8 @@ function OrganizationTab({ garageId }: { garageId: string }) {
 
       <Card>
         <CardHeader>
-          <CardTitle>Announcements</CardTitle>
-          <CardDescription>Company-wide announcements and updates</CardDescription>
+          <CardTitle>{t('hr.announcements', 'Announcements')}</CardTitle>
+          <CardDescription>{t('hr.companyWideAnnouncements', 'Company-wide announcements and updates')}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
           {mockAnnouncements.map((announcement) => (
@@ -1478,15 +1384,16 @@ function OrganizationTab({ garageId }: { garageId: string }) {
 }
 
 function SelfServiceTab({ garageId }: { garageId: string }) {
+  const { t } = useTranslation();
   const [showRequestDialog, setShowRequestDialog] = useState(false);
 
   const requestTypes = [
-    { value: "salary_certificate", label: "Salary Certificate" },
-    { value: "experience_letter", label: "Experience Letter" },
-    { value: "bank_letter", label: "Bank Letter" },
-    { value: "noc", label: "NOC (No Objection Certificate)" },
-    { value: "info_update", label: "Information Update" },
-    { value: "expense_claim", label: "Expense Claim" },
+    { value: "salary_certificate", label: t('hr.salaryCertificate', 'Salary Certificate') },
+    { value: "experience_letter", label: t('hr.experienceLetter', 'Experience Letter') },
+    { value: "bank_letter", label: t('hr.bankLetter', 'Bank Letter') },
+    { value: "noc", label: t('hr.noc', 'NOC (No Objection Certificate)') },
+    { value: "info_update", label: t('hr.infoUpdate', 'Information Update') },
+    { value: "expense_claim", label: t('hr.expenseClaim', 'Expense Claim') },
   ];
 
   const getStatusColor = (status: string) => {
@@ -1510,7 +1417,7 @@ function SelfServiceTab({ garageId }: { garageId: string }) {
               </div>
               <div>
                 <p className="text-2xl font-bold" data-testid="text-my-requests">12</p>
-                <p className="text-sm text-muted-foreground">My Requests</p>
+                <p className="text-sm text-muted-foreground">{t('hr.myRequests', 'My Requests')}</p>
               </div>
             </div>
           </CardContent>
@@ -1523,7 +1430,7 @@ function SelfServiceTab({ garageId }: { garageId: string }) {
               </div>
               <div>
                 <p className="text-2xl font-bold" data-testid="text-pending-self-service">3</p>
-                <p className="text-sm text-muted-foreground">Pending</p>
+                <p className="text-sm text-muted-foreground">{t('common.pending', 'Pending')}</p>
               </div>
             </div>
           </CardContent>
@@ -1535,8 +1442,8 @@ function SelfServiceTab({ garageId }: { garageId: string }) {
                 <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
               </div>
               <div>
-                <p className="text-2xl font-bold" data-testid="text-completed-requests">8</p>
-                <p className="text-sm text-muted-foreground">Completed</p>
+                <p className="text-2xl font-bold">8</p>
+                <p className="text-sm text-muted-foreground">{t('common.completed', 'Completed')}</p>
               </div>
             </div>
           </CardContent>
@@ -1548,40 +1455,62 @@ function SelfServiceTab({ garageId }: { garageId: string }) {
                 <CalendarDays className="h-5 w-5 text-purple-600 dark:text-purple-400" />
               </div>
               <div>
-                <p className="text-2xl font-bold" data-testid="text-leave-balance">14</p>
-                <p className="text-sm text-muted-foreground">Leave Balance</p>
+                <p className="text-2xl font-bold">18</p>
+                <p className="text-sm text-muted-foreground">{t('hr.leaveDaysLeft', 'Leave Days Left')}</p>
               </div>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <Card className="lg:col-span-2">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <Card>
+          <CardHeader>
+            <CardTitle>{t('common.quick_actions', 'Quick Actions')}</CardTitle>
+            <CardDescription>{t('hr.commonSelfServiceActions', 'Common self-service actions')}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 gap-3">
+              {[
+                { icon: FileText, label: t('hr.requestDocument', 'Request Document'), testId: "button-request-doc" },
+                { icon: DollarSign, label: t('hr.viewPayslip', 'View Payslip'), testId: "button-view-payslip" },
+                { icon: CalendarDays, label: t('hr.applyForLeave', 'Apply for Leave'), testId: "button-apply-leave" },
+                { icon: Edit, label: t('hr.updatePersonalInfo', 'Update Personal Info'), testId: "button-update-info" },
+              ].map((action, index) => (
+                <Button key={index} variant="outline" className="h-20 flex-col gap-2" data-testid={action.testId}>
+                  <action.icon className="h-5 w-5" />
+                  <span className="text-xs">{action.label}</span>
+                </Button>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
           <CardHeader>
             <div className="flex justify-between items-center">
               <div>
-                <CardTitle>My Requests</CardTitle>
-                <CardDescription>Track your HR requests</CardDescription>
+                <CardTitle>{t('hr.recentRequests', 'Recent Requests')}</CardTitle>
+                <CardDescription>{t('hr.yourServiceRequests', 'Your self-service requests')}</CardDescription>
               </div>
               <Dialog open={showRequestDialog} onOpenChange={setShowRequestDialog}>
                 <DialogTrigger asChild>
                   <Button data-testid="button-new-request">
                     <Plus className="h-4 w-4 mr-2" />
-                    New Request
+                    {t('hr.newRequest', 'New Request')}
                   </Button>
                 </DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
-                    <DialogTitle>Submit Request</DialogTitle>
-                    <DialogDescription>Create a new HR request</DialogDescription>
+                    <DialogTitle>{t('hr.submitNewRequest', 'Submit New Request')}</DialogTitle>
+                    <DialogDescription>{t('hr.createServiceRequest', 'Create a new self-service request')}</DialogDescription>
                   </DialogHeader>
                   <div className="space-y-4">
                     <div>
-                      <Label>Request Type</Label>
+                      <Label>{t('hr.requestType', 'Request Type')}</Label>
                       <Select>
                         <SelectTrigger data-testid="select-request-type">
-                          <SelectValue placeholder="Select request type" />
+                          <SelectValue placeholder={t('hr.selectType', 'Select type')} />
                         </SelectTrigger>
                         <SelectContent>
                           {requestTypes.map(type => (
@@ -1591,71 +1520,35 @@ function SelfServiceTab({ garageId }: { garageId: string }) {
                       </Select>
                     </div>
                     <div>
-                      <Label>Subject</Label>
-                      <Input placeholder="Brief subject" data-testid="input-request-subject" />
+                      <Label>{t('hr.subject', 'Subject')}</Label>
+                      <Input placeholder={t('hr.enterSubject', 'Enter subject...')} data-testid="input-request-subject" />
                     </div>
                     <div>
-                      <Label>Description</Label>
-                      <Textarea placeholder="Provide details..." data-testid="input-request-description" />
+                      <Label>{t('common.description', 'Description')}</Label>
+                      <Textarea placeholder={t('hr.provideDetails', 'Provide details...')} data-testid="input-request-details" />
                     </div>
                     <Button className="w-full" onClick={() => setShowRequestDialog(false)} data-testid="button-submit-request">
-                      Submit Request
+                      {t('hr.submitRequest', 'Submit Request')}
                     </Button>
                   </div>
                 </DialogContent>
               </Dialog>
             </div>
           </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Subject</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Status</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {mockSelfServiceRequests.map((request) => (
-                  <TableRow key={request.id} data-testid={`self-service-request-${request.id}`}>
-                    <TableCell className="capitalize">{request.type.replace("_", " ")}</TableCell>
-                    <TableCell>{request.subject}</TableCell>
-                    <TableCell>{request.date}</TableCell>
-                    <TableCell>
-                      <Badge className={getStatusColor(request.status)} variant="secondary">
-                        {request.status.replace("_", " ")}
-                      </Badge>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
-            <CardDescription>Common HR tasks</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            {[
-              { icon: FileText, label: "Request Salary Certificate", testId: "button-salary-cert" },
-              { icon: CalendarDays, label: "Apply for Leave", testId: "button-apply-leave" },
-              { icon: Edit, label: "Update Personal Info", testId: "button-update-info" },
-              { icon: DollarSign, label: "Submit Expense Claim", testId: "button-expense-claim" },
-              { icon: MessageSquare, label: "Contact HR", testId: "button-contact-hr" },
-            ].map((action, index) => (
-              <Button
-                key={index}
-                variant="outline"
-                className="w-full justify-start"
-                data-testid={action.testId}
-              >
-                <action.icon className="h-4 w-4 mr-2" />
-                {action.label}
-              </Button>
+          <CardContent className="space-y-3">
+            {mockSelfServiceRequests.map((request) => (
+              <div key={request.id} className="p-4 rounded-lg border" data-testid={`request-${request.id}`}>
+                <div className="flex justify-between items-start mb-2">
+                  <div>
+                    <h4 className="font-medium">{request.subject}</h4>
+                    <p className="text-sm text-muted-foreground">{request.type.replace("_", " ")}</p>
+                  </div>
+                  <Badge className={getStatusColor(request.status)} variant="secondary">
+                    {request.status.replace("_", " ")}
+                  </Badge>
+                </div>
+                <div className="text-sm text-muted-foreground">{request.date}</div>
+              </div>
             ))}
           </CardContent>
         </Card>

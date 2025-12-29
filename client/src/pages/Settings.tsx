@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,6 +14,7 @@ import type { UserSettings } from "@shared/schema";
 import { TabsPageLayout } from "@/components/layouts";
 
 export default function Settings() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("general");
 
@@ -24,10 +26,10 @@ export default function Settings() {
     mutationFn: (data: Partial<UserSettings>) => apiRequest('PATCH', '/api/settings', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/settings'] });
-      toast({ title: "Settings Updated", description: "Your preferences have been saved" });
+      toast({ title: t('settings.settingsUpdated', 'Settings Updated'), description: t('settings.preferencesSaved', 'Your preferences have been saved') });
     },
     onError: (error: any) => {
-      toast({ title: "Update Failed", description: error.message, variant: "destructive" });
+      toast({ title: t('settings.updateFailed', 'Update Failed'), description: error.message, variant: "destructive" });
     },
   });
 
@@ -40,7 +42,7 @@ export default function Settings() {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 dark:border-gray-100 mx-auto"></div>
-          <p className="mt-4 text-gray-900 dark:text-white/60">Loading settings...</p>
+          <p className="mt-4 text-gray-900 dark:text-white/60">{t('settings.loadingSettings', 'Loading settings...')}</p>
         </div>
       </div>
     );
@@ -51,12 +53,12 @@ export default function Settings() {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="text-gray-700 dark:text-gray-300 text-5xl mb-4">⚠️</div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Failed to Load Settings</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{t('settings.failedToLoad', 'Failed to Load Settings')}</h2>
           <p className="text-gray-900 dark:text-white/60 mb-4">
-            {error instanceof Error ? error.message : 'Unable to connect to server'}
+            {error instanceof Error ? error.message : t('settings.unableToConnect', 'Unable to connect to server')}
           </p>
           <Button onClick={() => window.location.reload()} data-testid="button-retry">
-            Retry
+            {t('common.retry', 'Retry')}
           </Button>
         </div>
       </div>
@@ -70,37 +72,37 @@ export default function Settings() {
   const tabs = [
     {
       id: "general",
-      label: "General",
+      label: t('settings.general', 'General'),
       icon: SettingsIcon,
       content: <GeneralSettingsTab settings={settings} onUpdate={handleUpdateSettings} />,
     },
     {
       id: "language",
-      label: "Language",
+      label: t('settings.language', 'Language'),
       icon: Globe,
       content: <LanguageSettingsTab settings={settings} onUpdate={handleUpdateSettings} />,
     },
     {
       id: "currency",
-      label: "Currency",
+      label: t('settings.currency', 'Currency'),
       icon: DollarSign,
       content: <CurrencySettingsTab settings={settings} onUpdate={handleUpdateSettings} />,
     },
     {
       id: "appearance",
-      label: "Appearance",
+      label: t('settings.appearance', 'Appearance'),
       icon: Palette,
       content: <AppearanceSettingsTab settings={settings} onUpdate={handleUpdateSettings} />,
     },
     {
       id: "print",
-      label: "Print",
+      label: t('settings.print', 'Print'),
       icon: Printer,
       content: <PrintSettingsTab settings={settings} onUpdate={handleUpdateSettings} />,
     },
     {
       id: "shortcuts",
-      label: "Shortcuts",
+      label: t('settings.shortcuts', 'Shortcuts'),
       icon: Keyboard,
       content: <KeyboardShortcutsTab settings={settings} onUpdate={handleUpdateSettings} />,
     },
@@ -108,8 +110,8 @@ export default function Settings() {
 
   return (
     <TabsPageLayout
-      title="Settings & Preferences"
-      description="Customize your experience"
+      title={t('settings.title', 'Settings & Preferences')}
+      description={t('settings.description', 'Customize your experience')}
       icon={SettingsIcon}
       tabs={tabs}
       activeTab={activeTab}
@@ -119,16 +121,17 @@ export default function Settings() {
 }
 
 function GeneralSettingsTab({ settings, onUpdate }: { settings: UserSettings; onUpdate: (data: Partial<UserSettings>) => void }) {
+  const { t } = useTranslation();
   return (
     <Card data-testid="card-general">
       <CardHeader>
-        <CardTitle className="text-gray-900 dark:text-white">General Settings</CardTitle>
-        <CardDescription className="text-gray-900 dark:text-white/60">Configure your basic preferences</CardDescription>
+        <CardTitle className="text-gray-900 dark:text-white">{t('settings.generalSettings', 'General Settings')}</CardTitle>
+        <CardDescription className="text-gray-900 dark:text-white/60">{t('settings.configureBasicPreferences', 'Configure your basic preferences')}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label>Timezone</Label>
+            <Label>{t('settings.timezone', 'Timezone')}</Label>
             <Select 
               value={settings.timezone || "UTC"} 
               onValueChange={(value) => onUpdate({ timezone: value })}
@@ -138,19 +141,19 @@ function GeneralSettingsTab({ settings, onUpdate }: { settings: UserSettings; on
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="UTC">UTC</SelectItem>
-                <SelectItem value="America/New_York">Eastern Time</SelectItem>
-                <SelectItem value="America/Chicago">Central Time</SelectItem>
-                <SelectItem value="America/Denver">Mountain Time</SelectItem>
-                <SelectItem value="America/Los_Angeles">Pacific Time</SelectItem>
-                <SelectItem value="Europe/London">London</SelectItem>
-                <SelectItem value="Europe/Paris">Paris</SelectItem>
-                <SelectItem value="Asia/Tokyo">Tokyo</SelectItem>
+                <SelectItem value="America/New_York">{t('settings.easternTime', 'Eastern Time')}</SelectItem>
+                <SelectItem value="America/Chicago">{t('settings.centralTime', 'Central Time')}</SelectItem>
+                <SelectItem value="America/Denver">{t('settings.mountainTime', 'Mountain Time')}</SelectItem>
+                <SelectItem value="America/Los_Angeles">{t('settings.pacificTime', 'Pacific Time')}</SelectItem>
+                <SelectItem value="Europe/London">{t('settings.london', 'London')}</SelectItem>
+                <SelectItem value="Europe/Paris">{t('settings.paris', 'Paris')}</SelectItem>
+                <SelectItem value="Asia/Tokyo">{t('settings.tokyo', 'Tokyo')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           <div className="space-y-2">
-            <Label>Date Format</Label>
+            <Label>{t('settings.dateFormat', 'Date Format')}</Label>
             <Select 
               value={settings.dateFormat || "MM/DD/YYYY"} 
               onValueChange={(value) => onUpdate({ dateFormat: value })}
@@ -167,7 +170,7 @@ function GeneralSettingsTab({ settings, onUpdate }: { settings: UserSettings; on
           </div>
 
           <div className="space-y-2">
-            <Label>Time Format</Label>
+            <Label>{t('settings.timeFormat', 'Time Format')}</Label>
             <Select 
               value={settings.timeFormat || "12h"} 
               onValueChange={(value) => onUpdate({ timeFormat: value })}
@@ -176,16 +179,16 @@ function GeneralSettingsTab({ settings, onUpdate }: { settings: UserSettings; on
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="12h">12-hour</SelectItem>
-                <SelectItem value="24h">24-hour</SelectItem>
+                <SelectItem value="12h">{t('settings.12hour', '12-hour')}</SelectItem>
+                <SelectItem value="24h">{t('settings.24hour', '24-hour')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           <div className="flex items-center justify-between">
             <div>
-              <Label>Notifications</Label>
-              <p className="text-sm text-gray-900 dark:text-white/60">Receive system notifications</p>
+              <Label>{t('settings.notifications', 'Notifications')}</Label>
+              <p className="text-sm text-gray-900 dark:text-white/60">{t('settings.receiveSystemNotifications', 'Receive system notifications')}</p>
             </div>
             <Switch 
               checked={settings.enableNotifications ?? true}
@@ -196,8 +199,8 @@ function GeneralSettingsTab({ settings, onUpdate }: { settings: UserSettings; on
 
           <div className="flex items-center justify-between">
             <div>
-              <Label>Sound Effects</Label>
-              <p className="text-sm text-gray-900 dark:text-white/60">Play sounds for notifications</p>
+              <Label>{t('settings.soundEffects', 'Sound Effects')}</Label>
+              <p className="text-sm text-gray-900 dark:text-white/60">{t('settings.playSoundsForNotifications', 'Play sounds for notifications')}</p>
             </div>
             <Switch 
               checked={settings.enableSounds ?? true}
@@ -212,15 +215,16 @@ function GeneralSettingsTab({ settings, onUpdate }: { settings: UserSettings; on
 }
 
 function LanguageSettingsTab({ settings, onUpdate }: { settings: UserSettings; onUpdate: (data: Partial<UserSettings>) => void }) {
+  const { t } = useTranslation();
   return (
     <Card data-testid="card-language">
       <CardHeader>
-        <CardTitle className="text-gray-900 dark:text-white">Language & Region</CardTitle>
-        <CardDescription className="text-gray-900 dark:text-white/60">Choose your preferred language</CardDescription>
+        <CardTitle className="text-gray-900 dark:text-white">{t('settings.languageRegion', 'Language & Region')}</CardTitle>
+        <CardDescription className="text-gray-900 dark:text-white/60">{t('settings.choosePreferredLanguage', 'Choose your preferred language')}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">
-          <Label>Language</Label>
+          <Label>{t('settings.language', 'Language')}</Label>
           <Select 
             value={settings.language || "en"} 
             onValueChange={(value) => onUpdate({ language: value })}
@@ -230,6 +234,7 @@ function LanguageSettingsTab({ settings, onUpdate }: { settings: UserSettings; o
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="en">English</SelectItem>
+              <SelectItem value="ar">العربية</SelectItem>
               <SelectItem value="es">Español</SelectItem>
               <SelectItem value="fr">Français</SelectItem>
               <SelectItem value="de">Deutsch</SelectItem>
@@ -240,7 +245,7 @@ function LanguageSettingsTab({ settings, onUpdate }: { settings: UserSettings; o
             </SelectContent>
           </Select>
           <p className="text-sm text-gray-900 dark:text-white/60">
-            Language support is coming soon. Currently only English is available.
+            {t('settings.languageSupportNote', 'Language support is coming soon. Currently only English is available.')}
           </p>
         </div>
       </CardContent>
@@ -249,15 +254,16 @@ function LanguageSettingsTab({ settings, onUpdate }: { settings: UserSettings; o
 }
 
 function CurrencySettingsTab({ settings, onUpdate }: { settings: UserSettings; onUpdate: (data: Partial<UserSettings>) => void }) {
+  const { t } = useTranslation();
   return (
     <Card data-testid="card-currency">
       <CardHeader>
-        <CardTitle className="text-gray-900 dark:text-white">Currency Settings</CardTitle>
-        <CardDescription className="text-gray-900 dark:text-white/60">Set your preferred currency</CardDescription>
+        <CardTitle className="text-gray-900 dark:text-white">{t('settings.currencySettings', 'Currency Settings')}</CardTitle>
+        <CardDescription className="text-gray-900 dark:text-white/60">{t('settings.setPreferredCurrency', 'Set your preferred currency')}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">
-          <Label>Currency</Label>
+          <Label>{t('settings.currency', 'Currency')}</Label>
           <Select 
             value={settings.currency || "USD"} 
             onValueChange={(value) => onUpdate({ currency: value })}
@@ -266,15 +272,17 @@ function CurrencySettingsTab({ settings, onUpdate }: { settings: UserSettings; o
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="USD">USD - US Dollar ($)</SelectItem>
-              <SelectItem value="EUR">EUR - Euro (€)</SelectItem>
-              <SelectItem value="GBP">GBP - British Pound (£)</SelectItem>
-              <SelectItem value="JPY">JPY - Japanese Yen (¥)</SelectItem>
-              <SelectItem value="CAD">CAD - Canadian Dollar (C$)</SelectItem>
-              <SelectItem value="AUD">AUD - Australian Dollar (A$)</SelectItem>
-              <SelectItem value="CHF">CHF - Swiss Franc (CHF)</SelectItem>
-              <SelectItem value="CNY">CNY - Chinese Yuan (¥)</SelectItem>
-              <SelectItem value="INR">INR - Indian Rupee (₹)</SelectItem>
+              <SelectItem value="USD">USD - {t('settings.usDollar', 'US Dollar')} ($)</SelectItem>
+              <SelectItem value="EUR">EUR - {t('settings.euro', 'Euro')} (€)</SelectItem>
+              <SelectItem value="GBP">GBP - {t('settings.britishPound', 'British Pound')} (£)</SelectItem>
+              <SelectItem value="JPY">JPY - {t('settings.japaneseYen', 'Japanese Yen')} (¥)</SelectItem>
+              <SelectItem value="CAD">CAD - {t('settings.canadianDollar', 'Canadian Dollar')} (C$)</SelectItem>
+              <SelectItem value="AUD">AUD - {t('settings.australianDollar', 'Australian Dollar')} (A$)</SelectItem>
+              <SelectItem value="CHF">CHF - {t('settings.swissFranc', 'Swiss Franc')} (CHF)</SelectItem>
+              <SelectItem value="CNY">CNY - {t('settings.chineseYuan', 'Chinese Yuan')} (¥)</SelectItem>
+              <SelectItem value="INR">INR - {t('settings.indianRupee', 'Indian Rupee')} (₹)</SelectItem>
+              <SelectItem value="SAR">SAR - {t('settings.saudiRiyal', 'Saudi Riyal')} (﷼)</SelectItem>
+              <SelectItem value="AED">AED - {t('settings.emiratiDirham', 'Emirati Dirham')} (د.إ)</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -284,21 +292,21 @@ function CurrencySettingsTab({ settings, onUpdate }: { settings: UserSettings; o
 }
 
 function AppearanceSettingsTab({ settings, onUpdate }: { settings: UserSettings; onUpdate: (data: Partial<UserSettings>) => void }) {
+  const { t } = useTranslation();
   return (
     <Card data-testid="card-appearance">
       <CardHeader>
-        <CardTitle className="text-gray-900 dark:text-white">Appearance</CardTitle>
-        <CardDescription className="text-gray-900 dark:text-white/60">Customize the look and feel</CardDescription>
+        <CardTitle className="text-gray-900 dark:text-white">{t('settings.appearance', 'Appearance')}</CardTitle>
+        <CardDescription className="text-gray-900 dark:text-white/60">{t('settings.customizeLookAndFeel', 'Customize the look and feel')}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label>Theme</Label>
+            <Label>{t('settings.theme', 'Theme')}</Label>
             <Select 
               value={settings.theme || "light"} 
               onValueChange={(value) => {
                 onUpdate({ theme: value });
-                // Apply theme immediately
                 if (value === "dark") {
                   document.documentElement.classList.add("dark");
                 } else {
@@ -310,15 +318,15 @@ function AppearanceSettingsTab({ settings, onUpdate }: { settings: UserSettings;
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="light">Light</SelectItem>
-                <SelectItem value="dark">Dark</SelectItem>
-                <SelectItem value="auto">System</SelectItem>
+                <SelectItem value="light">{t('settings.light', 'Light')}</SelectItem>
+                <SelectItem value="dark">{t('settings.dark', 'Dark')}</SelectItem>
+                <SelectItem value="auto">{t('settings.system', 'System')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           <div className="space-y-2">
-            <Label>Font Size</Label>
+            <Label>{t('settings.fontSize', 'Font Size')}</Label>
             <Select 
               value={settings.fontSize || "medium"} 
               onValueChange={(value) => onUpdate({ fontSize: value })}
@@ -327,17 +335,17 @@ function AppearanceSettingsTab({ settings, onUpdate }: { settings: UserSettings;
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="small">Small</SelectItem>
-                <SelectItem value="medium">Medium</SelectItem>
-                <SelectItem value="large">Large</SelectItem>
+                <SelectItem value="small">{t('settings.small', 'Small')}</SelectItem>
+                <SelectItem value="medium">{t('settings.medium', 'Medium')}</SelectItem>
+                <SelectItem value="large">{t('settings.large', 'Large')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           <div className="flex items-center justify-between">
             <div>
-              <Label>Compact Mode</Label>
-              <p className="text-sm text-gray-900 dark:text-white/60">Reduce spacing and padding</p>
+              <Label>{t('settings.compactMode', 'Compact Mode')}</Label>
+              <p className="text-sm text-gray-900 dark:text-white/60">{t('settings.reduceSpacingAndPadding', 'Reduce spacing and padding')}</p>
             </div>
             <Switch 
               checked={settings.compactMode ?? false}
@@ -352,6 +360,7 @@ function AppearanceSettingsTab({ settings, onUpdate }: { settings: UserSettings;
 }
 
 function PrintSettingsTab({ settings, onUpdate }: { settings: UserSettings; onUpdate: (data: Partial<UserSettings>) => void }) {
+  const { t } = useTranslation();
   const printSettings = settings.printSettings as any || {
     paperSize: "A4",
     includeHeader: true,
@@ -368,13 +377,13 @@ function PrintSettingsTab({ settings, onUpdate }: { settings: UserSettings; onUp
   return (
     <Card data-testid="card-print">
       <CardHeader>
-        <CardTitle className="text-gray-900 dark:text-white">Print Settings</CardTitle>
-        <CardDescription className="text-gray-900 dark:text-white/60">Configure print layout and options</CardDescription>
+        <CardTitle className="text-gray-900 dark:text-white">{t('settings.printSettings', 'Print Settings')}</CardTitle>
+        <CardDescription className="text-gray-900 dark:text-white/60">{t('settings.configurePrintLayout', 'Configure print layout and options')}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label>Paper Size</Label>
+            <Label>{t('settings.paperSize', 'Paper Size')}</Label>
             <Select 
               value={printSettings.paperSize} 
               onValueChange={(value) => updatePrintSettings({ paperSize: value })}
@@ -384,16 +393,16 @@ function PrintSettingsTab({ settings, onUpdate }: { settings: UserSettings; onUp
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="A4">A4</SelectItem>
-                <SelectItem value="Letter">Letter</SelectItem>
-                <SelectItem value="Legal">Legal</SelectItem>
+                <SelectItem value="Letter">{t('settings.letter', 'Letter')}</SelectItem>
+                <SelectItem value="Legal">{t('settings.legal', 'Legal')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           <div className="flex items-center justify-between">
             <div>
-              <Label>Include Header</Label>
-              <p className="text-sm text-gray-900 dark:text-white/60">Show header on printed pages</p>
+              <Label>{t('settings.includeHeader', 'Include Header')}</Label>
+              <p className="text-sm text-gray-900 dark:text-white/60">{t('settings.showHeaderOnPrintedPages', 'Show header on printed pages')}</p>
             </div>
             <Switch 
               checked={printSettings.includeHeader}
@@ -404,8 +413,8 @@ function PrintSettingsTab({ settings, onUpdate }: { settings: UserSettings; onUp
 
           <div className="flex items-center justify-between">
             <div>
-              <Label>Include Footer</Label>
-              <p className="text-sm text-gray-900 dark:text-white/60">Show footer on printed pages</p>
+              <Label>{t('settings.includeFooter', 'Include Footer')}</Label>
+              <p className="text-sm text-gray-900 dark:text-white/60">{t('settings.showFooterOnPrintedPages', 'Show footer on printed pages')}</p>
             </div>
             <Switch 
               checked={printSettings.includeFooter}
@@ -416,8 +425,8 @@ function PrintSettingsTab({ settings, onUpdate }: { settings: UserSettings; onUp
 
           <div className="flex items-center justify-between">
             <div>
-              <Label>Show Logo</Label>
-              <p className="text-sm text-gray-900 dark:text-white/60">Display company logo on prints</p>
+              <Label>{t('settings.showLogo', 'Show Logo')}</Label>
+              <p className="text-sm text-gray-900 dark:text-white/60">{t('settings.displayCompanyLogoOnPrints', 'Display company logo on prints')}</p>
             </div>
             <Switch 
               checked={printSettings.showLogo}
@@ -432,27 +441,28 @@ function PrintSettingsTab({ settings, onUpdate }: { settings: UserSettings; onUp
 }
 
 function KeyboardShortcutsTab({ settings, onUpdate }: { settings: UserSettings; onUpdate: (data: Partial<UserSettings>) => void }) {
+  const { t } = useTranslation();
   const shortcuts = [
-    { key: "Cmd/Ctrl + K", description: "Open quick actions" },
-    { key: "Cmd/Ctrl + Z", description: "Undo last action" },
-    { key: "Cmd/Ctrl + Shift + Z", description: "Redo action" },
-    { key: "Cmd/Ctrl + S", description: "Save current form" },
-    { key: "Cmd/Ctrl + P", description: "Print current page" },
-    { key: "Cmd/Ctrl + F", description: "Search" },
-    { key: "Esc", description: "Close dialog/modal" },
+    { key: "Cmd/Ctrl + K", description: t('settings.openQuickActions', 'Open quick actions') },
+    { key: "Cmd/Ctrl + Z", description: t('settings.undoLastAction', 'Undo last action') },
+    { key: "Cmd/Ctrl + Shift + Z", description: t('settings.redoAction', 'Redo action') },
+    { key: "Cmd/Ctrl + S", description: t('settings.saveCurrentForm', 'Save current form') },
+    { key: "Cmd/Ctrl + P", description: t('settings.printCurrentPage', 'Print current page') },
+    { key: "Cmd/Ctrl + F", description: t('common.search', 'Search') },
+    { key: "Esc", description: t('settings.closeDialogModal', 'Close dialog/modal') },
   ];
 
   return (
     <Card data-testid="card-shortcuts">
       <CardHeader>
-        <CardTitle className="text-gray-900 dark:text-white">Keyboard Shortcuts</CardTitle>
-        <CardDescription className="text-gray-900 dark:text-white/60">Available keyboard shortcuts</CardDescription>
+        <CardTitle className="text-gray-900 dark:text-white">{t('settings.keyboardShortcuts', 'Keyboard Shortcuts')}</CardTitle>
+        <CardDescription className="text-gray-900 dark:text-white/60">{t('settings.availableKeyboardShortcuts', 'Available keyboard shortcuts')}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <Label>Enable Keyboard Shortcuts</Label>
-            <p className="text-sm text-gray-900 dark:text-white/60">Use keyboard shortcuts for quick actions</p>
+            <Label>{t('settings.enableKeyboardShortcuts', 'Enable Keyboard Shortcuts')}</Label>
+            <p className="text-sm text-gray-900 dark:text-white/60">{t('settings.useKeyboardShortcutsForQuickActions', 'Use keyboard shortcuts for quick actions')}</p>
           </div>
           <Switch 
             checked={settings.enableKeyboardShortcuts ?? true}

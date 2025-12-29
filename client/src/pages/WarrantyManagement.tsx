@@ -3,6 +3,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -91,6 +92,7 @@ type WarrantyFormData = z.input<typeof warrantyFormSchema>;
 type ClaimFormData = z.input<typeof claimFormSchema>;
 
 export default function WarrantyManagement() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const { user } = useAuth();
   const [selectedTab, setSelectedTab] = useState("active");
@@ -199,8 +201,8 @@ export default function WarrantyManagement() {
       setEditingWarrantyId(null);
       warrantyForm.reset();
       toast({
-        title: editingWarrantyId ? "Warranty Updated" : "Warranty Created",
-        description: "Changes saved successfully",
+        title: editingWarrantyId ? t('payments.warranty.warrantyUpdated', 'Warranty Updated') : t('payments.warranty.warrantyCreated', 'Warranty Created'),
+        description: t('common.changesSaved', 'Changes saved successfully'),
       });
     },
   });
@@ -220,8 +222,8 @@ export default function WarrantyManagement() {
       setEditingClaimId(null);
       claimForm.reset();
       toast({
-        title: editingClaimId ? "Claim Updated" : "Claim Submitted",
-        description: "Changes saved successfully",
+        title: editingClaimId ? t('payments.warranty.claimUpdated', 'Claim Updated') : t('payments.warranty.claimSubmitted', 'Claim Submitted'),
+        description: t('common.changesSaved', 'Changes saved successfully'),
       });
     },
   });
@@ -233,7 +235,7 @@ export default function WarrantyManagement() {
       queryClient.invalidateQueries({ queryKey: ["/api/warranties"] });
       queryClient.invalidateQueries({ queryKey: ["/api/warranties/active"] });
       queryClient.invalidateQueries({ queryKey: ["/api/warranties/expired"] });
-      toast({ title: "Warranty Deleted", description: "Warranty removed successfully" });
+      toast({ title: t('payments.warranty.warrantyDeleted', 'Warranty Deleted'), description: t('payments.warranty.warrantyRemovedSuccess', 'Warranty removed successfully') });
     },
   });
 
@@ -241,7 +243,7 @@ export default function WarrantyManagement() {
     mutationFn: (id: string) => apiRequest("DELETE", `/api/warranty-claims/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/warranty-claims"] });
-      toast({ title: "Claim Deleted", description: "Claim removed successfully" });
+      toast({ title: t('payments.warranty.claimDeleted', 'Claim Deleted'), description: t('payments.warranty.claimRemovedSuccess', 'Claim removed successfully') });
     },
   });
 
@@ -290,12 +292,12 @@ export default function WarrantyManagement() {
     const daysUntilExpiry = differenceInDays(new Date(warranty.endDate), new Date());
     
     if (warranty.status === "expired" || daysUntilExpiry < 0) {
-      return <Badge variant="secondary" data-testid={`badge-warranty-status-${warranty.id}`}>Expired</Badge>;
+      return <Badge variant="secondary" data-testid={`badge-warranty-status-${warranty.id}`}>{t('payments.warranty.expired', 'Expired')}</Badge>;
     }
     if (daysUntilExpiry <= 30) {
-      return <Badge className="bg-salis-gray dark:bg-salis-gray-light text-white dark:text-salis-black" data-testid={`badge-warranty-status-${warranty.id}`}>Expiring Soon</Badge>;
+      return <Badge className="bg-salis-gray dark:bg-salis-gray-light text-white dark:text-salis-black" data-testid={`badge-warranty-status-${warranty.id}`}>{t('payments.warranty.expiringSoon', 'Expiring Soon')}</Badge>;
     }
-    return <Badge className="bg-salis-black dark:bg-white text-white dark:text-salis-black" data-testid={`badge-warranty-status-${warranty.id}`}>Active</Badge>;
+    return <Badge className="bg-salis-black dark:bg-white text-white dark:text-salis-black" data-testid={`badge-warranty-status-${warranty.id}`}>{t('payments.warranty.active', 'Active')}</Badge>;
   };
 
   const getClaimStatusBadge = (status: string, claimId: string) => {

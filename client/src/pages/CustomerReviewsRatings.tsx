@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { StandardPageLayout } from "@/components/layouts/StandardPageLayout";
 
 export default function CustomerReviewsRatings() {
+  const { t } = useTranslation();
   const [isRespondDialogOpen, setIsRespondDialogOpen] = useState(false);
   const [selectedReview, setSelectedReview] = useState<any>(null);
   const [responseText, setResponseText] = useState("");
@@ -65,8 +67,8 @@ export default function CustomerReviewsRatings() {
   if (isLoading) {
     return (
       <StandardPageLayout
-        title="Customer Reviews & Ratings"
-        description="Manage and respond to customer feedback"
+        title={t('customers.reviews.title', 'Customer Reviews & Ratings')}
+        description={t('customers.reviews.description', 'Manage and respond to customer feedback')}
         icon={Star}
       >
         <div className="animate-pulse space-y-4">
@@ -79,8 +81,8 @@ export default function CustomerReviewsRatings() {
 
   return (
     <StandardPageLayout
-      title="Customer Reviews & Ratings"
-      description="Manage and respond to customer feedback"
+      title={t('customers.reviews.title', 'Customer Reviews & Ratings')}
+      description={t('customers.reviews.description', 'Manage and respond to customer feedback')}
       icon={Star}
     >
 
@@ -90,7 +92,7 @@ export default function CustomerReviewsRatings() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Average Rating</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('customers.reviews.averageRating', 'Average Rating')}</p>
                 <div className="flex items-center gap-2 mt-2">
                   <h3 className="text-2xl font-bold text-gray-900 dark:text-white">{stats.averageRating}</h3>
                   <div className="flex">
@@ -107,7 +109,7 @@ export default function CustomerReviewsRatings() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Total Reviews</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('customers.reviews.totalReviews', 'Total Reviews')}</p>
                 <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">{stats.totalReviews}</h3>
               </div>
               <MessageCircle className="h-12 w-12 text-blue-600" />
@@ -119,7 +121,7 @@ export default function CustomerReviewsRatings() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Would Recommend</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('customers.reviews.wouldRecommend', 'Would Recommend')}</p>
                 <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">{stats.recommendationRate}%</h3>
               </div>
               <ThumbsUp className="h-12 w-12 text-green-600" />
@@ -131,7 +133,7 @@ export default function CustomerReviewsRatings() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Response Rate</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('customers.reviews.responseRate', 'Response Rate')}</p>
                 <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">{stats.responseRate}%</h3>
               </div>
               <TrendingUp className="h-12 w-12 text-purple-600" />
@@ -147,10 +149,10 @@ export default function CustomerReviewsRatings() {
             <div className="text-center">
               <AlertCircle className="h-16 w-16 mx-auto mb-4 text-gray-400" />
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                No Customer Reviews
+                {t('customers.reviews.noReviews', 'No Customer Reviews')}
               </h3>
               <p className="text-gray-600 dark:text-gray-400 mb-4">
-                No customer reviews found. Customer feedback will appear here.
+                {t('customers.reviews.noReviewsDescription', 'No customer reviews found. Customer feedback will appear here.')}
               </p>
             </div>
           </CardContent>
@@ -161,7 +163,7 @@ export default function CustomerReviewsRatings() {
       {reviewsArray.length > 0 && (
         <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
           <CardHeader>
-            <CardTitle>Recent Reviews</CardTitle>
+            <CardTitle>{t('customers.reviews.recentReviews', 'Recent Reviews')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -254,7 +256,7 @@ export default function CustomerReviewsRatings() {
                       data-testid={`button-respond-${review.id || index}`}
                     >
                       <MessageCircle className="h-4 w-4 mr-2" />
-                      Respond to Review
+                      {t('customers.reviews.respondToReview', 'Respond to Review')}
                     </Button>
                   )}
                 </div>
@@ -268,7 +270,7 @@ export default function CustomerReviewsRatings() {
       <Dialog open={isRespondDialogOpen} onOpenChange={setIsRespondDialogOpen}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle>Respond to Review</DialogTitle>
+            <DialogTitle>{t('customers.reviews.respondToReview', 'Respond to Review')}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
             {selectedReview && (
@@ -282,7 +284,7 @@ export default function CustomerReviewsRatings() {
               </div>
             )}
             <div>
-              <label className="text-sm font-medium">Your Response</label>
+              <label className="text-sm font-medium">{t('customers.reviews.yourResponse', 'Your Response')}</label>
               <Textarea
                 className="mt-1"
                 rows={4}
@@ -305,7 +307,7 @@ export default function CustomerReviewsRatings() {
               disabled={!responseText.trim() || respondMutation.isPending}
               data-testid="button-submit-response"
             >
-              {respondMutation.isPending ? "Posting..." : "Post Response"}
+              {respondMutation.isPending ? t('common.posting', 'Posting...') : t('customers.reviews.postResponse', 'Post Response')}
             </Button>
           </div>
         </DialogContent>

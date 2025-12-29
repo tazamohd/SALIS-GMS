@@ -1,4 +1,5 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -8,6 +9,7 @@ import { Shield, DollarSign, FileText, TrendingUp } from "lucide-react";
 import { DashboardPage } from "@/components/layouts";
 
 export default function InsuranceClaims() {
+  const { t } = useTranslation();
   const { toast } = useToast();
 
   const { data: claims = [], isLoading: claimsLoading } = useQuery<any[]>({
@@ -33,16 +35,16 @@ export default function InsuranceClaims() {
     },
     onSuccess: () => {
       toast({
-        title: "Claim Filed",
-        description: "Insurance claim created successfully",
+        title: t('payments.insurance.claimFiled', 'Claim Filed'),
+        description: t('payments.insurance.claimCreatedSuccess', 'Insurance claim created successfully'),
       });
       queryClient.invalidateQueries({ queryKey: ['/api/insurance/claims'] });
       queryClient.invalidateQueries({ queryKey: ['/api/insurance/claims/analytics'] });
     },
     onError: (error: any) => {
       toast({
-        title: "Filing Failed",
-        description: error.message || "Failed to file insurance claim",
+        title: t('payments.insurance.filingFailed', 'Filing Failed'),
+        description: error.message || t('payments.insurance.claimCreateFailed', 'Failed to file insurance claim'),
         variant: "destructive",
       });
     },
@@ -54,16 +56,16 @@ export default function InsuranceClaims() {
     },
     onSuccess: () => {
       toast({
-        title: "Status Updated",
-        description: "Claim status updated successfully",
+        title: t('common.statusUpdated', 'Status Updated'),
+        description: t('payments.insurance.claimStatusUpdated', 'Claim status updated successfully'),
       });
       queryClient.invalidateQueries({ queryKey: ['/api/insurance/claims'] });
       queryClient.invalidateQueries({ queryKey: ['/api/insurance/claims/analytics'] });
     },
     onError: (error: any) => {
       toast({
-        title: "Update Failed",
-        description: error.message || "Failed to update claim status",
+        title: t('common.updateFailed', 'Update Failed'),
+        description: error.message || t('payments.insurance.statusUpdateFailed', 'Failed to update claim status'),
         variant: "destructive",
       });
     },
@@ -71,25 +73,25 @@ export default function InsuranceClaims() {
 
   const metrics = [
     {
-      label: "Total Claims",
+      label: t('payments.insurance.totalClaims', 'Total Claims'),
       value: stats.totalClaims,
       icon: FileText,
       color: "text-blue-600",
     },
     {
-      label: "Pending Review",
+      label: t('payments.insurance.pendingReview', 'Pending Review'),
       value: stats.pendingReview,
       icon: Shield,
       color: "text-yellow-600",
     },
     {
-      label: "Approval Rate",
+      label: t('payments.insurance.approvalRate', 'Approval Rate'),
       value: `${stats.approvalRate}%`,
       icon: TrendingUp,
       color: "text-green-600",
     },
     {
-      label: "Total Value",
+      label: t('payments.insurance.totalValue', 'Total Value'),
       value: `$${Math.round(stats.totalValue).toLocaleString()}`,
       icon: DollarSign,
       color: "text-purple-600",
@@ -98,8 +100,8 @@ export default function InsuranceClaims() {
 
   return (
     <DashboardPage
-      title="🛡️ Insurance Claims"
-      description="Manage and track insurance claims"
+      title={t('payments.insurance.title', '🛡️ Insurance Claims')}
+      description={t('payments.insurance.description', 'Manage and track insurance claims')}
       icon={Shield}
       metrics={metrics}
     >
@@ -121,18 +123,18 @@ export default function InsuranceClaims() {
         data-testid="button-create-claim"
         className="absolute top-8 right-8"
       >
-        {createClaimMutation.isPending ? "Submitting..." : "Submit Claim"}
+        {createClaimMutation.isPending ? t('common.submitting', 'Submitting...') : t('payments.insurance.submitClaim', 'Submit Claim')}
       </Button>
 
       <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
         <CardHeader>
-          <CardTitle>Recent Claims</CardTitle>
+          <CardTitle>{t('payments.insurance.recentClaims', 'Recent Claims')}</CardTitle>
         </CardHeader>
         <CardContent>
           {claimsLoading ? (
-            <div className="text-center py-8 text-gray-500">Loading claims...</div>
+            <div className="text-center py-8 text-gray-500">{t('common.loading', 'Loading claims...')}</div>
           ) : claims.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">No insurance claims found</div>
+            <div className="text-center py-8 text-gray-500">{t('payments.insurance.noClaimsFound', 'No insurance claims found')}</div>
           ) : (
             <div className="space-y-3">
               {claims.map((claim) => (
@@ -154,7 +156,7 @@ export default function InsuranceClaims() {
                   <div className="text-right">
                     <p className="font-semibold text-gray-900 dark:text-white">${Number(claim.claimAmount || 0).toLocaleString()}</p>
                     {claim.approvedAmount && (
-                      <p className="text-sm text-green-600">Approved: ${Number(claim.approvedAmount).toLocaleString()}</p>
+                      <p className="text-sm text-green-600">{t('payments.insurance.approved', 'Approved')}: ${Number(claim.approvedAmount).toLocaleString()}</p>
                     )}
                   </div>
                 </div>

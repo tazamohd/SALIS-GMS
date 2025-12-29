@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslation } from "react-i18next";
 import { z } from "zod";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -51,6 +52,7 @@ type PayPeriodFormData = z.infer<typeof payPeriodSchema>;
 type PayrollRunFormData = z.infer<typeof payrollRunSchema>;
 
 export default function PayrollManagement() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [selectedTab, setSelectedTab] = useState("employees");
   const [isEmployeeDialogOpen, setIsEmployeeDialogOpen] = useState(false);
@@ -114,12 +116,12 @@ export default function PayrollManagement() {
     mutationFn: (data: EmployeeFormData) => apiRequest("POST", "/api/payroll/employees", data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/payroll/employees"] });
-      toast({ title: "Success", description: "Employee added to payroll" });
+      toast({ title: t('common.success', 'Success'), description: t('payroll.employeeAdded', 'Employee added to payroll') });
       setIsEmployeeDialogOpen(false);
       employeeForm.reset();
     },
     onError: () => {
-      toast({ title: "Error", description: "Failed to add employee", variant: "destructive" });
+      toast({ title: t('common.error', 'Error'), description: t('payroll.employeeAddError', 'Failed to add employee'), variant: "destructive" });
     }
   });
 
@@ -127,12 +129,12 @@ export default function PayrollManagement() {
     mutationFn: (data: PayPeriodFormData) => apiRequest("POST", "/api/payroll/periods", data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/payroll/periods"] });
-      toast({ title: "Success", description: "Pay period created" });
+      toast({ title: t('common.success', 'Success'), description: t('payroll.periodCreated', 'Pay period created') });
       setIsPeriodDialogOpen(false);
       periodForm.reset();
     },
     onError: () => {
-      toast({ title: "Error", description: "Failed to create pay period", variant: "destructive" });
+      toast({ title: t('common.error', 'Error'), description: t('payroll.periodCreateError', 'Failed to create pay period'), variant: "destructive" });
     }
   });
 
@@ -140,12 +142,12 @@ export default function PayrollManagement() {
     mutationFn: (data: PayrollRunFormData) => apiRequest("POST", "/api/payroll/runs", data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/payroll/runs", selectedPeriod?.id] });
-      toast({ title: "Success", description: "Payroll run created" });
+      toast({ title: t('common.success', 'Success'), description: t('payroll.runCreated', 'Payroll run created') });
       setIsRunDialogOpen(false);
       runForm.reset();
     },
     onError: () => {
-      toast({ title: "Error", description: "Failed to create payroll run", variant: "destructive" });
+      toast({ title: t('common.error', 'Error'), description: t('payroll.runCreateError', 'Failed to create payroll run'), variant: "destructive" });
     }
   });
 
@@ -158,30 +160,30 @@ export default function PayrollManagement() {
           data-testid="button-add-employee"
         >
           <Users className="mr-2 h-4 w-4" />
-          Add Employee
+          {t('payroll.addEmployee', 'Add Employee')}
         </Button>
       </div>
       <Card className="border-salis-gray-light dark:border-salis-gray-dark bg-white dark:bg-[#010101]">
         <CardHeader>
-          <CardTitle className="font-montserrat text-salis-black dark:text-white">Payroll Employees</CardTitle>
+          <CardTitle className="font-montserrat text-salis-black dark:text-white">{t('payroll.payrollEmployees', 'Payroll Employees')}</CardTitle>
           <CardDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
-            Manage employee payroll information
+            {t('payroll.manageEmployeePayroll', 'Manage employee payroll information')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           {employeesLoading ? (
-            <p className="text-salis-gray font-poppins" data-testid="text-loading">Loading employees...</p>
+            <p className="text-salis-gray font-poppins" data-testid="text-loading">{t('common.loading', 'Loading employees...')}</p>
           ) : employees.length === 0 ? (
-            <p className="text-salis-gray font-poppins" data-testid="text-no-employees">No employees found</p>
+            <p className="text-salis-gray font-poppins" data-testid="text-no-employees">{t('payroll.noEmployeesFound', 'No employees found')}</p>
           ) : (
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Employee #</TableHead>
-                  <TableHead>Pay Type</TableHead>
-                  <TableHead>Base Rate</TableHead>
-                  <TableHead>Frequency</TableHead>
-                  <TableHead>Status</TableHead>
+                  <TableHead>{t('payroll.employeeNumber', 'Employee #')}</TableHead>
+                  <TableHead>{t('payroll.payType', 'Pay Type')}</TableHead>
+                  <TableHead>{t('payroll.baseRate', 'Base Rate')}</TableHead>
+                  <TableHead>{t('payroll.frequency', 'Frequency')}</TableHead>
+                  <TableHead>{t('common.status', 'Status')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -193,7 +195,7 @@ export default function PayrollManagement() {
                     <TableCell data-testid={`text-frequency-${emp.id}`}>{emp.payFrequency}</TableCell>
                     <TableCell>
                       <Badge className={emp.isActive ? "bg-salis-black text-white" : "bg-salis-gray-light text-salis-black"} data-testid={`badge-status-${emp.id}`}>
-                        {emp.isActive ? "Active" : "Inactive"}
+                        {emp.isActive ? t('common.active', 'Active') : t('common.inactive', 'Inactive')}
                       </Badge>
                     </TableCell>
                   </TableRow>
@@ -215,21 +217,21 @@ export default function PayrollManagement() {
           data-testid="button-create-period"
         >
           <Calendar className="mr-2 h-4 w-4" />
-          Create Pay Period
+          {t('payroll.createPayPeriod', 'Create Pay Period')}
         </Button>
       </div>
       <Card className="border-salis-gray-light dark:border-salis-gray-dark bg-white dark:bg-[#010101]">
         <CardHeader>
-          <CardTitle className="font-montserrat text-salis-black dark:text-white">Pay Periods</CardTitle>
+          <CardTitle className="font-montserrat text-salis-black dark:text-white">{t('payroll.payPeriods', 'Pay Periods')}</CardTitle>
           <CardDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
-            Configure pay periods and payment schedules
+            {t('payroll.configurePayPeriods', 'Configure pay periods and payment schedules')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           {periodsLoading ? (
-            <p className="text-salis-gray font-poppins" data-testid="text-loading-periods">Loading periods...</p>
+            <p className="text-salis-gray font-poppins" data-testid="text-loading-periods">{t('common.loading', 'Loading periods...')}</p>
           ) : periods.length === 0 ? (
-            <p className="text-salis-gray font-poppins" data-testid="text-no-periods">No pay periods found</p>
+            <p className="text-salis-gray font-poppins" data-testid="text-no-periods">{t('payroll.noPayPeriodsFound', 'No pay periods found')}</p>
           ) : (
             <div className="grid gap-4">
               {periods.map((period: any) => (
@@ -249,7 +251,7 @@ export default function PayrollManagement() {
                           {new Date(period.startDate).toLocaleDateString()} - {new Date(period.endDate).toLocaleDateString()}
                         </p>
                         <p className="text-sm text-salis-gray dark:text-salis-gray-light font-poppins mt-1" data-testid={`text-pay-date-${period.id}`}>
-                          Pay Date: {new Date(period.payDate).toLocaleDateString()}
+                          {t('payroll.payDate', 'Pay Date')}: {new Date(period.payDate).toLocaleDateString()}
                         </p>
                       </div>
                       <Badge className="bg-salis-black text-white" data-testid={`badge-period-status-${period.id}`}>
@@ -270,7 +272,7 @@ export default function PayrollManagement() {
     <>
       <div className="flex justify-between items-center mb-4">
         <p className="text-sm text-salis-gray dark:text-salis-gray-light font-poppins" data-testid="text-selected-period">
-          {selectedPeriod ? `Period: ${selectedPeriod.periodName}` : "Select a pay period to view runs"}
+          {selectedPeriod ? t('payroll.periodSelected', 'Period: {{name}}', { name: selectedPeriod.periodName }) : t('payroll.selectPayPeriodToView', 'Select a pay period to view runs')}
         </p>
         <Button
           onClick={() => setIsRunDialogOpen(true)}
@@ -279,37 +281,37 @@ export default function PayrollManagement() {
           data-testid="button-create-run"
         >
           <PlayCircle className="mr-2 h-4 w-4" />
-          Create Run
+          {t('payroll.createRun', 'Create Run')}
         </Button>
       </div>
       <Card className="border-salis-gray-light dark:border-salis-gray-dark bg-white dark:bg-[#010101]">
         <CardHeader>
-          <CardTitle className="font-montserrat text-salis-black dark:text-white">Payroll Runs</CardTitle>
+          <CardTitle className="font-montserrat text-salis-black dark:text-white">{t('payroll.payrollRuns', 'Payroll Runs')}</CardTitle>
           <CardDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
-            Individual payroll runs for employees
+            {t('payroll.individualPayrollRuns', 'Individual payroll runs for employees')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           {!selectedPeriod ? (
-            <p className="text-salis-gray font-poppins" data-testid="text-select-period">Select a pay period from the Pay Periods tab</p>
+            <p className="text-salis-gray font-poppins" data-testid="text-select-period">{t('payroll.selectPayPeriodFromTab', 'Select a pay period from the Pay Periods tab')}</p>
           ) : runs.length === 0 ? (
-            <p className="text-salis-gray font-poppins" data-testid="text-no-runs">No payroll runs found</p>
+            <p className="text-salis-gray font-poppins" data-testid="text-no-runs">{t('payroll.noPayrollRunsFound', 'No payroll runs found')}</p>
           ) : (
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Employee</TableHead>
-                  <TableHead>Hours</TableHead>
-                  <TableHead>Gross Pay</TableHead>
-                  <TableHead>Deductions</TableHead>
-                  <TableHead>Net Pay</TableHead>
+                  <TableHead>{t('payroll.employee', 'Employee')}</TableHead>
+                  <TableHead>{t('payroll.hours', 'Hours')}</TableHead>
+                  <TableHead>{t('payroll.grossPay', 'Gross Pay')}</TableHead>
+                  <TableHead>{t('payroll.deductions', 'Deductions')}</TableHead>
+                  <TableHead>{t('payroll.netPay', 'Net Pay')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {runs.map((run: any) => (
                   <TableRow key={run.id} data-testid={`row-run-${run.id}`}>
                     <TableCell className="font-medium" data-testid={`text-employee-${run.id}`}>{run.employeeId}</TableCell>
-                    <TableCell data-testid={`text-hours-${run.id}`}>{run.hoursWorked || "N/A"}</TableCell>
+                    <TableCell data-testid={`text-hours-${run.id}`}>{run.hoursWorked || t('common.na', 'N/A')}</TableCell>
                     <TableCell data-testid={`text-gross-${run.id}`}>${run.grossPay.toFixed(2)}</TableCell>
                     <TableCell data-testid={`text-deductions-${run.id}`}>${run.deductions.toFixed(2)}</TableCell>
                     <TableCell className="font-semibold" data-testid={`text-net-${run.id}`}>${run.netPay.toFixed(2)}</TableCell>
@@ -326,19 +328,19 @@ export default function PayrollManagement() {
   const tabs: TabConfig[] = [
     {
       id: "employees",
-      label: "Employees",
+      label: t('payroll.employees', 'Employees'),
       icon: Users,
       content: employeesTabContent,
     },
     {
       id: "periods",
-      label: "Pay Periods",
+      label: t('payroll.payPeriods', 'Pay Periods'),
       icon: Calendar,
       content: periodsTabContent,
     },
     {
       id: "runs",
-      label: "Payroll Runs",
+      label: t('payroll.payrollRuns', 'Payroll Runs'),
       icon: PlayCircle,
       content: runsTabContent,
     },
@@ -347,8 +349,8 @@ export default function PayrollManagement() {
   return (
     <>
       <TabsPageLayout
-        title="Payroll Management"
-        description="Manage employee payroll, pay periods, and payroll runs"
+        title={t('payroll.title', 'Payroll Management')}
+        description={t('payroll.description', 'Manage employee payroll, pay periods, and payroll runs')}
         icon={DollarSign}
         tabs={tabs}
         activeTab={selectedTab}
@@ -359,9 +361,9 @@ export default function PayrollManagement() {
       <Dialog open={isEmployeeDialogOpen} onOpenChange={setIsEmployeeDialogOpen}>
         <DialogContent className="bg-white dark:bg-salis-black">
           <DialogHeader>
-            <DialogTitle className="font-montserrat text-salis-black dark:text-white">Add Employee to Payroll</DialogTitle>
+            <DialogTitle className="font-montserrat text-salis-black dark:text-white">{t('payroll.addEmployeeToPayroll', 'Add Employee to Payroll')}</DialogTitle>
             <DialogDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
-              Add a new employee to the payroll system
+              {t('payroll.addNewEmployeeDescription', 'Add a new employee to the payroll system')}
             </DialogDescription>
           </DialogHeader>
           <Form {...employeeForm}>
@@ -371,9 +373,9 @@ export default function PayrollManagement() {
                 name="userId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>User ID</FormLabel>
+                    <FormLabel>{t('payroll.userId', 'User ID')}</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="Enter user ID" data-testid="input-user-id" />
+                      <Input {...field} placeholder={t('payroll.enterUserId', 'Enter user ID')} data-testid="input-user-id" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -384,7 +386,7 @@ export default function PayrollManagement() {
                 name="employeeNumber"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Employee Number</FormLabel>
+                    <FormLabel>{t('payroll.employeeNumber', 'Employee Number')}</FormLabel>
                     <FormControl>
                       <Input {...field} placeholder="EMP001" data-testid="input-employee-number" />
                     </FormControl>
@@ -397,17 +399,17 @@ export default function PayrollManagement() {
                 name="payType"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Pay Type</FormLabel>
+                    <FormLabel>{t('payroll.payType', 'Pay Type')}</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger data-testid="select-pay-type">
-                          <SelectValue placeholder="Select pay type" />
+                          <SelectValue placeholder={t('payroll.selectPayType', 'Select pay type')} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="hourly">Hourly</SelectItem>
-                        <SelectItem value="salary">Salary</SelectItem>
-                        <SelectItem value="commission">Commission</SelectItem>
+                        <SelectItem value="hourly">{t('payroll.hourly', 'Hourly')}</SelectItem>
+                        <SelectItem value="salary">{t('payroll.salary', 'Salary')}</SelectItem>
+                        <SelectItem value="commission">{t('payroll.commission', 'Commission')}</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -419,7 +421,7 @@ export default function PayrollManagement() {
                 name="baseRate"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Base Rate</FormLabel>
+                    <FormLabel>{t('payroll.baseRate', 'Base Rate')}</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
@@ -438,17 +440,17 @@ export default function PayrollManagement() {
                 name="payFrequency"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Pay Frequency</FormLabel>
+                    <FormLabel>{t('payroll.payFrequency', 'Pay Frequency')}</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger data-testid="select-pay-frequency">
-                          <SelectValue placeholder="Select frequency" />
+                          <SelectValue placeholder={t('payroll.selectFrequency', 'Select frequency')} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="weekly">Weekly</SelectItem>
-                        <SelectItem value="biweekly">Bi-weekly</SelectItem>
-                        <SelectItem value="monthly">Monthly</SelectItem>
+                        <SelectItem value="weekly">{t('payroll.weekly', 'Weekly')}</SelectItem>
+                        <SelectItem value="biweekly">{t('payroll.biweekly', 'Bi-weekly')}</SelectItem>
+                        <SelectItem value="monthly">{t('payroll.monthly', 'Monthly')}</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -457,7 +459,7 @@ export default function PayrollManagement() {
               />
               <DialogFooter>
                 <Button type="submit" disabled={createEmployeeMutation.isPending} data-testid="button-submit-employee">
-                  {createEmployeeMutation.isPending ? "Adding..." : "Add Employee"}
+                  {createEmployeeMutation.isPending ? t('common.adding', 'Adding...') : t('payroll.addEmployee', 'Add Employee')}
                 </Button>
               </DialogFooter>
             </form>
@@ -469,9 +471,9 @@ export default function PayrollManagement() {
       <Dialog open={isPeriodDialogOpen} onOpenChange={setIsPeriodDialogOpen}>
         <DialogContent className="bg-white dark:bg-salis-black">
           <DialogHeader>
-            <DialogTitle className="font-montserrat text-salis-black dark:text-white">Create Pay Period</DialogTitle>
+            <DialogTitle className="font-montserrat text-salis-black dark:text-white">{t('payroll.createPayPeriod', 'Create Pay Period')}</DialogTitle>
             <DialogDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
-              Define a new pay period
+              {t('payroll.defineNewPayPeriod', 'Define a new pay period')}
             </DialogDescription>
           </DialogHeader>
           <Form {...periodForm}>
@@ -481,7 +483,7 @@ export default function PayrollManagement() {
                 name="periodName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Period Name</FormLabel>
+                    <FormLabel>{t('payroll.periodName', 'Period Name')}</FormLabel>
                     <FormControl>
                       <Input {...field} placeholder="Q1 2024" data-testid="input-period-name" />
                     </FormControl>
@@ -495,7 +497,7 @@ export default function PayrollManagement() {
                   name="startDate"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Start Date</FormLabel>
+                      <FormLabel>{t('payroll.startDate', 'Start Date')}</FormLabel>
                       <FormControl>
                         <Input {...field} type="date" data-testid="input-start-date" />
                       </FormControl>
@@ -508,7 +510,7 @@ export default function PayrollManagement() {
                   name="endDate"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>End Date</FormLabel>
+                      <FormLabel>{t('payroll.endDate', 'End Date')}</FormLabel>
                       <FormControl>
                         <Input {...field} type="date" data-testid="input-end-date" />
                       </FormControl>
@@ -522,7 +524,7 @@ export default function PayrollManagement() {
                 name="payDate"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Pay Date</FormLabel>
+                    <FormLabel>{t('payroll.payDate', 'Pay Date')}</FormLabel>
                     <FormControl>
                       <Input {...field} type="date" data-testid="input-pay-date" />
                     </FormControl>
@@ -532,7 +534,7 @@ export default function PayrollManagement() {
               />
               <DialogFooter>
                 <Button type="submit" disabled={createPeriodMutation.isPending} data-testid="button-submit-period">
-                  {createPeriodMutation.isPending ? "Creating..." : "Create Period"}
+                  {createPeriodMutation.isPending ? t('common.creating', 'Creating...') : t('payroll.createPeriod', 'Create Period')}
                 </Button>
               </DialogFooter>
             </form>
@@ -544,9 +546,9 @@ export default function PayrollManagement() {
       <Dialog open={isRunDialogOpen} onOpenChange={setIsRunDialogOpen}>
         <DialogContent className="bg-white dark:bg-salis-black">
           <DialogHeader>
-            <DialogTitle className="font-montserrat text-salis-black dark:text-white">Create Payroll Run</DialogTitle>
+            <DialogTitle className="font-montserrat text-salis-black dark:text-white">{t('payroll.createPayrollRun', 'Create Payroll Run')}</DialogTitle>
             <DialogDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
-              Process payroll for an employee
+              {t('payroll.processPayrollDescription', 'Process payroll for an employee')}
             </DialogDescription>
           </DialogHeader>
           <Form {...runForm}>
@@ -556,21 +558,10 @@ export default function PayrollManagement() {
                 name="employeeId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Employee</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger data-testid="select-employee">
-                          <SelectValue placeholder="Select employee" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {employees.map((emp: any) => (
-                          <SelectItem key={emp.id} value={emp.id}>
-                            {emp.employeeNumber}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <FormLabel>{t('payroll.employee', 'Employee')}</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder={t('payroll.enterEmployeeId', 'Enter employee ID')} data-testid="input-run-employee" />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -580,13 +571,13 @@ export default function PayrollManagement() {
                 name="hoursWorked"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Hours Worked</FormLabel>
+                    <FormLabel>{t('payroll.hoursWorked', 'Hours Worked')}</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
                         type="number"
-                        step="0.1"
-                        onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                        step="0.5"
+                        onChange={(e) => field.onChange(parseFloat(e.target.value))}
                         data-testid="input-hours-worked"
                       />
                     </FormControl>
@@ -594,66 +585,68 @@ export default function PayrollManagement() {
                   </FormItem>
                 )}
               />
-              <FormField
-                control={runForm.control}
-                name="grossPay"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Gross Pay</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        type="number"
-                        step="0.01"
-                        onChange={(e) => field.onChange(parseFloat(e.target.value))}
-                        data-testid="input-gross-pay"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={runForm.control}
-                name="deductions"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Deductions</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        type="number"
-                        step="0.01"
-                        onChange={(e) => field.onChange(parseFloat(e.target.value))}
-                        data-testid="input-deductions"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={runForm.control}
-                name="netPay"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Net Pay</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        type="number"
-                        step="0.01"
-                        onChange={(e) => field.onChange(parseFloat(e.target.value))}
-                        data-testid="input-net-pay"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="grid grid-cols-3 gap-4">
+                <FormField
+                  control={runForm.control}
+                  name="grossPay"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('payroll.grossPay', 'Gross Pay')}</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          type="number"
+                          step="0.01"
+                          onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                          data-testid="input-gross-pay"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={runForm.control}
+                  name="deductions"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('payroll.deductions', 'Deductions')}</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          type="number"
+                          step="0.01"
+                          onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                          data-testid="input-deductions"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={runForm.control}
+                  name="netPay"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('payroll.netPay', 'Net Pay')}</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          type="number"
+                          step="0.01"
+                          onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                          data-testid="input-net-pay"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
               <DialogFooter>
                 <Button type="submit" disabled={createRunMutation.isPending} data-testid="button-submit-run">
-                  {createRunMutation.isPending ? "Creating..." : "Create Run"}
+                  {createRunMutation.isPending ? t('common.creating', 'Creating...') : t('payroll.createRun', 'Create Run')}
                 </Button>
               </DialogFooter>
             </form>

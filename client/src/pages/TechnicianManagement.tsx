@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useQueries, useMutation } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { User, TechnicianProfile, Garage } from "@shared/schema";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -19,6 +20,7 @@ import AddTechnicianDialog from "@/components/AddTechnicianDialog";
 import { StandardPageLayout } from "@/components/layouts";
 
 export default function TechnicianManagement() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { toast } = useToast();
   const [selectedGarage, setSelectedGarage] = useState<string>("all");
@@ -66,14 +68,14 @@ export default function TechnicianManagement() {
       });
       setIsEditDialogOpen(false);
       toast({
-        title: "Success",
-        description: "Technician profile updated successfully",
+        title: t('common.success', 'Success'),
+        description: t('technician.profileUpdatedSuccess', 'Technician profile updated successfully'),
       });
     },
     onError: (error: any) => {
       toast({
-        title: "Error",
-        description: error.message || "Failed to update technician profile",
+        title: t('common.error', 'Error'),
+        description: error.message || t('technician.profileUpdateError', 'Failed to update technician profile'),
         variant: "destructive",
       });
     },
@@ -94,16 +96,16 @@ export default function TechnicianManagement() {
           ))
       });
       toast({
-        title: "Success",
-        description: "Technician deleted successfully",
+        title: t('common.success', 'Success'),
+        description: t('technician.deletedSuccess', 'Technician deleted successfully'),
       });
       setDeleteConfirmOpen(false);
       setTechnicianToDelete(null);
     },
     onError: (error: any) => {
       toast({
-        title: "Error",
-        description: error.message || "Failed to delete technician",
+        title: t('common.error', 'Error'),
+        description: error.message || t('technician.deleteError', 'Failed to delete technician'),
         variant: "destructive",
       });
     },
@@ -178,12 +180,12 @@ export default function TechnicianManagement() {
 
   return (
     <StandardPageLayout
-      title="Technician Management"
-      description="Manage technician profiles, skills, and assignments"
+      title={t('technician.management', 'Technician Management')}
+      description={t('technician.managementDescription', 'Manage technician profiles, skills, and assignments')}
       icon={Users}
       actions={[
         {
-          label: "Add Technician",
+          label: t('technician.addTechnician', 'Add Technician'),
           onClick: () => setIsAddDialogOpen(true),
           icon: UserPlus,
         },
@@ -193,18 +195,18 @@ export default function TechnicianManagement() {
       {/* Filters */}
       <Card data-testid="card-filters">
         <CardHeader>
-          <CardTitle className="text-lg">Filters</CardTitle>
+          <CardTitle className="text-lg">{t('common.filter', 'Filters')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex gap-4">
             <div className="w-64">
-              <Label htmlFor="garage-filter">Garage</Label>
+              <Label htmlFor="garage-filter">{t('technician.garage', 'Garage')}</Label>
               <Select value={selectedGarage} onValueChange={setSelectedGarage}>
                 <SelectTrigger id="garage-filter" data-testid="select-garage-filter">
-                  <SelectValue placeholder="Select garage" />
+                  <SelectValue placeholder={t('technician.selectGarage', 'Select garage')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all" data-testid="option-all-garages">All Garages</SelectItem>
+                  <SelectItem value="all" data-testid="option-all-garages">{t('technician.allGarages', 'All Garages')}</SelectItem>
                   {garages?.map((garage) => (
                     <SelectItem key={garage.id} value={garage.id} data-testid={`option-garage-${garage.id}`}>
                       {garage.name}
@@ -244,7 +246,7 @@ export default function TechnicianManagement() {
                   <div className="flex items-start justify-between">
                     <div>
                       <CardTitle className="text-lg" data-testid={`text-name-${technician.id}`}>
-                        {technician.fullName || "Unknown"}
+                        {technician.fullName || t('common.unknown', 'Unknown')}
                       </CardTitle>
                       <CardDescription data-testid={`text-email-${technician.id}`}>
                         {technician.email}
@@ -276,7 +278,7 @@ export default function TechnicianManagement() {
                       </Badge>
                     )}
                     {profile?.isLead && (
-                      <Badge variant="default" data-testid={`badge-lead-${technician.id}`}>Lead</Badge>
+                      <Badge variant="default" data-testid={`badge-lead-${technician.id}`}>{t('technician.lead', 'Lead')}</Badge>
                     )}
                   </div>
                 </CardHeader>
@@ -285,7 +287,7 @@ export default function TechnicianManagement() {
                     <div className="flex items-start gap-2" data-testid={`text-speciality-${technician.id}`}>
                       <Briefcase className="h-4 w-4 mt-0.5 text-gray-600 dark:text-gray-400" />
                       <div className="text-sm">
-                        <div className="font-medium">Speciality</div>
+                        <div className="font-medium">{t('technician.speciality', 'Speciality')}</div>
                         <div className="text-gray-600 dark:text-gray-400">{profile.speciality}</div>
                       </div>
                     </div>
@@ -295,8 +297,8 @@ export default function TechnicianManagement() {
                     <div className="flex items-start gap-2" data-testid={`text-experience-${technician.id}`}>
                       <Clock className="h-4 w-4 mt-0.5 text-gray-600 dark:text-gray-400" />
                       <div className="text-sm">
-                        <div className="font-medium">Experience</div>
-                        <div className="text-gray-600 dark:text-gray-400">{profile.yearsOfExperience} years</div>
+                        <div className="font-medium">{t('technician.experience', 'Experience')}</div>
+                        <div className="text-gray-600 dark:text-gray-400">{t('technician.yearsExperience', '{{count}} years', { count: profile.yearsOfExperience })}</div>
                       </div>
                     </div>
                   )}
@@ -305,8 +307,8 @@ export default function TechnicianManagement() {
                     <div className="flex items-start gap-2" data-testid={`text-rate-${technician.id}`}>
                       <DollarSign className="h-4 w-4 mt-0.5 text-gray-600 dark:text-gray-400" />
                       <div className="text-sm">
-                        <div className="font-medium">Hourly Rate</div>
-                        <div className="text-gray-600 dark:text-gray-400">${profile.hourlyRate}/hr</div>
+                        <div className="font-medium">{t('technician.hourlyRate', 'Hourly Rate')}</div>
+                        <div className="text-gray-600 dark:text-gray-400">${profile.hourlyRate}/{t('technician.hr', 'hr')}</div>
                       </div>
                     </div>
                   )}
@@ -315,7 +317,7 @@ export default function TechnicianManagement() {
                     <div className="flex items-start gap-2" data-testid={`text-qualifications-${technician.id}`}>
                       <GraduationCap className="h-4 w-4 mt-0.5 text-gray-600 dark:text-gray-400" />
                       <div className="text-sm">
-                        <div className="font-medium">Qualifications</div>
+                        <div className="font-medium">{t('technician.qualifications', 'Qualifications')}</div>
                         <div className="text-gray-600 dark:text-gray-400 text-xs line-clamp-2">{profile.qualifications}</div>
                       </div>
                     </div>
@@ -325,7 +327,7 @@ export default function TechnicianManagement() {
                     <div className="flex items-start gap-2" data-testid={`text-certifications-${technician.id}`}>
                       <Award className="h-4 w-4 mt-0.5 text-gray-600 dark:text-gray-400" />
                       <div className="text-sm">
-                        <div className="font-medium">Certifications</div>
+                        <div className="font-medium">{t('technician.certifications', 'Certifications')}</div>
                         <div className="text-gray-600 dark:text-gray-400 text-xs line-clamp-2">{profile.certifications}</div>
                       </div>
                     </div>
@@ -339,9 +341,9 @@ export default function TechnicianManagement() {
         <Card data-testid="card-empty">
           <CardContent className="flex flex-col items-center justify-center py-12">
             <Users className="h-12 w-12 text-gray-600 dark:text-gray-400 mb-4" />
-            <p className="text-lg font-medium" data-testid="text-empty">No technicians found</p>
+            <p className="text-lg font-medium" data-testid="text-empty">{t('technician.noTechniciansFound', 'No technicians found')}</p>
             <p className="text-sm text-gray-600 dark:text-gray-400" data-testid="text-empty-subtitle">
-              Try adjusting your filters
+              {t('technician.tryAdjustingFilters', 'Try adjusting your filters')}
             </p>
           </CardContent>
         </Card>
@@ -351,16 +353,16 @@ export default function TechnicianManagement() {
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" data-testid="dialog-edit">
           <DialogHeader>
-            <DialogTitle data-testid="text-dialog-title">Edit Technician Profile</DialogTitle>
+            <DialogTitle data-testid="text-dialog-title">{t('technician.editProfile', 'Edit Technician Profile')}</DialogTitle>
             <DialogDescription data-testid="text-dialog-subtitle">
-              Update technician information, skills, and qualifications
+              {t('technician.editProfileDescription', 'Update technician information, skills, and qualifications')}
             </DialogDescription>
           </DialogHeader>
           {editingProfile && (
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="level">Level</Label>
+                  <Label htmlFor="level">{t('technician.level', 'Level')}</Label>
                   <Select
                     value={editingProfile.level || "junior"}
                     onValueChange={(value) =>
@@ -371,16 +373,16 @@ export default function TechnicianManagement() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="junior" data-testid="option-level-junior">Junior</SelectItem>
-                      <SelectItem value="intermediate" data-testid="option-level-intermediate">Intermediate</SelectItem>
-                      <SelectItem value="senior" data-testid="option-level-senior">Senior</SelectItem>
-                      <SelectItem value="master" data-testid="option-level-master">Master</SelectItem>
+                      <SelectItem value="junior" data-testid="option-level-junior">{t('technician.levelJunior', 'Junior')}</SelectItem>
+                      <SelectItem value="intermediate" data-testid="option-level-intermediate">{t('technician.levelIntermediate', 'Intermediate')}</SelectItem>
+                      <SelectItem value="senior" data-testid="option-level-senior">{t('technician.levelSenior', 'Senior')}</SelectItem>
+                      <SelectItem value="master" data-testid="option-level-master">{t('technician.levelMaster', 'Master')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="yearsOfExperience">Years of Experience</Label>
+                  <Label htmlFor="yearsOfExperience">{t('technician.yearsOfExperience', 'Years of Experience')}</Label>
                   <Input
                     id="yearsOfExperience"
                     type="number"
@@ -398,20 +400,20 @@ export default function TechnicianManagement() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="speciality">Speciality</Label>
+                <Label htmlFor="speciality">{t('technician.speciality', 'Speciality')}</Label>
                 <Input
                   id="speciality"
                   value={editingProfile.speciality || ""}
                   onChange={(e) =>
                     setEditingProfile({ ...editingProfile, speciality: e.target.value })
                   }
-                  placeholder="e.g., Engine Repair & Diagnostics"
+                  placeholder={t('technician.specialityPlaceholder', 'e.g., Engine Repair & Diagnostics')}
                   data-testid="input-speciality"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="hourlyRate">Hourly Rate ($)</Label>
+                <Label htmlFor="hourlyRate">{t('technician.hourlyRateDollar', 'Hourly Rate ($)')}</Label>
                 <Input
                   id="hourlyRate"
                   type="number"
@@ -426,7 +428,7 @@ export default function TechnicianManagement() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="maxConcurrentJobs">Max Concurrent Jobs</Label>
+                <Label htmlFor="maxConcurrentJobs">{t('technician.maxConcurrentJobs', 'Max Concurrent Jobs')}</Label>
                 <Input
                   id="maxConcurrentJobs"
                   type="number"
@@ -443,42 +445,42 @@ export default function TechnicianManagement() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="qualifications">Qualifications</Label>
+                <Label htmlFor="qualifications">{t('technician.qualifications', 'Qualifications')}</Label>
                 <Textarea
                   id="qualifications"
                   value={editingProfile.qualifications || ""}
                   onChange={(e) =>
                     setEditingProfile({ ...editingProfile, qualifications: e.target.value })
                   }
-                  placeholder="e.g., ASE Master Certification, Automotive Technology Diploma"
+                  placeholder={t('technician.qualificationsPlaceholder', 'e.g., ASE Master Certification, Automotive Technology Diploma')}
                   rows={3}
                   data-testid="input-qualifications"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="certifications">Certifications</Label>
+                <Label htmlFor="certifications">{t('technician.certifications', 'Certifications')}</Label>
                 <Textarea
                   id="certifications"
                   value={editingProfile.certifications || ""}
                   onChange={(e) =>
                     setEditingProfile({ ...editingProfile, certifications: e.target.value })
                   }
-                  placeholder="e.g., ASE Master, HVAC Specialist"
+                  placeholder={t('technician.certificationsPlaceholder', 'e.g., ASE Master, HVAC Specialist')}
                   rows={3}
                   data-testid="input-certifications"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="skills">Skills</Label>
+                <Label htmlFor="skills">{t('technician.skills', 'Skills')}</Label>
                 <Textarea
                   id="skills"
                   value={editingProfile.skills || ""}
                   onChange={(e) =>
                     setEditingProfile({ ...editingProfile, skills: e.target.value })
                   }
-                  placeholder="e.g., Engine Repair, Diagnostics, Brake Systems"
+                  placeholder={t('technician.skillsPlaceholder', 'e.g., Engine Repair, Diagnostics, Brake Systems')}
                   rows={3}
                   data-testid="input-skills"
                 />
@@ -491,10 +493,10 @@ export default function TechnicianManagement() {
                   onClick={() => setIsEditDialogOpen(false)}
                   data-testid="button-cancel"
                 >
-                  Cancel
+                  {t('common.cancel', 'Cancel')}
                 </Button>
                 <Button type="submit" disabled={updateProfileMutation.isPending} data-testid="button-save">
-                  {updateProfileMutation.isPending ? "Saving..." : "Save Changes"}
+                  {updateProfileMutation.isPending ? t('common.saving', 'Saving...') : t('common.saveChanges', 'Save Changes')}
                 </Button>
               </div>
             </form>
@@ -513,19 +515,19 @@ export default function TechnicianManagement() {
       <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
         <AlertDialogContent data-testid="dialog-delete-confirm">
           <AlertDialogHeader>
-            <AlertDialogTitle data-testid="text-confirm-title">Delete Technician</AlertDialogTitle>
+            <AlertDialogTitle data-testid="text-confirm-title">{t('technician.deleteTechnician', 'Delete Technician')}</AlertDialogTitle>
             <AlertDialogDescription data-testid="text-confirm-description">
-              Are you sure you want to delete {technicianToDelete?.fullName}? This action cannot be undone.
+              {t('technician.deleteConfirmation', 'Are you sure you want to delete {{name}}? This action cannot be undone.', { name: technicianToDelete?.fullName })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel data-testid="button-cancel-delete">Cancel</AlertDialogCancel>
+            <AlertDialogCancel data-testid="button-cancel-delete">{t('common.cancel', 'Cancel')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmDelete}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               data-testid="button-confirm-delete"
             >
-              {deleteMutation.isPending ? "Deleting..." : "Delete"}
+              {deleteMutation.isPending ? t('common.deleting', 'Deleting...') : t('common.delete', 'Delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

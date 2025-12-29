@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,6 +10,7 @@ import { StandardPageLayout } from "@/components/layouts/StandardPageLayout";
 import { Scan, Package, Wrench, Car } from "lucide-react";
 
 export default function BarcodeScanner() {
+  const { t } = useTranslation();
   const [scanning, setScanning] = useState(false);
   const { toast } = useToast();
 
@@ -31,16 +33,16 @@ export default function BarcodeScanner() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/barcode/scans"] });
       toast({
-        title: "Success",
-        description: "Barcode scan recorded successfully",
+        title: t('common.success', 'Success'),
+        description: t('inventory.barcodeScanRecorded', 'Barcode scan recorded successfully'),
       });
       setScanning(false);
     },
     onError: (error: any) => {
       toast({
         variant: "destructive",
-        title: "Error",
-        description: error.message || "Failed to record barcode scan",
+        title: t('common.error', 'Error'),
+        description: error.message || t('inventory.failedToRecordBarcodeScan', 'Failed to record barcode scan'),
       });
     },
   });
@@ -80,12 +82,12 @@ export default function BarcodeScanner() {
 
   return (
     <StandardPageLayout
-      title="📱 Barcode & QR Scanner"
-      description="Scan parts, vehicles, and tools"
+      title={t('inventory.barcodeQrScanner', '📱 Barcode & QR Scanner')}
+      description={t('inventory.scanPartsVehiclesTools', 'Scan parts, vehicles, and tools')}
       icon={Scan}
       actions={[
         {
-          label: scanning ? "Stop Scanner" : "Start Scanner",
+          label: scanning ? t('inventory.stopScanner', 'Stop Scanner') : t('inventory.startScanner', 'Start Scanner'),
           onClick: () => {
             if (scanning) {
               setScanning(false);
@@ -106,7 +108,7 @@ export default function BarcodeScanner() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Today's Scans</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('inventory.todaysScans', "Today's Scans")}</p>
                 <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="stat-today-scans">{stats.todayScans}</h3>
               </div>
               <Scan className="h-12 w-12 text-blue-600" />
@@ -117,7 +119,7 @@ export default function BarcodeScanner() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Parts Scanned</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('inventory.partsScanned', 'Parts Scanned')}</p>
                 <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="stat-parts-scanned">{stats.partsScanned}</h3>
               </div>
               <Package className="h-12 w-12 text-green-600" />
@@ -128,7 +130,7 @@ export default function BarcodeScanner() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Vehicle Check-Ins</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('inventory.vehicleCheckIns', 'Vehicle Check-Ins')}</p>
                 <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="stat-vehicle-checkins">{stats.vehicleCheckIns}</h3>
               </div>
               <Car className="h-12 w-12 text-purple-600" />
@@ -139,7 +141,7 @@ export default function BarcodeScanner() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Tools Tracked</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('inventory.toolsTracked', 'Tools Tracked')}</p>
                 <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="stat-tools-tracked">{stats.toolsTracked}</h3>
               </div>
               <Wrench className="h-12 w-12 text-yellow-600" />
@@ -153,8 +155,8 @@ export default function BarcodeScanner() {
           <CardContent className="p-8">
             <div className="flex flex-col items-center justify-center gap-4">
               <Scan className="h-24 w-24 text-blue-600 animate-pulse" />
-              <p className="text-lg font-semibold text-gray-900 dark:text-white">Scanner Active</p>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Point camera at barcode or QR code</p>
+              <p className="text-lg font-semibold text-gray-900 dark:text-white">{t('inventory.scannerActive', 'Scanner Active')}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">{t('inventory.pointCameraAtBarcode', 'Point camera at barcode or QR code')}</p>
             </div>
           </CardContent>
         </Card>
@@ -162,16 +164,16 @@ export default function BarcodeScanner() {
 
       <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
         <CardHeader>
-          <CardTitle>Recent Scans</CardTitle>
+          <CardTitle>{t('inventory.recentScans', 'Recent Scans')}</CardTitle>
         </CardHeader>
         <CardContent>
           {isLoading ? (
             <div className="text-center py-8">
-              <p className="text-gray-600 dark:text-gray-400">Loading scan history...</p>
+              <p className="text-gray-600 dark:text-gray-400">{t('inventory.loadingScanHistory', 'Loading scan history...')}</p>
             </div>
           ) : scans.length === 0 ? (
             <div className="text-center py-8">
-              <p className="text-gray-600 dark:text-gray-400">No scans recorded yet. Start scanning to see results here.</p>
+              <p className="text-gray-600 dark:text-gray-400">{t('inventory.noScansRecorded', 'No scans recorded yet. Start scanning to see results here.')}</p>
             </div>
           ) : (
             <div className="space-y-3">

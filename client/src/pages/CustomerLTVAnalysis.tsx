@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from 'react-i18next';
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -39,6 +40,7 @@ import {
 import { TabsPageLayout } from "@/components/layouts/TabsPageLayout";
 
 export default function CustomerLTVAnalysis() {
+  const { t } = useTranslation();
   const [riskFilter, setRiskFilter] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -152,7 +154,7 @@ export default function CustomerLTVAnalysis() {
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Total Customers</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">{t('customers.ltv.totalCustomers', 'Total Customers')}</p>
               <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">604</h3>
               <p className="text-sm text-green-600 mt-1">+23 this month</p>
             </div>
@@ -165,7 +167,7 @@ export default function CustomerLTVAnalysis() {
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Avg LTV</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">{t('customers.ltv.avgLTV', 'Avg LTV')}</p>
               <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">$51,600</h3>
               <p className="text-sm text-green-600 mt-1">+8.5% vs last year</p>
             </div>
@@ -178,7 +180,7 @@ export default function CustomerLTVAnalysis() {
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">High Risk</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">{t('customers.ltv.highRisk', 'High Risk')}</p>
               <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">42</h3>
               <p className="text-sm text-red-600 mt-1">Need attention</p>
             </div>
@@ -191,7 +193,7 @@ export default function CustomerLTVAnalysis() {
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Retention Rate</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">{t('customers.ltv.retentionRate', 'Retention Rate')}</p>
               <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">87.3%</h3>
               <p className="text-sm text-green-600 mt-1">+2.1% improvement</p>
             </div>
@@ -205,7 +207,7 @@ export default function CustomerLTVAnalysis() {
   const ltvSegmentsChart = (
     <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
       <CardHeader>
-        <CardTitle>Customer Segments by LTV</CardTitle>
+        <CardTitle>{t('customers.ltv.segmentsByLTV', 'Customer Segments by LTV')}</CardTitle>
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={300}>
@@ -231,7 +233,7 @@ export default function CustomerLTVAnalysis() {
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
             <Input
-              placeholder="Search customers..."
+              placeholder={t('customers.searchPlaceholder', 'Search customers...')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10"
@@ -289,11 +291,11 @@ export default function CustomerLTVAnalysis() {
   const highValueTab = (
     <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
       <CardHeader>
-        <CardTitle>High Value Customers (Top 10%)</CardTitle>
+        <CardTitle>{t('customers.ltv.highValueCustomers', 'High Value Customers (Top 10%)')}</CardTitle>
       </CardHeader>
       <CardContent>
         <p className="text-gray-600 dark:text-gray-400 mb-4">
-          These customers represent your most valuable relationships. Focus on retention and expansion opportunities.
+          {t('customers.ltv.highValueDescription', 'These customers represent your most valuable relationships. Focus on retention and expansion opportunities.')}
         </p>
         <div className="space-y-3">
           {customers.filter(c => c.predictedLTV > 150000).map((customer) => (
@@ -326,12 +328,12 @@ export default function CustomerLTVAnalysis() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <AlertTriangle className="h-5 w-5 text-red-600" />
-          At-Risk Customers
+          {t('customers.ltv.atRiskCustomers', 'At-Risk Customers')}
         </CardTitle>
       </CardHeader>
       <CardContent>
         <p className="text-gray-600 dark:text-gray-400 mb-4">
-          These customers show signs of potential churn. Immediate action recommended.
+          {t('customers.ltv.atRiskDescription', 'These customers show signs of potential churn. Immediate action recommended.')}
         </p>
         <div className="space-y-3">
           {customers.filter(c => c.retentionRisk === "high" || c.retentionRisk === "medium").map((customer) => (
@@ -354,7 +356,7 @@ export default function CustomerLTVAnalysis() {
                   </p>
                 </div>
                 <Button size="sm" variant="outline" data-testid={`button-action-${customer.id}`}>
-                  Take Action
+                  {t('customers.ltv.takeAction', 'Take Action')}
                 </Button>
               </div>
             </div>
@@ -367,7 +369,7 @@ export default function CustomerLTVAnalysis() {
   const insightsTab = (
     <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
       <CardHeader>
-        <CardTitle>Customer Value Insights</CardTitle>
+        <CardTitle>{t('customers.ltv.insights', 'Customer Value Insights')}</CardTitle>
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={400}>
@@ -383,21 +385,21 @@ export default function CustomerLTVAnalysis() {
         </ResponsiveContainer>
         <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
-            <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Key Finding</h4>
+            <h4 className="font-semibold text-gray-900 dark:text-white mb-2">{t('customers.ltv.keyFinding', 'Key Finding')}</h4>
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              Customers with 20+ visits have 3.2x higher lifetime value
+              {t('customers.ltv.keyFindingText', 'Customers with 20+ visits have 3.2x higher lifetime value')}
             </p>
           </div>
           <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
-            <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Recommendation</h4>
+            <h4 className="font-semibold text-gray-900 dark:text-white mb-2">{t('customers.ltv.recommendation', 'Recommendation')}</h4>
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              Focus retention efforts on customers with 5-15 visits
+              {t('customers.ltv.recommendationText', 'Focus retention efforts on customers with 5-15 visits')}
             </p>
           </div>
           <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
-            <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Opportunity</h4>
+            <h4 className="font-semibold text-gray-900 dark:text-white mb-2">{t('customers.ltv.opportunity', 'Opportunity')}</h4>
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              42 customers at risk represent $6.4M potential loss
+              {t('customers.ltv.opportunityText', '42 customers at risk represent $6.4M potential loss')}
             </p>
           </div>
         </div>
@@ -407,8 +409,8 @@ export default function CustomerLTVAnalysis() {
 
   return (
     <TabsPageLayout
-      title="📈 Customer Lifetime Value"
-      description="Predict customer value and identify retention risks"
+      title={t('customers.ltv.title', '📈 Customer Lifetime Value')}
+      description={t('customers.ltv.description', 'Predict customer value and identify retention risks')}
       icon={TrendingUp}
       secondaryActions={[
         {
@@ -441,25 +443,25 @@ export default function CustomerLTVAnalysis() {
       tabs={[
         {
           id: "all",
-          label: "All Customers",
+          label: t('customers.ltv.tabs.allCustomers', 'All Customers'),
           icon: Users,
           content: allCustomersTab,
         },
         {
           id: "high-value",
-          label: "High Value",
+          label: t('customers.ltv.tabs.highValue', 'High Value'),
           icon: TrendingUp,
           content: highValueTab,
         },
         {
           id: "at-risk",
-          label: "At Risk",
+          label: t('customers.ltv.tabs.atRisk', 'At Risk'),
           icon: AlertTriangle,
           content: atRiskTab,
         },
         {
           id: "insights",
-          label: "Insights",
+          label: t('customers.ltv.tabs.insights', 'Insights'),
           icon: Lightbulb,
           content: insightsTab,
         },

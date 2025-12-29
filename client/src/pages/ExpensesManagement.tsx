@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Link } from "wouter";
+import { useTranslation } from "react-i18next";
 import { TabsPageLayout } from "@/components/layouts/TabsPageLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -165,6 +166,7 @@ const monthlyExpenses = [
 ];
 
 export default function ExpensesManagement() {
+  const { t } = useTranslation();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
@@ -226,31 +228,31 @@ export default function ExpensesManagement() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card data-testid="card-total-expenses">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Total Expenses</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t('payments.expenses.totalExpenses', 'Total Expenses')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-red-600">
               SAR {totalExpenses.toLocaleString()}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">إجمالي المصروفات</p>
+            <p className="text-xs text-muted-foreground mt-1">{t('payments.expenses.totalExpensesAr', 'إجمالي المصروفات')}</p>
           </CardContent>
         </Card>
 
         <Card data-testid="card-pending-expenses">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Pending Payments</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t('payments.expenses.pendingPayments', 'Pending Payments')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-orange-600">
               SAR {pendingExpenses.toLocaleString()}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">المدفوعات المعلقة</p>
+            <p className="text-xs text-muted-foreground mt-1">{t('payments.expenses.pendingPaymentsAr', 'المدفوعات المعلقة')}</p>
           </CardContent>
         </Card>
 
         <Card data-testid="card-budget-used">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Budget Used</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t('payments.expenses.budgetUsed', 'Budget Used')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">74%</div>
@@ -260,11 +262,11 @@ export default function ExpensesManagement() {
 
         <Card data-testid="card-transactions-count">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Transactions</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t('payments.expenses.transactions', 'Transactions')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{sampleExpenses.length}</div>
-            <p className="text-xs text-muted-foreground mt-1">This month</p>
+            <p className="text-xs text-muted-foreground mt-1">{t('common.thisMonth', 'This month')}</p>
           </CardContent>
         </Card>
       </div>
@@ -272,8 +274,8 @@ export default function ExpensesManagement() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
-            <CardTitle>Monthly Expense Trend</CardTitle>
-            <CardDescription>اتجاه المصروفات الشهرية</CardDescription>
+            <CardTitle>{t('payments.expenses.monthlyTrend', 'Monthly Expense Trend')}</CardTitle>
+            <CardDescription>{t('payments.expenses.monthlyTrendAr', 'اتجاه المصروفات الشهرية')}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -292,8 +294,8 @@ export default function ExpensesManagement() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Expense by Category</CardTitle>
-            <CardDescription>المصروفات حسب الفئة</CardDescription>
+            <CardTitle>{t('payments.expenses.expenseByCategory', 'Expense by Category')}</CardTitle>
+            <CardDescription>{t('payments.expenses.expenseByCategoryAr', 'المصروفات حسب الفئة')}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -302,7 +304,7 @@ export default function ExpensesManagement() {
                   <div className="flex justify-between mb-1">
                     <span className="text-sm font-medium flex items-center gap-2">
                       {getCategoryIcon(cat.category)}
-                      {cat.category}
+                      {t(`payments.expenses.categories.${cat.category.toLowerCase()}`, cat.category)}
                     </span>
                     <span className="text-sm text-muted-foreground">
                       SAR {cat.spent.toLocaleString()} / {cat.budget.toLocaleString()}
@@ -318,8 +320,8 @@ export default function ExpensesManagement() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Related Financial Modules</CardTitle>
-          <CardDescription>الوحدات المالية ذات الصلة - Quick access to related accounting</CardDescription>
+          <CardTitle>{t('payments.expenses.relatedModules', 'Related Financial Modules')}</CardTitle>
+          <CardDescription>{t('payments.expenses.relatedModulesDesc', 'Quick access to related accounting')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -330,11 +332,11 @@ export default function ExpensesManagement() {
                     <ShoppingCart className="h-8 w-8 text-green-600" />
                     <ExternalLink className="h-4 w-4 text-muted-foreground" />
                   </div>
-                  <CardTitle className="text-lg">Sales Management</CardTitle>
-                  <CardDescription>المبيعات</CardDescription>
+                  <CardTitle className="text-lg">{t('sales.management', 'Sales Management')}</CardTitle>
+                  <CardDescription>{t('sales.managementAr', 'المبيعات')}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm text-muted-foreground">Track revenue, transactions, and sales performance</p>
+                  <p className="text-sm text-muted-foreground">{t('sales.description', 'Track revenue, transactions, and sales performance')}</p>
                 </CardContent>
               </Card>
             </Link>
@@ -346,11 +348,11 @@ export default function ExpensesManagement() {
                     <FileText className="h-8 w-8 text-blue-600" />
                     <ExternalLink className="h-4 w-4 text-muted-foreground" />
                   </div>
-                  <CardTitle className="text-lg">Invoices</CardTitle>
-                  <CardDescription>الفواتير</CardDescription>
+                  <CardTitle className="text-lg">{t('invoices.title', 'Invoices')}</CardTitle>
+                  <CardDescription>{t('invoices.titleAr', 'الفواتير')}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm text-muted-foreground">Manage customer invoices and payment tracking</p>
+                  <p className="text-sm text-muted-foreground">{t('invoices.description', 'Manage customer invoices and payment tracking')}</p>
                 </CardContent>
               </Card>
             </Link>
@@ -366,20 +368,20 @@ export default function ExpensesManagement() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>Expense Transactions</CardTitle>
-              <CardDescription>معاملات المصروفات - All expense records</CardDescription>
+              <CardTitle>{t('payments.expenses.expenseTransactions', 'Expense Transactions')}</CardTitle>
+              <CardDescription>{t('payments.expenses.allExpenseRecords', 'All expense records')}</CardDescription>
             </div>
             <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
               <DialogTrigger asChild>
                 <Button data-testid="button-add-expense">
                   <Plus className="h-4 w-4 mr-2" />
-                  Add Expense
+                  {t('payments.expenses.addExpense', 'Add Expense')}
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-2xl" data-testid="modal-add-expense">
                 <DialogHeader>
-                  <DialogTitle>Record New Expense</DialogTitle>
-                  <DialogDescription>تسجيل مصروف جديد</DialogDescription>
+                  <DialogTitle>{t('payments.expenses.recordNewExpense', 'Record New Expense')}</DialogTitle>
+                  <DialogDescription>{t('payments.expenses.recordNewExpenseAr', 'تسجيل مصروف جديد')}</DialogDescription>
                 </DialogHeader>
                 <Form {...form}>
                   <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -389,9 +391,9 @@ export default function ExpensesManagement() {
                         name="description"
                         render={({ field }) => (
                           <FormItem className="col-span-2">
-                            <FormLabel>Description</FormLabel>
+                            <FormLabel>{t('common.description', 'Description')}</FormLabel>
                             <FormControl>
-                              <Input {...field} placeholder="Expense description" data-testid="input-description" />
+                              <Input {...field} placeholder={t('payments.expenses.expenseDescriptionPlaceholder', 'Expense description')} data-testid="input-description" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -402,23 +404,23 @@ export default function ExpensesManagement() {
                         name="category"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Category</FormLabel>
+                            <FormLabel>{t('common.category', 'Category')}</FormLabel>
                             <Select onValueChange={field.onChange} value={field.value}>
                               <FormControl>
                                 <SelectTrigger data-testid="select-category">
-                                  <SelectValue placeholder="Select category" />
+                                  <SelectValue placeholder={t('payments.expenses.selectCategory', 'Select category')} />
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                <SelectItem value="Utilities">Utilities</SelectItem>
-                                <SelectItem value="Inventory">Inventory</SelectItem>
-                                <SelectItem value="Payroll">Payroll</SelectItem>
-                                <SelectItem value="Maintenance">Maintenance</SelectItem>
-                                <SelectItem value="Office">Office</SelectItem>
-                                <SelectItem value="Fuel">Fuel</SelectItem>
-                                <SelectItem value="Rent">Rent</SelectItem>
-                                <SelectItem value="Marketing">Marketing</SelectItem>
-                                <SelectItem value="Insurance">Insurance</SelectItem>
+                                <SelectItem value="Utilities">{t('payments.expenses.categories.utilities', 'Utilities')}</SelectItem>
+                                <SelectItem value="Inventory">{t('payments.expenses.categories.inventory', 'Inventory')}</SelectItem>
+                                <SelectItem value="Payroll">{t('payments.expenses.categories.payroll', 'Payroll')}</SelectItem>
+                                <SelectItem value="Maintenance">{t('payments.expenses.categories.maintenance', 'Maintenance')}</SelectItem>
+                                <SelectItem value="Office">{t('payments.expenses.categories.office', 'Office')}</SelectItem>
+                                <SelectItem value="Fuel">{t('payments.expenses.categories.fuel', 'Fuel')}</SelectItem>
+                                <SelectItem value="Rent">{t('payments.expenses.categories.rent', 'Rent')}</SelectItem>
+                                <SelectItem value="Marketing">{t('payments.expenses.categories.marketing', 'Marketing')}</SelectItem>
+                                <SelectItem value="Insurance">{t('payments.expenses.categories.insurance', 'Insurance')}</SelectItem>
                               </SelectContent>
                             </Select>
                             <FormMessage />
@@ -430,7 +432,7 @@ export default function ExpensesManagement() {
                         name="amount"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Amount (SAR)</FormLabel>
+                            <FormLabel>{t('payments.expenses.amountSar', 'Amount (SAR)')}</FormLabel>
                             <FormControl>
                               <Input {...field} type="number" placeholder="0.00" data-testid="input-amount" />
                             </FormControl>
@@ -443,7 +445,7 @@ export default function ExpensesManagement() {
                         name="date"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Date</FormLabel>
+                            <FormLabel>{t('common.date', 'Date')}</FormLabel>
                             <FormControl>
                               <Input {...field} type="date" data-testid="input-date" />
                             </FormControl>
@@ -456,9 +458,9 @@ export default function ExpensesManagement() {
                         name="vendor"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Vendor</FormLabel>
+                            <FormLabel>{t('payments.expenses.vendor', 'Vendor')}</FormLabel>
                             <FormControl>
-                              <Input {...field} placeholder="Vendor name" data-testid="input-vendor" />
+                              <Input {...field} placeholder={t('payments.expenses.vendorPlaceholder', 'Vendor name')} data-testid="input-vendor" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -469,18 +471,18 @@ export default function ExpensesManagement() {
                         name="paymentMethod"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Payment Method</FormLabel>
+                            <FormLabel>{t('payments.paymentMethod', 'Payment Method')}</FormLabel>
                             <Select onValueChange={field.onChange} value={field.value}>
                               <FormControl>
                                 <SelectTrigger data-testid="select-payment-method">
-                                  <SelectValue placeholder="Select method" />
+                                  <SelectValue placeholder={t('payments.selectPaymentMethod', 'Select method')} />
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                <SelectItem value="Cash">Cash</SelectItem>
-                                <SelectItem value="Card">Card</SelectItem>
-                                <SelectItem value="Bank Transfer">Bank Transfer</SelectItem>
-                                <SelectItem value="Credit">Credit</SelectItem>
+                                <SelectItem value="Cash">{t('payments.methods.cash', 'Cash')}</SelectItem>
+                                <SelectItem value="Card">{t('payments.methods.card', 'Card')}</SelectItem>
+                                <SelectItem value="Bank Transfer">{t('payments.methods.bankTransfer', 'Bank Transfer')}</SelectItem>
+                                <SelectItem value="Credit">{t('payments.methods.credit', 'Credit')}</SelectItem>
                               </SelectContent>
                             </Select>
                             <FormMessage />
@@ -492,9 +494,9 @@ export default function ExpensesManagement() {
                         name="receipt"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Receipt Number</FormLabel>
+                            <FormLabel>{t('payments.expenses.receiptNumber', 'Receipt Number')}</FormLabel>
                             <FormControl>
-                              <Input {...field} placeholder="Optional" data-testid="input-receipt" />
+                              <Input {...field} placeholder={t('common.optional', 'Optional')} data-testid="input-receipt" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -505,9 +507,9 @@ export default function ExpensesManagement() {
                         name="notes"
                         render={({ field }) => (
                           <FormItem className="col-span-2">
-                            <FormLabel>Notes</FormLabel>
+                            <FormLabel>{t('common.notes', 'Notes')}</FormLabel>
                             <FormControl>
-                              <Textarea {...field} placeholder="Additional notes" data-testid="input-notes" />
+                              <Textarea {...field} placeholder={t('payments.expenses.additionalNotes', 'Additional notes')} data-testid="input-notes" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -516,9 +518,9 @@ export default function ExpensesManagement() {
                     </div>
                     <div className="flex justify-end gap-2">
                       <Button type="button" variant="outline" onClick={() => setIsAddDialogOpen(false)}>
-                        Cancel
+                        {t('common.cancel', 'Cancel')}
                       </Button>
-                      <Button type="submit" data-testid="button-save-expense">Save Expense</Button>
+                      <Button type="submit" data-testid="button-save-expense">{t('payments.expenses.saveExpense', 'Save Expense')}</Button>
                     </div>
                   </form>
                 </Form>
@@ -531,7 +533,7 @@ export default function ExpensesManagement() {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search expenses..."
+                placeholder={t('payments.expenses.searchExpenses', 'Search expenses...')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
@@ -540,34 +542,34 @@ export default function ExpensesManagement() {
             </div>
             <Select value={categoryFilter} onValueChange={setCategoryFilter}>
               <SelectTrigger className="w-48" data-testid="select-filter-category">
-                <SelectValue placeholder="Filter by category" />
+                <SelectValue placeholder={t('payments.expenses.filterByCategory', 'Filter by category')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Categories</SelectItem>
-                <SelectItem value="Utilities">Utilities</SelectItem>
-                <SelectItem value="Inventory">Inventory</SelectItem>
-                <SelectItem value="Payroll">Payroll</SelectItem>
-                <SelectItem value="Maintenance">Maintenance</SelectItem>
-                <SelectItem value="Office">Office</SelectItem>
-                <SelectItem value="Fuel">Fuel</SelectItem>
+                <SelectItem value="all">{t('payments.expenses.allCategories', 'All Categories')}</SelectItem>
+                <SelectItem value="Utilities">{t('payments.expenses.categories.utilities', 'Utilities')}</SelectItem>
+                <SelectItem value="Inventory">{t('payments.expenses.categories.inventory', 'Inventory')}</SelectItem>
+                <SelectItem value="Payroll">{t('payments.expenses.categories.payroll', 'Payroll')}</SelectItem>
+                <SelectItem value="Maintenance">{t('payments.expenses.categories.maintenance', 'Maintenance')}</SelectItem>
+                <SelectItem value="Office">{t('payments.expenses.categories.office', 'Office')}</SelectItem>
+                <SelectItem value="Fuel">{t('payments.expenses.categories.fuel', 'Fuel')}</SelectItem>
               </SelectContent>
             </Select>
             <Button variant="outline" data-testid="button-export-expenses">
               <Download className="h-4 w-4 mr-2" />
-              Export
+              {t('common.export', 'Export')}
             </Button>
           </div>
 
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Description</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Vendor</TableHead>
-                <TableHead>Amount</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>Payment</TableHead>
-                <TableHead>Status</TableHead>
+                <TableHead>{t('common.description', 'Description')}</TableHead>
+                <TableHead>{t('common.category', 'Category')}</TableHead>
+                <TableHead>{t('payments.expenses.vendor', 'Vendor')}</TableHead>
+                <TableHead>{t('common.amount', 'Amount')}</TableHead>
+                <TableHead>{t('common.date', 'Date')}</TableHead>
+                <TableHead>{t('payments.paymentMethod', 'Payment')}</TableHead>
+                <TableHead>{t('common.status', 'Status')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -582,7 +584,7 @@ export default function ExpensesManagement() {
                   <TableCell>
                     <Badge variant="outline" className="flex items-center gap-1 w-fit">
                       {getCategoryIcon(expense.category)}
-                      {expense.category}
+                      {t(`payments.expenses.categories.${expense.category.toLowerCase()}`, expense.category)}
                     </Badge>
                   </TableCell>
                   <TableCell>{expense.vendor}</TableCell>
@@ -598,7 +600,7 @@ export default function ExpensesManagement() {
                       ) : (
                         <Clock className="h-3 w-3 mr-1" />
                       )}
-                      {expense.status}
+                      {t(`payments.expenses.status.${expense.status.toLowerCase()}`, expense.status)}
                     </Badge>
                   </TableCell>
                 </TableRow>
@@ -615,50 +617,50 @@ export default function ExpensesManagement() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card data-testid="card-total-budget">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Total Budget</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t('payments.expenses.totalBudget', 'Total Budget')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">SAR 166,000</div>
-            <p className="text-xs text-muted-foreground mt-1">الميزانية الإجمالية</p>
+            <p className="text-xs text-muted-foreground mt-1">{t('payments.expenses.totalBudgetAr', 'الميزانية الإجمالية')}</p>
           </CardContent>
         </Card>
 
         <Card data-testid="card-spent">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Spent</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t('payments.expenses.spent', 'Spent')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-red-600">SAR 122,650</div>
-            <p className="text-xs text-muted-foreground mt-1">المصروف</p>
+            <p className="text-xs text-muted-foreground mt-1">{t('payments.expenses.spentAr', 'المصروف')}</p>
           </CardContent>
         </Card>
 
         <Card data-testid="card-remaining-budget">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Remaining</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t('payments.expenses.remaining', 'Remaining')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-600">SAR 43,350</div>
-            <p className="text-xs text-muted-foreground mt-1">المتبقي</p>
+            <p className="text-xs text-muted-foreground mt-1">{t('payments.expenses.remainingAr', 'المتبقي')}</p>
           </CardContent>
         </Card>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Budget by Category</CardTitle>
-          <CardDescription>الميزانية حسب الفئة - Budget allocation and usage</CardDescription>
+          <CardTitle>{t('payments.expenses.budgetByCategory', 'Budget by Category')}</CardTitle>
+          <CardDescription>{t('payments.expenses.budgetByCategoryDesc', 'Budget allocation and usage')}</CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Category</TableHead>
-                <TableHead>Budget</TableHead>
-                <TableHead>Spent</TableHead>
-                <TableHead>Remaining</TableHead>
-                <TableHead>Progress</TableHead>
-                <TableHead>Status</TableHead>
+                <TableHead>{t('common.category', 'Category')}</TableHead>
+                <TableHead>{t('payments.expenses.budget', 'Budget')}</TableHead>
+                <TableHead>{t('payments.expenses.spent', 'Spent')}</TableHead>
+                <TableHead>{t('payments.expenses.remaining', 'Remaining')}</TableHead>
+                <TableHead>{t('common.progress', 'Progress')}</TableHead>
+                <TableHead>{t('common.status', 'Status')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -669,7 +671,7 @@ export default function ExpensesManagement() {
                   <TableRow key={index} data-testid={`row-budget-${index}`}>
                     <TableCell className="font-medium flex items-center gap-2">
                       {getCategoryIcon(cat.category)}
-                      {cat.category}
+                      {t(`payments.expenses.categories.${cat.category.toLowerCase()}`, cat.category)}
                     </TableCell>
                     <TableCell>SAR {cat.budget.toLocaleString()}</TableCell>
                     <TableCell className="text-red-600">SAR {cat.spent.toLocaleString()}</TableCell>
@@ -682,11 +684,11 @@ export default function ExpensesManagement() {
                     </TableCell>
                     <TableCell>
                       {percentage > 90 ? (
-                        <Badge className="bg-red-600">Over Budget</Badge>
+                        <Badge className="bg-red-600">{t('payments.expenses.overBudget', 'Over Budget')}</Badge>
                       ) : percentage > 70 ? (
-                        <Badge className="bg-yellow-600">Warning</Badge>
+                        <Badge className="bg-yellow-600">{t('common.warning', 'Warning')}</Badge>
                       ) : (
-                        <Badge className="bg-green-600">On Track</Badge>
+                        <Badge className="bg-green-600">{t('payments.expenses.onTrack', 'On Track')}</Badge>
                       )}
                     </TableCell>
                   </TableRow>
@@ -706,13 +708,13 @@ export default function ExpensesManagement() {
           <CardHeader>
             <div className="flex items-center gap-2">
               <Calendar className="h-5 w-5 text-blue-600" />
-              <CardTitle className="text-lg">Monthly Expense Report</CardTitle>
+              <CardTitle className="text-lg">{t('payments.expenses.monthlyExpenseReport', 'Monthly Expense Report')}</CardTitle>
             </div>
-            <CardDescription>تقرير المصروفات الشهري</CardDescription>
+            <CardDescription>{t('payments.expenses.monthlyExpenseReportAr', 'تقرير المصروفات الشهري')}</CardDescription>
           </CardHeader>
           <CardContent>
             <Button className="w-full" variant="outline" data-testid="button-generate-monthly">
-              Generate Report
+              {t('payments.expenses.generateReport', 'Generate Report')}
             </Button>
           </CardContent>
         </Card>
@@ -721,13 +723,13 @@ export default function ExpensesManagement() {
           <CardHeader>
             <div className="flex items-center gap-2">
               <PieChart className="h-5 w-5 text-purple-600" />
-              <CardTitle className="text-lg">Category Analysis</CardTitle>
+              <CardTitle className="text-lg">{t('payments.expenses.categoryAnalysis', 'Category Analysis')}</CardTitle>
             </div>
-            <CardDescription>تحليل الفئات</CardDescription>
+            <CardDescription>{t('payments.expenses.categoryAnalysisAr', 'تحليل الفئات')}</CardDescription>
           </CardHeader>
           <CardContent>
             <Button className="w-full" variant="outline" data-testid="button-generate-category">
-              Generate Report
+              {t('payments.expenses.generateReport', 'Generate Report')}
             </Button>
           </CardContent>
         </Card>
@@ -736,13 +738,13 @@ export default function ExpensesManagement() {
           <CardHeader>
             <div className="flex items-center gap-2">
               <Building2 className="h-5 w-5 text-green-600" />
-              <CardTitle className="text-lg">Vendor Report</CardTitle>
+              <CardTitle className="text-lg">{t('payments.expenses.vendorReport', 'Vendor Report')}</CardTitle>
             </div>
-            <CardDescription>تقرير الموردين</CardDescription>
+            <CardDescription>{t('payments.expenses.vendorReportAr', 'تقرير الموردين')}</CardDescription>
           </CardHeader>
           <CardContent>
             <Button className="w-full" variant="outline" data-testid="button-generate-vendor">
-              Generate Report
+              {t('payments.expenses.generateReport', 'Generate Report')}
             </Button>
           </CardContent>
         </Card>
@@ -751,13 +753,13 @@ export default function ExpensesManagement() {
           <CardHeader>
             <div className="flex items-center gap-2">
               <TrendingDown className="h-5 w-5 text-orange-600" />
-              <CardTitle className="text-lg">Budget Variance</CardTitle>
+              <CardTitle className="text-lg">{t('payments.expenses.budgetVariance', 'Budget Variance')}</CardTitle>
             </div>
-            <CardDescription>تحليل فروقات الميزانية</CardDescription>
+            <CardDescription>{t('payments.expenses.budgetVarianceAr', 'تحليل فروقات الميزانية')}</CardDescription>
           </CardHeader>
           <CardContent>
             <Button className="w-full" variant="outline" data-testid="button-generate-budget">
-              Generate Report
+              {t('payments.expenses.generateReport', 'Generate Report')}
             </Button>
           </CardContent>
         </Card>
@@ -766,13 +768,13 @@ export default function ExpensesManagement() {
           <CardHeader>
             <div className="flex items-center gap-2">
               <FileText className="h-5 w-5 text-red-600" />
-              <CardTitle className="text-lg">Tax Deductible</CardTitle>
+              <CardTitle className="text-lg">{t('payments.expenses.taxDeductible', 'Tax Deductible')}</CardTitle>
             </div>
-            <CardDescription>المصروفات المخصومة ضريبياً</CardDescription>
+            <CardDescription>{t('payments.expenses.taxDeductibleAr', 'المصروفات المخصومة ضريبياً')}</CardDescription>
           </CardHeader>
           <CardContent>
             <Button className="w-full" variant="outline" data-testid="button-generate-tax">
-              Generate Report
+              {t('payments.expenses.generateReport', 'Generate Report')}
             </Button>
           </CardContent>
         </Card>
@@ -781,13 +783,13 @@ export default function ExpensesManagement() {
           <CardHeader>
             <div className="flex items-center gap-2">
               <Receipt className="h-5 w-5 text-teal-600" />
-              <CardTitle className="text-lg">Receipt Summary</CardTitle>
+              <CardTitle className="text-lg">{t('payments.expenses.receiptSummary', 'Receipt Summary')}</CardTitle>
             </div>
-            <CardDescription>ملخص الإيصالات</CardDescription>
+            <CardDescription>{t('payments.expenses.receiptSummaryAr', 'ملخص الإيصالات')}</CardDescription>
           </CardHeader>
           <CardContent>
             <Button className="w-full" variant="outline" data-testid="button-generate-receipts">
-              Generate Report
+              {t('payments.expenses.generateReport', 'Generate Report')}
             </Button>
           </CardContent>
         </Card>
@@ -798,14 +800,14 @@ export default function ExpensesManagement() {
   return (
     <div className="p-6 space-y-6">
       <TabsPageLayout
-        title="Expenses Management"
-        description="المصروفات - Track, categorize, and analyze business expenses"
+        title={t('payments.expenses.expensesManagement', 'Expenses Management')}
+        description={t('payments.expenses.expensesManagementDesc', 'Track, categorize, and analyze business expenses')}
         defaultTab="overview"
         tabs={[
-          { id: "overview", label: "Overview", icon: PieChart, content: overviewTab },
-          { id: "transactions", label: "Transactions", icon: Receipt, content: transactionsTab },
-          { id: "budget", label: "Budget", icon: DollarSign, content: budgetTab },
-          { id: "reports", label: "Reports", icon: FileText, content: reportsTab },
+          { id: "overview", label: t('common.overview', 'Overview'), icon: PieChart, content: overviewTab },
+          { id: "transactions", label: t('payments.expenses.transactions', 'Transactions'), icon: Receipt, content: transactionsTab },
+          { id: "budget", label: t('payments.expenses.budget', 'Budget'), icon: DollarSign, content: budgetTab },
+          { id: "reports", label: t('reports.title', 'Reports'), icon: FileText, content: reportsTab },
         ]}
       />
     </div>

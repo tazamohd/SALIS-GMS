@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Plus, Eye, Edit, Calendar, User, Wrench, Building2, Filter } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -64,6 +65,7 @@ const jobCardFormSchema = insertJobCardSchema.extend({
 type JobCardFormData = z.infer<typeof jobCardFormSchema>;
 
 export function JobCards() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
@@ -141,14 +143,14 @@ export function JobCards() {
       setIsCreateOpen(false);
       createForm.reset();
       toast({
-        title: "Success",
-        description: "Job card created successfully",
+        title: t('common.success', 'Success'),
+        description: t('jobCards.createSuccess', 'Job card created successfully'),
       });
     },
     onError: (error: any) => {
       toast({
-        title: "Error",
-        description: error.message || "Failed to create job card",
+        title: t('common.error', 'Error'),
+        description: error.message || t('jobCards.createError', 'Failed to create job card'),
         variant: "destructive",
       });
     },
@@ -170,14 +172,14 @@ export function JobCards() {
         return typeof key === 'string' && key.startsWith('/api/job-cards');
       }});
       toast({
-        title: "Success",
-        description: "Job card status updated",
+        title: t('common.success', 'Success'),
+        description: t('jobCards.statusUpdated', 'Job card status updated'),
       });
     },
     onError: (error: any) => {
       toast({
-        title: "Error",
-        description: error.message || "Failed to update status",
+        title: t('common.error', 'Error'),
+        description: error.message || t('jobCards.statusUpdateError', 'Failed to update status'),
         variant: "destructive",
       });
     },
@@ -206,12 +208,12 @@ export function JobCards() {
   return (
     <>
       <StandardPageLayout
-        title="Job Cards"
-        description="Manage service job cards and track progress"
+        title={t('jobCards.title', 'Job Cards')}
+        description={t('jobCards.description', 'Manage service job cards and track progress')}
         icon={Wrench}
         actions={[
           {
-            label: "Create Job Card",
+            label: t('jobCards.create', 'Create Job Card'),
             onClick: () => setIsCreateOpen(true),
             icon: Plus,
             variant: "default",
@@ -222,14 +224,14 @@ export function JobCards() {
           <CardContent className="pt-6">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
-                <Label>Garage</Label>
+                <Label>{t('jobCards.garage', 'Garage')}</Label>
                 <Select value={filterGarageId} onValueChange={setFilterGarageId}>
                   <SelectTrigger data-testid="select-filter-garage">
                     <Building2 className="w-4 h-4 mr-2" />
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Garages</SelectItem>
+                    <SelectItem value="all">{t('jobCards.allGarages', 'All Garages')}</SelectItem>
                     {(garages ?? []).map((garage) => (
                       <SelectItem key={garage.id} value={garage.id}>
                         {garage.name}
@@ -239,35 +241,35 @@ export function JobCards() {
                 </Select>
               </div>
               <div>
-                <Label>Status</Label>
+                <Label>{t('common.status', 'Status')}</Label>
                 <Select value={filterStatus} onValueChange={setFilterStatus}>
                   <SelectTrigger data-testid="select-filter-status">
                     <Filter className="w-4 h-4 mr-2" />
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Statuses</SelectItem>
-                    <SelectItem value="pending">Pending</SelectItem>
-                    <SelectItem value="assigned">Assigned</SelectItem>
-                    <SelectItem value="in_progress">In Progress</SelectItem>
-                    <SelectItem value="completed">Completed</SelectItem>
-                    <SelectItem value="cancelled">Cancelled</SelectItem>
+                    <SelectItem value="all">{t('jobCards.allStatuses', 'All Statuses')}</SelectItem>
+                    <SelectItem value="pending">{t('jobCards.status.pending', 'Pending')}</SelectItem>
+                    <SelectItem value="assigned">{t('jobCards.status.assigned', 'Assigned')}</SelectItem>
+                    <SelectItem value="in_progress">{t('jobCards.status.inProgress', 'In Progress')}</SelectItem>
+                    <SelectItem value="completed">{t('jobCards.status.completed', 'Completed')}</SelectItem>
+                    <SelectItem value="cancelled">{t('jobCards.status.cancelled', 'Cancelled')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div>
-                <Label>Priority</Label>
+                <Label>{t('jobCards.priority', 'Priority')}</Label>
                 <Select value={filterPriority} onValueChange={setFilterPriority}>
                   <SelectTrigger data-testid="select-filter-priority">
                     <Filter className="w-4 h-4 mr-2" />
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Priorities</SelectItem>
-                    <SelectItem value="low">Low</SelectItem>
-                    <SelectItem value="medium">Medium</SelectItem>
-                    <SelectItem value="high">High</SelectItem>
-                    <SelectItem value="urgent">Urgent</SelectItem>
+                    <SelectItem value="all">{t('jobCards.allPriorities', 'All Priorities')}</SelectItem>
+                    <SelectItem value="low">{t('jobCards.priority.low', 'Low')}</SelectItem>
+                    <SelectItem value="medium">{t('jobCards.priority.medium', 'Medium')}</SelectItem>
+                    <SelectItem value="high">{t('jobCards.priority.high', 'High')}</SelectItem>
+                    <SelectItem value="urgent">{t('jobCards.priority.urgent', 'Urgent')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -278,13 +280,13 @@ export function JobCards() {
         {isLoading ? (
           <div className="text-center py-12">
             <div className="animate-spin w-8 h-8 border-4 border-gray-900 dark:border-white border-t-transparent rounded-full mx-auto mb-4"></div>
-            <p className="text-gray-900 dark:text-white/60">Loading job cards...</p>
+            <p className="text-gray-900 dark:text-white/60">{t('jobCards.loading', 'Loading job cards...')}</p>
           </div>
         ) : filteredJobCards.length === 0 ? (
           <EmptyState
-            title="No Job Cards Found"
-            description="Get started by creating your first service job card."
-            actionLabel="Create Job Card"
+            title={t('jobCards.noJobCards', 'No Job Cards Found')}
+            description={t('jobCards.emptyDescription', 'Get started by creating your first service job card.')}
+            actionLabel={t('jobCards.create', 'Create Job Card')}
             onAction={() => setIsCreateOpen(true)}
             testId="job-cards-empty"
           />
@@ -311,7 +313,7 @@ export function JobCards() {
                       <div className="flex flex-col gap-1">
                         <StatusBadge status={jobCard.status} />
                         <Badge className={priorityColors[jobCard.priority as keyof typeof priorityColors]}>
-                          {jobCard.priority}
+                          {t(`jobCards.priority.${jobCard.priority}`, jobCard.priority)}
                         </Badge>
                       </div>
                     </div>
@@ -320,7 +322,7 @@ export function JobCards() {
                     <div className="space-y-2 text-sm">
                       <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
                         <Building2 className="w-4 h-4" />
-                        <span>{garage?.name || 'Unknown Garage'}</span>
+                        <span>{garage?.name || t('jobCards.unknownGarage', 'Unknown Garage')}</span>
                       </div>
                       <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
                         <Wrench className="w-4 h-4" />
@@ -351,7 +353,7 @@ export function JobCards() {
                         data-testid={`button-view-details-${jobCard.id}`}
                       >
                         <Eye className="w-4 h-4 mr-1" />
-                        Details
+                        {t('common.details', 'Details')}
                       </Button>
                       {jobCard.status !== 'completed' && jobCard.status !== 'cancelled' && (
                         <Select
@@ -362,11 +364,11 @@ export function JobCards() {
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="pending">Pending</SelectItem>
-                            <SelectItem value="assigned">Assigned</SelectItem>
-                            <SelectItem value="in_progress">In Progress</SelectItem>
-                            <SelectItem value="completed">Completed</SelectItem>
-                            <SelectItem value="cancelled">Cancelled</SelectItem>
+                            <SelectItem value="pending">{t('jobCards.status.pending', 'Pending')}</SelectItem>
+                            <SelectItem value="assigned">{t('jobCards.status.assigned', 'Assigned')}</SelectItem>
+                            <SelectItem value="in_progress">{t('jobCards.status.inProgress', 'In Progress')}</SelectItem>
+                            <SelectItem value="completed">{t('jobCards.status.completed', 'Completed')}</SelectItem>
+                            <SelectItem value="cancelled">{t('jobCards.status.cancelled', 'Cancelled')}</SelectItem>
                           </SelectContent>
                         </Select>
                       )}
@@ -382,12 +384,12 @@ export function JobCards() {
       <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Create New Job Card</DialogTitle>
+            <DialogTitle>{t('jobCards.createNew', 'Create New Job Card')}</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleCreateSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="jobNumber">Job Number *</Label>
+                <Label htmlFor="jobNumber">{t('jobCards.jobNumber', 'Job Number')} *</Label>
                 <Input
                   id="jobNumber"
                   {...createForm.register("jobNumber")}
@@ -399,13 +401,13 @@ export function JobCards() {
                 )}
               </div>
               <div>
-                <Label htmlFor="garageId">Garage *</Label>
+                <Label htmlFor="garageId">{t('jobCards.garage', 'Garage')} *</Label>
                 <Select
                   value={createForm.watch("garageId")}
                   onValueChange={(value) => createForm.setValue("garageId", value)}
                 >
                   <SelectTrigger id="garageId" data-testid="select-garage">
-                    <SelectValue placeholder="Select garage" />
+                    <SelectValue placeholder={t('jobCards.selectGarage', 'Select garage')} />
                   </SelectTrigger>
                   <SelectContent>
                     {(garages ?? []).map((garage) => (
@@ -422,10 +424,10 @@ export function JobCards() {
             </div>
 
             <div className="border-t pt-4">
-              <h3 className="font-semibold mb-3">Vehicle Information</h3>
+              <h3 className="font-semibold mb-3">{t('jobCards.vehicleInfo', 'Vehicle Information')}</h3>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="make">Make *</Label>
+                  <Label htmlFor="make">{t('jobCards.make', 'Make')} *</Label>
                   <Input
                     id="make"
                     {...createForm.register("vehicleInfo.make")}
@@ -434,7 +436,7 @@ export function JobCards() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="model">Model *</Label>
+                  <Label htmlFor="model">{t('jobCards.model', 'Model')} *</Label>
                   <Input
                     id="model"
                     {...createForm.register("vehicleInfo.model")}
@@ -443,7 +445,7 @@ export function JobCards() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="year">Year *</Label>
+                  <Label htmlFor="year">{t('jobCards.year', 'Year')} *</Label>
                   <Input
                     id="year"
                     {...createForm.register("vehicleInfo.year")}
@@ -452,7 +454,7 @@ export function JobCards() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="licensePlate">License Plate *</Label>
+                  <Label htmlFor="licensePlate">{t('jobCards.licensePlate', 'License Plate')} *</Label>
                   <Input
                     id="licensePlate"
                     {...createForm.register("vehicleInfo.licensePlate")}
@@ -461,7 +463,7 @@ export function JobCards() {
                   />
                 </div>
                 <div className="col-span-2">
-                  <Label htmlFor="vin">VIN (Optional)</Label>
+                  <Label htmlFor="vin">{t('jobCards.vinOptional', 'VIN (Optional)')}</Label>
                   <Input
                     id="vin"
                     {...createForm.register("vehicleInfo.vin")}
@@ -473,39 +475,39 @@ export function JobCards() {
             </div>
 
             <div className="border-t pt-4">
-              <h3 className="font-semibold mb-3">Service Details</h3>
+              <h3 className="font-semibold mb-3">{t('jobCards.serviceDetails', 'Service Details')}</h3>
               <div className="space-y-4">
                 <div>
-                  <Label htmlFor="serviceType">Service Type *</Label>
+                  <Label htmlFor="serviceType">{t('jobCards.serviceType', 'Service Type')} *</Label>
                   <Select
                     value={createForm.watch("serviceType")}
                     onValueChange={(value) => createForm.setValue("serviceType", value)}
                   >
                     <SelectTrigger id="serviceType" data-testid="select-service-type">
-                      <SelectValue placeholder="Select service type" />
+                      <SelectValue placeholder={t('jobCards.selectServiceType', 'Select service type')} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="maintenance">Maintenance</SelectItem>
-                      <SelectItem value="repair">Repair</SelectItem>
-                      <SelectItem value="diagnostic">Diagnostic</SelectItem>
-                      <SelectItem value="inspection">Inspection</SelectItem>
-                      <SelectItem value="bodywork">Bodywork</SelectItem>
+                      <SelectItem value="maintenance">{t('jobCards.serviceTypes.maintenance', 'Maintenance')}</SelectItem>
+                      <SelectItem value="repair">{t('jobCards.serviceTypes.repair', 'Repair')}</SelectItem>
+                      <SelectItem value="diagnostic">{t('jobCards.serviceTypes.diagnostic', 'Diagnostic')}</SelectItem>
+                      <SelectItem value="inspection">{t('jobCards.serviceTypes.inspection', 'Inspection')}</SelectItem>
+                      <SelectItem value="bodywork">{t('jobCards.serviceTypes.bodywork', 'Bodywork')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div>
-                  <Label htmlFor="description">Description *</Label>
+                  <Label htmlFor="description">{t('common.description', 'Description')} *</Label>
                   <Textarea
                     id="description"
                     {...createForm.register("description")}
-                    placeholder="Describe the service required..."
+                    placeholder={t('jobCards.descriptionPlaceholder', 'Describe the service required...')}
                     rows={3}
                     data-testid="input-description"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="priority">Priority *</Label>
+                    <Label htmlFor="priority">{t('jobCards.priority', 'Priority')} *</Label>
                     <Select
                       value={createForm.watch("priority")}
                       onValueChange={(value: any) => createForm.setValue("priority", value)}
@@ -514,21 +516,21 @@ export function JobCards() {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="low">Low</SelectItem>
-                        <SelectItem value="medium">Medium</SelectItem>
-                        <SelectItem value="high">High</SelectItem>
-                        <SelectItem value="urgent">Urgent</SelectItem>
+                        <SelectItem value="low">{t('jobCards.priority.low', 'Low')}</SelectItem>
+                        <SelectItem value="medium">{t('jobCards.priority.medium', 'Medium')}</SelectItem>
+                        <SelectItem value="high">{t('jobCards.priority.high', 'High')}</SelectItem>
+                        <SelectItem value="urgent">{t('jobCards.priority.urgent', 'Urgent')}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   <div>
-                    <Label htmlFor="assignedTo">Assign Technician</Label>
+                    <Label htmlFor="assignedTo">{t('jobCards.assignTechnician', 'Assign Technician')}</Label>
                     <Select
                       value={createForm.watch("assignedTo") || undefined}
                       onValueChange={(value) => createForm.setValue("assignedTo", value)}
                     >
                       <SelectTrigger id="assignedTo" data-testid="select-technician">
-                        <SelectValue placeholder="Select technician" />
+                        <SelectValue placeholder={t('jobCards.selectTechnician', 'Select technician')} />
                       </SelectTrigger>
                       <SelectContent>
                         {technicians?.map((tech) => {
@@ -553,7 +555,7 @@ export function JobCards() {
                 </div>
                 <div className="grid grid-cols-3 gap-4">
                   <div>
-                    <Label htmlFor="estimatedHours">Estimated Hours</Label>
+                    <Label htmlFor="estimatedHours">{t('jobCards.estimatedHours', 'Estimated Hours')}</Label>
                     <Input
                       id="estimatedHours"
                       type="number"
@@ -564,7 +566,7 @@ export function JobCards() {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="totalCost">Total Cost</Label>
+                    <Label htmlFor="totalCost">{t('jobCards.totalCost', 'Total Cost')}</Label>
                     <Input
                       id="totalCost"
                       type="number"
@@ -575,7 +577,7 @@ export function JobCards() {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="scheduledDate">Scheduled Date</Label>
+                    <Label htmlFor="scheduledDate">{t('jobCards.scheduledDate', 'Scheduled Date')}</Label>
                     <Input
                       id="scheduledDate"
                       type="date"
@@ -585,11 +587,11 @@ export function JobCards() {
                   </div>
                 </div>
                 <div>
-                  <Label htmlFor="notes">Notes</Label>
+                  <Label htmlFor="notes">{t('common.notes', 'Notes')}</Label>
                   <Textarea
                     id="notes"
                     {...createForm.register("notes")}
-                    placeholder="Additional notes..."
+                    placeholder={t('jobCards.notesPlaceholder', 'Additional notes...')}
                     rows={2}
                     data-testid="input-notes"
                   />
@@ -604,7 +606,7 @@ export function JobCards() {
                 onClick={() => setIsCreateOpen(false)}
                 data-testid="button-cancel-create"
               >
-                Cancel
+                {t('common.cancel', 'Cancel')}
               </Button>
               <Button
                 type="submit"
@@ -612,7 +614,7 @@ export function JobCards() {
                 disabled={createMutation.isPending}
                 data-testid="button-submit-create"
               >
-                {createMutation.isPending ? "Creating..." : "Create Job Card"}
+                {createMutation.isPending ? t('jobCards.creating', 'Creating...') : t('jobCards.createJobCard', 'Create Job Card')}
               </Button>
             </DialogFooter>
           </form>
@@ -622,51 +624,51 @@ export function JobCards() {
       <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Job Card Details</DialogTitle>
+            <DialogTitle>{t('jobCards.details', 'Job Card Details')}</DialogTitle>
           </DialogHeader>
           {selectedJobCard && (
             <div className="space-y-6">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label className="text-gray-600">Job Number</Label>
+                  <Label className="text-gray-600">{t('jobCards.jobNumber', 'Job Number')}</Label>
                   <p className="font-semibold">{selectedJobCard.jobNumber}</p>
                 </div>
                 <div>
-                  <Label className="text-gray-600">Status</Label>
+                  <Label className="text-gray-600">{t('common.status', 'Status')}</Label>
                   <div className="mt-1">
                     <StatusBadge status={selectedJobCard.status} />
                   </div>
                 </div>
                 <div>
-                  <Label className="text-gray-600">Priority</Label>
+                  <Label className="text-gray-600">{t('jobCards.priority', 'Priority')}</Label>
                   <div className="mt-1">
                     <Badge className={priorityColors[selectedJobCard.priority as keyof typeof priorityColors]}>
-                      {selectedJobCard.priority}
+                      {t(`jobCards.priority.${selectedJobCard.priority}`, selectedJobCard.priority)}
                     </Badge>
                   </div>
                 </div>
                 <div>
-                  <Label className="text-gray-600">Service Type</Label>
+                  <Label className="text-gray-600">{t('jobCards.serviceType', 'Service Type')}</Label>
                   <p className="font-semibold capitalize">{selectedJobCard.serviceType}</p>
                 </div>
               </div>
 
               <div className="border-t pt-4">
-                <h3 className="font-semibold mb-3">Vehicle Information</h3>
+                <h3 className="font-semibold mb-3">{t('jobCards.vehicleInfo', 'Vehicle Information')}</h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label className="text-gray-600">Vehicle</Label>
+                    <Label className="text-gray-600">{t('jobCards.vehicle', 'Vehicle')}</Label>
                     <p className="font-semibold">
                       {(selectedJobCard.vehicleInfo as any)?.make} {(selectedJobCard.vehicleInfo as any)?.model} ({(selectedJobCard.vehicleInfo as any)?.year})
                     </p>
                   </div>
                   <div>
-                    <Label className="text-gray-600">License Plate</Label>
+                    <Label className="text-gray-600">{t('jobCards.licensePlate', 'License Plate')}</Label>
                     <p className="font-semibold">{(selectedJobCard.vehicleInfo as any)?.licensePlate}</p>
                   </div>
                   {(selectedJobCard.vehicleInfo as any)?.vin && (
                     <div className="col-span-2">
-                      <Label className="text-gray-600">VIN</Label>
+                      <Label className="text-gray-600">{t('jobCards.vin', 'VIN')}</Label>
                       <p className="font-semibold">{(selectedJobCard.vehicleInfo as any)?.vin}</p>
                     </div>
                   )}
@@ -674,13 +676,13 @@ export function JobCards() {
               </div>
 
               <div className="border-t pt-4">
-                <Label className="text-gray-600">Description</Label>
+                <Label className="text-gray-600">{t('common.description', 'Description')}</Label>
                 <p className="mt-1">{selectedJobCard.description}</p>
               </div>
 
               {selectedJobCard.notes && (
                 <div className="border-t pt-4">
-                  <Label className="text-gray-600">Notes</Label>
+                  <Label className="text-gray-600">{t('common.notes', 'Notes')}</Label>
                   <p className="mt-1">{selectedJobCard.notes}</p>
                 </div>
               )}
@@ -689,25 +691,25 @@ export function JobCards() {
                 <div className="grid grid-cols-2 gap-4">
                   {selectedJobCard.estimatedHours && (
                     <div>
-                      <Label className="text-gray-600">Estimated Hours</Label>
+                      <Label className="text-gray-600">{t('jobCards.estimatedHours', 'Estimated Hours')}</Label>
                       <p className="font-semibold">{selectedJobCard.estimatedHours}h</p>
                     </div>
                   )}
                   {selectedJobCard.actualHours && (
                     <div>
-                      <Label className="text-gray-600">Actual Hours</Label>
+                      <Label className="text-gray-600">{t('jobCards.actualHours', 'Actual Hours')}</Label>
                       <p className="font-semibold">{selectedJobCard.actualHours}h</p>
                     </div>
                   )}
                   {selectedJobCard.totalCost && (
                     <div>
-                      <Label className="text-gray-600">Total Cost</Label>
+                      <Label className="text-gray-600">{t('jobCards.totalCost', 'Total Cost')}</Label>
                       <p className="font-semibold">${selectedJobCard.totalCost}</p>
                     </div>
                   )}
                   {selectedJobCard.scheduledDate && (
                     <div>
-                      <Label className="text-gray-600">Scheduled Date</Label>
+                      <Label className="text-gray-600">{t('jobCards.scheduledDate', 'Scheduled Date')}</Label>
                       <p className="font-semibold">
                         {new Date(selectedJobCard.scheduledDate).toLocaleDateString()}
                       </p>
@@ -720,7 +722,7 @@ export function JobCards() {
                 <div className="grid grid-cols-2 gap-4">
                   {selectedJobCard.startedAt && (
                     <div>
-                      <Label className="text-gray-600">Started At</Label>
+                      <Label className="text-gray-600">{t('jobCards.startedAt', 'Started At')}</Label>
                       <p className="font-semibold">
                         {new Date(selectedJobCard.startedAt).toLocaleString()}
                       </p>
@@ -728,7 +730,7 @@ export function JobCards() {
                   )}
                   {selectedJobCard.completedAt && (
                     <div>
-                      <Label className="text-gray-600">Completed At</Label>
+                      <Label className="text-gray-600">{t('jobCards.completedAt', 'Completed At')}</Label>
                       <p className="font-semibold">
                         {new Date(selectedJobCard.completedAt).toLocaleString()}
                       </p>
@@ -744,7 +746,7 @@ export function JobCards() {
               onClick={() => setIsDetailsOpen(false)}
               data-testid="button-close-details"
             >
-              Close
+              {t('common.close', 'Close')}
             </Button>
           </DialogFooter>
         </DialogContent>

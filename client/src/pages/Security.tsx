@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,42 +18,43 @@ import { format } from "date-fns";
 import { TabsPageLayout } from "@/components/layouts";
 
 export default function Security() {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState("2fa");
 
   const tabs = [
     {
       id: "2fa",
-      label: "2FA",
+      label: t('security.2fa', '2FA'),
       icon: Lock,
       content: <TwoFactorAuthTab />,
     },
     {
       id: "audit",
-      label: "Audit Logs",
+      label: t('security.auditLogs', 'Audit Logs'),
       icon: FileText,
       content: <AuditLogsTab />,
     },
     {
       id: "backup",
-      label: "Backup",
+      label: t('security.backup', 'Backup'),
       icon: Database,
       content: <BackupRestoreTab />,
     },
     {
       id: "gdpr",
-      label: "GDPR",
+      label: t('security.gdpr', 'GDPR'),
       icon: UserCheck,
       content: <GDPRTab />,
     },
     {
       id: "consents",
-      label: "Consents",
+      label: t('security.consents', 'Consents'),
       icon: CheckCircle,
       content: <ConsentsTab />,
     },
     {
       id: "permissions",
-      label: "Permissions",
+      label: t('security.permissions', 'Permissions'),
       icon: Key,
       content: <PermissionsTab />,
     },
@@ -60,8 +62,8 @@ export default function Security() {
 
   return (
     <TabsPageLayout
-      title="Security & Compliance"
-      description="Manage security settings and compliance features"
+      title={t('security.title', 'Security & Compliance')}
+      description={t('security.description', 'Manage security settings and compliance features')}
       icon={Shield}
       tabs={tabs}
       activeTab={activeTab}
@@ -71,6 +73,7 @@ export default function Security() {
 }
 
 function TwoFactorAuthTab() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [verificationCode, setVerificationCode] = useState("");
   const [setupData, setSetupData] = useState<any>(null);
@@ -86,10 +89,10 @@ function TwoFactorAuthTab() {
     },
     onSuccess: (data) => {
       setSetupData(data);
-      toast({ title: "2FA Setup Initiated", description: "Scan the QR code with your authenticator app" });
+      toast({ title: t('security.2faSetupInitiated', '2FA Setup Initiated'), description: t('security.scanQRCode', 'Scan the QR code with your authenticator app') });
     },
     onError: (error: any) => {
-      toast({ title: "Setup Failed", description: error.message, variant: "destructive" });
+      toast({ title: t('security.setupFailed', 'Setup Failed'), description: error.message, variant: "destructive" });
     },
   });
 
@@ -99,10 +102,10 @@ function TwoFactorAuthTab() {
       queryClient.invalidateQueries({ queryKey: ['/api/security/2fa/status'] });
       setSetupData(null);
       setVerificationCode("");
-      toast({ title: "2FA Enabled", description: "Two-factor authentication is now active" });
+      toast({ title: t('security.2faEnabled', '2FA Enabled'), description: t('security.2faIsNowActive', 'Two-factor authentication is now active') });
     },
     onError: (error: any) => {
-      toast({ title: "Verification Failed", description: error.message, variant: "destructive" });
+      toast({ title: t('security.verificationFailed', 'Verification Failed'), description: error.message, variant: "destructive" });
     },
   });
 
@@ -110,20 +113,20 @@ function TwoFactorAuthTab() {
     mutationFn: () => apiRequest('DELETE', '/api/security/2fa'),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/security/2fa/status'] });
-      toast({ title: "2FA Disabled", description: "Two-factor authentication has been disabled" });
+      toast({ title: t('security.2faDisabled', '2FA Disabled'), description: t('security.2faHasBeenDisabled', 'Two-factor authentication has been disabled') });
     },
   });
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
-    toast({ title: "Copied", description: "Copied to clipboard" });
+    toast({ title: t('common.copied', 'Copied'), description: t('common.copiedToClipboard', 'Copied to clipboard') });
   };
 
   return (
     <Card data-testid="card-2fa">
       <CardHeader>
-        <CardTitle>Two-Factor Authentication (2FA)</CardTitle>
-        <CardDescription>Add an extra layer of security to your account</CardDescription>
+        <CardTitle>{t('security.twoFactorAuth', 'Two-Factor Authentication (2FA)')}</CardTitle>
+        <CardDescription>{t('security.addExtraLayerSecurity', 'Add an extra layer of security to your account')}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         {status?.enabled ? (
@@ -132,9 +135,9 @@ function TwoFactorAuthTab() {
               <div className="flex items-center gap-3">
                 <CheckCircle className="h-5 w-5 text-gray-700" />
                 <div>
-                  <p className="font-medium">2FA is Active</p>
+                  <p className="font-medium">{t('security.2faIsActive', '2FA is Active')}</p>
                   <p className="text-sm text-muted-foreground">
-                    Backup codes remaining: {status.backupCodesCount}
+                    {t('security.backupCodesRemaining', 'Backup codes remaining')}: {status.backupCodesCount}
                   </p>
                 </div>
               </div>
@@ -144,18 +147,18 @@ function TwoFactorAuthTab() {
                 disabled={disableMutation.isPending}
                 data-testid="button-disable-2fa"
               >
-                Disable 2FA
+                {t('security.disable2fa', 'Disable 2FA')}
               </Button>
             </div>
           </div>
         ) : setupData ? (
           <div className="space-y-4">
             <div className="flex justify-center p-4 bg-white dark:bg-salis-black rounded-lg">
-              <img src={setupData.qrCodeUrl} alt="2FA QR Code" className="w-64 h-64" data-testid="img-qr-code" />
+              <img src={setupData.qrCodeUrl} alt={t('security.2faQRCode', '2FA QR Code')} className="w-64 h-64" data-testid="img-qr-code" />
             </div>
             
             <div className="space-y-2">
-              <Label>Manual Entry Key</Label>
+              <Label>{t('security.manualEntryKey', 'Manual Entry Key')}</Label>
               <div className="flex gap-2">
                 <Input value={setupData.secret} readOnly data-testid="input-secret-key" />
                 <Button 
@@ -170,7 +173,7 @@ function TwoFactorAuthTab() {
             </div>
 
             <div className="space-y-2">
-              <Label>Backup Codes (Save these securely)</Label>
+              <Label>{t('security.backupCodes', 'Backup Codes (Save these securely)')}</Label>
               <div className="grid grid-cols-2 gap-2 p-3 bg-muted rounded-lg">
                 {setupData.backupCodes.map((code: string, i: number) => (
                   <code key={i} className="text-sm" data-testid={`text-backup-code-${i}`}>{code}</code>
@@ -183,14 +186,14 @@ function TwoFactorAuthTab() {
                 data-testid="button-copy-backup-codes"
               >
                 <Copy className="h-4 w-4 mr-2" />
-                Copy All Codes
+                {t('security.copyAllCodes', 'Copy All Codes')}
               </Button>
             </div>
 
             <div className="space-y-2">
-              <Label>Verification Code</Label>
+              <Label>{t('security.verificationCode', 'Verification Code')}</Label>
               <Input 
-                placeholder="Enter 6-digit code from your app"
+                placeholder={t('security.enter6DigitCode', 'Enter 6-digit code from your app')}
                 value={verificationCode}
                 onChange={(e) => setVerificationCode(e.target.value)}
                 data-testid="input-verification-code"
@@ -203,7 +206,7 @@ function TwoFactorAuthTab() {
                 disabled={!verificationCode || enableMutation.isPending}
                 data-testid="button-verify-enable"
               >
-                Verify & Enable
+                {t('security.verifyAndEnable', 'Verify & Enable')}
               </Button>
               <Button 
                 variant="outline"
@@ -213,14 +216,14 @@ function TwoFactorAuthTab() {
                 }}
                 data-testid="button-cancel-setup"
               >
-                Cancel
+                {t('common.cancel', 'Cancel')}
               </Button>
             </div>
           </div>
         ) : (
           <div className="space-y-4">
             <p className="text-muted-foreground">
-              Two-factor authentication adds an extra layer of security by requiring a code from your authenticator app.
+              {t('security.2faDescription', 'Two-factor authentication adds an extra layer of security by requiring a code from your authenticator app.')}
             </p>
             <Button 
               onClick={() => setupMutation.mutate()}
@@ -228,7 +231,7 @@ function TwoFactorAuthTab() {
               data-testid="button-setup-2fa"
             >
               <Lock className="h-4 w-4 mr-2" />
-              Setup 2FA
+              {t('security.setup2fa', 'Setup 2FA')}
             </Button>
           </div>
         )}
@@ -238,6 +241,7 @@ function TwoFactorAuthTab() {
 }
 
 function AuditLogsTab() {
+  const { t } = useTranslation();
   const [filters, setFilters] = useState({
     resourceType: 'all',
     action: 'all',
@@ -260,44 +264,44 @@ function AuditLogsTab() {
   return (
     <Card data-testid="card-audit-logs">
       <CardHeader>
-        <CardTitle>Audit Logs</CardTitle>
-        <CardDescription>Track all system activities and changes</CardDescription>
+        <CardTitle>{t('security.auditLogs', 'Audit Logs')}</CardTitle>
+        <CardDescription>{t('security.trackAllSystemActivities', 'Track all system activities and changes')}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-4 gap-4">
           <div className="space-y-2">
-            <Label>Resource Type</Label>
+            <Label>{t('security.resourceType', 'Resource Type')}</Label>
             <Select value={filters.resourceType} onValueChange={(value) => setFilters({...filters, resourceType: value === 'all' ? '' : value})}>
               <SelectTrigger data-testid="select-resource-type">
-                <SelectValue placeholder="All" />
+                <SelectValue placeholder={t('common.all', 'All')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All</SelectItem>
-                <SelectItem value="job_card">Job Cards</SelectItem>
-                <SelectItem value="customer">Customers</SelectItem>
-                <SelectItem value="invoice">Invoices</SelectItem>
-                <SelectItem value="payment">Payments</SelectItem>
+                <SelectItem value="all">{t('common.all', 'All')}</SelectItem>
+                <SelectItem value="job_card">{t('security.jobCards', 'Job Cards')}</SelectItem>
+                <SelectItem value="customer">{t('security.customers', 'Customers')}</SelectItem>
+                <SelectItem value="invoice">{t('security.invoices', 'Invoices')}</SelectItem>
+                <SelectItem value="payment">{t('security.payments', 'Payments')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           <div className="space-y-2">
-            <Label>Action</Label>
+            <Label>{t('security.action', 'Action')}</Label>
             <Select value={filters.action} onValueChange={(value) => setFilters({...filters, action: value === 'all' ? '' : value})}>
               <SelectTrigger data-testid="select-action">
-                <SelectValue placeholder="All" />
+                <SelectValue placeholder={t('common.all', 'All')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All</SelectItem>
-                <SelectItem value="create">Create</SelectItem>
-                <SelectItem value="update">Update</SelectItem>
-                <SelectItem value="delete">Delete</SelectItem>
+                <SelectItem value="all">{t('common.all', 'All')}</SelectItem>
+                <SelectItem value="create">{t('common.create', 'Create')}</SelectItem>
+                <SelectItem value="update">{t('common.update', 'Update')}</SelectItem>
+                <SelectItem value="delete">{t('common.delete', 'Delete')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           <div className="space-y-2">
-            <Label>Start Date</Label>
+            <Label>{t('security.startDate', 'Start Date')}</Label>
             <Input 
               type="date" 
               value={filters.startDate}
@@ -307,7 +311,7 @@ function AuditLogsTab() {
           </div>
 
           <div className="space-y-2">
-            <Label>End Date</Label>
+            <Label>{t('security.endDate', 'End Date')}</Label>
             <Input 
               type="date" 
               value={filters.endDate}
@@ -321,22 +325,22 @@ function AuditLogsTab() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Timestamp</TableHead>
-                <TableHead>Action</TableHead>
-                <TableHead>Resource</TableHead>
-                <TableHead>User</TableHead>
-                <TableHead>IP Address</TableHead>
+                <TableHead>{t('security.timestamp', 'Timestamp')}</TableHead>
+                <TableHead>{t('security.action', 'Action')}</TableHead>
+                <TableHead>{t('security.resource', 'Resource')}</TableHead>
+                <TableHead>{t('security.user', 'User')}</TableHead>
+                <TableHead>{t('security.ipAddress', 'IP Address')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center">Loading...</TableCell>
+                  <TableCell colSpan={5} className="text-center">{t('common.loading', 'Loading...')}</TableCell>
                 </TableRow>
               ) : logs.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={5} className="text-center text-muted-foreground">
-                    No audit logs found
+                    {t('security.noAuditLogsFound', 'No audit logs found')}
                   </TableCell>
                 </TableRow>
               ) : (
@@ -348,7 +352,7 @@ function AuditLogsTab() {
                     </TableCell>
                     <TableCell>{log.resourceType}</TableCell>
                     <TableCell>{log.userId}</TableCell>
-                    <TableCell>{log.ipAddress || 'N/A'}</TableCell>
+                    <TableCell>{log.ipAddress || t('common.notAvailable', 'N/A')}</TableCell>
                   </TableRow>
                 ))
               )}
@@ -361,6 +365,7 @@ function AuditLogsTab() {
 }
 
 function BackupRestoreTab() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [backupType, setBackupType] = useState('full');
 
@@ -372,35 +377,35 @@ function BackupRestoreTab() {
     mutationFn: (type: string) => apiRequest('POST', '/api/security/backups', { type, includeAttachments: true }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/security/backups'] });
-      toast({ title: "Backup Started", description: "Your data backup is in progress" });
+      toast({ title: t('security.backupStarted', 'Backup Started'), description: t('security.backupInProgress', 'Your data backup is in progress') });
     },
   });
 
   const restoreMutation = useMutation({
     mutationFn: (id: string) => apiRequest('POST', `/api/security/backups/${id}/restore`),
     onSuccess: () => {
-      toast({ title: "Restore Initiated", description: "Your data is being restored" });
+      toast({ title: t('security.restoreInitiated', 'Restore Initiated'), description: t('security.dataBeingRestored', 'Your data is being restored') });
     },
   });
 
   return (
     <Card data-testid="card-backup">
       <CardHeader>
-        <CardTitle>Backup & Restore</CardTitle>
-        <CardDescription>Create and manage data backups</CardDescription>
+        <CardTitle>{t('security.backupRestore', 'Backup & Restore')}</CardTitle>
+        <CardDescription>{t('security.createAndManageBackups', 'Create and manage data backups')}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex gap-4 items-end">
           <div className="flex-1 space-y-2">
-            <Label>Backup Type</Label>
+            <Label>{t('security.backupType', 'Backup Type')}</Label>
             <Select value={backupType} onValueChange={setBackupType}>
               <SelectTrigger data-testid="select-backup-type">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="full">Full Backup</SelectItem>
-                <SelectItem value="incremental">Incremental</SelectItem>
-                <SelectItem value="database">Database Only</SelectItem>
+                <SelectItem value="full">{t('security.fullBackup', 'Full Backup')}</SelectItem>
+                <SelectItem value="incremental">{t('security.incremental', 'Incremental')}</SelectItem>
+                <SelectItem value="database">{t('security.databaseOnly', 'Database Only')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -410,7 +415,7 @@ function BackupRestoreTab() {
             data-testid="button-create-backup"
           >
             <Database className="h-4 w-4 mr-2" />
-            Create Backup
+            {t('security.createBackup', 'Create Backup')}
           </Button>
         </div>
 
@@ -418,22 +423,22 @@ function BackupRestoreTab() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Created</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Size</TableHead>
-                <TableHead>Actions</TableHead>
+                <TableHead>{t('security.created', 'Created')}</TableHead>
+                <TableHead>{t('common.type', 'Type')}</TableHead>
+                <TableHead>{t('common.status', 'Status')}</TableHead>
+                <TableHead>{t('security.size', 'Size')}</TableHead>
+                <TableHead>{t('common.actions', 'Actions')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center">Loading...</TableCell>
+                  <TableCell colSpan={5} className="text-center">{t('common.loading', 'Loading...')}</TableCell>
                 </TableRow>
               ) : backups.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={5} className="text-center text-muted-foreground">
-                    No backups found
+                    {t('security.noBackupsFound', 'No backups found')}
                   </TableCell>
                 </TableRow>
               ) : (
@@ -446,7 +451,7 @@ function BackupRestoreTab() {
                         {backup.status}
                       </Badge>
                     </TableCell>
-                    <TableCell>{backup.size ? `${(backup.size / 1024 / 1024).toFixed(2)} MB` : 'N/A'}</TableCell>
+                    <TableCell>{backup.size ? `${(backup.size / 1024 / 1024).toFixed(2)} MB` : t('common.notAvailable', 'N/A')}</TableCell>
                     <TableCell>
                       <div className="flex gap-2">
                         {backup.status === 'completed' && (
@@ -459,7 +464,7 @@ function BackupRestoreTab() {
                               data-testid={`button-restore-${backup.id}`}
                             >
                               <Upload className="h-3 w-3 mr-1" />
-                              Restore
+                              {t('security.restore', 'Restore')}
                             </Button>
                             <Button 
                               size="sm" 
@@ -467,7 +472,7 @@ function BackupRestoreTab() {
                               data-testid={`button-download-${backup.id}`}
                             >
                               <Download className="h-3 w-3 mr-1" />
-                              Download
+                              {t('common.download', 'Download')}
                             </Button>
                           </>
                         )}
@@ -485,6 +490,7 @@ function BackupRestoreTab() {
 }
 
 function GDPRTab() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [requestType, setRequestType] = useState('export');
   const [dataSubjectId, setDataSubjectId] = useState('');
@@ -500,38 +506,38 @@ function GDPRTab() {
       queryClient.invalidateQueries({ queryKey: ['/api/security/gdpr/requests'] });
       setDataSubjectId('');
       setReason('');
-      toast({ title: "GDPR Request Created", description: "The request has been queued for processing" });
+      toast({ title: t('security.gdprRequestCreated', 'GDPR Request Created'), description: t('security.requestQueuedForProcessing', 'The request has been queued for processing') });
     },
   });
 
   return (
     <Card data-testid="card-gdpr">
       <CardHeader>
-        <CardTitle>GDPR Compliance</CardTitle>
-        <CardDescription>Manage data subject rights requests</CardDescription>
+        <CardTitle>{t('security.gdprCompliance', 'GDPR Compliance')}</CardTitle>
+        <CardDescription>{t('security.manageDataSubjectRights', 'Manage data subject rights requests')}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid gap-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Request Type</Label>
+              <Label>{t('security.requestType', 'Request Type')}</Label>
               <Select value={requestType} onValueChange={setRequestType}>
                 <SelectTrigger data-testid="select-request-type">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="export">Data Export</SelectItem>
-                  <SelectItem value="deletion">Data Deletion</SelectItem>
-                  <SelectItem value="rectification">Data Rectification</SelectItem>
-                  <SelectItem value="restriction">Processing Restriction</SelectItem>
+                  <SelectItem value="export">{t('security.dataExport', 'Data Export')}</SelectItem>
+                  <SelectItem value="deletion">{t('security.dataDeletion', 'Data Deletion')}</SelectItem>
+                  <SelectItem value="rectification">{t('security.dataRectification', 'Data Rectification')}</SelectItem>
+                  <SelectItem value="restriction">{t('security.processingRestriction', 'Processing Restriction')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div className="space-y-2">
-              <Label>Data Subject ID</Label>
+              <Label>{t('security.dataSubjectId', 'Data Subject ID')}</Label>
               <Input 
-                placeholder="Customer/User ID"
+                placeholder={t('security.customerUserId', 'Customer/User ID')}
                 value={dataSubjectId}
                 onChange={(e) => setDataSubjectId(e.target.value)}
                 data-testid="input-subject-id"
@@ -540,9 +546,9 @@ function GDPRTab() {
           </div>
 
           <div className="space-y-2">
-            <Label>Reason (Optional)</Label>
+            <Label>{t('security.reasonOptional', 'Reason (Optional)')}</Label>
             <Textarea 
-              placeholder="Reason for this request..."
+              placeholder={t('security.reasonForRequest', 'Reason for this request...')}
               value={reason}
               onChange={(e) => setReason(e.target.value)}
               data-testid="textarea-reason"
@@ -554,7 +560,7 @@ function GDPRTab() {
             disabled={!dataSubjectId || createRequestMutation.isPending}
             data-testid="button-create-request"
           >
-            Create Request
+            {t('security.createRequest', 'Create Request')}
           </Button>
         </div>
 
@@ -562,22 +568,22 @@ function GDPRTab() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Created</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Subject ID</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Completed</TableHead>
+                <TableHead>{t('security.created', 'Created')}</TableHead>
+                <TableHead>{t('common.type', 'Type')}</TableHead>
+                <TableHead>{t('security.subjectId', 'Subject ID')}</TableHead>
+                <TableHead>{t('common.status', 'Status')}</TableHead>
+                <TableHead>{t('common.completed', 'Completed')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center">Loading...</TableCell>
+                  <TableCell colSpan={5} className="text-center">{t('common.loading', 'Loading...')}</TableCell>
                 </TableRow>
               ) : requests.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={5} className="text-center text-muted-foreground">
-                    No GDPR requests found
+                    {t('security.noGdprRequestsFound', 'No GDPR requests found')}
                   </TableCell>
                 </TableRow>
               ) : (
@@ -606,6 +612,7 @@ function GDPRTab() {
 }
 
 function ConsentsTab() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [consentType, setConsentType] = useState('');
   const [granted, setGranted] = useState(true);
@@ -619,35 +626,35 @@ function ConsentsTab() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/security/consents'] });
       setConsentType('');
-      toast({ title: "Consent Recorded", description: "Your consent preference has been saved" });
+      toast({ title: t('security.consentRecorded', 'Consent Recorded'), description: t('security.consentPreferenceSaved', 'Your consent preference has been saved') });
     },
   });
 
   return (
     <Card data-testid="card-consents">
       <CardHeader>
-        <CardTitle>User Consents</CardTitle>
-        <CardDescription>Manage user consent preferences</CardDescription>
+        <CardTitle>{t('security.userConsents', 'User Consents')}</CardTitle>
+        <CardDescription>{t('security.manageConsentPreferences', 'Manage user consent preferences')}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex gap-4 items-end">
           <div className="flex-1 space-y-2">
-            <Label>Consent Type</Label>
+            <Label>{t('security.consentType', 'Consent Type')}</Label>
             <Select value={consentType} onValueChange={setConsentType}>
               <SelectTrigger data-testid="select-consent-type">
-                <SelectValue placeholder="Select consent type" />
+                <SelectValue placeholder={t('security.selectConsentType', 'Select consent type')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="marketing">Marketing Communications</SelectItem>
-                <SelectItem value="analytics">Analytics & Tracking</SelectItem>
-                <SelectItem value="data_processing">Data Processing</SelectItem>
-                <SelectItem value="third_party_sharing">Third-Party Data Sharing</SelectItem>
+                <SelectItem value="marketing">{t('security.marketingCommunications', 'Marketing Communications')}</SelectItem>
+                <SelectItem value="analytics">{t('security.analyticsTracking', 'Analytics & Tracking')}</SelectItem>
+                <SelectItem value="data_processing">{t('security.dataProcessing', 'Data Processing')}</SelectItem>
+                <SelectItem value="third_party_sharing">{t('security.thirdPartyDataSharing', 'Third-Party Data Sharing')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
           
           <div className="flex items-center gap-2">
-            <Label>Granted</Label>
+            <Label>{t('security.granted', 'Granted')}</Label>
             <Switch 
               checked={granted} 
               onCheckedChange={setGranted}
@@ -660,7 +667,7 @@ function ConsentsTab() {
             disabled={!consentType || createConsentMutation.isPending}
             data-testid="button-record-consent"
           >
-            Record Consent
+            {t('security.recordConsent', 'Record Consent')}
           </Button>
         </div>
 
@@ -668,21 +675,21 @@ function ConsentsTab() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Type</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Granted At</TableHead>
-                <TableHead>IP Address</TableHead>
+                <TableHead>{t('common.type', 'Type')}</TableHead>
+                <TableHead>{t('common.status', 'Status')}</TableHead>
+                <TableHead>{t('security.grantedAt', 'Granted At')}</TableHead>
+                <TableHead>{t('security.ipAddress', 'IP Address')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={4} className="text-center">Loading...</TableCell>
+                  <TableCell colSpan={4} className="text-center">{t('common.loading', 'Loading...')}</TableCell>
                 </TableRow>
               ) : consents.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={4} className="text-center text-muted-foreground">
-                    No consent records found
+                    {t('security.noConsentRecordsFound', 'No consent records found')}
                   </TableCell>
                 </TableRow>
               ) : (
@@ -691,11 +698,11 @@ function ConsentsTab() {
                     <TableCell>{consent.consentType}</TableCell>
                     <TableCell>
                       <Badge variant={consent.granted ? 'default' : 'secondary'}>
-                        {consent.granted ? 'Granted' : 'Denied'}
+                        {consent.granted ? t('security.granted', 'Granted') : t('security.denied', 'Denied')}
                       </Badge>
                     </TableCell>
                     <TableCell>{format(new Date(consent.createdAt), 'MMM d, yyyy HH:mm')}</TableCell>
-                    <TableCell>{consent.ipAddress || 'N/A'}</TableCell>
+                    <TableCell>{consent.ipAddress || t('common.notAvailable', 'N/A')}</TableCell>
                   </TableRow>
                 ))
               )}
@@ -708,6 +715,7 @@ function ConsentsTab() {
 }
 
 function PermissionsTab() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [userId, setUserId] = useState('');
   const [permission, setPermission] = useState('');
@@ -725,7 +733,7 @@ function PermissionsTab() {
       setUserId('');
       setPermission('');
       setReason('');
-      toast({ title: "Permission Override Created", description: "The permission has been updated" });
+      toast({ title: t('security.permissionOverrideCreated', 'Permission Override Created'), description: t('security.permissionUpdated', 'The permission has been updated') });
     },
   });
 
@@ -733,23 +741,23 @@ function PermissionsTab() {
     mutationFn: (id: string) => apiRequest('DELETE', `/api/security/permissions/overrides/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/security/permissions/overrides'] });
-      toast({ title: "Override Removed", description: "Permission override has been deleted" });
+      toast({ title: t('security.overrideRemoved', 'Override Removed'), description: t('security.permissionOverrideDeleted', 'Permission override has been deleted') });
     },
   });
 
   return (
     <Card data-testid="card-permissions">
       <CardHeader>
-        <CardTitle>Permission Overrides</CardTitle>
-        <CardDescription>Grant or restrict specific permissions for users</CardDescription>
+        <CardTitle>{t('security.permissionOverrides', 'Permission Overrides')}</CardTitle>
+        <CardDescription>{t('security.grantOrRestrictPermissions', 'Grant or restrict specific permissions for users')}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid gap-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>User ID</Label>
+              <Label>{t('security.userId', 'User ID')}</Label>
               <Input 
-                placeholder="Enter user ID"
+                placeholder={t('security.enterUserId', 'Enter user ID')}
                 value={userId}
                 onChange={(e) => setUserId(e.target.value)}
                 data-testid="input-user-id"
@@ -757,24 +765,24 @@ function PermissionsTab() {
             </div>
 
             <div className="space-y-2">
-              <Label>Permission</Label>
+              <Label>{t('security.permission', 'Permission')}</Label>
               <Select value={permission} onValueChange={setPermission}>
                 <SelectTrigger data-testid="select-permission">
-                  <SelectValue placeholder="Select permission" />
+                  <SelectValue placeholder={t('security.selectPermission', 'Select permission')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="manage_users">Manage Users</SelectItem>
-                  <SelectItem value="view_reports">View Reports</SelectItem>
-                  <SelectItem value="manage_inventory">Manage Inventory</SelectItem>
-                  <SelectItem value="delete_records">Delete Records</SelectItem>
-                  <SelectItem value="manage_billing">Manage Billing</SelectItem>
+                  <SelectItem value="manage_users">{t('security.manageUsers', 'Manage Users')}</SelectItem>
+                  <SelectItem value="view_reports">{t('security.viewReports', 'View Reports')}</SelectItem>
+                  <SelectItem value="manage_inventory">{t('security.manageInventory', 'Manage Inventory')}</SelectItem>
+                  <SelectItem value="delete_records">{t('security.deleteRecords', 'Delete Records')}</SelectItem>
+                  <SelectItem value="manage_billing">{t('security.manageBilling', 'Manage Billing')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
-            <Label>Grant Permission</Label>
+            <Label>{t('security.grantPermission', 'Grant Permission')}</Label>
             <Switch 
               checked={granted} 
               onCheckedChange={setGranted}
@@ -783,9 +791,9 @@ function PermissionsTab() {
           </div>
 
           <div className="space-y-2">
-            <Label>Reason</Label>
+            <Label>{t('security.reason', 'Reason')}</Label>
             <Textarea 
-              placeholder="Reason for this override..."
+              placeholder={t('security.reasonForOverride', 'Reason for this override...')}
               value={reason}
               onChange={(e) => setReason(e.target.value)}
               data-testid="textarea-override-reason"
@@ -797,7 +805,7 @@ function PermissionsTab() {
             disabled={!userId || !permission || createOverrideMutation.isPending}
             data-testid="button-create-override"
           >
-            Create Override
+            {t('security.createOverride', 'Create Override')}
           </Button>
         </div>
 
@@ -805,22 +813,22 @@ function PermissionsTab() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>User</TableHead>
-                <TableHead>Permission</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Granted By</TableHead>
-                <TableHead>Actions</TableHead>
+                <TableHead>{t('security.user', 'User')}</TableHead>
+                <TableHead>{t('security.permission', 'Permission')}</TableHead>
+                <TableHead>{t('common.status', 'Status')}</TableHead>
+                <TableHead>{t('security.grantedBy', 'Granted By')}</TableHead>
+                <TableHead>{t('common.actions', 'Actions')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center">Loading...</TableCell>
+                  <TableCell colSpan={5} className="text-center">{t('common.loading', 'Loading...')}</TableCell>
                 </TableRow>
               ) : overrides.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={5} className="text-center text-muted-foreground">
-                    No permission overrides found
+                    {t('security.noPermissionOverridesFound', 'No permission overrides found')}
                   </TableCell>
                 </TableRow>
               ) : (
@@ -830,7 +838,7 @@ function PermissionsTab() {
                     <TableCell>{override.permission}</TableCell>
                     <TableCell>
                       <Badge variant={override.granted ? 'default' : 'destructive'}>
-                        {override.granted ? 'Granted' : 'Denied'}
+                        {override.granted ? t('security.granted', 'Granted') : t('security.denied', 'Denied')}
                       </Badge>
                     </TableCell>
                     <TableCell>{override.grantedBy}</TableCell>
@@ -842,7 +850,7 @@ function PermissionsTab() {
                         disabled={deleteOverrideMutation.isPending}
                         data-testid={`button-delete-override-${override.id}`}
                       >
-                        Remove
+                        {t('common.remove', 'Remove')}
                       </Button>
                     </TableCell>
                   </TableRow>

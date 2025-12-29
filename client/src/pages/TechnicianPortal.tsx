@@ -1,4 +1,5 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -11,6 +12,7 @@ import { StandardPageLayout } from "@/components/layouts/StandardPageLayout";
 import type { JobCard, User, TechnicianProfile } from "@shared/schema";
 
 export function TechnicianPortal() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { toast } = useToast();
 
@@ -37,14 +39,14 @@ export function TechnicianPortal() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/job-cards'] });
       toast({
-        title: "Status Updated",
-        description: "Job card status has been updated successfully.",
+        title: t('common.success', 'Success'),
+        description: t('technician.statusUpdatedSuccess', 'Job card status has been updated successfully.'),
       });
     },
     onError: () => {
       toast({
-        title: "Error",
-        description: "Failed to update job card status.",
+        title: t('common.error', 'Error'),
+        description: t('technician.statusUpdateError', 'Failed to update job card status.'),
         variant: "destructive",
       });
     },
@@ -113,8 +115,8 @@ export function TechnicianPortal() {
 
   return (
     <StandardPageLayout
-      title="Technician Portal"
-      description={`Welcome back, ${currentUser?.fullName || 'Technician'}! Here are your assigned tasks.`}
+      title={t('technician.portal', 'Technician Portal')}
+      description={t('technician.welcomeBack', 'Welcome back, {{name}}! Here are your assigned tasks.', { name: currentUser?.fullName || t('technician.technician', 'Technician') })}
       icon={Wrench}
     >
       {/* Profile Card */}
@@ -123,8 +125,8 @@ export function TechnicianPortal() {
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle data-testid="text-profile-title">My Profile</CardTitle>
-                <CardDescription data-testid="text-profile-subtitle">Your technician information and qualifications</CardDescription>
+                <CardTitle data-testid="text-profile-title">{t('technician.myProfile', 'My Profile')}</CardTitle>
+                <CardDescription data-testid="text-profile-subtitle">{t('technician.profileDescription', 'Your technician information and qualifications')}</CardDescription>
               </div>
               <div className="flex gap-2">
                 {technicianProfile.level && (
@@ -133,7 +135,7 @@ export function TechnicianPortal() {
                   </Badge>
                 )}
                 {technicianProfile.isLead && (
-                  <Badge variant="default" data-testid="badge-lead">Lead Technician</Badge>
+                  <Badge variant="default" data-testid="badge-lead">{t('technician.leadTechnician', 'Lead Technician')}</Badge>
                 )}
               </div>
             </div>
@@ -144,7 +146,7 @@ export function TechnicianPortal() {
                 <div className="flex items-start gap-3" data-testid="text-speciality">
                   <Briefcase className="h-5 w-5 mt-0.5 text-gray-700" />
                   <div>
-                    <div className="font-medium text-sm text-gray-700">Speciality</div>
+                    <div className="font-medium text-sm text-gray-700">{t('technician.speciality', 'Speciality')}</div>
                     <div className="text-sm text-gray-900">{technicianProfile.speciality}</div>
                   </div>
                 </div>
@@ -154,8 +156,8 @@ export function TechnicianPortal() {
                 <div className="flex items-start gap-3" data-testid="text-experience">
                   <Clock className="h-5 w-5 mt-0.5 text-gray-700" />
                   <div>
-                    <div className="font-medium text-sm text-gray-700">Experience</div>
-                    <div className="text-sm text-gray-900">{technicianProfile.yearsOfExperience} years</div>
+                    <div className="font-medium text-sm text-gray-700">{t('technician.experience', 'Experience')}</div>
+                    <div className="text-sm text-gray-900">{t('technician.yearsExperience', '{{count}} years', { count: technicianProfile.yearsOfExperience })}</div>
                   </div>
                 </div>
               )}
@@ -164,8 +166,8 @@ export function TechnicianPortal() {
                 <div className="flex items-start gap-3" data-testid="text-capacity">
                   <Wrench className="h-5 w-5 mt-0.5 text-gray-700" />
                   <div>
-                    <div className="font-medium text-sm text-gray-700">Job Capacity</div>
-                    <div className="text-sm text-gray-900">Up to {technicianProfile.maxConcurrentJobs} jobs</div>
+                    <div className="font-medium text-sm text-gray-700">{t('technician.jobCapacity', 'Job Capacity')}</div>
+                    <div className="text-sm text-gray-900">{t('technician.upToJobs', 'Up to {{count}} jobs', { count: technicianProfile.maxConcurrentJobs })}</div>
                   </div>
                 </div>
               )}
@@ -177,7 +179,7 @@ export function TechnicianPortal() {
                   <div className="flex items-start gap-3" data-testid="text-qualifications">
                     <GraduationCap className="h-5 w-5 mt-0.5 text-gray-700" />
                     <div>
-                      <div className="font-medium text-sm text-gray-700">Qualifications</div>
+                      <div className="font-medium text-sm text-gray-700">{t('technician.qualifications', 'Qualifications')}</div>
                       <div className="text-sm text-gray-600">{technicianProfile.qualifications}</div>
                     </div>
                   </div>
@@ -187,7 +189,7 @@ export function TechnicianPortal() {
                   <div className="flex items-start gap-3" data-testid="text-certifications">
                     <Award className="h-5 w-5 mt-0.5 text-gray-700" />
                     <div>
-                      <div className="font-medium text-sm text-gray-700">Certifications</div>
+                      <div className="font-medium text-sm text-gray-700">{t('technician.certifications', 'Certifications')}</div>
                       <div className="text-sm text-gray-600">{technicianProfile.certifications}</div>
                     </div>
                   </div>
@@ -197,7 +199,7 @@ export function TechnicianPortal() {
                   <div className="flex items-start gap-3" data-testid="text-skills">
                     <Wrench className="h-5 w-5 mt-0.5 text-gray-700" />
                     <div>
-                      <div className="font-medium text-sm text-gray-700">Skills</div>
+                      <div className="font-medium text-sm text-gray-700">{t('technician.skills', 'Skills')}</div>
                       <div className="text-sm text-gray-600">{technicianProfile.skills}</div>
                     </div>
                   </div>
@@ -212,60 +214,60 @@ export function TechnicianPortal() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         <Card data-testid="stat-total-jobs">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Jobs</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('technician.totalJobs', 'Total Jobs')}</CardTitle>
             <Wrench className="h-4 w-4 text-gray-600 dark:text-gray-400" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.total}</div>
-            <p className="text-xs text-gray-600 dark:text-gray-400">All assigned work</p>
+            <p className="text-xs text-gray-600 dark:text-gray-400">{t('technician.allAssignedWork', 'All assigned work')}</p>
           </CardContent>
         </Card>
 
         <Card data-testid="stat-pending-jobs">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Pending</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('common.pending', 'Pending')}</CardTitle>
             <Clock className="h-4 w-4 text-gray-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.pending}</div>
-            <p className="text-xs text-gray-600 dark:text-gray-400">Waiting to start</p>
+            <p className="text-xs text-gray-600 dark:text-gray-400">{t('technician.waitingToStart', 'Waiting to start')}</p>
           </CardContent>
         </Card>
 
         <Card data-testid="stat-in-progress-jobs">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">In Progress</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('common.inProgress', 'In Progress')}</CardTitle>
             <AlertCircle className="h-4 w-4 text-gray-700" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.inProgress}</div>
-            <p className="text-xs text-gray-600 dark:text-gray-400">Currently working</p>
+            <p className="text-xs text-gray-600 dark:text-gray-400">{t('technician.currentlyWorking', 'Currently working')}</p>
           </CardContent>
         </Card>
 
         <Card data-testid="stat-completed-jobs">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Completed</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('common.completed', 'Completed')}</CardTitle>
             <CheckCircle className="h-4 w-4 text-gray-800" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.completed}</div>
-            <p className="text-xs text-gray-600 dark:text-gray-400">Finished jobs</p>
+            <p className="text-xs text-gray-600 dark:text-gray-400">{t('technician.finishedJobs', 'Finished jobs')}</p>
           </CardContent>
         </Card>
       </div>
 
       {/* Job Cards List */}
       <div className="space-y-4">
-        <h2 className="text-xl font-semibold text-gray-900">My Assigned Jobs</h2>
+        <h2 className="text-xl font-semibold text-gray-900">{t('technician.myAssignedJobs', 'My Assigned Jobs')}</h2>
         
         {!jobCards || jobCards.length === 0 ? (
           <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
             <CardContent className="flex flex-col items-center justify-center py-12">
               <Wrench className="h-12 w-12 text-gray-500 dark:text-gray-500 mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">No Jobs Assigned</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">{t('technician.noJobsAssigned', 'No Jobs Assigned')}</h3>
               <p className="text-gray-600 text-center">
-                You don't have any jobs assigned to you at the moment.
+                {t('technician.noJobsMessage', "You don't have any jobs assigned to you at the moment.")}
               </p>
             </CardContent>
           </Card>
@@ -294,7 +296,7 @@ export function TechnicianPortal() {
                     {/* Vehicle Info */}
                     <div className="flex items-center gap-2 text-sm">
                       <UserIcon className="h-4 w-4 text-gray-600 dark:text-gray-400" />
-                      <span className="font-medium">Vehicle:</span>
+                      <span className="font-medium">{t('technician.vehicle', 'Vehicle')}:</span>
                       <span className="text-gray-600">
                         {(job.vehicleInfo as any)?.year} {(job.vehicleInfo as any)?.make} {(job.vehicleInfo as any)?.model} - {(job.vehicleInfo as any)?.licensePlate}
                       </span>
@@ -303,20 +305,20 @@ export function TechnicianPortal() {
                     {/* Service Type */}
                     <div className="flex items-center gap-2 text-sm">
                       <Wrench className="h-4 w-4 text-gray-600 dark:text-gray-400" />
-                      <span className="font-medium">Service:</span>
+                      <span className="font-medium">{t('technician.service', 'Service')}:</span>
                       <span className="text-gray-600 capitalize">{job.serviceType.replace('_', ' ')}</span>
                     </div>
 
                     {/* Time Info */}
                     <div className="flex items-center gap-2 text-sm">
                       <Clock className="h-4 w-4 text-gray-600 dark:text-gray-400" />
-                      <span className="font-medium">Est. Time:</span>
-                      <span className="text-gray-600">{job.estimatedHours} hours</span>
+                      <span className="font-medium">{t('technician.estTime', 'Est. Time')}:</span>
+                      <span className="text-gray-600">{t('technician.hoursCount', '{{count}} hours', { count: job.estimatedHours })}</span>
                       {job.scheduledDate && (
                         <>
                           <span className="mx-2">•</span>
                           <Calendar className="h-4 w-4 text-gray-600 dark:text-gray-400" />
-                          <span className="font-medium">Scheduled:</span>
+                          <span className="font-medium">{t('technician.scheduled', 'Scheduled')}:</span>
                           <span className="text-gray-600">
                             {new Date(job.scheduledDate).toLocaleDateString()}
                           </span>
@@ -326,7 +328,7 @@ export function TechnicianPortal() {
 
                     {/* Status Update */}
                     <div className="flex items-center gap-3 pt-4 border-t">
-                      <label className="text-sm font-medium">Update Status:</label>
+                      <label className="text-sm font-medium">{t('technician.updateStatus', 'Update Status')}:</label>
                       <Select
                         value={job.status}
                         onValueChange={(value) => handleStatusChange(job.id, value)}
@@ -336,9 +338,9 @@ export function TechnicianPortal() {
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="assigned">Assigned</SelectItem>
-                          <SelectItem value="in_progress">In Progress</SelectItem>
-                          <SelectItem value="completed">Completed</SelectItem>
+                          <SelectItem value="assigned">{t('technician.statusAssigned', 'Assigned')}</SelectItem>
+                          <SelectItem value="in_progress">{t('technician.statusInProgress', 'In Progress')}</SelectItem>
+                          <SelectItem value="completed">{t('technician.statusCompleted', 'Completed')}</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>

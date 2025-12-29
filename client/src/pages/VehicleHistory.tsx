@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { StandardTablePage } from "@/components/layouts";
 import { History, Car, Wrench, Calendar, FileText } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -21,6 +22,7 @@ interface VehicleHistoryRecord {
 }
 
 export default function VehicleHistory() {
+  const { t } = useTranslation();
   const [vehicleFilter, setVehicleFilter] = useState("all");
   const [serviceTypeFilter, setServiceTypeFilter] = useState("all");
 
@@ -97,15 +99,24 @@ export default function VehicleHistory() {
     return statusColors[status] || 'bg-gray-100 dark:bg-gray-800';
   };
 
+  const getStatusLabel = (status: string) => {
+    const statusLabels: { [key: string]: string } = {
+      'completed': t('common.completed', 'Completed'),
+      'in_progress': t('common.inProgress', 'In Progress'),
+      'cancelled': t('common.cancelled', 'Cancelled'),
+    };
+    return statusLabels[status] || status;
+  };
+
   const handleViewDetails = (id: string) => {
     console.log("View details for record:", id);
   };
 
   const columns = [
     {
-      header: "Vehicle",
-      accessorKey: "vehicleMake",
-      cell: (row: VehicleHistoryRecord) => (
+      key: "vehicleMake",
+      label: t('vehicles.vehicle', 'Vehicle'),
+      render: (row: VehicleHistoryRecord) => (
         <div data-testid={`vehicle-${row.id}`}>
           <div className="flex items-center gap-2">
             <Car className="w-4 h-4 text-gray-600 dark:text-gray-400" />
@@ -116,9 +127,9 @@ export default function VehicleHistory() {
       ),
     },
     {
-      header: "Service Type",
-      accessorKey: "serviceType",
-      cell: (row: VehicleHistoryRecord) => (
+      key: "serviceType",
+      label: t('vehicles.serviceType', 'Service Type'),
+      render: (row: VehicleHistoryRecord) => (
         <div className="flex items-center gap-2" data-testid={`service-${row.id}`}>
           <Wrench className="w-4 h-4 text-gray-600 dark:text-gray-400" />
           <span>{row.serviceType}</span>
@@ -126,9 +137,9 @@ export default function VehicleHistory() {
       ),
     },
     {
-      header: "Date",
-      accessorKey: "serviceDate",
-      cell: (row: VehicleHistoryRecord) => (
+      key: "serviceDate",
+      label: t('common.date', 'Date'),
+      render: (row: VehicleHistoryRecord) => (
         <div className="flex items-center gap-2" data-testid={`date-${row.id}`}>
           <Calendar className="w-4 h-4 text-gray-600 dark:text-gray-400" />
           <span>{new Date(row.serviceDate).toLocaleDateString()}</span>
@@ -136,43 +147,43 @@ export default function VehicleHistory() {
       ),
     },
     {
-      header: "Mileage",
-      accessorKey: "mileage",
-      cell: (row: VehicleHistoryRecord) => (
+      key: "mileage",
+      label: t('vehicles.mileage', 'Mileage'),
+      render: (row: VehicleHistoryRecord) => (
         <span className="font-medium" data-testid={`mileage-${row.id}`}>
           {row.mileage.toLocaleString()} km
         </span>
       ),
     },
     {
-      header: "Technician",
-      accessorKey: "technician",
-      cell: (row: VehicleHistoryRecord) => (
+      key: "technician",
+      label: t('vehicles.technician', 'Technician'),
+      render: (row: VehicleHistoryRecord) => (
         <span data-testid={`tech-${row.id}`}>{row.technician}</span>
       ),
     },
     {
-      header: "Cost",
-      accessorKey: "cost",
-      cell: (row: VehicleHistoryRecord) => (
+      key: "cost",
+      label: t('vehicles.cost', 'Cost'),
+      render: (row: VehicleHistoryRecord) => (
         <span className="font-semibold" data-testid={`cost-${row.id}`}>
           ${row.cost.toFixed(2)}
         </span>
       ),
     },
     {
-      header: "Status",
-      accessorKey: "status",
-      cell: (row: VehicleHistoryRecord) => (
-        <Badge className={`${getStatusBadge(row.status)} border-0 capitalize`} data-testid={`status-${row.id}`}>
-          {row.status.replace('_', ' ')}
+      key: "status",
+      label: t('common.status', 'Status'),
+      render: (row: VehicleHistoryRecord) => (
+        <Badge className={`${getStatusBadge(row.status)} border-0`} data-testid={`status-${row.id}`}>
+          {getStatusLabel(row.status)}
         </Badge>
       ),
     },
     {
-      header: "Actions",
-      accessorKey: "actions",
-      cell: (row: VehicleHistoryRecord) => (
+      key: "actions",
+      label: t('common.actions', 'Actions'),
+      render: (row: VehicleHistoryRecord) => (
         <Button
           size="sm"
           variant="outline"
@@ -180,7 +191,7 @@ export default function VehicleHistory() {
           data-testid={`button-view-${row.id}`}
         >
           <FileText className="w-4 h-4 mr-1" />
-          View
+          {t('common.view', 'View')}
         </Button>
       ),
     },
@@ -189,9 +200,9 @@ export default function VehicleHistory() {
   const filters = [
     {
       id: "vehicle",
-      label: "Vehicle",
+      label: t('vehicles.vehicle', 'Vehicle'),
       options: [
-        { value: "all", label: "All Vehicles" },
+        { value: "all", label: t('vehicles.allVehicles', 'All Vehicles') },
         { value: "v1", label: "Toyota Camry (ABC-1234)" },
         { value: "v2", label: "Honda Accord (XYZ-5678)" },
         { value: "v3", label: "Ford F-150 (DEF-9012)" },
@@ -200,13 +211,13 @@ export default function VehicleHistory() {
     },
     {
       id: "serviceType",
-      label: "Service Type",
+      label: t('vehicles.serviceType', 'Service Type'),
       options: [
-        { value: "all", label: "All Services" },
-        { value: "oil_change", label: "Oil Change" },
-        { value: "brake", label: "Brake Service" },
-        { value: "diagnostics", label: "Diagnostics" },
-        { value: "tire", label: "Tire Service" },
+        { value: "all", label: t('vehicles.allServices', 'All Services') },
+        { value: "oil_change", label: t('vehicles.oilChange', 'Oil Change') },
+        { value: "brake", label: t('vehicles.brakeService', 'Brake Service') },
+        { value: "diagnostics", label: t('vehicles.diagnostics', 'Diagnostics') },
+        { value: "tire", label: t('vehicles.tireService', 'Tire Service') },
       ],
       defaultValue: serviceTypeFilter,
     },
@@ -214,18 +225,18 @@ export default function VehicleHistory() {
 
   return (
     <StandardTablePage
-      title="Vehicle History"
-      description="Complete service history and maintenance records for all vehicles"
+      title={t('vehicles.vehicleHistory', 'Vehicle History')}
+      description={t('vehicles.vehicleHistoryDescription', 'Complete service history and maintenance records for all vehicles')}
       icon={History}
       data={history}
       isLoading={isLoading}
       columns={columns}
-      searchPlaceholder="Search vehicle history..."
+      searchPlaceholder={t('vehicles.searchVehicleHistory', 'Search vehicle history...')}
       filters={filters}
       emptyState={{
         icon: History,
-        title: "No service history found",
-        description: "No service records available for the selected criteria.",
+        title: t('vehicles.noServiceHistoryFound', 'No service history found'),
+        description: t('vehicles.noServiceHistoryDescription', 'No service records available for the selected criteria.'),
       }}
     />
   );

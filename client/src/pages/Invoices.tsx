@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { FileText, Plus, Building2 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { StandardTablePage } from "@/components/layouts";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { CreateInvoiceDialog } from "@/components/CreateInvoiceDialog";
@@ -9,6 +10,7 @@ import type { Invoice, Garage, User } from "@shared/schema";
 import type { Column } from "@/components/DataTable";
 
 export function Invoices() {
+  const { t } = useTranslation();
   const [selectedGarageId, setSelectedGarageId] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
@@ -38,7 +40,7 @@ export function Invoices() {
   const columns: Column<Invoice>[] = [
     {
       key: "invoiceNumber",
-      label: "Invoice #",
+      label: t('invoices.invoiceNumber', 'Invoice #'),
       render: (invoice) => (
         <span className="font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white">
           {invoice.invoiceNumber}
@@ -47,18 +49,18 @@ export function Invoices() {
     },
     {
       key: "customerId",
-      label: "Customer",
+      label: t('invoices.customer', 'Customer'),
       render: (invoice) => (
         <span className="text-sm text-gray-700 dark:text-gray-300">
           {customers?.find(c => c.id === invoice.customerId)?.fullName || 
            customers?.find(c => c.id === invoice.customerId)?.email || 
-           "Unknown"}
+           t('common.unknown', 'Unknown')}
         </span>
       ),
     },
     {
       key: "invoiceDate",
-      label: "Invoice Date",
+      label: t('invoices.invoiceDate', 'Invoice Date'),
       render: (invoice) => (
         <span className="text-sm text-gray-700 dark:text-gray-300">
           {new Date(invoice.invoiceDate).toLocaleDateString()}
@@ -67,7 +69,7 @@ export function Invoices() {
     },
     {
       key: "dueDate",
-      label: "Due Date",
+      label: t('invoices.dueDate', 'Due Date'),
       render: (invoice) => (
         <span className="text-sm text-gray-700 dark:text-gray-300">
           {new Date(invoice.dueDate).toLocaleDateString()}
@@ -76,7 +78,7 @@ export function Invoices() {
     },
     {
       key: "totalAmount",
-      label: "Total Amount",
+      label: t('invoices.totalAmount', 'Total Amount'),
       render: (invoice) => (
         <span className="font-['Poppins',Helvetica] font-semibold text-sm text-gray-900 dark:text-white">
           ${parseFloat(invoice.totalAmount).toFixed(2)}
@@ -85,7 +87,7 @@ export function Invoices() {
     },
     {
       key: "balanceAmount",
-      label: "Balance",
+      label: t('invoices.balance', 'Balance'),
       render: (invoice) => (
         <span className="font-['Poppins',Helvetica] font-semibold text-sm text-gray-900 dark:text-white">
           ${parseFloat(invoice.balanceAmount).toFixed(2)}
@@ -94,14 +96,14 @@ export function Invoices() {
     },
     {
       key: "status",
-      label: "Status",
+      label: t('common.status', 'Status'),
       render: (invoice) => (
         <StatusBadge status={invoice.status} />
       ),
     },
     {
       key: "actions",
-      label: "Actions",
+      label: t('common.actions', 'Actions'),
       render: (invoice) => (
         <InvoiceDetailsDialog 
           invoice={invoice}
@@ -114,12 +116,12 @@ export function Invoices() {
   return (
     <>
       <StandardTablePage
-        title="Invoices & Billing"
-        description="Manage invoices and payments"
+        title={t('invoices.title', 'Invoices & Billing')}
+        description={t('invoices.description', 'Manage invoices and payments')}
         icon={FileText}
         actions={[
           {
-            label: "Create Invoice",
+            label: t('invoices.createInvoice', 'Create Invoice'),
             onClick: () => setIsCreateDialogOpen(true),
             icon: Plus,
           },
@@ -127,13 +129,13 @@ export function Invoices() {
         data={invoices ?? []}
         isLoading={isLoading}
         columns={columns}
-        searchPlaceholder="Search invoices..."
+        searchPlaceholder={t('invoices.searchPlaceholder', 'Search invoices...')}
         filters={[
           {
             id: "garageId",
-            label: "Garage",
+            label: t('invoices.garage', 'Garage'),
             options: [
-              { value: "all", label: "All Garages" },
+              { value: "all", label: t('invoices.allGarages', 'All Garages') },
               ...(garages ?? []).map((garage) => ({
                 value: garage.id,
                 label: garage.name,
@@ -143,14 +145,14 @@ export function Invoices() {
           },
           {
             id: "status",
-            label: "Status",
+            label: t('common.status', 'Status'),
             options: [
-              { value: "all", label: "All Status" },
-              { value: "draft", label: "Draft" },
-              { value: "sent", label: "Sent" },
-              { value: "paid", label: "Paid" },
-              { value: "overdue", label: "Overdue" },
-              { value: "cancelled", label: "Cancelled" },
+              { value: "all", label: t('invoices.allStatus', 'All Status') },
+              { value: "draft", label: t('invoices.status.draft', 'Draft') },
+              { value: "sent", label: t('invoices.status.sent', 'Sent') },
+              { value: "paid", label: t('invoices.status.paid', 'Paid') },
+              { value: "overdue", label: t('invoices.status.overdue', 'Overdue') },
+              { value: "cancelled", label: t('invoices.status.cancelled', 'Cancelled') },
             ],
             defaultValue: statusFilter,
           },
@@ -165,11 +167,11 @@ export function Invoices() {
         }}
         emptyState={{
           icon: FileText,
-          title: "No Invoices",
-          description: "Create your first invoice to start billing customers",
+          title: t('invoices.noInvoices', 'No Invoices'),
+          description: t('invoices.noInvoicesDescription', 'Create your first invoice to start billing customers'),
           actions: [
             {
-              label: "Create Invoice",
+              label: t('invoices.createInvoice', 'Create Invoice'),
               onClick: () => setIsCreateDialogOpen(true),
               icon: Plus,
             },

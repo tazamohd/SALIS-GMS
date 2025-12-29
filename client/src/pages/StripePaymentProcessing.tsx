@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -49,6 +50,7 @@ const CURRENCIES = [
 ];
 
 export default function StripePaymentProcessing() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [createPaymentOpen, setCreatePaymentOpen] = useState(false);
   const [paymentAmount, setPaymentAmount] = useState("");
@@ -67,8 +69,8 @@ export default function StripePaymentProcessing() {
     },
     onSuccess: (data: any) => {
       toast({
-        title: "Payment Intent Created",
-        description: `Payment intent ${data.paymentIntentId} created successfully`,
+        title: t('payments.stripe.paymentIntentCreated', 'Payment Intent Created'),
+        description: t('payments.stripe.paymentIntentCreatedDesc', 'Payment intent {{id}} created successfully').replace('{{id}}', data.paymentIntentId),
       });
       setCreatePaymentOpen(false);
       setPaymentAmount("");
@@ -76,8 +78,8 @@ export default function StripePaymentProcessing() {
     },
     onError: (error: any) => {
       toast({
-        title: "Payment Creation Failed",
-        description: error.message || "Failed to create payment intent",
+        title: t('payments.stripe.paymentCreationFailed', 'Payment Creation Failed'),
+        description: error.message || t('payments.stripe.failedToCreatePaymentIntent', 'Failed to create payment intent'),
         variant: "destructive",
       });
     },
@@ -90,8 +92,8 @@ export default function StripePaymentProcessing() {
     },
     onSuccess: (data: any) => {
       toast({
-        title: "Refund Processed",
-        description: `Refund ${data.refundId} processed successfully`,
+        title: t('payments.stripe.refundProcessed', 'Refund Processed'),
+        description: t('payments.stripe.refundProcessedDesc', 'Refund {{id}} processed successfully').replace('{{id}}', data.refundId),
       });
       setRefundDialogOpen(false);
       setSelectedPaymentId("");
@@ -99,8 +101,8 @@ export default function StripePaymentProcessing() {
     },
     onError: (error: any) => {
       toast({
-        title: "Refund Failed",
-        description: error.message || "Failed to process refund",
+        title: t('payments.stripe.refundFailed', 'Refund Failed'),
+        description: error.message || t('payments.stripe.failedToProcessRefund', 'Failed to process refund'),
         variant: "destructive",
       });
     },
@@ -126,8 +128,8 @@ export default function StripePaymentProcessing() {
     const amount = parseFloat(paymentAmount);
     if (isNaN(amount) || amount <= 0) {
       toast({
-        title: "Invalid Amount",
-        description: "Please enter a valid amount greater than 0",
+        title: t('payments.stripe.invalidAmount', 'Invalid Amount'),
+        description: t('payments.stripe.enterValidAmount', 'Please enter a valid amount greater than 0'),
         variant: "destructive",
       });
       return;
@@ -142,8 +144,8 @@ export default function StripePaymentProcessing() {
   const handleProcessRefund = () => {
     if (!selectedPaymentId) {
       toast({
-        title: "No Payment Selected",
-        description: "Please select a payment to refund",
+        title: t('payments.stripe.noPaymentSelected', 'No Payment Selected'),
+        description: t('payments.stripe.selectPaymentToRefund', 'Please select a payment to refund'),
         variant: "destructive",
       });
       return;
@@ -152,8 +154,8 @@ export default function StripePaymentProcessing() {
     const amount = refundAmount ? parseFloat(refundAmount) : undefined;
     if (amount !== undefined && (isNaN(amount) || amount <= 0)) {
       toast({
-        title: "Invalid Amount",
-        description: "Please enter a valid refund amount",
+        title: t('payments.stripe.invalidAmount', 'Invalid Amount'),
+        description: t('payments.stripe.enterValidRefundAmount', 'Please enter a valid refund amount'),
         variant: "destructive",
       });
       return;
@@ -194,18 +196,18 @@ export default function StripePaymentProcessing() {
 
   return (
     <StandardPageLayout
-      title="Stripe Payment Processing"
-      description="Manage payment intents, refunds, and transaction status"
+      title={t('payments.stripe.title', 'Stripe Payment Processing')}
+      description={t('payments.stripe.description', 'Manage payment intents, refunds, and transaction status')}
       icon={CreditCard}
       actions={[
         {
-          label: "Create Payment",
+          label: t('payments.stripe.createPayment', 'Create Payment'),
           onClick: () => setCreatePaymentOpen(true),
           icon: CreditCard,
           variant: "default",
         },
         {
-          label: "Process Refund",
+          label: t('payments.stripe.processRefund', 'Process Refund'),
           onClick: () => setRefundDialogOpen(true),
           icon: RefreshCw,
           variant: "outline",
@@ -218,31 +220,31 @@ export default function StripePaymentProcessing() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => setCreatePaymentOpen(true)}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Create Payment Intent</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('payments.stripe.createPaymentIntent', 'Create Payment Intent')}</CardTitle>
             <DollarSign className="h-5 w-5 text-green-500" />
           </CardHeader>
           <CardContent>
-            <p className="text-xs text-gray-500">Start a new payment transaction</p>
+            <p className="text-xs text-gray-500">{t('payments.stripe.startNewTransaction', 'Start a new payment transaction')}</p>
           </CardContent>
         </Card>
 
         <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => setStatusDialogOpen(true)}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Check Payment Status</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('payments.stripe.checkPaymentStatus', 'Check Payment Status')}</CardTitle>
             <CheckCircle className="h-5 w-5 text-blue-500" />
           </CardHeader>
           <CardContent>
-            <p className="text-xs text-gray-500">Track payment intent status</p>
+            <p className="text-xs text-gray-500">{t('payments.stripe.trackPaymentStatus', 'Track payment intent status')}</p>
           </CardContent>
         </Card>
 
         <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => setRefundDialogOpen(true)}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Process Refund</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('payments.stripe.processRefund', 'Process Refund')}</CardTitle>
             <Banknote className="h-5 w-5 text-red-500" />
           </CardHeader>
           <CardContent>
-            <p className="text-xs text-gray-500">Refund a completed payment</p>
+            <p className="text-xs text-gray-500">{t('payments.stripe.refundCompletedPayment', 'Refund a completed payment')}</p>
           </CardContent>
         </Card>
       </div>
@@ -252,7 +254,7 @@ export default function StripePaymentProcessing() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <CreditCard className="h-5 w-5" />
-            Accepted Payment Methods
+            {t('payments.stripe.acceptedPaymentMethods', 'Accepted Payment Methods')}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -319,16 +321,16 @@ export default function StripePaymentProcessing() {
               <div className="w-12 h-12 mx-auto mb-2 bg-gray-600 rounded-lg flex items-center justify-center">
                 <Banknote className="w-6 h-6 text-white" />
               </div>
-              <p className="font-medium text-sm text-gray-900 dark:text-white">Bank Transfer</p>
+              <p className="font-medium text-sm text-gray-900 dark:text-white">{t('payments.methods.bankTransfer', 'Bank Transfer')}</p>
               <p className="text-xs text-gray-500 dark:text-gray-400">تحويل بنكي</p>
             </div>
           </div>
 
           <div className="mt-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              <strong className="text-gray-900 dark:text-white">Default Currency:</strong> Saudi Riyal (SAR) ر.س
+              <strong className="text-gray-900 dark:text-white">{t('payments.stripe.defaultCurrency', 'Default Currency')}:</strong> Saudi Riyal (SAR) ر.س
               <span className="mx-2">|</span>
-              <strong className="text-gray-900 dark:text-white">Supported:</strong> SAR, AED, BHD, KWD, OMR, QAR, USD, EUR, GBP
+              <strong className="text-gray-900 dark:text-white">{t('payments.stripe.supported', 'Supported')}:</strong> SAR, AED, BHD, KWD, OMR, QAR, USD, EUR, GBP
             </p>
           </div>
         </CardContent>
@@ -337,37 +339,37 @@ export default function StripePaymentProcessing() {
       {/* Payment Processing Guide */}
       <Card>
         <CardHeader>
-          <CardTitle>Payment Integration Guide</CardTitle>
+          <CardTitle>{t('payments.stripe.integrationGuide', 'Payment Integration Guide')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <h3 className="font-medium mb-2 dark:text-white">Setup Instructions</h3>
+            <h3 className="font-medium mb-2 dark:text-white">{t('payments.stripe.setupInstructions', 'Setup Instructions')}</h3>
             <ol className="list-decimal list-inside space-y-1 text-sm text-gray-600 dark:text-gray-400">
-              <li>Add your Stripe Secret Key to environment secrets</li>
-              <li>Configure webhook endpoints for payment confirmations</li>
-              <li>Test with Stripe test mode before going live</li>
-              <li>Review Stripe dashboard for transaction details</li>
+              <li>{t('payments.stripe.step1', 'Add your Stripe Secret Key to environment secrets')}</li>
+              <li>{t('payments.stripe.step2', 'Configure webhook endpoints for payment confirmations')}</li>
+              <li>{t('payments.stripe.step3', 'Test with Stripe test mode before going live')}</li>
+              <li>{t('payments.stripe.step4', 'Review Stripe dashboard for transaction details')}</li>
             </ol>
           </div>
 
           <div>
-            <h3 className="font-medium mb-2 dark:text-white">Payment Statuses</h3>
+            <h3 className="font-medium mb-2 dark:text-white">{t('payments.stripe.paymentStatuses', 'Payment Statuses')}</h3>
             <div className="grid grid-cols-2 gap-2 text-sm">
               <div className="flex items-center space-x-2">
                 <CheckCircle className="w-4 h-4 text-green-500" />
-                <span className="text-gray-600 dark:text-gray-400">Succeeded - Payment complete</span>
+                <span className="text-gray-600 dark:text-gray-400">{t('payments.stripe.status.succeeded', 'Succeeded - Payment complete')}</span>
               </div>
               <div className="flex items-center space-x-2">
                 <Clock className="w-4 h-4 text-blue-500" />
-                <span className="text-gray-600 dark:text-gray-400">Processing - In progress</span>
+                <span className="text-gray-600 dark:text-gray-400">{t('payments.stripe.status.processing', 'Processing - In progress')}</span>
               </div>
               <div className="flex items-center space-x-2">
                 <XCircle className="w-4 h-4 text-red-500" />
-                <span className="text-gray-600 dark:text-gray-400">Failed - Payment failed</span>
+                <span className="text-gray-600 dark:text-gray-400">{t('payments.stripe.status.failed', 'Failed - Payment failed')}</span>
               </div>
               <div className="flex items-center space-x-2">
                 <AlertCircle className="w-4 h-4 text-yellow-500" />
-                <span className="text-gray-600 dark:text-gray-400">Requires Action - User input needed</span>
+                <span className="text-gray-600 dark:text-gray-400">{t('payments.stripe.status.requiresAction', 'Requires Action - User input needed')}</span>
               </div>
             </div>
           </div>
@@ -378,14 +380,14 @@ export default function StripePaymentProcessing() {
       <Dialog open={createPaymentOpen} onOpenChange={setCreatePaymentOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Create Payment Intent</DialogTitle>
+            <DialogTitle>{t('payments.stripe.createPaymentIntent', 'Create Payment Intent')}</DialogTitle>
             <DialogDescription>
-              Create a new Stripe payment intent for processing
+              {t('payments.stripe.createPaymentDescription', 'Create a new Stripe payment intent for processing')}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label htmlFor="amount">Amount</Label>
+              <Label htmlFor="amount">{t('common.amount', 'Amount')}</Label>
               <Input
                 id="amount"
                 type="number"
@@ -397,7 +399,7 @@ export default function StripePaymentProcessing() {
               />
             </div>
             <div>
-              <Label htmlFor="currency">Currency</Label>
+              <Label htmlFor="currency">{t('payments.stripe.currency', 'Currency')}</Label>
               <Select value={paymentCurrency} onValueChange={setPaymentCurrency}>
                 <SelectTrigger id="currency" data-testid="select-currency">
                   <SelectValue />
@@ -414,14 +416,14 @@ export default function StripePaymentProcessing() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setCreatePaymentOpen(false)}>
-              Cancel
+              {t('common.cancel', 'Cancel')}
             </Button>
             <Button
               onClick={handleCreatePayment}
               disabled={createPaymentMutation.isPending}
               data-testid="button-confirm-payment"
             >
-              {createPaymentMutation.isPending ? "Creating..." : "Create Payment"}
+              {createPaymentMutation.isPending ? t('common.creating', 'Creating...') : t('payments.stripe.createPayment', 'Create Payment')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -431,14 +433,14 @@ export default function StripePaymentProcessing() {
       <Dialog open={refundDialogOpen} onOpenChange={setRefundDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Process Refund</DialogTitle>
+            <DialogTitle>{t('payments.stripe.processRefund', 'Process Refund')}</DialogTitle>
             <DialogDescription>
-              Refund a completed payment. Leave amount empty for full refund.
+              {t('payments.stripe.refundDescription', 'Refund a completed payment. Leave amount empty for full refund.')}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label htmlFor="paymentIntentId">Payment Intent ID</Label>
+              <Label htmlFor="paymentIntentId">{t('payments.stripe.paymentIntentId', 'Payment Intent ID')}</Label>
               <Input
                 id="paymentIntentId"
                 placeholder="pi_..."
@@ -448,12 +450,12 @@ export default function StripePaymentProcessing() {
               />
             </div>
             <div>
-              <Label htmlFor="refundAmount">Refund Amount (optional)</Label>
+              <Label htmlFor="refundAmount">{t('payments.stripe.refundAmountOptional', 'Refund Amount (optional)')}</Label>
               <Input
                 id="refundAmount"
                 type="number"
                 step="0.01"
-                placeholder="Leave empty for full refund"
+                placeholder={t('payments.stripe.leaveEmptyForFullRefund', 'Leave empty for full refund')}
                 value={refundAmount}
                 onChange={(e) => setRefundAmount(e.target.value)}
                 data-testid="input-refund-amount"
@@ -462,7 +464,7 @@ export default function StripePaymentProcessing() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setRefundDialogOpen(false)}>
-              Cancel
+              {t('common.cancel', 'Cancel')}
             </Button>
             <Button
               onClick={handleProcessRefund}
@@ -470,7 +472,7 @@ export default function StripePaymentProcessing() {
               variant="destructive"
               data-testid="button-confirm-refund"
             >
-              {refundMutation.isPending ? "Processing..." : "Process Refund"}
+              {refundMutation.isPending ? t('common.processing', 'Processing...') : t('payments.stripe.processRefund', 'Process Refund')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -480,14 +482,14 @@ export default function StripePaymentProcessing() {
       <Dialog open={statusDialogOpen} onOpenChange={setStatusDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Check Payment Status</DialogTitle>
+            <DialogTitle>{t('payments.stripe.checkPaymentStatus', 'Check Payment Status')}</DialogTitle>
             <DialogDescription>
-              Retrieve the current status of a payment intent
+              {t('payments.stripe.retrievePaymentStatus', 'Retrieve the current status of a payment intent')}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label htmlFor="statusPaymentId">Payment Intent ID</Label>
+              <Label htmlFor="statusPaymentId">{t('payments.stripe.paymentIntentId', 'Payment Intent ID')}</Label>
               <Input
                 id="statusPaymentId"
                 placeholder="pi_..."
@@ -502,25 +504,25 @@ export default function StripePaymentProcessing() {
                 <CardHeader>
                   <CardTitle className="text-base flex items-center space-x-2">
                     {getStatusIcon(paymentStatus.status)}
-                    <span>Payment Status</span>
+                    <span>{t('payments.stripe.paymentStatus', 'Payment Status')}</span>
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2">
                   <div className="flex justify-between">
-                    <span className="text-sm text-gray-500">Status:</span>
+                    <span className="text-sm text-gray-500">{t('common.status', 'Status')}:</span>
                     <Badge variant={getStatusBadgeVariant(paymentStatus.status)} data-testid="badge-payment-status">
                       {paymentStatus.status}
                     </Badge>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-sm text-gray-500">Amount:</span>
+                    <span className="text-sm text-gray-500">{t('common.amount', 'Amount')}:</span>
                     <span className="font-medium" data-testid="text-payment-amount">
                       {paymentStatus.currency?.toUpperCase()} {(paymentStatus.amount / 100).toFixed(2)}
                     </span>
                   </div>
                   {paymentStatus.created && (
                     <div className="flex justify-between">
-                      <span className="text-sm text-gray-500">Created:</span>
+                      <span className="text-sm text-gray-500">{t('common.created', 'Created')}:</span>
                       <span className="text-sm">{new Date(paymentStatus.created * 1000).toLocaleString()}</span>
                     </div>
                   )}
@@ -530,14 +532,14 @@ export default function StripePaymentProcessing() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setStatusDialogOpen(false)}>
-              Close
+              {t('common.close', 'Close')}
             </Button>
             <Button
               onClick={() => refetchStatus()}
               disabled={!statusPaymentId}
               data-testid="button-check-status"
             >
-              Check Status
+              {t('payments.stripe.checkStatus', 'Check Status')}
             </Button>
           </DialogFooter>
         </DialogContent>

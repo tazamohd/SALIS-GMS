@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { BarChart3, TrendingUp, FileText, Package, Building2, Users, UserCheck, ArrowUp, ArrowDown } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -66,6 +67,7 @@ const CustomPercentTooltip = ({ active, payload, label }: any) => {
 };
 
 export function Reports() {
+  const { t } = useTranslation();
   const [selectedGarageId, setSelectedGarageId] = useState<string>("all");
   const [dateRange, setDateRange] = useState<DateRange>({
     from: subDays(new Date(), 30),
@@ -179,44 +181,44 @@ export function Reports() {
       {overviewLoading ? (
         <div className="text-center py-12">
           <div className="animate-spin w-8 h-8 border-4 border-gray-900 dark:border-white border-t-transparent rounded-full mx-auto mb-4"></div>
-          <p className="text-gray-900 dark:text-white/60">Loading overview...</p>
+          <p className="text-gray-900 dark:text-white/60">{t('common.loading', 'Loading overview...')}</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Total Revenue</CardTitle>
+              <CardTitle className="text-sm font-medium text-gray-600">{t('analytics.totalRevenue', 'Total Revenue')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">${overview?.totalRevenue || "0"}</div>
-              <p className="text-xs text-gray-900 dark:text-white/60 mt-1">All time</p>
+              <p className="text-xs text-gray-900 dark:text-white/60 mt-1">{t('analytics.allTime', 'All time')}</p>
             </CardContent>
           </Card>
           <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Total Invoices</CardTitle>
+              <CardTitle className="text-sm font-medium text-gray-600">{t('analytics.totalInvoices', 'Total Invoices')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{overview?.totalInvoices || 0}</div>
-              <p className="text-xs text-gray-900 dark:text-white/60 mt-1">{overview?.pendingInvoices || 0} pending</p>
+              <p className="text-xs text-gray-900 dark:text-white/60 mt-1">{overview?.pendingInvoices || 0} {t('common.pending', 'pending')}</p>
             </CardContent>
           </Card>
           <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Job Cards</CardTitle>
+              <CardTitle className="text-sm font-medium text-gray-600">{t('nav.job_cards', 'Job Cards')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{overview?.totalJobCards || 0}</div>
-              <p className="text-xs text-gray-900 dark:text-white/60 mt-1">{overview?.activeJobCards || 0} active</p>
+              <p className="text-xs text-gray-900 dark:text-white/60 mt-1">{overview?.activeJobCards || 0} {t('common.active', 'active')}</p>
             </CardContent>
           </Card>
           <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Customers</CardTitle>
+              <CardTitle className="text-sm font-medium text-gray-600">{t('nav.customers', 'Customers')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{overview?.totalCustomers || 0}</div>
-              <p className="text-xs text-gray-900 dark:text-white/60 mt-1">Total registered</p>
+              <p className="text-xs text-gray-900 dark:text-white/60 mt-1">{t('analytics.totalRegistered', 'Total registered')}</p>
             </CardContent>
           </Card>
         </div>
@@ -229,14 +231,14 @@ export function Reports() {
       {revenueLoading ? (
         <div className="text-center py-12">
           <div className="animate-spin w-8 h-8 border-4 border-gray-900 dark:border-white border-t-transparent rounded-full mx-auto mb-4"></div>
-          <p className="text-gray-900 dark:text-white/60">Loading revenue data...</p>
+          <p className="text-gray-900 dark:text-white/60">{t('analytics.loadingRevenueData', 'Loading revenue data...')}</p>
         </div>
       ) : (
         <>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-gray-600">Total Revenue</CardTitle>
+                <CardTitle className="text-sm font-medium text-gray-600">{t('analytics.totalRevenue', 'Total Revenue')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-gray-900 dark:text-white">${revenueReport?.totalRevenue || "0"}</div>
@@ -244,7 +246,7 @@ export function Reports() {
             </Card>
             <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-gray-600">Paid Amount</CardTitle>
+                <CardTitle className="text-sm font-medium text-gray-600">{t('analytics.paidAmount', 'Paid Amount')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-gray-800 dark:text-gray-200">${revenueReport?.paidAmount || "0"}</div>
@@ -252,7 +254,7 @@ export function Reports() {
             </Card>
             <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-gray-600">Pending Amount</CardTitle>
+                <CardTitle className="text-sm font-medium text-gray-600">{t('analytics.pendingAmount', 'Pending Amount')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-gray-900 dark:text-white">${revenueReport?.pendingAmount || "0"}</div>
@@ -264,12 +266,12 @@ export function Reports() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-gray-600">Month-over-Month</CardTitle>
+                  <CardTitle className="text-sm font-medium text-gray-600">{t('analytics.monthOverMonth', 'Month-over-Month')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <span className="text-xs text-gray-900 dark:text-white/60">Previous Month</span>
+                      <span className="text-xs text-gray-900 dark:text-white/60">{t('analytics.previousMonth', 'Previous Month')}</span>
                       <span className="text-sm font-medium">${revenueReport.comparison.previousMonth.revenue.toFixed(2)}</span>
                     </div>
                     <div className="flex items-center gap-2">
@@ -291,12 +293,12 @@ export function Reports() {
               
               <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-gray-600">Year-over-Year</CardTitle>
+                  <CardTitle className="text-sm font-medium text-gray-600">{t('analytics.yearOverYear', 'Year-over-Year')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <span className="text-xs text-gray-900 dark:text-white/60">Same Period Last Year</span>
+                      <span className="text-xs text-gray-900 dark:text-white/60">{t('analytics.samePeriodLastYear', 'Same Period Last Year')}</span>
                       <span className="text-sm font-medium">${revenueReport.comparison.previousYear.revenue.toFixed(2)}</span>
                     </div>
                     <div className="flex items-center gap-2">
@@ -321,7 +323,7 @@ export function Reports() {
           {revenueReport?.revenueByMonth && revenueReport.revenueByMonth.length > 0 && (
             <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
               <CardHeader>
-                <CardTitle className="text-gray-900 dark:text-white">Revenue Trend</CardTitle>
+                <CardTitle className="text-gray-900 dark:text-white">{t('analytics.revenueTrend', 'Revenue Trend')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
@@ -331,7 +333,7 @@ export function Reports() {
                     <YAxis tickFormatter={(value) => `$${value}`} />
                     <Tooltip content={<CustomCurrencyTooltip />} />
                     <Legend />
-                    <Line type="monotone" dataKey="revenue" stroke="#000000" strokeWidth={2} name="Revenue" />
+                    <Line type="monotone" dataKey="revenue" stroke="#000000" strokeWidth={2} name={t('analytics.revenue', 'Revenue')} />
                   </LineChart>
                 </ResponsiveContainer>
               </CardContent>
@@ -342,7 +344,7 @@ export function Reports() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
                 <CardHeader>
-                  <CardTitle className="text-gray-900 dark:text-white">Invoices by Status</CardTitle>
+                  <CardTitle className="text-gray-900 dark:text-white">{t('analytics.invoicesByStatus', 'Invoices by Status')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <ResponsiveContainer width="100%" height={250}>
@@ -370,7 +372,7 @@ export function Reports() {
               {revenueReport?.paymentsByMethod && revenueReport.paymentsByMethod.length > 0 && (
                 <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
                   <CardHeader>
-                    <CardTitle className="text-gray-900 dark:text-white">Payments by Method</CardTitle>
+                    <CardTitle className="text-gray-900 dark:text-white">{t('analytics.paymentsByMethod', 'Payments by Method')}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <ResponsiveContainer width="100%" height={250}>
@@ -379,7 +381,7 @@ export function Reports() {
                         <XAxis dataKey="method" />
                         <YAxis tickFormatter={(value) => `$${value}`} />
                         <Tooltip content={<CustomCurrencyTooltip />} />
-                        <Bar dataKey="total" fill="#404040" name="Total Amount" />
+                        <Bar dataKey="total" fill="#404040" name={t('analytics.totalAmount', 'Total Amount')} />
                       </BarChart>
                     </ResponsiveContainer>
                   </CardContent>
@@ -397,14 +399,14 @@ export function Reports() {
       {jobCardsLoading ? (
         <div className="text-center py-12">
           <div className="animate-spin w-8 h-8 border-4 border-gray-900 dark:border-white border-t-transparent rounded-full mx-auto mb-4"></div>
-          <p className="text-gray-900 dark:text-white/60">Loading job card analytics...</p>
+          <p className="text-gray-900 dark:text-white/60">{t('analytics.loadingJobCardAnalytics', 'Loading job card analytics...')}</p>
         </div>
       ) : (
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-gray-600">Total Job Cards</CardTitle>
+                <CardTitle className="text-sm font-medium text-gray-600">{t('analytics.totalJobCards', 'Total Job Cards')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{jobCardAnalytics?.totalJobCards || 0}</div>
@@ -412,7 +414,7 @@ export function Reports() {
             </Card>
             <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-gray-600">Avg. Completion Time</CardTitle>
+                <CardTitle className="text-sm font-medium text-gray-600">{t('analytics.avgCompletionTime', 'Avg. Completion Time')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{jobCardAnalytics?.averageCompletionTime || 0}h</div>
@@ -424,7 +426,7 @@ export function Reports() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
                 <CardHeader>
-                  <CardTitle className="text-gray-900 dark:text-white">Job Cards by Status</CardTitle>
+                  <CardTitle className="text-gray-900 dark:text-white">{t('analytics.jobCardsByStatus', 'Job Cards by Status')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <ResponsiveContainer width="100%" height={250}>
@@ -452,7 +454,7 @@ export function Reports() {
               {jobCardAnalytics?.byPriority && jobCardAnalytics.byPriority.length > 0 && (
                 <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
                   <CardHeader>
-                    <CardTitle className="text-gray-900 dark:text-white">Job Cards by Priority</CardTitle>
+                    <CardTitle className="text-gray-900 dark:text-white">{t('analytics.jobCardsByPriority', 'Job Cards by Priority')}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <ResponsiveContainer width="100%" height={250}>
@@ -461,7 +463,7 @@ export function Reports() {
                         <XAxis dataKey="priority" />
                         <YAxis />
                         <Tooltip content={<CustomCountTooltip />} />
-                        <Bar dataKey="count" fill="#8b5cf6" name="Count" />
+                        <Bar dataKey="count" fill="#8b5cf6" name={t('analytics.count', 'Count')} />
                       </BarChart>
                     </ResponsiveContainer>
                   </CardContent>
@@ -479,7 +481,7 @@ export function Reports() {
       {technicianLoading ? (
         <div className="text-center py-12">
           <div className="animate-spin w-8 h-8 border-4 border-gray-900 dark:border-white border-t-transparent rounded-full mx-auto mb-4"></div>
-          <p className="text-gray-900 dark:text-white/60">Loading technician performance...</p>
+          <p className="text-gray-900 dark:text-white/60">{t('analytics.loadingTechnicianPerformance', 'Loading technician performance...')}</p>
         </div>
       ) : (
         <>
@@ -493,25 +495,25 @@ export function Reports() {
                     </CardHeader>
                     <CardContent className="space-y-3">
                       <div className="flex justify-between items-center">
-                        <span className="text-sm text-gray-600">Jobs Completed</span>
+                        <span className="text-sm text-gray-600">{t('analytics.jobsCompleted', 'Jobs Completed')}</span>
                         <span className="font-semibold text-gray-900 dark:text-white" data-testid={`text-jobs-${tech.id}`}>
                           {tech.jobsCompleted}
                         </span>
                       </div>
                       <div className="flex justify-between items-center">
-                        <span className="text-sm text-gray-600">Avg. Completion</span>
+                        <span className="text-sm text-gray-600">{t('analytics.avgCompletion', 'Avg. Completion')}</span>
                         <span className="font-semibold" data-testid={`text-avg-time-${tech.id}`}>
-                          {tech.avgCompletionTime} days
+                          {tech.avgCompletionTime} {t('analytics.days', 'days')}
                         </span>
                       </div>
                       <div className="flex justify-between items-center">
-                        <span className="text-sm text-gray-600">Revenue Generated</span>
+                        <span className="text-sm text-gray-600">{t('analytics.revenueGenerated', 'Revenue Generated')}</span>
                         <span className="font-semibold text-gray-800 dark:text-gray-200" data-testid={`text-revenue-${tech.id}`}>
                           ${tech.revenueGenerated.toFixed(2)}
                         </span>
                       </div>
                       <div className="flex justify-between items-center">
-                        <span className="text-sm text-gray-600">Efficiency Rating</span>
+                        <span className="text-sm text-gray-600">{t('analytics.efficiencyRating', 'Efficiency Rating')}</span>
                         <div className="flex items-center gap-2">
                           <span className="font-semibold" data-testid={`text-efficiency-${tech.id}`}>
                             {tech.efficiencyRating}%
@@ -526,7 +528,7 @@ export function Reports() {
                       </div>
                       {tech.jobsByStatus && tech.jobsByStatus.length > 0 && (
                         <div className="mt-3 pt-3 border-t">
-                          <div className="text-xs text-gray-900 dark:text-white/60 mb-2">Job Status Breakdown</div>
+                          <div className="text-xs text-gray-900 dark:text-white/60 mb-2">{t('analytics.jobStatusBreakdown', 'Job Status Breakdown')}</div>
                           <div className="grid grid-cols-2 gap-2">
                             {tech.jobsByStatus.map((status) => (
                               <div key={status.status} className="flex justify-between text-xs">
@@ -545,7 +547,7 @@ export function Reports() {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-6">
                 <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
                   <CardHeader>
-                    <CardTitle className="text-gray-900 dark:text-white">Jobs Completed by Technician</CardTitle>
+                    <CardTitle className="text-gray-900 dark:text-white">{t('analytics.jobsCompletedByTechnician', 'Jobs Completed by Technician')}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <ResponsiveContainer width="100%" height={300}>
@@ -555,7 +557,7 @@ export function Reports() {
                         <YAxis />
                         <Tooltip content={<CustomCountTooltip />} />
                         <Legend />
-                        <Bar dataKey="jobsCompleted" fill="#3b82f6" name="Jobs Completed" />
+                        <Bar dataKey="jobsCompleted" fill="#3b82f6" name={t('analytics.jobsCompleted', 'Jobs Completed')} />
                       </BarChart>
                     </ResponsiveContainer>
                   </CardContent>
@@ -563,7 +565,7 @@ export function Reports() {
 
                 <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
                   <CardHeader>
-                    <CardTitle className="text-gray-900 dark:text-white">Revenue Generated by Technician</CardTitle>
+                    <CardTitle className="text-gray-900 dark:text-white">{t('analytics.revenueGeneratedByTechnician', 'Revenue Generated by Technician')}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <ResponsiveContainer width="100%" height={300}>
@@ -573,7 +575,7 @@ export function Reports() {
                         <YAxis tickFormatter={(value) => `$${value}`} />
                         <Tooltip content={<CustomCurrencyTooltip />} />
                         <Legend />
-                        <Bar dataKey="revenueGenerated" fill="#404040" name="Revenue" />
+                        <Bar dataKey="revenueGenerated" fill="#404040" name={t('analytics.revenue', 'Revenue')} />
                       </BarChart>
                     </ResponsiveContainer>
                   </CardContent>
@@ -581,7 +583,7 @@ export function Reports() {
 
                 <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
                   <CardHeader>
-                    <CardTitle className="text-gray-900 dark:text-white">Average Completion Time</CardTitle>
+                    <CardTitle className="text-gray-900 dark:text-white">{t('analytics.averageCompletionTime', 'Average Completion Time')}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <ResponsiveContainer width="100%" height={300}>
@@ -591,7 +593,7 @@ export function Reports() {
                         <YAxis />
                         <Tooltip content={<CustomCountTooltip />} />
                         <Legend />
-                        <Bar dataKey="avgCompletionTime" fill="#f59e0b" name="Avg. Days" />
+                        <Bar dataKey="avgCompletionTime" fill="#f59e0b" name={t('analytics.avgDays', 'Avg. Days')} />
                       </BarChart>
                     </ResponsiveContainer>
                   </CardContent>
@@ -599,7 +601,7 @@ export function Reports() {
 
                 <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
                   <CardHeader>
-                    <CardTitle className="text-gray-900 dark:text-white">Efficiency Rating</CardTitle>
+                    <CardTitle className="text-gray-900 dark:text-white">{t('analytics.efficiencyRating', 'Efficiency Rating')}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <ResponsiveContainer width="100%" height={300}>
@@ -609,7 +611,7 @@ export function Reports() {
                         <YAxis tickFormatter={(value) => `${value}%`} />
                         <Tooltip content={<CustomPercentTooltip />} />
                         <Legend />
-                        <Bar dataKey="efficiencyRating" fill="#8b5cf6" name="Efficiency" />
+                        <Bar dataKey="efficiencyRating" fill="#8b5cf6" name={t('analytics.efficiency', 'Efficiency')} />
                       </BarChart>
                     </ResponsiveContainer>
                   </CardContent>
@@ -619,9 +621,9 @@ export function Reports() {
           ) : (
             <div className="text-center py-12">
               <Users className="w-16 h-16 mx-auto text-gray-900 dark:text-white/50 mb-4" />
-              <p className="text-gray-900 dark:text-white/60 text-lg">No technician performance data available</p>
+              <p className="text-gray-900 dark:text-white/60 text-lg">{t('analytics.noTechnicianDataAvailable', 'No technician performance data available')}</p>
               <p className="text-gray-900 dark:text-white/50 text-sm mt-2">
-                Technicians will appear here once they start completing jobs
+                {t('analytics.techniciansWillAppear', 'Technicians will appear here once they start completing jobs')}
               </p>
             </div>
           )}
@@ -635,7 +637,7 @@ export function Reports() {
       {customerLoading ? (
         <div className="text-center py-12">
           <div className="animate-spin w-8 h-8 border-4 border-gray-900 dark:border-white border-t-transparent rounded-full mx-auto mb-4"></div>
-          <p className="text-gray-900 dark:text-white/60">Loading customer analytics...</p>
+          <p className="text-gray-900 dark:text-white/60">{t('analytics.loadingCustomerAnalytics', 'Loading customer analytics...')}</p>
         </div>
       ) : (
         <>
@@ -664,32 +666,32 @@ export function Reports() {
                     </CardHeader>
                     <CardContent className="space-y-3">
                       <div className="flex justify-between items-center">
-                        <span className="text-sm text-gray-600">Lifetime Value</span>
+                        <span className="text-sm text-gray-600">{t('analytics.lifetimeValue', 'Lifetime Value')}</span>
                         <span className="font-semibold text-gray-800 dark:text-gray-200" data-testid={`text-ltv-${customer.id}`}>
                           ${customer.lifetimeValue.toFixed(2)}
                         </span>
                       </div>
                       <div className="flex justify-between items-center">
-                        <span className="text-sm text-gray-600">Total Invoices</span>
+                        <span className="text-sm text-gray-600">{t('analytics.totalInvoices', 'Total Invoices')}</span>
                         <span className="font-semibold" data-testid={`text-invoices-${customer.id}`}>
                           {customer.totalInvoices}
                         </span>
                       </div>
                       <div className="flex justify-between items-center">
-                        <span className="text-sm text-gray-600">Total Visits</span>
+                        <span className="text-sm text-gray-600">{t('analytics.totalVisits', 'Total Visits')}</span>
                         <span className="font-semibold" data-testid={`text-visits-${customer.id}`}>
                           {customer.totalVisits}
                         </span>
                       </div>
                       <div className="flex justify-between items-center">
-                        <span className="text-sm text-gray-600">Avg. Invoice</span>
+                        <span className="text-sm text-gray-600">{t('analytics.avgInvoice', 'Avg. Invoice')}</span>
                         <span className="font-semibold" data-testid={`text-avg-invoice-${customer.id}`}>
                           ${customer.avgInvoiceValue.toFixed(2)}
                         </span>
                       </div>
                       {customer.lastVisit && (
                         <div className="flex justify-between items-center pt-2 border-t">
-                          <span className="text-xs text-gray-900 dark:text-white/60">Last Visit</span>
+                          <span className="text-xs text-gray-900 dark:text-white/60">{t('analytics.lastVisit', 'Last Visit')}</span>
                           <span className="text-xs font-medium">
                             {new Date(customer.lastVisit).toLocaleDateString()}
                           </span>
@@ -703,7 +705,7 @@ export function Reports() {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-6">
                 <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
                   <CardHeader>
-                    <CardTitle className="text-gray-900 dark:text-white">Top 10 Customers by Lifetime Value</CardTitle>
+                    <CardTitle className="text-gray-900 dark:text-white">{t('analytics.top10CustomersByLTV', 'Top 10 Customers by Lifetime Value')}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <ResponsiveContainer width="100%" height={300}>
@@ -713,7 +715,7 @@ export function Reports() {
                         <YAxis tickFormatter={(value) => `$${value}`} />
                         <Tooltip content={<CustomCurrencyTooltip />} />
                         <Legend />
-                        <Bar dataKey="lifetimeValue" fill="#404040" name="Lifetime Value" />
+                        <Bar dataKey="lifetimeValue" fill="#404040" name={t('analytics.lifetimeValue', 'Lifetime Value')} />
                       </BarChart>
                     </ResponsiveContainer>
                   </CardContent>
@@ -721,7 +723,7 @@ export function Reports() {
 
                 <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
                   <CardHeader>
-                    <CardTitle className="text-gray-900 dark:text-white">Visit Frequency</CardTitle>
+                    <CardTitle className="text-gray-900 dark:text-white">{t('analytics.visitFrequency', 'Visit Frequency')}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <ResponsiveContainer width="100%" height={300}>
@@ -731,7 +733,7 @@ export function Reports() {
                         <YAxis />
                         <Tooltip content={<CustomCountTooltip />} />
                         <Legend />
-                        <Bar dataKey="totalVisits" fill="#3b82f6" name="Total Visits" />
+                        <Bar dataKey="totalVisits" fill="#3b82f6" name={t('analytics.totalVisits', 'Total Visits')} />
                       </BarChart>
                     </ResponsiveContainer>
                   </CardContent>
@@ -739,7 +741,7 @@ export function Reports() {
 
                 <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
                   <CardHeader>
-                    <CardTitle className="text-gray-900 dark:text-white">Average Invoice Value</CardTitle>
+                    <CardTitle className="text-gray-900 dark:text-white">{t('analytics.averageInvoiceValue', 'Average Invoice Value')}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <ResponsiveContainer width="100%" height={300}>
@@ -749,7 +751,7 @@ export function Reports() {
                         <YAxis tickFormatter={(value) => `$${value}`} />
                         <Tooltip content={<CustomCurrencyTooltip />} />
                         <Legend />
-                        <Bar dataKey="avgInvoiceValue" fill="#f59e0b" name="Avg. Invoice" />
+                        <Bar dataKey="avgInvoiceValue" fill="#f59e0b" name={t('analytics.avgInvoice', 'Avg. Invoice')} />
                       </BarChart>
                     </ResponsiveContainer>
                   </CardContent>
@@ -757,16 +759,16 @@ export function Reports() {
 
                 <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
                   <CardHeader>
-                    <CardTitle className="text-gray-900 dark:text-white">Customer Status Distribution</CardTitle>
+                    <CardTitle className="text-gray-900 dark:text-white">{t('analytics.customerStatusDistribution', 'Customer Status Distribution')}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <ResponsiveContainer width="100%" height={300}>
                       <PieChart>
                         <Pie
                           data={[
-                            { name: 'Active', value: customerAnalytics.customers.filter(c => c.status === 'active').length },
-                            { name: 'Recent', value: customerAnalytics.customers.filter(c => c.status === 'recent').length },
-                            { name: 'Inactive', value: customerAnalytics.customers.filter(c => c.status === 'inactive').length },
+                            { name: t('common.active', 'Active'), value: customerAnalytics.customers.filter(c => c.status === 'active').length },
+                            { name: t('analytics.recent', 'Recent'), value: customerAnalytics.customers.filter(c => c.status === 'recent').length },
+                            { name: t('common.inactive', 'Inactive'), value: customerAnalytics.customers.filter(c => c.status === 'inactive').length },
                           ].filter(item => item.value > 0)}
                           dataKey="value"
                           nameKey="name"
@@ -776,9 +778,9 @@ export function Reports() {
                           label
                         >
                           {[
-                            { name: 'Active', value: customerAnalytics.customers.filter(c => c.status === 'active').length },
-                            { name: 'Recent', value: customerAnalytics.customers.filter(c => c.status === 'recent').length },
-                            { name: 'Inactive', value: customerAnalytics.customers.filter(c => c.status === 'inactive').length },
+                            { name: t('common.active', 'Active'), value: customerAnalytics.customers.filter(c => c.status === 'active').length },
+                            { name: t('analytics.recent', 'Recent'), value: customerAnalytics.customers.filter(c => c.status === 'recent').length },
+                            { name: t('common.inactive', 'Inactive'), value: customerAnalytics.customers.filter(c => c.status === 'inactive').length },
                           ].filter(item => item.value > 0).map((entry, index) => (
                             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                           ))}
@@ -794,9 +796,9 @@ export function Reports() {
           ) : (
             <div className="text-center py-12">
               <UserCheck className="w-16 h-16 mx-auto text-gray-900 dark:text-white/50 mb-4" />
-              <p className="text-gray-900 dark:text-white/60 text-lg">No customer data available</p>
+              <p className="text-gray-900 dark:text-white/60 text-lg">{t('analytics.noCustomerDataAvailable', 'No customer data available')}</p>
               <p className="text-gray-900 dark:text-white/50 text-sm mt-2">
-                Customer analytics will appear here once you have invoices and appointments
+                {t('analytics.customerAnalyticsWillAppear', 'Customer analytics will appear here once you have invoices and appointments')}
               </p>
             </div>
           )}
@@ -810,14 +812,14 @@ export function Reports() {
       {inventoryLoading ? (
         <div className="text-center py-12">
           <div className="animate-spin w-8 h-8 border-4 border-gray-900 dark:border-white border-t-transparent rounded-full mx-auto mb-4"></div>
-          <p className="text-gray-900 dark:text-white/60">Loading inventory data...</p>
+          <p className="text-gray-900 dark:text-white/60">{t('analytics.loadingInventoryData', 'Loading inventory data...')}</p>
         </div>
       ) : (
         <>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-gray-600">Total Tools</CardTitle>
+                <CardTitle className="text-sm font-medium text-gray-600">{t('analytics.totalTools', 'Total Tools')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{inventoryReport?.totalTools || 0}</div>
@@ -825,7 +827,7 @@ export function Reports() {
             </Card>
             <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-gray-600">Available</CardTitle>
+                <CardTitle className="text-sm font-medium text-gray-600">{t('analytics.available', 'Available')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-gray-800 dark:text-gray-200">{inventoryReport?.availableTools || 0}</div>
@@ -833,7 +835,7 @@ export function Reports() {
             </Card>
             <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-gray-600">In Use</CardTitle>
+                <CardTitle className="text-sm font-medium text-gray-600">{t('analytics.inUse', 'In Use')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-gray-900 dark:text-white">{inventoryReport?.inUseTools || 0}</div>
@@ -844,7 +846,7 @@ export function Reports() {
           {inventoryReport?.toolsByCategory && inventoryReport.toolsByCategory.length > 0 && (
             <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
               <CardHeader>
-                <CardTitle className="text-gray-900 dark:text-white">Tools by Category</CardTitle>
+                <CardTitle className="text-gray-900 dark:text-white">{t('analytics.toolsByCategory', 'Tools by Category')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
@@ -853,7 +855,7 @@ export function Reports() {
                     <XAxis dataKey="category" />
                     <YAxis />
                     <Tooltip content={<CustomCountTooltip />} />
-                    <Bar dataKey="count" fill="#06b6d4" name="Count" />
+                    <Bar dataKey="count" fill="#06b6d4" name={t('analytics.count', 'Count')} />
                   </BarChart>
                 </ResponsiveContainer>
               </CardContent>
@@ -874,10 +876,10 @@ export function Reports() {
       <Select value={selectedGarageId} onValueChange={setSelectedGarageId}>
         <SelectTrigger className="w-[200px]" data-testid="select-garage-filter">
           <Building2 className="w-4 h-4 mr-2" />
-          <SelectValue placeholder="All Garages" />
+          <SelectValue placeholder={t('analytics.allGarages', 'All Garages')} />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="all">All Garages</SelectItem>
+          <SelectItem value="all">{t('analytics.allGarages', 'All Garages')}</SelectItem>
           {(garages ?? []).map((garage) => (
             <SelectItem key={garage.id} value={garage.id}>
               {garage.name}
@@ -890,45 +892,45 @@ export function Reports() {
 
   return (
     <TabsPageLayout
-      title="Reports & Analytics"
-      description="Comprehensive business insights and metrics"
+      title={t('nav.reports', 'Reports & Analytics')}
+      description={t('analytics.reportsDescription', 'Comprehensive business insights and metrics')}
       icon={BarChart3}
       headerContent={headerContent}
       defaultTab="overview"
       tabs={[
         {
           id: "overview",
-          label: "Overview",
+          label: t('analytics.overview', 'Overview'),
           icon: BarChart3,
           content: overviewTabContent,
         },
         {
           id: "revenue",
-          label: "Revenue",
+          label: t('analytics.revenue', 'Revenue'),
           icon: TrendingUp,
           content: revenueTabContent,
         },
         {
           id: "job-cards",
-          label: "Job Cards",
+          label: t('nav.job_cards', 'Job Cards'),
           icon: FileText,
           content: jobCardsTabContent,
         },
         {
           id: "technicians",
-          label: "Technicians",
+          label: t('analytics.technicians', 'Technicians'),
           icon: Users,
           content: techniciansTabContent,
         },
         {
           id: "customers",
-          label: "Customers",
+          label: t('nav.customers', 'Customers'),
           icon: UserCheck,
           content: customersTabContent,
         },
         {
           id: "inventory",
-          label: "Inventory",
+          label: t('nav.inventory', 'Inventory'),
           icon: Package,
           content: inventoryTabContent,
         },

@@ -3,6 +3,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useTranslation } from "react-i18next";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -40,6 +41,7 @@ type CategoryFormData = z.infer<typeof categorySchema>;
 type ExpenseFormData = z.infer<typeof expenseSchema>;
 
 export default function ExpenseTracking() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [selectedTab, setSelectedTab] = useState("expenses");
   const [isCategoryDialogOpen, setIsCategoryDialogOpen] = useState(false);
@@ -81,12 +83,12 @@ export default function ExpenseTracking() {
     mutationFn: (data: CategoryFormData) => apiRequest("POST", "/api/expense-categories", data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/expense-categories"] });
-      toast({ title: "Success", description: "Expense category created" });
+      toast({ title: t('common.success', 'Success'), description: t('payments.expenses.categoryCreated', 'Expense category created') });
       setIsCategoryDialogOpen(false);
       categoryForm.reset();
     },
     onError: () => {
-      toast({ title: "Error", description: "Failed to create category", variant: "destructive" });
+      toast({ title: t('common.error', 'Error'), description: t('payments.expenses.categoryCreateFailed', 'Failed to create category'), variant: "destructive" });
     }
   });
 
@@ -94,12 +96,12 @@ export default function ExpenseTracking() {
     mutationFn: (data: ExpenseFormData) => apiRequest("POST", "/api/expenses", data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/expenses"] });
-      toast({ title: "Success", description: "Expense created successfully" });
+      toast({ title: t('common.success', 'Success'), description: t('payments.expenses.expenseCreated', 'Expense created successfully') });
       setIsExpenseDialogOpen(false);
       expenseForm.reset();
     },
     onError: () => {
-      toast({ title: "Error", description: "Failed to create expense", variant: "destructive" });
+      toast({ title: t('common.error', 'Error'), description: t('payments.expenses.expenseCreateFailed', 'Failed to create expense'), variant: "destructive" });
     }
   });
 
@@ -107,7 +109,7 @@ export default function ExpenseTracking() {
     mutationFn: (id: string) => apiRequest("PATCH", `/api/expenses/${id}/approve`, {}),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/expenses"] });
-      toast({ title: "Success", description: "Expense approved" });
+      toast({ title: t('common.success', 'Success'), description: t('payments.expenses.expenseApproved', 'Expense approved') });
     },
   });
 
@@ -115,7 +117,7 @@ export default function ExpenseTracking() {
     mutationFn: (id: string) => apiRequest("PATCH", `/api/expenses/${id}/reject`, {}),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/expenses"] });
-      toast({ title: "Success", description: "Expense rejected" });
+      toast({ title: t('common.success', 'Success'), description: t('payments.expenses.expenseRejected', 'Expense rejected') });
     },
   });
 
@@ -132,26 +134,26 @@ export default function ExpenseTracking() {
   const expensesTab = (
     <Card className="border-salis-gray-light dark:border-salis-gray-dark bg-white dark:bg-[#010101]">
       <CardHeader>
-        <CardTitle className="font-montserrat text-salis-black dark:text-white">All Expenses</CardTitle>
+        <CardTitle className="font-montserrat text-salis-black dark:text-white">{t('payments.expenses.allExpenses', 'All Expenses')}</CardTitle>
         <CardDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
-          View and manage all business expenses
+          {t('payments.expenses.viewAndManage', 'View and manage all business expenses')}
         </CardDescription>
       </CardHeader>
       <CardContent>
         {expensesLoading ? (
-          <p className="text-salis-gray font-poppins" data-testid="text-loading">Loading expenses...</p>
+          <p className="text-salis-gray font-poppins" data-testid="text-loading">{t('common.loading', 'Loading expenses...')}</p>
         ) : expenses.length === 0 ? (
-          <p className="text-salis-gray font-poppins" data-testid="text-no-expenses">No expenses found</p>
+          <p className="text-salis-gray font-poppins" data-testid="text-no-expenses">{t('payments.expenses.noExpenses', 'No expenses found')}</p>
         ) : (
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Vendor</TableHead>
-                <TableHead>Amount</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>Payment Method</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Actions</TableHead>
+                <TableHead>{t('payments.expenses.vendor', 'Vendor')}</TableHead>
+                <TableHead>{t('common.amount', 'Amount')}</TableHead>
+                <TableHead>{t('common.date', 'Date')}</TableHead>
+                <TableHead>{t('payments.paymentMethod', 'Payment Method')}</TableHead>
+                <TableHead>{t('common.status', 'Status')}</TableHead>
+                <TableHead>{t('common.actions', 'Actions')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -210,21 +212,21 @@ export default function ExpenseTracking() {
           data-testid="button-create-category"
         >
           <FolderPlus className="mr-2 h-4 w-4" />
-          Create Category
+          {t('payments.expenses.createCategory', 'Create Category')}
         </Button>
       </div>
       <Card className="border-salis-gray-light dark:border-salis-gray-dark bg-white dark:bg-[#010101]">
         <CardHeader>
-          <CardTitle className="font-montserrat text-salis-black dark:text-white">Expense Categories</CardTitle>
+          <CardTitle className="font-montserrat text-salis-black dark:text-white">{t('payments.expenses.expenseCategories', 'Expense Categories')}</CardTitle>
           <CardDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
-            Manage expense categories and budgets
+            {t('payments.expenses.manageCategoriesAndBudgets', 'Manage expense categories and budgets')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           {categoriesLoading ? (
-            <p className="text-salis-gray font-poppins" data-testid="text-loading-categories">Loading categories...</p>
+            <p className="text-salis-gray font-poppins" data-testid="text-loading-categories">{t('common.loading', 'Loading categories...')}</p>
           ) : categories.length === 0 ? (
-            <p className="text-salis-gray font-poppins" data-testid="text-no-categories">No categories found</p>
+            <p className="text-salis-gray font-poppins" data-testid="text-no-categories">{t('payments.expenses.noCategories', 'No categories found')}</p>
           ) : (
             <div className="grid gap-4">
               {categories.map((category: any) => (
@@ -245,7 +247,7 @@ export default function ExpenseTracking() {
                       <div className="text-right">
                         {category.budgetLimit && (
                           <div>
-                            <p className="text-sm text-salis-gray dark:text-salis-gray-light font-poppins">Budget Limit</p>
+                            <p className="text-sm text-salis-gray dark:text-salis-gray-light font-poppins">{t('payments.expenses.budgetLimit', 'Budget Limit')}</p>
                             <p className="font-semibold text-salis-black dark:text-white" data-testid={`text-budget-${category.id}`}>
                               ${category.budgetLimit.toFixed(2)}
                             </p>
@@ -253,7 +255,7 @@ export default function ExpenseTracking() {
                         )}
                         {category.requiresApproval && (
                           <Badge className="mt-2 bg-salis-black text-white" data-testid={`badge-approval-${category.id}`}>
-                            Requires Approval
+                            {t('payments.expenses.requiresApproval', 'Requires Approval')}
                           </Badge>
                         )}
                       </div>
@@ -271,11 +273,11 @@ export default function ExpenseTracking() {
   return (
     <>
       <TabsPageLayout
-        title="Expense Tracking"
-        description="Manage business expenses, categories, and approvals"
+        title={t('payments.expenses.title', 'Expense Tracking')}
+        description={t('payments.expenses.description', 'Manage business expenses, categories, and approvals')}
         icon={DollarSign}
         primaryAction={{
-          label: "Create Expense",
+          label: t('payments.expenses.createExpense', 'Create Expense'),
           icon: Receipt,
           onClick: () => setIsExpenseDialogOpen(true),
           testId: "button-create-expense",
@@ -283,13 +285,13 @@ export default function ExpenseTracking() {
         tabs={[
           {
             id: "expenses",
-            label: "Expenses",
+            label: t('payments.expenses.expenses', 'Expenses'),
             icon: Receipt,
             content: expensesTab,
           },
           {
             id: "categories",
-            label: "Categories",
+            label: t('payments.expenses.categories', 'Categories'),
             icon: FolderPlus,
             content: categoriesTab,
           },
@@ -301,9 +303,9 @@ export default function ExpenseTracking() {
       <Dialog open={isCategoryDialogOpen} onOpenChange={setIsCategoryDialogOpen}>
         <DialogContent className="bg-white dark:bg-salis-black">
           <DialogHeader>
-            <DialogTitle className="font-montserrat text-salis-black dark:text-white">Create Expense Category</DialogTitle>
+            <DialogTitle className="font-montserrat text-salis-black dark:text-white">{t('payments.expenses.createExpenseCategory', 'Create Expense Category')}</DialogTitle>
             <DialogDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
-              Add a new expense category
+              {t('payments.expenses.addNewCategory', 'Add a new expense category')}
             </DialogDescription>
           </DialogHeader>
           <Form {...categoryForm}>
@@ -313,9 +315,9 @@ export default function ExpenseTracking() {
                 name="categoryName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Category Name</FormLabel>
+                    <FormLabel>{t('payments.expenses.categoryName', 'Category Name')}</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="Office Supplies" data-testid="input-category-name" />
+                      <Input {...field} placeholder={t('payments.expenses.categoryNamePlaceholder', 'Office Supplies')} data-testid="input-category-name" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -326,7 +328,7 @@ export default function ExpenseTracking() {
                 name="categoryCode"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Category Code</FormLabel>
+                    <FormLabel>{t('payments.expenses.categoryCode', 'Category Code')}</FormLabel>
                     <FormControl>
                       <Input {...field} placeholder="OS001" data-testid="input-category-code" />
                     </FormControl>
@@ -339,9 +341,9 @@ export default function ExpenseTracking() {
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Description</FormLabel>
+                    <FormLabel>{t('common.description', 'Description')}</FormLabel>
                     <FormControl>
-                      <Textarea {...field} placeholder="Category description..." data-testid="input-category-description" />
+                      <Textarea {...field} placeholder={t('payments.expenses.categoryDescriptionPlaceholder', 'Category description...')} data-testid="input-category-description" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -352,7 +354,7 @@ export default function ExpenseTracking() {
                 name="budgetLimit"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Budget Limit (optional)</FormLabel>
+                    <FormLabel>{t('payments.expenses.budgetLimitOptional', 'Budget Limit (optional)')}</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
@@ -368,7 +370,7 @@ export default function ExpenseTracking() {
               />
               <DialogFooter>
                 <Button type="submit" disabled={createCategoryMutation.isPending} data-testid="button-submit-category">
-                  {createCategoryMutation.isPending ? "Creating..." : "Create Category"}
+                  {createCategoryMutation.isPending ? t('common.creating', 'Creating...') : t('payments.expenses.createCategory', 'Create Category')}
                 </Button>
               </DialogFooter>
             </form>
@@ -379,9 +381,9 @@ export default function ExpenseTracking() {
       <Dialog open={isExpenseDialogOpen} onOpenChange={setIsExpenseDialogOpen}>
         <DialogContent className="bg-white dark:bg-salis-black">
           <DialogHeader>
-            <DialogTitle className="font-montserrat text-salis-black dark:text-white">Create Expense</DialogTitle>
+            <DialogTitle className="font-montserrat text-salis-black dark:text-white">{t('payments.expenses.createExpense', 'Create Expense')}</DialogTitle>
             <DialogDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
-              Record a new business expense
+              {t('payments.expenses.recordNewExpense', 'Record a new business expense')}
             </DialogDescription>
           </DialogHeader>
           <Form {...expenseForm}>
@@ -391,11 +393,11 @@ export default function ExpenseTracking() {
                 name="categoryId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Category</FormLabel>
+                    <FormLabel>{t('common.category', 'Category')}</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger data-testid="select-category">
-                          <SelectValue placeholder="Select category" />
+                          <SelectValue placeholder={t('payments.expenses.selectCategory', 'Select category')} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -415,9 +417,9 @@ export default function ExpenseTracking() {
                 name="vendorName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Vendor Name</FormLabel>
+                    <FormLabel>{t('payments.expenses.vendorName', 'Vendor Name')}</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="ABC Supplies Inc." data-testid="input-vendor-name" />
+                      <Input {...field} placeholder={t('payments.expenses.vendorPlaceholder', 'ABC Supplies Inc.')} data-testid="input-vendor-name" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -429,7 +431,7 @@ export default function ExpenseTracking() {
                   name="amount"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Amount</FormLabel>
+                      <FormLabel>{t('common.amount', 'Amount')}</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -448,7 +450,7 @@ export default function ExpenseTracking() {
                   name="expenseDate"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Date</FormLabel>
+                      <FormLabel>{t('common.date', 'Date')}</FormLabel>
                       <FormControl>
                         <Input {...field} type="date" data-testid="input-expense-date" />
                       </FormControl>
@@ -462,19 +464,19 @@ export default function ExpenseTracking() {
                 name="paymentMethod"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Payment Method</FormLabel>
+                    <FormLabel>{t('payments.paymentMethod', 'Payment Method')}</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger data-testid="select-payment-method">
-                          <SelectValue placeholder="Select payment method" />
+                          <SelectValue placeholder={t('payments.selectPaymentMethod', 'Select payment method')} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="cash">Cash</SelectItem>
-                        <SelectItem value="credit_card">Credit Card</SelectItem>
-                        <SelectItem value="debit_card">Debit Card</SelectItem>
-                        <SelectItem value="check">Check</SelectItem>
-                        <SelectItem value="wire_transfer">Wire Transfer</SelectItem>
+                        <SelectItem value="cash">{t('payments.methods.cash', 'Cash')}</SelectItem>
+                        <SelectItem value="credit_card">{t('payments.methods.creditCard', 'Credit Card')}</SelectItem>
+                        <SelectItem value="debit_card">{t('payments.methods.debitCard', 'Debit Card')}</SelectItem>
+                        <SelectItem value="check">{t('payments.methods.check', 'Check')}</SelectItem>
+                        <SelectItem value="wire_transfer">{t('payments.methods.wireTransfer', 'Wire Transfer')}</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -486,9 +488,9 @@ export default function ExpenseTracking() {
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Description (optional)</FormLabel>
+                    <FormLabel>{t('payments.expenses.descriptionOptional', 'Description (optional)')}</FormLabel>
                     <FormControl>
-                      <Textarea {...field} placeholder="Expense details..." data-testid="input-expense-description" />
+                      <Textarea {...field} placeholder={t('payments.expenses.expenseDetailsPlaceholder', 'Expense details...')} data-testid="input-expense-description" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -496,7 +498,7 @@ export default function ExpenseTracking() {
               />
               <DialogFooter>
                 <Button type="submit" disabled={createExpenseMutation.isPending} data-testid="button-submit-expense">
-                  {createExpenseMutation.isPending ? "Creating..." : "Create Expense"}
+                  {createExpenseMutation.isPending ? t('common.creating', 'Creating...') : t('payments.expenses.createExpense', 'Create Expense')}
                 </Button>
               </DialogFooter>
             </form>

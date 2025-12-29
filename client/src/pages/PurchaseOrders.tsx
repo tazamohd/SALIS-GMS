@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { ShoppingCart, Plus, Building2, Eye, Edit, Trash2, MoreVertical, CheckCircle, Send, XCircle, Package as PackageIcon } from "lucide-react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -30,6 +31,7 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { StandardTablePage } from "@/components/layouts";
 
 export function PurchaseOrders() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [selectedGarageId, setSelectedGarageId] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -69,16 +71,16 @@ export function PurchaseOrders() {
           (typeof query.queryKey[0] === 'string' && query.queryKey[0].startsWith('/api/purchase-orders'))
       });
       toast({
-        title: "Success",
-        description: "Purchase order deleted successfully",
+        title: t('common.success', 'Success'),
+        description: t('inventory.purchaseOrderDeleted', 'Purchase order deleted successfully'),
       });
       setDeleteConfirmOpen(false);
       setPoToDelete(null);
     },
     onError: (error: any) => {
       toast({
-        title: "Error",
-        description: error.message || "Failed to delete purchase order",
+        title: t('common.error', 'Error'),
+        description: error.message || t('inventory.failedToDeletePurchaseOrder', 'Failed to delete purchase order'),
         variant: "destructive",
       });
     },
@@ -96,14 +98,14 @@ export function PurchaseOrders() {
           (typeof query.queryKey[0] === 'string' && query.queryKey[0].startsWith('/api/purchase-orders'))
       });
       toast({
-        title: "Success",
-        description: "Purchase order status updated",
+        title: t('common.success', 'Success'),
+        description: t('inventory.purchaseOrderStatusUpdated', 'Purchase order status updated'),
       });
     },
     onError: (error: any) => {
       toast({
-        title: "Error",
-        description: error.message || "Failed to update status",
+        title: t('common.error', 'Error'),
+        description: error.message || t('inventory.failedToUpdateStatus', 'Failed to update status'),
         variant: "destructive",
       });
     },
@@ -138,7 +140,7 @@ export function PurchaseOrders() {
   const columns = [
     {
       key: "poNumber",
-      label: "PO Number",
+      label: t('inventory.poNumber', 'PO Number'),
       render: (po: PurchaseOrder) => (
         <span className="font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white">
           {po.poNumber}
@@ -147,7 +149,7 @@ export function PurchaseOrders() {
     },
     {
       key: "supplier",
-      label: "Supplier",
+      label: t('inventory.supplier', 'Supplier'),
       render: (po: PurchaseOrder) => (
         <span className="text-sm text-gray-700">
           {getSupplierName(po.supplierId)}
@@ -156,7 +158,7 @@ export function PurchaseOrders() {
     },
     {
       key: "orderDate",
-      label: "Order Date",
+      label: t('inventory.orderDate', 'Order Date'),
       render: (po: PurchaseOrder) => (
         <span className="text-sm text-gray-700">
           {new Date(po.orderDate).toLocaleDateString()}
@@ -165,7 +167,7 @@ export function PurchaseOrders() {
     },
     {
       key: "expectedDelivery",
-      label: "Expected Delivery",
+      label: t('inventory.expectedDelivery', 'Expected Delivery'),
       render: (po: PurchaseOrder) => (
         <span className="text-sm text-gray-700">
           {po.expectedDeliveryDate ? new Date(po.expectedDeliveryDate).toLocaleDateString() : 'N/A'}
@@ -174,7 +176,7 @@ export function PurchaseOrders() {
     },
     {
       key: "totalAmount",
-      label: "Total Amount",
+      label: t('inventory.totalAmount', 'Total Amount'),
       render: (po: PurchaseOrder) => (
         <span className="font-['Poppins',Helvetica] font-semibold text-sm text-gray-900 dark:text-white">
           ${parseFloat(po.totalAmount).toFixed(2)}
@@ -183,7 +185,7 @@ export function PurchaseOrders() {
     },
     {
       key: "status",
-      label: "Status",
+      label: t('common.status', 'Status'),
       render: (po: PurchaseOrder) => (
         <Badge className={`${getStatusColor(po.status)} capitalize`}>
           {po.status}
@@ -192,7 +194,7 @@ export function PurchaseOrders() {
     },
     {
       key: "actions",
-      label: "Actions",
+      label: t('common.actions', 'Actions'),
       render: (po: PurchaseOrder) => (
         <div className="flex items-center gap-2">
           <PurchaseOrderDetailsDialog
@@ -214,7 +216,7 @@ export function PurchaseOrders() {
                 <>
                   <DropdownMenuItem onClick={() => handleStatusChange(po, 'sent')}>
                     <Send className="w-4 h-4 mr-2" />
-                    Send to Supplier
+                    {t('inventory.sendToSupplier', 'Send to Supplier')}
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                 </>
@@ -223,7 +225,7 @@ export function PurchaseOrders() {
                 <>
                   <DropdownMenuItem onClick={() => handleStatusChange(po, 'confirmed')}>
                     <CheckCircle className="w-4 h-4 mr-2" />
-                    Mark as Confirmed
+                    {t('inventory.markAsConfirmed', 'Mark as Confirmed')}
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                 </>
@@ -232,11 +234,11 @@ export function PurchaseOrders() {
                 <>
                   <DropdownMenuItem onClick={() => handleStatusChange(po, 'partial')}>
                     <PackageIcon className="w-4 h-4 mr-2" />
-                    Mark as Partially Received
+                    {t('inventory.markAsPartiallyReceived', 'Mark as Partially Received')}
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => handleStatusChange(po, 'received')}>
                     <CheckCircle className="w-4 h-4 mr-2" />
-                    Mark as Fully Received
+                    {t('inventory.markAsFullyReceived', 'Mark as Fully Received')}
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                 </>
@@ -245,7 +247,7 @@ export function PurchaseOrders() {
                 <>
                   <DropdownMenuItem onClick={() => handleStatusChange(po, 'received')}>
                     <CheckCircle className="w-4 h-4 mr-2" />
-                    Mark as Fully Received
+                    {t('inventory.markAsFullyReceived', 'Mark as Fully Received')}
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                 </>
@@ -254,7 +256,7 @@ export function PurchaseOrders() {
                 <>
                   <DropdownMenuItem onClick={() => handleStatusChange(po, 'cancelled')}>
                     <XCircle className="w-4 h-4 mr-2" />
-                    Cancel Order
+                    {t('inventory.cancelOrder', 'Cancel Order')}
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                 </>
@@ -265,7 +267,7 @@ export function PurchaseOrders() {
                   className="text-gray-800 dark:text-gray-200"
                 >
                   <Trash2 className="w-4 h-4 mr-2" />
-                  Delete
+                  {t('common.delete', 'Delete')}
                 </DropdownMenuItem>
               )}
             </DropdownMenuContent>
@@ -281,7 +283,7 @@ export function PurchaseOrders() {
         <CardContent className="pt-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-900 dark:text-white/60">Total Orders</p>
+              <p className="text-sm text-gray-900 dark:text-white/60">{t('inventory.totalOrders', 'Total Orders')}</p>
               <p className="text-2xl font-bold text-gray-900">{purchaseOrders.length}</p>
             </div>
             <ShoppingCart className="w-8 h-8 text-gray-700" />
@@ -292,7 +294,7 @@ export function PurchaseOrders() {
         <CardContent className="pt-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-900 dark:text-white/60">Pending</p>
+              <p className="text-sm text-gray-900 dark:text-white/60">{t('common.pending', 'Pending')}</p>
               <p className="text-2xl font-bold text-gray-700">
                 {purchaseOrders.filter(po => ['draft', 'sent'].includes(po.status)).length}
               </p>
@@ -305,7 +307,7 @@ export function PurchaseOrders() {
         <CardContent className="pt-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-900 dark:text-white/60">Confirmed</p>
+              <p className="text-sm text-gray-900 dark:text-white/60">{t('inventory.confirmed', 'Confirmed')}</p>
               <p className="text-2xl font-bold text-gray-800">
                 {purchaseOrders.filter(po => po.status === 'confirmed').length}
               </p>
@@ -318,7 +320,7 @@ export function PurchaseOrders() {
         <CardContent className="pt-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-900 dark:text-white/60">Total Value</p>
+              <p className="text-sm text-gray-900 dark:text-white/60">{t('inventory.totalValue', 'Total Value')}</p>
               <p className="text-2xl font-bold text-gray-900">
                 ${purchaseOrders.reduce((sum, po) => sum + parseFloat(po.totalAmount), 0).toFixed(2)}
               </p>
@@ -338,8 +340,8 @@ export function PurchaseOrders() {
   return (
     <>
       <StandardTablePage
-        title="Purchase Orders"
-        description="Manage purchase orders and track supplier deliveries"
+        title={t('inventory.purchaseOrders', 'Purchase Orders')}
+        description={t('inventory.managePurchaseOrders', 'Manage purchase orders and track supplier deliveries')}
         icon={ShoppingCart}
         data={purchaseOrders ?? []}
         isLoading={isLoading}
@@ -353,29 +355,29 @@ export function PurchaseOrders() {
         filters={[
           {
             id: "garageId",
-            label: "Garage",
-            options: [{ label: "All Garages", value: "all" }, ...garageOptions],
+            label: t('inventory.garage', 'Garage'),
+            options: [{ label: t('inventory.allGarages', 'All Garages'), value: "all" }, ...garageOptions],
             defaultValue: "all",
           },
           {
             id: "status",
-            label: "Status",
+            label: t('common.status', 'Status'),
             options: [
-              { label: "All Status", value: "all" },
-              { label: "Draft", value: "draft" },
-              { label: "Sent", value: "sent" },
-              { label: "Confirmed", value: "confirmed" },
-              { label: "Partially Received", value: "partial" },
-              { label: "Fully Received", value: "received" },
-              { label: "Cancelled", value: "cancelled" },
+              { label: t('inventory.allStatus', 'All Status'), value: "all" },
+              { label: t('inventory.draft', 'Draft'), value: "draft" },
+              { label: t('inventory.sent', 'Sent'), value: "sent" },
+              { label: t('inventory.confirmed', 'Confirmed'), value: "confirmed" },
+              { label: t('inventory.partiallyReceived', 'Partially Received'), value: "partial" },
+              { label: t('inventory.fullyReceived', 'Fully Received'), value: "received" },
+              { label: t('inventory.cancelled', 'Cancelled'), value: "cancelled" },
             ],
             defaultValue: "all",
           },
         ]}
         emptyState={{
           icon: ShoppingCart,
-          title: "No Purchase Orders",
-          description: "Create your first purchase order to start managing inventory",
+          title: t('inventory.noPurchaseOrders', 'No Purchase Orders'),
+          description: t('inventory.createFirstPurchaseOrder', 'Create your first purchase order to start managing inventory'),
         }}
         additionalContent={summaryCards}
       />
@@ -383,18 +385,18 @@ export function PurchaseOrders() {
       <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Purchase Order</AlertDialogTitle>
+            <AlertDialogTitle>{t('inventory.deletePurchaseOrder', 'Delete Purchase Order')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete PO {poToDelete?.poNumber}? This action cannot be undone.
+              {t('inventory.confirmDeletePO', 'Are you sure you want to delete PO {{poNumber}}? This action cannot be undone.', { poNumber: poToDelete?.poNumber })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>{t('common.cancel', 'Cancel')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => poToDelete && deleteMutation.mutate(poToDelete.id)}
               className="bg-salis-black hover:bg-gray-800 dark:bg-white dark:hover:bg-gray-200"
             >
-              {deleteMutation.isPending ? "Deleting..." : "Delete"}
+              {deleteMutation.isPending ? t('common.deleting', 'Deleting...') : t('common.delete', 'Delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

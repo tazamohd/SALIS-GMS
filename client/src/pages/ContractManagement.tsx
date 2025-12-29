@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -28,6 +29,7 @@ const COLORS = {
 };
 
 export default function ContractManagement() {
+  const { t } = useTranslation();
   const [selectedContractId, setSelectedContractId] = useState<string | null>(null);
   const { toast } = useToast();
 
@@ -45,8 +47,8 @@ export default function ContractManagement() {
       apiRequest(`/api/contracts/${contractId}/trigger-renewal`, "POST"),
     onSuccess: () => {
       toast({
-        title: "Renewal Initiated",
-        description: "Contract renewal process has been started",
+        title: t('payments.contracts.renewalInitiated', 'Renewal Initiated'),
+        description: t('payments.contracts.renewalStarted', 'Contract renewal process has been started'),
       });
       queryClient.invalidateQueries({ queryKey: ["/api/contracts/enhanced"] });
     },
@@ -57,8 +59,8 @@ export default function ContractManagement() {
       apiRequest(`/api/contracts/${contractId}/accept-renewal`, "POST", { renewalId }),
     onSuccess: () => {
       toast({
-        title: "Renewal Accepted",
-        description: "Contract has been renewed successfully",
+        title: t('payments.contracts.renewalAccepted', 'Renewal Accepted'),
+        description: t('payments.contracts.renewedSuccess', 'Contract has been renewed successfully'),
       });
       queryClient.invalidateQueries({ queryKey: ["/api/contracts/enhanced"] });
     },
@@ -149,7 +151,7 @@ export default function ContractManagement() {
   if (contractsLoading) {
     return (
       <div className="flex items-center justify-center h-screen" data-testid="loading-contracts">
-        <div className="text-xl">Loading contracts...</div>
+        <div className="text-xl">{t('common.loading', 'Loading contracts...')}</div>
       </div>
     );
   }
@@ -159,20 +161,20 @@ export default function ContractManagement() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card data-testid="card-total-contracts">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Contracts</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('payments.contracts.totalContracts', 'Total Contracts')}</CardTitle>
             <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold" data-testid="text-total-contracts">{dashboardMetrics.totalContracts}</div>
             <p className="text-xs text-muted-foreground">
-              {dashboardMetrics.activeContracts} active
+              {dashboardMetrics.activeContracts} {t('payments.contracts.active', 'active')}
             </p>
           </CardContent>
         </Card>
 
         <Card data-testid="card-contract-value">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Contract Value</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('payments.contracts.totalContractValue', 'Total Contract Value')}</CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -180,14 +182,14 @@ export default function ContractManagement() {
               ${dashboardMetrics.totalValue.toLocaleString()}
             </div>
             <p className="text-xs text-muted-foreground">
-              ${dashboardMetrics.totalUtilized.toLocaleString()} utilized
+              ${dashboardMetrics.totalUtilized.toLocaleString()} {t('payments.contracts.utilized', 'utilized')}
             </p>
           </CardContent>
         </Card>
 
         <Card data-testid="card-avg-utilization">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Avg Utilization</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('payments.contracts.avgUtilization', 'Avg Utilization')}</CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -200,7 +202,7 @@ export default function ContractManagement() {
 
         <Card data-testid="card-sla-compliance">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">SLA Compliance</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('payments.contracts.slaCompliance', 'SLA Compliance')}</CardTitle>
             <CheckCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -208,7 +210,7 @@ export default function ContractManagement() {
               {dashboardMetrics.slaCompliance.toFixed(1)}%
             </div>
             <p className="text-xs text-muted-foreground">
-              {dashboardMetrics.totalBreach} breaches
+              {dashboardMetrics.totalBreach} {t('payments.contracts.breaches', 'breaches')}
             </p>
           </CardContent>
         </Card>
@@ -219,20 +221,20 @@ export default function ContractManagement() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <AlertTriangle className="h-5 w-5 text-orange-500" />
-              Contracts Requiring Attention
+              {t('payments.contracts.contractsRequiringAttention', 'Contracts Requiring Attention')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
               <p className="text-sm">
-                {dashboardMetrics.expiringContracts} contracts expiring within renewal notice period
+                {dashboardMetrics.expiringContracts} {t('payments.contracts.contractsExpiringWithin', 'contracts expiring within renewal notice period')}
               </p>
               <div className="space-y-1">
                 {expiringContractsData.slice(0, 5).map((contract) => (
                   <div key={contract.id} className="flex justify-between items-center text-sm" data-testid={`contract-expiring-${contract.id}`}>
                     <span className="font-medium">{contract.contractNumber}</span>
                     <span className="text-muted-foreground">
-                      {contract.daysUntilExpiry} days remaining
+                      {contract.daysUntilExpiry} {t('payments.contracts.daysRemaining', 'days remaining')}
                     </span>
                     <Button 
                       size="sm" 
@@ -242,7 +244,7 @@ export default function ContractManagement() {
                       data-testid={`button-trigger-renewal-${contract.id}`}
                     >
                       <RefreshCcw className="h-3 w-3 mr-1" />
-                      Initiate Renewal
+                      {t('payments.contracts.initiateRenewal', 'Initiate Renewal')}
                     </Button>
                   </div>
                 ))}

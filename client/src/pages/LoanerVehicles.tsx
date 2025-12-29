@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslation } from "react-i18next";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import {
@@ -100,6 +101,7 @@ type LoanerVehicleFormData = z.input<typeof loanerVehicleFormSchema>;
 type LoanerReservationFormData = z.input<typeof loanerReservationFormSchema>;
 
 export default function LoanerVehicles() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const { user } = useAuth();
   const [selectedTab, setSelectedTab] = useState("fleet");
@@ -188,14 +190,14 @@ export default function LoanerVehicles() {
       setEditingLoanerId(null);
       loanerForm.reset();
       toast({
-        title: editingLoanerId ? "Loaner Vehicle Updated" : "Loaner Vehicle Created",
-        description: "Changes saved successfully",
+        title: editingLoanerId ? t('vehicles.loanerVehicleUpdated', 'Loaner Vehicle Updated') : t('vehicles.loanerVehicleCreated', 'Loaner Vehicle Created'),
+        description: t('vehicles.changesSavedSuccessfully', 'Changes saved successfully'),
       });
     },
     onError: () => {
       toast({
-        title: "Error",
-        description: "Failed to save loaner vehicle",
+        title: t('common.error', 'Error'),
+        description: t('vehicles.failedToSaveLoanerVehicle', 'Failed to save loaner vehicle'),
         variant: "destructive",
       });
     },
@@ -215,14 +217,14 @@ export default function LoanerVehicles() {
       setEditingReservationId(null);
       reservationForm.reset();
       toast({
-        title: editingReservationId ? "Reservation Updated" : "Reservation Created",
-        description: "Changes saved successfully",
+        title: editingReservationId ? t('vehicles.reservationUpdated', 'Reservation Updated') : t('vehicles.reservationCreated', 'Reservation Created'),
+        description: t('vehicles.changesSavedSuccessfully', 'Changes saved successfully'),
       });
     },
     onError: () => {
       toast({
-        title: "Error",
-        description: "Failed to save reservation",
+        title: t('common.error', 'Error'),
+        description: t('vehicles.failedToSaveReservation', 'Failed to save reservation'),
         variant: "destructive",
       });
     },
@@ -232,7 +234,7 @@ export default function LoanerVehicles() {
     mutationFn: (id: string) => apiRequest("DELETE", `/api/loaner-vehicles/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/loaner-vehicles"] });
-      toast({ title: "Loaner Vehicle Deleted", description: "Loaner vehicle removed successfully" });
+      toast({ title: t('vehicles.loanerVehicleDeleted', 'Loaner Vehicle Deleted'), description: t('vehicles.loanerVehicleRemovedSuccessfully', 'Loaner vehicle removed successfully') });
     },
   });
 
@@ -240,7 +242,7 @@ export default function LoanerVehicles() {
     mutationFn: (id: string) => apiRequest("DELETE", `/api/loaner-reservations/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/loaner-reservations"] });
-      toast({ title: "Reservation Deleted", description: "Reservation removed successfully" });
+      toast({ title: t('vehicles.reservationDeleted', 'Reservation Deleted'), description: t('vehicles.reservationRemovedSuccessfully', 'Reservation removed successfully') });
     },
   });
 
@@ -359,28 +361,28 @@ export default function LoanerVehicles() {
           data-testid="button-create-loaner"
         >
           <Plus className="w-4 h-4 mr-2" />
-          Add Loaner Vehicle
+          {t('vehicles.addLoanerVehicle', 'Add Loaner Vehicle')}
         </Button>
       </div>
 
       {loanersLoading ? (
-        <div className="text-center py-8 text-gray-400 dark:text-gray-400">Loading loaner vehicles...</div>
+        <div className="text-center py-8 text-gray-400 dark:text-gray-400">{t('vehicles.loadingLoanerVehicles', 'Loading loaner vehicles...')}</div>
       ) : loanerVehicles.length === 0 ? (
-        <div className="text-center py-8 text-gray-400 dark:text-gray-400">No loaner vehicles found</div>
+        <div className="text-center py-8 text-gray-400 dark:text-gray-400">{t('vehicles.noLoanerVehiclesFound', 'No loaner vehicles found')}</div>
       ) : (
         <div className="border border-gray-200 dark:border-salis-gray-light rounded-lg overflow-hidden">
           <Table>
             <TableHeader>
               <TableRow className="hover:bg-gray-50 dark:hover:bg-salis-gray border-b border-gray-200 dark:border-salis-gray-light">
-                <TableHead className="text-gray-900 dark:text-white">Loaner #</TableHead>
-                <TableHead className="text-gray-900 dark:text-white">Make/Model/Year</TableHead>
-                <TableHead className="text-gray-900 dark:text-white">License Plate</TableHead>
-                <TableHead className="text-gray-900 dark:text-white">Condition</TableHead>
-                <TableHead className="text-gray-900 dark:text-white">Status</TableHead>
-                <TableHead className="text-gray-900 dark:text-white">Daily Rate</TableHead>
-                <TableHead className="text-gray-900 dark:text-white">Deposit</TableHead>
-                <TableHead className="text-gray-900 dark:text-white">Last Service</TableHead>
-                <TableHead className="text-gray-900 dark:text-white">Actions</TableHead>
+                <TableHead className="text-gray-900 dark:text-white">{t('vehicles.loanerNumber', 'Loaner #')}</TableHead>
+                <TableHead className="text-gray-900 dark:text-white">{t('vehicles.makeModelYear', 'Make/Model/Year')}</TableHead>
+                <TableHead className="text-gray-900 dark:text-white">{t('vehicles.licensePlate', 'License Plate')}</TableHead>
+                <TableHead className="text-gray-900 dark:text-white">{t('vehicles.condition', 'Condition')}</TableHead>
+                <TableHead className="text-gray-900 dark:text-white">{t('common.status', 'Status')}</TableHead>
+                <TableHead className="text-gray-900 dark:text-white">{t('vehicles.dailyRate', 'Daily Rate')}</TableHead>
+                <TableHead className="text-gray-900 dark:text-white">{t('vehicles.deposit', 'Deposit')}</TableHead>
+                <TableHead className="text-gray-900 dark:text-white">{t('vehicles.lastService', 'Last Service')}</TableHead>
+                <TableHead className="text-gray-900 dark:text-white">{t('common.actions', 'Actions')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -390,11 +392,11 @@ export default function LoanerVehicles() {
                   data-testid={`row-loaner-${loaner.id}`}
                   className="hover:bg-gray-50 dark:hover:bg-salis-gray border-b border-gray-200 dark:border-salis-gray-light"
                 >
-                  <TableCell className="text-gray-900 dark:text-white">{loaner.loanerNumber ?? "N/A"}</TableCell>
+                  <TableCell className="text-gray-900 dark:text-white">{loaner.loanerNumber ?? t('common.notAvailable', 'N/A')}</TableCell>
                   <TableCell className="text-gray-900 dark:text-white">
                     {loaner.make} {loaner.model} {loaner.year}
                   </TableCell>
-                  <TableCell className="text-gray-900 dark:text-white">{loaner.licensePlate ?? "N/A"}</TableCell>
+                  <TableCell className="text-gray-900 dark:text-white">{loaner.licensePlate ?? t('common.notAvailable', 'N/A')}</TableCell>
                   <TableCell>
                     {getConditionBadge(loaner.condition ?? "good", loaner.id)}
                   </TableCell>
@@ -406,7 +408,7 @@ export default function LoanerVehicles() {
                   <TableCell className="text-gray-900 dark:text-white">
                     {loaner.lastServiceDate
                       ? format(new Date(loaner.lastServiceDate), "MMM dd, yyyy")
-                      : "N/A"}
+                      : t('common.notAvailable', 'N/A')}
                   </TableCell>
                   <TableCell>
                     <div className="flex gap-2">
@@ -450,29 +452,29 @@ export default function LoanerVehicles() {
           data-testid="button-create-reservation"
         >
           <Plus className="w-4 h-4 mr-2" />
-          Create Reservation
+          {t('vehicles.createReservation', 'Create Reservation')}
         </Button>
       </div>
 
       {reservationsLoading ? (
-        <div className="text-center py-8 text-gray-400 dark:text-gray-400">Loading reservations...</div>
+        <div className="text-center py-8 text-gray-400 dark:text-gray-400">{t('vehicles.loadingReservations', 'Loading reservations...')}</div>
       ) : reservations.length === 0 ? (
-        <div className="text-center py-8 text-gray-400 dark:text-gray-400">No reservations found</div>
+        <div className="text-center py-8 text-gray-400 dark:text-gray-400">{t('vehicles.noReservationsFound', 'No reservations found')}</div>
       ) : (
         <div className="border border-gray-200 dark:border-salis-gray-light rounded-lg overflow-hidden">
           <Table>
             <TableHeader>
               <TableRow className="hover:bg-gray-50 dark:hover:bg-salis-gray border-b border-gray-200 dark:border-salis-gray-light">
-                <TableHead className="text-gray-900 dark:text-white">Reservation #</TableHead>
-                <TableHead className="text-gray-900 dark:text-white">Loaner Vehicle</TableHead>
-                <TableHead className="text-gray-900 dark:text-white">Customer</TableHead>
-                <TableHead className="text-gray-900 dark:text-white">Start Date</TableHead>
-                <TableHead className="text-gray-900 dark:text-white">End Date</TableHead>
-                <TableHead className="text-gray-900 dark:text-white">Status</TableHead>
-                <TableHead className="text-gray-900 dark:text-white">Deposit Paid</TableHead>
-                <TableHead className="text-gray-900 dark:text-white">Total Cost</TableHead>
-                <TableHead className="text-gray-900 dark:text-white">Damage Reported</TableHead>
-                <TableHead className="text-gray-900 dark:text-white">Actions</TableHead>
+                <TableHead className="text-gray-900 dark:text-white">{t('vehicles.reservationNumber', 'Reservation #')}</TableHead>
+                <TableHead className="text-gray-900 dark:text-white">{t('vehicles.loanerVehicle', 'Loaner Vehicle')}</TableHead>
+                <TableHead className="text-gray-900 dark:text-white">{t('vehicles.customer', 'Customer')}</TableHead>
+                <TableHead className="text-gray-900 dark:text-white">{t('vehicles.startDate', 'Start Date')}</TableHead>
+                <TableHead className="text-gray-900 dark:text-white">{t('vehicles.endDate', 'End Date')}</TableHead>
+                <TableHead className="text-gray-900 dark:text-white">{t('common.status', 'Status')}</TableHead>
+                <TableHead className="text-gray-900 dark:text-white">{t('vehicles.depositPaid', 'Deposit Paid')}</TableHead>
+                <TableHead className="text-gray-900 dark:text-white">{t('vehicles.totalCost', 'Total Cost')}</TableHead>
+                <TableHead className="text-gray-900 dark:text-white">{t('vehicles.damageReported', 'Damage Reported')}</TableHead>
+                <TableHead className="text-gray-900 dark:text-white">{t('common.actions', 'Actions')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -485,20 +487,20 @@ export default function LoanerVehicles() {
                     data-testid={`row-reservation-${reservation.id}`}
                     className="hover:bg-gray-50 dark:hover:bg-salis-gray border-b border-gray-200 dark:border-salis-gray-light"
                   >
-                    <TableCell className="text-gray-900 dark:text-white">{reservation.reservationNumber ?? "N/A"}</TableCell>
+                    <TableCell className="text-gray-900 dark:text-white">{reservation.reservationNumber ?? t('common.notAvailable', 'N/A')}</TableCell>
                     <TableCell className="text-gray-900 dark:text-white">
-                      {loaner ? `${loaner.make} ${loaner.model}` : "N/A"}
+                      {loaner ? `${loaner.make} ${loaner.model}` : t('common.notAvailable', 'N/A')}
                     </TableCell>
-                    <TableCell className="text-gray-900 dark:text-white">{customer?.fullName ?? "N/A"}</TableCell>
+                    <TableCell className="text-gray-900 dark:text-white">{customer?.fullName ?? t('common.notAvailable', 'N/A')}</TableCell>
                     <TableCell className="text-gray-900 dark:text-white">
                       {reservation.startDate
                         ? format(new Date(reservation.startDate), "MMM dd, yyyy")
-                        : "N/A"}
+                        : t('common.notAvailable', 'N/A')}
                     </TableCell>
                     <TableCell className="text-gray-900 dark:text-white">
                       {reservation.endDate
                         ? format(new Date(reservation.endDate), "MMM dd, yyyy")
-                        : "N/A"}
+                        : t('common.notAvailable', 'N/A')}
                     </TableCell>
                     <TableCell>
                       {getReservationStatusBadge(reservation.status ?? "reserved", reservation.id)}
@@ -507,9 +509,9 @@ export default function LoanerVehicles() {
                     <TableCell className="text-gray-900 dark:text-white">${reservation.totalCost ?? "0.00"}</TableCell>
                     <TableCell>
                       {reservation.damageReported ? (
-                        <Badge variant="destructive">Yes</Badge>
+                        <Badge variant="destructive">{t('common.yes', 'Yes')}</Badge>
                       ) : (
-                        <Badge variant="outline">No</Badge>
+                        <Badge variant="outline">{t('common.no', 'No')}</Badge>
                       )}
                     </TableCell>
                     <TableCell>
@@ -545,19 +547,19 @@ export default function LoanerVehicles() {
   return (
     <>
       <TabsPageLayout
-        title="Loaner Vehicle Management"
-        description="Manage loaner fleet and reservations"
+        title={t('vehicles.loanerVehicleManagement', 'Loaner Vehicle Management')}
+        description={t('vehicles.manageLoanerFleetAndReservations', 'Manage loaner fleet and reservations')}
         icon={Car}
         tabs={[
           {
             id: "fleet",
-            label: "Loaner Fleet",
+            label: t('vehicles.loanerFleet', 'Loaner Fleet'),
             icon: Car,
             content: fleetContent,
           },
           {
             id: "reservations",
-            label: "Reservations",
+            label: t('vehicles.reservations', 'Reservations'),
             icon: Key,
             content: reservationsContent,
           },
@@ -567,439 +569,104 @@ export default function LoanerVehicles() {
       />
 
       <Dialog open={isLoanerDialogOpen} onOpenChange={setIsLoanerDialogOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white dark:bg-salis-gray text-gray-900 dark:text-white border-gray-200 dark:border-salis-gray-light">
+        <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>
-            <DialogTitle>{editingLoanerId ? "Edit" : "Create"} Loaner Vehicle</DialogTitle>
-            <DialogDescription className="text-gray-600 dark:text-gray-400">
-              {editingLoanerId ? "Update loaner vehicle details" : "Add a new loaner vehicle to the fleet"}
-            </DialogDescription>
+            <DialogTitle>
+              {editingLoanerId ? t('vehicles.editLoanerVehicle', 'Edit Loaner Vehicle') : t('vehicles.addLoanerVehicle', 'Add Loaner Vehicle')}
+            </DialogTitle>
           </DialogHeader>
-
           <Form {...loanerForm}>
             <form onSubmit={loanerForm.handleSubmit((data) => loanerMutation.mutate(data))} className="space-y-4">
-              <FormField
-                control={loanerForm.control}
-                name="loanerNumber"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Loaner Number</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        value={field.value ?? ""}
-                        placeholder="LON-001"
-                        data-testid="input-loaner-number"
-                        className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-light text-gray-900 dark:text-white"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
               <div className="grid grid-cols-2 gap-4">
                 <FormField
                   control={loanerForm.control}
                   name="make"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Make</FormLabel>
+                      <FormLabel>{t('vehicles.make', 'Make')}</FormLabel>
                       <FormControl>
-                        <Input
-                          {...field}
-                          value={field.value ?? ""}
-                          placeholder="Toyota"
-                          data-testid="input-make"
-                          className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-light text-gray-900 dark:text-white"
-                        />
+                        <Input {...field} data-testid="input-make" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-
                 <FormField
                   control={loanerForm.control}
                   name="model"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Model</FormLabel>
+                      <FormLabel>{t('vehicles.model', 'Model')}</FormLabel>
                       <FormControl>
-                        <Input
-                          {...field}
-                          value={field.value ?? ""}
-                          placeholder="Camry"
-                          data-testid="input-model"
-                          className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-light text-gray-900 dark:text-white"
-                        />
+                        <Input {...field} data-testid="input-model" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
               </div>
-
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-2 gap-4">
                 <FormField
                   control={loanerForm.control}
                   name="year"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Year</FormLabel>
+                      <FormLabel>{t('vehicles.year', 'Year')}</FormLabel>
                       <FormControl>
-                        <Input
-                          {...field}
-                          value={field.value ?? ""}
-                          type="number"
-                          placeholder="2023"
-                          data-testid="input-year"
-                          className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-light text-gray-900 dark:text-white"
-                        />
+                        <Input {...field} type="number" data-testid="input-year" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-
-                <FormField
-                  control={loanerForm.control}
-                  name="color"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Color</FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          value={field.value ?? ""}
-                          placeholder="Silver"
-                          data-testid="input-color"
-                          className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-light text-gray-900 dark:text-white"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={loanerForm.control}
-                  name="currentMileage"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Current Mileage</FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          value={field.value ?? ""}
-                          type="number"
-                          placeholder="15000"
-                          data-testid="input-current-mileage"
-                          className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-light text-gray-900 dark:text-white"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
                 <FormField
                   control={loanerForm.control}
                   name="licensePlate"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>License Plate</FormLabel>
+                      <FormLabel>{t('vehicles.licensePlate', 'License Plate')}</FormLabel>
                       <FormControl>
-                        <Input
-                          {...field}
-                          value={field.value ?? ""}
-                          placeholder="ABC-123"
-                          data-testid="input-license-plate"
-                          className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-light text-gray-900 dark:text-white"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={loanerForm.control}
-                  name="vin"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>VIN</FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          value={field.value ?? ""}
-                          placeholder="1HGBH41JXMN109186"
-                          data-testid="input-vin"
-                          className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-light text-gray-900 dark:text-white"
-                        />
+                        <Input {...field} value={field.value ?? ""} data-testid="input-license" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
               </div>
-
               <div className="grid grid-cols-2 gap-4">
                 <FormField
                   control={loanerForm.control}
                   name="dailyRate"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Daily Rate ($)</FormLabel>
+                      <FormLabel>{t('vehicles.dailyRate', 'Daily Rate')}</FormLabel>
                       <FormControl>
-                        <Input
-                          {...field}
-                          value={field.value ?? ""}
-                          type="number"
-                          step="0.01"
-                          placeholder="35.00"
-                          data-testid="input-daily-rate"
-                          className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-light text-gray-900 dark:text-white"
-                        />
+                        <Input {...field} type="number" step="0.01" data-testid="input-daily-rate" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-
                 <FormField
                   control={loanerForm.control}
                   name="depositAmount"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Deposit Amount ($)</FormLabel>
+                      <FormLabel>{t('vehicles.depositAmount', 'Deposit Amount')}</FormLabel>
                       <FormControl>
-                        <Input
-                          {...field}
-                          value={field.value ?? ""}
-                          type="number"
-                          step="0.01"
-                          placeholder="250.00"
-                          data-testid="input-deposit-amount"
-                          className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-light text-gray-900 dark:text-white"
-                        />
+                        <Input {...field} type="number" step="0.01" data-testid="input-deposit" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
               </div>
-
-              <FormField
-                control={loanerForm.control}
-                name="insuranceCoverage"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Insurance Coverage</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        value={field.value ?? ""}
-                        placeholder="Full coverage details"
-                        data-testid="input-insurance-coverage"
-                        className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-light text-gray-900 dark:text-white"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={loanerForm.control}
-                  name="status"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Status</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value ?? ""}>
-                        <FormControl>
-                          <SelectTrigger data-testid="select-loaner-status" className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-light text-gray-900 dark:text-white">
-                            <SelectValue placeholder="Select status" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent className="bg-white dark:bg-salis-gray text-gray-900 dark:text-white border-gray-200 dark:border-salis-gray-light">
-                          <SelectItem value="available">Available</SelectItem>
-                          <SelectItem value="reserved">Reserved</SelectItem>
-                          <SelectItem value="on_loan">On Loan</SelectItem>
-                          <SelectItem value="maintenance">Maintenance</SelectItem>
-                          <SelectItem value="retired">Retired</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={loanerForm.control}
-                  name="condition"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Condition</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value ?? ""}>
-                        <FormControl>
-                          <SelectTrigger data-testid="select-condition" className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-light text-gray-900 dark:text-white">
-                            <SelectValue placeholder="Select condition" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent className="bg-white dark:bg-salis-gray text-gray-900 dark:text-white border-gray-200 dark:border-salis-gray-light">
-                          <SelectItem value="excellent">Excellent</SelectItem>
-                          <SelectItem value="good">Good</SelectItem>
-                          <SelectItem value="fair">Fair</SelectItem>
-                          <SelectItem value="poor">Poor</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={loanerForm.control}
-                  name="lastServiceDate"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Last Service Date</FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          value={field.value ?? ""}
-                          type="date"
-                          data-testid="input-last-service-date"
-                          className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-light text-gray-900 dark:text-white"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={loanerForm.control}
-                  name="nextServiceDue"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Next Service Due (Mileage)</FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          value={field.value ?? ""}
-                          type="number"
-                          placeholder="20000"
-                          data-testid="input-next-service-due"
-                          className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-light text-gray-900 dark:text-white"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <FormField
-                control={loanerForm.control}
-                name="features"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Features (JSON array or comma-separated)</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        {...field}
-                        value={field.value ?? ""}
-                        placeholder='["GPS", "Bluetooth"] or GPS, Bluetooth, Backup Camera'
-                        data-testid="textarea-features"
-                        className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-light text-gray-900 dark:text-white"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={loanerForm.control}
-                name="restrictions"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Restrictions</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        {...field}
-                        value={field.value ?? ""}
-                        placeholder="Any restrictions or requirements"
-                        data-testid="textarea-restrictions"
-                        className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-light text-gray-900 dark:text-white"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={loanerForm.control}
-                name="notes"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Notes</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        {...field}
-                        value={field.value ?? ""}
-                        data-testid="textarea-loaner-notes"
-                        className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-light text-gray-900 dark:text-white"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={loanerForm.control}
-                name="isActive"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                    <FormControl>
-                      <Checkbox
-                        checked={field.value ?? true}
-                        onCheckedChange={field.onChange}
-                        data-testid="checkbox-is-active"
-                      />
-                    </FormControl>
-                    <div className="space-y-1 leading-none">
-                      <FormLabel>Is Active</FormLabel>
-                    </div>
-                  </FormItem>
-                )}
-              />
-
               <DialogFooter>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setIsLoanerDialogOpen(false)}
-                  className="border-gray-200 dark:border-salis-gray-light"
-                  data-testid="button-cancel-loaner"
-                >
-                  Cancel
+                <Button type="button" variant="outline" onClick={() => setIsLoanerDialogOpen(false)}>
+                  {t('common.cancel', 'Cancel')}
                 </Button>
-                <Button
-                  type="submit"
-                  disabled={loanerMutation.isPending}
-                  className="bg-salis-blue hover:bg-salis-blue/90 dark:bg-salis-blue dark:hover:bg-salis-blue/90"
-                  data-testid="button-save-loaner"
-                >
-                  {loanerMutation.isPending ? "Saving..." : editingLoanerId ? "Update" : "Create"}
+                <Button type="submit" disabled={loanerMutation.isPending}>
+                  {loanerMutation.isPending ? t('common.saving', 'Saving...') : t('common.save', 'Save')}
                 </Button>
               </DialogFooter>
             </form>
@@ -1008,473 +675,72 @@ export default function LoanerVehicles() {
       </Dialog>
 
       <Dialog open={isReservationDialogOpen} onOpenChange={setIsReservationDialogOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white dark:bg-salis-gray text-gray-900 dark:text-white border-gray-200 dark:border-salis-gray-light">
+        <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>
-            <DialogTitle>{editingReservationId ? "Edit" : "Create"} Reservation</DialogTitle>
-            <DialogDescription className="text-gray-600 dark:text-gray-400">
-              {editingReservationId ? "Update reservation details" : "Create a new loaner reservation"}
-            </DialogDescription>
+            <DialogTitle>
+              {editingReservationId ? t('vehicles.editReservation', 'Edit Reservation') : t('vehicles.createReservation', 'Create Reservation')}
+            </DialogTitle>
           </DialogHeader>
-
           <Form {...reservationForm}>
             <form onSubmit={reservationForm.handleSubmit((data) => reservationMutation.mutate(data))} className="space-y-4">
               <FormField
                 control={reservationForm.control}
-                name="reservationNumber"
+                name="loanerVehicleId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Reservation Number</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        value={field.value ?? ""}
-                        placeholder="Auto-generated if empty"
-                        data-testid="input-reservation-number"
-                        className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-light text-gray-900 dark:text-white"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={reservationForm.control}
-                  name="loanerVehicleId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Loaner Vehicle</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value ?? ""}>
-                        <FormControl>
-                          <SelectTrigger data-testid="select-loaner-vehicle" className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-light text-gray-900 dark:text-white">
-                            <SelectValue placeholder="Select loaner vehicle" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent className="bg-white dark:bg-salis-gray text-gray-900 dark:text-white border-gray-200 dark:border-salis-gray-light">
-                          {loanerVehicles.map((loaner) => (
-                            <SelectItem key={loaner.id} value={loaner.id}>
-                              {loaner.make} {loaner.model} {loaner.year} - {loaner.loanerNumber ?? "No #"}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={reservationForm.control}
-                  name="customerId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Customer</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value ?? ""}>
-                        <FormControl>
-                          <SelectTrigger data-testid="select-customer" className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-light text-gray-900 dark:text-white">
-                            <SelectValue placeholder="Select customer" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent className="bg-white dark:bg-salis-gray text-gray-900 dark:text-white border-gray-200 dark:border-salis-gray-light">
-                          {customers.map((customer) => (
-                            <SelectItem key={customer.id} value={customer.id}>
-                              {customer.fullName ?? customer.email}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <FormField
-                control={reservationForm.control}
-                name="jobCardId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Job Card ID (Optional)</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        value={field.value ?? ""}
-                        placeholder="UUID of related job card"
-                        data-testid="input-job-card-id"
-                        className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-light text-gray-900 dark:text-white"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={reservationForm.control}
-                  name="startDate"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Start Date</FormLabel>
+                    <FormLabel>{t('vehicles.loanerVehicle', 'Loaner Vehicle')}</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
-                        <Input
-                          {...field}
-                          value={field.value ?? ""}
-                          type="datetime-local"
-                          data-testid="input-start-date"
-                          className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-light text-gray-900 dark:text-white"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={reservationForm.control}
-                  name="endDate"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>End Date</FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          value={field.value ?? ""}
-                          type="datetime-local"
-                          data-testid="input-end-date"
-                          className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-light text-gray-900 dark:text-white"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <FormField
-                control={reservationForm.control}
-                name="actualReturnDate"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Actual Return Date (Optional)</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        value={field.value ?? ""}
-                        type="datetime-local"
-                        data-testid="input-actual-return-date"
-                        className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-light text-gray-900 dark:text-white"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={reservationForm.control}
-                  name="startMileage"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Start Mileage</FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          value={field.value ?? ""}
-                          type="number"
-                          data-testid="input-start-mileage"
-                          className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-light text-gray-900 dark:text-white"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={reservationForm.control}
-                  name="endMileage"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>End Mileage (Optional)</FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          value={field.value ?? ""}
-                          type="number"
-                          data-testid="input-end-mileage"
-                          className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-light text-gray-900 dark:text-white"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={reservationForm.control}
-                  name="startFuelLevel"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Start Fuel Level</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value ?? ""}>
-                        <FormControl>
-                          <SelectTrigger data-testid="select-start-fuel-level" className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-light text-gray-900 dark:text-white">
-                            <SelectValue placeholder="Select fuel level" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent className="bg-white dark:bg-salis-gray text-gray-900 dark:text-white border-gray-200 dark:border-salis-gray-light">
-                          <SelectItem value="empty">Empty</SelectItem>
-                          <SelectItem value="quarter">Quarter</SelectItem>
-                          <SelectItem value="half">Half</SelectItem>
-                          <SelectItem value="three_quarters">Three Quarters</SelectItem>
-                          <SelectItem value="full">Full</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={reservationForm.control}
-                  name="endFuelLevel"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>End Fuel Level (Optional)</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value ?? ""}>
-                        <FormControl>
-                          <SelectTrigger data-testid="select-end-fuel-level" className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-light text-gray-900 dark:text-white">
-                            <SelectValue placeholder="Select fuel level" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent className="bg-white dark:bg-salis-gray text-gray-900 dark:text-white border-gray-200 dark:border-salis-gray-light">
-                          <SelectItem value="empty">Empty</SelectItem>
-                          <SelectItem value="quarter">Quarter</SelectItem>
-                          <SelectItem value="half">Half</SelectItem>
-                          <SelectItem value="three_quarters">Three Quarters</SelectItem>
-                          <SelectItem value="full">Full</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <div className="grid grid-cols-3 gap-4">
-                <FormField
-                  control={reservationForm.control}
-                  name="depositPaid"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Deposit Paid</FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          value={field.value ?? ""}
-                          type="number"
-                          step="0.01"
-                          data-testid="input-deposit-paid"
-                          className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-light text-gray-900 dark:text-white"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={reservationForm.control}
-                  name="depositRefunded"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Deposit Refunded (Optional)</FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          value={field.value ?? ""}
-                          type="number"
-                          step="0.01"
-                          data-testid="input-deposit-refunded"
-                          className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-light text-gray-900 dark:text-white"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={reservationForm.control}
-                  name="totalCost"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Total Cost</FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          value={field.value ?? ""}
-                          type="number"
-                          step="0.01"
-                          data-testid="input-total-cost"
-                          className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-light text-gray-900 dark:text-white"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <FormField
-                control={reservationForm.control}
-                name="damageReported"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                    <FormControl>
-                      <Checkbox
-                        checked={field.value ?? false}
-                        onCheckedChange={field.onChange}
-                        data-testid="checkbox-damage-reported"
-                      />
-                    </FormControl>
-                    <div className="space-y-1 leading-none">
-                      <FormLabel>Damage Reported</FormLabel>
-                    </div>
-                  </FormItem>
-                )}
-              />
-
-              {reservationForm.watch("damageReported") && (
-                <>
-                  <FormField
-                    control={reservationForm.control}
-                    name="damageDescription"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Damage Description</FormLabel>
-                        <FormControl>
-                          <Textarea
-                            {...field}
-                            value={field.value ?? ""}
-                            data-testid="textarea-damage-description"
-                            className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-light text-gray-900 dark:text-white"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={reservationForm.control}
-                    name="damagePhotos"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Damage Photos (JSON array URLs)</FormLabel>
-                        <FormControl>
-                          <Textarea
-                            {...field}
-                            value={field.value ?? ""}
-                            placeholder='["https://example.com/photo1.jpg"] or comma-separated URLs'
-                            data-testid="textarea-damage-photos"
-                            className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-light text-gray-900 dark:text-white"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={reservationForm.control}
-                    name="damageCharge"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Damage Charge (Optional)</FormLabel>
-                        <FormControl>
-                          <Input
-                            {...field}
-                            value={field.value ?? ""}
-                            type="number"
-                            step="0.01"
-                            data-testid="input-damage-charge"
-                            className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-light text-gray-900 dark:text-white"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </>
-              )}
-
-              <FormField
-                control={reservationForm.control}
-                name="status"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Status</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value ?? ""}>
-                      <FormControl>
-                        <SelectTrigger data-testid="select-reservation-status" className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-light text-gray-900 dark:text-white">
-                          <SelectValue placeholder="Select status" />
+                        <SelectTrigger data-testid="select-loaner">
+                          <SelectValue placeholder={t('vehicles.selectLoanerVehicle', 'Select loaner vehicle')} />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent className="bg-white dark:bg-salis-gray text-gray-900 dark:text-white border-gray-200 dark:border-salis-gray-light">
-                        <SelectItem value="reserved">Reserved</SelectItem>
-                        <SelectItem value="active">Active</SelectItem>
-                        <SelectItem value="returned">Returned</SelectItem>
-                        <SelectItem value="late">Late</SelectItem>
-                        <SelectItem value="cancelled">Cancelled</SelectItem>
+                      <SelectContent>
+                        {loanerVehicles.map((loaner) => (
+                          <SelectItem key={loaner.id} value={loaner.id}>
+                            {loaner.make} {loaner.model} - {loaner.licensePlate}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-
-              <FormField
-                control={reservationForm.control}
-                name="notes"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Notes</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        {...field}
-                        value={field.value ?? ""}
-                        data-testid="textarea-reservation-notes"
-                        className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-light text-gray-900 dark:text-white"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={reservationForm.control}
+                  name="startDate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('vehicles.startDate', 'Start Date')}</FormLabel>
+                      <FormControl>
+                        <Input {...field} type="datetime-local" data-testid="input-start-date" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={reservationForm.control}
+                  name="endDate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('vehicles.endDate', 'End Date')}</FormLabel>
+                      <FormControl>
+                        <Input {...field} type="datetime-local" data-testid="input-end-date" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
               <DialogFooter>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setIsReservationDialogOpen(false)}
-                  className="border-gray-200 dark:border-salis-gray-light"
-                  data-testid="button-cancel-reservation"
-                >
-                  Cancel
+                <Button type="button" variant="outline" onClick={() => setIsReservationDialogOpen(false)}>
+                  {t('common.cancel', 'Cancel')}
                 </Button>
-                <Button
-                  type="submit"
-                  disabled={reservationMutation.isPending}
-                  className="bg-salis-blue hover:bg-salis-blue/90 dark:bg-salis-blue dark:hover:bg-salis-blue/90"
-                  data-testid="button-save-reservation"
-                >
-                  {reservationMutation.isPending ? "Saving..." : editingReservationId ? "Update" : "Create"}
+                <Button type="submit" disabled={reservationMutation.isPending}>
+                  {reservationMutation.isPending ? t('common.saving', 'Saving...') : t('common.save', 'Save')}
                 </Button>
               </DialogFooter>
             </form>

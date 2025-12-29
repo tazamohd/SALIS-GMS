@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertSparePartSchema, type SparePart } from "@shared/schema";
@@ -64,21 +65,22 @@ const createSchema = insertSparePartSchema.extend({
 
 type CreateFormData = z.infer<typeof createSchema>;
 
-const CATEGORIES = [
-  { value: "engine", label: "Engine" },
-  { value: "brakes", label: "Brakes" },
-  { value: "electrical", label: "Electrical" },
-  { value: "fluids", label: "Fluids" },
-  { value: "filters", label: "Filters" },
+const getCategoriesWithTranslation = (t: any) => [
+  { value: "engine", label: t('inventory.categoryEngine', 'Engine') },
+  { value: "brakes", label: t('inventory.categoryBrakes', 'Brakes') },
+  { value: "electrical", label: t('inventory.categoryElectrical', 'Electrical') },
+  { value: "fluids", label: t('inventory.categoryFluids', 'Fluids') },
+  { value: "filters", label: t('inventory.categoryFilters', 'Filters') },
 ];
 
-const PART_TYPES = [
-  { value: "oem", label: "OEM" },
-  { value: "generic", label: "Generic" },
-  { value: "consumable", label: "Consumable" },
+const getPartTypesWithTranslation = (t: any) => [
+  { value: "oem", label: t('inventory.partTypeOEM', 'OEM') },
+  { value: "generic", label: t('inventory.partTypeGeneric', 'Generic') },
+  { value: "consumable", label: t('inventory.partTypeConsumable', 'Consumable') },
 ];
 
 export default function SpareParts() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [selectedPart, setSelectedPart] = useState<SparePart | null>(null);
@@ -89,6 +91,9 @@ export default function SpareParts() {
   const { data: spareParts = [], isLoading, error } = useQuery<SparePart[]>({
     queryKey: ["/api/spare-parts"],
   });
+
+  const CATEGORIES = getCategoriesWithTranslation(t);
+  const PART_TYPES = getPartTypesWithTranslation(t);
 
   const filteredParts = spareParts.filter((part) => {
     const matchesCategory = categoryFilter === "all" || part.category === categoryFilter;
@@ -135,14 +140,14 @@ export default function SpareParts() {
       setIsCreateOpen(false);
       createForm.reset();
       toast({
-        title: "Success",
-        description: "Spare part created successfully",
+        title: t('common.success', 'Success'),
+        description: t('inventory.sparePartCreated', 'Spare part created successfully'),
       });
     },
     onError: (error: Error) => {
       toast({
-        title: "Error",
-        description: error.message || "Failed to create spare part",
+        title: t('common.error', 'Error'),
+        description: error.message || t('inventory.failedToCreateSparePart', 'Failed to create spare part'),
         variant: "destructive",
       });
     },
@@ -156,14 +161,14 @@ export default function SpareParts() {
       queryClient.invalidateQueries({ queryKey: ["/api/spare-parts"] });
       setIsDetailsOpen(false);
       toast({
-        title: "Success",
-        description: "Spare part deleted successfully",
+        title: t('common.success', 'Success'),
+        description: t('inventory.sparePartDeleted', 'Spare part deleted successfully'),
       });
     },
     onError: (error: Error) => {
       toast({
-        title: "Error",
-        description: error.message || "Failed to delete spare part",
+        title: t('common.error', 'Error'),
+        description: error.message || t('inventory.failedToDeleteSparePart', 'Failed to delete spare part'),
         variant: "destructive",
       });
     },
@@ -174,7 +179,7 @@ export default function SpareParts() {
   };
 
   const handleDelete = (id: string) => {
-    if (window.confirm("Are you sure you want to delete this spare part?")) {
+    if (window.confirm(t('inventory.confirmDeleteSparePart', 'Are you sure you want to delete this spare part?'))) {
       deleteMutation.mutate(id);
     }
   };
@@ -201,12 +206,12 @@ export default function SpareParts() {
 
   return (
     <StandardPageLayout
-      title="Spare Parts & Inventory"
-      description="Manage spare parts and inventory levels"
+      title={t('inventory.sparePartsInventory', 'Spare Parts & Inventory')}
+      description={t('inventory.manageSparePartsDesc', 'Manage spare parts and inventory levels')}
       icon={Package}
       actions={[
         {
-          label: "Add Spare Part",
+          label: t('inventory.addSparePart', 'Add Spare Part'),
           icon: Plus,
           onClick: () => setIsCreateOpen(true),
         },
@@ -215,7 +220,7 @@ export default function SpareParts() {
       <div className="flex gap-4 items-center mb-6">
         <div className="relative flex-1 max-w-md">
           <Input
-            placeholder="Search by name, SKU, or brand..."
+            placeholder={t('inventory.searchByNameSku', 'Search by name, SKU, or brand...')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-3"
@@ -224,10 +229,10 @@ export default function SpareParts() {
         </div>
         <Select value={categoryFilter} onValueChange={setCategoryFilter}>
           <SelectTrigger className="w-[200px]" data-testid="select-category-filter">
-            <SelectValue placeholder="Filter by category" />
+            <SelectValue placeholder={t('inventory.filterByCategory', 'Filter by category')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Categories</SelectItem>
+            <SelectItem value="all">{t('inventory.allCategories', 'All Categories')}</SelectItem>
             {CATEGORIES.map((cat) => (
               <SelectItem key={cat.value} value={cat.value}>
                 {cat.label}
@@ -241,12 +246,12 @@ export default function SpareParts() {
         <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
           <CardContent className="flex flex-col items-center justify-center py-12">
             <Package className="h-12 w-12 text-destructive mb-4" />
-            <p className="text-lg font-medium mb-2">Failed to load spare parts</p>
+            <p className="text-lg font-medium mb-2">{t('inventory.failedToLoadSpareParts', 'Failed to load spare parts')}</p>
             <p className="text-gray-900 dark:text-white/60 mb-4">
               {error instanceof Error ? error.message : "An error occurred"}
             </p>
             <Button onClick={() => queryClient.invalidateQueries({ queryKey: ["/api/spare-parts"] })} data-testid="button-retry">
-              Retry
+              {t('common.retry', 'Retry')}
             </Button>
           </CardContent>
         </Card>
@@ -272,16 +277,16 @@ export default function SpareParts() {
         <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
           <CardContent className="flex flex-col items-center justify-center py-12">
             <Package className="h-12 w-12 text-gray-900 dark:text-white/60 mb-4" />
-            <p className="text-lg font-medium mb-2">No spare parts found</p>
+            <p className="text-lg font-medium mb-2">{t('inventory.noSparePartsFound', 'No spare parts found')}</p>
             <p className="text-gray-900 dark:text-white/60 mb-4">
               {searchQuery || categoryFilter !== "all" 
-                ? "Try adjusting your filters" 
-                : "Get started by adding your first spare part"}
+                ? t('inventory.tryAdjustingFilters', 'Try adjusting your filters') 
+                : t('inventory.getStartedAddingSparePart', 'Get started by adding your first spare part')}
             </p>
             {!searchQuery && categoryFilter === "all" && (
               <Button onClick={() => setIsCreateOpen(true)} data-testid="button-create-first">
                 <Plus className="mr-2 h-4 w-4" />
-                Add Spare Part
+                {t('inventory.addSparePart', 'Add Spare Part')}
               </Button>
             )}
           </CardContent>
@@ -321,7 +326,7 @@ export default function SpareParts() {
                         setIsDetailsOpen(true);
                       }}>
                         <Edit className="mr-2 h-4 w-4" />
-                        View Details
+                        {t('common.view', 'View Details')}
                       </DropdownMenuItem>
                       <DropdownMenuItem 
                         className="text-gray-800 dark:text-gray-200"
@@ -332,7 +337,7 @@ export default function SpareParts() {
                         data-testid={`button-delete-${part.id}`}
                       >
                         <Trash2 className="mr-2 h-4 w-4" />
-                        Delete
+                        {t('common.delete', 'Delete')}
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -373,9 +378,9 @@ export default function SpareParts() {
       <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Add Spare Part</DialogTitle>
+            <DialogTitle>{t('inventory.addSparePart', 'Add Spare Part')}</DialogTitle>
             <DialogDescription>
-              Create a new spare part for your inventory
+              {t('inventory.createSparePartDesc', 'Create a new spare part for your inventory')}
             </DialogDescription>
           </DialogHeader>
           <Form {...createForm}>
@@ -386,7 +391,7 @@ export default function SpareParts() {
                   name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Part Name *</FormLabel>
+                      <FormLabel>{t('inventory.partName', 'Part Name')} *</FormLabel>
                       <FormControl>
                         <Input placeholder="Oil Filter" {...field} data-testid="input-name" />
                       </FormControl>
@@ -399,7 +404,7 @@ export default function SpareParts() {
                   name="sku"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>SKU *</FormLabel>
+                      <FormLabel>{t('inventory.sku', 'SKU')} *</FormLabel>
                       <FormControl>
                         <Input placeholder="OF-12345" {...field} data-testid="input-sku" />
                       </FormControl>
@@ -414,7 +419,7 @@ export default function SpareParts() {
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Description</FormLabel>
+                    <FormLabel>{t('common.description', 'Description')}</FormLabel>
                     <FormControl>
                       <Textarea 
                         placeholder="Describe the spare part..." 
@@ -434,11 +439,11 @@ export default function SpareParts() {
                   name="category"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Category *</FormLabel>
+                      <FormLabel>{t('common.category', 'Category')} *</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger data-testid="select-category">
-                            <SelectValue placeholder="Select category" />
+                            <SelectValue placeholder={t('inventory.selectCategory', 'Select category')} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -458,7 +463,7 @@ export default function SpareParts() {
                   name="subcategory"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Subcategory</FormLabel>
+                      <FormLabel>{t('inventory.subcategory', 'Subcategory')}</FormLabel>
                       <FormControl>
                         <Input 
                           placeholder="Enter subcategory" 
@@ -479,11 +484,11 @@ export default function SpareParts() {
                   name="partType"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Part Type *</FormLabel>
+                      <FormLabel>{t('inventory.partType', 'Part Type')} *</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger data-testid="select-part-type">
-                            <SelectValue placeholder="Select type" />
+                            <SelectValue placeholder={t('inventory.selectType', 'Select type')} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -503,18 +508,18 @@ export default function SpareParts() {
                   name="unitOfMeasure"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Unit of Measure</FormLabel>
+                      <FormLabel>{t('inventory.unitOfMeasure', 'Unit of Measure')}</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value ?? undefined}>
                         <FormControl>
                           <SelectTrigger data-testid="select-unit">
-                            <SelectValue placeholder="Select unit" />
+                            <SelectValue placeholder={t('inventory.selectUnit', 'Select unit')} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="pcs">Pieces</SelectItem>
-                          <SelectItem value="liters">Liters</SelectItem>
-                          <SelectItem value="kg">Kilograms</SelectItem>
-                          <SelectItem value="boxes">Boxes</SelectItem>
+                          <SelectItem value="pcs">{t('inventory.pieces', 'Pieces')}</SelectItem>
+                          <SelectItem value="liters">{t('inventory.liters', 'Liters')}</SelectItem>
+                          <SelectItem value="kg">{t('inventory.kilograms', 'Kilograms')}</SelectItem>
+                          <SelectItem value="boxes">{t('inventory.boxes', 'Boxes')}</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -529,7 +534,7 @@ export default function SpareParts() {
                   name="brand"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Brand</FormLabel>
+                      <FormLabel>{t('inventory.brand', 'Brand')}</FormLabel>
                       <FormControl>
                         <Input 
                           placeholder="Enter brand" 
@@ -547,7 +552,7 @@ export default function SpareParts() {
                   name="manufacturer"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Manufacturer</FormLabel>
+                      <FormLabel>{t('inventory.manufacturer', 'Manufacturer')}</FormLabel>
                       <FormControl>
                         <Input 
                           placeholder="Enter manufacturer" 
@@ -567,7 +572,7 @@ export default function SpareParts() {
                 name="barcode"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Barcode</FormLabel>
+                    <FormLabel>{t('inventory.barcode', 'Barcode')}</FormLabel>
                     <FormControl>
                       <Input 
                         placeholder="Enter barcode" 
@@ -586,7 +591,7 @@ export default function SpareParts() {
                 name="notes"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Notes</FormLabel>
+                    <FormLabel>{t('common.notes', 'Notes')}</FormLabel>
                     <FormControl>
                       <Textarea 
                         placeholder="Additional notes..." 
@@ -607,14 +612,14 @@ export default function SpareParts() {
                   onClick={() => setIsCreateOpen(false)}
                   data-testid="button-cancel"
                 >
-                  Cancel
+                  {t('common.cancel', 'Cancel')}
                 </Button>
                 <Button 
                   type="submit" 
                   disabled={createMutation.isPending}
                   data-testid="button-submit"
                 >
-                  {createMutation.isPending ? "Creating..." : "Create Spare Part"}
+                  {createMutation.isPending ? t('common.creating', 'Creating...') : t('inventory.createSparePart', 'Create Spare Part')}
                 </Button>
               </div>
             </form>
