@@ -34,18 +34,26 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+import { CURRENCIES as CURRENCY_CONFIG, PAYMENT_METHODS, getPaymentMethods } from "@/lib/currency";
+
 const CURRENCIES = [
-  { code: 'usd', symbol: '$', name: 'USD' },
-  { code: 'eur', symbol: '€', name: 'EUR' },
-  { code: 'gbp', symbol: '£', name: 'GBP' },
-  { code: 'cad', symbol: 'C$', name: 'CAD' },
+  { code: 'sar', symbol: 'ر.س', name: 'SAR - Saudi Riyal' },
+  { code: 'usd', symbol: '$', name: 'USD - US Dollar' },
+  { code: 'aed', symbol: 'د.إ', name: 'AED - UAE Dirham' },
+  { code: 'bhd', symbol: 'د.ب', name: 'BHD - Bahraini Dinar' },
+  { code: 'kwd', symbol: 'د.ك', name: 'KWD - Kuwaiti Dinar' },
+  { code: 'omr', symbol: 'ر.ع', name: 'OMR - Omani Rial' },
+  { code: 'qar', symbol: 'ر.ق', name: 'QAR - Qatari Riyal' },
+  { code: 'eur', symbol: '€', name: 'EUR - Euro' },
+  { code: 'gbp', symbol: '£', name: 'GBP - British Pound' },
 ];
 
 export default function StripePaymentProcessing() {
   const { toast } = useToast();
   const [createPaymentOpen, setCreatePaymentOpen] = useState(false);
   const [paymentAmount, setPaymentAmount] = useState("");
-  const [paymentCurrency, setPaymentCurrency] = useState("usd");
+  const [paymentCurrency, setPaymentCurrency] = useState("sar");
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("mada");
   const [refundDialogOpen, setRefundDialogOpen] = useState(false);
   const [selectedPaymentId, setSelectedPaymentId] = useState("");
   const [refundAmount, setRefundAmount] = useState("");
@@ -239,10 +247,97 @@ export default function StripePaymentProcessing() {
         </Card>
       </div>
 
+      {/* Accepted Payment Methods */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <CreditCard className="h-5 w-5" />
+            Accepted Payment Methods
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {/* Local Saudi Payment Methods */}
+            <div className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg text-center hover:border-gray-400 dark:hover:border-gray-500 transition-colors">
+              <div className="w-12 h-12 mx-auto mb-2 bg-[#004D8D] rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-sm">mada</span>
+              </div>
+              <p className="font-medium text-sm text-gray-900 dark:text-white">Mada</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">مدى</p>
+            </div>
+
+            <div className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg text-center hover:border-gray-400 dark:hover:border-gray-500 transition-colors">
+              <div className="w-12 h-12 mx-auto mb-2 bg-[#4F008C] rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-xs">STC Pay</span>
+              </div>
+              <p className="font-medium text-sm text-gray-900 dark:text-white">STC Pay</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">إس تي سي باي</p>
+            </div>
+
+            <div className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg text-center hover:border-gray-400 dark:hover:border-gray-500 transition-colors">
+              <div className="w-12 h-12 mx-auto mb-2 bg-[#4F008C] rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-xs">STC</span>
+              </div>
+              <p className="font-medium text-sm text-gray-900 dark:text-white">STC Bank</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">بنك إس تي سي</p>
+            </div>
+
+            {/* International Cards */}
+            <div className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg text-center hover:border-gray-400 dark:hover:border-gray-500 transition-colors">
+              <div className="w-12 h-12 mx-auto mb-2 bg-[#1A1F71] rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-sm">VISA</span>
+              </div>
+              <p className="font-medium text-sm text-gray-900 dark:text-white">Visa</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">فيزا</p>
+            </div>
+
+            <div className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg text-center hover:border-gray-400 dark:hover:border-gray-500 transition-colors">
+              <div className="w-12 h-12 mx-auto mb-2 bg-gradient-to-r from-[#EB001B] to-[#F79E1B] rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-xs">MC</span>
+              </div>
+              <p className="font-medium text-sm text-gray-900 dark:text-white">Mastercard</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">ماستركارد</p>
+            </div>
+
+            <div className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg text-center hover:border-gray-400 dark:hover:border-gray-500 transition-colors">
+              <div className="w-12 h-12 mx-auto mb-2 bg-[#006FCF] rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-xs">AMEX</span>
+              </div>
+              <p className="font-medium text-sm text-gray-900 dark:text-white">American Express</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">أمريكان إكسبريس</p>
+            </div>
+
+            <div className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg text-center hover:border-gray-400 dark:hover:border-gray-500 transition-colors">
+              <div className="w-12 h-12 mx-auto mb-2 bg-black rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-xs">Pay</span>
+              </div>
+              <p className="font-medium text-sm text-gray-900 dark:text-white">Apple Pay</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">آبل باي</p>
+            </div>
+
+            <div className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg text-center hover:border-gray-400 dark:hover:border-gray-500 transition-colors">
+              <div className="w-12 h-12 mx-auto mb-2 bg-gray-600 rounded-lg flex items-center justify-center">
+                <Banknote className="w-6 h-6 text-white" />
+              </div>
+              <p className="font-medium text-sm text-gray-900 dark:text-white">Bank Transfer</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">تحويل بنكي</p>
+            </div>
+          </div>
+
+          <div className="mt-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              <strong className="text-gray-900 dark:text-white">Default Currency:</strong> Saudi Riyal (SAR) ر.س
+              <span className="mx-2">|</span>
+              <strong className="text-gray-900 dark:text-white">Supported:</strong> SAR, AED, BHD, KWD, OMR, QAR, USD, EUR, GBP
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Payment Processing Guide */}
       <Card>
         <CardHeader>
-          <CardTitle>Stripe Integration Guide</CardTitle>
+          <CardTitle>Payment Integration Guide</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
