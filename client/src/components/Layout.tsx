@@ -204,16 +204,22 @@ export function Layout({ children }: LayoutProps) {
   // Filter navigation based on role and plan - no loading state needed since plan is in user object
   const filteredNavigation = filterNavigationByAccess(navigationConfig, userRole, userPlan);
   
+  // Helper function to convert navigation title to translation key
+  const getNavKey = (title: string): string => {
+    return `nav.${title.toLowerCase().replace(/[&\s]+/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '')}`;
+  };
+
   // Convert to legacy format for backwards compatibility with existing sidebar rendering
+  // Apply translations to all navigation labels
   const navGroups = filteredNavigation.map((group: NavGroup) => ({
-    label: group.title,
+    label: t(getNavKey(group.title), group.title),
     items: group.items 
       ? group.items.map((item) => ({
           path: item.href,
           icon: group.icon,
-          label: item.title,
+          label: t(getNavKey(item.title), item.title),
         })) 
-      : [{ path: group.href!, icon: group.icon, label: group.title }],
+      : [{ path: group.href!, icon: group.icon, label: t(getNavKey(group.title), group.title) }],
   }));
 
   const filteredNavGroups = navGroups;
@@ -397,7 +403,7 @@ export function Layout({ children }: LayoutProps) {
               data-testid="button-quick-actions"
             >
               <Zap className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline text-xs">Quick Actions</span>
+              <span className="hidden sm:inline text-xs">{t("common.quick_actions", "Quick Actions")}</span>
               <kbd className="hidden sm:inline-flex px-1 py-0.5 bg-gray-100 dark:bg-salis-gray-dark border border-gray-300 dark:border-salis-gray rounded text-[10px] font-mono text-gray-600 dark:text-gray-400">
                 {navigator.platform.includes("Mac") ? "⌘K" : "Ctrl+K"}
               </kbd>
