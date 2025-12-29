@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { DashboardPage } from "@/components/layouts";
 import { Activity, Clock, CheckCircle, TrendingUp, Users } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 
 export default function ProductivityTracker() {
+  const { t } = useTranslation();
   const [selectedPeriod, setSelectedPeriod] = useState("today");
 
   const { data: productivityData } = useQuery({
@@ -32,28 +34,28 @@ export default function ProductivityTracker() {
 
   const metrics = [
     {
-      label: "Tasks Completed Today",
+      label: t('productivity.metrics.tasksCompletedToday', 'Tasks Completed Today'),
       value: "42",
       icon: CheckCircle,
       color: "text-green-500",
       trend: { value: "+15%", isPositive: true },
     },
     {
-      label: "Average Efficiency",
+      label: t('productivity.metrics.averageEfficiency', 'Average Efficiency'),
       value: "92%",
       icon: TrendingUp,
       color: "text-blue-500",
       trend: { value: "+3%", isPositive: true },
     },
     {
-      label: "Avg Task Duration",
+      label: t('productivity.metrics.avgTaskDuration', 'Avg Task Duration'),
       value: "2.4h",
       icon: Clock,
       color: "text-purple-500",
       trend: { value: "-12%", isPositive: true },
     },
     {
-      label: "Active Technicians",
+      label: t('productivity.metrics.activeTechnicians', 'Active Technicians'),
       value: "4",
       icon: Users,
       color: "text-orange-500",
@@ -62,16 +64,16 @@ export default function ProductivityTracker() {
 
   return (
     <DashboardPage
-      title="Productivity Tracker"
-      description="Monitor team performance and task completion metrics"
+      title={t('productivity.title', 'Productivity Tracker')}
+      description={t('productivity.description', 'Monitor team performance and task completion metrics')}
       icon={Activity}
       metrics={metrics}
     >
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <Card>
           <CardHeader>
-            <CardTitle>Hourly Productivity</CardTitle>
-            <CardDescription>Tasks completed and efficiency by hour</CardDescription>
+            <CardTitle>{t('productivity.hourlyProductivity', 'Hourly Productivity')}</CardTitle>
+            <CardDescription>{t('productivity.hourlyProductivityDesc', 'Tasks completed and efficiency by hour')}</CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -87,7 +89,7 @@ export default function ProductivityTracker() {
                   type="monotone"
                   dataKey="tasks"
                   stroke="#8884d8"
-                  name="Tasks Completed"
+                  name={t('productivity.tasksCompleted', 'Tasks Completed')}
                   strokeWidth={2}
                 />
                 <Line
@@ -95,7 +97,7 @@ export default function ProductivityTracker() {
                   type="monotone"
                   dataKey="efficiency"
                   stroke="#82ca9d"
-                  name="Efficiency %"
+                  name={t('productivity.efficiencyPercent', 'Efficiency %')}
                   strokeWidth={2}
                 />
               </LineChart>
@@ -105,8 +107,8 @@ export default function ProductivityTracker() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Task Distribution</CardTitle>
-            <CardDescription>Completed vs pending tasks by technician</CardDescription>
+            <CardTitle>{t('productivity.taskDistribution', 'Task Distribution')}</CardTitle>
+            <CardDescription>{t('productivity.taskDistributionDesc', 'Completed vs pending tasks by technician')}</CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -116,8 +118,8 @@ export default function ProductivityTracker() {
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                <Bar dataKey="completed" fill="#82ca9d" name="Completed" />
-                <Bar dataKey="pending" fill="#ffc658" name="Pending" />
+                <Bar dataKey="completed" fill="#82ca9d" name={t('common.completed', 'Completed')} />
+                <Bar dataKey="pending" fill="#ffc658" name={t('common.pending', 'Pending')} />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
@@ -126,8 +128,8 @@ export default function ProductivityTracker() {
 
       <Card className="mb-6">
         <CardHeader>
-          <CardTitle>Technician Performance</CardTitle>
-          <CardDescription>Individual productivity metrics and efficiency scores</CardDescription>
+          <CardTitle>{t('productivity.technicianPerformance', 'Technician Performance')}</CardTitle>
+          <CardDescription>{t('productivity.technicianPerformanceDesc', 'Individual productivity metrics and efficiency scores')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -141,7 +143,7 @@ export default function ProductivityTracker() {
                   <div>
                     <p className="font-medium">{tech.name}</p>
                     <p className="text-sm text-muted-foreground">
-                      {tech.completed} completed • {tech.pending} pending • Avg: {tech.avgTime}
+                      {tech.completed} {t('common.completed', 'completed')} • {tech.pending} {t('common.pending', 'pending')} • {t('productivity.avg', 'Avg')}: {tech.avgTime}
                     </p>
                   </div>
                   <Badge
@@ -153,12 +155,12 @@ export default function ProductivityTracker() {
                         : "bg-yellow-100 text-yellow-700"
                     }
                   >
-                    {tech.efficiency}% Efficiency
+                    {tech.efficiency}% {t('productivity.efficiency', 'Efficiency')}
                   </Badge>
                 </div>
                 <div className="space-y-1">
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">Efficiency</span>
+                    <span className="text-muted-foreground">{t('productivity.efficiency', 'Efficiency')}</span>
                     <span className="font-medium">{tech.efficiency}%</span>
                   </div>
                   <Progress value={tech.efficiency} className="h-2" />
@@ -172,7 +174,7 @@ export default function ProductivityTracker() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card>
           <CardHeader>
-            <CardTitle>Top Performer</CardTitle>
+            <CardTitle>{t('productivity.topPerformer', 'Top Performer')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-4">
@@ -181,7 +183,7 @@ export default function ProductivityTracker() {
               </div>
               <div>
                 <p className="font-semibold">Mike Johnson</p>
-                <p className="text-sm text-muted-foreground">96% efficiency</p>
+                <p className="text-sm text-muted-foreground">96% {t('productivity.efficiency', 'efficiency')}</p>
               </div>
             </div>
           </CardContent>
@@ -189,7 +191,7 @@ export default function ProductivityTracker() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Most Productive Hour</CardTitle>
+            <CardTitle>{t('productivity.mostProductiveHour', 'Most Productive Hour')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-4">
@@ -198,7 +200,7 @@ export default function ProductivityTracker() {
               </div>
               <div>
                 <p className="font-semibold">2PM - 4PM</p>
-                <p className="text-sm text-muted-foreground">15 tasks completed</p>
+                <p className="text-sm text-muted-foreground">15 {t('productivity.tasksCompletedShort', 'tasks completed')}</p>
               </div>
             </div>
           </CardContent>
@@ -206,16 +208,16 @@ export default function ProductivityTracker() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Team Goal Progress</CardTitle>
+            <CardTitle>{t('productivity.teamGoalProgress', 'Team Goal Progress')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Daily Target</span>
+                <span className="text-sm text-muted-foreground">{t('productivity.dailyTarget', 'Daily Target')}</span>
                 <span className="font-medium">42/50</span>
               </div>
               <Progress value={84} className="h-2" />
-              <p className="text-xs text-muted-foreground">84% of daily goal achieved</p>
+              <p className="text-xs text-muted-foreground">{t('productivity.goalAchieved', '84% of daily goal achieved')}</p>
             </div>
           </CardContent>
         </Card>

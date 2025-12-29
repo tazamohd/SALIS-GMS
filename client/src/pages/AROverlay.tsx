@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { TabsPageLayout } from "@/components/layouts/TabsPageLayout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -30,7 +31,8 @@ import {
   Upload,
   Glasses,
   Cpu,
-  Zap
+  Zap,
+  Clock
 } from "lucide-react";
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart, Pie, Cell } from "recharts";
 
@@ -68,44 +70,45 @@ interface ARSession {
 }
 
 export default function AROverlay() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [showLivePreview, setShowLivePreview] = useState(false);
 
   const devices: ARDevice[] = [
-    { id: "1", deviceName: "Workshop Tablet 1", deviceType: "tablet", technicianName: "Ahmed Al-Rashid", status: "connected", batteryLevel: 85, lastSeen: "2 min ago" },
-    { id: "2", deviceName: "AR Glasses Pro", deviceType: "glasses", technicianName: "Mohammed Khalid", status: "connected", batteryLevel: 62, lastSeen: "Just now" },
-    { id: "3", deviceName: "Mobile Device 3", deviceType: "phone", technicianName: "Unassigned", status: "disconnected", batteryLevel: 0, lastSeen: "2 hours ago" },
-    { id: "4", deviceName: "Headset Unit A", deviceType: "headset", technicianName: "Fatima Hassan", status: "pairing", batteryLevel: 45, lastSeen: "5 min ago" },
+    { id: "1", deviceName: t('arOverlay.workshopTablet', 'Workshop Tablet') + " 1", deviceType: "tablet", technicianName: "Ahmed Al-Rashid", status: "connected", batteryLevel: 85, lastSeen: t('arOverlay.minAgo', '2 min ago') },
+    { id: "2", deviceName: t('arOverlay.arGlassesPro', 'AR Glasses Pro'), deviceType: "glasses", technicianName: "Mohammed Khalid", status: "connected", batteryLevel: 62, lastSeen: t('arOverlay.justNow', 'Just now') },
+    { id: "3", deviceName: t('arOverlay.mobileDevice', 'Mobile Device') + " 3", deviceType: "phone", technicianName: t('arOverlay.unassigned', 'Unassigned'), status: "disconnected", batteryLevel: 0, lastSeen: t('arOverlay.hoursAgo', '2 hours ago') },
+    { id: "4", deviceName: t('arOverlay.headsetUnit', 'Headset Unit') + " A", deviceType: "headset", technicianName: "Fatima Hassan", status: "pairing", batteryLevel: 45, lastSeen: t('arOverlay.minAgo5', '5 min ago') },
   ];
 
   const instructions: ARInstruction[] = [
-    { id: "1", title: "Brake Pad Replacement", description: "Step-by-step guide for replacing brake pads", stepCount: 12, difficulty: "intermediate", estimatedTime: 45, category: "Brakes", usageCount: 156, rating: 4.8 },
-    { id: "2", title: "Oil Filter Change", description: "Complete oil and filter change procedure", stepCount: 8, difficulty: "beginner", estimatedTime: 20, category: "Maintenance", usageCount: 289, rating: 4.9 },
-    { id: "3", title: "Engine Timing Belt", description: "Timing belt inspection and replacement", stepCount: 24, difficulty: "advanced", estimatedTime: 120, category: "Engine", usageCount: 67, rating: 4.6 },
-    { id: "4", title: "AC System Recharge", description: "Air conditioning system diagnosis and recharge", stepCount: 15, difficulty: "intermediate", estimatedTime: 35, category: "AC/Heating", usageCount: 98, rating: 4.7 },
-    { id: "5", title: "Wheel Alignment Setup", description: "Wheel alignment measurement and adjustment", stepCount: 18, difficulty: "advanced", estimatedTime: 60, category: "Alignment", usageCount: 124, rating: 4.5 },
+    { id: "1", title: t('arOverlay.brakePadReplacement', 'Brake Pad Replacement'), description: t('arOverlay.brakePadDesc', 'Step-by-step guide for replacing brake pads'), stepCount: 12, difficulty: "intermediate", estimatedTime: 45, category: t('arOverlay.brakes', 'Brakes'), usageCount: 156, rating: 4.8 },
+    { id: "2", title: t('arOverlay.oilFilterChange', 'Oil Filter Change'), description: t('arOverlay.oilFilterDesc', 'Complete oil and filter change procedure'), stepCount: 8, difficulty: "beginner", estimatedTime: 20, category: t('arOverlay.maintenance', 'Maintenance'), usageCount: 289, rating: 4.9 },
+    { id: "3", title: t('arOverlay.engineTimingBelt', 'Engine Timing Belt'), description: t('arOverlay.engineTimingDesc', 'Timing belt inspection and replacement'), stepCount: 24, difficulty: "advanced", estimatedTime: 120, category: t('arOverlay.engine', 'Engine'), usageCount: 67, rating: 4.6 },
+    { id: "4", title: t('arOverlay.acSystemRecharge', 'AC System Recharge'), description: t('arOverlay.acSystemDesc', 'Air conditioning system diagnosis and recharge'), stepCount: 15, difficulty: "intermediate", estimatedTime: 35, category: t('arOverlay.acHeating', 'AC/Heating'), usageCount: 98, rating: 4.7 },
+    { id: "5", title: t('arOverlay.wheelAlignmentSetup', 'Wheel Alignment Setup'), description: t('arOverlay.wheelAlignmentDesc', 'Wheel alignment measurement and adjustment'), stepCount: 18, difficulty: "advanced", estimatedTime: 60, category: t('arOverlay.alignment', 'Alignment'), usageCount: 124, rating: 4.5 },
   ];
 
   const activeSessions: ARSession[] = [
-    { id: "1", technicianName: "Ahmed Al-Rashid", instructionTitle: "Brake Pad Replacement", vehicleInfo: "Toyota Camry 2022", startTime: "10:30 AM", duration: 25, completionRate: 58, status: "active" },
-    { id: "2", technicianName: "Mohammed Khalid", instructionTitle: "Oil Filter Change", vehicleInfo: "Honda Accord 2021", startTime: "11:15 AM", duration: 12, completionRate: 75, status: "active" },
+    { id: "1", technicianName: "Ahmed Al-Rashid", instructionTitle: t('arOverlay.brakePadReplacement', 'Brake Pad Replacement'), vehicleInfo: "Toyota Camry 2022", startTime: "10:30 AM", duration: 25, completionRate: 58, status: "active" },
+    { id: "2", technicianName: "Mohammed Khalid", instructionTitle: t('arOverlay.oilFilterChange', 'Oil Filter Change'), vehicleInfo: "Honda Accord 2021", startTime: "11:15 AM", duration: 12, completionRate: 75, status: "active" },
   ];
 
   const usageData = [
-    { day: "Mon", sessions: 12, avgDuration: 28 },
-    { day: "Tue", sessions: 15, avgDuration: 32 },
-    { day: "Wed", sessions: 18, avgDuration: 25 },
-    { day: "Thu", sessions: 14, avgDuration: 30 },
-    { day: "Fri", sessions: 20, avgDuration: 27 },
-    { day: "Sat", sessions: 8, avgDuration: 35 },
+    { day: t('arOverlay.mon', 'Mon'), sessions: 12, avgDuration: 28 },
+    { day: t('arOverlay.tue', 'Tue'), sessions: 15, avgDuration: 32 },
+    { day: t('arOverlay.wed', 'Wed'), sessions: 18, avgDuration: 25 },
+    { day: t('arOverlay.thu', 'Thu'), sessions: 14, avgDuration: 30 },
+    { day: t('arOverlay.fri', 'Fri'), sessions: 20, avgDuration: 27 },
+    { day: t('arOverlay.sat', 'Sat'), sessions: 8, avgDuration: 35 },
   ];
 
   const categoryData = [
-    { name: "Maintenance", value: 35, color: "#10b981" },
-    { name: "Brakes", value: 25, color: "#3b82f6" },
-    { name: "Engine", value: 20, color: "#f59e0b" },
-    { name: "AC/Heating", value: 12, color: "#8b5cf6" },
-    { name: "Other", value: 8, color: "#6b7280" },
+    { name: t('arOverlay.maintenance', 'Maintenance'), value: 35, color: "#10b981" },
+    { name: t('arOverlay.brakes', 'Brakes'), value: 25, color: "#3b82f6" },
+    { name: t('arOverlay.engine', 'Engine'), value: 20, color: "#f59e0b" },
+    { name: t('arOverlay.acHeating', 'AC/Heating'), value: 12, color: "#8b5cf6" },
+    { name: t('arOverlay.other', 'Other'), value: 8, color: "#6b7280" },
   ];
 
   const getDeviceIcon = (type: string) => {
@@ -137,7 +140,7 @@ export default function AROverlay() {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Connected Devices</p>
+                <p className="text-sm text-muted-foreground">{t('arOverlay.connectedDevices', 'Connected Devices')}</p>
                 <p className="text-3xl font-bold" data-testid="text-connected-count">{connectedDevices}/{devices.length}</p>
               </div>
               <Wifi className="w-8 h-8 text-green-500" />
@@ -148,7 +151,7 @@ export default function AROverlay() {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Active Sessions</p>
+                <p className="text-sm text-muted-foreground">{t('arOverlay.activeSessions', 'Active Sessions')}</p>
                 <p className="text-3xl font-bold" data-testid="text-sessions-count">{activeSessions.length}</p>
               </div>
               <Eye className="w-8 h-8 text-blue-500" />
@@ -159,7 +162,7 @@ export default function AROverlay() {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Weekly Sessions</p>
+                <p className="text-sm text-muted-foreground">{t('arOverlay.weeklySessions', 'Weekly Sessions')}</p>
                 <p className="text-3xl font-bold" data-testid="text-weekly-count">{totalSessions}</p>
               </div>
               <ScanLine className="w-8 h-8 text-purple-500" />
@@ -170,7 +173,7 @@ export default function AROverlay() {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Instructions</p>
+                <p className="text-sm text-muted-foreground">{t('arOverlay.instructions', 'Instructions')}</p>
                 <p className="text-3xl font-bold" data-testid="text-instructions-count">{instructions.length}</p>
               </div>
               <Layers className="w-8 h-8 text-yellow-500" />
@@ -184,9 +187,9 @@ export default function AROverlay() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Eye className="w-5 h-5" />
-              Active AR Sessions
+              {t('arOverlay.activeARSessions', 'Active AR Sessions')}
             </CardTitle>
-            <CardDescription>Real-time technician guidance sessions</CardDescription>
+            <CardDescription>{t('arOverlay.realTimeGuidance', 'Real-time technician guidance sessions')}</CardDescription>
           </CardHeader>
           <CardContent>
             {activeSessions.length > 0 ? (
@@ -206,14 +209,14 @@ export default function AROverlay() {
                     <p className="text-sm text-muted-foreground mb-2">{session.vehicleInfo}</p>
                     <div className="space-y-1">
                       <div className="flex justify-between text-sm">
-                        <span>Progress</span>
+                        <span>{t('arOverlay.progress', 'Progress')}</span>
                         <span>{session.completionRate}%</span>
                       </div>
                       <Progress value={session.completionRate} className="h-2" data-testid={`progress-session-${session.id}`} />
                     </div>
                     <div className="flex items-center justify-between mt-2 text-xs text-muted-foreground">
-                      <span>Started: {session.startTime}</span>
-                      <span>Duration: {session.duration} min</span>
+                      <span>{t('arOverlay.started', 'Started')}: {session.startTime}</span>
+                      <span>{t('arOverlay.duration', 'Duration')}: {session.duration} {t('arOverlay.min', 'min')}</span>
                     </div>
                   </div>
                 ))}
@@ -221,7 +224,7 @@ export default function AROverlay() {
             ) : (
               <div className="text-center py-8 text-muted-foreground">
                 <EyeOff className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                <p>No active AR sessions</p>
+                <p>{t('arOverlay.noActiveSessions', 'No active AR sessions')}</p>
               </div>
             )}
           </CardContent>
@@ -231,9 +234,9 @@ export default function AROverlay() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Zap className="w-5 h-5" />
-              Usage Analytics
+              {t('arOverlay.usageAnalytics', 'Usage Analytics')}
             </CardTitle>
-            <CardDescription>Weekly AR session statistics</CardDescription>
+            <CardDescription>{t('arOverlay.weeklyStats', 'Weekly AR session statistics')}</CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={250}>
@@ -243,8 +246,8 @@ export default function AROverlay() {
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                <Line type="monotone" dataKey="sessions" stroke="#3b82f6" name="Sessions" strokeWidth={2} />
-                <Line type="monotone" dataKey="avgDuration" stroke="#10b981" name="Avg Duration (min)" strokeWidth={2} />
+                <Line type="monotone" dataKey="sessions" stroke="#3b82f6" name={t('arOverlay.sessions', 'Sessions')} strokeWidth={2} />
+                <Line type="monotone" dataKey="avgDuration" stroke="#10b981" name={t('arOverlay.avgDurationMin', 'Avg Duration (min)')} strokeWidth={2} />
               </LineChart>
             </ResponsiveContainer>
           </CardContent>
@@ -256,12 +259,12 @@ export default function AROverlay() {
           <div>
             <CardTitle className="flex items-center gap-2">
               <Camera className="w-5 h-5" />
-              AR Live Preview
+              {t('arOverlay.arLivePreview', 'AR Live Preview')}
             </CardTitle>
-            <CardDescription>Preview AR overlay rendering</CardDescription>
+            <CardDescription>{t('arOverlay.previewAROverlay', 'Preview AR overlay rendering')}</CardDescription>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground">Live Preview</span>
+            <span className="text-sm text-muted-foreground">{t('arOverlay.livePreview', 'Live Preview')}</span>
             <Switch checked={showLivePreview} onCheckedChange={setShowLivePreview} data-testid="switch-live-preview" />
           </div>
         </CardHeader>
@@ -272,12 +275,12 @@ export default function AROverlay() {
                 <div className="absolute inset-0 bg-[url('/api/placeholder/1280/720')] bg-cover bg-center opacity-50" />
                 <div className="absolute top-4 left-4 bg-black/50 backdrop-blur-sm rounded px-3 py-1 text-white text-sm flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-                  LIVE
+                  {t('arOverlay.live', 'LIVE')}
                 </div>
                 <div className="absolute bottom-4 left-4 right-4 bg-black/50 backdrop-blur-sm rounded p-3 text-white">
                   <div className="flex items-center gap-2 mb-2">
                     <CheckCircle2 className="w-4 h-4 text-green-400" />
-                    <span className="text-sm">Step 5/12: Remove caliper bolts</span>
+                    <span className="text-sm">{t('arOverlay.step5', 'Step 5/12: Remove caliper bolts')}</span>
                   </div>
                   <Progress value={42} className="h-1" />
                 </div>
@@ -288,8 +291,8 @@ export default function AROverlay() {
             ) : (
               <div className="text-center text-white">
                 <Camera className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                <p className="text-lg">Enable Live Preview</p>
-                <p className="text-sm opacity-75">Connect a device to view AR overlay</p>
+                <p className="text-lg">{t('arOverlay.enableLivePreview', 'Enable Live Preview')}</p>
+                <p className="text-sm opacity-75">{t('arOverlay.connectDevice', 'Connect a device to view AR overlay')}</p>
               </div>
             )}
           </div>
@@ -301,10 +304,10 @@ export default function AROverlay() {
   const devicesTab = (
     <div className="space-y-6" data-testid="ar-devices">
       <div className="flex justify-between items-center">
-        <h3 className="text-lg font-semibold">Paired Devices</h3>
+        <h3 className="text-lg font-semibold">{t('arOverlay.pairedDevices', 'Paired Devices')}</h3>
         <Button data-testid="button-pair-device">
           <Wifi className="w-4 h-4 mr-2" />
-          Pair New Device
+          {t('arOverlay.pairNewDevice', 'Pair New Device')}
         </Button>
       </div>
 
@@ -331,8 +334,8 @@ export default function AROverlay() {
                   </Badge>
                 </div>
                 <div className="mt-4 flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">Battery: {device.batteryLevel}%</span>
-                  <span className="text-muted-foreground">Last seen: {device.lastSeen}</span>
+                  <span className="text-muted-foreground">{t('arOverlay.battery', 'Battery')}: {device.batteryLevel}%</span>
+                  <span className="text-muted-foreground">{t('arOverlay.lastSeen', 'Last seen')}: {device.lastSeen}</span>
                 </div>
                 {device.status === "connected" && (
                   <Progress value={device.batteryLevel} className="h-1 mt-2" />
@@ -348,15 +351,15 @@ export default function AROverlay() {
   const instructionsTab = (
     <div className="space-y-6" data-testid="ar-instructions">
       <div className="flex justify-between items-center">
-        <h3 className="text-lg font-semibold">Work Instructions Library</h3>
+        <h3 className="text-lg font-semibold">{t('arOverlay.workInstructionsLibrary', 'Work Instructions Library')}</h3>
         <div className="flex gap-2">
           <Button variant="outline">
             <Download className="w-4 h-4 mr-2" />
-            Import
+            {t('common.import', 'Import')}
           </Button>
           <Button data-testid="button-create-instruction">
             <Layers className="w-4 h-4 mr-2" />
-            Create New
+            {t('arOverlay.createNew', 'Create New')}
           </Button>
         </div>
       </div>
@@ -378,24 +381,24 @@ export default function AROverlay() {
               <div className="grid grid-cols-2 gap-2 text-sm">
                 <div className="flex items-center gap-1">
                   <Layers className="w-4 h-4 text-muted-foreground" />
-                  <span>{instruction.stepCount} steps</span>
+                  <span>{instruction.stepCount} {t('arOverlay.steps', 'steps')}</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <Clock className="w-4 h-4 text-muted-foreground" />
-                  <span>~{instruction.estimatedTime} min</span>
+                  <span>~{instruction.estimatedTime} {t('arOverlay.min', 'min')}</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <Eye className="w-4 h-4 text-muted-foreground" />
-                  <span>{instruction.usageCount} uses</span>
+                  <span>{instruction.usageCount} {t('arOverlay.uses', 'uses')}</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <CheckCircle2 className="w-4 h-4 text-yellow-500" />
-                  <span>{instruction.rating} rating</span>
+                  <span>{instruction.rating} {t('arOverlay.rating', 'rating')}</span>
                 </div>
               </div>
               <div className="flex gap-2 mt-4">
-                <Button variant="outline" size="sm" className="flex-1" data-testid={`button-preview-instruction-${instruction.id}`}>Preview</Button>
-                <Button size="sm" className="flex-1" data-testid={`button-launch-instruction-${instruction.id}`}>Launch</Button>
+                <Button variant="outline" size="sm" className="flex-1" data-testid={`button-preview-instruction-${instruction.id}`}>{t('arOverlay.preview', 'Preview')}</Button>
+                <Button size="sm" className="flex-1" data-testid={`button-launch-instruction-${instruction.id}`}>{t('arOverlay.launch', 'Launch')}</Button>
               </div>
             </CardContent>
           </Card>
@@ -409,8 +412,8 @@ export default function AROverlay() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
-            <CardTitle>Usage by Category</CardTitle>
-            <CardDescription>Distribution of AR instruction usage</CardDescription>
+            <CardTitle>{t('arOverlay.usageByCategory', 'Usage by Category')}</CardTitle>
+            <CardDescription>{t('arOverlay.distributionOfUsage', 'Distribution of AR instruction usage')}</CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={250}>
@@ -436,22 +439,22 @@ export default function AROverlay() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Performance Metrics</CardTitle>
-            <CardDescription>AR system performance</CardDescription>
+            <CardTitle>{t('arOverlay.performanceMetrics', 'Performance Metrics')}</CardTitle>
+            <CardDescription>{t('arOverlay.arSystemPerformance', 'AR system performance')}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
-              <span>Avg. Completion Rate</span>
+              <span>{t('arOverlay.avgCompletionRate', 'Avg. Completion Rate')}</span>
               <span className="font-bold text-green-600">87%</span>
             </div>
             <Progress value={87} className="h-2" />
             <div className="flex items-center justify-between">
-              <span>Time Saved per Task</span>
-              <span className="font-bold text-blue-600">-15 min</span>
+              <span>{t('arOverlay.timeSavedPerTask', 'Time Saved per Task')}</span>
+              <span className="font-bold text-blue-600">-15 {t('arOverlay.min', 'min')}</span>
             </div>
             <Progress value={75} className="h-2" />
             <div className="flex items-center justify-between">
-              <span>Error Reduction</span>
+              <span>{t('arOverlay.errorReduction', 'Error Reduction')}</span>
               <span className="font-bold text-purple-600">42%</span>
             </div>
             <Progress value={42} className="h-2" />
@@ -462,16 +465,16 @@ export default function AROverlay() {
   );
 
   const tabs = [
-    { id: "overview", label: "Overview", icon: ScanLine, content: overviewTab },
-    { id: "devices", label: "Devices", icon: Smartphone, content: devicesTab },
-    { id: "instructions", label: "Instructions", icon: Layers, content: instructionsTab },
-    { id: "analytics", label: "Analytics", icon: Zap, content: analyticsTab },
+    { id: "overview", label: t('arOverlay.overview', 'Overview'), icon: ScanLine, content: overviewTab },
+    { id: "devices", label: t('arOverlay.devices', 'Devices'), icon: Smartphone, content: devicesTab },
+    { id: "instructions", label: t('arOverlay.instructionsTab', 'Instructions'), icon: Layers, content: instructionsTab },
+    { id: "analytics", label: t('arOverlay.analyticsTab', 'Analytics'), icon: Zap, content: analyticsTab },
   ];
 
   return (
     <TabsPageLayout
-      title="AR Overlay for Mechanics"
-      description="Augmented reality work instructions and guidance system"
+      title={t('arOverlay.title', 'AR Overlay for Mechanics')}
+      description={t('arOverlay.description', 'Augmented reality work instructions and guidance system')}
       icon={ScanLine}
       tabs={tabs}
       defaultTab="overview"

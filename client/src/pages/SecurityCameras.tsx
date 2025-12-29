@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -9,6 +10,7 @@ import { Camera, Play, Circle, Video } from "lucide-react";
 import { StandardPageLayout } from "@/components/layouts";
 
 export default function SecurityCameras() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [selectedCamera, setSelectedCamera] = useState<string | null>(null);
 
@@ -35,15 +37,15 @@ export default function SecurityCameras() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/cameras/cameras"] });
       toast({
-        title: "Success",
-        description: "Camera created successfully",
+        title: t('common.success', 'Success'),
+        description: t('cameras.cameraCreated', 'Camera created successfully'),
       });
     },
     onError: (error: any) => {
       toast({
         variant: "destructive",
-        title: "Error",
-        description: error.message || "Failed to create camera",
+        title: t('common.error', 'Error'),
+        description: error.message || t('cameras.failedToCreate', 'Failed to create camera'),
       });
     },
   });
@@ -57,16 +59,16 @@ export default function SecurityCameras() {
 
   return (
     <StandardPageLayout
-      title="📹 Security Cameras"
-      description="Monitor and manage security camera system"
+      title={t('cameras.title', '📹 Security Cameras')}
+      description={t('cameras.description', 'Monitor and manage security camera system')}
       icon={Camera}
       actions={[
         {
-          label: "Add Camera",
+          label: t('cameras.addCamera', 'Add Camera'),
           onClick: () => {
             createCameraMutation.mutate({
-              name: "New Camera",
-              location: "Service Bay",
+              name: t('cameras.newCamera', 'New Camera'),
+              location: t('cameras.serviceBay', 'Service Bay'),
               cameraType: "indoor",
               resolution: "1920x1080",
             });
@@ -79,7 +81,7 @@ export default function SecurityCameras() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Active Cameras</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('cameras.activeCameras', 'Active Cameras')}</p>
                 <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="stat-active-cameras">{stats.activeCameras}</h3>
               </div>
               <Camera className="h-12 w-12 text-blue-600" />
@@ -90,7 +92,7 @@ export default function SecurityCameras() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Recordings</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('cameras.recordings', 'Recordings')}</p>
                 <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="stat-total-recordings">{stats.totalRecordings}</h3>
               </div>
               <Video className="h-12 w-12 text-green-600" />
@@ -101,7 +103,7 @@ export default function SecurityCameras() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Storage (GB)</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('cameras.storageGB', 'Storage (GB)')}</p>
                 <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="stat-storage-used">{stats.storageUsed.toFixed(1)}</h3>
               </div>
               <Video className="h-12 w-12 text-purple-600" />
@@ -112,7 +114,7 @@ export default function SecurityCameras() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Motion Events</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('cameras.motionEvents', 'Motion Events')}</p>
                 <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="stat-motion-events">{stats.motionEvents}</h3>
               </div>
               <Circle className="h-12 w-12 text-red-600" />
@@ -123,16 +125,16 @@ export default function SecurityCameras() {
 
       <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
         <CardHeader>
-          <CardTitle>Camera Feeds</CardTitle>
+          <CardTitle>{t('cameras.cameraFeeds', 'Camera Feeds')}</CardTitle>
         </CardHeader>
         <CardContent>
           {loadingCameras ? (
             <div className="text-center py-8">
-              <p className="text-gray-600 dark:text-gray-400">Loading cameras...</p>
+              <p className="text-gray-600 dark:text-gray-400">{t('cameras.loadingCameras', 'Loading cameras...')}</p>
             </div>
           ) : cameras.length === 0 ? (
             <div className="text-center py-8">
-              <p className="text-gray-600 dark:text-gray-400">No cameras configured yet. Add a camera to get started.</p>
+              <p className="text-gray-600 dark:text-gray-400">{t('cameras.noCamerasConfigured', 'No cameras configured yet. Add a camera to get started.')}</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -150,12 +152,12 @@ export default function SecurityCameras() {
                         <div className="absolute top-2 right-2">
                           <Badge variant="destructive" className="gap-1">
                             <Circle className="h-2 w-2 fill-current" />
-                            LIVE
+                            {t('cameras.live', 'LIVE')}
                           </Badge>
                         </div>
                       </>
                     ) : (
-                      <p className="text-white">Camera Offline</p>
+                      <p className="text-white">{t('cameras.cameraOffline', 'Camera Offline')}</p>
                     )}
                   </div>
                   <div className="p-3 bg-gray-50 dark:bg-gray-900">
@@ -165,8 +167,8 @@ export default function SecurityCameras() {
                         <p className="text-sm text-gray-600 dark:text-gray-400">{camera.location} • {camera.cameraType}</p>
                       </div>
                       <div className="flex gap-2">
-                        {camera.recordingEnabled && <Badge variant="secondary">Recording</Badge>}
-                        {camera.motionDetection && <Badge>Motion</Badge>}
+                        {camera.recordingEnabled && <Badge variant="secondary">{t('cameras.recording', 'Recording')}</Badge>}
+                        {camera.motionDetection && <Badge>{t('cameras.motion', 'Motion')}</Badge>}
                       </div>
                     </div>
                   </div>
@@ -179,13 +181,13 @@ export default function SecurityCameras() {
 
       <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
         <CardHeader>
-          <CardTitle>Recent Recordings</CardTitle>
+          <CardTitle>{t('cameras.recentRecordings', 'Recent Recordings')}</CardTitle>
         </CardHeader>
         <CardContent>
           {recordings.length === 0 ? (
             <div className="text-center py-8">
               <p className="text-gray-600 dark:text-gray-400">
-                {selectedCamera ? "No recordings found for this camera." : "Select a camera to view recordings."}
+                {selectedCamera ? t('cameras.noRecordingsForCamera', 'No recordings found for this camera.') : t('cameras.selectCameraToView', 'Select a camera to view recordings.')}
               </p>
             </div>
           ) : (
@@ -194,7 +196,7 @@ export default function SecurityCameras() {
                 <div key={recording.id} className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-800 rounded-lg" data-testid={`recording-${recording.id}`}>
                   <div className="flex-1">
                     <h3 className="font-semibold text-gray-900 dark:text-white">
-                      {recording.vehiclePlate || "Recording"}
+                      {recording.vehiclePlate || t('cameras.recording', 'Recording')}
                     </h3>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
                       {recording.recordingStart ? new Date(recording.recordingStart).toLocaleString() : ""} - 
@@ -204,7 +206,7 @@ export default function SecurityCameras() {
                   <div className="text-right">
                     <Badge>{recording.eventType}</Badge>
                     <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                      {recording.fileSize ? `${(recording.fileSize / 1000).toFixed(1)} MB` : "N/A"}
+                      {recording.fileSize ? `${(recording.fileSize / 1000).toFixed(1)} MB` : t('drone.na', 'N/A')}
                     </p>
                   </div>
                 </div>

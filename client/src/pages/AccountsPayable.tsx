@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Link } from "wouter";
+import { useTranslation } from "react-i18next";
 import { TabsPageLayout } from "@/components/layouts/TabsPageLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -166,6 +167,7 @@ const vendors = [
 ];
 
 export default function AccountsPayable() {
+  const { t } = useTranslation();
   const [isPaymentDialogOpen, setIsPaymentDialogOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -204,6 +206,16 @@ export default function AccountsPayable() {
     return styles[status] || "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200";
   };
 
+  const getStatusLabel = (status: string) => {
+    const labels: Record<string, string> = {
+      Current: t('accounting.status.current', 'Current'),
+      "Due Soon": t('accounting.status.dueSoon', 'Due Soon'),
+      Overdue: t('accounting.status.overdue', 'Overdue'),
+      Paid: t('accounting.status.paid', 'Paid'),
+    };
+    return labels[status] || status;
+  };
+
   const payablesTab = (
     <div className="space-y-4">
       <div className="flex flex-col md:flex-row gap-4 justify-between">
@@ -211,7 +223,7 @@ export default function AccountsPayable() {
           <div className="relative flex-1 max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search vendors or invoices..."
+              placeholder={t('accounting.searchVendorsOrInvoices', 'Search vendors or invoices...')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10"
@@ -220,34 +232,34 @@ export default function AccountsPayable() {
           </div>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="w-[150px]" data-testid="select-status-filter">
-              <SelectValue placeholder="Status" />
+              <SelectValue placeholder={t('common.status', 'Status')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Status</SelectItem>
-              <SelectItem value="current">Current</SelectItem>
-              <SelectItem value="due-soon">Due Soon</SelectItem>
-              <SelectItem value="overdue">Overdue</SelectItem>
-              <SelectItem value="paid">Paid</SelectItem>
+              <SelectItem value="all">{t('accounting.allStatus', 'All Status')}</SelectItem>
+              <SelectItem value="current">{t('accounting.status.current', 'Current')}</SelectItem>
+              <SelectItem value="due-soon">{t('accounting.status.dueSoon', 'Due Soon')}</SelectItem>
+              <SelectItem value="overdue">{t('accounting.status.overdue', 'Overdue')}</SelectItem>
+              <SelectItem value="paid">{t('accounting.status.paid', 'Paid')}</SelectItem>
             </SelectContent>
           </Select>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" data-testid="button-export">
             <Download className="h-4 w-4 mr-2" />
-            Export
+            {t('common.export', 'Export')}
           </Button>
           <Dialog open={isPaymentDialogOpen} onOpenChange={setIsPaymentDialogOpen}>
             <DialogTrigger asChild>
               <Button data-testid="button-make-payment">
                 <Plus className="h-4 w-4 mr-2" />
-                Make Payment
+                {t('accounting.makePayment', 'Make Payment')}
               </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Make Payment</DialogTitle>
+                <DialogTitle>{t('accounting.makePayment', 'Make Payment')}</DialogTitle>
                 <DialogDescription>
-                  Record a payment to a vendor
+                  {t('accounting.recordPaymentToVendor', 'Record a payment to a vendor')}
                 </DialogDescription>
               </DialogHeader>
               <Form {...form}>
@@ -257,11 +269,11 @@ export default function AccountsPayable() {
                     name="vendorId"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Vendor</FormLabel>
+                        <FormLabel>{t('accounting.vendor', 'Vendor')}</FormLabel>
                         <Select onValueChange={field.onChange} value={field.value}>
                           <FormControl>
                             <SelectTrigger data-testid="select-vendor">
-                              <SelectValue placeholder="Select vendor" />
+                              <SelectValue placeholder={t('accounting.selectVendor', 'Select vendor')} />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
@@ -281,9 +293,9 @@ export default function AccountsPayable() {
                     name="invoiceId"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Invoice</FormLabel>
+                        <FormLabel>{t('accounting.invoice', 'Invoice')}</FormLabel>
                         <FormControl>
-                          <Input placeholder="e.g., VND-INV-2024-0156" {...field} data-testid="input-invoice" />
+                          <Input placeholder={t('accounting.invoicePlaceholder', 'e.g., VND-INV-2024-0156')} {...field} data-testid="input-invoice" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -295,7 +307,7 @@ export default function AccountsPayable() {
                       name="amount"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Amount (SAR)</FormLabel>
+                          <FormLabel>{t('accounting.amountSAR', 'Amount (SAR)')}</FormLabel>
                           <FormControl>
                             <Input type="number" placeholder="0.00" {...field} data-testid="input-amount" />
                           </FormControl>
@@ -308,7 +320,7 @@ export default function AccountsPayable() {
                       name="paymentDate"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Payment Date</FormLabel>
+                          <FormLabel>{t('accounting.paymentDate', 'Payment Date')}</FormLabel>
                           <FormControl>
                             <Input type="date" {...field} data-testid="input-payment-date" />
                           </FormControl>
@@ -322,18 +334,18 @@ export default function AccountsPayable() {
                     name="paymentMethod"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Payment Method</FormLabel>
+                        <FormLabel>{t('accounting.paymentMethod', 'Payment Method')}</FormLabel>
                         <Select onValueChange={field.onChange} value={field.value}>
                           <FormControl>
                             <SelectTrigger data-testid="select-payment-method">
-                              <SelectValue placeholder="Select method" />
+                              <SelectValue placeholder={t('accounting.selectMethod', 'Select method')} />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
-                            <SelectItem value="check">Check</SelectItem>
-                            <SelectItem value="cash">Cash</SelectItem>
-                            <SelectItem value="wire">Wire Transfer</SelectItem>
+                            <SelectItem value="bank_transfer">{t('accounting.bankTransfer', 'Bank Transfer')}</SelectItem>
+                            <SelectItem value="check">{t('accounting.check', 'Check')}</SelectItem>
+                            <SelectItem value="cash">{t('accounting.cash', 'Cash')}</SelectItem>
+                            <SelectItem value="wire">{t('accounting.wireTransfer', 'Wire Transfer')}</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -345,9 +357,9 @@ export default function AccountsPayable() {
                     name="reference"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Reference (Optional)</FormLabel>
+                        <FormLabel>{t('accounting.referenceOptional', 'Reference (Optional)')}</FormLabel>
                         <FormControl>
-                          <Input placeholder="e.g., Transfer #12345" {...field} data-testid="input-reference" />
+                          <Input placeholder={t('accounting.referencePlaceholder', 'e.g., Transfer #12345')} {...field} data-testid="input-reference" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -355,10 +367,10 @@ export default function AccountsPayable() {
                   />
                   <div className="flex justify-end gap-2">
                     <Button type="button" variant="outline" onClick={() => setIsPaymentDialogOpen(false)}>
-                      Cancel
+                      {t('common.cancel', 'Cancel')}
                     </Button>
                     <Button type="submit" data-testid="button-save-payment">
-                      Make Payment
+                      {t('accounting.makePayment', 'Make Payment')}
                     </Button>
                   </div>
                 </form>
@@ -373,15 +385,15 @@ export default function AccountsPayable() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Vendor</TableHead>
-                <TableHead>Invoice</TableHead>
-                <TableHead>Due Date</TableHead>
-                <TableHead>Terms</TableHead>
-                <TableHead className="text-right">Original</TableHead>
-                <TableHead className="text-right">Paid</TableHead>
-                <TableHead className="text-right">Balance</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Actions</TableHead>
+                <TableHead>{t('accounting.vendor', 'Vendor')}</TableHead>
+                <TableHead>{t('accounting.invoice', 'Invoice')}</TableHead>
+                <TableHead>{t('accounting.dueDate', 'Due Date')}</TableHead>
+                <TableHead>{t('accounting.terms', 'Terms')}</TableHead>
+                <TableHead className="text-right">{t('accounting.original', 'Original')}</TableHead>
+                <TableHead className="text-right">{t('accounting.paid', 'Paid')}</TableHead>
+                <TableHead className="text-right">{t('accounting.balance', 'Balance')}</TableHead>
+                <TableHead>{t('common.status', 'Status')}</TableHead>
+                <TableHead>{t('common.actions', 'Actions')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -402,10 +414,10 @@ export default function AccountsPayable() {
                     <div>
                       <p>{ap.dueDate}</p>
                       {ap.daysUntilDue < 0 && (
-                        <p className="text-xs text-red-600">{Math.abs(ap.daysUntilDue)} days overdue</p>
+                        <p className="text-xs text-red-600">{t('accounting.daysOverdue', '{{days}} days overdue', { days: Math.abs(ap.daysUntilDue) })}</p>
                       )}
                       {ap.daysUntilDue > 0 && ap.daysUntilDue <= 7 && (
-                        <p className="text-xs text-yellow-600">Due in {ap.daysUntilDue} days</p>
+                        <p className="text-xs text-yellow-600">{t('accounting.dueInDays', 'Due in {{days}} days', { days: ap.daysUntilDue })}</p>
                       )}
                     </div>
                   </TableCell>
@@ -422,7 +434,7 @@ export default function AccountsPayable() {
                     {ap.balanceDue.toLocaleString()}
                   </TableCell>
                   <TableCell>
-                    <Badge className={getStatusBadge(ap.status)}>{ap.status}</Badge>
+                    <Badge className={getStatusBadge(ap.status)}>{getStatusLabel(ap.status)}</Badge>
                   </TableCell>
                   <TableCell>
                     <div className="flex gap-1">
@@ -452,12 +464,12 @@ export default function AccountsPayable() {
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
               <DollarSign className="h-4 w-4" />
-              Total Payables
+              {t('accounting.totalPayables', 'Total Payables')}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold">SAR {totalPayables.toLocaleString()}</p>
-            <p className="text-xs text-muted-foreground">{unpaidPayables.length} invoices</p>
+            <p className="text-2xl font-bold">{t('common.sar', 'SAR')} {totalPayables.toLocaleString()}</p>
+            <p className="text-xs text-muted-foreground">{t('accounting.invoicesCount', '{{count}} invoices', { count: unpaidPayables.length })}</p>
           </CardContent>
         </Card>
 
@@ -465,14 +477,14 @@ export default function AccountsPayable() {
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
               <CheckCircle className="h-4 w-4 text-green-600" />
-              Current
+              {t('accounting.status.current', 'Current')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-bold text-green-600">
-              SAR {currentPayables.toLocaleString()}
+              {t('common.sar', 'SAR')} {currentPayables.toLocaleString()}
             </p>
-            <p className="text-xs text-muted-foreground">Not yet due</p>
+            <p className="text-xs text-muted-foreground">{t('accounting.notYetDue', 'Not yet due')}</p>
           </CardContent>
         </Card>
 
@@ -480,14 +492,14 @@ export default function AccountsPayable() {
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
               <Clock className="h-4 w-4 text-yellow-600" />
-              Due Soon
+              {t('accounting.status.dueSoon', 'Due Soon')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-bold text-yellow-600">
-              SAR {dueSoonPayables.toLocaleString()}
+              {t('common.sar', 'SAR')} {dueSoonPayables.toLocaleString()}
             </p>
-            <p className="text-xs text-muted-foreground">Within 7 days</p>
+            <p className="text-xs text-muted-foreground">{t('accounting.within7Days', 'Within 7 days')}</p>
           </CardContent>
         </Card>
 
@@ -495,34 +507,34 @@ export default function AccountsPayable() {
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
               <AlertTriangle className="h-4 w-4 text-red-600" />
-              Overdue
+              {t('accounting.status.overdue', 'Overdue')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-bold text-red-600">
-              SAR {overduePayables.toLocaleString()}
+              {t('common.sar', 'SAR')} {overduePayables.toLocaleString()}
             </p>
-            <p className="text-xs text-muted-foreground">Requires attention</p>
+            <p className="text-xs text-muted-foreground">{t('accounting.requiresAttention', 'Requires attention')}</p>
           </CardContent>
         </Card>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Payment Schedule</CardTitle>
-          <CardDescription>Upcoming payments by due date</CardDescription>
+          <CardTitle>{t('accounting.paymentSchedule', 'Payment Schedule')}</CardTitle>
+          <CardDescription>{t('accounting.upcomingPaymentsByDueDate', 'Upcoming payments by due date')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             {[
-              { label: "Overdue", amount: overduePayables, color: "bg-red-500" },
-              { label: "Due This Week", amount: dueSoonPayables, color: "bg-yellow-500" },
-              { label: "Due This Month", amount: currentPayables, color: "bg-green-500" },
+              { label: t('accounting.status.overdue', 'Overdue'), amount: overduePayables, color: "bg-red-500" },
+              { label: t('accounting.dueThisWeek', 'Due This Week'), amount: dueSoonPayables, color: "bg-yellow-500" },
+              { label: t('accounting.dueThisMonth', 'Due This Month'), amount: currentPayables, color: "bg-green-500" },
             ].map((item, index) => (
               <div key={index}>
                 <div className="flex justify-between mb-1">
                   <span className="text-sm">{item.label}</span>
-                  <span className="text-sm font-bold">SAR {item.amount.toLocaleString()}</span>
+                  <span className="text-sm font-bold">{t('common.sar', 'SAR')} {item.amount.toLocaleString()}</span>
                 </div>
                 <Progress value={(item.amount / totalPayables) * 100} className="h-2" />
               </div>
@@ -533,36 +545,36 @@ export default function AccountsPayable() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Related Modules</CardTitle>
-          <CardDescription>Navigate to related pages</CardDescription>
+          <CardTitle>{t('accounting.relatedModules', 'Related Modules')}</CardTitle>
+          <CardDescription>{t('accounting.navigateToRelatedPages', 'Navigate to related pages')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <Link href="/vendor-supplier-portal">
               <Button variant="outline" className="w-full justify-start" data-testid="link-vendors">
                 <Building2 className="h-4 w-4 mr-2" />
-                Vendors
+                {t('accounting.vendors', 'Vendors')}
                 <ExternalLink className="h-3 w-3 ml-auto" />
               </Button>
             </Link>
             <Link href="/general-ledger">
               <Button variant="outline" className="w-full justify-start" data-testid="link-general-ledger">
                 <FileText className="h-4 w-4 mr-2" />
-                General Ledger
+                {t('accounting.generalLedger', 'General Ledger')}
                 <ExternalLink className="h-3 w-3 ml-auto" />
               </Button>
             </Link>
             <Link href="/accounts-receivable">
               <Button variant="outline" className="w-full justify-start" data-testid="link-accounts-receivable">
                 <TrendingUp className="h-4 w-4 mr-2" />
-                Accounts Receivable
+                {t('accounting.accountsReceivable', 'Accounts Receivable')}
                 <ExternalLink className="h-3 w-3 ml-auto" />
               </Button>
             </Link>
             <Link href="/cash-flow-statement">
               <Button variant="outline" className="w-full justify-start" data-testid="link-cash-flow">
                 <Calendar className="h-4 w-4 mr-2" />
-                Cash Flow
+                {t('accounting.cashFlow', 'Cash Flow')}
                 <ExternalLink className="h-3 w-3 ml-auto" />
               </Button>
             </Link>
@@ -576,14 +588,14 @@ export default function AccountsPayable() {
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <div>
-          <h3 className="text-lg font-semibold">Payment Queue</h3>
+          <h3 className="text-lg font-semibold">{t('accounting.paymentQueue', 'Payment Queue')}</h3>
           <p className="text-sm text-muted-foreground">
-            Prioritized list of payments requiring action
+            {t('accounting.prioritizedPaymentsList', 'Prioritized list of payments requiring action')}
           </p>
         </div>
         <Button data-testid="button-process-batch">
           <Send className="h-4 w-4 mr-2" />
-          Process Batch Payment
+          {t('accounting.processBatchPayment', 'Process Batch Payment')}
         </Button>
       </div>
 
@@ -602,17 +614,17 @@ export default function AccountsPayable() {
                     <div>
                       <p className="font-medium">{ap.vendorName}</p>
                       <p className="text-sm text-muted-foreground">
-                        {ap.invoiceNumber} • Due: {ap.dueDate}
+                        {ap.invoiceNumber} • {t('accounting.due', 'Due')}: {ap.dueDate}
                       </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-4">
                     <div className="text-right">
-                      <p className="font-bold font-mono">SAR {ap.balanceDue.toLocaleString()}</p>
-                      <Badge className={getStatusBadge(ap.status)}>{ap.status}</Badge>
+                      <p className="font-bold font-mono">{t('common.sar', 'SAR')} {ap.balanceDue.toLocaleString()}</p>
+                      <Badge className={getStatusBadge(ap.status)}>{getStatusLabel(ap.status)}</Badge>
                     </div>
                     <Button size="sm" data-testid={`button-pay-now-${ap.id}`}>
-                      Pay Now
+                      {t('accounting.payNow', 'Pay Now')}
                     </Button>
                   </div>
                 </div>
@@ -624,18 +636,18 @@ export default function AccountsPayable() {
   );
 
   const tabs = [
-    { id: "overview", label: "Overview", icon: TrendingUp, content: overviewTab },
-    { id: "payables", label: "Payables", icon: DollarSign, content: payablesTab },
-    { id: "scheduled", label: "Payment Queue", icon: Calendar, content: scheduledTab },
+    { id: "payables", label: t('accounting.payables', 'Payables'), icon: FileText, content: payablesTab },
+    { id: "overview", label: t('accounting.overview', 'Overview'), icon: TrendingUp, content: overviewTab },
+    { id: "scheduled", label: t('accounting.scheduled', 'Scheduled'), icon: Calendar, content: scheduledTab },
   ];
 
   return (
     <TabsPageLayout
-      title="Accounts Payable - حسابات الدائنين"
-      description="Manage vendor payments and obligations"
-      icon={Building2}
+      title={t('accounting.accountsPayableTitle', 'Accounts Payable - الذمم الدائنة')}
+      description={t('accounting.accountsPayableDescription', 'Manage vendor invoices and payments')}
+      icon={CreditCard}
       tabs={tabs}
-      defaultTab="overview"
+      defaultTab="payables"
     />
   );
 }

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { DashboardPage } from '@/components/layouts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -50,6 +51,7 @@ interface SensorReading {
 }
 
 export default function IoTDashboard() {
+  const { t } = useTranslation();
   const [selectedVehicleId, setSelectedVehicleId] = useState<string>('');
   const { toast } = useToast();
 
@@ -82,14 +84,14 @@ export default function IoTDashboard() {
       queryClient.invalidateQueries({ queryKey: ['/api/iot/alerts'] });
       queryClient.invalidateQueries({ queryKey: ['/api/iot/dashboard/summary'] });
       toast({
-        title: "Alert Acknowledged",
-        description: "The alert has been acknowledged successfully.",
+        title: t('iot.alertAcknowledged', 'Alert Acknowledged'),
+        description: t('iot.alertAcknowledgedDesc', 'The alert has been acknowledged successfully.'),
       });
     },
     onError: () => {
       toast({
-        title: "Error",
-        description: "Failed to acknowledge alert.",
+        title: t('common.error', 'Error'),
+        description: t('iot.acknowledgeError', 'Failed to acknowledge alert.'),
         variant: "destructive",
       });
     },
@@ -100,25 +102,25 @@ export default function IoTDashboard() {
 
   const metrics = [
     {
-      label: 'Total Sensors',
+      label: t('iot.totalSensors', 'Total Sensors'),
       value: summary?.totalSensors || 0,
       icon: Zap,
       color: 'text-blue-500',
     },
     {
-      label: 'Active Sensors',
+      label: t('iot.activeSensors', 'Active Sensors'),
       value: summary?.activeSensors || 0,
       icon: CheckCircle,
       color: 'text-green-500',
     },
     {
-      label: 'Active Alerts',
+      label: t('iot.activeAlerts', 'Active Alerts'),
       value: summary?.activeAlerts || 0,
       icon: AlertTriangle,
       color: (summary?.activeAlerts ?? 0) > 0 ? 'text-orange-500' : 'text-gray-500',
     },
     {
-      label: 'Critical Alerts',
+      label: t('iot.criticalAlerts', 'Critical Alerts'),
       value: summary?.criticalAlerts || 0,
       icon: AlertTriangle,
       color: (summary?.criticalAlerts ?? 0) > 0 ? 'text-red-500' : 'text-gray-500',
@@ -135,15 +137,15 @@ export default function IoTDashboard() {
 
   return (
     <DashboardPage
-      title="IoT Sensor Dashboard"
-      description="Real-time monitoring of connected sensors across all service bays"
+      title={t('iot.title', 'IoT Sensor Dashboard')}
+      description={t('iot.description', 'Real-time monitoring of connected sensors across all service bays')}
       icon={Activity}
       metrics={metrics}
     >
       <div className="mb-6 flex items-center justify-between">
         <Select value={selectedVehicleId} onValueChange={setSelectedVehicleId}>
           <SelectTrigger className="w-64">
-            <SelectValue placeholder="Select vehicle..." />
+            <SelectValue placeholder={t('iot.selectVehicle', 'Select vehicle...')} />
           </SelectTrigger>
           <SelectContent>
             {Array.isArray(vehicles) && vehicles.map((vehicle) => (
@@ -158,14 +160,14 @@ export default function IoTDashboard() {
             <>
               <Wifi className="h-5 w-5 text-green-500" />
               <Badge className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 border-0">
-                Connected
+                {t('iot.connected', 'Connected')}
               </Badge>
             </>
           ) : (
             <>
               <WifiOff className="h-5 w-5 text-red-500" />
               <Badge className="bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 border-0">
-                No Sensors
+                {t('iot.noSensors', 'No Sensors')}
               </Badge>
             </>
           )}
@@ -176,16 +178,16 @@ export default function IoTDashboard() {
         <TabsList>
           <TabsTrigger value="sensors" data-testid="tab-sensors">
             <Zap className="h-4 w-4 mr-2" />
-            Sensor List ({sensors.length})
+            {t('iot.sensorList', 'Sensor List')} ({sensors.length})
           </TabsTrigger>
           <TabsTrigger value="alerts" data-testid="tab-alerts">
             <AlertTriangle className="h-4 w-4 mr-2" />
-            Alerts ({activeAlerts.length})
+            {t('iot.alerts', 'Alerts')} ({activeAlerts.length})
           </TabsTrigger>
           {selectedVehicleId && (
             <TabsTrigger value="live" data-testid="tab-live">
               <Activity className="h-4 w-4 mr-2" />
-              Live Monitoring
+              {t('iot.liveMonitoring', 'Live Monitoring')}
             </TabsTrigger>
           )}
         </TabsList>
@@ -193,7 +195,7 @@ export default function IoTDashboard() {
         <TabsContent value="sensors">
           <Card className="bg-white dark:bg-salis-black">
             <CardHeader>
-              <CardTitle>Installed Sensors</CardTitle>
+              <CardTitle>{t('iot.installedSensors', 'Installed Sensors')}</CardTitle>
             </CardHeader>
             <CardContent>
               {sensorsLoading ? (
@@ -204,7 +206,7 @@ export default function IoTDashboard() {
                 <div className="text-center py-12">
                   <Zap className="h-16 w-16 mx-auto mb-4 text-gray-400" />
                   <p className="text-gray-500 dark:text-gray-400">
-                    No sensors configured yet
+                    {t('iot.noSensorsConfigured', 'No sensors configured yet')}
                   </p>
                 </div>
               ) : (
@@ -212,11 +214,11 @@ export default function IoTDashboard() {
                   <table className="w-full">
                     <thead className="border-b">
                       <tr className="text-left">
-                        <th className="pb-3">Sensor ID</th>
-                        <th className="pb-3">Type</th>
-                        <th className="pb-3">Vehicle</th>
-                        <th className="pb-3">Status</th>
-                        <th className="pb-3">Last Communication</th>
+                        <th className="pb-3">{t('iot.sensorId', 'Sensor ID')}</th>
+                        <th className="pb-3">{t('iot.type', 'Type')}</th>
+                        <th className="pb-3">{t('iot.vehicle', 'Vehicle')}</th>
+                        <th className="pb-3">{t('iot.status', 'Status')}</th>
+                        <th className="pb-3">{t('iot.lastCommunication', 'Last Communication')}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -227,15 +229,15 @@ export default function IoTDashboard() {
                             <td className="py-3 font-mono text-xs">{sensor.sensorIdentifier}</td>
                             <td className="py-3">{sensor.sensorType}</td>
                             <td className="py-3">
-                              {vehicle ? `${vehicle.make} ${vehicle.model}` : 'Unknown'}
+                              {vehicle ? `${vehicle.make} ${vehicle.model}` : t('iot.unknown', 'Unknown')}
                             </td>
                             <td className="py-3">
                               <Badge className={sensor.status === 'active' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 border-0' : 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 border-0'}>
-                                {sensor.status}
+                                {sensor.status === 'active' ? t('iot.active', 'active') : sensor.status}
                               </Badge>
                             </td>
                             <td className="py-3 text-sm text-gray-600 dark:text-gray-400">
-                              {sensor.lastCommunication ? new Date(sensor.lastCommunication).toLocaleString() : 'Never'}
+                              {sensor.lastCommunication ? new Date(sensor.lastCommunication).toLocaleString() : t('iot.never', 'Never')}
                             </td>
                           </tr>
                         );
@@ -253,7 +255,7 @@ export default function IoTDashboard() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <AlertTriangle className="h-5 w-5" />
-                Active Alerts
+                {t('iot.activeAlertsTitle', 'Active Alerts')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -265,7 +267,7 @@ export default function IoTDashboard() {
                 <div className="text-center py-12">
                   <CheckCircle className="h-16 w-16 mx-auto mb-4 text-green-500" />
                   <p className="text-gray-500 dark:text-gray-400">
-                    No active alerts - all systems normal
+                    {t('iot.noActiveAlerts', 'No active alerts - all systems normal')}
                   </p>
                 </div>
               ) : (
@@ -309,7 +311,7 @@ export default function IoTDashboard() {
                               </p>
                               {vehicle && (
                                 <p className="text-xs text-gray-500 mt-1">
-                                  Vehicle: {vehicle.make} {vehicle.model} - {vehicle.licensePlate}
+                                  {t('iot.vehicleLabel', 'Vehicle')}: {vehicle.make} {vehicle.model} - {vehicle.licensePlate}
                                 </p>
                               )}
                               <p className="text-xs text-gray-500 mt-1">
@@ -327,7 +329,7 @@ export default function IoTDashboard() {
                             {acknowledgeAlertMutation.isPending ? (
                               <Loader2 className="h-4 w-4 animate-spin" />
                             ) : (
-                              'Acknowledge'
+                              t('iot.acknowledge', 'Acknowledge')
                             )}
                           </Button>
                         </div>
@@ -346,7 +348,7 @@ export default function IoTDashboard() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Activity className="h-5 w-5 text-blue-500" />
-                  Latest Sensor Readings
+                  {t('iot.latestReadings', 'Latest Sensor Readings')}
                 </CardTitle>
               </CardHeader>
               <CardContent>

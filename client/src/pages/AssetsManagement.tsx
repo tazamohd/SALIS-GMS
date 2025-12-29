@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Link } from "wouter";
+import { useTranslation } from "react-i18next";
 import { TabsPageLayout } from "@/components/layouts/TabsPageLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -153,6 +154,7 @@ const depreciationSchedule = [
 ];
 
 export default function AssetsManagement() {
+  const { t } = useTranslation();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
@@ -210,45 +212,45 @@ export default function AssetsManagement() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card data-testid="card-total-assets">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Total Asset Value</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t('assets.totalAssetValue', 'Total Asset Value')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-600">
               SAR {totalAssetValue.toLocaleString()}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">Current book value</p>
+            <p className="text-xs text-muted-foreground mt-1">{t('assets.currentBookValue', 'Current book value')}</p>
           </CardContent>
         </Card>
 
         <Card data-testid="card-total-depreciation">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Total Depreciation</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t('assets.totalDepreciation', 'Total Depreciation')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-orange-600">
               SAR {totalDepreciation.toLocaleString()}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">Accumulated</p>
+            <p className="text-xs text-muted-foreground mt-1">{t('assets.accumulated', 'Accumulated')}</p>
           </CardContent>
         </Card>
 
         <Card data-testid="card-asset-count">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Total Assets</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t('assets.totalAssets', 'Total Assets')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{sampleAssets.length}</div>
-            <p className="text-xs text-muted-foreground mt-1">Active assets</p>
+            <p className="text-xs text-muted-foreground mt-1">{t('assets.activeAssets', 'Active assets')}</p>
           </CardContent>
         </Card>
 
         <Card data-testid="card-depreciation-rate">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Avg Depreciation</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t('assets.avgDepreciation', 'Avg Depreciation')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">12.4%</div>
-            <p className="text-xs text-muted-foreground mt-1">Annual rate</p>
+            <p className="text-xs text-muted-foreground mt-1">{t('assets.annualRate', 'Annual rate')}</p>
           </CardContent>
         </Card>
       </div>
@@ -257,20 +259,20 @@ export default function AssetsManagement() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>Fixed Assets Register</CardTitle>
-              <CardDescription>سجل الأصول الثابتة - Track all company fixed assets</CardDescription>
+              <CardTitle>{t('assets.fixedAssetsRegister', 'Fixed Assets Register')}</CardTitle>
+              <CardDescription>{t('assets.fixedAssetsDescription', 'سجل الأصول الثابتة - Track all company fixed assets')}</CardDescription>
             </div>
             <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
               <DialogTrigger asChild>
                 <Button data-testid="button-add-asset">
                   <Plus className="h-4 w-4 mr-2" />
-                  Add Asset
+                  {t('assets.addAsset', 'Add Asset')}
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-2xl" data-testid="modal-add-asset">
                 <DialogHeader>
-                  <DialogTitle>Add New Asset</DialogTitle>
-                  <DialogDescription>إضافة أصل جديد - Register a new fixed asset</DialogDescription>
+                  <DialogTitle>{t('assets.addNewAsset', 'Add New Asset')}</DialogTitle>
+                  <DialogDescription>{t('assets.addNewAssetDescription', 'إضافة أصل جديد - Register a new fixed asset')}</DialogDescription>
                 </DialogHeader>
                 <Form {...form}>
                   <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -280,9 +282,9 @@ export default function AssetsManagement() {
                         name="name"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Asset Name</FormLabel>
+                            <FormLabel>{t('assets.assetName', 'Asset Name')}</FormLabel>
                             <FormControl>
-                              <Input {...field} placeholder="Enter asset name" data-testid="input-asset-name" />
+                              <Input {...field} placeholder={t('assets.enterAssetName', 'Enter asset name')} data-testid="input-asset-name" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -293,19 +295,19 @@ export default function AssetsManagement() {
                         name="category"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Category</FormLabel>
+                            <FormLabel>{t('common.category', 'Category')}</FormLabel>
                             <Select onValueChange={field.onChange} value={field.value}>
                               <FormControl>
                                 <SelectTrigger data-testid="select-category">
-                                  <SelectValue placeholder="Select category" />
+                                  <SelectValue placeholder={t('assets.selectCategory', 'Select category')} />
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                <SelectItem value="Equipment">Equipment</SelectItem>
-                                <SelectItem value="Vehicle">Vehicle</SelectItem>
-                                <SelectItem value="IT Equipment">IT Equipment</SelectItem>
-                                <SelectItem value="Property">Property</SelectItem>
-                                <SelectItem value="Furniture">Furniture</SelectItem>
+                                <SelectItem value="Equipment">{t('assets.equipment', 'Equipment')}</SelectItem>
+                                <SelectItem value="Vehicle">{t('assets.vehicle', 'Vehicle')}</SelectItem>
+                                <SelectItem value="IT Equipment">{t('assets.itEquipment', 'IT Equipment')}</SelectItem>
+                                <SelectItem value="Property">{t('assets.property', 'Property')}</SelectItem>
+                                <SelectItem value="Furniture">{t('assets.furniture', 'Furniture')}</SelectItem>
                               </SelectContent>
                             </Select>
                             <FormMessage />
@@ -317,7 +319,7 @@ export default function AssetsManagement() {
                         name="purchaseDate"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Purchase Date</FormLabel>
+                            <FormLabel>{t('assets.purchaseDate', 'Purchase Date')}</FormLabel>
                             <FormControl>
                               <Input {...field} type="date" data-testid="input-purchase-date" />
                             </FormControl>
@@ -330,7 +332,7 @@ export default function AssetsManagement() {
                         name="purchaseValue"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Purchase Value (SAR)</FormLabel>
+                            <FormLabel>{t('assets.purchaseValueSAR', 'Purchase Value (SAR)')}</FormLabel>
                             <FormControl>
                               <Input {...field} type="number" placeholder="0.00" data-testid="input-purchase-value" />
                             </FormControl>
@@ -343,7 +345,7 @@ export default function AssetsManagement() {
                         name="currentValue"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Current Value (SAR)</FormLabel>
+                            <FormLabel>{t('assets.currentValueSAR', 'Current Value (SAR)')}</FormLabel>
                             <FormControl>
                               <Input {...field} type="number" placeholder="0.00" data-testid="input-current-value" />
                             </FormControl>
@@ -356,7 +358,7 @@ export default function AssetsManagement() {
                         name="depreciationRate"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Depreciation Rate (%)</FormLabel>
+                            <FormLabel>{t('assets.depreciationRatePercent', 'Depreciation Rate (%)')}</FormLabel>
                             <FormControl>
                               <Input {...field} type="number" placeholder="10" data-testid="input-depreciation-rate" />
                             </FormControl>
@@ -369,9 +371,9 @@ export default function AssetsManagement() {
                         name="location"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Location</FormLabel>
+                            <FormLabel>{t('assets.location', 'Location')}</FormLabel>
                             <FormControl>
-                              <Input {...field} placeholder="Enter location" data-testid="input-location" />
+                              <Input {...field} placeholder={t('assets.enterLocation', 'Enter location')} data-testid="input-location" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -382,9 +384,9 @@ export default function AssetsManagement() {
                         name="serialNumber"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Serial Number</FormLabel>
+                            <FormLabel>{t('assets.serialNumber', 'Serial Number')}</FormLabel>
                             <FormControl>
-                              <Input {...field} placeholder="Optional" data-testid="input-serial-number" />
+                              <Input {...field} placeholder={t('common.optional', 'Optional')} data-testid="input-serial-number" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -395,18 +397,18 @@ export default function AssetsManagement() {
                         name="condition"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Condition</FormLabel>
+                            <FormLabel>{t('assets.condition', 'Condition')}</FormLabel>
                             <Select onValueChange={field.onChange} value={field.value}>
                               <FormControl>
                                 <SelectTrigger data-testid="select-condition">
-                                  <SelectValue placeholder="Select condition" />
+                                  <SelectValue placeholder={t('assets.selectCondition', 'Select condition')} />
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                <SelectItem value="Excellent">Excellent</SelectItem>
-                                <SelectItem value="Good">Good</SelectItem>
-                                <SelectItem value="Fair">Fair</SelectItem>
-                                <SelectItem value="Poor">Poor</SelectItem>
+                                <SelectItem value="Excellent">{t('assets.excellent', 'Excellent')}</SelectItem>
+                                <SelectItem value="Good">{t('assets.good', 'Good')}</SelectItem>
+                                <SelectItem value="Fair">{t('assets.fair', 'Fair')}</SelectItem>
+                                <SelectItem value="Poor">{t('assets.poor', 'Poor')}</SelectItem>
                               </SelectContent>
                             </Select>
                             <FormMessage />
@@ -416,9 +418,9 @@ export default function AssetsManagement() {
                     </div>
                     <div className="flex justify-end gap-2">
                       <Button type="button" variant="outline" onClick={() => setIsAddDialogOpen(false)}>
-                        Cancel
+                        {t('common.cancel', 'Cancel')}
                       </Button>
-                      <Button type="submit" data-testid="button-save-asset">Save Asset</Button>
+                      <Button type="submit" data-testid="button-save-asset">{t('assets.saveAsset', 'Save Asset')}</Button>
                     </div>
                   </form>
                 </Form>
@@ -431,7 +433,7 @@ export default function AssetsManagement() {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search assets..."
+                placeholder={t('assets.searchAssets', 'Search assets...')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
@@ -440,32 +442,32 @@ export default function AssetsManagement() {
             </div>
             <Select value={categoryFilter} onValueChange={setCategoryFilter}>
               <SelectTrigger className="w-48" data-testid="select-filter-category">
-                <SelectValue placeholder="Filter by category" />
+                <SelectValue placeholder={t('assets.filterByCategory', 'Filter by category')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Categories</SelectItem>
-                <SelectItem value="Equipment">Equipment</SelectItem>
-                <SelectItem value="Vehicle">Vehicle</SelectItem>
-                <SelectItem value="IT Equipment">IT Equipment</SelectItem>
-                <SelectItem value="Property">Property</SelectItem>
+                <SelectItem value="all">{t('assets.allCategories', 'All Categories')}</SelectItem>
+                <SelectItem value="Equipment">{t('assets.equipment', 'Equipment')}</SelectItem>
+                <SelectItem value="Vehicle">{t('assets.vehicle', 'Vehicle')}</SelectItem>
+                <SelectItem value="IT Equipment">{t('assets.itEquipment', 'IT Equipment')}</SelectItem>
+                <SelectItem value="Property">{t('assets.property', 'Property')}</SelectItem>
               </SelectContent>
             </Select>
             <Button variant="outline" data-testid="button-export-assets">
               <Download className="h-4 w-4 mr-2" />
-              Export
+              {t('common.export', 'Export')}
             </Button>
           </div>
 
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Asset</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Purchase Value</TableHead>
-                <TableHead>Current Value</TableHead>
-                <TableHead>Depreciation</TableHead>
-                <TableHead>Condition</TableHead>
-                <TableHead>Status</TableHead>
+                <TableHead>{t('assets.asset', 'Asset')}</TableHead>
+                <TableHead>{t('common.category', 'Category')}</TableHead>
+                <TableHead>{t('assets.purchaseValue', 'Purchase Value')}</TableHead>
+                <TableHead>{t('assets.currentValue', 'Current Value')}</TableHead>
+                <TableHead>{t('assets.depreciation', 'Depreciation')}</TableHead>
+                <TableHead>{t('assets.condition', 'Condition')}</TableHead>
+                <TableHead>{t('common.status', 'Status')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -497,7 +499,7 @@ export default function AssetsManagement() {
                   <TableCell>
                     <Badge variant="outline" className="text-green-600">
                       <CheckCircle className="h-3 w-3 mr-1" />
-                      {asset.status}
+                      {t('common.active', 'Active')}
                     </Badge>
                   </TableCell>
                 </TableRow>
@@ -509,8 +511,8 @@ export default function AssetsManagement() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Related Financial Modules</CardTitle>
-          <CardDescription>الوحدات المالية ذات الصلة - Quick access to balance sheet items</CardDescription>
+          <CardTitle>{t('assets.relatedFinancialModules', 'Related Financial Modules')}</CardTitle>
+          <CardDescription>{t('assets.relatedFinancialModulesDescription', 'الوحدات المالية ذات الصلة - Quick access to balance sheet items')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -521,11 +523,11 @@ export default function AssetsManagement() {
                     <CreditCard className="h-8 w-8 text-red-600" />
                     <ExternalLink className="h-4 w-4 text-muted-foreground" />
                   </div>
-                  <CardTitle className="text-lg">Liabilities & Obligations</CardTitle>
-                  <CardDescription>الخصوم</CardDescription>
+                  <CardTitle className="text-lg">{t('assets.liabilitiesObligations', 'Liabilities & Obligations')}</CardTitle>
+                  <CardDescription>{t('assets.liabilitiesArabic', 'الخصوم')}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm text-muted-foreground">Manage company debts, loans, and financial obligations</p>
+                  <p className="text-sm text-muted-foreground">{t('assets.liabilitiesDescription', 'Manage company debts, loans, and financial obligations')}</p>
                 </CardContent>
               </Card>
             </Link>
@@ -537,11 +539,11 @@ export default function AssetsManagement() {
                     <DollarSign className="h-8 w-8 text-green-600" />
                     <ExternalLink className="h-4 w-4 text-muted-foreground" />
                   </div>
-                  <CardTitle className="text-lg">Equity Management</CardTitle>
-                  <CardDescription>حقوق الملكية</CardDescription>
+                  <CardTitle className="text-lg">{t('assets.equityManagement', 'Equity Management')}</CardTitle>
+                  <CardDescription>{t('assets.equityArabic', 'حقوق الملكية')}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm text-muted-foreground">Track owner's equity, capital, and retained earnings</p>
+                  <p className="text-sm text-muted-foreground">{t('assets.equityDescription', "Track owner's equity, capital, and retained earnings")}</p>
                 </CardContent>
               </Card>
             </Link>
@@ -556,96 +558,84 @@ export default function AssetsManagement() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card data-testid="card-cash-balance">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Cash & Bank</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t('assets.cashBank', 'Cash & Bank')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-600">SAR 485,000</div>
-            <p className="text-xs text-muted-foreground mt-1">النقد والبنوك</p>
+            <p className="text-xs text-muted-foreground mt-1">{t('assets.cashBankArabic', 'النقد والبنوك')}</p>
           </CardContent>
         </Card>
 
         <Card data-testid="card-receivables">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Accounts Receivable</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t('assets.accountsReceivable', 'Accounts Receivable')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-blue-600">SAR 156,000</div>
-            <p className="text-xs text-muted-foreground mt-1">الذمم المدينة</p>
+            <p className="text-xs text-muted-foreground mt-1">{t('assets.accountsReceivableArabic', 'الذمم المدينة')}</p>
           </CardContent>
         </Card>
 
         <Card data-testid="card-inventory-value">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Inventory</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t('assets.inventory', 'Inventory')}</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-purple-600">SAR 892,000</div>
-            <p className="text-xs text-muted-foreground mt-1">المخزون</p>
+            <div className="text-2xl font-bold text-purple-600">SAR 320,000</div>
+            <p className="text-xs text-muted-foreground mt-1">{t('assets.inventoryArabic', 'المخزون')}</p>
           </CardContent>
         </Card>
 
         <Card data-testid="card-prepaid">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Prepaid Expenses</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t('assets.prepaidExpenses', 'Prepaid Expenses')}</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">SAR 45,000</div>
-            <p className="text-xs text-muted-foreground mt-1">المصروفات المدفوعة مقدماً</p>
+            <div className="text-2xl font-bold text-orange-600">SAR 45,000</div>
+            <p className="text-xs text-muted-foreground mt-1">{t('assets.prepaidExpensesArabic', 'المصروفات المقدمة')}</p>
           </CardContent>
         </Card>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Current Assets Summary</CardTitle>
-          <CardDescription>الأصول المتداولة - Short-term assets breakdown</CardDescription>
+          <CardTitle>{t('assets.currentAssetsSummary', 'Current Assets Summary')}</CardTitle>
+          <CardDescription>{t('assets.currentAssetsSummaryDescription', 'ملخص الأصول المتداولة - Short-term assets overview')}</CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Asset Type</TableHead>
-                <TableHead>Description</TableHead>
-                <TableHead>Value (SAR)</TableHead>
-                <TableHead>% of Total</TableHead>
-                <TableHead>Status</TableHead>
+                <TableHead>{t('assets.assetType', 'Asset Type')}</TableHead>
+                <TableHead className="text-right">{t('assets.balance', 'Balance')}</TableHead>
+                <TableHead className="text-right">{t('assets.percentOfTotal', '% of Total')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              <TableRow data-testid="row-current-cash">
-                <TableCell className="font-medium">Cash on Hand</TableCell>
-                <TableCell>Petty cash and registers</TableCell>
-                <TableCell>SAR 25,000</TableCell>
-                <TableCell>1.6%</TableCell>
-                <TableCell><Badge>Available</Badge></TableCell>
+              <TableRow>
+                <TableCell className="font-medium">{t('assets.cashBank', 'Cash & Bank')}</TableCell>
+                <TableCell className="text-right">SAR 485,000</TableCell>
+                <TableCell className="text-right">48.2%</TableCell>
               </TableRow>
-              <TableRow data-testid="row-current-bank">
-                <TableCell className="font-medium">Bank Accounts</TableCell>
-                <TableCell>Operating and savings accounts</TableCell>
-                <TableCell>SAR 460,000</TableCell>
-                <TableCell>29.1%</TableCell>
-                <TableCell><Badge>Available</Badge></TableCell>
+              <TableRow>
+                <TableCell className="font-medium">{t('assets.accountsReceivable', 'Accounts Receivable')}</TableCell>
+                <TableCell className="text-right">SAR 156,000</TableCell>
+                <TableCell className="text-right">15.5%</TableCell>
               </TableRow>
-              <TableRow data-testid="row-current-receivables">
-                <TableCell className="font-medium">Trade Receivables</TableCell>
-                <TableCell>Customer outstanding balances</TableCell>
-                <TableCell>SAR 156,000</TableCell>
-                <TableCell>9.9%</TableCell>
-                <TableCell><Badge variant="secondary">Pending</Badge></TableCell>
+              <TableRow>
+                <TableCell className="font-medium">{t('assets.inventory', 'Inventory')}</TableCell>
+                <TableCell className="text-right">SAR 320,000</TableCell>
+                <TableCell className="text-right">31.8%</TableCell>
               </TableRow>
-              <TableRow data-testid="row-current-inventory">
-                <TableCell className="font-medium">Parts Inventory</TableCell>
-                <TableCell>Spare parts and supplies</TableCell>
-                <TableCell>SAR 892,000</TableCell>
-                <TableCell>56.5%</TableCell>
-                <TableCell><Badge>In Stock</Badge></TableCell>
+              <TableRow>
+                <TableCell className="font-medium">{t('assets.prepaidExpenses', 'Prepaid Expenses')}</TableCell>
+                <TableCell className="text-right">SAR 45,000</TableCell>
+                <TableCell className="text-right">4.5%</TableCell>
               </TableRow>
-              <TableRow data-testid="row-current-prepaid">
-                <TableCell className="font-medium">Prepaid Insurance</TableCell>
-                <TableCell>Annual insurance premium</TableCell>
-                <TableCell>SAR 45,000</TableCell>
-                <TableCell>2.9%</TableCell>
-                <TableCell><Badge variant="outline">Prepaid</Badge></TableCell>
+              <TableRow className="font-bold bg-muted/50">
+                <TableCell>{t('assets.totalCurrentAssets', 'Total Current Assets')}</TableCell>
+                <TableCell className="text-right">SAR 1,006,000</TableCell>
+                <TableCell className="text-right">100%</TableCell>
               </TableRow>
             </TableBody>
           </Table>
@@ -656,229 +646,47 @@ export default function AssetsManagement() {
 
   const depreciationTab = (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card data-testid="card-annual-depreciation">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Annual Depreciation</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-orange-600">SAR 268,800</div>
-            <p className="text-xs text-muted-foreground mt-1">الإهلاك السنوي</p>
-          </CardContent>
-        </Card>
-
-        <Card data-testid="card-accumulated-depreciation">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Accumulated Depreciation</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-red-600">SAR 789,000</div>
-            <p className="text-xs text-muted-foreground mt-1">مجمع الإهلاك</p>
-          </CardContent>
-        </Card>
-
-        <Card data-testid="card-net-book-value">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Net Book Value</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-600">SAR 2,389,900</div>
-            <p className="text-xs text-muted-foreground mt-1">صافي القيمة الدفترية</p>
-          </CardContent>
-        </Card>
-      </div>
-
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>Depreciation Schedule</CardTitle>
-              <CardDescription>جدول الإهلاك - 5-year depreciation forecast</CardDescription>
-            </div>
-            <div className="flex gap-2">
-              <Button variant="outline" data-testid="button-print-schedule">
-                <Printer className="h-4 w-4 mr-2" />
-                Print
-              </Button>
-              <Button variant="outline" data-testid="button-export-schedule">
-                <Download className="h-4 w-4 mr-2" />
-                Export
-              </Button>
-            </div>
-          </div>
+          <CardTitle>{t('assets.depreciationSchedule', 'Depreciation Schedule')}</CardTitle>
+          <CardDescription>{t('assets.depreciationScheduleDescription', 'جدول الاستهلاك - Projected asset depreciation over time')}</CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Year</TableHead>
-                <TableHead>Start Value</TableHead>
-                <TableHead>Depreciation</TableHead>
-                <TableHead>End Value</TableHead>
-                <TableHead>Progress</TableHead>
+                <TableHead>{t('assets.year', 'Year')}</TableHead>
+                <TableHead className="text-right">{t('assets.startingValue', 'Starting Value')}</TableHead>
+                <TableHead className="text-right">{t('assets.depreciation', 'Depreciation')}</TableHead>
+                <TableHead className="text-right">{t('assets.endingValue', 'Ending Value')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {depreciationSchedule.map((row) => (
                 <TableRow key={row.year} data-testid={`row-depreciation-${row.year}`}>
                   <TableCell className="font-medium">{row.year}</TableCell>
-                  <TableCell>SAR {row.startValue.toLocaleString()}</TableCell>
-                  <TableCell className="text-orange-600">-SAR {row.depreciation.toLocaleString()}</TableCell>
-                  <TableCell>SAR {row.endValue.toLocaleString()}</TableCell>
-                  <TableCell>
-                    <Progress value={(row.endValue / 2688000) * 100} className="w-24 h-2" />
-                  </TableCell>
+                  <TableCell className="text-right">SAR {row.startValue.toLocaleString()}</TableCell>
+                  <TableCell className="text-right text-red-600">-SAR {row.depreciation.toLocaleString()}</TableCell>
+                  <TableCell className="text-right">SAR {row.endValue.toLocaleString()}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </CardContent>
       </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Depreciation Methods</CardTitle>
-          <CardDescription>طرق الإهلاك - Available calculation methods</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="p-4 border rounded-lg" data-testid="card-method-straight">
-              <div className="flex items-center gap-2 mb-2">
-                <TrendingDown className="h-5 w-5 text-blue-600" />
-                <h4 className="font-semibold">Straight Line</h4>
-              </div>
-              <p className="text-sm text-muted-foreground">Equal annual depreciation over useful life</p>
-              <Badge className="mt-2">Currently Used</Badge>
-            </div>
-            <div className="p-4 border rounded-lg" data-testid="card-method-declining">
-              <div className="flex items-center gap-2 mb-2">
-                <BarChart3 className="h-5 w-5 text-orange-600" />
-                <h4 className="font-semibold">Declining Balance</h4>
-              </div>
-              <p className="text-sm text-muted-foreground">Higher depreciation in early years</p>
-              <Badge variant="outline" className="mt-2">Available</Badge>
-            </div>
-            <div className="p-4 border rounded-lg" data-testid="card-method-units">
-              <div className="flex items-center gap-2 mb-2">
-                <FileText className="h-5 w-5 text-green-600" />
-                <h4 className="font-semibold">Units of Production</h4>
-              </div>
-              <p className="text-sm text-muted-foreground">Based on actual usage or output</p>
-              <Badge variant="outline" className="mt-2">Available</Badge>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
-
-  const reportsTab = (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <Card className="cursor-pointer hover:border-primary transition-colors" data-testid="card-report-register">
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <FileText className="h-5 w-5 text-blue-600" />
-              <CardTitle className="text-lg">Asset Register Report</CardTitle>
-            </div>
-            <CardDescription>Complete list of all fixed assets</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button className="w-full" variant="outline" data-testid="button-generate-register">
-              Generate Report
-            </Button>
-          </CardContent>
-        </Card>
-
-        <Card className="cursor-pointer hover:border-primary transition-colors" data-testid="card-report-depreciation">
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <TrendingDown className="h-5 w-5 text-orange-600" />
-              <CardTitle className="text-lg">Depreciation Report</CardTitle>
-            </div>
-            <CardDescription>Annual depreciation summary</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button className="w-full" variant="outline" data-testid="button-generate-depreciation">
-              Generate Report
-            </Button>
-          </CardContent>
-        </Card>
-
-        <Card className="cursor-pointer hover:border-primary transition-colors" data-testid="card-report-valuation">
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <DollarSign className="h-5 w-5 text-green-600" />
-              <CardTitle className="text-lg">Asset Valuation</CardTitle>
-            </div>
-            <CardDescription>Current market value assessment</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button className="w-full" variant="outline" data-testid="button-generate-valuation">
-              Generate Report
-            </Button>
-          </CardContent>
-        </Card>
-
-        <Card className="cursor-pointer hover:border-primary transition-colors" data-testid="card-report-disposal">
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5 text-red-600" />
-              <CardTitle className="text-lg">Asset Disposal Report</CardTitle>
-            </div>
-            <CardDescription>Disposed and written-off assets</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button className="w-full" variant="outline" data-testid="button-generate-disposal">
-              Generate Report
-            </Button>
-          </CardContent>
-        </Card>
-
-        <Card className="cursor-pointer hover:border-primary transition-colors" data-testid="card-report-insurance">
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <CheckCircle className="h-5 w-5 text-purple-600" />
-              <CardTitle className="text-lg">Insurance Schedule</CardTitle>
-            </div>
-            <CardDescription>Assets with insurance coverage</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button className="w-full" variant="outline" data-testid="button-generate-insurance">
-              Generate Report
-            </Button>
-          </CardContent>
-        </Card>
-
-        <Card className="cursor-pointer hover:border-primary transition-colors" data-testid="card-report-maintenance">
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <Calendar className="h-5 w-5 text-teal-600" />
-              <CardTitle className="text-lg">Maintenance Schedule</CardTitle>
-            </div>
-            <CardDescription>Asset maintenance history</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button className="w-full" variant="outline" data-testid="button-generate-maintenance">
-              Generate Report
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
     </div>
   );
 
   return (
     <div className="p-6 space-y-6">
       <TabsPageLayout
-        title="Assets Management"
-        description="الاصول - Track and manage all company assets, depreciation, and valuations"
-        defaultTab="fixed"
+        title={t('assets.title', 'Assets Management')}
+        description={t('assets.description', 'إدارة الأصول - Track and manage company assets and depreciation')}
+        defaultTab="fixed-assets"
         tabs={[
-          { id: "fixed", label: "Fixed Assets", icon: Building2, content: fixedAssetsTab },
-          { id: "current", label: "Current Assets", icon: DollarSign, content: currentAssetsTab },
-          { id: "depreciation", label: "Depreciation", icon: TrendingDown, content: depreciationTab },
-          { id: "reports", label: "Reports", icon: FileText, content: reportsTab },
+          { id: "fixed-assets", label: t('assets.fixedAssets', 'Fixed Assets'), icon: Building2, content: fixedAssetsTab },
+          { id: "current-assets", label: t('assets.currentAssets', 'Current Assets'), icon: DollarSign, content: currentAssetsTab },
+          { id: "depreciation", label: t('assets.depreciation', 'Depreciation'), icon: TrendingDown, content: depreciationTab },
         ]}
       />
     </div>

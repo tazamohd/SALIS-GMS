@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { Upload, Download, FileJson, FileSpreadsheet, AlertTriangle, CheckCircle } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -19,6 +20,7 @@ import type { ExportJob } from "@shared/schema";
 import { TabsPageLayout } from "@/components/layouts";
 
 export default function DataImportExport() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [selectedModule, setSelectedModule] = useState("jobCards");
   const [selectedFormat, setSelectedFormat] = useState("csv");
@@ -53,10 +55,10 @@ export default function DataImportExport() {
         predicate: (query) => 
           typeof query.queryKey[0] === 'string' && query.queryKey[0].includes('/api/export-jobs')
       });
-      toast({ title: "Export started successfully" });
+      toast({ title: t('dataImportExport.exportStarted', 'Export started successfully') });
     },
     onError: () => {
-      toast({ title: "Error", description: "Failed to start export", variant: "destructive" });
+      toast({ title: t('common.error', 'Error'), description: t('dataImportExport.exportFailed', 'Failed to start export'), variant: "destructive" });
     },
   });
 
@@ -70,8 +72,12 @@ export default function DataImportExport() {
     },
     onSuccess: (result: any) => {
       toast({ 
-        title: "Import completed", 
-        description: `Imported: ${result.imported}, Skipped: ${result.skipped}, Errors: ${result.errors.length}` 
+        title: t('dataImportExport.importCompleted', 'Import completed'), 
+        description: t('dataImportExport.importSummary', 'Imported: {{imported}}, Skipped: {{skipped}}, Errors: {{errors}}', {
+          imported: result.imported,
+          skipped: result.skipped,
+          errors: result.errors.length
+        })
       });
       setImportFile(null);
       queryClient.invalidateQueries({
@@ -88,13 +94,13 @@ export default function DataImportExport() {
       });
     },
     onError: () => {
-      toast({ title: "Error", description: "Failed to import data", variant: "destructive" });
+      toast({ title: t('common.error', 'Error'), description: t('dataImportExport.importFailed', 'Failed to import data'), variant: "destructive" });
     },
   });
 
   const handleExport = () => {
     if (!garageId) {
-      toast({ title: "Error", description: "Please select a garage", variant: "destructive" });
+      toast({ title: t('common.error', 'Error'), description: t('dataImportExport.selectGarage', 'Please select a garage'), variant: "destructive" });
       return;
     }
     exportMutation.mutate();
@@ -102,12 +108,12 @@ export default function DataImportExport() {
 
   const handleImport = async () => {
     if (!garageId) {
-      toast({ title: "Error", description: "Please select a garage", variant: "destructive" });
+      toast({ title: t('common.error', 'Error'), description: t('dataImportExport.selectGarage', 'Please select a garage'), variant: "destructive" });
       return;
     }
     
     if (!importFile) {
-      toast({ title: "Error", description: "Please select a file", variant: "destructive" });
+      toast({ title: t('common.error', 'Error'), description: t('dataImportExport.selectFile', 'Please select a file'), variant: "destructive" });
       return;
     }
 
@@ -132,36 +138,36 @@ export default function DataImportExport() {
       }
 
       if (!Array.isArray(data) || data.length === 0) {
-        toast({ title: "Error", description: "Invalid file format", variant: "destructive" });
+        toast({ title: t('common.error', 'Error'), description: t('dataImportExport.invalidFormat', 'Invalid file format'), variant: "destructive" });
         return;
       }
 
       importMutation.mutate(data);
     } catch (error) {
-      toast({ title: "Error", description: "Failed to parse file", variant: "destructive" });
+      toast({ title: t('common.error', 'Error'), description: t('dataImportExport.parseFailed', 'Failed to parse file'), variant: "destructive" });
     }
   };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'completed':
-        return <Badge className="bg-gray-800 dark:bg-gray-200 text-white dark:text-black"><CheckCircle className="h-3 w-3 mr-1" />Completed</Badge>;
+        return <Badge className="bg-gray-800 dark:bg-gray-200 text-white dark:text-black"><CheckCircle className="h-3 w-3 mr-1" />{t('common.completed', 'Completed')}</Badge>;
       case 'processing':
-        return <Badge className="bg-gray-600 dark:bg-gray-400 text-white dark:text-black">Processing...</Badge>;
+        return <Badge className="bg-gray-600 dark:bg-gray-400 text-white dark:text-black">{t('dataImportExport.processing', 'Processing...')}</Badge>;
       case 'failed':
-        return <Badge variant="destructive"><AlertTriangle className="h-3 w-3 mr-1" />Failed</Badge>;
+        return <Badge variant="destructive"><AlertTriangle className="h-3 w-3 mr-1" />{t('common.failed', 'Failed')}</Badge>;
       default:
-        return <Badge variant="outline">Pending</Badge>;
+        return <Badge variant="outline">{t('common.pending', 'Pending')}</Badge>;
     }
   };
 
   const modules = [
-    { value: "jobCards", label: "Job Cards" },
-    { value: "customers", label: "Customers" },
-    { value: "vehicles", label: "Vehicles" },
-    { value: "invoices", label: "Invoices" },
-    { value: "estimates", label: "Estimates" },
-    { value: "spareParts", label: "Spare Parts" },
+    { value: "jobCards", label: t('dataImportExport.jobCards', 'Job Cards') },
+    { value: "customers", label: t('dataImportExport.customers', 'Customers') },
+    { value: "vehicles", label: t('dataImportExport.vehicles', 'Vehicles') },
+    { value: "invoices", label: t('dataImportExport.invoices', 'Invoices') },
+    { value: "estimates", label: t('dataImportExport.estimates', 'Estimates') },
+    { value: "spareParts", label: t('dataImportExport.spareParts', 'Spare Parts') },
   ];
 
   const exportTab = (
@@ -169,13 +175,13 @@ export default function DataImportExport() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Download className="h-5 w-5" />
-          Export Data
+          {t('dataImportExport.exportData', 'Export Data')}
         </CardTitle>
-        <CardDescription className="text-gray-900 dark:text-white/60">Export data from selected module</CardDescription>
+        <CardDescription className="text-gray-900 dark:text-white/60">{t('dataImportExport.exportDescription', 'Export data from selected module')}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">
-          <Label>Module</Label>
+          <Label>{t('dataImportExport.module', 'Module')}</Label>
           <Select value={selectedModule} onValueChange={setSelectedModule}>
             <SelectTrigger data-testid="select-export-module">
               <SelectValue />
@@ -189,7 +195,7 @@ export default function DataImportExport() {
         </div>
 
         <div className="space-y-2">
-          <Label>Format</Label>
+          <Label>{t('dataImportExport.format', 'Format')}</Label>
           <Select value={selectedFormat} onValueChange={setSelectedFormat}>
             <SelectTrigger data-testid="select-export-format">
               <SelectValue />
@@ -218,7 +224,7 @@ export default function DataImportExport() {
           data-testid="button-export"
         >
           <Download className="h-4 w-4 mr-2" />
-          {exportMutation.isPending ? "Starting Export..." : "Export Data"}
+          {exportMutation.isPending ? t('dataImportExport.startingExport', 'Starting Export...') : t('dataImportExport.exportData', 'Export Data')}
         </Button>
       </CardContent>
     </Card>
@@ -229,13 +235,13 @@ export default function DataImportExport() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Upload className="h-5 w-5" />
-          Import Data
+          {t('dataImportExport.importData', 'Import Data')}
         </CardTitle>
-        <CardDescription className="text-gray-900 dark:text-white/60">Import data from CSV or JSON file</CardDescription>
+        <CardDescription className="text-gray-900 dark:text-white/60">{t('dataImportExport.importDescription', 'Import data from CSV or JSON file')}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">
-          <Label>Module</Label>
+          <Label>{t('dataImportExport.module', 'Module')}</Label>
           <Select value={selectedModule} onValueChange={setSelectedModule}>
             <SelectTrigger data-testid="select-import-module">
               <SelectValue />
@@ -249,7 +255,7 @@ export default function DataImportExport() {
         </div>
 
         <div className="space-y-2">
-          <Label>File</Label>
+          <Label>{t('dataImportExport.file', 'File')}</Label>
           <Input
             type="file"
             accept=".csv,.json"
@@ -258,7 +264,7 @@ export default function DataImportExport() {
           />
           {importFile && (
             <p className="text-sm text-gray-900 dark:text-white/60">
-              Selected: {importFile.name}
+              {t('dataImportExport.selected', 'Selected')}: {importFile.name}
             </p>
           )}
         </div>
@@ -270,7 +276,7 @@ export default function DataImportExport() {
           data-testid="button-import"
         >
           <Upload className="h-4 w-4 mr-2" />
-          {importMutation.isPending ? "Importing..." : "Import Data"}
+          {importMutation.isPending ? t('dataImportExport.importing', 'Importing...') : t('dataImportExport.importData', 'Import Data')}
         </Button>
       </CardContent>
     </Card>
@@ -279,13 +285,13 @@ export default function DataImportExport() {
   const historyTab = (
     <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
       <CardHeader>
-        <CardTitle className="text-gray-900 dark:text-white">Export History</CardTitle>
-        <CardDescription className="text-gray-900 dark:text-white/60">Recent export jobs</CardDescription>
+        <CardTitle className="text-gray-900 dark:text-white">{t('dataImportExport.exportHistory', 'Export History')}</CardTitle>
+        <CardDescription className="text-gray-900 dark:text-white/60">{t('dataImportExport.recentExportJobs', 'Recent export jobs')}</CardDescription>
       </CardHeader>
       <CardContent>
         {!exportJobs || exportJobs.length === 0 ? (
           <div className="text-center text-gray-900 dark:text-white/60 py-8">
-            No export history
+            {t('dataImportExport.noExportHistory', 'No export history')}
           </div>
         ) : (
           <div className="space-y-3">
@@ -302,11 +308,11 @@ export default function DataImportExport() {
                   </div>
                   <div className="text-sm text-gray-900 dark:text-white/60">
                     {job.createdAt && new Date(job.createdAt).toLocaleString()}
-                    {job.recordCount && ` • ${job.recordCount} records`}
+                    {job.recordCount && ` • ${job.recordCount} ${t('dataImportExport.records', 'records')}`}
                   </div>
                   {job.errorMessage && (
                     <div className="text-sm text-destructive mt-1">
-                      Error: {job.errorMessage}
+                      {t('common.error', 'Error')}: {job.errorMessage}
                     </div>
                   )}
                 </div>
@@ -321,7 +327,7 @@ export default function DataImportExport() {
                     >
                       <a href={job.fileUrl} download={job.fileName}>
                         <Download className="h-4 w-4 mr-2" />
-                        Download
+                        {t('common.download', 'Download')}
                       </a>
                     </Button>
                   )}
@@ -336,14 +342,14 @@ export default function DataImportExport() {
 
   return (
     <TabsPageLayout
-      title="Data Import/Export"
-      description="Import and export data across modules"
+      title={t('dataImportExport.title', 'Data Import/Export')}
+      description={t('dataImportExport.pageDescription', 'Import and export data across modules')}
       icon={Upload}
       headerContent={
         garages && garages.length > 0 && (
           <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark mb-6">
             <CardHeader>
-              <CardTitle className="text-gray-900 dark:text-white">Select Garage</CardTitle>
+              <CardTitle className="text-gray-900 dark:text-white">{t('dataImportExport.selectGarageTitle', 'Select Garage')}</CardTitle>
             </CardHeader>
             <CardContent>
               <Select value={garageId} onValueChange={setGarageId}>
@@ -365,19 +371,19 @@ export default function DataImportExport() {
       tabs={[
         {
           id: "export",
-          label: "Export",
+          label: t('common.export', 'Export'),
           icon: Download,
           content: exportTab,
         },
         {
           id: "import",
-          label: "Import",
+          label: t('common.import', 'Import'),
           icon: Upload,
           content: importTab,
         },
         {
           id: "history",
-          label: "History",
+          label: t('dataImportExport.historyTab', 'History'),
           content: historyTab,
         },
       ]}

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,6 +11,7 @@ import { Calendar, TrendingUp, Users, Zap } from "lucide-react";
 import { DashboardPage } from "@/components/layouts/DashboardPage";
 
 export default function AIScheduling() {
+  const { t } = useTranslation();
   const { toast } = useToast();
 
   const { data: rules = [] } = useQuery<any[]>({
@@ -27,20 +29,20 @@ export default function AIScheduling() {
         appointmentsOptimized: 10,
         efficiencyGain: "12.5",
         technicianUtilization: { tech1: "85", tech2: "90" },
-        suggestions: ["Optimize morning schedule", "Balance workload across technicians"],
+        suggestions: [t('aiScheduling.optimizeMorningSchedule', 'Optimize morning schedule'), t('aiScheduling.balanceWorkload', 'Balance workload across technicians')],
       });
     },
     onSuccess: () => {
       toast({
-        title: "Optimization Complete",
-        description: "Scheduling optimization completed successfully",
+        title: t('aiScheduling.optimizationComplete', 'Optimization Complete'),
+        description: t('aiScheduling.optimizationCompletedSuccessfully', 'Scheduling optimization completed successfully'),
       });
       queryClient.invalidateQueries({ queryKey: ['/api/scheduling/history'] });
     },
     onError: (error: any) => {
       toast({
-        title: "Optimization Failed",
-        description: error.message || "Failed to run optimization",
+        title: t('aiScheduling.optimizationFailed', 'Optimization Failed'),
+        description: error.message || t('aiScheduling.failedToRunOptimization', 'Failed to run optimization'),
         variant: "destructive",
       });
     },
@@ -62,25 +64,25 @@ export default function AIScheduling() {
 
   const metrics = [
     {
-      label: "Optimized Today",
+      label: t('aiScheduling.optimizedToday', 'Optimized Today'),
       value: String(latestOptimization.appointmentsOptimized || 0),
       icon: Calendar,
       color: "text-blue-600",
     },
     {
-      label: "Efficiency Gain",
+      label: t('aiScheduling.efficiencyGain', 'Efficiency Gain'),
       value: `${latestOptimization.efficiencyGain ? parseFloat(latestOptimization.efficiencyGain).toFixed(1) : 0}%`,
       icon: TrendingUp,
       color: "text-green-600",
     },
     {
-      label: "Avg Utilization",
+      label: t('aiScheduling.avgUtilization', 'Avg Utilization'),
       value: `${avgUtilization ? avgUtilization.toFixed(0) : 0}%`,
       icon: Users,
       color: "text-purple-600",
     },
     {
-      label: "Active Rules",
+      label: t('aiScheduling.activeRules', 'Active Rules'),
       value: String(rules.filter((r: any) => r.isActive).length),
       icon: Zap,
       color: "text-yellow-600",
@@ -89,8 +91,8 @@ export default function AIScheduling() {
 
   return (
     <DashboardPage
-      title="🤖 AI-Powered Scheduling"
-      description="Optimize technician schedules automatically"
+      title={t('aiScheduling.title', '🤖 AI-Powered Scheduling')}
+      description={t('aiScheduling.description', 'Optimize technician schedules automatically')}
       icon={Zap}
       metrics={metrics}
     >
@@ -101,25 +103,25 @@ export default function AIScheduling() {
           data-testid="button-run-optimization"
         >
           <Zap className="h-4 w-4 mr-2" />
-          {optimizeMutation.isPending ? "Optimizing..." : "Run Optimization"}
+          {optimizeMutation.isPending ? t('aiScheduling.optimizing', 'Optimizing...') : t('aiScheduling.runOptimization', 'Run Optimization')}
         </Button>
       </div>
 
       <div className="grid grid-cols-1 gap-6">
         <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
           <CardHeader>
-            <CardTitle>Scheduling Rules</CardTitle>
+            <CardTitle>{t('aiScheduling.schedulingRules', 'Scheduling Rules')}</CardTitle>
           </CardHeader>
           <CardContent>
             {rules.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">No scheduling rules defined</div>
+              <div className="text-center py-8 text-gray-500">{t('aiScheduling.noSchedulingRulesDefined', 'No scheduling rules defined')}</div>
             ) : (
               <div className="space-y-3">
                 {rules.map((rule: any) => (
                   <div key={rule.id} className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-800 rounded-lg" data-testid={`rule-${rule.id}`}>
                     <div>
-                      <h3 className="font-semibold text-gray-900 dark:text-white">{rule.ruleName || 'Unnamed Rule'}</h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">Priority: {rule.priority || 1}</p>
+                      <h3 className="font-semibold text-gray-900 dark:text-white">{rule.ruleName || t('aiScheduling.unnamedRule', 'Unnamed Rule')}</h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">{t('aiScheduling.priority', 'Priority')}: {rule.priority || 1}</p>
                     </div>
                     <Switch checked={rule.isActive} data-testid={`switch-rule-${rule.id}`} />
                   </div>
@@ -131,12 +133,12 @@ export default function AIScheduling() {
 
         <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
           <CardHeader>
-            <CardTitle>AI Suggestions</CardTitle>
+            <CardTitle>{t('aiScheduling.aiSuggestions', 'AI Suggestions')}</CardTitle>
           </CardHeader>
           <CardContent>
             {(!latestOptimization.suggestions || latestOptimization.suggestions.length === 0) ? (
               <div className="text-center py-8 text-gray-500">
-                Run an optimization to see AI suggestions
+                {t('aiScheduling.runOptimizationToSeeSuggestions', 'Run an optimization to see AI suggestions')}
               </div>
             ) : (
               <div className="space-y-2">

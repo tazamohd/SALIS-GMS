@@ -1,4 +1,5 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -49,6 +50,7 @@ interface DispositionCode {
 }
 
 export default function CallCenter() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [selectedQueue, setSelectedQueue] = useState<string | null>(null);
   const [newQueueOpen, setNewQueueOpen] = useState(false);
@@ -92,11 +94,11 @@ export default function CallCenter() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/call-center/queues"] });
-      toast({ title: "Queue created successfully" });
+      toast({ title: t('callCenter.queueCreated', 'Queue created successfully') });
       setNewQueueOpen(false);
     },
     onError: () => {
-      toast({ title: "Failed to create queue", variant: "destructive" });
+      toast({ title: t('callCenter.queueCreateFailed', 'Failed to create queue'), variant: "destructive" });
     },
   });
 
@@ -113,11 +115,11 @@ export default function CallCenter() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/call-center/sessions"] });
-      toast({ title: "Call session initiated" });
+      toast({ title: t('callCenter.callInitiated', 'Call session initiated') });
       setNewSessionOpen(false);
     },
     onError: () => {
-      toast({ title: "Failed to create call session", variant: "destructive" });
+      toast({ title: t('callCenter.callCreateFailed', 'Failed to create call session'), variant: "destructive" });
     },
   });
 
@@ -127,7 +129,7 @@ export default function CallCenter() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/call-center/sessions"] });
-      toast({ title: "Call status updated" });
+      toast({ title: t('callCenter.statusUpdated', 'Call status updated') });
     },
   });
 
@@ -143,16 +145,16 @@ export default function CallCenter() {
   };
 
   const formatDuration = (seconds: number | null) => {
-    if (!seconds) return 'N/A';
+    if (!seconds) return t('common.notAvailable', 'N/A');
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    return `${mins}m ${secs}s`;
+    return `${mins}${t('callCenter.minutes', 'm')} ${secs}${t('callCenter.seconds', 's')}`;
   };
 
   if (queuesLoading || sessionsLoading) {
     return (
       <div className="p-6">
-        <div className="text-center text-muted-foreground">Loading Call Center...</div>
+        <div className="text-center text-muted-foreground">{t('callCenter.loading', 'Loading Call Center...')}</div>
       </div>
     );
   }
@@ -161,7 +163,7 @@ export default function CallCenter() {
     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
       <Card className="bg-card dark:bg-gray-900 border-border dark:border-gray-800">
         <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-sm font-medium text-foreground dark:text-gray-100">Active Calls</CardTitle>
+          <CardTitle className="text-sm font-medium text-foreground dark:text-gray-100">{t('callCenter.activeCalls', 'Active Calls')}</CardTitle>
           <Phone className="h-4 w-4 text-green-500" />
         </CardHeader>
         <CardContent>
@@ -173,7 +175,7 @@ export default function CallCenter() {
 
       <Card className="bg-card dark:bg-gray-900 border-border dark:border-gray-800">
         <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-sm font-medium text-foreground dark:text-gray-100">Total Queues</CardTitle>
+          <CardTitle className="text-sm font-medium text-foreground dark:text-gray-100">{t('callCenter.totalQueues', 'Total Queues')}</CardTitle>
           <Users className="h-4 w-4 text-blue-500" />
         </CardHeader>
         <CardContent>
@@ -185,7 +187,7 @@ export default function CallCenter() {
 
       <Card className="bg-card dark:bg-gray-900 border-border dark:border-gray-800">
         <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-sm font-medium text-foreground dark:text-gray-100">Completed Today</CardTitle>
+          <CardTitle className="text-sm font-medium text-foreground dark:text-gray-100">{t('callCenter.completedToday', 'Completed Today')}</CardTitle>
           <TrendingUp className="h-4 w-4 text-purple-500" />
         </CardHeader>
         <CardContent>
@@ -197,7 +199,7 @@ export default function CallCenter() {
 
       <Card className="bg-card dark:bg-gray-900 border-border dark:border-gray-800">
         <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-sm font-medium text-foreground dark:text-gray-100">Avg Duration Today</CardTitle>
+          <CardTitle className="text-sm font-medium text-foreground dark:text-gray-100">{t('callCenter.avgDurationToday', 'Avg Duration Today')}</CardTitle>
           <Clock className="h-4 w-4 text-orange-500" />
         </CardHeader>
         <CardContent>
@@ -208,7 +210,7 @@ export default function CallCenter() {
                     completedToday.reduce((acc, s) => acc + (s.duration || 0), 0) / completedToday.length
                   )
                 )
-              : 'N/A'}
+              : t('common.notAvailable', 'N/A')}
           </div>
         </CardContent>
       </Card>
@@ -218,13 +220,13 @@ export default function CallCenter() {
   const tabs: TabConfig[] = [
     {
       id: "live",
-      label: "Live Calls",
+      label: t('callCenter.liveCalls', 'Live Calls'),
       icon: PhoneCall,
       content: activeSessions.length === 0 ? (
         <Card className="bg-card dark:bg-gray-900 border-border dark:border-gray-800">
           <CardContent className="p-12 text-center">
             <PhoneOff className="h-12 w-12 mx-auto mb-4 text-muted-foreground dark:text-gray-500" />
-            <p className="text-muted-foreground dark:text-gray-400">No active calls</p>
+            <p className="text-muted-foreground dark:text-gray-400">{t('callCenter.noActiveCalls', 'No active calls')}</p>
           </CardContent>
         </Card>
       ) : (
@@ -240,7 +242,7 @@ export default function CallCenter() {
                     <div>
                       <div className="font-semibold text-foreground dark:text-gray-50">{session.phoneNumber}</div>
                       <div className="text-sm text-muted-foreground dark:text-gray-400">
-                        {session.direction === 'inbound' ? 'Incoming' : 'Outgoing'} • {session.status}
+                        {session.direction === 'inbound' ? t('callCenter.incoming', 'Incoming') : t('callCenter.outgoing', 'Outgoing')} • {session.status}
                       </div>
                     </div>
                   </div>
@@ -254,7 +256,7 @@ export default function CallCenter() {
                         onClick={() => updateSessionMutation.mutate({ id: session.id, status: 'active' })}
                         data-testid={`button-answer-${session.id}`}
                       >
-                        Answer
+                        {t('callCenter.answer', 'Answer')}
                       </Button>
                     )}
                     {session.status === 'active' && (
@@ -264,7 +266,7 @@ export default function CallCenter() {
                         onClick={() => updateSessionMutation.mutate({ id: session.id, status: 'completed' })}
                         data-testid={`button-end-${session.id}`}
                       >
-                        End Call
+                        {t('callCenter.endCall', 'End Call')}
                       </Button>
                     )}
                   </div>
@@ -277,7 +279,7 @@ export default function CallCenter() {
     },
     {
       id: "queues",
-      label: "Queues",
+      label: t('callCenter.queues', 'Queues'),
       icon: Users,
       content: (
         <div className="grid gap-4">
@@ -287,7 +289,7 @@ export default function CallCenter() {
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-foreground dark:text-gray-50">{queue.name}</CardTitle>
                   <Badge variant="outline" className="border-green-500 text-green-500 dark:border-green-600 dark:text-green-400">
-                    Active
+                    {t('common.active', 'Active')}
                   </Badge>
                 </div>
                 {queue.description && (
@@ -298,11 +300,11 @@ export default function CallCenter() {
                 <div className="flex items-center gap-4 text-sm">
                   <div className="flex items-center gap-1 text-muted-foreground dark:text-gray-400">
                     <Clock className="h-4 w-4" />
-                    Max Wait: {queue.maxWaitTime ? `${queue.maxWaitTime}s` : 'Unlimited'}
+                    {t('callCenter.maxWait', 'Max Wait')}: {queue.maxWaitTime ? `${queue.maxWaitTime}${t('callCenter.secondsShort', 's')}` : t('callCenter.unlimited', 'Unlimited')}
                   </div>
                   <div className="flex items-center gap-1 text-muted-foreground dark:text-gray-400">
                     <Users className="h-4 w-4" />
-                    Calls in Queue: {sessions?.filter(s => s.queueId === queue.id && s.status === 'ringing').length || 0}
+                    {t('callCenter.callsInQueue', 'Calls in Queue')}: {sessions?.filter(s => s.queueId === queue.id && s.status === 'ringing').length || 0}
                   </div>
                 </div>
               </CardContent>
@@ -313,7 +315,7 @@ export default function CallCenter() {
     },
     {
       id: "history",
-      label: "History",
+      label: t('callCenter.history', 'History'),
       icon: MessageSquare,
       content: (
         <div className="grid gap-4">
@@ -328,8 +330,8 @@ export default function CallCenter() {
                     <div>
                       <div className="font-semibold text-foreground dark:text-gray-50">{session.phoneNumber}</div>
                       <div className="text-sm text-muted-foreground dark:text-gray-400">
-                        {session.direction === 'inbound' ? 'Incoming' : 'Outgoing'} • 
-                        {session.startedAt ? new Date(session.startedAt).toLocaleString() : 'N/A'}
+                        {session.direction === 'inbound' ? t('callCenter.incoming', 'Incoming') : t('callCenter.outgoing', 'Outgoing')} • 
+                        {session.startedAt ? new Date(session.startedAt).toLocaleString() : t('common.notAvailable', 'N/A')}
                       </div>
                     </div>
                   </div>
@@ -338,7 +340,7 @@ export default function CallCenter() {
                       {session.status}
                     </Badge>
                     <div className="text-sm text-muted-foreground dark:text-gray-400 mt-1">
-                      Duration: {formatDuration(session.duration)}
+                      {t('callCenter.duration', 'Duration')}: {formatDuration(session.duration)}
                     </div>
                   </div>
                 </div>
@@ -353,18 +355,18 @@ export default function CallCenter() {
   return (
     <>
       <TabsPageLayout
-        title="Call Center"
-        description="Manage customer interactions and call queues"
+        title={t('callCenter.title', 'Call Center')}
+        description={t('callCenter.description', 'Manage customer interactions and call queues')}
         icon={Phone}
         secondaryActions={[
           {
-            label: "New Queue",
+            label: t('callCenter.newQueue', 'New Queue'),
             icon: Users,
             onClick: () => setNewQueueOpen(true),
             testId: "button-create-queue",
           },
           {
-            label: "New Call",
+            label: t('callCenter.newCall', 'New Call'),
             icon: PhoneCall,
             onClick: () => setNewSessionOpen(true),
             variant: "outline",
@@ -379,7 +381,7 @@ export default function CallCenter() {
       <Dialog open={newQueueOpen} onOpenChange={setNewQueueOpen}>
         <DialogContent className="bg-card dark:bg-gray-900">
           <DialogHeader>
-            <DialogTitle className="text-foreground dark:text-gray-50">Create Call Queue</DialogTitle>
+            <DialogTitle className="text-foreground dark:text-gray-50">{t('callCenter.createQueue', 'Create Call Queue')}</DialogTitle>
           </DialogHeader>
           <form
             onSubmit={(e) => {
@@ -394,28 +396,28 @@ export default function CallCenter() {
             className="space-y-4"
           >
             <div>
-              <Label htmlFor="name" className="text-foreground dark:text-gray-200">Queue Name</Label>
+              <Label htmlFor="name" className="text-foreground dark:text-gray-200">{t('callCenter.queueName', 'Queue Name')}</Label>
               <Input
                 id="name"
                 name="name"
                 required
-                placeholder="e.g., Support Queue"
+                placeholder={t('callCenter.queueNamePlaceholder', 'e.g., Support Queue')}
                 data-testid="input-queue-name"
                 className="bg-background dark:bg-gray-800 text-foreground dark:text-gray-100"
               />
             </div>
             <div>
-              <Label htmlFor="description" className="text-foreground dark:text-gray-200">Description</Label>
+              <Label htmlFor="description" className="text-foreground dark:text-gray-200">{t('common.description', 'Description')}</Label>
               <Textarea
                 id="description"
                 name="description"
-                placeholder="Queue description..."
+                placeholder={t('callCenter.queueDescriptionPlaceholder', 'Queue description...')}
                 data-testid="input-queue-description"
                 className="bg-background dark:bg-gray-800 text-foreground dark:text-gray-100"
               />
             </div>
             <div>
-              <Label htmlFor="maxWaitTime" className="text-foreground dark:text-gray-200">Max Wait Time (seconds)</Label>
+              <Label htmlFor="maxWaitTime" className="text-foreground dark:text-gray-200">{t('callCenter.maxWaitTimeSeconds', 'Max Wait Time (seconds)')}</Label>
               <Input
                 id="maxWaitTime"
                 name="maxWaitTime"
@@ -426,7 +428,7 @@ export default function CallCenter() {
               />
             </div>
             <Button type="submit" className="w-full" data-testid="button-submit-queue">
-              Create Queue
+              {t('callCenter.createQueue', 'Create Queue')}
             </Button>
           </form>
         </DialogContent>
@@ -435,7 +437,7 @@ export default function CallCenter() {
       <Dialog open={newSessionOpen} onOpenChange={setNewSessionOpen}>
         <DialogContent className="bg-card dark:bg-gray-900">
           <DialogHeader>
-            <DialogTitle className="text-foreground dark:text-gray-50">Initiate Call</DialogTitle>
+            <DialogTitle className="text-foreground dark:text-gray-50">{t('callCenter.initiateCall', 'Initiate Call')}</DialogTitle>
           </DialogHeader>
           <form
             onSubmit={(e) => {
@@ -450,7 +452,7 @@ export default function CallCenter() {
             className="space-y-4"
           >
             <div>
-              <Label htmlFor="phoneNumber" className="text-foreground dark:text-gray-200">Phone Number</Label>
+              <Label htmlFor="phoneNumber" className="text-foreground dark:text-gray-200">{t('callCenter.phoneNumber', 'Phone Number')}</Label>
               <Input
                 id="phoneNumber"
                 name="phoneNumber"
@@ -461,22 +463,22 @@ export default function CallCenter() {
               />
             </div>
             <div>
-              <Label htmlFor="direction" className="text-foreground dark:text-gray-200">Direction</Label>
+              <Label htmlFor="direction" className="text-foreground dark:text-gray-200">{t('callCenter.direction', 'Direction')}</Label>
               <Select name="direction" defaultValue="outbound">
                 <SelectTrigger data-testid="select-direction" className="bg-background dark:bg-gray-800 text-foreground dark:text-gray-100">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="bg-card dark:bg-gray-900">
-                  <SelectItem value="outbound">Outbound</SelectItem>
-                  <SelectItem value="inbound">Inbound</SelectItem>
+                  <SelectItem value="outbound">{t('callCenter.outbound', 'Outbound')}</SelectItem>
+                  <SelectItem value="inbound">{t('callCenter.inbound', 'Inbound')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <Label htmlFor="queueId" className="text-foreground dark:text-gray-200">Queue (Optional)</Label>
+              <Label htmlFor="queueId" className="text-foreground dark:text-gray-200">{t('callCenter.queueOptional', 'Queue (Optional)')}</Label>
               <Select name="queueId">
                 <SelectTrigger data-testid="select-queue" className="bg-background dark:bg-gray-800 text-foreground dark:text-gray-100">
-                  <SelectValue placeholder="Select queue..." />
+                  <SelectValue placeholder={t('callCenter.selectQueue', 'Select queue...')} />
                 </SelectTrigger>
                 <SelectContent className="bg-card dark:bg-gray-900">
                   {queues?.filter(q => q.isActive).map(queue => (
@@ -488,7 +490,7 @@ export default function CallCenter() {
               </Select>
             </div>
             <Button type="submit" className="w-full" data-testid="button-submit-call">
-              Initiate Call
+              {t('callCenter.initiateCall', 'Initiate Call')}
             </Button>
           </form>
         </DialogContent>

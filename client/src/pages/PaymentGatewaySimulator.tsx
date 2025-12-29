@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { StandardPageLayout } from "@/components/layouts";
 import { CreditCard, DollarSign, CheckCircle, XCircle, RefreshCw } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -19,6 +20,7 @@ type Transaction = {
 };
 
 export default function PaymentGatewaySimulator() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [amount, setAmount] = useState("");
   const [gateway, setGateway] = useState("stripe");
@@ -29,8 +31,8 @@ export default function PaymentGatewaySimulator() {
   const simulatePayment = async () => {
     if (!amount || !cardNumber) {
       toast({
-        title: "Error",
-        description: "Please fill in all fields",
+        title: t('common.error', 'Error'),
+        description: t('paymentSimulator.fillAllFields', 'Please fill in all fields'),
         variant: "destructive",
       });
       return;
@@ -53,10 +55,10 @@ export default function PaymentGatewaySimulator() {
       setIsProcessing(false);
 
       toast({
-        title: success ? "Payment Successful" : "Payment Failed",
+        title: success ? t('paymentSimulator.paymentSuccessful', 'Payment Successful') : t('paymentSimulator.paymentFailed', 'Payment Failed'),
         description: success
-          ? `Successfully processed $${amount} via ${gateway}`
-          : "Payment was declined. Please try again.",
+          ? t('paymentSimulator.successMessage', `Successfully processed $${amount} via ${gateway}`)
+          : t('paymentSimulator.failedMessage', 'Payment was declined. Please try again.'),
         variant: success ? "default" : "destructive",
       });
 
@@ -69,19 +71,19 @@ export default function PaymentGatewaySimulator() {
 
   return (
     <StandardPageLayout
-      title="Payment Gateway Simulator"
-      description="Test payment processing with different gateways"
+      title={t('paymentSimulator.title', 'Payment Gateway Simulator')}
+      description={t('paymentSimulator.description', 'Test payment processing with different gateways')}
       icon={CreditCard}
     >
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
-            <CardTitle>Simulate Payment</CardTitle>
-            <CardDescription>Test payment processing flow</CardDescription>
+            <CardTitle>{t('paymentSimulator.simulatePayment', 'Simulate Payment')}</CardTitle>
+            <CardDescription>{t('paymentSimulator.testPaymentFlow', 'Test payment processing flow')}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="gateway">Payment Gateway</Label>
+              <Label htmlFor="gateway">{t('paymentSimulator.paymentGateway', 'Payment Gateway')}</Label>
               <Select value={gateway} onValueChange={setGateway}>
                 <SelectTrigger id="gateway" data-testid="select-gateway">
                   <SelectValue />
@@ -96,7 +98,7 @@ export default function PaymentGatewaySimulator() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="amount">Amount ($)</Label>
+              <Label htmlFor="amount">{t('paymentSimulator.amountDollar', 'Amount ($)')}</Label>
               <Input
                 id="amount"
                 type="number"
@@ -109,7 +111,7 @@ export default function PaymentGatewaySimulator() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="cardNumber">Card Number (Test)</Label>
+              <Label htmlFor="cardNumber">{t('paymentSimulator.cardNumberTest', 'Card Number (Test)')}</Label>
               <Input
                 id="cardNumber"
                 placeholder="4242 4242 4242 4242"
@@ -118,7 +120,7 @@ export default function PaymentGatewaySimulator() {
                 data-testid="input-card-number"
               />
               <p className="text-xs text-muted-foreground">
-                Test cards: 4242 4242 4242 4242 (success), 4000 0000 0000 0002 (declined)
+                {t('paymentSimulator.testCardsHint', 'Test cards: 4242 4242 4242 4242 (success), 4000 0000 0000 0002 (declined)')}
               </p>
             </div>
 
@@ -131,12 +133,12 @@ export default function PaymentGatewaySimulator() {
               {isProcessing ? (
                 <>
                   <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
-                  Processing...
+                  {t('paymentSimulator.processing', 'Processing...')}
                 </>
               ) : (
                 <>
                   <DollarSign className="mr-2 h-4 w-4" />
-                  Process Payment
+                  {t('paymentSimulator.processPayment', 'Process Payment')}
                 </>
               )}
             </Button>
@@ -145,14 +147,14 @@ export default function PaymentGatewaySimulator() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Transaction History</CardTitle>
-            <CardDescription>Recent simulated transactions</CardDescription>
+            <CardTitle>{t('paymentSimulator.transactionHistory', 'Transaction History')}</CardTitle>
+            <CardDescription>{t('paymentSimulator.recentTransactions', 'Recent simulated transactions')}</CardDescription>
           </CardHeader>
           <CardContent>
             {transactions.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
                 <CreditCard className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                <p>No transactions yet</p>
+                <p>{t('paymentSimulator.noTransactionsYet', 'No transactions yet')}</p>
               </div>
             ) : (
               <div className="space-y-3">
@@ -182,8 +184,8 @@ export default function PaymentGatewaySimulator() {
                       </Badge>
                     </div>
                     <div className="text-sm text-muted-foreground">
-                      <p>Gateway: {txn.gateway}</p>
-                      <p>Card: **** **** **** {txn.cardLast4}</p>
+                      <p>{t('paymentSimulator.gateway', 'Gateway')}: {txn.gateway}</p>
+                      <p>{t('paymentSimulator.cardLabel', 'Card')}: **** **** **** {txn.cardLast4}</p>
                       <p>{txn.timestamp.toLocaleString()}</p>
                     </div>
                   </div>
@@ -196,8 +198,8 @@ export default function PaymentGatewaySimulator() {
 
       <Card className="mt-6">
         <CardHeader>
-          <CardTitle>Gateway Statistics</CardTitle>
-          <CardDescription>Success rates by payment gateway</CardDescription>
+          <CardTitle>{t('paymentSimulator.gatewayStatistics', 'Gateway Statistics')}</CardTitle>
+          <CardDescription>{t('paymentSimulator.successRatesByGateway', 'Success rates by payment gateway')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -212,7 +214,7 @@ export default function PaymentGatewaySimulator() {
                   <p className="text-sm text-muted-foreground capitalize">{gw}</p>
                   <p className="text-2xl font-bold">{successRate.toFixed(0)}%</p>
                   <p className="text-xs text-muted-foreground">
-                    {gwTransactions.length} transactions
+                    {gwTransactions.length} {t('paymentSimulator.transactions', 'transactions')}
                   </p>
                 </div>
               );

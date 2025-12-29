@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { DashboardPage } from "@/components/layouts";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Plane, MapPin, Camera, Battery, Wind, Image as ImageIcon } from 'lucide-react';
 
 export default function DroneInspection() {
+  const { t } = useTranslation();
   const [selectedFlight, setSelectedFlight] = useState<string | null>(null);
   
   const { data: inspectionsResponse, isLoading } = useQuery({ queryKey: ['/api/nextgen/drone-inspections'] });
@@ -14,21 +16,21 @@ export default function DroneInspection() {
 
   const flights = inspections.length > 0 ? inspections.map((insp: any) => ({
     id: insp.id,
-    location: insp.location || 'Unknown Location',
+    location: insp.location || t('drone.unknownLocation', 'Unknown Location'),
     status: insp.status || 'completed',
     images: insp.mediaCount || 0,
     battery: 100 - (Math.random() * 40),
-    duration: insp.duration || 'N/A',
+    duration: insp.duration || t('drone.na', 'N/A'),
   })) : [
-    { id: 'demo-1', location: 'Service Bay 1 (Demo)', status: 'completed', images: 12, battery: 85, duration: '8 min' },
-    { id: 'demo-2', location: 'Parking Lot (Demo)', status: 'in_progress', images: 6, battery: 62, duration: '4 min' },
+    { id: 'demo-1', location: t('drone.serviceBayDemo', 'Service Bay 1 (Demo)'), status: 'completed', images: 12, battery: 85, duration: t('drone.eightMin', '8 min') },
+    { id: 'demo-2', location: t('drone.parkingLotDemo', 'Parking Lot (Demo)'), status: 'in_progress', images: 6, battery: 62, duration: t('drone.fourMin', '4 min') },
   ];
 
   const metrics = [
-    { label: "Total Flights", value: flights.length, icon: Plane, color: "text-sky-600" },
-    { label: "Active Flights", value: flights.filter(f => f.status === 'in_progress').length, icon: MapPin, color: "text-blue-600" },
-    { label: "Total Images", value: flights.reduce((sum, f) => sum + f.images, 0), icon: Camera, color: "text-purple-600" },
-    { label: "Avg Battery", value: `${Math.round(flights.reduce((sum, f) => sum + f.battery, 0) / flights.length)}%`, icon: Battery, color: "text-green-600" },
+    { label: t('drone.totalFlights', 'Total Flights'), value: flights.length, icon: Plane, color: "text-sky-600" },
+    { label: t('drone.activeFlights', 'Active Flights'), value: flights.filter(f => f.status === 'in_progress').length, icon: MapPin, color: "text-blue-600" },
+    { label: t('drone.totalImages', 'Total Images'), value: flights.reduce((sum, f) => sum + f.images, 0), icon: Camera, color: "text-purple-600" },
+    { label: t('drone.avgBattery', 'Avg Battery'), value: `${Math.round(flights.reduce((sum, f) => sum + f.battery, 0) / flights.length)}%`, icon: Battery, color: "text-green-600" },
   ];
 
   if (isLoading) {
@@ -36,7 +38,7 @@ export default function DroneInspection() {
       <div className="flex-1 p-6 bg-gray-50 dark:bg-salis-black min-h-screen flex items-center justify-center">
         <div className="text-center">
           <Plane className="h-16 w-16 mx-auto mb-4 text-gray-400 animate-pulse" />
-          <p className="text-gray-500 dark:text-gray-400">Loading drone data...</p>
+          <p className="text-gray-500 dark:text-gray-400">{t('drone.loadingData', 'Loading drone data...')}</p>
         </div>
       </div>
     );
@@ -44,8 +46,8 @@ export default function DroneInspection() {
 
   return (
     <DashboardPage
-      title="Drone Inspection Interface"
-      description="Autonomous drone fleet management for vehicle and facility inspections"
+      title={t('drone.title', 'Drone Inspection Interface')}
+      description={t('drone.description', 'Autonomous drone fleet management for vehicle and facility inspections')}
       icon={Plane}
       metrics={metrics}
     >
@@ -54,7 +56,7 @@ export default function DroneInspection() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <MapPin className="h-5 w-5 text-sky-600" />
-              Active Flights
+              {t('drone.activeFlights', 'Active Flights')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -71,18 +73,18 @@ export default function DroneInspection() {
                       <Plane className="h-5 w-5 text-sky-600" />
                       <div>
                         <h4 className="font-semibold text-gray-900 dark:text-white">{flight.location}</h4>
-                        <p className="text-sm text-gray-500">Flight #{flight.id}</p>
+                        <p className="text-sm text-gray-500">{t('drone.flight', 'Flight')} #{flight.id}</p>
                       </div>
                     </div>
                     <Badge className={flight.status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}>
-                      {flight.status}
+                      {flight.status === 'completed' ? t('common.completed', 'completed') : t('common.inProgress', 'in_progress')}
                     </Badge>
                   </div>
 
                   <div className="grid grid-cols-4 gap-3 text-sm">
                     <div className="flex items-center gap-2">
                       <Camera className="h-4 w-4 text-gray-500" />
-                      <span>{flight.images} photos</span>
+                      <span>{flight.images} {t('drone.photos', 'photos')}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Battery className="h-4 w-4 text-gray-500" />
@@ -99,14 +101,14 @@ export default function DroneInspection() {
 
             <Button className="w-full mt-4 bg-sky-600 hover:bg-sky-700" data-testid="button-new-flight">
               <Plane className="mr-2 h-4 w-4" />
-              Plan New Flight
+              {t('drone.planNewFlight', 'Plan New Flight')}
             </Button>
           </CardContent>
         </Card>
 
         <Card className="bg-white dark:bg-salis-black">
           <CardHeader>
-            <CardTitle>Flight Details</CardTitle>
+            <CardTitle>{t('drone.flightDetails', 'Flight Details')}</CardTitle>
           </CardHeader>
           <CardContent>
             {selectedFlight ? (
@@ -119,21 +121,21 @@ export default function DroneInspection() {
                       </h4>
                       <div className="space-y-2 text-sm">
                         <div className="flex justify-between">
-                          <span className="text-gray-600 dark:text-gray-400">Status</span>
+                          <span className="text-gray-600 dark:text-gray-400">{t('common.status', 'Status')}</span>
                           <Badge className={flight.status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}>
-                            {flight.status}
+                            {flight.status === 'completed' ? t('common.completed', 'completed') : t('common.inProgress', 'in_progress')}
                           </Badge>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-gray-600 dark:text-gray-400">Images</span>
+                          <span className="text-gray-600 dark:text-gray-400">{t('drone.images', 'Images')}</span>
                           <span className="font-semibold">{flight.images}</span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-gray-600 dark:text-gray-400">Duration</span>
+                          <span className="text-gray-600 dark:text-gray-400">{t('drone.duration', 'Duration')}</span>
                           <span className="font-semibold">{flight.duration}</span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-gray-600 dark:text-gray-400">Battery</span>
+                          <span className="text-gray-600 dark:text-gray-400">{t('drone.battery', 'Battery')}</span>
                           <span className="font-semibold">{Math.round(flight.battery)}%</span>
                         </div>
                       </div>
@@ -144,7 +146,7 @@ export default function DroneInspection() {
                       onClick={() => setSelectedFlight(null)}
                       data-testid="button-clear-selection"
                     >
-                      Clear Selection
+                      {t('drone.clearSelection', 'Clear Selection')}
                     </Button>
                   </div>
                 ))}
@@ -153,7 +155,7 @@ export default function DroneInspection() {
               <div className="text-center py-8">
                 <Plane className="h-12 w-12 mx-auto mb-3 text-gray-400" />
                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                  Select a flight to view details
+                  {t('drone.selectFlightToView', 'Select a flight to view details')}
                 </p>
               </div>
             )}
@@ -165,7 +167,7 @@ export default function DroneInspection() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <ImageIcon className="h-5 w-5 text-purple-600" />
-            Captured Media {selectedFlight && `- ${flights.find(f => f.id === selectedFlight)?.location}`}
+            {t('drone.capturedMedia', 'Captured Media')} {selectedFlight && `- ${flights.find(f => f.id === selectedFlight)?.location}`}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -188,7 +190,7 @@ export default function DroneInspection() {
             <div className="text-center py-12">
               <ImageIcon className="h-16 w-16 mx-auto mb-4 text-gray-400" />
               <p className="text-gray-500 dark:text-gray-400">
-                Select a flight to view captured media
+                {t('drone.selectFlightToViewMedia', 'Select a flight to view captured media')}
               </p>
             </div>
           )}

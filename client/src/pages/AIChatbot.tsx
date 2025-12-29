@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -12,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import type { AiChatMessage, AIChatConversation } from "@shared/schema";
 
 export default function AIChatbot() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("chat");
   const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
@@ -163,11 +165,11 @@ export default function AIChatbot() {
       
       const isAborted = error.name === 'AbortError' || error.message?.includes('abort');
       const errorMessage = isAborted 
-        ? "Request timed out. Please try again."
-        : "Failed to send message. Please try again.";
+        ? t('aiChatbot.requestTimedOut', 'Request timed out. Please try again.')
+        : t('aiChatbot.failedToSend', 'Failed to send message. Please try again.');
       
       toast({ 
-        title: "Error", 
+        title: t('common.error', 'Error'), 
         description: errorMessage, 
         variant: "destructive" 
       });
@@ -182,21 +184,21 @@ export default function AIChatbot() {
   const tabs: TabConfig[] = [
     {
       id: "chat",
-      label: "Live Chat",
+      label: t('aiChatbot.liveChat', 'Live Chat'),
       icon: MessageSquare,
       content: (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <Card className="lg:col-span-2 p-6 bg-white dark:bg-salis-black">
             <h2 className="text-xl font-bold font-['Montserrat'] mb-4 text-gray-900 dark:text-white">
-              Chat with AI Assistant
+              {t('aiChatbot.chatWithAI', 'Chat with AI Assistant')}
             </h2>
             
             <ScrollArea className="h-[500px] mb-4 border border-gray-200 dark:border-gray-700 rounded p-4">
               {messages.length === 0 ? (
                 <div className="text-center text-gray-500 dark:text-gray-400 py-12">
                   <Bot className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-                  <p className="font-['Poppins']">Start a conversation with the AI assistant</p>
-                  <p className="text-sm mt-2">Ask about appointments, services, or vehicle status</p>
+                  <p className="font-['Poppins']">{t('aiChatbot.startConversation', 'Start a conversation with the AI assistant')}</p>
+                  <p className="text-sm mt-2">{t('aiChatbot.askAbout', 'Ask about appointments, services, or vehicle status')}</p>
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -214,7 +216,7 @@ export default function AIChatbot() {
                             <Bot className="w-4 h-4" />
                           )}
                           <span className="text-xs font-semibold">
-                            {msg.role === 'user' ? 'You' : 'AI Assistant'}
+                            {msg.role === 'user' ? t('aiChatbot.you', 'You') : t('aiChatbot.aiAssistant', 'AI Assistant')}
                           </span>
                           {msg.intent && (
                             <Badge className="text-xs bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 border-0">
@@ -227,7 +229,7 @@ export default function AIChatbot() {
                         </p>
                         {msg.confidence && (
                           <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                            Confidence: {Number(msg.confidence).toFixed(0)}%
+                            {t('aiChatbot.confidence', 'Confidence')}: {Number(msg.confidence).toFixed(0)}%
                           </p>
                         )}
                       </div>
@@ -239,7 +241,7 @@ export default function AIChatbot() {
 
             <div className="flex gap-2">
               <Input
-                placeholder="Type your message..."
+                placeholder={t('aiChatbot.typeMessage', 'Type your message...')}
                 value={messageInput}
                 onChange={(e) => setMessageInput(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
@@ -258,63 +260,63 @@ export default function AIChatbot() {
 
           <Card className="p-6 bg-white dark:bg-salis-black">
             <h3 className="text-lg font-bold font-['Montserrat'] mb-4 text-gray-900 dark:text-white">
-              Quick Actions
+              {t('common.quick_actions', 'Quick Actions')}
             </h3>
             <div className="space-y-2">
               <Button 
                 variant="outline" 
                 className="w-full justify-start text-left"
-                onClick={() => setMessageInput("I want to book an appointment")}
+                onClick={() => setMessageInput(t('aiChatbot.bookAppointmentMessage', 'I want to book an appointment'))}
                 data-testid="button-book-appointment"
               >
-                📅 Book Appointment
+                📅 {t('aiChatbot.bookAppointment', 'Book Appointment')}
               </Button>
               <Button 
                 variant="outline" 
                 className="w-full justify-start text-left"
-                onClick={() => setMessageInput("Check my vehicle status")}
+                onClick={() => setMessageInput(t('aiChatbot.checkStatusMessage', 'Check my vehicle status'))}
                 data-testid="button-check-status"
               >
-                🚗 Check Vehicle Status
+                🚗 {t('aiChatbot.checkVehicleStatus', 'Check Vehicle Status')}
               </Button>
               <Button 
                 variant="outline" 
                 className="w-full justify-start text-left"
-                onClick={() => setMessageInput("Get a quote for service")}
+                onClick={() => setMessageInput(t('aiChatbot.getQuoteMessage', 'Get a quote for service'))}
                 data-testid="button-get-quote"
               >
-                💰 Get Quote
+                💰 {t('aiChatbot.getQuote', 'Get Quote')}
               </Button>
               <Button 
                 variant="outline" 
                 className="w-full justify-start text-left"
-                onClick={() => setMessageInput("View my service history")}
+                onClick={() => setMessageInput(t('aiChatbot.viewHistoryMessage', 'View my service history'))}
                 data-testid="button-service-history"
               >
-                📋 Service History
+                📋 {t('aiChatbot.serviceHistory', 'Service History')}
               </Button>
             </div>
 
             <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
               <h4 className="text-sm font-semibold mb-2 text-gray-900 dark:text-white">
-                AI Capabilities
+                {t('aiChatbot.aiCapabilities', 'AI Capabilities')}
               </h4>
               <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400 font-['Poppins']">
                 <li className="flex items-start gap-2">
                   <CheckCircle2 className="w-4 h-4 mt-0.5 text-green-500" />
-                  Book & manage appointments
+                  {t('aiChatbot.capability1', 'Book & manage appointments')}
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle2 className="w-4 h-4 mt-0.5 text-green-500" />
-                  Check service status
+                  {t('aiChatbot.capability2', 'Check service status')}
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle2 className="w-4 h-4 mt-0.5 text-green-500" />
-                  Generate instant quotes
+                  {t('aiChatbot.capability3', 'Generate instant quotes')}
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle2 className="w-4 h-4 mt-0.5 text-green-500" />
-                  Answer common questions
+                  {t('aiChatbot.capability4', 'Answer common questions')}
                 </li>
               </ul>
             </div>
@@ -324,30 +326,30 @@ export default function AIChatbot() {
     },
     {
       id: "conversations",
-      label: "Conversations",
+      label: t('aiChatbot.conversations', 'Conversations'),
       icon: Bot,
       content: (
         <Card className="p-6 bg-white dark:bg-salis-black">
           <h2 className="text-xl font-bold font-['Montserrat'] mb-4 text-gray-900 dark:text-white">
-            Recent Conversations
+            {t('aiChatbot.recentConversations', 'Recent Conversations')}
           </h2>
           
           {conversations.length === 0 ? (
             <div className="text-center text-gray-500 dark:text-gray-400 py-12">
               <MessageSquare className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-              <p className="font-['Poppins']">No conversations yet</p>
+              <p className="font-['Poppins']">{t('aiChatbot.noConversations', 'No conversations yet')}</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead className="border-b border-gray-200 dark:border-gray-700">
                   <tr className="text-left text-sm font-semibold text-gray-700 dark:text-gray-300 font-['Poppins']">
-                    <th className="pb-3">Session</th>
-                    <th className="pb-3">Status</th>
-                    <th className="pb-3">Handler</th>
-                    <th className="pb-3">Source</th>
-                    <th className="pb-3">Created</th>
-                    <th className="pb-3">Actions</th>
+                    <th className="pb-3">{t('aiChatbot.session', 'Session')}</th>
+                    <th className="pb-3">{t('common.status', 'Status')}</th>
+                    <th className="pb-3">{t('aiChatbot.handler', 'Handler')}</th>
+                    <th className="pb-3">{t('aiChatbot.source', 'Source')}</th>
+                    <th className="pb-3">{t('aiChatbot.created', 'Created')}</th>
+                    <th className="pb-3">{t('common.actions', 'Actions')}</th>
                   </tr>
                 </thead>
                 <tbody className="text-sm font-['Poppins']">
@@ -363,7 +365,7 @@ export default function AIChatbot() {
                       <td className="py-3">{getStatusBadge(conv.status || 'active')}</td>
                       <td className="py-3">
                         <Badge className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-0">
-                          {conv.handoffTo ? 'Escalated' : 'AI'}
+                          {conv.handoffTo ? t('aiChatbot.escalated', 'Escalated') : t('aiChatbot.ai', 'AI')}
                         </Badge>
                       </td>
                       <td className="py-3">
@@ -381,7 +383,7 @@ export default function AIChatbot() {
                           onClick={() => setSelectedConversation(conv.id)}
                           data-testid={`button-view-${conv.id}`}
                         >
-                          View
+                          {t('common.view', 'View')}
                         </Button>
                       </td>
                     </tr>
@@ -395,7 +397,7 @@ export default function AIChatbot() {
     },
     {
       id: "analytics",
-      label: "Analytics",
+      label: t('aiChatbot.analytics', 'Analytics'),
       icon: TrendingUp,
       content: (
         <div className="space-y-6">
@@ -407,7 +409,7 @@ export default function AIChatbot() {
                 </div>
                 <div>
                   <p className="text-sm text-gray-600 dark:text-gray-400 font-['Poppins']">
-                    Total Conversations
+                    {t('aiChatbot.totalConversations', 'Total Conversations')}
                   </p>
                   <p className="text-2xl font-bold text-gray-900 dark:text-white font-['Montserrat']" data-testid="text-total-conversations">
                     {conversations.length}
@@ -423,7 +425,7 @@ export default function AIChatbot() {
                 </div>
                 <div>
                   <p className="text-sm text-gray-600 dark:text-gray-400 font-['Poppins']">
-                    Resolved
+                    {t('aiChatbot.resolved', 'Resolved')}
                   </p>
                   <p className="text-2xl font-bold text-gray-900 dark:text-white font-['Montserrat']" data-testid="text-resolved">
                     {conversations.filter(c => c.status === 'resolved').length}
@@ -439,7 +441,7 @@ export default function AIChatbot() {
                 </div>
                 <div>
                   <p className="text-sm text-gray-600 dark:text-gray-400 font-['Poppins']">
-                    Active
+                    {t('common.active', 'Active')}
                   </p>
                   <p className="text-2xl font-bold text-gray-900 dark:text-white font-['Montserrat']" data-testid="text-active">
                     {conversations.filter(c => c.status === 'active').length}
@@ -451,12 +453,12 @@ export default function AIChatbot() {
 
           <Card className="p-6 bg-white dark:bg-salis-black">
             <h3 className="text-lg font-bold font-['Montserrat'] mb-4 text-gray-900 dark:text-white">
-              📊 Performance Metrics
+              📊 {t('aiChatbot.performanceMetrics', 'Performance Metrics')}
             </h3>
             <div className="text-center text-gray-500 dark:text-gray-400 py-8">
               <Clock className="w-12 h-12 mx-auto mb-2 text-gray-400" />
-              <p className="font-['Poppins']">Advanced analytics coming soon</p>
-              <p className="text-sm mt-1">Response time, satisfaction scores, intent analysis</p>
+              <p className="font-['Poppins']">{t('aiChatbot.advancedAnalytics', 'Advanced analytics coming soon')}</p>
+              <p className="text-sm mt-1">{t('aiChatbot.analyticsDescription', 'Response time, satisfaction scores, intent analysis')}</p>
             </div>
           </Card>
         </div>
@@ -466,8 +468,8 @@ export default function AIChatbot() {
 
   return (
     <TabsPageLayout
-      title="AI Chatbot"
-      description="AI-powered customer support with OpenAI integration for intelligent responses and automated tasks"
+      title={t('aiChatbot.title', 'AI Chatbot')}
+      description={t('aiChatbot.description', 'AI-powered customer support with OpenAI integration for intelligent responses and automated tasks')}
       icon={Bot}
       tabs={tabs}
       activeTab={activeTab}

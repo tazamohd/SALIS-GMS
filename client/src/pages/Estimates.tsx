@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { FileText, Plus } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
@@ -8,6 +9,7 @@ import { StandardTablePage } from "@/components/layouts";
 import type { Estimate, Garage, User } from "@shared/schema";
 
 export function Estimates() {
+  const { t } = useTranslation();
   const [selectedGarageId, setSelectedGarageId] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
 
@@ -46,7 +48,7 @@ export function Estimates() {
   const columns = [
     {
       key: "estimateNumber",
-      label: "Estimate #",
+      label: t('estimates.estimateNumber', 'Estimate #'),
       render: (estimate: Estimate) => (
         <div className="flex items-center gap-3">
           <FileText className="w-5 h-5 text-gray-900 dark:text-white/50" />
@@ -55,7 +57,7 @@ export function Estimates() {
               {estimate.estimateNumber}
             </p>
             <p className="text-xs text-gray-900 dark:text-white/60" data-testid={`text-customer-${estimate.id}`}>
-              {customers?.find(c => c.id === estimate.customerId)?.fullName || "Unknown Customer"}
+              {customers?.find(c => c.id === estimate.customerId)?.fullName || t('estimates.unknownCustomer', 'Unknown Customer')}
             </p>
           </div>
         </div>
@@ -63,7 +65,7 @@ export function Estimates() {
     },
     {
       key: "totalAmount",
-      label: "Amount",
+      label: t('common.amount', 'Amount'),
       render: (estimate: Estimate) => (
         <div className="text-right">
           <p className="font-bold text-sm text-gray-900 dark:text-white" data-testid={`text-amount-${estimate.id}`}>
@@ -71,7 +73,7 @@ export function Estimates() {
           </p>
           {estimate.validUntil && (
             <p className="text-xs text-gray-900 dark:text-white/60">
-              Valid until {new Date(estimate.validUntil).toLocaleDateString()}
+              {t('estimates.validUntil', 'Valid until')} {new Date(estimate.validUntil).toLocaleDateString()}
             </p>
           )}
         </div>
@@ -79,7 +81,7 @@ export function Estimates() {
     },
     {
       key: "status",
-      label: "Status",
+      label: t('common.status', 'Status'),
       render: (estimate: Estimate) => (
         <span
           className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(estimate.status)}`}
@@ -93,12 +95,12 @@ export function Estimates() {
 
   return (
     <StandardTablePage
-      title="Estimates & Quotes"
-      description="Create and manage customer estimates"
+      title={t('nav.estimates', 'Estimates & Quotes')}
+      description={t('estimates.description', 'Create and manage customer estimates')}
       icon={FileText}
       actions={[
         {
-          label: "Create Estimate",
+          label: t('estimates.createEstimate', 'Create Estimate'),
           onClick: () => {},
           icon: Plus,
         },
@@ -106,27 +108,27 @@ export function Estimates() {
       data={estimates || []}
       isLoading={isLoading}
       columns={columns}
-      searchPlaceholder="Search estimates..."
+      searchPlaceholder={t('estimates.searchPlaceholder', 'Search estimates...')}
       filters={[
         {
           id: "garageId",
-          label: "Garage",
+          label: t('estimates.garage', 'Garage'),
           options: [
-            { value: "all", label: "All Garages" },
+            { value: "all", label: t('estimates.allGarages', 'All Garages') },
             ...(garages || []).map(g => ({ value: g.id, label: g.name })),
           ],
           defaultValue: selectedGarageId,
         },
         {
           id: "status",
-          label: "Status",
+          label: t('common.status', 'Status'),
           options: [
-            { value: "all", label: "All Status" },
-            { value: "draft", label: "Draft" },
-            { value: "sent", label: "Sent" },
-            { value: "accepted", label: "Accepted" },
-            { value: "declined", label: "Declined" },
-            { value: "expired", label: "Expired" },
+            { value: "all", label: t('estimates.allStatus', 'All Status') },
+            { value: "draft", label: t('common.draft', 'Draft') },
+            { value: "sent", label: t('estimates.sent', 'Sent') },
+            { value: "accepted", label: t('estimates.accepted', 'Accepted') },
+            { value: "declined", label: t('estimates.declined', 'Declined') },
+            { value: "expired", label: t('estimates.expired', 'Expired') },
           ],
           defaultValue: statusFilter,
         },
@@ -138,8 +140,8 @@ export function Estimates() {
       onRowClick={(estimate) => {}}
       emptyState={{
         icon: FileText,
-        title: "No Estimates",
-        description: "Create your first estimate to start quoting customers",
+        title: t('estimates.noEstimates', 'No Estimates'),
+        description: t('estimates.noEstimatesDescription', 'Create your first estimate to start quoting customers'),
       }}
       additionalContent={<CreateEstimateDialog />}
     />

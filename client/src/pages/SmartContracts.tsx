@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -41,6 +42,7 @@ interface SmartContract {
 }
 
 export default function SmartContracts() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { toast } = useToast();
   const [showCreateForm, setShowCreateForm] = useState(false);
@@ -65,8 +67,8 @@ export default function SmartContracts() {
     },
     onSuccess: () => {
       toast({
-        title: "Smart Contract Created",
-        description: "Contract created successfully",
+        title: t('smartContracts.contractCreated', 'Smart Contract Created'),
+        description: t('smartContracts.contractCreatedSuccess', 'Contract created successfully'),
       });
       queryClient.invalidateQueries({ queryKey: ["/api/smart-contracts"] });
       setShowCreateForm(false);
@@ -80,8 +82,8 @@ export default function SmartContracts() {
     },
     onError: () => {
       toast({
-        title: "Error",
-        description: "Failed to create smart contract",
+        title: t('common.error', 'Error'),
+        description: t('smartContracts.createError', 'Failed to create smart contract'),
         variant: "destructive",
       });
     },
@@ -94,8 +96,8 @@ export default function SmartContracts() {
     },
     onSuccess: () => {
       toast({
-        title: "Contract Updated",
-        description: "Contract status updated successfully",
+        title: t('smartContracts.contractUpdated', 'Contract Updated'),
+        description: t('smartContracts.statusUpdatedSuccess', 'Contract status updated successfully'),
       });
       queryClient.invalidateQueries({ queryKey: ["/api/smart-contracts"] });
     },
@@ -106,8 +108,8 @@ export default function SmartContracts() {
       garageId: (user as any)?.garageId,
       contractType: newContract.contractType,
       blockchain: "Ethereum",
-      partyA: newContract.partyA || "Garage",
-      partyB: newContract.partyB || "Customer",
+      partyA: newContract.partyA || t('smartContracts.garage', 'Garage'),
+      partyB: newContract.partyB || t('smartContracts.customer', 'Customer'),
       contractValue: newContract.contractValue,
       currency: "USD",
       terms: newContract.terms,
@@ -143,12 +145,12 @@ export default function SmartContracts() {
 
   return (
     <StandardPageLayout
-      title="Smart Contracts"
-      description="Automated service agreements with digital signatures and payment triggers"
+      title={t('smartContracts.title', 'Smart Contracts')}
+      description={t('smartContracts.description', 'Automated service agreements with digital signatures and payment triggers')}
       icon={FileSignature}
       actions={[
         {
-          label: "Create Contract",
+          label: t('smartContracts.createContract', 'Create Contract'),
           icon: FileSignature,
           onClick: () => setShowCreateForm(!showCreateForm),
           variant: "default",
@@ -159,15 +161,15 @@ export default function SmartContracts() {
         {showCreateForm && (
           <Card className="mb-8 border-2 border-blue-600">
             <CardHeader>
-              <CardTitle>Create New Smart Contract</CardTitle>
+              <CardTitle>{t('smartContracts.createNewContract', 'Create New Smart Contract')}</CardTitle>
               <CardDescription>
-                Automated contract with digital signatures and payment automation
+                {t('smartContracts.automatedContractDesc', 'Automated contract with digital signatures and payment automation')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label>Contract Type</Label>
+                  <Label>{t('smartContracts.contractType', 'Contract Type')}</Label>
                   <Select
                     value={newContract.contractType}
                     onValueChange={(value) =>
@@ -178,15 +180,15 @@ export default function SmartContracts() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="service_agreement">Service Agreement</SelectItem>
-                      <SelectItem value="warranty">Warranty Contract</SelectItem>
-                      <SelectItem value="maintenance_plan">Maintenance Plan</SelectItem>
-                      <SelectItem value="parts_supply">Parts Supply Contract</SelectItem>
+                      <SelectItem value="service_agreement">{t('smartContracts.serviceAgreement', 'Service Agreement')}</SelectItem>
+                      <SelectItem value="warranty">{t('smartContracts.warrantyContract', 'Warranty Contract')}</SelectItem>
+                      <SelectItem value="maintenance_plan">{t('smartContracts.maintenancePlan', 'Maintenance Plan')}</SelectItem>
+                      <SelectItem value="parts_supply">{t('smartContracts.partsSupplyContract', 'Parts Supply Contract')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div>
-                  <Label>Payment Trigger</Label>
+                  <Label>{t('smartContracts.paymentTrigger', 'Payment Trigger')}</Label>
                   <Select
                     value={newContract.terms.paymentTrigger}
                     onValueChange={(value) =>
@@ -200,9 +202,9 @@ export default function SmartContracts() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="on_start">On Service Start</SelectItem>
-                      <SelectItem value="on_completion">On Service Completion</SelectItem>
-                      <SelectItem value="on_approval">On Customer Approval</SelectItem>
+                      <SelectItem value="on_start">{t('smartContracts.onServiceStart', 'On Service Start')}</SelectItem>
+                      <SelectItem value="on_completion">{t('smartContracts.onServiceCompletion', 'On Service Completion')}</SelectItem>
+                      <SelectItem value="on_approval">{t('smartContracts.onCustomerApproval', 'On Customer Approval')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -210,9 +212,9 @@ export default function SmartContracts() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label>Customer Name (Party B)</Label>
+                  <Label>{t('smartContracts.customerName', 'Customer Name (Party B)')}</Label>
                   <Input
-                    placeholder="Enter customer name"
+                    placeholder={t('smartContracts.enterCustomerName', 'Enter customer name')}
                     value={newContract.partyB}
                     onChange={(e) =>
                       setNewContract({
@@ -224,7 +226,7 @@ export default function SmartContracts() {
                   />
                 </div>
                 <div>
-                  <Label>Contract Amount ($)</Label>
+                  <Label>{t('smartContracts.contractAmount', 'Contract Amount ($)')}</Label>
                   <Input
                     type="number"
                     placeholder="0.00"
@@ -241,9 +243,9 @@ export default function SmartContracts() {
               </div>
 
               <div>
-                <Label>Service Description</Label>
+                <Label>{t('smartContracts.serviceDescription', 'Service Description')}</Label>
                 <Textarea
-                  placeholder="Describe the service to be provided..."
+                  placeholder={t('smartContracts.describeService', 'Describe the service to be provided...')}
                   value={newContract.terms.service}
                   onChange={(e) =>
                     setNewContract({
@@ -262,10 +264,10 @@ export default function SmartContracts() {
                   data-testid="button-submit-contract"
                 >
                   <Shield className="w-4 h-4 mr-2" />
-                  Create Signed Contract
+                  {t('smartContracts.createSignedContract', 'Create Signed Contract')}
                 </Button>
                 <Button variant="outline" onClick={() => setShowCreateForm(false)}>
-                  Cancel
+                  {t('common.cancel', 'Cancel')}
                 </Button>
               </div>
             </CardContent>
@@ -278,7 +280,7 @@ export default function SmartContracts() {
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Total Contracts</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">{t('smartContracts.totalContracts', 'Total Contracts')}</p>
                   <p className="text-2xl font-bold" data-testid="text-total-contracts">
                     {contracts?.length || 0}
                   </p>
@@ -291,7 +293,7 @@ export default function SmartContracts() {
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Active</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">{t('common.active', 'Active')}</p>
                   <p className="text-2xl font-bold">
                     {contracts?.filter((c) => c.status === "active").length || 0}
                   </p>
@@ -304,7 +306,7 @@ export default function SmartContracts() {
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Executed</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">{t('smartContracts.executed', 'Executed')}</p>
                   <p className="text-2xl font-bold">
                     {contracts?.filter((c) => c.status === "executed" || c.status === "completed").length || 0}
                   </p>
@@ -317,7 +319,7 @@ export default function SmartContracts() {
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Payment Ready</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">{t('smartContracts.paymentReady', 'Payment Ready')}</p>
                   <p className="text-2xl font-bold">
                     {contracts?.filter((c) => c.status === "signed").length || 0}
                   </p>
@@ -333,7 +335,7 @@ export default function SmartContracts() {
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600 dark:text-gray-400">Loading contracts...</p>
+            <p className="mt-4 text-gray-600 dark:text-gray-400">{t('smartContracts.loadingContracts', 'Loading contracts...')}</p>
           </div>
         </div>
       )}
@@ -343,14 +345,14 @@ export default function SmartContracts() {
           <CardContent className="text-center py-12">
             <FileSignature className="w-16 h-16 text-gray-400 mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">
-              No Smart Contracts
+              {t('smartContracts.noContracts', 'No Smart Contracts')}
             </h3>
             <p className="text-gray-500 dark:text-gray-400 mb-6">
-              Create your first smart contract with automated payment processing
+              {t('smartContracts.createFirstContract', 'Create your first smart contract with automated payment processing')}
             </p>
             <Button onClick={() => setShowCreateForm(true)}>
               <FileSignature className="w-4 h-4 mr-2" />
-              Create Contract
+              {t('smartContracts.createContract', 'Create Contract')}
             </Button>
           </CardContent>
         </Card>
@@ -359,7 +361,7 @@ export default function SmartContracts() {
       {!isLoading && contracts && contracts.length > 0 && (
         <div className="space-y-4">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-            Contracts ({contracts.length})
+            {t('smartContracts.contracts', 'Contracts')} ({contracts.length})
           </h2>
           {contracts.map((contract) => (
             <Card key={contract.id} className="border-l-4 border-l-blue-600">
@@ -376,7 +378,7 @@ export default function SmartContracts() {
                       </Badge>
                     </CardTitle>
                     <CardDescription>
-                      Created: {new Date(contract.createdAt).toLocaleDateString()}
+                      {t('smartContracts.created', 'Created')}: {new Date(contract.createdAt).toLocaleDateString()}
                     </CardDescription>
                   </div>
                   <div className="flex gap-2">
@@ -388,7 +390,7 @@ export default function SmartContracts() {
                         data-testid={`button-sign-contract-${contract.id}`}
                       >
                         <FileSignature className="w-4 h-4 mr-2" />
-                        Sign Contract
+                        {t('smartContracts.signContract', 'Sign Contract')}
                       </Button>
                     )}
                     {contract.status === "signed" && (
@@ -399,7 +401,7 @@ export default function SmartContracts() {
                         data-testid={`button-execute-contract-${contract.id}`}
                       >
                         <Zap className="w-4 h-4 mr-2" />
-                        Execute Contract
+                        {t('smartContracts.executeContract', 'Execute Contract')}
                       </Button>
                     )}
                   </div>
@@ -408,15 +410,15 @@ export default function SmartContracts() {
               <CardContent>
                 <div className="grid grid-cols-3 gap-6">
                   <div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Parties</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t('smartContracts.parties', 'Parties')}</p>
                     <p className="text-sm font-semibold">{contract.partyA} ↔ {contract.partyB}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Contract Value</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t('smartContracts.contractValue', 'Contract Value')}</p>
                     <p className="font-semibold">${contract.contractValue} {contract.currency}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Blockchain</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t('smartContracts.blockchain', 'Blockchain')}</p>
                     <Badge variant="outline">{contract.blockchain}</Badge>
                   </div>
                 </div>

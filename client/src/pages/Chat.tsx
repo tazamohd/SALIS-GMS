@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { chatWebSocket } from "@/lib/chatWebSocket";
 import type { User } from "@shared/schema";
@@ -125,6 +126,7 @@ interface PresenceUpdate {
 }
 
 export default function Chat() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const { data: user } = useQuery<User>({
     queryKey: ['/api/auth/user'],
@@ -196,8 +198,8 @@ export default function Chat() {
       setTicketCategory("");
       setTicketPriority("medium");
       toast({
-        title: "Support Ticket Created",
-        description: "Your support ticket has been created successfully.",
+        title: t('chat.ticketCreated', 'Support Ticket Created'),
+        description: t('chat.ticketCreatedDesc', 'Your support ticket has been created successfully.'),
       });
     },
   });
@@ -220,8 +222,8 @@ export default function Chat() {
     },
     onSuccess: () => {
       toast({
-        title: "File Uploaded",
-        description: "Your file has been attached successfully.",
+        title: t('chat.fileUploaded', 'File Uploaded'),
+        description: t('chat.fileUploadedDesc', 'Your file has been attached successfully.'),
       });
     },
   });
@@ -362,8 +364,8 @@ export default function Chat() {
     const validFiles = files.filter(file => {
       if (file.size > 50 * 1024 * 1024) {
         toast({
-          title: "File Too Large",
-          description: `${file.name} exceeds 50MB limit`,
+          title: t('chat.fileTooLarge', 'File Too Large'),
+          description: t('chat.fileSizeLimit', '{{name}} exceeds 50MB limit', { name: file.name }),
           variant: "destructive",
         });
         return false;
@@ -380,8 +382,8 @@ export default function Chat() {
   const handleCreateTicket = () => {
     if (!ticketSubject.trim() || !ticketDescription.trim() || !ticketCategory) {
       toast({
-        title: "Validation Error",
-        description: "Please fill in all required fields",
+        title: t('chat.validationError', 'Validation Error'),
+        description: t('chat.fillAllFields', 'Please fill in all required fields'),
         variant: "destructive",
       });
       return;
@@ -451,8 +453,8 @@ export default function Chat() {
 
   return (
     <StandardPageLayout
-      title="Support & Chat"
-      description="Real-time messaging and support ticket management"
+      title={t('chat.title', 'Support & Chat')}
+      description={t('chat.description', 'Real-time messaging and support ticket management')}
       icon={MessageCircle}
       contentClassName="!p-0 !h-[calc(100vh-4rem)]"
     >
@@ -461,70 +463,70 @@ export default function Chat() {
           <div className="p-4 border-b dark:border-salis-gray-dark">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-montserrat font-semibold text-salis-black dark:text-salis-white">
-                Messages
+                {t('chat.messages', 'Messages')}
               </h2>
               <Dialog open={showSupportDialog} onOpenChange={setShowSupportDialog}>
                 <DialogTrigger asChild>
                   <Button size="sm" variant="ghost" data-testid="button-new-ticket">
                     <Ticket className="h-4 w-4 mr-1" />
-                    New Ticket
+                    {t('chat.newTicket', 'New Ticket')}
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-[500px]">
                   <DialogHeader>
-                    <DialogTitle>Create Support Ticket</DialogTitle>
+                    <DialogTitle>{t('chat.createSupportTicket', 'Create Support Ticket')}</DialogTitle>
                     <DialogDescription>
-                      Submit a support request and our team will assist you shortly.
+                      {t('chat.supportTicketDesc', 'Submit a support request and our team will assist you shortly.')}
                     </DialogDescription>
                   </DialogHeader>
                   <div className="grid gap-4 py-4">
                     <div className="grid gap-2">
-                      <Label htmlFor="subject">Subject *</Label>
+                      <Label htmlFor="subject">{t('chat.subject', 'Subject')} *</Label>
                       <Input
                         id="subject"
                         value={ticketSubject}
                         onChange={(e) => setTicketSubject(e.target.value)}
-                        placeholder="Brief description of your issue"
+                        placeholder={t('chat.subjectPlaceholder', 'Brief description of your issue')}
                         data-testid="input-ticket-subject"
                       />
                     </div>
                     <div className="grid gap-2">
-                      <Label htmlFor="category">Category *</Label>
+                      <Label htmlFor="category">{t('chat.category', 'Category')} *</Label>
                       <Select value={ticketCategory} onValueChange={setTicketCategory}>
                         <SelectTrigger data-testid="select-ticket-category">
-                          <SelectValue placeholder="Select category" />
+                          <SelectValue placeholder={t('chat.selectCategory', 'Select category')} />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="technical">Technical Support</SelectItem>
-                          <SelectItem value="billing">Billing</SelectItem>
-                          <SelectItem value="feature">Feature Request</SelectItem>
-                          <SelectItem value="bug">Bug Report</SelectItem>
-                          <SelectItem value="account">Account Issue</SelectItem>
-                          <SelectItem value="other">Other</SelectItem>
+                          <SelectItem value="technical">{t('chat.technicalSupport', 'Technical Support')}</SelectItem>
+                          <SelectItem value="billing">{t('chat.billing', 'Billing')}</SelectItem>
+                          <SelectItem value="feature">{t('chat.featureRequest', 'Feature Request')}</SelectItem>
+                          <SelectItem value="bug">{t('chat.bugReport', 'Bug Report')}</SelectItem>
+                          <SelectItem value="account">{t('chat.accountIssue', 'Account Issue')}</SelectItem>
+                          <SelectItem value="other">{t('chat.other', 'Other')}</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
                     <div className="grid gap-2">
-                      <Label htmlFor="priority">Priority</Label>
+                      <Label htmlFor="priority">{t('chat.priority', 'Priority')}</Label>
                       <Select value={ticketPriority} onValueChange={setTicketPriority}>
                         <SelectTrigger data-testid="select-ticket-priority">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="low">Low</SelectItem>
-                          <SelectItem value="medium">Medium</SelectItem>
-                          <SelectItem value="high">High</SelectItem>
-                          <SelectItem value="urgent">Urgent</SelectItem>
+                          <SelectItem value="low">{t('chat.low', 'Low')}</SelectItem>
+                          <SelectItem value="medium">{t('chat.medium', 'Medium')}</SelectItem>
+                          <SelectItem value="high">{t('chat.high', 'High')}</SelectItem>
+                          <SelectItem value="urgent">{t('chat.urgent', 'Urgent')}</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
                     <div className="grid gap-2">
-                      <Label htmlFor="description">Description *</Label>
+                      <Label htmlFor="description">{t('chat.description', 'Description')} *</Label>
                       <Textarea
                         id="description"
                         value={ticketDescription}
                         onChange={(e) => setTicketDescription(e.target.value)}
-                        placeholder="Provide detailed information about your issue"
+                        placeholder={t('chat.descriptionPlaceholder', 'Provide detailed information about your issue')}
                         rows={4}
                         data-testid="textarea-ticket-description"
                       />
@@ -536,7 +538,7 @@ export default function Chat() {
                       disabled={createTicketMutation.isPending}
                       data-testid="button-submit-ticket"
                     >
-                      {createTicketMutation.isPending ? "Creating..." : "Create Ticket"}
+                      {createTicketMutation.isPending ? t('chat.creating', 'Creating...') : t('chat.createTicket', 'Create Ticket')}
                     </Button>
                   </DialogFooter>
                 </DialogContent>
@@ -545,7 +547,7 @@ export default function Chat() {
             <div className="relative">
               <Search className="absolute left-3 top-2.5 h-4 w-4 text-salis-gray dark:text-salis-gray-light" />
               <Input
-                placeholder="Search conversations..."
+                placeholder={t('chat.searchConversations', 'Search conversations...')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-9"
@@ -558,7 +560,7 @@ export default function Chat() {
             {tickets.length > 0 && (
               <div className="p-2 border-b dark:border-salis-gray-dark">
                 <h3 className="text-xs font-semibold text-salis-gray dark:text-salis-gray-light px-3 py-2 mb-1">
-                  Support Tickets
+                  {t('chat.supportTickets', 'Support Tickets')}
                 </h3>
                 {tickets.slice(0, 3).map((ticket) => (
                   <div
@@ -592,12 +594,12 @@ export default function Chat() {
 
             <div className="p-2">
               <h3 className="text-xs font-semibold text-salis-gray dark:text-salis-gray-light px-3 py-2 mb-1">
-                Conversations
+                {t('chat.conversations', 'Conversations')}
               </h3>
               {filteredConversations.length === 0 ? (
                 <div className="text-center py-8">
                   <MessageCircle className="h-12 w-12 mx-auto text-salis-gray dark:text-salis-gray-light mb-3" />
-                  <p className="text-sm text-salis-gray dark:text-salis-gray-light">No conversations yet</p>
+                  <p className="text-sm text-salis-gray dark:text-salis-gray-light">{t('chat.noConversations', 'No conversations yet')}</p>
                 </div>
               ) : (
                 filteredConversations.map((conversation) => (
@@ -621,7 +623,7 @@ export default function Chat() {
                         </Avatar>
                         <div className="flex-1 min-w-0">
                           <p className="font-medium font-poppins truncate">
-                            {conversation.title || 'Untitled Conversation'}
+                            {conversation.title || t('chat.untitledConversation', 'Untitled Conversation')}
                           </p>
                           {conversation.lastMessageAt && (
                             <p className="text-xs text-salis-gray dark:text-salis-gray-light">
@@ -640,154 +642,103 @@ export default function Chat() {
           </ScrollArea>
         </Card>
 
-        <div className="flex-1 flex flex-col bg-salis-gray-light/10 dark:bg-salis-black">
+        <div className="flex-1 flex flex-col bg-salis-gray-light/10 dark:bg-salis-gray-dark/10">
           {selectedConversation ? (
             <>
-              <div className="p-4 border-b bg-white dark:bg-salis-black dark:border-salis-gray-dark">
+              <div className="p-4 border-b dark:border-salis-gray-dark bg-white dark:bg-salis-black">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <Avatar className="h-10 w-10">
-                      <AvatarFallback className="bg-salis-black dark:bg-salis-white text-salis-white dark:text-salis-black font-medium">
+                      <AvatarFallback className="bg-salis-gray dark:bg-salis-gray-dark text-salis-white font-medium">
                         {selectedConversation.title?.charAt(0) || '?'}
                       </AvatarFallback>
                     </Avatar>
                     <div>
-                      <h3 className="font-montserrat font-semibold text-salis-black dark:text-salis-white">
-                        {selectedConversation.title || 'Untitled Conversation'}
+                      <h3 className="font-semibold text-salis-black dark:text-salis-white">
+                        {selectedConversation.title || t('chat.untitledConversation', 'Untitled Conversation')}
                       </h3>
-                      <p className="text-xs text-salis-gray dark:text-salis-gray-light">
-                        {participants.length} participant{participants.length !== 1 ? 's' : ''}
-                      </p>
+                      {conversationTypingUsers.length > 0 && (
+                        <p className="text-sm text-salis-gray dark:text-salis-gray-light">
+                          {conversationTypingUsers.map(u => u.userName).join(', ')} {t('chat.isTyping', 'is typing...')}
+                        </p>
+                      )}
                     </div>
                   </div>
-                  <Button size="sm" variant="ghost" data-testid="button-conversation-options">
-                    <MoreVertical className="h-4 w-4" />
+                  <Button variant="ghost" size="icon">
+                    <MoreVertical className="h-5 w-5" />
                   </Button>
                 </div>
               </div>
 
               <ScrollArea className="flex-1 p-4">
                 <div className="space-y-4">
-                  {messages.length === 0 ? (
-                    <div className="text-center py-12">
-                      <MessageCircle className="h-16 w-16 mx-auto text-salis-gray dark:text-salis-gray-light mb-4" />
-                      <p className="text-salis-gray dark:text-salis-gray-light">No messages yet. Start the conversation!</p>
-                    </div>
-                  ) : (
-                    [...messages].reverse().map((message) => {
-                      const isOwnMessage = message.senderId === user?.id;
-                      return (
-                        <div
-                          key={message.id}
-                          className={cn(
-                            "flex",
-                            isOwnMessage ? "justify-end" : "justify-start"
-                          )}
-                          data-testid={`message-${message.id}`}
-                        >
-                          <div
-                            className={cn(
-                              "max-w-[70%] rounded-lg p-3",
-                              isOwnMessage
-                                ? "bg-salis-black dark:bg-salis-white text-salis-white dark:text-salis-black"
-                                : "bg-white dark:bg-salis-gray-dark text-salis-black dark:text-salis-white"
-                            )}
-                          >
-                            <p className="font-poppins whitespace-pre-wrap break-words">
-                              {message.content}
-                            </p>
-                            <div className="flex items-center gap-2 mt-2">
-                              <p className="text-xs opacity-70">
-                                {formatDistanceToNow(new Date(message.createdAt), {
-                                  addSuffix: true,
-                                })}
-                              </p>
-                              {message.isEdited && (
-                                <Badge variant="outline" className="text-xs">
-                                  Edited
-                                </Badge>
-                              )}
-                            </div>
-                            <div className="flex gap-1 mt-2">
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                className="h-6 px-2"
-                                onClick={() => addReactionMutation.mutate({ messageId: message.id, emoji: '👍' })}
-                              >
-                                <Smile className="h-3 w-3" />
-                              </Button>
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })
-                  )}
-
-                  {conversationTypingUsers.length > 0 && (
-                    <div className="flex justify-start">
-                      <div className="bg-white dark:bg-salis-gray-dark rounded-lg px-4 py-2">
-                        <p className="text-sm text-salis-gray dark:text-salis-gray-light italic">
-                          {conversationTypingUsers[0].userName} is typing...
+                  {messages.slice().reverse().map((message) => (
+                    <div
+                      key={message.id}
+                      className={cn(
+                        "flex",
+                        message.senderId === user?.id ? "justify-end" : "justify-start"
+                      )}
+                    >
+                      <div
+                        className={cn(
+                          "max-w-[70%] rounded-lg p-3",
+                          message.senderId === user?.id
+                            ? "bg-salis-black dark:bg-salis-white text-salis-white dark:text-salis-black"
+                            : "bg-white dark:bg-salis-gray-dark text-salis-black dark:text-salis-white"
+                        )}
+                      >
+                        <p className="text-sm">{message.content}</p>
+                        <p className="text-xs opacity-60 mt-1">
+                          {formatDistanceToNow(new Date(message.createdAt), { addSuffix: true })}
                         </p>
                       </div>
                     </div>
-                  )}
-
+                  ))}
                   <div ref={messagesEndRef} />
                 </div>
               </ScrollArea>
 
-              {uploadingFiles.length > 0 && (
-                <div className="px-4 py-2 border-t bg-white dark:bg-salis-black dark:border-salis-gray-dark">
-                  <div className="flex gap-2 flex-wrap">
+              <div className="p-4 border-t dark:border-salis-gray-dark bg-white dark:bg-salis-black">
+                {uploadingFiles.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mb-3">
                     {uploadingFiles.map((file, index) => (
                       <div
                         key={index}
-                        className="flex items-center gap-2 bg-salis-gray-light/20 dark:bg-salis-gray-dark/20 rounded px-3 py-2"
+                        className="flex items-center gap-2 bg-salis-gray-light/20 dark:bg-salis-gray-dark/20 px-3 py-1 rounded-full"
                       >
-                        <Paperclip className="h-4 w-4" />
-                        <span className="text-sm truncate max-w-[200px]">{file.name}</span>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className="h-6 w-6 p-0"
-                          onClick={() => removeFile(index)}
-                        >
+                        <span className="text-sm truncate max-w-[150px]">{file.name}</span>
+                        <button onClick={() => removeFile(index)}>
                           <X className="h-3 w-3" />
-                        </Button>
+                        </button>
                       </div>
                     ))}
                   </div>
-                </div>
-              )}
-
-              <div className="p-4 border-t bg-white dark:bg-salis-black dark:border-salis-gray-dark">
+                )}
                 <div className="flex items-center gap-2">
                   <input
-                    type="file"
                     ref={fileInputRef}
-                    onChange={handleFileSelect}
+                    type="file"
                     multiple
                     className="hidden"
-                    accept="image/*,application/pdf,.doc,.docx,.xls,.xlsx"
+                    onChange={handleFileSelect}
                   />
                   <Button
-                    size="sm"
                     variant="ghost"
+                    size="icon"
                     onClick={() => fileInputRef.current?.click()}
                     data-testid="button-attach-file"
                   >
-                    <Paperclip className="h-4 w-4" />
+                    <Paperclip className="h-5 w-5" />
                   </Button>
                   <Input
-                    placeholder="Type a message..."
+                    placeholder={t('chat.typeMessage', 'Type a message...')}
                     value={newMessage}
                     onChange={(e) => {
                       setNewMessage(e.target.value);
                       handleTyping();
                     }}
-                    onKeyPress={handleKeyPress}
+                    onKeyDown={handleKeyPress}
                     className="flex-1"
                     data-testid="input-message"
                   />
@@ -796,7 +747,7 @@ export default function Chat() {
                     disabled={!newMessage.trim() || sendMessageMutation.isPending}
                     data-testid="button-send-message"
                   >
-                    <Send className="h-4 w-4" />
+                    <Send className="h-5 w-5" />
                   </Button>
                 </div>
               </div>
@@ -804,20 +755,13 @@ export default function Chat() {
           ) : (
             <div className="flex-1 flex items-center justify-center">
               <div className="text-center">
-                <MessageCircle className="h-24 w-24 mx-auto text-salis-gray dark:text-salis-gray-light mb-4" />
-                <h3 className="font-montserrat font-semibold text-xl text-salis-black dark:text-salis-white mb-2">
-                  Welcome to Support & Chat
+                <MessageCircle className="h-16 w-16 mx-auto text-salis-gray dark:text-salis-gray-light mb-4" />
+                <h3 className="text-xl font-semibold text-salis-black dark:text-salis-white mb-2">
+                  {t('chat.selectConversation', 'Select a conversation')}
                 </h3>
-                <p className="text-salis-gray dark:text-salis-gray-light mb-4">
-                  Select a conversation or create a support ticket to get started
+                <p className="text-salis-gray dark:text-salis-gray-light">
+                  {t('chat.selectConversationDesc', 'Choose a conversation from the sidebar to start chatting')}
                 </p>
-                <Button
-                  onClick={() => setShowSupportDialog(true)}
-                  data-testid="button-create-ticket-cta"
-                >
-                  <Ticket className="h-4 w-4 mr-2" />
-                  Create Support Ticket
-                </Button>
               </div>
             </div>
           )}

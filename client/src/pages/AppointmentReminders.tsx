@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -24,6 +25,7 @@ import { SiWhatsapp } from "react-icons/si";
 import { TabsPageLayout, TabConfig } from "@/components/layouts";
 
 export default function AppointmentReminders() {
+  const { t } = useTranslation();
   const [selectedTab, setSelectedTab] = useState("overview");
 
   const { data: appointmentsData } = useQuery({ queryKey: ["/api/appointments"] });
@@ -91,20 +93,31 @@ export default function AppointmentReminders() {
 
   const exportNoShowsToCSV = () => {
     if (recentNoShows.length === 0) {
-      alert('No no-show data to export');
+      alert(t('reminders.noNoShowData', 'No no-show data to export'));
       return;
     }
 
     try {
-      const headers = ['Date', 'Customer', 'Phone', 'Scheduled Time', 'Revenue Loss', 'Contact Attempts', 'Fee Charged', 'Status', 'Rescheduled', 'Reason'];
+      const headers = [
+        t('common.date', 'Date'),
+        t('customers.customer', 'Customer'),
+        t('auth.phone', 'Phone'),
+        t('reminders.scheduledTime', 'Scheduled Time'),
+        t('reminders.revenueLoss', 'Revenue Loss'),
+        t('reminders.contactAttempts', 'Contact Attempts'),
+        t('reminders.feeCharged', 'Fee Charged'),
+        t('common.status', 'Status'),
+        t('reminders.rescheduled', 'Rescheduled'),
+        t('reminders.reason', 'Reason')
+      ];
       const csvRows = [
         headers.join(','),
         ...recentNoShows.map((ns: any) => {
           const markedDate = ns.markedNoShowAt ? new Date(ns.markedNoShowAt).toLocaleDateString() : 'N/A';
           const scheduledTime = ns.scheduledTime ? new Date(ns.scheduledTime).toLocaleString() : 'N/A';
           const revenueLoss = `$${Number(ns.estimatedRevenueLoss || 0).toFixed(2)}`;
-          const feeCharged = ns.noShowFeeCharged ? `$${Number(ns.feeAmount || 0).toFixed(2)}` : 'None';
-          const status = ns.feePaid ? 'Paid' : ns.feeWaived ? 'Waived' : 'Unpaid';
+          const feeCharged = ns.noShowFeeCharged ? `$${Number(ns.feeAmount || 0).toFixed(2)}` : t('common.none', 'None');
+          const status = ns.feePaid ? t('reminders.paid', 'Paid') : ns.feeWaived ? t('reminders.waived', 'Waived') : t('reminders.unpaid', 'Unpaid');
           
           return [
             escapeCsvField(markedDate),
@@ -115,7 +128,7 @@ export default function AppointmentReminders() {
             escapeCsvField(ns.contactAttempts || 0),
             escapeCsvField(feeCharged),
             escapeCsvField(status),
-            escapeCsvField(ns.rescheduled ? 'Yes' : 'No'),
+            escapeCsvField(ns.rescheduled ? t('common.yes', 'Yes') : t('common.no', 'No')),
             escapeCsvField(ns.customerReason || ''),
           ].join(',');
         })
@@ -135,10 +148,10 @@ export default function AppointmentReminders() {
       
       URL.revokeObjectURL(url);
       
-      alert('No-show report exported successfully!');
+      alert(t('reminders.exportSuccess', 'No-show report exported successfully!'));
     } catch (error) {
       console.error('Error exporting no-shows:', error);
-      alert('Failed to export report. Please try again.');
+      alert(t('reminders.exportFailed', 'Failed to export report. Please try again.'));
     }
   };
 
@@ -149,7 +162,7 @@ export default function AppointmentReminders() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Reminders Sent</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('reminders.remindersSent', 'Reminders Sent')}</p>
                 <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{recentReminders.length}</p>
               </div>
               <Send className="h-12 w-12 text-blue-600 opacity-20" />
@@ -161,7 +174,7 @@ export default function AppointmentReminders() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Delivery Rate</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('reminders.deliveryRate', 'Delivery Rate')}</p>
                 <p className="text-3xl font-bold text-green-600 mt-2">{deliveryRate.toFixed(1)}%</p>
               </div>
               <CheckCircle className="h-12 w-12 text-green-600 opacity-20" />
@@ -173,7 +186,7 @@ export default function AppointmentReminders() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Confirmation Rate</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('reminders.confirmationRate', 'Confirmation Rate')}</p>
                 <p className="text-3xl font-bold text-purple-600 mt-2">{confirmationRate.toFixed(1)}%</p>
               </div>
               <TrendingUp className="h-12 w-12 text-purple-600 opacity-20" />
@@ -185,7 +198,7 @@ export default function AppointmentReminders() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">No-Show Rate</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('reminders.noShowRate', 'No-Show Rate')}</p>
                 <p className="text-3xl font-bold text-red-600 mt-2">{noShowRate.toFixed(1)}%</p>
               </div>
               <UserX className="h-12 w-12 text-red-600 opacity-20" />
@@ -197,7 +210,7 @@ export default function AppointmentReminders() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Revenue Loss</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('reminders.revenueLoss', 'Revenue Loss')}</p>
                 <p className="text-3xl font-bold text-orange-600 mt-2">${totalRevenueLoss.toFixed(0)}</p>
               </div>
               <DollarSign className="h-12 w-12 text-orange-600 opacity-20" />
@@ -212,14 +225,14 @@ export default function AppointmentReminders() {
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
                 <MessageSquare className="h-5 w-5 text-blue-600" />
-                <span className="font-semibold text-gray-900 dark:text-white">SMS</span>
+                <span className="font-semibold text-gray-900 dark:text-white">{t('reminders.sms', 'SMS')}</span>
               </div>
               <Badge className={reminderSettings.smsEnabled ? 'bg-green-500' : 'bg-gray-500'}>
-                {reminderSettings.smsEnabled ? 'Active' : 'Inactive'}
+                {reminderSettings.smsEnabled ? t('common.active', 'Active') : t('common.inactive', 'Inactive')}
               </Badge>
             </div>
             <p className="text-2xl font-bold text-gray-900 dark:text-white">{smsReminders}</p>
-            <p className="text-sm text-gray-600 dark:text-gray-400">messages sent</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">{t('reminders.messagesSent', 'messages sent')}</p>
           </CardContent>
         </Card>
 
@@ -228,14 +241,14 @@ export default function AppointmentReminders() {
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
                 <Mail className="h-5 w-5 text-green-600" />
-                <span className="font-semibold text-gray-900 dark:text-white">Email</span>
+                <span className="font-semibold text-gray-900 dark:text-white">{t('reminders.email', 'Email')}</span>
               </div>
               <Badge className={reminderSettings.emailEnabled ? 'bg-green-500' : 'bg-gray-500'}>
-                {reminderSettings.emailEnabled ? 'Active' : 'Inactive'}
+                {reminderSettings.emailEnabled ? t('common.active', 'Active') : t('common.inactive', 'Inactive')}
               </Badge>
             </div>
             <p className="text-2xl font-bold text-gray-900 dark:text-white">{emailReminders}</p>
-            <p className="text-sm text-gray-600 dark:text-gray-400">emails sent</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">{t('reminders.emailsSent', 'emails sent')}</p>
           </CardContent>
         </Card>
 
@@ -244,14 +257,14 @@ export default function AppointmentReminders() {
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
                 <SiWhatsapp className="h-5 w-5 text-green-500" />
-                <span className="font-semibold text-gray-900 dark:text-white">WhatsApp</span>
+                <span className="font-semibold text-gray-900 dark:text-white">{t('reminders.whatsapp', 'WhatsApp')}</span>
               </div>
               <Badge className={reminderSettings.whatsappEnabled ? 'bg-green-500' : 'bg-gray-500'}>
-                {reminderSettings.whatsappEnabled ? 'Active' : 'Inactive'}
+                {reminderSettings.whatsappEnabled ? t('common.active', 'Active') : t('common.inactive', 'Inactive')}
               </Badge>
             </div>
             <p className="text-2xl font-bold text-gray-900 dark:text-white">{whatsappReminders}</p>
-            <p className="text-sm text-gray-600 dark:text-gray-400">messages sent</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">{t('reminders.messagesSent', 'messages sent')}</p>
           </CardContent>
         </Card>
       </div>
@@ -261,7 +274,7 @@ export default function AppointmentReminders() {
   const tabs: TabConfig[] = [
     {
       id: "overview",
-      label: "Reminder Logs",
+      label: t('reminders.reminderLogs', 'Reminder Logs'),
       icon: Send,
       content: (
         <Card className="bg-white dark:bg-salis-black">
@@ -269,10 +282,10 @@ export default function AppointmentReminders() {
             <CardTitle className="flex items-center justify-between">
               <span className="flex items-center gap-2">
                 <Send className="h-5 w-5 text-blue-600" />
-                Recent Reminder Activity
+                {t('reminders.recentReminderActivity', 'Recent Reminder Activity')}
               </span>
               <Button className="bg-blue-600 hover:bg-blue-700" data-testid="button-send-manual-reminder">
-                Send Manual Reminder
+                {t('reminders.sendManualReminder', 'Send Manual Reminder')}
               </Button>
             </CardTitle>
           </CardHeader>
@@ -280,7 +293,7 @@ export default function AppointmentReminders() {
             {recentReminders.length === 0 ? (
               <div className="text-center py-12">
                 <Bell className="h-16 w-16 mx-auto mb-4 text-gray-400" />
-                <p className="text-gray-500 dark:text-gray-400">No reminders sent yet</p>
+                <p className="text-gray-500 dark:text-gray-400">{t('reminders.noRemindersSent', 'No reminders sent yet')}</p>
               </div>
             ) : (
               <div className="space-y-3">
@@ -297,7 +310,7 @@ export default function AppointmentReminders() {
                           {log.reminderType === 'email' && <Mail className="h-4 w-4 text-green-600" />}
                           {log.reminderType === 'whatsapp' && <SiWhatsapp className="h-4 w-4 text-green-500" />}
                           <span className="font-semibold text-gray-900 dark:text-white">
-                            {log.reminderTiming} reminder
+                            {log.reminderTiming} {t('reminders.reminder', 'reminder')}
                           </span>
                           <Badge className={
                             log.deliveryStatus === 'delivered' ? 'bg-green-500' :
@@ -308,16 +321,16 @@ export default function AppointmentReminders() {
                           </Badge>
                         </div>
                         <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
-                          To: {log.recipientPhone || log.recipientEmail}
+                          {t('reminders.to', 'To')}: {log.recipientPhone || log.recipientEmail}
                         </p>
                         <p className="text-sm text-gray-600 dark:text-gray-400">
-                          Sent: {new Date(log.sentAt).toLocaleString()}
+                          {t('reminders.sent', 'Sent')}: {new Date(log.sentAt).toLocaleString()}
                         </p>
                         {log.responseAction && (
                           <div className="mt-2 flex items-center gap-2">
                             <CheckCircle className="h-4 w-4 text-green-600" />
                             <span className="text-sm font-semibold text-green-600">
-                              Customer {log.responseAction}ed
+                              {t('reminders.customerAction', 'Customer {{action}}ed', { action: log.responseAction })}
                             </span>
                           </div>
                         )}
@@ -333,7 +346,7 @@ export default function AppointmentReminders() {
     },
     {
       id: "noshows",
-      label: "No-Show Tracking",
+      label: t('reminders.noShowTracking', 'No-Show Tracking'),
       icon: UserX,
       content: (
         <Card className="bg-white dark:bg-salis-black">
@@ -341,14 +354,14 @@ export default function AppointmentReminders() {
             <CardTitle className="flex items-center justify-between">
               <span className="flex items-center gap-2">
                 <UserX className="h-5 w-5 text-red-600" />
-                No-Show History
+                {t('reminders.noShowHistory', 'No-Show History')}
               </span>
               <div className="flex gap-2">
                 <Button variant="outline" onClick={exportNoShowsToCSV} data-testid="button-export-noshows">
-                  Export Report
+                  {t('reminders.exportReport', 'Export Report')}
                 </Button>
                 <Button className="bg-red-600 hover:bg-red-700" data-testid="button-mark-noshow">
-                  Mark No-Show
+                  {t('reminders.markNoShow', 'Mark No-Show')}
                 </Button>
               </div>
             </CardTitle>
@@ -357,7 +370,7 @@ export default function AppointmentReminders() {
             {recentNoShows.length === 0 ? (
               <div className="text-center py-12">
                 <CheckCircle className="h-16 w-16 mx-auto mb-4 text-green-400" />
-                <p className="text-gray-500 dark:text-gray-400">No no-shows recorded in the last 30 days!</p>
+                <p className="text-gray-500 dark:text-gray-400">{t('reminders.noNoShowsRecorded', 'No no-shows recorded in the last 30 days!')}</p>
               </div>
             ) : (
               <div className="space-y-3">
@@ -372,18 +385,18 @@ export default function AppointmentReminders() {
                         <div className="flex items-center gap-2 mb-1">
                           <UserX className="h-5 w-5 text-red-600" />
                           <span className="font-semibold text-gray-900 dark:text-white">
-                            Customer No-Show
+                            {t('reminders.customerNoShow', 'Customer No-Show')}
                           </span>
                           {noShow.rescheduled && (
-                            <Badge className="bg-green-500">Rescheduled</Badge>
+                            <Badge className="bg-green-500">{t('reminders.rescheduled', 'Rescheduled')}</Badge>
                           )}
                         </div>
                         <p className="text-sm text-gray-600 dark:text-gray-400">
-                          Scheduled: {new Date(noShow.scheduledTime).toLocaleString()}
+                          {t('reminders.scheduledTime', 'Scheduled')}: {new Date(noShow.scheduledTime).toLocaleString()}
                         </p>
                       </div>
                       <div className="text-right">
-                        <p className="text-sm text-gray-600 dark:text-gray-400">Est. Loss</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">{t('reminders.estLoss', 'Est. Loss')}</p>
                         <p className="text-lg font-bold text-red-600">
                           ${Number(noShow.estimatedRevenueLoss || 0).toFixed(2)}
                         </p>
@@ -392,28 +405,28 @@ export default function AppointmentReminders() {
 
                     <div className="grid grid-cols-3 gap-4 mt-3 text-sm">
                       <div>
-                        <p className="text-gray-600 dark:text-gray-400">Contact Attempts</p>
+                        <p className="text-gray-600 dark:text-gray-400">{t('reminders.contactAttempts', 'Contact Attempts')}</p>
                         <p className="font-semibold text-gray-900 dark:text-white">
                           {noShow.contactAttempts || 0}
                         </p>
                       </div>
                       <div>
-                        <p className="text-gray-600 dark:text-gray-400">Fee Charged</p>
+                        <p className="text-gray-600 dark:text-gray-400">{t('reminders.feeCharged', 'Fee Charged')}</p>
                         <p className="font-semibold text-gray-900 dark:text-white">
-                          {noShow.noShowFeeCharged ? `$${Number(noShow.feeAmount || 0).toFixed(2)}` : 'None'}
+                          {noShow.noShowFeeCharged ? `$${Number(noShow.feeAmount || 0).toFixed(2)}` : t('common.none', 'None')}
                         </p>
                       </div>
                       <div>
-                        <p className="text-gray-600 dark:text-gray-400">Status</p>
+                        <p className="text-gray-600 dark:text-gray-400">{t('common.status', 'Status')}</p>
                         <p className="font-semibold text-gray-900 dark:text-white">
-                          {noShow.feePaid ? 'Paid' : noShow.feeWaived ? 'Waived' : 'Unpaid'}
+                          {noShow.feePaid ? t('reminders.paid', 'Paid') : noShow.feeWaived ? t('reminders.waived', 'Waived') : t('reminders.unpaid', 'Unpaid')}
                         </p>
                       </div>
                     </div>
 
                     {noShow.customerReason && (
                       <div className="mt-3 p-2 bg-white dark:bg-gray-800 rounded">
-                        <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Reason:</p>
+                        <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">{t('reminders.reason', 'Reason')}:</p>
                         <p className="text-sm text-gray-900 dark:text-white">{noShow.customerReason}</p>
                       </div>
                     )}
@@ -427,7 +440,7 @@ export default function AppointmentReminders() {
     },
     {
       id: "settings",
-      label: "Settings",
+      label: t('common.settings', 'Settings'),
       icon: Settings,
       content: (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -435,7 +448,7 @@ export default function AppointmentReminders() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Settings className="h-5 w-5 text-blue-600" />
-                Reminder Channels
+                {t('reminders.reminderChannels', 'Reminder Channels')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -443,8 +456,8 @@ export default function AppointmentReminders() {
                 <div className="flex items-center gap-3">
                   <MessageSquare className="h-5 w-5 text-blue-600" />
                   <div>
-                    <p className="font-semibold text-gray-900 dark:text-white">SMS Reminders</p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">24h, 2h before appointment</p>
+                    <p className="font-semibold text-gray-900 dark:text-white">{t('reminders.smsReminders', 'SMS Reminders')}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">{t('reminders.smsSchedule', '24h, 2h before appointment')}</p>
                   </div>
                 </div>
                 <Switch checked={reminderSettings.smsEnabled} data-testid="switch-sms" />
@@ -454,8 +467,8 @@ export default function AppointmentReminders() {
                 <div className="flex items-center gap-3">
                   <Mail className="h-5 w-5 text-green-600" />
                   <div>
-                    <p className="font-semibold text-gray-900 dark:text-white">Email Reminders</p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">72h, 24h before appointment</p>
+                    <p className="font-semibold text-gray-900 dark:text-white">{t('reminders.emailReminders', 'Email Reminders')}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">{t('reminders.emailSchedule', '72h, 24h before appointment')}</p>
                   </div>
                 </div>
                 <Switch checked={reminderSettings.emailEnabled} data-testid="switch-email" />
@@ -465,8 +478,8 @@ export default function AppointmentReminders() {
                 <div className="flex items-center gap-3">
                   <SiWhatsapp className="h-5 w-5 text-green-500" />
                   <div>
-                    <p className="font-semibold text-gray-900 dark:text-white">WhatsApp Reminders</p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">24h before appointment</p>
+                    <p className="font-semibold text-gray-900 dark:text-white">{t('reminders.whatsappReminders', 'WhatsApp Reminders')}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">{t('reminders.whatsappSchedule', '24h before appointment')}</p>
                   </div>
                 </div>
                 <Switch checked={reminderSettings.whatsappEnabled} data-testid="switch-whatsapp" />
@@ -476,8 +489,8 @@ export default function AppointmentReminders() {
                 <div className="flex items-center gap-3">
                   <Clock className="h-5 w-5 text-purple-600" />
                   <div>
-                    <p className="font-semibold text-gray-900 dark:text-white">Post-Appointment Follow-up</p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">24h after service completion</p>
+                    <p className="font-semibold text-gray-900 dark:text-white">{t('reminders.postAppointmentFollowup', 'Post-Appointment Follow-up')}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">{t('reminders.followupSchedule', '24h after service completion')}</p>
                   </div>
                 </div>
                 <Switch checked={reminderSettings.postAppointmentFollowup} data-testid="switch-followup" />
@@ -489,12 +502,12 @@ export default function AppointmentReminders() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <AlertTriangle className="h-5 w-5 text-orange-600" />
-                No-Show Settings
+                {t('reminders.noShowSettings', 'No-Show Settings')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="auto-mark-time">Auto-mark no-show after (minutes)</Label>
+                <Label htmlFor="auto-mark-time">{t('reminders.autoMarkNoShowAfter', 'Auto-mark no-show after (minutes)')}</Label>
                 <Input
                   id="auto-mark-time"
                   type="number"
@@ -505,7 +518,7 @@ export default function AppointmentReminders() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="noshow-fee">No-show fee amount ($)</Label>
+                <Label htmlFor="noshow-fee">{t('reminders.noShowFeeAmount', 'No-show fee amount ($)')}</Label>
                 <Input
                   id="noshow-fee"
                   type="number"
@@ -517,88 +530,33 @@ export default function AppointmentReminders() {
               </div>
 
               <div className="flex items-center justify-between">
-                <Label htmlFor="reschedule-enabled">Allow no-show rescheduling</Label>
+                <Label htmlFor="reschedule-enabled">{t('reminders.allowNoShowRescheduling', 'Allow no-show rescheduling')}</Label>
                 <Switch id="reschedule-enabled" defaultChecked data-testid="switch-reschedule" />
               </div>
 
               <div className="flex items-center justify-between">
-                <Label htmlFor="blacklist-repeat">Blacklist repeat offenders (3+ no-shows)</Label>
+                <Label htmlFor="blacklist-repeat">{t('reminders.blacklistRepeatOffenders', 'Blacklist repeat offenders (3+ no-shows)')}</Label>
                 <Switch id="blacklist-repeat" data-testid="switch-blacklist" />
               </div>
 
               <Button className="w-full bg-orange-600 hover:bg-orange-700" data-testid="button-save-noshow-settings">
-                Save No-Show Settings
+                {t('reminders.saveNoShowSettings', 'Save No-Show Settings')}
               </Button>
             </CardContent>
           </Card>
         </div>
       ),
     },
-    {
-      id: "templates",
-      label: "Templates",
-      icon: MessageSquare,
-      content: (
-        <Card className="bg-white dark:bg-salis-black">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <MessageSquare className="h-5 w-5 text-purple-600" />
-              Message Templates
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="space-y-2">
-              <Label htmlFor="sms-template">SMS Template</Label>
-              <Textarea
-                id="sms-template"
-                rows={3}
-                defaultValue="Hi {customerName}, reminder: Your appointment at {garageName} is scheduled for {appointmentTime}. Reply CONFIRM or CANCEL."
-                data-testid="textarea-sms-template"
-              />
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                Available variables: {"{customerName}"}, {"{garageName}"}, {"{appointmentTime}"}, {"{vehicleMake}"}, {"{vehicleModel}"}
-              </p>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="email-template">Email Template</Label>
-              <Textarea
-                id="email-template"
-                rows={5}
-                defaultValue="Dear {customerName},&#10;&#10;This is a friendly reminder that your appointment is scheduled for {appointmentTime} at {garageName}.&#10;&#10;Service: {serviceType}&#10;Vehicle: {vehicleMake} {vehicleModel}&#10;&#10;Please reply to confirm or contact us to reschedule.&#10;&#10;Thank you!"
-                data-testid="textarea-email-template"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="followup-template">Follow-up Template</Label>
-              <Textarea
-                id="followup-template"
-                rows={4}
-                defaultValue="Hi {customerName}, thank you for visiting {garageName}! We hope you're satisfied with our service. Please rate your experience and let us know if you need anything else."
-                data-testid="textarea-followup-template"
-              />
-            </div>
-
-            <Button className="w-full bg-purple-600 hover:bg-purple-700" data-testid="button-save-templates">
-              Save Templates
-            </Button>
-          </CardContent>
-        </Card>
-      ),
-    },
   ];
 
   return (
     <TabsPageLayout
-      title="Appointment Reminder System"
-      description="Multi-channel reminders (SMS, Email, WhatsApp) with no-show tracking and analytics"
+      title={t('nav.appointment_reminders', 'Appointment Reminders')}
+      description={t('reminders.description', 'Manage automated reminder notifications and no-show tracking')}
       icon={Bell}
-      headerContent={statsCards}
       tabs={tabs}
       defaultTab="overview"
-      activeTab={selectedTab}
-      onTabChange={setSelectedTab}
+      statsCards={statsCards}
     />
   );
 }

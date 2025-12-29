@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Link } from "wouter";
+import { useTranslation } from "react-i18next";
 import { TabsPageLayout } from "@/components/layouts/TabsPageLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -508,6 +509,7 @@ function AccountTreeNode({ account, level = 0 }: AccountTreeNodeProps) {
 }
 
 export default function ChartOfAccounts() {
+  const { t } = useTranslation();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterType, setFilterType] = useState<string>("all");
@@ -555,14 +557,14 @@ export default function ChartOfAccounts() {
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
               <Building2 className="h-4 w-4 text-green-600" />
-              Total Assets
+              {t('accounting.totalAssets', 'Total Assets')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-600">
               SAR {totalAssets.toLocaleString()}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">إجمالي الأصول</p>
+            <p className="text-xs text-muted-foreground mt-1">{t('accounting.totalAssetsAr', 'إجمالي الأصول')}</p>
           </CardContent>
         </Card>
 
@@ -570,14 +572,14 @@ export default function ChartOfAccounts() {
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
               <CreditCard className="h-4 w-4 text-red-600" />
-              Total Liabilities
+              {t('accounting.totalLiabilities', 'Total Liabilities')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-red-600">
               SAR {totalLiabilities.toLocaleString()}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">إجمالي الخصوم</p>
+            <p className="text-xs text-muted-foreground mt-1">{t('accounting.totalLiabilitiesAr', 'إجمالي الخصوم')}</p>
           </CardContent>
         </Card>
 
@@ -585,14 +587,14 @@ export default function ChartOfAccounts() {
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
               <Wallet className="h-4 w-4 text-blue-600" />
-              Total Equity
+              {t('accounting.totalEquity', 'Total Equity')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-blue-600">
               SAR {totalEquity.toLocaleString()}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">حقوق الملكية</p>
+            <p className="text-xs text-muted-foreground mt-1">{t('accounting.totalEquityAr', 'حقوق الملكية')}</p>
           </CardContent>
         </Card>
 
@@ -600,14 +602,14 @@ export default function ChartOfAccounts() {
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
               <TrendingUp className="h-4 w-4 text-purple-600" />
-              Total Revenue
+              {t('accounting.totalRevenue', 'Total Revenue')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-purple-600">
               SAR {totalRevenue.toLocaleString()}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">الإيرادات</p>
+            <p className="text-xs text-muted-foreground mt-1">{t('accounting.totalRevenueAr', 'الإيرادات')}</p>
           </CardContent>
         </Card>
 
@@ -615,14 +617,14 @@ export default function ChartOfAccounts() {
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
               <TrendingDown className="h-4 w-4 text-orange-600" />
-              Total Expenses
+              {t('accounting.totalExpenses', 'Total Expenses')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-orange-600">
               SAR {totalExpenses.toLocaleString()}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">المصروفات</p>
+            <p className="text-xs text-muted-foreground mt-1">{t('accounting.totalExpensesAr', 'المصروفات')}</p>
           </CardContent>
         </Card>
       </div>
@@ -633,30 +635,30 @@ export default function ChartOfAccounts() {
             <div>
               <CardTitle className="flex items-center gap-2">
                 <FolderTree className="h-5 w-5" />
-                Account Tree Structure
+                {t('accounting.accountTreeStructure', 'Account Tree Structure')}
               </CardTitle>
-              <CardDescription>شجرة الحسابات - Hierarchical view of all accounts</CardDescription>
+              <CardDescription>{t('accounting.accountTreeDescription', 'شجرة الحسابات - Hierarchical view of all accounts')}</CardDescription>
             </div>
             <div className="flex items-center gap-2">
               <Button variant="outline" size="sm" data-testid="button-expand-all">
                 <ChevronDown className="h-4 w-4 mr-1" />
-                Expand All
+                {t('common.expandAll', 'Expand All')}
               </Button>
               <Button variant="outline" size="sm" data-testid="button-collapse-all">
                 <ChevronRight className="h-4 w-4 mr-1" />
-                Collapse All
+                {t('common.collapseAll', 'Collapse All')}
               </Button>
               <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
                 <DialogTrigger asChild>
                   <Button data-testid="button-add-account">
                     <Plus className="h-4 w-4 mr-2" />
-                    Add Account
+                    {t('accounting.addAccount', 'Add Account')}
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="max-w-2xl" data-testid="modal-add-account">
                   <DialogHeader>
-                    <DialogTitle>Add New Account</DialogTitle>
-                    <DialogDescription>إضافة حساب جديد - Create a new account in the chart</DialogDescription>
+                    <DialogTitle>{t('accounting.addNewAccount', 'Add New Account')}</DialogTitle>
+                    <DialogDescription>{t('accounting.addNewAccountDescription', 'إضافة حساب جديد - Create a new account in the chart')}</DialogDescription>
                   </DialogHeader>
                   <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -666,9 +668,9 @@ export default function ChartOfAccounts() {
                           name="code"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Account Code</FormLabel>
+                              <FormLabel>{t('accounting.accountCode', 'Account Code')}</FormLabel>
                               <FormControl>
-                                <Input {...field} placeholder="e.g., 1111" data-testid="input-account-code" />
+                                <Input {...field} placeholder={t('accounting.accountCodePlaceholder', 'e.g., 1111')} data-testid="input-account-code" />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -679,15 +681,15 @@ export default function ChartOfAccounts() {
                           name="parentCode"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Parent Account</FormLabel>
+                              <FormLabel>{t('accounting.parentAccount', 'Parent Account')}</FormLabel>
                               <Select onValueChange={field.onChange} value={field.value}>
                                 <FormControl>
                                   <SelectTrigger data-testid="select-parent-account">
-                                    <SelectValue placeholder="Select parent" />
+                                    <SelectValue placeholder={t('accounting.selectParent', 'Select parent')} />
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                  <SelectItem value="none">None (Root Account)</SelectItem>
+                                  <SelectItem value="none">{t('accounting.noneRootAccount', 'None (Root Account)')}</SelectItem>
                                   {allAccounts.filter(a => a.level < 4).map((account) => (
                                     <SelectItem key={account.id} value={account.code}>
                                       {account.code} - {account.nameEn}
@@ -707,9 +709,9 @@ export default function ChartOfAccounts() {
                           name="nameAr"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Arabic Name</FormLabel>
+                              <FormLabel>{t('accounting.arabicName', 'Arabic Name')}</FormLabel>
                               <FormControl>
-                                <Input {...field} placeholder="اسم الحساب" dir="rtl" data-testid="input-name-ar" />
+                                <Input {...field} placeholder={t('accounting.accountNameAr', 'اسم الحساب')} dir="rtl" data-testid="input-name-ar" />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -720,9 +722,9 @@ export default function ChartOfAccounts() {
                           name="nameEn"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>English Name</FormLabel>
+                              <FormLabel>{t('accounting.englishName', 'English Name')}</FormLabel>
                               <FormControl>
-                                <Input {...field} placeholder="Account name" data-testid="input-name-en" />
+                                <Input {...field} placeholder={t('accounting.accountNameEn', 'Account name')} data-testid="input-name-en" />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -736,19 +738,19 @@ export default function ChartOfAccounts() {
                           name="type"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Account Type</FormLabel>
+                              <FormLabel>{t('accounting.accountType', 'Account Type')}</FormLabel>
                               <Select onValueChange={field.onChange} value={field.value}>
                                 <FormControl>
                                   <SelectTrigger data-testid="select-account-type">
-                                    <SelectValue placeholder="Select type" />
+                                    <SelectValue placeholder={t('accounting.selectType', 'Select type')} />
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                  <SelectItem value="asset">Asset (أصل)</SelectItem>
-                                  <SelectItem value="liability">Liability (خصم)</SelectItem>
-                                  <SelectItem value="equity">Equity (حقوق ملكية)</SelectItem>
-                                  <SelectItem value="revenue">Revenue (إيراد)</SelectItem>
-                                  <SelectItem value="expense">Expense (مصروف)</SelectItem>
+                                  <SelectItem value="asset">{t('accounting.asset', 'Asset (أصل)')}</SelectItem>
+                                  <SelectItem value="liability">{t('accounting.liability', 'Liability (خصم)')}</SelectItem>
+                                  <SelectItem value="equity">{t('accounting.equity', 'Equity (حقوق ملكية)')}</SelectItem>
+                                  <SelectItem value="revenue">{t('accounting.revenue', 'Revenue (إيراد)')}</SelectItem>
+                                  <SelectItem value="expense">{t('accounting.expense', 'Expense (مصروف)')}</SelectItem>
                                 </SelectContent>
                               </Select>
                               <FormMessage />
@@ -760,16 +762,16 @@ export default function ChartOfAccounts() {
                           name="nature"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Nature</FormLabel>
+                              <FormLabel>{t('accounting.nature', 'Nature')}</FormLabel>
                               <Select onValueChange={field.onChange} value={field.value}>
                                 <FormControl>
                                   <SelectTrigger data-testid="select-nature">
-                                    <SelectValue placeholder="Select nature" />
+                                    <SelectValue placeholder={t('accounting.selectNature', 'Select nature')} />
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                  <SelectItem value="debit">Debit (مدين)</SelectItem>
-                                  <SelectItem value="credit">Credit (دائن)</SelectItem>
+                                  <SelectItem value="debit">{t('accounting.debitNature', 'Debit (مدين)')}</SelectItem>
+                                  <SelectItem value="credit">{t('accounting.creditNature', 'Credit (دائن)')}</SelectItem>
                                 </SelectContent>
                               </Select>
                               <FormMessage />
@@ -781,18 +783,18 @@ export default function ChartOfAccounts() {
                           name="level"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Level</FormLabel>
+                              <FormLabel>{t('accounting.level', 'Level')}</FormLabel>
                               <Select onValueChange={field.onChange} value={field.value}>
                                 <FormControl>
                                   <SelectTrigger data-testid="select-level">
-                                    <SelectValue placeholder="Select level" />
+                                    <SelectValue placeholder={t('accounting.selectLevel', 'Select level')} />
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                  <SelectItem value="1">Level 1 (Main)</SelectItem>
-                                  <SelectItem value="2">Level 2 (Category)</SelectItem>
-                                  <SelectItem value="3">Level 3 (Sub-category)</SelectItem>
-                                  <SelectItem value="4">Level 4 (Detail)</SelectItem>
+                                  <SelectItem value="1">{t('accounting.level1Main', 'Level 1 (Main)')}</SelectItem>
+                                  <SelectItem value="2">{t('accounting.level2Category', 'Level 2 (Category)')}</SelectItem>
+                                  <SelectItem value="3">{t('accounting.level3SubCategory', 'Level 3 (Sub-category)')}</SelectItem>
+                                  <SelectItem value="4">{t('accounting.level4Detail', 'Level 4 (Detail)')}</SelectItem>
                                 </SelectContent>
                               </Select>
                               <FormMessage />
@@ -806,9 +808,9 @@ export default function ChartOfAccounts() {
                         name="description"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Description</FormLabel>
+                            <FormLabel>{t('common.description', 'Description')}</FormLabel>
                             <FormControl>
-                              <Textarea {...field} placeholder="Account description (optional)" data-testid="input-description" />
+                              <Textarea {...field} placeholder={t('accounting.accountDescriptionPlaceholder', 'Account description (optional)')} data-testid="input-description" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -817,10 +819,10 @@ export default function ChartOfAccounts() {
 
                       <div className="flex justify-end gap-2 pt-4">
                         <Button type="button" variant="outline" onClick={() => setIsAddDialogOpen(false)} data-testid="button-cancel">
-                          Cancel
+                          {t('common.cancel', 'Cancel')}
                         </Button>
                         <Button type="submit" data-testid="button-save-account">
-                          Save Account
+                          {t('accounting.saveAccount', 'Save Account')}
                         </Button>
                       </div>
                     </form>
@@ -841,8 +843,8 @@ export default function ChartOfAccounts() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Related Financial Modules</CardTitle>
-          <CardDescription>الوحدات المالية ذات الصلة - Quick access to related modules</CardDescription>
+          <CardTitle>{t('accounting.relatedFinancialModules', 'Related Financial Modules')}</CardTitle>
+          <CardDescription>{t('accounting.relatedFinancialModulesDescription', 'الوحدات المالية ذات الصلة - Quick access to related modules')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -853,8 +855,8 @@ export default function ChartOfAccounts() {
                     <Building2 className="h-8 w-8 text-green-600" />
                     <ExternalLink className="h-4 w-4 text-muted-foreground" />
                   </div>
-                  <CardTitle className="text-lg">Assets Management</CardTitle>
-                  <CardDescription>الأصول</CardDescription>
+                  <CardTitle className="text-lg">{t('nav.assets_management', 'Assets Management')}</CardTitle>
+                  <CardDescription>{t('accounting.assetsAr', 'الأصول')}</CardDescription>
                 </CardHeader>
               </Card>
             </Link>
@@ -866,8 +868,8 @@ export default function ChartOfAccounts() {
                     <CreditCard className="h-8 w-8 text-red-600" />
                     <ExternalLink className="h-4 w-4 text-muted-foreground" />
                   </div>
-                  <CardTitle className="text-lg">Liabilities</CardTitle>
-                  <CardDescription>الخصوم</CardDescription>
+                  <CardTitle className="text-lg">{t('nav.liabilities', 'Liabilities')}</CardTitle>
+                  <CardDescription>{t('accounting.liabilitiesAr', 'الخصوم')}</CardDescription>
                 </CardHeader>
               </Card>
             </Link>
@@ -879,8 +881,8 @@ export default function ChartOfAccounts() {
                     <Wallet className="h-8 w-8 text-blue-600" />
                     <ExternalLink className="h-4 w-4 text-muted-foreground" />
                   </div>
-                  <CardTitle className="text-lg">Equity Management</CardTitle>
-                  <CardDescription>حقوق الملكية</CardDescription>
+                  <CardTitle className="text-lg">{t('nav.equity_management', 'Equity Management')}</CardTitle>
+                  <CardDescription>{t('accounting.equityAr', 'حقوق الملكية')}</CardDescription>
                 </CardHeader>
               </Card>
             </Link>
@@ -892,8 +894,8 @@ export default function ChartOfAccounts() {
                     <TrendingUp className="h-8 w-8 text-purple-600" />
                     <ExternalLink className="h-4 w-4 text-muted-foreground" />
                   </div>
-                  <CardTitle className="text-lg">Sales & Revenue</CardTitle>
-                  <CardDescription>المبيعات والإيرادات</CardDescription>
+                  <CardTitle className="text-lg">{t('nav.sales_revenue', 'Sales & Revenue')}</CardTitle>
+                  <CardDescription>{t('accounting.salesRevenueAr', 'المبيعات والإيرادات')}</CardDescription>
                 </CardHeader>
               </Card>
             </Link>
@@ -911,15 +913,15 @@ export default function ChartOfAccounts() {
             <div>
               <CardTitle className="flex items-center gap-2">
                 <LayoutList className="h-5 w-5" />
-                All Accounts List
+                {t('accounting.allAccountsList', 'All Accounts List')}
               </CardTitle>
-              <CardDescription>قائمة جميع الحسابات - Flat view of all accounts</CardDescription>
+              <CardDescription>{t('accounting.allAccountsListDescription', 'قائمة جميع الحسابات - Flat view of all accounts')}</CardDescription>
             </div>
             <div className="flex items-center gap-2">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Search accounts..."
+                  placeholder={t('accounting.searchAccounts', 'Search accounts...')}
                   className="pl-9 w-64"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -929,20 +931,20 @@ export default function ChartOfAccounts() {
               <Select value={filterType} onValueChange={setFilterType}>
                 <SelectTrigger className="w-40" data-testid="select-filter-type">
                   <Filter className="h-4 w-4 mr-2" />
-                  <SelectValue placeholder="Filter by type" />
+                  <SelectValue placeholder={t('accounting.filterByType', 'Filter by type')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Types</SelectItem>
-                  <SelectItem value="asset">Assets</SelectItem>
-                  <SelectItem value="liability">Liabilities</SelectItem>
-                  <SelectItem value="equity">Equity</SelectItem>
-                  <SelectItem value="revenue">Revenue</SelectItem>
-                  <SelectItem value="expense">Expenses</SelectItem>
+                  <SelectItem value="all">{t('accounting.allTypes', 'All Types')}</SelectItem>
+                  <SelectItem value="asset">{t('accounting.assets', 'Assets')}</SelectItem>
+                  <SelectItem value="liability">{t('accounting.liabilities', 'Liabilities')}</SelectItem>
+                  <SelectItem value="equity">{t('accounting.equityType', 'Equity')}</SelectItem>
+                  <SelectItem value="revenue">{t('accounting.revenueType', 'Revenue')}</SelectItem>
+                  <SelectItem value="expense">{t('accounting.expenses', 'Expenses')}</SelectItem>
                 </SelectContent>
               </Select>
               <Button variant="outline" data-testid="button-export">
                 <Download className="h-4 w-4 mr-2" />
-                Export
+                {t('common.export', 'Export')}
               </Button>
             </div>
           </div>
@@ -951,15 +953,15 @@ export default function ChartOfAccounts() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-20">Code</TableHead>
-                <TableHead>Arabic Name</TableHead>
-                <TableHead>English Name</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Nature</TableHead>
-                <TableHead>Level</TableHead>
-                <TableHead className="text-right">Balance</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead className="w-20">{t('accounting.code', 'Code')}</TableHead>
+                <TableHead>{t('accounting.arabicName', 'Arabic Name')}</TableHead>
+                <TableHead>{t('accounting.englishName', 'English Name')}</TableHead>
+                <TableHead>{t('common.type', 'Type')}</TableHead>
+                <TableHead>{t('accounting.nature', 'Nature')}</TableHead>
+                <TableHead>{t('accounting.level', 'Level')}</TableHead>
+                <TableHead className="text-right">{t('accounting.balance', 'Balance')}</TableHead>
+                <TableHead>{t('common.status', 'Status')}</TableHead>
+                <TableHead className="text-right">{t('common.actions', 'Actions')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -985,7 +987,7 @@ export default function ChartOfAccounts() {
                   </TableCell>
                   <TableCell>
                     <Badge variant={account.isActive ? "default" : "secondary"}>
-                      {account.isActive ? "Active" : "Inactive"}
+                      {account.isActive ? t('common.active', 'Active') : t('common.inactive', 'Inactive')}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">
@@ -1014,9 +1016,9 @@ export default function ChartOfAccounts() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Building2 className="h-5 w-5 text-green-600" />
-              Assets (الأصول)
+              {t('accounting.assetsTitle', 'Assets (الأصول)')}
             </CardTitle>
-            <CardDescription>Resources owned by the business</CardDescription>
+            <CardDescription>{t('accounting.assetsDescription', 'Resources owned by the business')}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-green-600 mb-4">
@@ -1024,16 +1026,16 @@ export default function ChartOfAccounts() {
             </div>
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
-                <span>Current Assets</span>
+                <span>{t('accounting.currentAssets', 'Current Assets')}</span>
                 <span className="font-medium">SAR 2,750,000</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span>Fixed Assets</span>
+                <span>{t('accounting.fixedAssets', 'Fixed Assets')}</span>
                 <span className="font-medium">SAR 2,500,000</span>
               </div>
             </div>
             <div className="mt-4 text-xs text-muted-foreground">
-              Normal Balance: <Badge variant="outline">Debit (مدين)</Badge>
+              {t('accounting.normalBalance', 'Normal Balance')}: <Badge variant="outline">{t('accounting.debitNature', 'Debit (مدين)')}</Badge>
             </div>
           </CardContent>
         </Card>
@@ -1042,9 +1044,9 @@ export default function ChartOfAccounts() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <CreditCard className="h-5 w-5 text-red-600" />
-              Liabilities (الخصوم)
+              {t('accounting.liabilitiesTitle', 'Liabilities (الخصوم)')}
             </CardTitle>
-            <CardDescription>Obligations owed to others</CardDescription>
+            <CardDescription>{t('accounting.liabilitiesDescription', 'Obligations owed to others')}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-red-600 mb-4">
@@ -1052,16 +1054,16 @@ export default function ChartOfAccounts() {
             </div>
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
-                <span>Current Liabilities</span>
+                <span>{t('accounting.currentLiabilities', 'Current Liabilities')}</span>
                 <span className="font-medium">SAR 920,000</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span>Long-term Liabilities</span>
+                <span>{t('accounting.longTermLiabilities', 'Long-term Liabilities')}</span>
                 <span className="font-medium">SAR 800,000</span>
               </div>
             </div>
             <div className="mt-4 text-xs text-muted-foreground">
-              Normal Balance: <Badge variant="outline">Credit (دائن)</Badge>
+              {t('accounting.normalBalance', 'Normal Balance')}: <Badge variant="outline">{t('accounting.creditNature', 'Credit (دائن)')}</Badge>
             </div>
           </CardContent>
         </Card>
@@ -1070,9 +1072,9 @@ export default function ChartOfAccounts() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Wallet className="h-5 w-5 text-blue-600" />
-              Equity (حقوق الملكية)
+              {t('accounting.equityTitle', 'Equity (حقوق الملكية)')}
             </CardTitle>
-            <CardDescription>Owner's stake in the business</CardDescription>
+            <CardDescription>{t('accounting.equityDescription', "Owner's stake in the business")}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-blue-600 mb-4">
@@ -1080,16 +1082,16 @@ export default function ChartOfAccounts() {
             </div>
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
-                <span>Share Capital</span>
+                <span>{t('accounting.shareCapital', 'Share Capital')}</span>
                 <span className="font-medium">SAR 2,500,000</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span>Retained Earnings</span>
+                <span>{t('accounting.retainedEarnings', 'Retained Earnings')}</span>
                 <span className="font-medium">SAR 1,030,000</span>
               </div>
             </div>
             <div className="mt-4 text-xs text-muted-foreground">
-              Normal Balance: <Badge variant="outline">Credit (دائن)</Badge>
+              {t('accounting.normalBalance', 'Normal Balance')}: <Badge variant="outline">{t('accounting.creditNature', 'Credit (دائن)')}</Badge>
             </div>
           </CardContent>
         </Card>
@@ -1098,9 +1100,9 @@ export default function ChartOfAccounts() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <TrendingUp className="h-5 w-5 text-purple-600" />
-              Revenue (الإيرادات)
+              {t('accounting.revenueTitle', 'Revenue (الإيرادات)')}
             </CardTitle>
-            <CardDescription>Income from business operations</CardDescription>
+            <CardDescription>{t('accounting.revenueDescription', 'Income from business operations')}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-purple-600 mb-4">
@@ -1108,16 +1110,16 @@ export default function ChartOfAccounts() {
             </div>
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
-                <span>Service Revenue</span>
+                <span>{t('accounting.serviceRevenue', 'Service Revenue')}</span>
                 <span className="font-medium">SAR 3,200,000</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span>Sales Revenue</span>
+                <span>{t('accounting.salesRevenue', 'Sales Revenue')}</span>
                 <span className="font-medium">SAR 1,650,000</span>
               </div>
             </div>
             <div className="mt-4 text-xs text-muted-foreground">
-              Normal Balance: <Badge variant="outline">Credit (دائن)</Badge>
+              {t('accounting.normalBalance', 'Normal Balance')}: <Badge variant="outline">{t('accounting.creditNature', 'Credit (دائن)')}</Badge>
             </div>
           </CardContent>
         </Card>
@@ -1126,9 +1128,9 @@ export default function ChartOfAccounts() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <TrendingDown className="h-5 w-5 text-orange-600" />
-              Expenses (المصروفات)
+              {t('accounting.expensesTitle', 'Expenses (المصروفات)')}
             </CardTitle>
-            <CardDescription>Costs of business operations</CardDescription>
+            <CardDescription>{t('accounting.expensesDescription', 'Costs of business operations')}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-orange-600 mb-4">
@@ -1136,16 +1138,16 @@ export default function ChartOfAccounts() {
             </div>
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
-                <span>Cost of Sales</span>
+                <span>{t('accounting.costOfSales', 'Cost of Sales')}</span>
                 <span className="font-medium">SAR 2,850,000</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span>Operating Expenses</span>
+                <span>{t('accounting.operatingExpenses', 'Operating Expenses')}</span>
                 <span className="font-medium">SAR 1,820,000</span>
               </div>
             </div>
             <div className="mt-4 text-xs text-muted-foreground">
-              Normal Balance: <Badge variant="outline">Debit (مدين)</Badge>
+              {t('accounting.normalBalance', 'Normal Balance')}: <Badge variant="outline">{t('accounting.debitNature', 'Debit (مدين)')}</Badge>
             </div>
           </CardContent>
         </Card>
@@ -1154,33 +1156,33 @@ export default function ChartOfAccounts() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <DollarSign className="h-5 w-5" />
-              Accounting Equation
+              {t('accounting.accountingEquation', 'Accounting Equation')}
             </CardTitle>
-            <CardDescription>معادلة الميزانية العمومية</CardDescription>
+            <CardDescription>{t('accounting.accountingEquationAr', 'معادلة الميزانية العمومية')}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               <div className="text-center p-4 bg-muted rounded-lg">
-                <p className="text-lg font-medium">Assets = Liabilities + Equity</p>
-                <p className="text-sm text-muted-foreground mt-1">الأصول = الخصوم + حقوق الملكية</p>
+                <p className="text-lg font-medium">{t('accounting.equationFormula', 'Assets = Liabilities + Equity')}</p>
+                <p className="text-sm text-muted-foreground mt-1">{t('accounting.equationFormulaAr', 'الأصول = الخصوم + حقوق الملكية')}</p>
               </div>
               <div className="grid grid-cols-3 gap-2 text-center">
                 <div className="p-2 bg-green-100 dark:bg-green-900 rounded">
-                  <p className="text-xs text-muted-foreground">Assets</p>
+                  <p className="text-xs text-muted-foreground">{t('accounting.assets', 'Assets')}</p>
                   <p className="font-bold text-green-600">{totalAssets.toLocaleString()}</p>
                 </div>
                 <div className="p-2 bg-red-100 dark:bg-red-900 rounded">
-                  <p className="text-xs text-muted-foreground">Liabilities</p>
+                  <p className="text-xs text-muted-foreground">{t('accounting.liabilities', 'Liabilities')}</p>
                   <p className="font-bold text-red-600">{totalLiabilities.toLocaleString()}</p>
                 </div>
                 <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded">
-                  <p className="text-xs text-muted-foreground">Equity</p>
+                  <p className="text-xs text-muted-foreground">{t('accounting.equityType', 'Equity')}</p>
                   <p className="font-bold text-blue-600">{totalEquity.toLocaleString()}</p>
                 </div>
               </div>
               <div className="text-center">
                 <Badge variant={totalAssets === (totalLiabilities + totalEquity) ? "default" : "destructive"}>
-                  {totalAssets === (totalLiabilities + totalEquity) ? "✓ Balanced" : "⚠ Unbalanced"}
+                  {totalAssets === (totalLiabilities + totalEquity) ? t('accounting.balancedCheck', '✓ Balanced') : t('accounting.unbalancedCheck', '⚠ Unbalanced')}
                 </Badge>
               </div>
             </div>
@@ -1193,19 +1195,19 @@ export default function ChartOfAccounts() {
   const tabs = [
     {
       id: "tree-view",
-      label: "Tree View",
+      label: t('accounting.chartOfAccounts.tabs.treeView', 'Tree View'),
       icon: FolderTree,
       content: treeViewTab,
     },
     {
       id: "list-view",
-      label: "List View",
+      label: t('accounting.chartOfAccounts.tabs.listView', 'List View'),
       icon: LayoutList,
       content: listViewTab,
     },
     {
       id: "account-types",
-      label: "Account Types",
+      label: t('accounting.chartOfAccounts.tabs.accountTypes', 'Account Types'),
       icon: FileText,
       content: accountTypesTab,
     },
@@ -1213,8 +1215,8 @@ export default function ChartOfAccounts() {
 
   return (
     <TabsPageLayout
-      title="Chart of Accounts - شجرة الحسابات"
-      description="Manage your complete chart of accounts with hierarchical structure"
+      title={t('accounting.chartOfAccounts.title', 'Chart of Accounts - شجرة الحسابات')}
+      description={t('accounting.chartOfAccounts.description', 'Manage your complete chart of accounts with hierarchical structure')}
       icon={FolderTree}
       tabs={tabs}
       defaultTab="tree-view"

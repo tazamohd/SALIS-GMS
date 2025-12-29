@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { StandardTablePage } from "@/components/layouts";
 import { Clock, User, Calendar, DollarSign } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -19,6 +20,7 @@ interface Timesheet {
 }
 
 export default function TimesheetManagement() {
+  const { t } = useTranslation();
   const [statusFilter, setStatusFilter] = useState("all");
   const [periodFilter, setPeriodFilter] = useState("week");
 
@@ -87,6 +89,15 @@ export default function TimesheetManagement() {
     return statusColors[status] || 'bg-gray-100 dark:bg-gray-800';
   };
 
+  const getStatusLabel = (status: string) => {
+    const statusLabels: { [key: string]: string } = {
+      'approved': t('timesheet.status.approved', 'Approved'),
+      'pending': t('timesheet.status.pending', 'Pending'),
+      'rejected': t('timesheet.status.rejected', 'Rejected'),
+    };
+    return statusLabels[status] || status;
+  };
+
   const handleApprove = (id: string) => {
     console.log("Approve timesheet:", id);
   };
@@ -97,7 +108,7 @@ export default function TimesheetManagement() {
 
   const columns = [
     {
-      header: "Date",
+      header: t('timesheet.columns.date', 'Date'),
       accessorKey: "date",
       cell: (row: Timesheet) => (
         <div className="flex items-center gap-2" data-testid={`timesheet-date-${row.id}`}>
@@ -107,7 +118,7 @@ export default function TimesheetManagement() {
       ),
     },
     {
-      header: "Technician",
+      header: t('timesheet.columns.technician', 'Technician'),
       accessorKey: "technicianName",
       cell: (row: Timesheet) => (
         <div className="flex items-center gap-2" data-testid={`timesheet-tech-${row.id}`}>
@@ -117,31 +128,31 @@ export default function TimesheetManagement() {
       ),
     },
     {
-      header: "Clock In",
+      header: t('timesheet.columns.clockIn', 'Clock In'),
       accessorKey: "clockIn",
       cell: (row: Timesheet) => (
         <span className="font-medium" data-testid={`timesheet-in-${row.id}`}>{row.clockIn}</span>
       ),
     },
     {
-      header: "Clock Out",
+      header: t('timesheet.columns.clockOut', 'Clock Out'),
       accessorKey: "clockOut",
       cell: (row: Timesheet) => (
         <span className="font-medium" data-testid={`timesheet-out-${row.id}`}>{row.clockOut}</span>
       ),
     },
     {
-      header: "Hours Worked",
+      header: t('timesheet.columns.hoursWorked', 'Hours Worked'),
       accessorKey: "hoursWorked",
       cell: (row: Timesheet) => (
         <div className="flex items-center gap-2" data-testid={`timesheet-hours-${row.id}`}>
           <Clock className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-          <span className="font-semibold">{row.hoursWorked}h</span>
+          <span className="font-semibold">{row.hoursWorked}{t('timesheet.hours', 'h')}</span>
         </div>
       ),
     },
     {
-      header: "Total Pay",
+      header: t('timesheet.columns.totalPay', 'Total Pay'),
       accessorKey: "totalPay",
       cell: (row: Timesheet) => (
         <div className="flex items-center gap-2" data-testid={`timesheet-pay-${row.id}`}>
@@ -151,16 +162,16 @@ export default function TimesheetManagement() {
       ),
     },
     {
-      header: "Status",
+      header: t('timesheet.columns.status', 'Status'),
       accessorKey: "status",
       cell: (row: Timesheet) => (
         <Badge className={`${getStatusBadge(row.status)} border-0 capitalize`} data-testid={`timesheet-status-${row.id}`}>
-          {row.status}
+          {getStatusLabel(row.status)}
         </Badge>
       ),
     },
     {
-      header: "Actions",
+      header: t('timesheet.columns.actions', 'Actions'),
       accessorKey: "actions",
       cell: (row: Timesheet) => (
         <div className="flex gap-2">
@@ -173,7 +184,7 @@ export default function TimesheetManagement() {
                 className="bg-green-50 dark:bg-green-900/20 hover:bg-green-100 dark:hover:bg-green-900/30"
                 data-testid={`button-approve-${row.id}`}
               >
-                Approve
+                {t('timesheet.actions.approve', 'Approve')}
               </Button>
               <Button
                 size="sm"
@@ -182,13 +193,13 @@ export default function TimesheetManagement() {
                 className="bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/30"
                 data-testid={`button-reject-${row.id}`}
               >
-                Reject
+                {t('timesheet.actions.reject', 'Reject')}
               </Button>
             </>
           )}
           {row.status !== "pending" && (
             <Button size="sm" variant="ghost" data-testid={`button-view-${row.id}`}>
-              View
+              {t('common.view', 'View')}
             </Button>
           )}
         </div>
@@ -199,23 +210,23 @@ export default function TimesheetManagement() {
   const filters = [
     {
       id: "status",
-      label: "Status",
+      label: t('timesheet.filters.status', 'Status'),
       options: [
-        { value: "all", label: "All Status" },
-        { value: "approved", label: "Approved" },
-        { value: "pending", label: "Pending" },
-        { value: "rejected", label: "Rejected" },
+        { value: "all", label: t('timesheet.filters.allStatus', 'All Status') },
+        { value: "approved", label: t('timesheet.status.approved', 'Approved') },
+        { value: "pending", label: t('timesheet.status.pending', 'Pending') },
+        { value: "rejected", label: t('timesheet.status.rejected', 'Rejected') },
       ],
       defaultValue: statusFilter,
     },
     {
       id: "period",
-      label: "Period",
+      label: t('timesheet.filters.period', 'Period'),
       options: [
-        { value: "today", label: "Today" },
-        { value: "week", label: "This Week" },
-        { value: "month", label: "This Month" },
-        { value: "custom", label: "Custom Range" },
+        { value: "today", label: t('timesheet.filters.today', 'Today') },
+        { value: "week", label: t('timesheet.filters.thisWeek', 'This Week') },
+        { value: "month", label: t('timesheet.filters.thisMonth', 'This Month') },
+        { value: "custom", label: t('timesheet.filters.customRange', 'Custom Range') },
       ],
       defaultValue: periodFilter,
     },
@@ -223,18 +234,18 @@ export default function TimesheetManagement() {
 
   return (
     <StandardTablePage
-      title="Timesheet Management"
-      description="Track and approve technician work hours and payroll"
+      title={t('timesheet.title', 'Timesheet Management')}
+      description={t('timesheet.description', 'Track and approve technician work hours and payroll')}
       icon={Clock}
       data={timesheets}
       isLoading={isLoading}
       columns={columns}
-      searchPlaceholder="Search timesheets..."
+      searchPlaceholder={t('timesheet.searchPlaceholder', 'Search timesheets...')}
       filters={filters}
       emptyState={{
         icon: Clock,
-        title: "No timesheets found",
-        description: "No timesheet records available for the selected period.",
+        title: t('timesheet.emptyState.title', 'No timesheets found'),
+        description: t('timesheet.emptyState.description', 'No timesheet records available for the selected period.'),
       }}
     />
   );

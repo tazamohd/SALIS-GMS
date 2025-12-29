@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { StandardPageLayout } from "@/components/layouts";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function WearableIntegration() {
+  const { t } = useTranslation();
   const [isConnected, setIsConnected] = useState(true);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [healthMonitoring, setHealthMonitoring] = useState(true);
@@ -18,39 +20,39 @@ export default function WearableIntegration() {
     {
       id: 1,
       name: "Apple Watch Series 9",
-      type: "Smartwatch",
+      type: t('wearable.smartwatch', 'Smartwatch'),
       status: "connected",
       battery: 75,
-      lastSync: "2 min ago"
+      lastSync: t('wearable.minAgo', '2 min ago')
     },
     {
       id: 2,
       name: "Samsung Galaxy Watch",
-      type: "Smartwatch",
+      type: t('wearable.smartwatch', 'Smartwatch'),
       status: "disconnected",
       battery: 45,
-      lastSync: "1 hour ago"
+      lastSync: t('wearable.hourAgo', '1 hour ago')
     },
     {
       id: 3,
       name: "Fitbit Charge 5",
-      type: "Fitness Tracker",
+      type: t('wearable.fitnessTracker', 'Fitness Tracker'),
       status: "connected",
       battery: 92,
-      lastSync: "1 min ago"
+      lastSync: t('wearable.minAgoSingle', '1 min ago')
     },
   ];
 
   const notifications = [
-    { id: 1, type: "task", message: "New task assigned: Oil Change for Toyota Camry", time: "5 min ago", priority: "high" },
-    { id: 2, type: "alert", message: "Customer arrived for appointment", time: "15 min ago", priority: "medium" },
-    { id: 3, type: "reminder", message: "Lunch break in 30 minutes", time: "30 min ago", priority: "low" },
+    { id: 1, type: t('wearable.task', 'task'), message: t('wearable.newTaskAssigned', 'New task assigned: Oil Change for Toyota Camry'), time: t('wearable.fiveMinAgo', '5 min ago'), priority: "high" },
+    { id: 2, type: t('wearable.alert', 'alert'), message: t('wearable.customerArrived', 'Customer arrived for appointment'), time: t('wearable.fifteenMinAgo', '15 min ago'), priority: "medium" },
+    { id: 3, type: t('wearable.reminder', 'reminder'), message: t('wearable.lunchBreak', 'Lunch break in 30 minutes'), time: t('wearable.thirtyMinAgo', '30 min ago'), priority: "low" },
   ];
 
   const healthMetrics = [
-    { label: "Steps Today", value: "8,245", goal: 10000, icon: Footprints, color: "text-blue-600 dark:text-blue-400" },
-    { label: "Heart Rate", value: "72 bpm", goal: null, icon: Heart, color: "text-red-600 dark:text-red-400" },
-    { label: "Active Minutes", value: "45 min", goal: 60, icon: Activity, color: "text-green-600 dark:text-green-400" },
+    { label: t('wearable.stepsToday', 'Steps Today'), value: "8,245", goal: 10000, icon: Footprints, color: "text-blue-600 dark:text-blue-400" },
+    { label: t('wearable.heartRate', 'Heart Rate'), value: t('wearable.bpm', '72 bpm'), goal: null, icon: Heart, color: "text-red-600 dark:text-red-400" },
+    { label: t('wearable.activeMinutes', 'Active Minutes'), value: t('wearable.minValue', '45 min'), goal: 60, icon: Activity, color: "text-green-600 dark:text-green-400" },
   ];
 
   const getStatusBadge = (status: string) => {
@@ -72,21 +74,19 @@ export default function WearableIntegration() {
 
   return (
     <StandardPageLayout
-      title="Wearable Integration"
-      description="Connect and manage wearable devices for real-time updates"
+      title={t('wearable.title', 'Wearable Integration')}
+      description={t('wearable.description', 'Connect and manage wearable devices for real-time updates')}
       icon={Watch}
     >
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Main Content */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Connected Devices */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Watch className="w-5 h-5" />
-                Connected Devices
+                {t('wearable.connectedDevices', 'Connected Devices')}
               </CardTitle>
-              <CardDescription>Manage your wearable devices</CardDescription>
+              <CardDescription>{t('wearable.manageDevices', 'Manage your wearable devices')}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -114,7 +114,7 @@ export default function WearableIntegration() {
                         <p className="text-xs text-gray-600 dark:text-gray-400">{device.lastSync}</p>
                       </div>
                       <Badge className={`${getStatusBadge(device.status)} border-0 capitalize`}>
-                        {device.status}
+                        {device.status === 'connected' ? t('wearable.connected', 'connected') : t('wearable.disconnected', 'disconnected')}
                       </Badge>
                     </div>
                   </div>
@@ -122,16 +122,15 @@ export default function WearableIntegration() {
               </div>
               <Button className="w-full mt-4" variant="outline" data-testid="button-add-device">
                 <Wifi className="w-4 h-4 mr-2" />
-                Add New Device
+                {t('wearable.addNewDevice', 'Add New Device')}
               </Button>
             </CardContent>
           </Card>
 
-          {/* Notifications */}
           <Card>
             <CardHeader>
-              <CardTitle>Recent Notifications</CardTitle>
-              <CardDescription>Messages synced to your wearable devices</CardDescription>
+              <CardTitle>{t('wearable.recentNotifications', 'Recent Notifications')}</CardTitle>
+              <CardDescription>{t('wearable.messagesSynced', 'Messages synced to your wearable devices')}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
@@ -160,14 +159,13 @@ export default function WearableIntegration() {
             </CardContent>
           </Card>
 
-          {/* Health Metrics */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Activity className="w-5 h-5" />
-                Health & Activity
+                {t('wearable.healthActivity', 'Health & Activity')}
               </CardTitle>
-              <CardDescription>Daily health metrics from connected devices</CardDescription>
+              <CardDescription>{t('wearable.dailyHealthMetrics', 'Daily health metrics from connected devices')}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -187,7 +185,7 @@ export default function WearableIntegration() {
                           className="h-2"
                         />
                         <p className="text-xs text-gray-600 dark:text-gray-400">
-                          Goal: {metric.goal.toLocaleString()}
+                          {t('wearable.goal', 'Goal')}: {metric.goal.toLocaleString()}
                         </p>
                       </>
                     )}
@@ -198,12 +196,10 @@ export default function WearableIntegration() {
           </Card>
         </div>
 
-        {/* Settings Sidebar */}
         <div className="space-y-6">
-          {/* Connection Status */}
           <Card>
             <CardHeader>
-              <CardTitle>Connection Status</CardTitle>
+              <CardTitle>{t('wearable.connectionStatus', 'Connection Status')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
@@ -214,7 +210,7 @@ export default function WearableIntegration() {
                     <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400" />
                   )}
                   <span className="text-sm font-medium">
-                    {isConnected ? "Connected" : "Disconnected"}
+                    {isConnected ? t('wearable.connected', 'Connected') : t('wearable.disconnected', 'Disconnected')}
                   </span>
                 </div>
                 <Button
@@ -223,24 +219,23 @@ export default function WearableIntegration() {
                   onClick={() => setIsConnected(!isConnected)}
                   data-testid="button-toggle-connection"
                 >
-                  {isConnected ? "Disconnect" : "Connect"}
+                  {isConnected ? t('wearable.disconnect', 'Disconnect') : t('wearable.connect', 'Connect')}
                 </Button>
               </div>
               <div className="text-sm text-gray-600 dark:text-gray-400">
-                <p>Last synced: 2 minutes ago</p>
-                <p>Next sync: In 3 minutes</p>
+                <p>{t('wearable.lastSynced', 'Last synced')}: {t('wearable.twoMinutesAgo', '2 minutes ago')}</p>
+                <p>{t('wearable.nextSync', 'Next sync')}: {t('wearable.inThreeMinutes', 'In 3 minutes')}</p>
               </div>
             </CardContent>
           </Card>
 
-          {/* Settings */}
           <Card>
             <CardHeader>
-              <CardTitle>Settings</CardTitle>
+              <CardTitle>{t('common.settings', 'Settings')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
-                <Label htmlFor="notifications">Push Notifications</Label>
+                <Label htmlFor="notifications">{t('wearable.pushNotifications', 'Push Notifications')}</Label>
                 <Switch
                   id="notifications"
                   checked={notificationsEnabled}
@@ -249,7 +244,7 @@ export default function WearableIntegration() {
                 />
               </div>
               <div className="flex items-center justify-between">
-                <Label htmlFor="health">Health Monitoring</Label>
+                <Label htmlFor="health">{t('wearable.healthMonitoring', 'Health Monitoring')}</Label>
                 <Switch
                   id="health"
                   checked={healthMonitoring}
@@ -258,30 +253,29 @@ export default function WearableIntegration() {
                 />
               </div>
               <div className="flex items-center justify-between">
-                <Label htmlFor="auto-sync">Auto Sync</Label>
+                <Label htmlFor="auto-sync">{t('wearable.autoSync', 'Auto Sync')}</Label>
                 <Switch id="auto-sync" defaultChecked data-testid="switch-auto-sync" />
               </div>
               <div className="flex items-center justify-between">
-                <Label htmlFor="vibration">Vibration Alerts</Label>
+                <Label htmlFor="vibration">{t('wearable.vibrationAlerts', 'Vibration Alerts')}</Label>
                 <Switch id="vibration" defaultChecked data-testid="switch-vibration" />
               </div>
             </CardContent>
           </Card>
 
-          {/* Quick Actions */}
           <Card>
             <CardHeader>
-              <CardTitle>Quick Actions</CardTitle>
+              <CardTitle>{t('common.quick_actions', 'Quick Actions')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
               <Button className="w-full" variant="outline" data-testid="button-sync">
-                Sync Now
+                {t('wearable.syncNow', 'Sync Now')}
               </Button>
               <Button className="w-full" variant="outline" data-testid="button-test">
-                Send Test Notification
+                {t('wearable.sendTestNotification', 'Send Test Notification')}
               </Button>
               <Button className="w-full" variant="outline" data-testid="button-history">
-                View Sync History
+                {t('wearable.viewSyncHistory', 'View Sync History')}
               </Button>
             </CardContent>
           </Card>

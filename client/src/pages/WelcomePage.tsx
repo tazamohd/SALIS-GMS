@@ -2,8 +2,10 @@ import { useEffect } from "react";
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
 import { Loader2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export default function WelcomePage() {
+  const { t } = useTranslation();
   const { user, isLoading } = useAuth();
   const [, setLocation] = useLocation();
 
@@ -46,22 +48,22 @@ export default function WelcomePage() {
         </div>
         
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-          Welcome back, {userName}!
+          {t('welcome.welcomeBack', 'Welcome back')}, {userName}!
         </h1>
         
         {roles.length > 0 && (
           <p className="text-gray-600 dark:text-gray-400">
-            Logged in as: <span className="font-medium">{roles.join(", ")}</span>
+            {t('welcome.loggedInAs', 'Logged in as')}: <span className="font-medium">{roles.join(", ")}</span>
           </p>
         )}
         
         <div className="flex items-center justify-center gap-2 text-gray-500 dark:text-gray-400">
           <Loader2 className="h-4 w-4 animate-spin" />
-          <span>Redirecting to your portal...</span>
+          <span>{t('welcome.redirecting', 'Redirecting to your portal...')}</span>
         </div>
         
         <p className="text-sm text-gray-400 dark:text-gray-500">
-          Taking you to {primaryPortal}
+          {t('welcome.takingYouTo', 'Taking you to')} {primaryPortal}
         </p>
       </div>
     </div>

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "wouter";
+import { useTranslation } from "react-i18next";
 import { TabsPageLayout } from "@/components/layouts/TabsPageLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -73,6 +74,7 @@ const equity = [
 ];
 
 export default function BalanceSheet() {
+  const { t } = useTranslation();
   const [period, setPeriod] = useState("2024-01-31");
 
   const totalCurrentAssets = currentAssets.reduce((sum, item) => sum + item.amount, 0);
@@ -98,45 +100,45 @@ export default function BalanceSheet() {
         <div className="flex gap-4">
           <Select value={period} onValueChange={setPeriod}>
             <SelectTrigger className="w-[200px]" data-testid="select-period">
-              <SelectValue placeholder="Select Date" />
+              <SelectValue placeholder={t('accounting.selectDate', 'Select Date')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="2024-01-31">January 31, 2024</SelectItem>
-              <SelectItem value="2023-12-31">December 31, 2023</SelectItem>
-              <SelectItem value="2023-09-30">September 30, 2023</SelectItem>
-              <SelectItem value="2023-06-30">June 30, 2023</SelectItem>
+              <SelectItem value="2024-01-31">{t('accounting.dates.jan2024', 'January 31, 2024')}</SelectItem>
+              <SelectItem value="2023-12-31">{t('accounting.dates.dec2023', 'December 31, 2023')}</SelectItem>
+              <SelectItem value="2023-09-30">{t('accounting.dates.sep2023', 'September 30, 2023')}</SelectItem>
+              <SelectItem value="2023-06-30">{t('accounting.dates.jun2023', 'June 30, 2023')}</SelectItem>
             </SelectContent>
           </Select>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" data-testid="button-print">
             <Printer className="h-4 w-4 mr-2" />
-            Print
+            {t('common.print', 'Print')}
           </Button>
           <Button variant="outline" data-testid="button-export">
             <Download className="h-4 w-4 mr-2" />
-            Export
+            {t('common.export', 'Export')}
           </Button>
         </div>
       </div>
 
       <Card>
         <CardHeader className="text-center border-b">
-          <CardTitle className="text-xl">SALIS AUTO</CardTitle>
+          <CardTitle className="text-xl">{t('app.name', 'SALIS AUTO')}</CardTitle>
           <CardDescription className="text-base">
-            Balance Sheet (الميزانية العمومية)
+            {t('accounting.balanceSheet', 'Balance Sheet')} (الميزانية العمومية)
           </CardDescription>
           <p className="text-sm text-muted-foreground">
-            As of {period === "2024-01-31" ? "January 31, 2024" : period}
+            {t('accounting.asOf', 'As of')} {period === "2024-01-31" ? t('accounting.dates.jan2024', 'January 31, 2024') : period}
           </p>
           <Badge variant={isBalanced ? "default" : "destructive"} className="w-fit mx-auto">
             {isBalanced ? (
               <>
                 <CheckCircle className="h-3 w-3 mr-1" />
-                Balanced
+                {t('accounting.balanced', 'Balanced')}
               </>
             ) : (
-              "Unbalanced"
+              t('accounting.unbalanced', 'Unbalanced')
             )}
           </Badge>
         </CardHeader>
@@ -144,21 +146,21 @@ export default function BalanceSheet() {
           <Table>
             <TableHeader>
               <TableRow className="bg-muted/50">
-                <TableHead className="w-[100px]">Code</TableHead>
-                <TableHead>Description</TableHead>
-                <TableHead className="text-right">Current Period</TableHead>
-                <TableHead className="text-right">Previous Period</TableHead>
+                <TableHead className="w-[100px]">{t('accounting.code', 'Code')}</TableHead>
+                <TableHead>{t('common.description', 'Description')}</TableHead>
+                <TableHead className="text-right">{t('accounting.currentPeriod', 'Current Period')}</TableHead>
+                <TableHead className="text-right">{t('accounting.previousPeriod', 'Previous Period')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               <TableRow className="bg-blue-50 dark:bg-blue-900/20">
                 <TableCell colSpan={4} className="font-bold text-blue-700 dark:text-blue-400">
-                  ASSETS
+                  {t('accounting.assets', 'ASSETS')}
                 </TableCell>
               </TableRow>
               <TableRow className="bg-blue-50/50 dark:bg-blue-900/10">
                 <TableCell colSpan={4} className="font-semibold text-blue-600 dark:text-blue-300 pl-6">
-                  Current Assets
+                  {t('accounting.currentAssets', 'Current Assets')}
                 </TableCell>
               </TableRow>
               {currentAssets.map((item) => (
@@ -177,7 +179,7 @@ export default function BalanceSheet() {
               ))}
               <TableRow className="bg-muted/30 font-semibold">
                 <TableCell></TableCell>
-                <TableCell className="pl-6">Total Current Assets</TableCell>
+                <TableCell className="pl-6">{t('accounting.totalCurrentAssets', 'Total Current Assets')}</TableCell>
                 <TableCell className="text-right font-mono">{totalCurrentAssets.toLocaleString()}</TableCell>
                 <TableCell className="text-right font-mono text-muted-foreground">
                   {currentAssets.reduce((sum, item) => sum + item.previousAmount, 0).toLocaleString()}
@@ -186,7 +188,7 @@ export default function BalanceSheet() {
 
               <TableRow className="bg-blue-50/50 dark:bg-blue-900/10">
                 <TableCell colSpan={4} className="font-semibold text-blue-600 dark:text-blue-300 pl-6">
-                  Non-Current Assets
+                  {t('accounting.nonCurrentAssets', 'Non-Current Assets')}
                 </TableCell>
               </TableRow>
               {nonCurrentAssets.map((item) => (
@@ -205,7 +207,7 @@ export default function BalanceSheet() {
               ))}
               <TableRow className="bg-muted/30 font-semibold">
                 <TableCell></TableCell>
-                <TableCell className="pl-6">Total Non-Current Assets</TableCell>
+                <TableCell className="pl-6">{t('accounting.totalNonCurrentAssets', 'Total Non-Current Assets')}</TableCell>
                 <TableCell className="text-right font-mono">{totalNonCurrentAssets.toLocaleString()}</TableCell>
                 <TableCell className="text-right font-mono text-muted-foreground">
                   {nonCurrentAssets.reduce((sum, item) => sum + item.previousAmount, 0).toLocaleString()}
@@ -214,23 +216,23 @@ export default function BalanceSheet() {
 
               <TableRow className="bg-blue-100 dark:bg-blue-900/40 font-bold">
                 <TableCell></TableCell>
-                <TableCell>TOTAL ASSETS</TableCell>
+                <TableCell>{t('accounting.totalAssets', 'TOTAL ASSETS')}</TableCell>
                 <TableCell className="text-right font-mono text-blue-700 dark:text-blue-300">
-                  SAR {totalAssets.toLocaleString()}
+                  {t('common.sar', 'SAR')} {totalAssets.toLocaleString()}
                 </TableCell>
                 <TableCell className="text-right font-mono text-muted-foreground">
-                  SAR {previousTotalAssets.toLocaleString()}
+                  {t('common.sar', 'SAR')} {previousTotalAssets.toLocaleString()}
                 </TableCell>
               </TableRow>
 
               <TableRow className="bg-red-50 dark:bg-red-900/20">
                 <TableCell colSpan={4} className="font-bold text-red-700 dark:text-red-400">
-                  LIABILITIES
+                  {t('accounting.liabilities', 'LIABILITIES')}
                 </TableCell>
               </TableRow>
               <TableRow className="bg-red-50/50 dark:bg-red-900/10">
                 <TableCell colSpan={4} className="font-semibold text-red-600 dark:text-red-300 pl-6">
-                  Current Liabilities
+                  {t('accounting.currentLiabilities', 'Current Liabilities')}
                 </TableCell>
               </TableRow>
               {currentLiabilities.map((item) => (
@@ -245,7 +247,7 @@ export default function BalanceSheet() {
               ))}
               <TableRow className="bg-muted/30 font-semibold">
                 <TableCell></TableCell>
-                <TableCell className="pl-6">Total Current Liabilities</TableCell>
+                <TableCell className="pl-6">{t('accounting.totalCurrentLiabilities', 'Total Current Liabilities')}</TableCell>
                 <TableCell className="text-right font-mono">{totalCurrentLiabilities.toLocaleString()}</TableCell>
                 <TableCell className="text-right font-mono text-muted-foreground">
                   {currentLiabilities.reduce((sum, item) => sum + item.previousAmount, 0).toLocaleString()}
@@ -254,7 +256,7 @@ export default function BalanceSheet() {
 
               <TableRow className="bg-red-50/50 dark:bg-red-900/10">
                 <TableCell colSpan={4} className="font-semibold text-red-600 dark:text-red-300 pl-6">
-                  Non-Current Liabilities
+                  {t('accounting.nonCurrentLiabilities', 'Non-Current Liabilities')}
                 </TableCell>
               </TableRow>
               {nonCurrentLiabilities.map((item) => (
@@ -269,7 +271,7 @@ export default function BalanceSheet() {
               ))}
               <TableRow className="bg-muted/30 font-semibold">
                 <TableCell></TableCell>
-                <TableCell className="pl-6">Total Non-Current Liabilities</TableCell>
+                <TableCell className="pl-6">{t('accounting.totalNonCurrentLiabilities', 'Total Non-Current Liabilities')}</TableCell>
                 <TableCell className="text-right font-mono">{totalNonCurrentLiabilities.toLocaleString()}</TableCell>
                 <TableCell className="text-right font-mono text-muted-foreground">
                   {nonCurrentLiabilities.reduce((sum, item) => sum + item.previousAmount, 0).toLocaleString()}
@@ -278,18 +280,18 @@ export default function BalanceSheet() {
 
               <TableRow className="bg-red-100 dark:bg-red-900/40 font-bold">
                 <TableCell></TableCell>
-                <TableCell>TOTAL LIABILITIES</TableCell>
+                <TableCell>{t('accounting.totalLiabilities', 'TOTAL LIABILITIES')}</TableCell>
                 <TableCell className="text-right font-mono text-red-700 dark:text-red-300">
-                  SAR {totalLiabilities.toLocaleString()}
+                  {t('common.sar', 'SAR')} {totalLiabilities.toLocaleString()}
                 </TableCell>
                 <TableCell className="text-right font-mono text-muted-foreground">
-                  SAR {[...currentLiabilities, ...nonCurrentLiabilities].reduce((sum, item) => sum + item.previousAmount, 0).toLocaleString()}
+                  {t('common.sar', 'SAR')} {[...currentLiabilities, ...nonCurrentLiabilities].reduce((sum, item) => sum + item.previousAmount, 0).toLocaleString()}
                 </TableCell>
               </TableRow>
 
               <TableRow className="bg-purple-50 dark:bg-purple-900/20">
                 <TableCell colSpan={4} className="font-bold text-purple-700 dark:text-purple-400">
-                  SHAREHOLDERS' EQUITY
+                  {t('accounting.shareholdersEquity', "SHAREHOLDERS' EQUITY")}
                 </TableCell>
               </TableRow>
               {equity.map((item) => (
@@ -306,23 +308,23 @@ export default function BalanceSheet() {
               ))}
               <TableRow className="bg-purple-100 dark:bg-purple-900/40 font-bold">
                 <TableCell></TableCell>
-                <TableCell>TOTAL EQUITY</TableCell>
+                <TableCell>{t('accounting.totalEquity', 'TOTAL EQUITY')}</TableCell>
                 <TableCell className="text-right font-mono text-purple-700 dark:text-purple-300">
-                  SAR {totalEquity.toLocaleString()}
+                  {t('common.sar', 'SAR')} {totalEquity.toLocaleString()}
                 </TableCell>
                 <TableCell className="text-right font-mono text-muted-foreground">
-                  SAR {equity.reduce((sum, item) => sum + item.previousAmount, 0).toLocaleString()}
+                  {t('common.sar', 'SAR')} {equity.reduce((sum, item) => sum + item.previousAmount, 0).toLocaleString()}
                 </TableCell>
               </TableRow>
 
               <TableRow className="bg-green-100 dark:bg-green-900/40 font-bold text-lg">
                 <TableCell></TableCell>
-                <TableCell>TOTAL LIABILITIES & EQUITY</TableCell>
+                <TableCell>{t('accounting.totalLiabilitiesAndEquity', 'TOTAL LIABILITIES & EQUITY')}</TableCell>
                 <TableCell className="text-right font-mono text-green-700 dark:text-green-300">
-                  SAR {totalLiabilitiesAndEquity.toLocaleString()}
+                  {t('common.sar', 'SAR')} {totalLiabilitiesAndEquity.toLocaleString()}
                 </TableCell>
                 <TableCell className="text-right font-mono text-muted-foreground">
-                  SAR {[...currentLiabilities, ...nonCurrentLiabilities, ...equity].reduce((sum, item) => sum + item.previousAmount, 0).toLocaleString()}
+                  {t('common.sar', 'SAR')} {[...currentLiabilities, ...nonCurrentLiabilities, ...equity].reduce((sum, item) => sum + item.previousAmount, 0).toLocaleString()}
                 </TableCell>
               </TableRow>
             </TableBody>
@@ -338,7 +340,7 @@ export default function BalanceSheet() {
         <Card data-testid="card-current-ratio">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              Current Ratio
+              {t('accounting.currentRatio', 'Current Ratio')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -346,7 +348,7 @@ export default function BalanceSheet() {
               {currentRatio.toFixed(2)}
             </p>
             <Badge variant={currentRatio >= 1.5 ? "default" : "secondary"}>
-              {currentRatio >= 1.5 ? "Healthy" : "Monitor"}
+              {currentRatio >= 1.5 ? t('accounting.healthy', 'Healthy') : t('accounting.monitor', 'Monitor')}
             </Badge>
           </CardContent>
         </Card>
@@ -354,7 +356,7 @@ export default function BalanceSheet() {
         <Card data-testid="card-debt-ratio">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              Debt Ratio
+              {t('accounting.debtRatio', 'Debt Ratio')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -362,7 +364,7 @@ export default function BalanceSheet() {
               {debtRatio.toFixed(1)}%
             </p>
             <Badge variant={debtRatio < 50 ? "default" : "destructive"}>
-              {debtRatio < 50 ? "Low Risk" : "High Debt"}
+              {debtRatio < 50 ? t('accounting.lowRisk', 'Low Risk') : t('accounting.highDebt', 'High Debt')}
             </Badge>
           </CardContent>
         </Card>
@@ -370,51 +372,51 @@ export default function BalanceSheet() {
         <Card data-testid="card-working-capital">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              Working Capital
+              {t('accounting.workingCapital', 'Working Capital')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-bold text-green-600">
-              SAR {(totalCurrentAssets - totalCurrentLiabilities).toLocaleString()}
+              {t('common.sar', 'SAR')} {(totalCurrentAssets - totalCurrentLiabilities).toLocaleString()}
             </p>
-            <Badge variant="default">Positive</Badge>
+            <Badge variant="default">{t('accounting.positive', 'Positive')}</Badge>
           </CardContent>
         </Card>
 
         <Card data-testid="card-equity-ratio">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              Equity Ratio
+              {t('accounting.equityRatio', 'Equity Ratio')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-bold text-purple-600">
               {((totalEquity / totalAssets) * 100).toFixed(1)}%
             </p>
-            <Badge variant="default">Strong</Badge>
+            <Badge variant="default">{t('accounting.strong', 'Strong')}</Badge>
           </CardContent>
         </Card>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Financial Position Analysis</CardTitle>
-          <CardDescription>Key balance sheet metrics and trends</CardDescription>
+          <CardTitle>{t('accounting.financialPositionAnalysis', 'Financial Position Analysis')}</CardTitle>
+          <CardDescription>{t('accounting.keyBalanceSheetMetrics', 'Key balance sheet metrics and trends')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="space-y-4">
               <h4 className="font-semibold flex items-center gap-2">
                 <Building2 className="h-4 w-4 text-blue-600" />
-                Asset Composition
+                {t('accounting.assetComposition', 'Asset Composition')}
               </h4>
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span>Current Assets</span>
+                  <span>{t('accounting.currentAssets', 'Current Assets')}</span>
                   <span className="font-mono">{((totalCurrentAssets / totalAssets) * 100).toFixed(1)}%</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span>Non-Current Assets</span>
+                  <span>{t('accounting.nonCurrentAssets', 'Non-Current Assets')}</span>
                   <span className="font-mono">{((totalNonCurrentAssets / totalAssets) * 100).toFixed(1)}%</span>
                 </div>
               </div>
@@ -423,15 +425,15 @@ export default function BalanceSheet() {
             <div className="space-y-4">
               <h4 className="font-semibold flex items-center gap-2">
                 <CreditCard className="h-4 w-4 text-red-600" />
-                Liability Structure
+                {t('accounting.liabilityStructure', 'Liability Structure')}
               </h4>
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span>Current Liabilities</span>
+                  <span>{t('accounting.currentLiabilities', 'Current Liabilities')}</span>
                   <span className="font-mono">{((totalCurrentLiabilities / totalLiabilities) * 100).toFixed(1)}%</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span>Long-term Liabilities</span>
+                  <span>{t('accounting.longTermLiabilities', 'Long-term Liabilities')}</span>
                   <span className="font-mono">{((totalNonCurrentLiabilities / totalLiabilities) * 100).toFixed(1)}%</span>
                 </div>
               </div>
@@ -440,15 +442,15 @@ export default function BalanceSheet() {
             <div className="space-y-4">
               <h4 className="font-semibold flex items-center gap-2">
                 <Wallet className="h-4 w-4 text-purple-600" />
-                Capital Structure
+                {t('accounting.capitalStructure', 'Capital Structure')}
               </h4>
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span>Debt Financing</span>
+                  <span>{t('accounting.debtFinancing', 'Debt Financing')}</span>
                   <span className="font-mono">{debtRatio.toFixed(1)}%</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span>Equity Financing</span>
+                  <span>{t('accounting.equityFinancing', 'Equity Financing')}</span>
                   <span className="font-mono">{((totalEquity / totalAssets) * 100).toFixed(1)}%</span>
                 </div>
               </div>
@@ -459,36 +461,36 @@ export default function BalanceSheet() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Related Reports</CardTitle>
-          <CardDescription>Navigate to related financial statements</CardDescription>
+          <CardTitle>{t('accounting.relatedReports', 'Related Reports')}</CardTitle>
+          <CardDescription>{t('accounting.navigateToRelatedStatements', 'Navigate to related financial statements')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <Link href="/income-statement">
               <Button variant="outline" className="w-full justify-start" data-testid="link-income-statement">
                 <TrendingUp className="h-4 w-4 mr-2" />
-                Income Statement
+                {t('accounting.incomeStatement', 'Income Statement')}
                 <ExternalLink className="h-3 w-3 ml-auto" />
               </Button>
             </Link>
             <Link href="/cash-flow-statement">
               <Button variant="outline" className="w-full justify-start" data-testid="link-cash-flow">
                 <BarChart3 className="h-4 w-4 mr-2" />
-                Cash Flow
+                {t('accounting.cashFlow', 'Cash Flow')}
                 <ExternalLink className="h-3 w-3 ml-auto" />
               </Button>
             </Link>
             <Link href="/equity-management">
               <Button variant="outline" className="w-full justify-start" data-testid="link-equity">
                 <Wallet className="h-4 w-4 mr-2" />
-                Equity Management
+                {t('accounting.equityManagement', 'Equity Management')}
                 <ExternalLink className="h-3 w-3 ml-auto" />
               </Button>
             </Link>
             <Link href="/assets-management">
               <Button variant="outline" className="w-full justify-start" data-testid="link-assets">
                 <Building2 className="h-4 w-4 mr-2" />
-                Assets Management
+                {t('accounting.assetsManagement', 'Assets Management')}
                 <ExternalLink className="h-3 w-3 ml-auto" />
               </Button>
             </Link>
@@ -502,43 +504,26 @@ export default function BalanceSheet() {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Comparative Balance Sheet</CardTitle>
-          <CardDescription>Year-over-year comparison</CardDescription>
+          <CardTitle>{t('accounting.comparativeBalanceSheet', 'Comparative Balance Sheet')}</CardTitle>
+          <CardDescription>{t('accounting.yearOverYearComparison', 'Year-over-year comparison')}</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-6">
-            {[
-              { category: "Total Assets", current: totalAssets, previous: previousTotalAssets },
-              { category: "Total Liabilities", current: totalLiabilities, previous: [...currentLiabilities, ...nonCurrentLiabilities].reduce((sum, item) => sum + item.previousAmount, 0) },
-              { category: "Total Equity", current: totalEquity, previous: equity.reduce((sum, item) => sum + item.previousAmount, 0) },
-              { category: "Working Capital", current: totalCurrentAssets - totalCurrentLiabilities, previous: currentAssets.reduce((sum, item) => sum + item.previousAmount, 0) - currentLiabilities.reduce((sum, item) => sum + item.previousAmount, 0) },
-            ].map((item, index) => {
-              const change = ((item.current - item.previous) / item.previous) * 100;
-              return (
-                <div key={index} className="p-4 border rounded-lg" data-testid={`compare-row-${index}`}>
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="font-semibold">{item.category}</span>
-                    <Badge variant={change >= 0 ? "default" : "destructive"}>
-                      {change >= 0 ? "+" : ""}{change.toFixed(1)}%
-                    </Badge>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <p className="text-sm text-muted-foreground">Current Period</p>
-                      <p className="text-lg font-mono font-bold">
-                        SAR {item.current.toLocaleString()}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">Previous Period</p>
-                      <p className="text-lg font-mono text-muted-foreground">
-                        SAR {item.previous.toLocaleString()}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
+          <div className="space-y-4">
+            <div className="grid grid-cols-3 gap-4 p-4 bg-muted/50 rounded-lg">
+              <div>
+                <p className="text-sm text-muted-foreground">{t('accounting.totalAssets', 'Total Assets')}</p>
+                <p className="text-xl font-bold">{t('common.sar', 'SAR')} {totalAssets.toLocaleString()}</p>
+                <p className="text-xs text-green-600">+{((totalAssets - previousTotalAssets) / previousTotalAssets * 100).toFixed(1)}% {t('accounting.vsLastYear', 'vs last year')}</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">{t('accounting.totalLiabilities', 'Total Liabilities')}</p>
+                <p className="text-xl font-bold">{t('common.sar', 'SAR')} {totalLiabilities.toLocaleString()}</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">{t('accounting.totalEquity', 'Total Equity')}</p>
+                <p className="text-xl font-bold">{t('common.sar', 'SAR')} {totalEquity.toLocaleString()}</p>
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -546,15 +531,15 @@ export default function BalanceSheet() {
   );
 
   const tabs = [
-    { id: "balance-sheet", label: "Balance Sheet", icon: Scale, content: balanceSheetTab },
-    { id: "ratios", label: "Financial Ratios", icon: PieChart, content: ratiosTab },
-    { id: "comparative", label: "Comparative", icon: BarChart3, content: comparativeTab },
+    { id: "balance-sheet", label: t('accounting.balanceSheet', 'Balance Sheet'), icon: Scale, content: balanceSheetTab },
+    { id: "ratios", label: t('accounting.ratios', 'Ratios'), icon: PieChart, content: ratiosTab },
+    { id: "comparative", label: t('accounting.comparative', 'Comparative'), icon: BarChart3, content: comparativeTab },
   ];
 
   return (
     <TabsPageLayout
-      title="Balance Sheet - الميزانية العمومية"
-      description="Statement of financial position"
+      title={t('accounting.balanceSheetTitle', 'Balance Sheet - الميزانية العمومية')}
+      description={t('accounting.balanceSheetDescription', 'Financial position statement')}
       icon={Scale}
       tabs={tabs}
       defaultTab="balance-sheet"

@@ -3,6 +3,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useTranslation } from "react-i18next";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -35,6 +36,7 @@ const towingJobSchema = z.object({
 type TowingJobFormData = z.infer<typeof towingJobSchema>;
 
 export default function TowingServices() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [isJobDialogOpen, setIsJobDialogOpen] = useState(false);
   const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -64,12 +66,12 @@ export default function TowingServices() {
     mutationFn: (data: TowingJobFormData) => apiRequest("POST", "/api/towing-jobs", data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/towing-jobs"] });
-      toast({ title: "Success", description: "Towing job created successfully" });
+      toast({ title: t('common.success', 'Success'), description: t('towing.jobCreatedSuccessfully', 'Towing job created successfully') });
       setIsJobDialogOpen(false);
       jobForm.reset();
     },
     onError: () => {
-      toast({ title: "Error", description: "Failed to create towing job", variant: "destructive" });
+      toast({ title: t('common.error', 'Error'), description: t('towing.failedToCreateJob', 'Failed to create towing job'), variant: "destructive" });
     }
   });
 
@@ -78,7 +80,7 @@ export default function TowingServices() {
       apiRequest("PATCH", `/api/towing-jobs/${id}`, { status }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/towing-jobs"] });
-      toast({ title: "Success", description: "Job status updated" });
+      toast({ title: t('common.success', 'Success'), description: t('towing.jobStatusUpdated', 'Job status updated') });
     },
   });
 
@@ -107,57 +109,57 @@ export default function TowingServices() {
 
   return (
     <StandardPageLayout
-      title="Towing Services"
-      description="Manage towing job requests and dispatch operations"
+      title={t('towing.towingServices', 'Towing Services')}
+      description={t('towing.manageTowingJobRequests', 'Manage towing job requests and dispatch operations')}
       icon={Truck}
       actions={[
         {
-          label: "Create Towing Job",
+          label: t('towing.createTowingJob', 'Create Towing Job'),
           icon: Truck,
           onClick: () => setIsJobDialogOpen(true),
         }
       ]}
     >
       <div className="flex gap-2 items-center mb-4">
-        <span className="text-sm text-salis-gray dark:text-salis-gray-light font-poppins">Filter by status:</span>
+        <span className="text-sm text-salis-gray dark:text-salis-gray-light font-poppins">{t('common.filterByStatus', 'Filter by status')}:</span>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
           <SelectTrigger className="w-[200px]" data-testid="select-status-filter">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Jobs</SelectItem>
-            <SelectItem value="requested">Requested</SelectItem>
-            <SelectItem value="dispatched">Dispatched</SelectItem>
-            <SelectItem value="in_progress">In Progress</SelectItem>
-            <SelectItem value="completed">Completed</SelectItem>
-            <SelectItem value="cancelled">Cancelled</SelectItem>
+            <SelectItem value="all">{t('towing.allJobs', 'All Jobs')}</SelectItem>
+            <SelectItem value="requested">{t('status.requested', 'Requested')}</SelectItem>
+            <SelectItem value="dispatched">{t('status.dispatched', 'Dispatched')}</SelectItem>
+            <SelectItem value="in_progress">{t('common.inProgress', 'In Progress')}</SelectItem>
+            <SelectItem value="completed">{t('common.completed', 'Completed')}</SelectItem>
+            <SelectItem value="cancelled">{t('status.cancelled', 'Cancelled')}</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
       <Card className="border-salis-gray-light dark:border-salis-gray-dark bg-white dark:bg-[#010101]">
         <CardHeader>
-          <CardTitle className="font-montserrat text-salis-black dark:text-white">Towing Jobs</CardTitle>
+          <CardTitle className="font-montserrat text-salis-black dark:text-white">{t('towing.towingJobs', 'Towing Jobs')}</CardTitle>
           <CardDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
-            All towing service requests and their current status
+            {t('towing.allTowingServiceRequests', 'All towing service requests and their current status')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <p className="text-salis-gray font-poppins" data-testid="text-loading">Loading jobs...</p>
+            <p className="text-salis-gray font-poppins" data-testid="text-loading">{t('common.loading', 'Loading')}...</p>
           ) : filteredJobs.length === 0 ? (
-            <p className="text-salis-gray font-poppins" data-testid="text-no-jobs">No towing jobs found</p>
+            <p className="text-salis-gray font-poppins" data-testid="text-no-jobs">{t('towing.noTowingJobsFound', 'No towing jobs found')}</p>
           ) : (
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Customer</TableHead>
-                  <TableHead>Pickup</TableHead>
-                  <TableHead>Dropoff</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Priority</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Actions</TableHead>
+                  <TableHead>{t('customers.customer', 'Customer')}</TableHead>
+                  <TableHead>{t('towing.pickup', 'Pickup')}</TableHead>
+                  <TableHead>{t('towing.dropoff', 'Dropoff')}</TableHead>
+                  <TableHead>{t('common.type', 'Type')}</TableHead>
+                  <TableHead>{t('common.priority', 'Priority')}</TableHead>
+                  <TableHead>{t('common.status', 'Status')}</TableHead>
+                  <TableHead>{t('common.actions', 'Actions')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -189,7 +191,7 @@ export default function TowingServices() {
                           onClick={() => updateStatusMutation.mutate({ id: job.id, status: "dispatched" })}
                           data-testid={`button-dispatch-${job.id}`}
                         >
-                          Dispatch
+                          {t('towing.dispatch', 'Dispatch')}
                         </Button>
                       )}
                       {job.status === "dispatched" && (
@@ -198,7 +200,7 @@ export default function TowingServices() {
                           onClick={() => updateStatusMutation.mutate({ id: job.id, status: "in_progress" })}
                           data-testid={`button-start-${job.id}`}
                         >
-                          Start
+                          {t('towing.start', 'Start')}
                         </Button>
                       )}
                       {job.status === "in_progress" && (
@@ -208,7 +210,7 @@ export default function TowingServices() {
                           className="bg-green-500 hover:bg-green-600"
                           data-testid={`button-complete-${job.id}`}
                         >
-                          Complete
+                          {t('towing.complete', 'Complete')}
                         </Button>
                       )}
                     </TableCell>
@@ -223,9 +225,9 @@ export default function TowingServices() {
       <Dialog open={isJobDialogOpen} onOpenChange={setIsJobDialogOpen}>
         <DialogContent className="bg-white dark:bg-salis-black max-w-2xl">
           <DialogHeader>
-            <DialogTitle className="font-montserrat text-salis-black dark:text-white">Create Towing Job</DialogTitle>
+            <DialogTitle className="font-montserrat text-salis-black dark:text-white">{t('towing.createTowingJob', 'Create Towing Job')}</DialogTitle>
             <DialogDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
-              Create a new towing service request
+              {t('towing.createNewTowingRequest', 'Create a new towing service request')}
             </DialogDescription>
           </DialogHeader>
           <Form {...jobForm}>
@@ -236,7 +238,7 @@ export default function TowingServices() {
                   name="customerName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Customer Name</FormLabel>
+                      <FormLabel>{t('customers.customerName', 'Customer Name')}</FormLabel>
                       <FormControl>
                         <Input {...field} placeholder="John Doe" data-testid="input-customer-name" />
                       </FormControl>
@@ -249,7 +251,7 @@ export default function TowingServices() {
                   name="customerPhone"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Customer Phone</FormLabel>
+                      <FormLabel>{t('customers.customerPhone', 'Customer Phone')}</FormLabel>
                       <FormControl>
                         <Input {...field} placeholder="+1 (555) 123-4567" data-testid="input-customer-phone" />
                       </FormControl>
@@ -263,7 +265,7 @@ export default function TowingServices() {
                 name="pickupLocation"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Pickup Location</FormLabel>
+                    <FormLabel>{t('towing.pickupLocation', 'Pickup Location')}</FormLabel>
                     <FormControl>
                       <Input {...field} placeholder="123 Main St, City, State ZIP" data-testid="input-pickup-location" />
                     </FormControl>
@@ -276,7 +278,7 @@ export default function TowingServices() {
                 name="dropoffLocation"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Dropoff Location</FormLabel>
+                    <FormLabel>{t('towing.dropoffLocation', 'Dropoff Location')}</FormLabel>
                     <FormControl>
                       <Input {...field} placeholder="456 Oak Ave, City, State ZIP" data-testid="input-dropoff-location" />
                     </FormControl>
@@ -289,7 +291,7 @@ export default function TowingServices() {
                 name="vehicleInfo"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Vehicle Information</FormLabel>
+                    <FormLabel>{t('towing.vehicleInformation', 'Vehicle Information')}</FormLabel>
                     <FormControl>
                       <Input {...field} placeholder="2020 Honda Civic, License: ABC123" data-testid="input-vehicle-info" />
                     </FormControl>
@@ -303,18 +305,18 @@ export default function TowingServices() {
                   name="towType"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Tow Type</FormLabel>
+                      <FormLabel>{t('towing.towType', 'Tow Type')}</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger data-testid="select-tow-type">
-                            <SelectValue placeholder="Select tow type" />
+                            <SelectValue placeholder={t('towing.selectTowType', 'Select tow type')} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="flatbed">Flatbed</SelectItem>
-                          <SelectItem value="wheel_lift">Wheel Lift</SelectItem>
-                          <SelectItem value="dolly">Dolly</SelectItem>
-                          <SelectItem value="integrated">Integrated</SelectItem>
+                          <SelectItem value="flatbed">{t('towing.flatbed', 'Flatbed')}</SelectItem>
+                          <SelectItem value="wheel_lift">{t('towing.wheelLift', 'Wheel Lift')}</SelectItem>
+                          <SelectItem value="dolly">{t('towing.dolly', 'Dolly')}</SelectItem>
+                          <SelectItem value="integrated">{t('towing.integrated', 'Integrated')}</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -326,18 +328,18 @@ export default function TowingServices() {
                   name="priority"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Priority</FormLabel>
+                      <FormLabel>{t('common.priority', 'Priority')}</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger data-testid="select-priority">
-                            <SelectValue placeholder="Select priority" />
+                            <SelectValue placeholder={t('common.selectPriority', 'Select priority')} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="low">Low</SelectItem>
-                          <SelectItem value="medium">Medium</SelectItem>
-                          <SelectItem value="high">High</SelectItem>
-                          <SelectItem value="emergency">Emergency</SelectItem>
+                          <SelectItem value="low">{t('priority.low', 'Low')}</SelectItem>
+                          <SelectItem value="medium">{t('priority.medium', 'Medium')}</SelectItem>
+                          <SelectItem value="high">{t('priority.high', 'High')}</SelectItem>
+                          <SelectItem value="emergency">{t('priority.emergency', 'Emergency')}</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -351,7 +353,7 @@ export default function TowingServices() {
                   name="distance"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Distance (miles)</FormLabel>
+                      <FormLabel>{t('towing.distanceMiles', 'Distance (miles)')}</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -370,7 +372,7 @@ export default function TowingServices() {
                   name="estimatedCost"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Estimated Cost</FormLabel>
+                      <FormLabel>{t('towing.estimatedCost', 'Estimated Cost')}</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -390,9 +392,9 @@ export default function TowingServices() {
                 name="notes"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Notes</FormLabel>
+                    <FormLabel>{t('common.notes', 'Notes')}</FormLabel>
                     <FormControl>
-                      <Textarea {...field} placeholder="Additional details..." data-testid="input-notes" />
+                      <Textarea {...field} placeholder={t('towing.additionalDetails', 'Additional details...')} data-testid="input-notes" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -400,7 +402,7 @@ export default function TowingServices() {
               />
               <DialogFooter>
                 <Button type="submit" disabled={createJobMutation.isPending} data-testid="button-submit-job">
-                  {createJobMutation.isPending ? "Creating..." : "Create Job"}
+                  {createJobMutation.isPending ? t('common.creating', 'Creating...') : t('towing.createJob', 'Create Job')}
                 </Button>
               </DialogFooter>
             </form>

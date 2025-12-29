@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/hooks/useAuth";
+import { useTranslation } from 'react-i18next';
 import { useQuery } from "@tanstack/react-query";
 import type { User, Garage, JobCard, ServiceTemplate, Tool } from "@shared/schema";
 import { JobCardDialog } from "@/components/JobCardDialog";
@@ -21,6 +22,7 @@ import { useToast } from "@/hooks/use-toast";
 
 // Garage Overview Component
 const GarageOverview = () => {
+  const { t } = useTranslation();
   const { data: garages, isLoading } = useQuery({
     queryKey: ['/api/garages'],
     retry: false,
@@ -50,12 +52,12 @@ const GarageOverview = () => {
           <span className={`px-2 py-1 rounded-full text-xs font-medium ${
             garage.isActive ? 'bg-gray-200 text-gray-800' : 'bg-gray-300 text-gray-700'
           }`}>
-            {garage.isActive ? 'Active' : 'Inactive'}
+            {garage.isActive ? t('common.active', 'Active') : t('common.inactive', 'Inactive')}
           </span>
         </div>
       )) || (
         <p className="font-['Poppins',Helvetica] font-normal text-gray-500 dark:text-gray-500 text-sm">
-          No garages found
+          {t('dashboard.noGaragesFound', 'No garages found')}
         </p>
       )}
     </div>
@@ -64,6 +66,7 @@ const GarageOverview = () => {
 
 // Tools Overview Component - Module 7
 const ToolsOverview = () => {
+  const { t } = useTranslation();
   const { data: tools, isLoading } = useQuery({
     queryKey: ['/api/tools'],
     retry: false,
@@ -121,7 +124,7 @@ const ToolsOverview = () => {
                 <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                   tool.isGlobal ? 'bg-gray-300 text-gray-800' : 'bg-gray-100 text-gray-700'
                 }`}>
-                  {tool.isGlobal ? 'Global' : 'Local'}
+                  {tool.isGlobal ? t('tools.global', 'Global') : t('tools.local', 'Local')}
                 </span>
               </div>
             </div>
@@ -131,13 +134,13 @@ const ToolsOverview = () => {
               tool.isActive ? 'bg-gray-700' : 'bg-gray-400'
             }`}></span>
             <span className="font-['Poppins',Helvetica] font-normal text-gray-500 dark:text-gray-500 text-xs">
-              {tool.isActive ? 'Available' : 'Unavailable'}
+              {tool.isActive ? t('tools.available', 'Available') : t('tools.unavailable', 'Unavailable')}
             </span>
           </div>
         </div>
       )) || (
         <p className="font-['Poppins',Helvetica] font-normal text-gray-500 dark:text-gray-500 text-sm">
-          No tools found. Add your first tool to get started.
+          {t('dashboard.noToolsFound', 'No tools found. Add your first tool to get started.')}
         </p>
       )}
     </div>
@@ -146,6 +149,7 @@ const ToolsOverview = () => {
 
 // Job Cards Overview Component
 const JobCardsOverview = () => {
+  const { t } = useTranslation();
   const { data: jobCards, isLoading } = useQuery({
     queryKey: ['/api/job-cards'],
     retry: false,
@@ -205,7 +209,7 @@ const JobCardsOverview = () => {
                 </span>
                 {jobCard.priority === 'high' && (
                   <span className="px-2 py-1 bg-gray-400 text-gray-900 rounded-full text-xs font-medium">
-                    High Priority
+                    {t('jobCards.highPriority', 'High Priority')}
                   </span>
                 )}
               </div>
@@ -216,30 +220,30 @@ const JobCardsOverview = () => {
                 {jobCard.description}
               </p>
               <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-500 mb-2">
-                <span>Service: {jobCard.serviceType}</span>
-                {jobCard.estimatedHours && <span>Est: {jobCard.estimatedHours}h</span>}
+                <span>{t('jobCards.service', 'Service')}: {jobCard.serviceType}</span>
+                {jobCard.estimatedHours && <span>{t('jobCards.estimated', 'Est')}: {jobCard.estimatedHours}h</span>}
                 {jobCard.scheduledDate && (
-                  <span>Due: {new Date(jobCard.scheduledDate).toLocaleDateString()}</span>
+                  <span>{t('jobCards.due', 'Due')}: {new Date(jobCard.scheduledDate).toLocaleDateString()}</span>
                 )}
               </div>
               {/* Tool Integration Display */}
               <div className="flex items-center gap-2 mt-2 p-2 bg-gray-100 rounded-md">
                 <Wrench className="w-3 h-3 text-gray-700" />
                 <span className="font-['Poppins',Helvetica] font-medium text-gray-800 text-xs">
-                  Required Tools: 
+                  {t('jobCards.requiredTools', 'Required Tools')}: 
                 </span>
                 <div className="flex gap-1">
                   {jobCard.serviceType === 'Engine Diagnostic' && (
-                    <span className="px-1.5 py-0.5 bg-gray-300 text-gray-800 rounded text-xs">OBD Scanner</span>
+                    <span className="px-1.5 py-0.5 bg-gray-300 text-gray-800 rounded text-xs">{t('tools.obdScanner', 'OBD Scanner')}</span>
                   )}
                   {jobCard.serviceType === 'Brake Service' && (
-                    <span className="px-1.5 py-0.5 bg-gray-300 text-gray-800 rounded text-xs">Torque Wrench</span>
+                    <span className="px-1.5 py-0.5 bg-gray-300 text-gray-800 rounded text-xs">{t('tools.torqueWrench', 'Torque Wrench')}</span>
                   )}
                   {jobCard.serviceType === 'Electrical System Check' && (
-                    <span className="px-1.5 py-0.5 bg-gray-200 text-gray-700 rounded text-xs">Multimeter</span>
+                    <span className="px-1.5 py-0.5 bg-gray-200 text-gray-700 rounded text-xs">{t('tools.multimeter', 'Multimeter')}</span>
                   )}
                   {!['Engine Diagnostic', 'Brake Service', 'Electrical System Check'].includes(jobCard.serviceType) && (
-                    <span className="px-1.5 py-0.5 bg-gray-100 text-gray-700 rounded text-xs">General Tools</span>
+                    <span className="px-1.5 py-0.5 bg-gray-100 text-gray-700 rounded text-xs">{t('tools.generalTools', 'General Tools')}</span>
                   )}
                 </div>
               </div>
@@ -252,7 +256,7 @@ const JobCardsOverview = () => {
         </div>
       )) || (
         <p className="font-['Poppins',Helvetica] font-normal text-gray-500 dark:text-gray-500 text-sm text-center py-4">
-          No active job cards
+          {t('dashboard.noActiveJobCards', 'No active job cards')}
         </p>
       )}
     </div>
@@ -261,6 +265,7 @@ const JobCardsOverview = () => {
 
 // Service Templates Component
 const ServiceTemplatesOverview = () => {
+  const { t } = useTranslation();
   const { data: garages } = useQuery({
     queryKey: ['/api/garages'],
     retry: false,
@@ -316,7 +321,7 @@ const ServiceTemplatesOverview = () => {
         </div>
       )) || (
         <p className="font-['Poppins',Helvetica] font-normal text-gray-500 dark:text-gray-500 text-sm">
-          No service templates found
+          {t('dashboard.noServiceTemplates', 'No service templates found')}
         </p>
       )}
     </div>
@@ -325,6 +330,7 @@ const ServiceTemplatesOverview = () => {
 
 // Integration Metrics Component - Shows real-time system connections
 const IntegrationMetrics = () => {
+  const { t } = useTranslation();
   const { data: integrationStatus, isLoading } = useQuery({
     queryKey: ['/api/integrated/status'],
     retry: false,
@@ -344,36 +350,36 @@ const IntegrationMetrics = () => {
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <span className="font-['Poppins',Helvetica] font-normal text-gray-500 dark:text-gray-500 text-sm">Job-Tool Links</span>
+        <span className="font-['Poppins',Helvetica] font-normal text-gray-500 dark:text-gray-500 text-sm">{t('dashboard.jobToolLinks', 'Job-Tool Links')}</span>
         <span className="font-['Poppins',Helvetica] font-semibold text-gray-900 dark:text-white text-sm">
-          {status?.integrationHealth?.jobToolLinks || 8}/10 Active
+          {status?.integrationHealth?.jobToolLinks || 8}/10 {t('common.active', 'Active')}
         </span>
       </div>
       <div className="flex items-center justify-between">
-        <span className="font-['Poppins',Helvetica] font-normal text-gray-500 dark:text-gray-500 text-sm">Auto-Assignments</span>
+        <span className="font-['Poppins',Helvetica] font-normal text-gray-500 dark:text-gray-500 text-sm">{t('dashboard.autoAssignments', 'Auto-Assignments')}</span>
         <span className="font-['Poppins',Helvetica] font-semibold text-gray-900 dark:text-white text-sm">
-          {status?.integrationHealth?.autoAssignments || 12} Today
+          {status?.integrationHealth?.autoAssignments || 12} {t('dashboard.today', 'Today')}
         </span>
       </div>
       <div className="flex items-center justify-between">
-        <span className="font-['Poppins',Helvetica] font-normal text-gray-500 dark:text-gray-500 text-sm">Cross-Branch Sharing</span>
+        <span className="font-['Poppins',Helvetica] font-normal text-gray-500 dark:text-gray-500 text-sm">{t('dashboard.crossBranchSharing', 'Cross-Branch Sharing')}</span>
         <span className="font-['Poppins',Helvetica] font-semibold text-gray-900 dark:text-white text-sm">
-          {status?.integrationHealth?.crossBranchSharing || 3} Active
+          {status?.integrationHealth?.crossBranchSharing || 3} {t('common.active', 'Active')}
         </span>
       </div>
       <div className="flex items-center justify-between">
-        <span className="font-['Poppins',Helvetica] font-normal text-gray-500 dark:text-gray-500 text-sm">System Health</span>
+        <span className="font-['Poppins',Helvetica] font-normal text-gray-500 dark:text-gray-500 text-sm">{t('dashboard.systemHealth', 'System Health')}</span>
         <span className="font-['Poppins',Helvetica] font-semibold text-gray-800 text-sm">
-          {status?.integrationHealth?.templateToolMatching || 100}% Connected
+          {status?.integrationHealth?.templateToolMatching || 100}% {t('dashboard.connected', 'Connected')}
         </span>
       </div>
       <div className="mt-4 pt-3 border-t border-gray-200 dark:border-salis-gray-dark">
         <div className="text-center">
           <p className="font-['Poppins',Helvetica] font-semibold text-gray-900 dark:text-white text-lg">
-            {status?.totalJobCards || 0} Job Cards
+            {status?.totalJobCards || 0} {t('nav.job_cards', 'Job Cards')}
           </p>
           <p className="font-['Poppins',Helvetica] font-normal text-gray-500 dark:text-gray-500 text-xs">
-            {status?.totalTools || 0} Tools • {status?.totalGarages || 0} Garages
+            {status?.totalTools || 0} {t('nav.tools', 'Tools')} • {status?.totalGarages || 0} {t('dashboard.garages', 'Garages')}
           </p>
         </div>
       </div>
@@ -382,6 +388,7 @@ const IntegrationMetrics = () => {
 };
 
 export const LoginDashboard = (): JSX.Element => {
+  const { t } = useTranslation();
   const { user, isAuthenticated } = useAuth() as { user: User | undefined; isAuthenticated: boolean };
   const { toast } = useToast();
   const [toolAvailabilityOpen, setToolAvailabilityOpen] = React.useState(false);
@@ -411,15 +418,15 @@ export const LoginDashboard = (): JSX.Element => {
       
       if (response.ok) {
         toast({
-          title: "Success!",
-          description: "Job card created successfully with auto-assigned tools!",
+          title: t('common.success', 'Success!'),
+          description: t('dashboard.jobCardCreated', 'Job card created successfully with auto-assigned tools!'),
         });
         window.location.reload();
       }
     } catch (error) {
       toast({
-        title: "Error",
-        description: "Error creating job card. Please try again.",
+        title: t('common.error', 'Error'),
+        description: t('dashboard.jobCardError', 'Error creating job card. Please try again.'),
         variant: "destructive",
       });
     }
@@ -457,14 +464,14 @@ export const LoginDashboard = (): JSX.Element => {
   const formFields = [
     {
       id: "email",
-      label: "Email",
-      placeholder: "Enter your email address",
+      label: t('auth.email', 'Email'),
+      placeholder: t('auth.emailPlaceholder', 'Enter your email address'),
       type: "text",
     },
     {
       id: "password",
-      label: "Password",
-      placeholder: "Enter your Password",
+      label: t('auth.password', 'Password'),
+      placeholder: t('dashboard.enterPassword', 'Enter your Password'),
       type: "password",
       hasIcon: true,
     },
@@ -490,10 +497,10 @@ export const LoginDashboard = (): JSX.Element => {
             <div className="flex items-center justify-between mb-8">
               <div>
                 <h1 className="font-display-large-semibold font-semibold text-gray-900 dark:text-white text-2xl sm:text-3xl lg:text-4xl tracking-[-1.5px] leading-tight">
-                  Dashboard
+                  {t('nav.dashboard', 'Dashboard')}
                 </h1>
                 <p className="font-['Poppins',Helvetica] font-medium text-gray-500 dark:text-gray-500 text-sm mt-1">
-                  Welcome back, {user.firstName || 'User'}
+                  {t('welcome.welcomeBack', 'Welcome back')}, {user.firstName || t('dashboard.user', 'User')}
                 </p>
               </div>
               <div className="flex items-center gap-3">
@@ -508,7 +515,7 @@ export const LoginDashboard = (): JSX.Element => {
                   data-testid="button-logout"
                 >
                   <LogOut className="w-4 h-4" />
-                  Sign Out
+                  {t('auth.signOut', 'Sign Out')}
                 </Button>
               </div>
             </div>
@@ -522,16 +529,16 @@ export const LoginDashboard = (): JSX.Element => {
                 <h3 className="font-['Poppins',Helvetica] font-semibold text-gray-900 dark:text-white text-base">
                   {user.firstName || user.lastName 
                     ? `${user.firstName || ''} ${user.lastName || ''}`.trim()
-                    : 'User Account'
+                    : t('dashboard.userAccount', 'User Account')
                   }
                 </h3>
                 <p className="font-['Poppins',Helvetica] font-medium text-gray-500 dark:text-gray-500 text-sm">
-                  {user.email || 'No email provided'}
+                  {user.email || t('dashboard.noEmailProvided', 'No email provided')}
                 </p>
               </div>
               <div className="text-right">
                 <span className="inline-block px-3 py-1 bg-gray-200 text-gray-800 rounded-full text-xs font-medium">
-                  Active
+                  {t('common.active', 'Active')}
                 </span>
               </div>
             </div>
@@ -541,7 +548,7 @@ export const LoginDashboard = (): JSX.Element => {
               <div className="p-4 rounded-[10px] border border-solid border-gray-200 dark:border-salis-gray-dark bg-white">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="font-['Poppins',Helvetica] font-medium text-gray-500 dark:text-gray-500 text-xs">Total Projects</p>
+                    <p className="font-['Poppins',Helvetica] font-medium text-gray-500 dark:text-gray-500 text-xs">{t('dashboard.totalProjects', 'Total Projects')}</p>
                     <p className="font-['Poppins',Helvetica] font-semibold text-gray-900 dark:text-white text-2xl">12</p>
                   </div>
                   <div className="w-10 h-10 bg-gray-200 rounded-lg flex items-center justify-center">
@@ -553,7 +560,7 @@ export const LoginDashboard = (): JSX.Element => {
               <div className="p-4 rounded-[10px] border border-solid border-gray-200 dark:border-salis-gray-dark bg-white">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="font-['Poppins',Helvetica] font-medium text-gray-500 dark:text-gray-500 text-xs">Team Members</p>
+                    <p className="font-['Poppins',Helvetica] font-medium text-gray-500 dark:text-gray-500 text-xs">{t('dashboard.teamMembers', 'Team Members')}</p>
                     <p className="font-['Poppins',Helvetica] font-semibold text-gray-900 dark:text-white text-2xl">8</p>
                   </div>
                   <div className="w-10 h-10 bg-gray-300 rounded-lg flex items-center justify-center">
@@ -565,7 +572,7 @@ export const LoginDashboard = (): JSX.Element => {
               <div className="p-4 rounded-[10px] border border-solid border-gray-200 dark:border-salis-gray-dark bg-white">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="font-['Poppins',Helvetica] font-medium text-gray-500 dark:text-gray-500 text-xs">Revenue</p>
+                    <p className="font-['Poppins',Helvetica] font-medium text-gray-500 dark:text-gray-500 text-xs">{t('dashboard.revenue', 'Revenue')}</p>
                     <p className="font-['Poppins',Helvetica] font-semibold text-gray-900 dark:text-white text-2xl">$24k</p>
                   </div>
                   <div className="w-10 h-10 bg-accent-100 rounded-lg flex items-center justify-center">
@@ -577,7 +584,7 @@ export const LoginDashboard = (): JSX.Element => {
               <div className="p-4 rounded-[10px] border border-solid border-gray-200 dark:border-salis-gray-dark bg-white">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="font-['Poppins',Helvetica] font-medium text-gray-500 dark:text-gray-500 text-xs">Growth</p>
+                    <p className="font-['Poppins',Helvetica] font-medium text-gray-500 dark:text-gray-500 text-xs">{t('dashboard.growth', 'Growth')}</p>
                     <p className="font-['Poppins',Helvetica] font-semibold text-gray-900 dark:text-white text-2xl">+23%</p>
                   </div>
                   <div className="w-10 h-10 bg-gray-400 rounded-lg flex items-center justify-center">
@@ -592,17 +599,17 @@ export const LoginDashboard = (): JSX.Element => {
               {/* Recent Activity */}
               <div className="lg:col-span-2 p-6 rounded-[10px] border border-solid border-gray-200 dark:border-salis-gray-dark bg-white">
                 <h3 className="font-['Poppins',Helvetica] font-semibold text-gray-900 dark:text-white text-lg mb-4">
-                  Recent Activity
+                  {t('dashboard.recentActivity', 'Recent Activity')}
                 </h3>
                 <div className="space-y-4">
                   <div className="flex items-start gap-3">
                     <div className="w-2 h-2 bg-accent-500 rounded-full mt-2"></div>
                     <div>
                       <p className="font-['Poppins',Helvetica] font-medium text-gray-900 dark:text-white text-sm">
-                        New project created
+                        {t('dashboard.newProjectCreated', 'New project created')}
                       </p>
                       <p className="font-['Poppins',Helvetica] font-normal text-gray-500 dark:text-gray-500 text-xs">
-                        2 hours ago
+                        {t('dashboard.hoursAgo', '2 hours ago')}
                       </p>
                     </div>
                   </div>
@@ -610,10 +617,10 @@ export const LoginDashboard = (): JSX.Element => {
                     <div className="w-2 h-2 bg-gray-500 rounded-full mt-2"></div>
                     <div>
                       <p className="font-['Poppins',Helvetica] font-medium text-gray-900 dark:text-white text-sm">
-                        Team member added
+                        {t('dashboard.teamMemberAdded', 'Team member added')}
                       </p>
                       <p className="font-['Poppins',Helvetica] font-normal text-gray-500 dark:text-gray-500 text-xs">
-                        5 hours ago
+                        {t('dashboard.fiveHoursAgo', '5 hours ago')}
                       </p>
                     </div>
                   </div>
@@ -621,10 +628,10 @@ export const LoginDashboard = (): JSX.Element => {
                     <div className="w-2 h-2 bg-gray-600 rounded-full mt-2"></div>
                     <div>
                       <p className="font-['Poppins',Helvetica] font-medium text-gray-900 dark:text-white text-sm">
-                        Task completed
+                        {t('dashboard.taskCompleted', 'Task completed')}
                       </p>
                       <p className="font-['Poppins',Helvetica] font-normal text-gray-500 dark:text-gray-500 text-xs">
-                        1 day ago
+                        {t('dashboard.oneDayAgo', '1 day ago')}
                       </p>
                     </div>
                   </div>
@@ -634,24 +641,24 @@ export const LoginDashboard = (): JSX.Element => {
               {/* Quick Actions */}
               <div className="p-6 rounded-[10px] border border-solid border-gray-200 dark:border-salis-gray-dark bg-white">
                 <h3 className="font-['Poppins',Helvetica] font-semibold text-gray-900 dark:text-white text-lg mb-4">
-                  Quick Actions
+                  {t('common.quick_actions', 'Quick Actions')}
                 </h3>
                 <div className="space-y-3">
                   <Button className="w-full justify-start gap-3 h-12 bg-accent-500 hover:bg-accent-500/90 text-white rounded-lg" data-testid="button-manage-garages">
                     <Building2 className="w-4 h-4" />
-                    Manage Garages
+                    {t('dashboard.manageGarages', 'Manage Garages')}
                   </Button>
                   <Button variant="outline" className="w-full justify-start gap-3 h-12 border-gray-200 dark:border-salis-gray-dark text-gray-900 dark:text-white hover:bg-gray-50 rounded-lg" data-testid="button-add-user">
                     <UserPlus className="w-4 h-4" />
-                    Add User
+                    {t('dashboard.addUser', 'Add User')}
                   </Button>
                   <Button variant="outline" className="w-full justify-start gap-3 h-12 border-gray-200 dark:border-salis-gray-dark text-gray-900 dark:text-white hover:bg-gray-50 rounded-lg" data-testid="button-user-roles">
                     <Shield className="w-4 h-4" />
-                    User Roles
+                    {t('dashboard.userRoles', 'User Roles')}
                   </Button>
                   <Button variant="outline" className="w-full justify-start gap-3 h-12 border-gray-200 dark:border-salis-gray-dark text-gray-900 dark:text-white hover:bg-gray-50 rounded-lg" data-testid="button-settings">
                     <Settings className="w-4 h-4" />
-                    Settings
+                    {t('nav.settings', 'Settings')}
                   </Button>
                 </div>
               </div>
@@ -660,7 +667,7 @@ export const LoginDashboard = (): JSX.Element => {
             {/* Job Cards & Task Management Section */}
             <div className="mt-6">
               <h3 className="font-['Poppins',Helvetica] font-semibold text-gray-900 dark:text-white text-xl mb-4">
-                Job Cards & Task Management
+                {t('dashboard.jobCardsTaskManagement', 'Job Cards & Task Management')}
               </h3>
               
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -668,11 +675,11 @@ export const LoginDashboard = (): JSX.Element => {
                 <div className="lg:col-span-2 p-6 rounded-[10px] border border-solid border-gray-200 dark:border-salis-gray-dark bg-white">
                   <div className="flex items-center justify-between mb-4">
                     <h4 className="font-['Poppins',Helvetica] font-semibold text-gray-900 dark:text-white text-lg">
-                      Active Job Cards
+                      {t('dashboard.activeJobCards', 'Active Job Cards')}
                     </h4>
                     <Button size="sm" className="bg-accent-500 hover:bg-accent-500/90 text-white" data-testid="button-new-job-card">
                       <FileText className="w-4 h-4 mr-2" />
-                      New Job Card
+                      {t('dashboard.newJobCard', 'New Job Card')}
                     </Button>
                   </div>
                   <JobCardsOverview />
@@ -681,13 +688,13 @@ export const LoginDashboard = (): JSX.Element => {
                 {/* Service Templates & Tool Integration */}
                 <div className="p-6 rounded-[10px] border border-solid border-gray-200 dark:border-salis-gray-dark bg-white">
                   <h4 className="font-['Poppins',Helvetica] font-semibold text-gray-900 dark:text-white text-lg mb-4">
-                    Service Templates
+                    {t('nav.service_templates', 'Service Templates')}
                   </h4>
                   <ServiceTemplatesOverview />
                   
                   <div className="mt-4 pt-4 border-t border-gray-200 dark:border-salis-gray-dark">
                     <h5 className="font-['Poppins',Helvetica] font-medium text-gray-900 dark:text-white text-sm mb-2">
-                      Required Tools Integration
+                      {t('dashboard.requiredToolsIntegration', 'Required Tools Integration')}
                     </h5>
                     <div className="flex flex-wrap gap-1">
                       <span className="px-2 py-1 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-full text-xs">OBD Scanner</span>
@@ -702,14 +709,14 @@ export const LoginDashboard = (): JSX.Element => {
             {/* Garage Management Section */}
             <div className="mt-6">
               <h3 className="font-['Poppins',Helvetica] font-semibold text-gray-900 dark:text-white text-xl mb-4">
-                Garage Management System
+                {t('dashboard.garageManagementSystem', 'Garage Management System')}
               </h3>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Garages Overview */}
                 <div className="p-6 rounded-[10px] border border-solid border-gray-200 dark:border-salis-gray-dark bg-white">
                   <h4 className="font-['Poppins',Helvetica] font-semibold text-gray-900 dark:text-white text-lg mb-4">
-                    Active Garages
+                    {t('dashboard.activeGarages', 'Active Garages')}
                   </h4>
                   <GarageOverview />
                 </div>
@@ -717,32 +724,32 @@ export const LoginDashboard = (): JSX.Element => {
                 {/* System Modules */}
                 <div className="p-6 rounded-[10px] border border-solid border-gray-200 dark:border-salis-gray-dark bg-white">
                   <h4 className="font-['Poppins',Helvetica] font-semibold text-gray-900 dark:text-white text-lg mb-4">
-                    System Progress
+                    {t('dashboard.systemProgress', 'System Progress')}
                   </h4>
                   <div className="grid grid-cols-2 gap-2 text-sm">
                     <div className="flex items-center gap-2 p-2 bg-gray-100 dark:bg-gray-800 rounded-md">
                       <span className="w-2 h-2 bg-gray-700 dark:bg-gray-400 rounded-full"></span>
-                      <span className="font-['Poppins',Helvetica] text-gray-900 dark:text-white">User Management</span>
+                      <span className="font-['Poppins',Helvetica] text-gray-900 dark:text-white">{t('dashboard.userManagement', 'User Management')}</span>
                     </div>
                     <div className="flex items-center gap-2 p-2 bg-gray-100 dark:bg-gray-800 rounded-md">
                       <span className="w-2 h-2 bg-gray-700 dark:bg-gray-400 rounded-full"></span>
-                      <span className="font-['Poppins',Helvetica] text-gray-900 dark:text-white">Branch Control</span>
+                      <span className="font-['Poppins',Helvetica] text-gray-900 dark:text-white">{t('dashboard.branchControl', 'Branch Control')}</span>
                     </div>
                     <div className="flex items-center gap-2 p-2 bg-gray-100 dark:bg-gray-800 rounded-md">
                       <span className="w-2 h-2 bg-gray-700 dark:bg-gray-400 rounded-full"></span>
-                      <span className="font-['Poppins',Helvetica] text-gray-900 dark:text-white">Job Cards</span>
+                      <span className="font-['Poppins',Helvetica] text-gray-900 dark:text-white">{t('nav.job_cards', 'Job Cards')}</span>
                     </div>
                     <div className="flex items-center gap-2 p-2 bg-gray-100 dark:bg-gray-800 rounded-md">
                       <span className="w-2 h-2 bg-gray-700 dark:bg-gray-400 rounded-full"></span>
-                      <span className="font-['Poppins',Helvetica] text-gray-900 dark:text-white">Task Assignment</span>
+                      <span className="font-['Poppins',Helvetica] text-gray-900 dark:text-white">{t('dashboard.taskAssignment', 'Task Assignment')}</span>
                     </div>
                     <div className="flex items-center gap-2 p-2 bg-gray-100 dark:bg-gray-800 rounded-md">
                       <span className="w-2 h-2 bg-gray-700 dark:bg-gray-400 rounded-full"></span>
-                      <span className="font-['Poppins',Helvetica] text-gray-900 dark:text-white">Tool Management</span>
+                      <span className="font-['Poppins',Helvetica] text-gray-900 dark:text-white">{t('dashboard.toolManagement', 'Tool Management')}</span>
                     </div>
                     <div className="flex items-center gap-2 p-2 bg-gray-50 rounded-md">
                       <span className="w-2 h-2 bg-gray-400 rounded-full"></span>
-                      <span className="font-['Poppins',Helvetica] text-gray-500 dark:text-gray-500">Appointments</span>
+                      <span className="font-['Poppins',Helvetica] text-gray-500 dark:text-gray-500">{t('nav.appointments', 'Appointments')}</span>
                     </div>
                   </div>
                 </div>
@@ -752,7 +759,7 @@ export const LoginDashboard = (): JSX.Element => {
             {/* Tool Management Section - Module 7 */}
             <div className="mt-6">
               <h3 className="font-['Poppins',Helvetica] font-semibold text-gray-900 dark:text-white text-xl mb-4">
-                Tool Management System
+                {t('dashboard.toolManagementSystem', 'Tool Management System')}
               </h3>
               
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -760,11 +767,11 @@ export const LoginDashboard = (): JSX.Element => {
                 <div className="lg:col-span-2 p-6 rounded-[10px] border border-solid border-gray-200 dark:border-salis-gray-dark bg-white">
                   <div className="flex items-center justify-between mb-4">
                     <h4 className="font-['Poppins',Helvetica] font-semibold text-gray-900 dark:text-white text-lg">
-                      Available Tools
+                      {t('dashboard.availableTools', 'Available Tools')}
                     </h4>
                     <Button size="sm" className="bg-accent-500 hover:bg-accent-500/90 text-white">
                       <Wrench className="w-4 h-4 mr-2" />
-                      Add Tool
+                      {t('dashboard.addTool', 'Add Tool')}
                     </Button>
                   </div>
                   <ToolsOverview />
@@ -773,7 +780,7 @@ export const LoginDashboard = (): JSX.Element => {
                 {/* Tool Categories */}
                 <div className="p-6 rounded-[10px] border border-solid border-gray-200 dark:border-salis-gray-dark bg-white">
                   <h4 className="font-['Poppins',Helvetica] font-semibold text-gray-900 dark:text-white text-lg mb-4">
-                    Tool Categories
+                    {t('dashboard.toolCategories', 'Tool Categories')}
                   </h4>
                   <div className="space-y-3">
                     <div className="flex items-center justify-between p-3 border border-gray-200 dark:border-salis-gray-dark rounded-lg bg-gray-50">
@@ -783,10 +790,10 @@ export const LoginDashboard = (): JSX.Element => {
                         </div>
                         <div>
                           <p className="font-['Poppins',Helvetica] font-medium text-gray-900 dark:text-white text-sm">
-                            Diagnostic
+                            {t('tools.diagnostic', 'Diagnostic')}
                           </p>
                           <p className="font-['Poppins',Helvetica] font-normal text-gray-500 dark:text-gray-500 text-xs">
-                            Scanners, Meters
+                            {t('tools.scannersMeters', 'Scanners, Meters')}
                           </p>
                         </div>
                       </div>
@@ -800,10 +807,10 @@ export const LoginDashboard = (): JSX.Element => {
                         </div>
                         <div>
                           <p className="font-['Poppins',Helvetica] font-medium text-gray-900 dark:text-white text-sm">
-                            Mechanical
+                            {t('tools.mechanical', 'Mechanical')}
                           </p>
                           <p className="font-['Poppins',Helvetica] font-normal text-gray-500 dark:text-gray-500 text-xs">
-                            Wrenches, Jacks
+                            {t('tools.wrenchesJacks', 'Wrenches, Jacks')}
                           </p>
                         </div>
                       </div>
@@ -817,10 +824,10 @@ export const LoginDashboard = (): JSX.Element => {
                         </div>
                         <div>
                           <p className="font-['Poppins',Helvetica] font-medium text-gray-900 dark:text-white text-sm">
-                            Electrical
+                            {t('tools.electrical', 'Electrical')}
                           </p>
                           <p className="font-['Poppins',Helvetica] font-normal text-gray-500 dark:text-gray-500 text-xs">
-                            Multimeters, Scopes
+                            {t('tools.multimetersScopes', 'Multimeters, Scopes')}
                           </p>
                         </div>
                       </div>
@@ -834,25 +841,25 @@ export const LoginDashboard = (): JSX.Element => {
             {/* Integrated Workflow System */}
             <div className="mt-6">
               <h3 className="font-['Poppins',Helvetica] font-semibold text-gray-900 dark:text-white text-xl mb-4">
-                Integrated Task & Tool Assignment Workflow
+                {t('dashboard.integratedWorkflow', 'Integrated Task & Tool Assignment Workflow')}
               </h3>
               
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Integrated Assignment Scenarios */}
                 <div className="p-6 rounded-[10px] border border-solid border-gray-200 dark:border-salis-gray-dark bg-white">
                   <h4 className="font-['Poppins',Helvetica] font-semibold text-gray-900 dark:text-white text-lg mb-4">
-                    Job + Tool Assignment Scenarios
+                    {t('dashboard.jobToolAssignmentScenarios', 'Job + Tool Assignment Scenarios')}
                   </h4>
                   <div className="space-y-3">
                     <div className="p-3 bg-gray-100 dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600">
                       <div className="flex items-center gap-2 mb-1">
                         <CheckCircle className="w-4 h-4 text-gray-700 dark:text-gray-300" />
                         <h5 className="font-['Poppins',Helvetica] font-medium text-gray-900 dark:text-white text-sm">
-                          Scenario A: Complete Assignment
+                          {t('dashboard.scenarioATitle', 'Scenario A: Complete Assignment')}
                         </h5>
                       </div>
                       <p className="font-['Poppins',Helvetica] font-normal text-gray-700 dark:text-gray-300 text-xs mb-2">
-                        Manager assigns job card + required tools + technician team in one workflow
+                        {t('dashboard.scenarioADescription', 'Manager assigns job card + required tools + technician team in one workflow')}
                       </p>
                       <div className="flex flex-wrap gap-1">
                         <span className="px-2 py-1 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-full text-xs">Job Card</span>
@@ -865,11 +872,11 @@ export const LoginDashboard = (): JSX.Element => {
                       <div className="flex items-center gap-2 mb-1">
                         <UserPlus className="w-4 h-4 text-gray-700 dark:text-gray-300" />
                         <h5 className="font-['Poppins',Helvetica] font-medium text-gray-900 dark:text-white text-sm">
-                          Scenario B: Self-Assignment
+                          {t('dashboard.scenarioBTitle', 'Scenario B: Self-Assignment')}
                         </h5>
                       </div>
                       <p className="font-['Poppins',Helvetica] font-normal text-gray-700 dark:text-gray-300 text-xs">
-                        Technicians can assign assistants to their tasks and manage sub-tasks independently
+                        {t('dashboard.scenarioBDescription', 'Technicians can assign assistants to their tasks and manage sub-tasks independently')}
                       </p>
                     </div>
                     
@@ -877,11 +884,11 @@ export const LoginDashboard = (): JSX.Element => {
                       <div className="flex items-center gap-2 mb-1">
                         <AlertCircle className="w-4 h-4 text-gray-800 dark:text-gray-200" />
                         <h5 className="font-['Poppins',Helvetica] font-medium text-gray-900 dark:text-white text-sm">
-                          Scenario C: Dynamic Reassignment
+                          {t('dashboard.scenarioCTitle', 'Scenario C: Dynamic Reassignment')}
                         </h5>
                       </div>
                       <p className="font-['Poppins',Helvetica] font-normal text-gray-800 dark:text-gray-200 text-xs">
-                        Real-time task reassignment based on priority changes and resource availability
+                        {t('dashboard.scenarioCDescription', 'Real-time task reassignment based on priority changes and resource availability')}
                       </p>
                     </div>
                   </div>
@@ -890,7 +897,7 @@ export const LoginDashboard = (): JSX.Element => {
                 {/* Task Progress Updates */}
                 <div className="p-6 rounded-[10px] border border-solid border-gray-200 dark:border-salis-gray-dark bg-white">
                   <h4 className="font-['Poppins',Helvetica] font-semibold text-gray-900 dark:text-white text-lg mb-4">
-                    Task Progress Updates
+                    {t('dashboard.taskProgressUpdates', 'Task Progress Updates')}
                   </h4>
                   <div className="space-y-3">
                     <div className="flex items-start space-x-3">
@@ -941,14 +948,14 @@ export const LoginDashboard = (): JSX.Element => {
             {/* System Integration Dashboard */}
             <div className="mt-6">
               <h3 className="font-['Poppins',Helvetica] font-semibold text-gray-900 dark:text-white text-xl mb-4">
-                Fully Integrated System Dashboard
+                {t('dashboard.fullyIntegratedSystem', 'Fully Integrated System Dashboard')}
               </h3>
               
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Live Integration Metrics */}
                 <div className="p-6 rounded-[10px] border border-solid border-gray-200 dark:border-salis-gray-dark bg-white">
                   <h4 className="font-['Poppins',Helvetica] font-semibold text-gray-900 dark:text-white text-lg mb-4">
-                    Real-time Integration Status
+                    {t('dashboard.realtimeIntegrationStatus', 'Real-time Integration Status')}
                   </h4>
                   <IntegrationMetrics />
                 </div>
@@ -956,7 +963,7 @@ export const LoginDashboard = (): JSX.Element => {
                 {/* Quick Cross-System Actions */}
                 <div className="p-6 rounded-[10px] border border-solid border-gray-200 dark:border-salis-gray-dark bg-white">
                   <h4 className="font-['Poppins',Helvetica] font-semibold text-gray-900 dark:text-white text-lg mb-4">
-                    Cross-System Actions
+                    {t('dashboard.crossSystemActions', 'Cross-System Actions')}
                   </h4>
                   <div className="space-y-2">
                     <JobCardDialog 
@@ -965,7 +972,7 @@ export const LoginDashboard = (): JSX.Element => {
                           size="sm" className="w-full justify-start gap-2 h-9 bg-gray-700 dark:bg-gray-600 hover:bg-gray-800 dark:hover:bg-gray-500 text-white"
                           data-testid="button-create-job-with-tools">
                           <CheckCircle className="w-3 h-3" />
-                          Create New Job Card
+                          {t('dashboard.createNewJobCard', 'Create New Job Card')}
                         </Button>
                       }
                     />
@@ -974,42 +981,42 @@ export const LoginDashboard = (): JSX.Element => {
                       size="sm" variant="outline" className="w-full justify-start gap-2 h-9"
                       data-testid="button-smart-tool-assignment">
                       <Wrench className="w-3 h-3" />
-                      Smart Tool Assignment
+                      {t('dashboard.smartToolAssignment', 'Smart Tool Assignment')}
                     </Button>
                     <Button 
                       onClick={handleToolAvailabilityCheck}
                       size="sm" variant="outline" className="w-full justify-start gap-2 h-9"
                       data-testid="button-tool-availability">
                       <Wrench className="w-3 h-3" />
-                      Check Tool Availability
+                      {t('dashboard.checkToolAvailability', 'Check Tool Availability')}
                     </Button>
                     <Button 
                       onClick={handleAddNewTool}
                       size="sm" variant="outline" className="w-full justify-start gap-2 h-9"
                       data-testid="button-add-new-tool">
                       <Users className="w-3 h-3" />
-                      Add New Tool
+                      {t('dashboard.addNewTool', 'Add New Tool')}
                     </Button>
                     <Button 
                       onClick={handleViewServiceTemplates}
                       size="sm" variant="outline" className="w-full justify-start gap-2 h-9"
                       data-testid="button-service-templates">
                       <FileText className="w-3 h-3" />
-                      Service Templates
+                      {t('nav.service_templates', 'Service Templates')}
                     </Button>
                     <Button 
                       onClick={handleCrossBranchTransfer}
                       size="sm" variant="outline" className="w-full justify-start gap-2 h-9"
                       data-testid="button-cross-branch-transfer">
                       <Building2 className="w-3 h-3" />
-                      Cross-Branch Transfer
+                      {t('dashboard.crossBranchTransfer', 'Cross-Branch Transfer')}
                     </Button>
                     <Button 
                       onClick={handleGenerateReport}
                       size="sm" variant="outline" className="w-full justify-start gap-2 h-9"
                       data-testid="button-generate-report">
                       <BarChart3 className="w-3 h-3" />
-                      Full System Report
+                      {t('dashboard.fullSystemReport', 'Full System Report')}
                     </Button>
                   </div>
                 </div>
@@ -1017,29 +1024,29 @@ export const LoginDashboard = (): JSX.Element => {
                 {/* System Connection Health */}
                 <div className="p-6 rounded-[10px] border border-solid border-gray-200 dark:border-salis-gray-dark bg-white">
                   <h4 className="font-['Poppins',Helvetica] font-semibold text-gray-900 dark:text-white text-lg mb-4">
-                    Connection Health
+                    {t('dashboard.connectionHealth', 'Connection Health')}
                   </h4>
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <span className="w-2 h-2 bg-gray-700 rounded-full"></span>
-                        <span className="font-['Poppins',Helvetica] font-normal text-gray-900 dark:text-white text-sm">All Systems</span>
+                        <span className="font-['Poppins',Helvetica] font-normal text-gray-900 dark:text-white text-sm">{t('dashboard.allSystems', 'All Systems')}</span>
                       </div>
-                      <span className="font-['Poppins',Helvetica] font-semibold text-gray-800 text-sm">Connected</span>
+                      <span className="font-['Poppins',Helvetica] font-semibold text-gray-800 text-sm">{t('dashboard.connected', 'Connected')}</span>
                     </div>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <span className="w-2 h-2 bg-gray-600 rounded-full"></span>
-                        <span className="font-['Poppins',Helvetica] font-normal text-gray-900 dark:text-white text-sm">Real-time Sync</span>
+                        <span className="font-['Poppins',Helvetica] font-normal text-gray-900 dark:text-white text-sm">{t('dashboard.realtimeSync', 'Real-time Sync')}</span>
                       </div>
-                      <span className="font-['Poppins',Helvetica] font-semibold text-gray-700 text-sm">Active</span>
+                      <span className="font-['Poppins',Helvetica] font-semibold text-gray-700 text-sm">{t('common.active', 'Active')}</span>
                     </div>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <span className="w-2 h-2 bg-gray-500 rounded-full"></span>
-                        <span className="font-['Poppins',Helvetica] font-normal text-gray-900 dark:text-white text-sm">Cross-Module Links</span>
+                        <span className="font-['Poppins',Helvetica] font-normal text-gray-900 dark:text-white text-sm">{t('dashboard.crossModuleLinks', 'Cross-Module Links')}</span>
                       </div>
-                      <span className="font-['Poppins',Helvetica] font-semibold text-gray-700 text-sm">18 Active</span>
+                      <span className="font-['Poppins',Helvetica] font-semibold text-gray-700 text-sm">18 {t('common.active', 'Active')}</span>
                     </div>
                   </div>
                 </div>
@@ -1050,7 +1057,7 @@ export const LoginDashboard = (): JSX.Element => {
           {/* Footer */}
           <div className="mt-8 pt-6 border-t border-gray-200 dark:border-salis-gray-dark text-center">
             <p className="font-['Poppins',Helvetica] font-normal text-gray-500 dark:text-gray-500 text-xs">
-              Al Rasheed Automotive • Fully Integrated • 7 Modules Connected • Real-time Data Flow
+              {t('dashboard.footerText', 'Al Rasheed Automotive • Fully Integrated • 7 Modules Connected • Real-time Data Flow')}
             </p>
           </div>
         </div>
@@ -1085,10 +1092,10 @@ export const LoginDashboard = (): JSX.Element => {
             {/* Header */}
             <div className="flex flex-col w-full items-start gap-2">
               <h1 className="relative self-stretch font-display-large-semibold font-semibold text-gray-900 dark:text-white text-3xl sm:text-4xl lg:text-[54px] text-center tracking-[-2.7px] leading-normal">
-                Login
+                {t('auth.login', 'Login')}
               </h1>
               <p className="relative self-stretch font-['Poppins',Helvetica] font-medium text-gray-900 dark:text-white text-base sm:text-lg lg:text-xl text-center tracking-[0] leading-normal px-4 sm:px-0">
-                Welcome again! Click login to securely access your account
+                {t('dashboard.welcomeAgain', 'Welcome again! Click login to securely access your account')}
               </p>
             </div>
 
@@ -1128,14 +1135,14 @@ export const LoginDashboard = (): JSX.Element => {
                       htmlFor="remember"
                       className="font-['Poppins',Helvetica] font-normal text-gray-900 dark:text-white text-base leading-[22.4px]"
                     >
-                      Remember me
+                      {t('auth.rememberMe', 'Remember me')}
                     </label>
                   </div>
                   <a
                     href="#"
                     className="font-['Poppins',Helvetica] font-normal text-gray-900 dark:text-white text-base underline leading-[22.4px]"
                   >
-                    Forgot password?
+                    {t('auth.forgotPassword', 'Forgot password?')}
                   </a>
                 </div>
 
@@ -1144,7 +1151,7 @@ export const LoginDashboard = (): JSX.Element => {
                   onClick={() => window.location.href = '/api/login'}
                   className="flex items-center justify-center gap-2.5 px-8 sm:px-[84px] py-3 sm:py-4 w-full bg-accent-500 rounded-lg text-white text-lg sm:text-xl font-['Poppins',Helvetica] font-medium hover:bg-accent-500/90"
                 >
-                  Login
+                  {t('auth.login', 'Login')}
                 </Button>
               </div>
             </div>

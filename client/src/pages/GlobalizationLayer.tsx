@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Globe, Languages, DollarSign, MapPin, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -19,6 +20,7 @@ import { insertLocaleSchema, insertTranslationResourceSchema, insertCurrencyRate
 import { TabsPageLayout } from "@/components/layouts/TabsPageLayout";
 
 export default function GlobalizationLayer() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("locales");
   const [showLocaleDialog, setShowLocaleDialog] = useState(false);
@@ -50,31 +52,31 @@ export default function GlobalizationLayer() {
 
   const createLocaleMutation = useMutation({
     mutationFn: (data: InsertLocale) => apiRequest("/api/locales", "POST", data),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/locales"] }); setShowLocaleDialog(false); toast({ title: "Locale created" }); },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/locales"] }); setShowLocaleDialog(false); toast({ title: t('globalization.localeCreated', 'Locale created') }); },
   });
 
   const createTranslationMutation = useMutation({
     mutationFn: (data: InsertTranslationResource) => apiRequest("/api/translation-resources", "POST", data),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/translation-resources"] }); setShowTranslationDialog(false); toast({ title: "Translation created" }); },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/translation-resources"] }); setShowTranslationDialog(false); toast({ title: t('globalization.translationCreated', 'Translation created') }); },
   });
 
   const createCurrencyMutation = useMutation({
     mutationFn: (data: InsertCurrencyRate) => apiRequest("/api/currency-rates", "POST", data),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/currency-rates"] }); setShowCurrencyDialog(false); toast({ title: "Currency rate created" }); },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/currency-rates"] }); setShowCurrencyDialog(false); toast({ title: t('globalization.currencyRateCreated', 'Currency rate created') }); },
   });
 
   const createTaxMutation = useMutation({
     mutationFn: (data: InsertTaxRegion) => apiRequest("/api/tax-regions", "POST", data),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/tax-regions"] }); setShowTaxDialog(false); toast({ title: "Tax region created" }); },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/tax-regions"] }); setShowTaxDialog(false); toast({ title: t('globalization.taxRegionCreated', 'Tax region created') }); },
   });
 
   const localesContent = (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">Language Locales</h2>
+        <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">{t('globalization.languageLocales', 'Language Locales')}</h2>
         <Button onClick={() => { localeForm.reset(); setShowLocaleDialog(true); }} data-testid="button-add-locale">
           <Plus className="h-4 w-4 mr-2" />
-          Add Locale
+          {t('globalization.addLocale', 'Add Locale')}
         </Button>
       </div>
 
@@ -83,10 +85,10 @@ export default function GlobalizationLayer() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Code</TableHead>
-                <TableHead>Name</TableHead>
-                <TableHead>English Name</TableHead>
-                <TableHead>Status</TableHead>
+                <TableHead>{t('globalization.code', 'Code')}</TableHead>
+                <TableHead>{t('globalization.name', 'Name')}</TableHead>
+                <TableHead>{t('globalization.englishName', 'English Name')}</TableHead>
+                <TableHead>{t('common.status', 'Status')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -94,10 +96,10 @@ export default function GlobalizationLayer() {
                 <TableRow key={locale.id}>
                   <TableCell className="font-mono">{locale.code}</TableCell>
                   <TableCell>{locale.name}</TableCell>
-                  <TableCell>{locale.englishName || 'N/A'}</TableCell>
+                  <TableCell>{locale.englishName || t('common.notAvailable', 'N/A')}</TableCell>
                   <TableCell>
                     <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${locale.isActive ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'}`}>
-                      {locale.isActive ? '✅ Active' : '○ Inactive'}
+                      {locale.isActive ? `✅ ${t('common.active', 'Active')}` : `○ ${t('common.inactive', 'Inactive')}`}
                     </span>
                   </TableCell>
                 </TableRow>
@@ -112,10 +114,10 @@ export default function GlobalizationLayer() {
   const translationsContent = (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">Translation Resources</h2>
+        <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">{t('globalization.translationResources', 'Translation Resources')}</h2>
         <Button onClick={() => { translationForm.reset(); setShowTranslationDialog(true); }} data-testid="button-add-translation">
           <Plus className="h-4 w-4 mr-2" />
-          Add Translation
+          {t('globalization.addTranslation', 'Add Translation')}
         </Button>
       </div>
 
@@ -124,15 +126,15 @@ export default function GlobalizationLayer() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Locale</TableHead>
-                <TableHead>Key</TableHead>
-                <TableHead>Value</TableHead>
+                <TableHead>{t('globalization.locale', 'Locale')}</TableHead>
+                <TableHead>{t('globalization.key', 'Key')}</TableHead>
+                <TableHead>{t('globalization.value', 'Value')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {translations.map((trans) => (
                 <TableRow key={trans.id}>
-                  <TableCell className="font-mono">{locales.find(l => l.id === trans.localeId)?.code || 'N/A'}</TableCell>
+                  <TableCell className="font-mono">{locales.find(l => l.id === trans.localeId)?.code || t('common.notAvailable', 'N/A')}</TableCell>
                   <TableCell className="font-mono text-sm">{trans.translationKey}</TableCell>
                   <TableCell>{trans.translationValue}</TableCell>
                 </TableRow>
@@ -147,10 +149,10 @@ export default function GlobalizationLayer() {
   const currenciesContent = (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">Currency Exchange Rates</h2>
+        <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">{t('globalization.currencyExchangeRates', 'Currency Exchange Rates')}</h2>
         <Button onClick={() => { currencyForm.reset(); setShowCurrencyDialog(true); }} data-testid="button-add-currency">
           <Plus className="h-4 w-4 mr-2" />
-          Add Rate
+          {t('globalization.addRate', 'Add Rate')}
         </Button>
       </div>
 
@@ -159,10 +161,10 @@ export default function GlobalizationLayer() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>From</TableHead>
-                <TableHead>To</TableHead>
-                <TableHead>Rate</TableHead>
-                <TableHead>Status</TableHead>
+                <TableHead>{t('common.from', 'From')}</TableHead>
+                <TableHead>{t('common.to', 'To')}</TableHead>
+                <TableHead>{t('globalization.rate', 'Rate')}</TableHead>
+                <TableHead>{t('common.status', 'Status')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -173,7 +175,7 @@ export default function GlobalizationLayer() {
                   <TableCell>{parseFloat(curr.rate).toFixed(4)}</TableCell>
                   <TableCell>
                     <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300">
-                      ✅ {curr.source || 'Manual'}
+                      ✅ {curr.source || t('globalization.manual', 'Manual')}
                     </span>
                   </TableCell>
                 </TableRow>
@@ -188,10 +190,10 @@ export default function GlobalizationLayer() {
   const taxContent = (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">Tax Regions</h2>
+        <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">{t('globalization.taxRegions', 'Tax Regions')}</h2>
         <Button onClick={() => { taxForm.reset(); setShowTaxDialog(true); }} data-testid="button-add-tax">
           <Plus className="h-4 w-4 mr-2" />
-          Add Tax Region
+          {t('globalization.addTaxRegion', 'Add Tax Region')}
         </Button>
       </div>
 
@@ -200,10 +202,10 @@ export default function GlobalizationLayer() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Code</TableHead>
-                <TableHead>Region</TableHead>
-                <TableHead>Tax Rate</TableHead>
-                <TableHead>Status</TableHead>
+                <TableHead>{t('globalization.code', 'Code')}</TableHead>
+                <TableHead>{t('globalization.region', 'Region')}</TableHead>
+                <TableHead>{t('globalization.taxRate', 'Tax Rate')}</TableHead>
+                <TableHead>{t('common.status', 'Status')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -214,7 +216,7 @@ export default function GlobalizationLayer() {
                   <TableCell>{parseFloat(tax.taxRate).toFixed(2)}%</TableCell>
                   <TableCell>
                     <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${tax.isActive ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'}`}>
-                      {tax.isActive ? '✅ Active' : '○ Inactive'}
+                      {tax.isActive ? `✅ ${t('common.active', 'Active')}` : `○ ${t('common.inactive', 'Inactive')}`}
                     </span>
                   </TableCell>
                 </TableRow>
@@ -229,33 +231,33 @@ export default function GlobalizationLayer() {
   return (
     <>
       <TabsPageLayout
-        title="Globalization Layer"
-        description="Manage multi-language support, currency rates, and tax regions for global operations"
+        title={t('globalization.title', 'Globalization Layer')}
+        description={t('globalization.description', 'Manage multi-language support, currency rates, and tax regions for global operations')}
         icon={Globe}
         activeTab={activeTab}
         onTabChange={setActiveTab}
         tabs={[
           {
             id: "locales",
-            label: "Locales",
+            label: t('globalization.locales', 'Locales'),
             icon: Languages,
             content: localesContent,
           },
           {
             id: "translations",
-            label: "Translations",
+            label: t('globalization.translations', 'Translations'),
             icon: Globe,
             content: translationsContent,
           },
           {
             id: "currencies",
-            label: "Currency Rates",
+            label: t('globalization.currencyRates', 'Currency Rates'),
             icon: DollarSign,
             content: currenciesContent,
           },
           {
             id: "tax",
-            label: "Tax Regions",
+            label: t('globalization.taxRegions', 'Tax Regions'),
             icon: MapPin,
             content: taxContent,
           },
@@ -265,36 +267,36 @@ export default function GlobalizationLayer() {
       <Dialog open={showLocaleDialog} onOpenChange={setShowLocaleDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Add Language Locale</DialogTitle>
+            <DialogTitle>{t('globalization.addLanguageLocale', 'Add Language Locale')}</DialogTitle>
           </DialogHeader>
           <Form {...localeForm}>
             <form onSubmit={localeForm.handleSubmit((data) => createLocaleMutation.mutate(data))} className="space-y-4">
               <FormField control={localeForm.control} name="code" render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Locale Code (e.g., en-US, es-ES)</FormLabel>
+                  <FormLabel>{t('globalization.localeCodeLabel', 'Locale Code (e.g., en-US, es-ES)')}</FormLabel>
                   <FormControl><Input {...field} placeholder="en-US" /></FormControl>
                 </FormItem>
               )} />
               <FormField control={localeForm.control} name="name" render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Name</FormLabel>
-                  <FormControl><Input {...field} placeholder="English (United States)" /></FormControl>
+                  <FormLabel>{t('globalization.name', 'Name')}</FormLabel>
+                  <FormControl><Input {...field} placeholder={t('globalization.englishUSPlaceholder', 'English (United States)')} /></FormControl>
                 </FormItem>
               )} />
               <FormField control={localeForm.control} name="englishName" render={({ field }) => (
                 <FormItem>
-                  <FormLabel>English Name</FormLabel>
-                  <FormControl><Input {...field} value={field.value || ''} placeholder="English (United States)" /></FormControl>
+                  <FormLabel>{t('globalization.englishName', 'English Name')}</FormLabel>
+                  <FormControl><Input {...field} value={field.value || ''} placeholder={t('globalization.englishUSPlaceholder', 'English (United States)')} /></FormControl>
                 </FormItem>
               )} />
               <FormField control={localeForm.control} name="isActive" render={({ field }) => (
                 <FormItem className="flex items-center justify-between">
-                  <FormLabel>Active</FormLabel>
+                  <FormLabel>{t('common.active', 'Active')}</FormLabel>
                   <FormControl><Switch checked={field.value ?? false} onCheckedChange={field.onChange} /></FormControl>
                 </FormItem>
               )} />
               <Button type="submit" className="w-full" disabled={createLocaleMutation.isPending}>
-                {createLocaleMutation.isPending ? "Creating..." : "Create Locale"}
+                {createLocaleMutation.isPending ? t('common.creating', 'Creating...') : t('globalization.createLocale', 'Create Locale')}
               </Button>
             </form>
           </Form>
@@ -304,17 +306,17 @@ export default function GlobalizationLayer() {
       <Dialog open={showTranslationDialog} onOpenChange={setShowTranslationDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Add Translation</DialogTitle>
+            <DialogTitle>{t('globalization.addTranslation', 'Add Translation')}</DialogTitle>
           </DialogHeader>
           <Form {...translationForm}>
             <form onSubmit={translationForm.handleSubmit((data) => createTranslationMutation.mutate(data))} className="space-y-4">
               <FormField control={translationForm.control} name="localeId" render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Locale</FormLabel>
+                  <FormLabel>{t('globalization.locale', 'Locale')}</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select locale" />
+                        <SelectValue placeholder={t('globalization.selectLocale', 'Select locale')} />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -329,18 +331,18 @@ export default function GlobalizationLayer() {
               )} />
               <FormField control={translationForm.control} name="translationKey" render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Key</FormLabel>
+                  <FormLabel>{t('globalization.key', 'Key')}</FormLabel>
                   <FormControl><Input {...field} placeholder="welcome.message" /></FormControl>
                 </FormItem>
               )} />
               <FormField control={translationForm.control} name="translationValue" render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Value</FormLabel>
-                  <FormControl><Textarea {...field} placeholder="Welcome to our application" /></FormControl>
+                  <FormLabel>{t('globalization.value', 'Value')}</FormLabel>
+                  <FormControl><Textarea {...field} placeholder={t('globalization.welcomePlaceholder', 'Welcome to our application')} /></FormControl>
                 </FormItem>
               )} />
               <Button type="submit" className="w-full" disabled={createTranslationMutation.isPending}>
-                {createTranslationMutation.isPending ? "Creating..." : "Create Translation"}
+                {createTranslationMutation.isPending ? t('common.creating', 'Creating...') : t('globalization.createTranslation', 'Create Translation')}
               </Button>
             </form>
           </Form>
@@ -350,30 +352,30 @@ export default function GlobalizationLayer() {
       <Dialog open={showCurrencyDialog} onOpenChange={setShowCurrencyDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Add Currency Rate</DialogTitle>
+            <DialogTitle>{t('globalization.addCurrencyRate', 'Add Currency Rate')}</DialogTitle>
           </DialogHeader>
           <Form {...currencyForm}>
             <form onSubmit={currencyForm.handleSubmit((data) => createCurrencyMutation.mutate(data))} className="space-y-4">
               <FormField control={currencyForm.control} name="fromCurrency" render={({ field }) => (
                 <FormItem>
-                  <FormLabel>From Currency</FormLabel>
+                  <FormLabel>{t('globalization.fromCurrency', 'From Currency')}</FormLabel>
                   <FormControl><Input {...field} placeholder="USD" /></FormControl>
                 </FormItem>
               )} />
               <FormField control={currencyForm.control} name="toCurrency" render={({ field }) => (
                 <FormItem>
-                  <FormLabel>To Currency</FormLabel>
+                  <FormLabel>{t('globalization.toCurrency', 'To Currency')}</FormLabel>
                   <FormControl><Input {...field} placeholder="EUR" /></FormControl>
                 </FormItem>
               )} />
               <FormField control={currencyForm.control} name="rate" render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Exchange Rate</FormLabel>
+                  <FormLabel>{t('globalization.exchangeRate', 'Exchange Rate')}</FormLabel>
                   <FormControl><Input {...field} type="number" step="0.0001" placeholder="1.0" /></FormControl>
                 </FormItem>
               )} />
               <Button type="submit" className="w-full" disabled={createCurrencyMutation.isPending}>
-                {createCurrencyMutation.isPending ? "Creating..." : "Create Rate"}
+                {createCurrencyMutation.isPending ? t('common.creating', 'Creating...') : t('globalization.createRate', 'Create Rate')}
               </Button>
             </form>
           </Form>
@@ -383,30 +385,30 @@ export default function GlobalizationLayer() {
       <Dialog open={showTaxDialog} onOpenChange={setShowTaxDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Add Tax Region</DialogTitle>
+            <DialogTitle>{t('globalization.addTaxRegion', 'Add Tax Region')}</DialogTitle>
           </DialogHeader>
           <Form {...taxForm}>
             <form onSubmit={taxForm.handleSubmit((data) => createTaxMutation.mutate(data))} className="space-y-4">
               <FormField control={taxForm.control} name="countryCode" render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Country Code</FormLabel>
+                  <FormLabel>{t('globalization.countryCode', 'Country Code')}</FormLabel>
                   <FormControl><Input {...field} placeholder="US" /></FormControl>
                 </FormItem>
               )} />
               <FormField control={taxForm.control} name="regionName" render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Region Name</FormLabel>
-                  <FormControl><Input {...field} placeholder="California" /></FormControl>
+                  <FormLabel>{t('globalization.regionName', 'Region Name')}</FormLabel>
+                  <FormControl><Input {...field} placeholder={t('globalization.californiaPlaceholder', 'California')} /></FormControl>
                 </FormItem>
               )} />
               <FormField control={taxForm.control} name="taxRate" render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Tax Rate (%)</FormLabel>
+                  <FormLabel>{t('globalization.taxRatePercent', 'Tax Rate (%)')}</FormLabel>
                   <FormControl><Input {...field} type="number" step="0.01" placeholder="7.25" /></FormControl>
                 </FormItem>
               )} />
               <Button type="submit" className="w-full" disabled={createTaxMutation.isPending}>
-                {createTaxMutation.isPending ? "Creating..." : "Create Tax Region"}
+                {createTaxMutation.isPending ? t('common.creating', 'Creating...') : t('globalization.createTaxRegion', 'Create Tax Region')}
               </Button>
             </form>
           </Form>

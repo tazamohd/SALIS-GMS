@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "wouter";
+import { useTranslation } from "react-i18next";
 import { TabsPageLayout } from "@/components/layouts/TabsPageLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -153,6 +154,7 @@ const accountSummaries = [
 ];
 
 export default function GeneralLedger() {
+  const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState("");
   const [accountFilter, setAccountFilter] = useState("all");
   const [dateRange, setDateRange] = useState("this-month");
@@ -178,14 +180,14 @@ export default function GeneralLedger() {
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
               <ArrowUpRight className="h-4 w-4 text-green-600" />
-              Total Debits
+              {t('accounting.totalDebits', 'Total Debits')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-bold text-green-600" data-testid="text-total-debits">
               SAR {totalDebits.toLocaleString()}
             </p>
-            <p className="text-xs text-muted-foreground mt-1">This period</p>
+            <p className="text-xs text-muted-foreground mt-1">{t('accounting.thisPeriod', 'This period')}</p>
           </CardContent>
         </Card>
 
@@ -193,14 +195,14 @@ export default function GeneralLedger() {
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
               <ArrowDownRight className="h-4 w-4 text-red-600" />
-              Total Credits
+              {t('accounting.totalCredits', 'Total Credits')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-bold text-red-600" data-testid="text-total-credits">
               SAR {totalCredits.toLocaleString()}
             </p>
-            <p className="text-xs text-muted-foreground mt-1">This period</p>
+            <p className="text-xs text-muted-foreground mt-1">{t('accounting.thisPeriod', 'This period')}</p>
           </CardContent>
         </Card>
 
@@ -208,7 +210,7 @@ export default function GeneralLedger() {
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
               <BarChart3 className="h-4 w-4" />
-              Balance Check
+              {t('accounting.balanceCheck', 'Balance Check')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -217,10 +219,10 @@ export default function GeneralLedger() {
               className="text-sm"
               data-testid="badge-balance-status"
             >
-              {totalDebits === totalCredits ? "✓ Balanced" : "⚠ Unbalanced"}
+              {totalDebits === totalCredits ? t('accounting.balanced', '✓ Balanced') : t('accounting.unbalanced', '⚠ Unbalanced')}
             </Badge>
             <p className="text-xs text-muted-foreground mt-2">
-              Difference: SAR {Math.abs(totalDebits - totalCredits).toLocaleString()}
+              {t('accounting.difference', 'Difference')}: SAR {Math.abs(totalDebits - totalCredits).toLocaleString()}
             </p>
           </CardContent>
         </Card>
@@ -229,14 +231,14 @@ export default function GeneralLedger() {
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
               <Layers className="h-4 w-4" />
-              Total Entries
+              {t('accounting.totalEntries', 'Total Entries')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-bold" data-testid="text-entries-count">
               {ledgerEntries.length}
             </p>
-            <p className="text-xs text-muted-foreground mt-1">Journal entries posted</p>
+            <p className="text-xs text-muted-foreground mt-1">{t('accounting.journalEntriesPosted', 'Journal entries posted')}</p>
           </CardContent>
         </Card>
       </div>
@@ -245,12 +247,12 @@ export default function GeneralLedger() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>Account Summaries</CardTitle>
-              <CardDescription>Overview of all accounts with balances</CardDescription>
+              <CardTitle>{t('accounting.accountSummaries', 'Account Summaries')}</CardTitle>
+              <CardDescription>{t('accounting.accountSummariesDescription', 'Overview of all accounts with balances')}</CardDescription>
             </div>
             <Button variant="outline" size="sm" data-testid="button-export-summary">
               <Download className="h-4 w-4 mr-2" />
-              Export
+              {t('common.export', 'Export')}
             </Button>
           </div>
         </CardHeader>
@@ -258,12 +260,12 @@ export default function GeneralLedger() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Account Code</TableHead>
-                <TableHead>Account Name</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead className="text-right">Total Debits</TableHead>
-                <TableHead className="text-right">Total Credits</TableHead>
-                <TableHead className="text-right">Balance</TableHead>
+                <TableHead>{t('accounting.accountCode', 'Account Code')}</TableHead>
+                <TableHead>{t('accounting.accountName', 'Account Name')}</TableHead>
+                <TableHead>{t('common.type', 'Type')}</TableHead>
+                <TableHead className="text-right">{t('accounting.totalDebits', 'Total Debits')}</TableHead>
+                <TableHead className="text-right">{t('accounting.totalCredits', 'Total Credits')}</TableHead>
+                <TableHead className="text-right">{t('accounting.balance', 'Balance')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -294,36 +296,36 @@ export default function GeneralLedger() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Related Modules</CardTitle>
-          <CardDescription>Navigate to related financial pages</CardDescription>
+          <CardTitle>{t('accounting.relatedModules', 'Related Modules')}</CardTitle>
+          <CardDescription>{t('accounting.relatedModulesDescription', 'Navigate to related financial pages')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <Link href="/journal-entries">
               <Button variant="outline" className="w-full justify-start" data-testid="link-journal-entries">
                 <FileText className="h-4 w-4 mr-2" />
-                Journal Entries
+                {t('nav.journal_entries', 'Journal Entries')}
                 <ExternalLink className="h-3 w-3 ml-auto" />
               </Button>
             </Link>
             <Link href="/trial-balance">
               <Button variant="outline" className="w-full justify-start" data-testid="link-trial-balance">
                 <BarChart3 className="h-4 w-4 mr-2" />
-                Trial Balance
+                {t('nav.trial_balance', 'Trial Balance')}
                 <ExternalLink className="h-3 w-3 ml-auto" />
               </Button>
             </Link>
             <Link href="/chart-of-accounts">
               <Button variant="outline" className="w-full justify-start" data-testid="link-chart-of-accounts">
                 <BookOpen className="h-4 w-4 mr-2" />
-                Chart of Accounts
+                {t('nav.chart_of_accounts', 'Chart of Accounts')}
                 <ExternalLink className="h-3 w-3 ml-auto" />
               </Button>
             </Link>
             <Link href="/income-statement">
               <Button variant="outline" className="w-full justify-start" data-testid="link-income-statement">
                 <TrendingUp className="h-4 w-4 mr-2" />
-                Income Statement
+                {t('nav.income_statement', 'Income Statement')}
                 <ExternalLink className="h-3 w-3 ml-auto" />
               </Button>
             </Link>
@@ -339,7 +341,7 @@ export default function GeneralLedger() {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search transactions..."
+            placeholder={t('accounting.searchTransactions', 'Search transactions...')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-10"
@@ -348,27 +350,27 @@ export default function GeneralLedger() {
         </div>
         <Select value={accountFilter} onValueChange={setAccountFilter}>
           <SelectTrigger className="w-[200px]" data-testid="select-account-filter">
-            <SelectValue placeholder="All Accounts" />
+            <SelectValue placeholder={t('accounting.allAccounts', 'All Accounts')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Accounts</SelectItem>
-            <SelectItem value="asset">Assets</SelectItem>
-            <SelectItem value="liability">Liabilities</SelectItem>
-            <SelectItem value="equity">Equity</SelectItem>
-            <SelectItem value="revenue">Revenue</SelectItem>
-            <SelectItem value="expense">Expenses</SelectItem>
+            <SelectItem value="all">{t('accounting.allAccounts', 'All Accounts')}</SelectItem>
+            <SelectItem value="asset">{t('accounting.assets', 'Assets')}</SelectItem>
+            <SelectItem value="liability">{t('accounting.liabilities', 'Liabilities')}</SelectItem>
+            <SelectItem value="equity">{t('accounting.equityType', 'Equity')}</SelectItem>
+            <SelectItem value="revenue">{t('accounting.revenueType', 'Revenue')}</SelectItem>
+            <SelectItem value="expense">{t('accounting.expenses', 'Expenses')}</SelectItem>
           </SelectContent>
         </Select>
         <Select value={dateRange} onValueChange={setDateRange}>
           <SelectTrigger className="w-[180px]" data-testid="select-date-range">
-            <SelectValue placeholder="Date Range" />
+            <SelectValue placeholder={t('common.dateRange', 'Date Range')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="today">Today</SelectItem>
-            <SelectItem value="this-week">This Week</SelectItem>
-            <SelectItem value="this-month">This Month</SelectItem>
-            <SelectItem value="this-quarter">This Quarter</SelectItem>
-            <SelectItem value="this-year">This Year</SelectItem>
+            <SelectItem value="today">{t('common.today', 'Today')}</SelectItem>
+            <SelectItem value="this-week">{t('common.thisWeek', 'This Week')}</SelectItem>
+            <SelectItem value="this-month">{t('common.thisMonth', 'This Month')}</SelectItem>
+            <SelectItem value="this-quarter">{t('common.thisQuarter', 'This Quarter')}</SelectItem>
+            <SelectItem value="this-year">{t('common.thisYear', 'This Year')}</SelectItem>
           </SelectContent>
         </Select>
         <Button variant="outline" data-testid="button-refresh">
@@ -381,13 +383,13 @@ export default function GeneralLedger() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Date</TableHead>
-                <TableHead>Reference</TableHead>
-                <TableHead>Account</TableHead>
-                <TableHead>Description</TableHead>
-                <TableHead className="text-right">Debit</TableHead>
-                <TableHead className="text-right">Credit</TableHead>
-                <TableHead className="text-right">Balance</TableHead>
+                <TableHead>{t('common.date', 'Date')}</TableHead>
+                <TableHead>{t('accounting.reference', 'Reference')}</TableHead>
+                <TableHead>{t('accounting.account', 'Account')}</TableHead>
+                <TableHead>{t('common.description', 'Description')}</TableHead>
+                <TableHead className="text-right">{t('accounting.debit', 'Debit')}</TableHead>
+                <TableHead className="text-right">{t('accounting.credit', 'Credit')}</TableHead>
+                <TableHead className="text-right">{t('accounting.balance', 'Balance')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -427,16 +429,16 @@ export default function GeneralLedger() {
       </Card>
 
       <div className="flex justify-between items-center p-4 bg-muted/50 rounded-lg">
-        <span className="font-medium">Period Totals:</span>
+        <span className="font-medium">{t('accounting.periodTotals', 'Period Totals')}:</span>
         <div className="flex gap-8">
           <span className="text-green-600 font-bold">
-            Debits: SAR {totalDebits.toLocaleString()}
+            {t('accounting.debits', 'Debits')}: SAR {totalDebits.toLocaleString()}
           </span>
           <span className="text-red-600 font-bold">
-            Credits: SAR {totalCredits.toLocaleString()}
+            {t('accounting.credits', 'Credits')}: SAR {totalCredits.toLocaleString()}
           </span>
           <Badge variant={totalDebits === totalCredits ? "default" : "destructive"}>
-            {totalDebits === totalCredits ? "Balanced ✓" : "Unbalanced ⚠"}
+            {totalDebits === totalCredits ? t('accounting.balancedCheck', 'Balanced ✓') : t('accounting.unbalancedCheck', 'Unbalanced ⚠')}
           </Badge>
         </div>
       </div>
@@ -449,7 +451,7 @@ export default function GeneralLedger() {
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search accounts..."
+            placeholder={t('accounting.searchAccounts', 'Search accounts...')}
             className="pl-10"
             data-testid="input-search-accounts"
           />
@@ -457,11 +459,11 @@ export default function GeneralLedger() {
         <div className="flex gap-2">
           <Button variant="outline" data-testid="button-filter-accounts">
             <Filter className="h-4 w-4 mr-2" />
-            Filter
+            {t('common.filter', 'Filter')}
           </Button>
           <Button variant="outline" data-testid="button-export-accounts">
             <Download className="h-4 w-4 mr-2" />
-            Export
+            {t('common.export', 'Export')}
           </Button>
         </div>
       </div>
@@ -497,7 +499,7 @@ export default function GeneralLedger() {
                     </div>
                   ))}
                   <div className="flex justify-between items-center pt-2 font-bold">
-                    <span>Total</span>
+                    <span>{t('common.total', 'Total')}</span>
                     <span className="font-mono">SAR {typeTotal.toLocaleString()}</span>
                   </div>
                 </div>
@@ -516,15 +518,15 @@ export default function GeneralLedger() {
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
               <FileText className="h-5 w-5" />
-              Detailed Ledger Report
+              {t('accounting.detailedLedgerReport', 'Detailed Ledger Report')}
             </CardTitle>
             <CardDescription>
-              Complete transaction history by account
+              {t('accounting.detailedLedgerReportDescription', 'Complete transaction history by account')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Button className="w-full" data-testid="button-generate-detailed">
-              Generate Report
+              {t('common.generateReport', 'Generate Report')}
             </Button>
           </CardContent>
         </Card>
@@ -533,15 +535,15 @@ export default function GeneralLedger() {
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
               <BarChart3 className="h-5 w-5" />
-              Summary Report
+              {t('accounting.summaryReport', 'Summary Report')}
             </CardTitle>
             <CardDescription>
-              Account balances and totals overview
+              {t('accounting.summaryReportDescription', 'Account balances and totals overview')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Button className="w-full" data-testid="button-generate-summary">
-              Generate Report
+              {t('common.generateReport', 'Generate Report')}
             </Button>
           </CardContent>
         </Card>
@@ -550,15 +552,15 @@ export default function GeneralLedger() {
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
               <Calendar className="h-5 w-5" />
-              Audit Trail Report
+              {t('accounting.auditTrailReport', 'Audit Trail Report')}
             </CardTitle>
             <CardDescription>
-              Track all changes and modifications
+              {t('accounting.auditTrailReportDescription', 'Track all changes and modifications')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Button className="w-full" data-testid="button-generate-audit">
-              Generate Report
+              {t('common.generateReport', 'Generate Report')}
             </Button>
           </CardContent>
         </Card>
@@ -566,44 +568,44 @@ export default function GeneralLedger() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Report Settings</CardTitle>
-          <CardDescription>Configure report parameters</CardDescription>
+          <CardTitle>{t('accounting.reportSettings', 'Report Settings')}</CardTitle>
+          <CardDescription>{t('accounting.reportSettingsDescription', 'Configure report parameters')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium">Date Range</label>
+              <label className="text-sm font-medium">{t('common.dateRange', 'Date Range')}</label>
               <Select defaultValue="this-month">
                 <SelectTrigger data-testid="select-report-date-range">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="this-month">This Month</SelectItem>
-                  <SelectItem value="last-month">Last Month</SelectItem>
-                  <SelectItem value="this-quarter">This Quarter</SelectItem>
-                  <SelectItem value="this-year">This Year</SelectItem>
-                  <SelectItem value="custom">Custom Range</SelectItem>
+                  <SelectItem value="this-month">{t('common.thisMonth', 'This Month')}</SelectItem>
+                  <SelectItem value="last-month">{t('common.lastMonth', 'Last Month')}</SelectItem>
+                  <SelectItem value="this-quarter">{t('common.thisQuarter', 'This Quarter')}</SelectItem>
+                  <SelectItem value="this-year">{t('common.thisYear', 'This Year')}</SelectItem>
+                  <SelectItem value="custom">{t('common.customRange', 'Custom Range')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium">Account Type</label>
+              <label className="text-sm font-medium">{t('accounting.accountType', 'Account Type')}</label>
               <Select defaultValue="all">
                 <SelectTrigger data-testid="select-report-account-type">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Types</SelectItem>
-                  <SelectItem value="asset">Assets</SelectItem>
-                  <SelectItem value="liability">Liabilities</SelectItem>
-                  <SelectItem value="equity">Equity</SelectItem>
-                  <SelectItem value="revenue">Revenue</SelectItem>
-                  <SelectItem value="expense">Expenses</SelectItem>
+                  <SelectItem value="all">{t('accounting.allTypes', 'All Types')}</SelectItem>
+                  <SelectItem value="asset">{t('accounting.assets', 'Assets')}</SelectItem>
+                  <SelectItem value="liability">{t('accounting.liabilities', 'Liabilities')}</SelectItem>
+                  <SelectItem value="equity">{t('accounting.equityType', 'Equity')}</SelectItem>
+                  <SelectItem value="revenue">{t('accounting.revenueType', 'Revenue')}</SelectItem>
+                  <SelectItem value="expense">{t('accounting.expenses', 'Expenses')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium">Format</label>
+              <label className="text-sm font-medium">{t('common.format', 'Format')}</label>
               <Select defaultValue="pdf">
                 <SelectTrigger data-testid="select-report-format">
                   <SelectValue />
@@ -622,16 +624,16 @@ export default function GeneralLedger() {
   );
 
   const tabs = [
-    { id: "overview", label: "Overview", icon: BookOpen, content: overviewTab },
-    { id: "transactions", label: "Transactions", icon: Layers, content: transactionsTab },
-    { id: "accounts", label: "Accounts", icon: DollarSign, content: accountsTab },
-    { id: "reports", label: "Reports", icon: FileText, content: reportsTab },
+    { id: "overview", label: t('accounting.generalLedger.tabs.overview', 'Overview'), icon: BookOpen, content: overviewTab },
+    { id: "transactions", label: t('accounting.generalLedger.tabs.transactions', 'Transactions'), icon: Layers, content: transactionsTab },
+    { id: "accounts", label: t('accounting.generalLedger.tabs.accounts', 'Accounts'), icon: DollarSign, content: accountsTab },
+    { id: "reports", label: t('accounting.generalLedger.tabs.reports', 'Reports'), icon: FileText, content: reportsTab },
   ];
 
   return (
     <TabsPageLayout
-      title="General Ledger - دفتر الأستاذ العام"
-      description="Complete record of all financial transactions"
+      title={t('accounting.generalLedger.title', 'General Ledger - دفتر الأستاذ العام')}
+      description={t('accounting.generalLedger.description', 'Complete record of all financial transactions')}
       icon={BookOpen}
       tabs={tabs}
       defaultTab="overview"

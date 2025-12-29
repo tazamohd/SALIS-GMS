@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { TabsPageLayout, TabConfig } from "@/components/layouts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,6 +10,7 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Clock, DollarSign, Users } from "lucide-react";
 
 export default function TimeClockPayroll() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [isClockedIn, setIsClockedIn] = useState(false);
 
@@ -33,10 +35,10 @@ export default function TimeClockPayroll() {
     },
     onSuccess: () => {
       setIsClockedIn(true);
-      toast({ title: "Clocked In", description: "You have successfully clocked in" });
+      toast({ title: t('timeClock.clockedIn', 'Clocked In'), description: t('timeClock.clockedInSuccess', 'You have successfully clocked in') });
     },
     onError: (error: any) => {
-      toast({ title: "Clock In Failed", description: error.message || "Failed to clock in", variant: "destructive" });
+      toast({ title: t('timeClock.clockInFailed', 'Clock In Failed'), description: error.message || t('timeClock.failedToClockIn', 'Failed to clock in'), variant: "destructive" });
     },
   });
 
@@ -48,10 +50,10 @@ export default function TimeClockPayroll() {
     },
     onSuccess: () => {
       setIsClockedIn(false);
-      toast({ title: "Clocked Out", description: "You have successfully clocked out" });
+      toast({ title: t('timeClock.clockedOut', 'Clocked Out'), description: t('timeClock.clockedOutSuccess', 'You have successfully clocked out') });
     },
     onError: (error: any) => {
-      toast({ title: "Clock Out Failed", description: error.message || "Failed to clock out", variant: "destructive" });
+      toast({ title: t('timeClock.clockOutFailed', 'Clock Out Failed'), description: error.message || t('timeClock.failedToClockOut', 'Failed to clock out'), variant: "destructive" });
     },
   });
 
@@ -60,11 +62,11 @@ export default function TimeClockPayroll() {
       return apiRequest(`/api/payroll/calculate/${periodId}`, "POST", {});
     },
     onSuccess: () => {
-      toast({ title: "Payroll Calculated", description: "Payroll has been calculated successfully" });
+      toast({ title: t('payroll.calculated', 'Payroll Calculated'), description: t('payroll.calculatedSuccess', 'Payroll has been calculated successfully') });
       queryClient.invalidateQueries({ queryKey: ['/api/payroll/periods'] });
     },
     onError: (error: any) => {
-      toast({ title: "Calculation Failed", description: error.message || "Failed to calculate payroll", variant: "destructive" });
+      toast({ title: t('payroll.calculationFailed', 'Calculation Failed'), description: error.message || t('payroll.failedToCalculate', 'Failed to calculate payroll'), variant: "destructive" });
     },
   });
 
@@ -79,10 +81,10 @@ export default function TimeClockPayroll() {
   const statsContent = (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
       {[
-        { label: "Period Gross", value: `$${(currentPeriod.totalGrossPay || 0).toLocaleString()}`, icon: DollarSign, color: "green", testId: "text-period-gross" },
-        { label: "Deductions", value: `$${(currentPeriod.totalDeductions || 0).toLocaleString()}`, icon: DollarSign, color: "red", testId: "text-deductions" },
-        { label: "Net Pay", value: `$${(currentPeriod.totalNetPay || 0).toLocaleString()}`, icon: DollarSign, color: "blue", testId: "text-net-pay" },
-        { label: "Employees", value: "12", icon: Users, color: "purple", testId: "text-employees" },
+        { label: t('payroll.periodGross', 'Period Gross'), value: `$${(currentPeriod.totalGrossPay || 0).toLocaleString()}`, icon: DollarSign, color: "green", testId: "text-period-gross" },
+        { label: t('payroll.deductions', 'Deductions'), value: `$${(currentPeriod.totalDeductions || 0).toLocaleString()}`, icon: DollarSign, color: "red", testId: "text-deductions" },
+        { label: t('payroll.netPay', 'Net Pay'), value: `$${(currentPeriod.totalNetPay || 0).toLocaleString()}`, icon: DollarSign, color: "blue", testId: "text-net-pay" },
+        { label: t('payroll.employees', 'Employees'), value: "12", icon: Users, color: "purple", testId: "text-employees" },
       ].map((stat, i) => (
         <Card key={i} className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
           <CardContent className="p-6">
@@ -101,10 +103,10 @@ export default function TimeClockPayroll() {
 
   const timeclockContent = (
     <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
-      <CardHeader><CardTitle>Recent Time Entries</CardTitle></CardHeader>
+      <CardHeader><CardTitle>{t('timeClock.recentTimeEntries', 'Recent Time Entries')}</CardTitle></CardHeader>
       <CardContent>
         <div className="text-center py-8 text-gray-500">
-          No time entries available. Clock in to start tracking time.
+          {t('timeClock.noTimeEntries', 'No time entries available. Clock in to start tracking time.')}
         </div>
       </CardContent>
     </Card>
@@ -114,49 +116,49 @@ export default function TimeClockPayroll() {
     <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle>Current Pay Period</CardTitle>
+          <CardTitle>{t('payroll.currentPayPeriod', 'Current Pay Period')}</CardTitle>
           <Button 
             variant="outline" 
             onClick={() => currentPeriod.id && calculatePayrollMutation.mutate(currentPeriod.id)}
             disabled={calculatePayrollMutation.isPending || !currentPeriod.id}
             data-testid="button-calculate-payroll"
           >
-            {calculatePayrollMutation.isPending ? "Calculating..." : "Calculate Payroll"}
+            {calculatePayrollMutation.isPending ? t('payroll.calculating', 'Calculating...') : t('payroll.calculatePayroll', 'Calculate Payroll')}
           </Button>
         </div>
       </CardHeader>
       <CardContent>
         {periods.length === 0 ? (
-          <div className="text-center py-8 text-gray-500">No payroll periods available</div>
+          <div className="text-center py-8 text-gray-500">{t('payroll.noPeriodsAvailable', 'No payroll periods available')}</div>
         ) : (
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Period</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('payroll.period', 'Period')}</p>
                 <p className="font-semibold text-gray-900 dark:text-white" data-testid="text-period-range">
                   {new Date(currentPeriod.periodStart).toLocaleDateString()} - {new Date(currentPeriod.periodEnd).toLocaleDateString()}
                 </p>
               </div>
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Status</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('common.status', 'Status')}</p>
                 <Badge data-testid="badge-period-status">{currentPeriod.status}</Badge>
               </div>
             </div>
             <div className="space-y-2">
               <div className="flex justify-between p-2">
-                <span className="text-gray-600 dark:text-gray-400">Total Gross Pay</span>
+                <span className="text-gray-600 dark:text-gray-400">{t('payroll.totalGrossPay', 'Total Gross Pay')}</span>
                 <span className="font-semibold text-gray-900 dark:text-white" data-testid="text-gross-detail">${(currentPeriod.totalGrossPay || 0).toLocaleString()}</span>
               </div>
               <div className="flex justify-between p-2">
-                <span className="text-gray-600 dark:text-gray-400">Total Deductions</span>
+                <span className="text-gray-600 dark:text-gray-400">{t('payroll.totalDeductions', 'Total Deductions')}</span>
                 <span className="font-semibold text-red-600" data-testid="text-deductions-detail">-${(currentPeriod.totalDeductions || 0).toLocaleString()}</span>
               </div>
               <div className="flex justify-between p-3 bg-blue-50 dark:bg-blue-900 rounded font-semibold">
-                <span className="text-gray-900 dark:text-white">Total Net Pay</span>
+                <span className="text-gray-900 dark:text-white">{t('payroll.totalNetPay', 'Total Net Pay')}</span>
                 <span className="text-gray-900 dark:text-white" data-testid="text-net-detail">${(currentPeriod.totalNetPay || 0).toLocaleString()}</span>
               </div>
             </div>
-            <Button className="w-full" data-testid="button-process-payroll">Process Payroll</Button>
+            <Button className="w-full" data-testid="button-process-payroll">{t('payroll.processPayroll', 'Process Payroll')}</Button>
           </div>
         )}
       </CardContent>
@@ -166,13 +168,13 @@ export default function TimeClockPayroll() {
   const tabs: TabConfig[] = [
     {
       id: "timeclock",
-      label: "Time Entries",
+      label: t('timeClock.timeEntries', 'Time Entries'),
       icon: Clock,
       content: timeclockContent,
     },
     {
       id: "payroll",
-      label: "Payroll",
+      label: t('payroll.payroll', 'Payroll'),
       icon: DollarSign,
       content: payrollContent,
     },
@@ -180,11 +182,11 @@ export default function TimeClockPayroll() {
 
   return (
     <TabsPageLayout
-      title="Time Clock & Payroll"
-      description="Track time and manage payroll"
+      title={t('timeClock.title', 'Time Clock & Payroll')}
+      description={t('timeClock.description', 'Track time and manage payroll')}
       icon={Clock}
       primaryAction={{
-        label: isClockedIn ? "Clock Out" : "Clock In",
+        label: isClockedIn ? t('timeClock.clockOut', 'Clock Out') : t('timeClock.clockIn', 'Clock In'),
         icon: Clock,
         onClick: handleClockToggle,
         variant: isClockedIn ? "destructive" : "default",

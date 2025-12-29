@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -25,6 +26,7 @@ interface BlockchainRecord {
 }
 
 export default function BlockchainServiceHistory() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { toast } = useToast();
   const [selectedVehicle, setSelectedVehicle] = useState<string>("");
@@ -47,10 +49,10 @@ export default function BlockchainServiceHistory() {
     },
     onSuccess: (data) => {
       toast({
-        title: data.isValid ? "Chain Verified" : "Chain Integrity Issue",
+        title: data.isValid ? t('blockchain.chainVerified', 'Chain Verified') : t('blockchain.chainIntegrityIssue', 'Chain Integrity Issue'),
         description: data.isValid
-          ? "All blockchain records are verified and tamper-proof"
-          : "Some records have pending verification",
+          ? t('blockchain.allRecordsVerified', 'All blockchain records are verified and tamper-proof')
+          : t('blockchain.pendingVerification', 'Some records have pending verification'),
         variant: data.isValid ? "default" : "destructive",
       });
     },
@@ -68,16 +70,16 @@ export default function BlockchainServiceHistory() {
 
   return (
     <StandardPageLayout
-      title="Blockchain Service History"
-      description="Immutable, tamper-proof vehicle service records secured by cryptographic hashing"
+      title={t('blockchain.title', 'Blockchain Service History')}
+      description={t('blockchain.description', 'Immutable, tamper-proof vehicle service records secured by cryptographic hashing')}
       icon={Shield}
     >
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         <div className="lg:col-span-1">
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Select Vehicle</CardTitle>
-              <CardDescription>View blockchain service records</CardDescription>
+              <CardTitle className="text-lg">{t('blockchain.selectVehicle', 'Select Vehicle')}</CardTitle>
+              <CardDescription>{t('blockchain.viewRecords', 'View blockchain service records')}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
               {vehicles?.map((vehicle) => (
@@ -97,7 +99,7 @@ export default function BlockchainServiceHistory() {
                 </Button>
               ))}
               {!vehicles?.length && (
-                <p className="text-sm text-gray-500 dark:text-gray-400">No vehicles found</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{t('blockchain.noVehicles', 'No vehicles found')}</p>
               )}
             </CardContent>
           </Card>
@@ -107,18 +109,18 @@ export default function BlockchainServiceHistory() {
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
                   <Lock className="w-5 h-5 text-green-600" />
-                  Blockchain Stats
+                  {t('blockchain.stats', 'Blockchain Stats')}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-600 dark:text-gray-400">Total Records:</span>
+                  <span className="text-sm text-gray-600 dark:text-gray-400">{t('blockchain.totalRecords', 'Total Records')}:</span>
                   <span className="font-semibold" data-testid="text-total-records">
                     {blockchainRecords.length}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-600 dark:text-gray-400">Chain Height:</span>
+                  <span className="text-sm text-gray-600 dark:text-gray-400">{t('blockchain.chainHeight', 'Chain Height')}:</span>
                   <span className="font-semibold" data-testid="text-chain-height">
                     {blockchainRecords.length > 0 ? blockchainRecords[0].blockNumber : 0}
                   </span>
@@ -131,7 +133,7 @@ export default function BlockchainServiceHistory() {
                   data-testid="button-verify-chain"
                 >
                   <FileCheck className="w-4 h-4 mr-2" />
-                  Verify Chain Integrity
+                  {t('blockchain.verifyChain', 'Verify Chain Integrity')}
                 </Button>
               </CardContent>
             </Card>
@@ -144,10 +146,10 @@ export default function BlockchainServiceHistory() {
               <CardContent className="text-center">
                 <Shield className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                 <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                  Select a Vehicle
+                  {t('blockchain.selectVehiclePrompt', 'Select a Vehicle')}
                 </h3>
                 <p className="text-gray-500 dark:text-gray-400">
-                  Choose a vehicle from the sidebar to view its blockchain service history
+                  {t('blockchain.selectVehicleDesc', 'Choose a vehicle from the sidebar to view its blockchain service history')}
                 </p>
               </CardContent>
             </Card>
@@ -157,7 +159,7 @@ export default function BlockchainServiceHistory() {
             <div className="flex items-center justify-center min-h-[400px]">
               <div className="text-center">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-                <p className="mt-4 text-gray-600 dark:text-gray-400">Loading blockchain records...</p>
+                <p className="mt-4 text-gray-600 dark:text-gray-400">{t('blockchain.loadingRecords', 'Loading blockchain records...')}</p>
               </div>
             </div>
           )}
@@ -167,10 +169,10 @@ export default function BlockchainServiceHistory() {
               <CardContent className="text-center py-12">
                 <AlertCircle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
                 <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                  No Blockchain Records
+                  {t('blockchain.noRecords', 'No Blockchain Records')}
                 </h3>
                 <p className="text-gray-500 dark:text-gray-400">
-                  This vehicle has no blockchain service history yet
+                  {t('blockchain.noRecordsDesc', 'This vehicle has no blockchain service history yet')}
                 </p>
               </CardContent>
             </Card>
@@ -180,11 +182,11 @@ export default function BlockchainServiceHistory() {
             <div className="space-y-4">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                  Service Records ({blockchainRecords.length})
+                  {t('blockchain.serviceRecords', 'Service Records')} ({blockchainRecords.length})
                 </h2>
                 <Badge variant="outline" className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-green-600" />
-                  Verified & Immutable
+                  {t('blockchain.verifiedImmutable', 'Verified & Immutable')}
                 </Badge>
               </div>
 
@@ -226,19 +228,19 @@ export default function BlockchainServiceHistory() {
                     <CardContent className="border-t pt-4 space-y-3">
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <p className="text-sm text-gray-600 dark:text-gray-400">Block Number</p>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">{t('blockchain.blockNumber', 'Block Number')}</p>
                           <p className="font-mono font-semibold" data-testid={`text-block-number-${record.id}`}>
                             #{record.blockNumber}
                           </p>
                         </div>
                         <div>
-                          <p className="text-sm text-gray-600 dark:text-gray-400">Position</p>
-                          <p className="font-semibold">Record #{index + 1}</p>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">{t('blockchain.position', 'Position')}</p>
+                          <p className="font-semibold">{t('blockchain.recordNumber', 'Record')} #{index + 1}</p>
                         </div>
                       </div>
 
                       <div>
-                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Transaction Hash</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t('blockchain.transactionHash', 'Transaction Hash')}</p>
                         <div className="bg-gray-100 dark:bg-gray-800 p-2 rounded-md">
                           <p className="font-mono text-xs break-all" data-testid={`text-tx-hash-${record.id}`}>
                             {record.transactionHash}
@@ -248,7 +250,7 @@ export default function BlockchainServiceHistory() {
 
                       {record.previousHash && (
                         <div>
-                          <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Previous Hash</p>
+                          <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t('blockchain.previousHash', 'Previous Hash')}</p>
                           <div className="bg-gray-100 dark:bg-gray-800 p-2 rounded-md">
                             <p className="font-mono text-xs break-all">{record.previousHash}</p>
                           </div>
@@ -256,13 +258,13 @@ export default function BlockchainServiceHistory() {
                       )}
 
                       <div>
-                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Blockchain Network</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t('blockchain.network', 'Blockchain Network')}</p>
                         <Badge variant="outline">{record.blockchainNetwork || "Ethereum"}</Badge>
                       </div>
 
                       {record.recordData && (
                         <div>
-                          <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Record Data</p>
+                          <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">{t('blockchain.recordData', 'Record Data')}</p>
                           <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-md">
                             <pre className="text-xs overflow-auto">
                               {JSON.stringify(record.recordData, null, 2)}
@@ -276,14 +278,14 @@ export default function BlockchainServiceHistory() {
                           <>
                             <CheckCircle2 className="w-5 h-5 text-green-600" />
                             <span className="text-sm font-semibold text-green-600">
-                              Cryptographically Verified
+                              {t('blockchain.cryptographicallyVerified', 'Cryptographically Verified')}
                             </span>
                           </>
                         ) : (
                           <>
                             <AlertCircle className="w-5 h-5 text-yellow-600" />
                             <span className="text-sm font-semibold text-yellow-600">
-                              Verification: {record.verificationStatus}
+                              {t('blockchain.verification', 'Verification')}: {record.verificationStatus}
                             </span>
                           </>
                         )}

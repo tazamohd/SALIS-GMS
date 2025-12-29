@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -43,6 +44,7 @@ type ProfileFormData = z.infer<typeof profileSchema>;
 type PostFormData = z.infer<typeof postSchema>;
 
 export default function GoogleMyBusiness() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [selectedTab, setSelectedTab] = useState("profiles");
   const [isProfileDialogOpen, setIsProfileDialogOpen] = useState(false);
@@ -92,12 +94,12 @@ export default function GoogleMyBusiness() {
     mutationFn: (data: ProfileFormData) => apiRequest("POST", "/api/gmb/profiles", data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/gmb/profiles"] });
-      toast({ title: "Success", description: "GMB profile created" });
+      toast({ title: t('common.success', 'Success'), description: t('gmb.profileCreated', 'GMB profile created') });
       setIsProfileDialogOpen(false);
       profileForm.reset();
     },
     onError: () => {
-      toast({ title: "Error", description: "Failed to create profile", variant: "destructive" });
+      toast({ title: t('common.error', 'Error'), description: t('gmb.failedToCreateProfile', 'Failed to create profile'), variant: "destructive" });
     }
   });
 
@@ -105,12 +107,12 @@ export default function GoogleMyBusiness() {
     mutationFn: (data: PostFormData) => apiRequest("POST", "/api/gmb/posts", data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/gmb/posts"] });
-      toast({ title: "Success", description: "Post created successfully" });
+      toast({ title: t('common.success', 'Success'), description: t('gmb.postCreatedSuccessfully', 'Post created successfully') });
       setIsPostDialogOpen(false);
       postForm.reset();
     },
     onError: () => {
-      toast({ title: "Error", description: "Failed to create post", variant: "destructive" });
+      toast({ title: t('common.error', 'Error'), description: t('gmb.failedToCreatePost', 'Failed to create post'), variant: "destructive" });
     }
   });
 
@@ -118,7 +120,7 @@ export default function GoogleMyBusiness() {
     mutationFn: (id: string) => apiRequest("PATCH", `/api/gmb/posts/${id}/publish`, {}),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/gmb/posts"] });
-      toast({ title: "Success", description: "Post published to Google" });
+      toast({ title: t('common.success', 'Success'), description: t('gmb.postPublishedToGoogle', 'Post published to Google') });
     },
   });
 
@@ -127,23 +129,23 @@ export default function GoogleMyBusiness() {
       apiRequest("PATCH", `/api/gmb/reviews/${id}/respond`, { responseText }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/gmb/reviews"] });
-      toast({ title: "Success", description: "Review response posted" });
+      toast({ title: t('common.success', 'Success'), description: t('gmb.reviewResponsePosted', 'Review response posted') });
     },
   });
 
   const profilesContent = (
     <Card className="border-salis-gray-light dark:border-salis-gray-dark bg-white dark:bg-[#010101]">
       <CardHeader>
-        <CardTitle className="font-montserrat text-salis-black dark:text-white">Business Profiles</CardTitle>
+        <CardTitle className="font-montserrat text-salis-black dark:text-white">{t('gmb.businessProfiles', 'Business Profiles')}</CardTitle>
         <CardDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
-          Connected Google My Business locations
+          {t('gmb.connectedGMBLocations', 'Connected Google My Business locations')}
         </CardDescription>
       </CardHeader>
       <CardContent>
         {profilesLoading ? (
-          <p className="text-salis-gray font-poppins" data-testid="text-loading">Loading profiles...</p>
+          <p className="text-salis-gray font-poppins" data-testid="text-loading">{t('gmb.loadingProfiles', 'Loading profiles...')}</p>
         ) : profiles.length === 0 ? (
-          <p className="text-salis-gray font-poppins" data-testid="text-no-profiles">No GMB profiles found</p>
+          <p className="text-salis-gray font-poppins" data-testid="text-no-profiles">{t('gmb.noProfilesFound', 'No GMB profiles found')}</p>
         ) : (
           <div className="grid gap-4">
             {profiles.map((profile: any) => (
@@ -158,19 +160,19 @@ export default function GoogleMyBusiness() {
                         </h3>
                         {profile.isVerified && (
                           <Badge className="bg-green-500 text-white" data-testid={`badge-verified-${profile.id}`}>
-                            Verified
+                            {t('gmb.verified', 'Verified')}
                           </Badge>
                         )}
                         {profile.isConnected && (
                           <Badge className="bg-salis-black text-white" data-testid={`badge-connected-${profile.id}`}>
-                            Connected
+                            {t('gmb.connected', 'Connected')}
                           </Badge>
                         )}
                       </div>
                       <div className="text-sm text-salis-gray dark:text-salis-gray-light space-y-1">
-                        {profile.address && <p data-testid={`text-address-${profile.id}`}>Address: {profile.address}</p>}
-                        {profile.phone && <p data-testid={`text-phone-${profile.id}`}>Phone: {profile.phone}</p>}
-                        {profile.website && <p data-testid={`text-website-${profile.id}`}>Website: {profile.website}</p>}
+                        {profile.address && <p data-testid={`text-address-${profile.id}`}>{t('gmb.address', 'Address')}: {profile.address}</p>}
+                        {profile.phone && <p data-testid={`text-phone-${profile.id}`}>{t('gmb.phone', 'Phone')}: {profile.phone}</p>}
+                        {profile.website && <p data-testid={`text-website-${profile.id}`}>{t('gmb.website', 'Website')}: {profile.website}</p>}
                       </div>
                     </div>
                   </div>
@@ -192,21 +194,21 @@ export default function GoogleMyBusiness() {
           data-testid="button-create-post"
         >
           <MessageCircle className="mr-2 h-4 w-4" />
-          Create Post
+          {t('gmb.createPost', 'Create Post')}
         </Button>
       </div>
       <Card className="border-salis-gray-light dark:border-salis-gray-dark bg-white dark:bg-[#010101]">
         <CardHeader>
-          <CardTitle className="font-montserrat text-salis-black dark:text-white">GMB Posts</CardTitle>
+          <CardTitle className="font-montserrat text-salis-black dark:text-white">{t('gmb.gmbPosts', 'GMB Posts')}</CardTitle>
           <CardDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
-            Updates, offers, and events posted to Google
+            {t('gmb.updatesOffersEvents', 'Updates, offers, and events posted to Google')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           {postsLoading ? (
-            <p className="text-salis-gray font-poppins" data-testid="text-loading-posts">Loading posts...</p>
+            <p className="text-salis-gray font-poppins" data-testid="text-loading-posts">{t('gmb.loadingPosts', 'Loading posts...')}</p>
           ) : posts.length === 0 ? (
-            <p className="text-salis-gray font-poppins" data-testid="text-no-posts">No posts found</p>
+            <p className="text-salis-gray font-poppins" data-testid="text-no-posts">{t('gmb.noPostsFound', 'No posts found')}</p>
           ) : (
             <div className="grid gap-4">
               {posts.map((post: any) => (
@@ -239,7 +241,7 @@ export default function GoogleMyBusiness() {
                           data-testid={`button-publish-${post.id}`}
                         >
                           <Send className="h-4 w-4 mr-1" />
-                          Publish
+                          {t('gmb.publish', 'Publish')}
                         </Button>
                       )}
                     </div>
@@ -256,25 +258,25 @@ export default function GoogleMyBusiness() {
   const reviewsContent = (
     <Card className="border-salis-gray-light dark:border-salis-gray-dark bg-white dark:bg-[#010101]">
       <CardHeader>
-        <CardTitle className="font-montserrat text-salis-black dark:text-white">Customer Reviews</CardTitle>
+        <CardTitle className="font-montserrat text-salis-black dark:text-white">{t('gmb.customerReviews', 'Customer Reviews')}</CardTitle>
         <CardDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
-          Reviews from Google My Business
+          {t('gmb.reviewsFromGMB', 'Reviews from Google My Business')}
         </CardDescription>
       </CardHeader>
       <CardContent>
         {reviewsLoading ? (
-          <p className="text-salis-gray font-poppins" data-testid="text-loading-reviews">Loading reviews...</p>
+          <p className="text-salis-gray font-poppins" data-testid="text-loading-reviews">{t('gmb.loadingReviews', 'Loading reviews...')}</p>
         ) : reviews.length === 0 ? (
-          <p className="text-salis-gray font-poppins" data-testid="text-no-reviews">No reviews found</p>
+          <p className="text-salis-gray font-poppins" data-testid="text-no-reviews">{t('gmb.noReviewsFound', 'No reviews found')}</p>
         ) : (
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Reviewer</TableHead>
-                <TableHead>Rating</TableHead>
-                <TableHead>Comment</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>Actions</TableHead>
+                <TableHead>{t('gmb.reviewer', 'Reviewer')}</TableHead>
+                <TableHead>{t('gmb.rating', 'Rating')}</TableHead>
+                <TableHead>{t('gmb.comment', 'Comment')}</TableHead>
+                <TableHead>{t('common.date', 'Date')}</TableHead>
+                <TableHead>{t('common.actions', 'Actions')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -289,24 +291,24 @@ export default function GoogleMyBusiness() {
                     </div>
                   </TableCell>
                   <TableCell className="max-w-xs truncate" data-testid={`text-comment-${review.id}`}>
-                    {review.comment || "No comment"}
+                    {review.comment || t('gmb.noComment', 'No comment')}
                   </TableCell>
                   <TableCell data-testid={`text-review-date-${review.id}`}>
-                    {review.reviewDate ? new Date(review.reviewDate).toLocaleDateString() : "N/A"}
+                    {review.reviewDate ? new Date(review.reviewDate).toLocaleDateString() : t('common.notApplicable', 'N/A')}
                   </TableCell>
                   <TableCell>
                     {!review.ownerResponse && (
                       <Button
                         size="sm"
                         onClick={() => {
-                          const response = prompt("Enter your response:");
+                          const response = prompt(t('gmb.enterYourResponse', 'Enter your response:'));
                           if (response) {
                             respondToReviewMutation.mutate({ id: review.id, responseText: response });
                           }
                         }}
                         data-testid={`button-respond-${review.id}`}
                       >
-                        Respond
+                        {t('gmb.respond', 'Respond')}
                       </Button>
                     )}
                   </TableCell>
@@ -322,11 +324,11 @@ export default function GoogleMyBusiness() {
   return (
     <>
       <TabsPageLayout
-        title="Google My Business"
-        description="Manage GMB profiles, posts, and customer reviews"
+        title={t('nav.google_my_business', 'Google My Business')}
+        description={t('gmb.manageProfilesPostsReviews', 'Manage GMB profiles, posts, and customer reviews')}
         icon={Building}
         primaryAction={{
-          label: "Add Profile",
+          label: t('gmb.addProfile', 'Add Profile'),
           icon: Building,
           onClick: () => setIsProfileDialogOpen(true),
           testId: "button-add-profile",
@@ -336,19 +338,19 @@ export default function GoogleMyBusiness() {
         tabs={[
           {
             id: "profiles",
-            label: "Profiles",
+            label: t('gmb.profiles', 'Profiles'),
             icon: Building,
             content: profilesContent,
           },
           {
             id: "posts",
-            label: "Posts",
+            label: t('gmb.posts', 'Posts'),
             icon: MessageCircle,
             content: postsContent,
           },
           {
             id: "reviews",
-            label: "Reviews",
+            label: t('gmb.reviews', 'Reviews'),
             icon: Star,
             content: reviewsContent,
           },
@@ -358,9 +360,9 @@ export default function GoogleMyBusiness() {
       <Dialog open={isProfileDialogOpen} onOpenChange={setIsProfileDialogOpen}>
         <DialogContent className="bg-white dark:bg-salis-black">
           <DialogHeader>
-            <DialogTitle className="font-montserrat text-salis-black dark:text-white">Add GMB Profile</DialogTitle>
+            <DialogTitle className="font-montserrat text-salis-black dark:text-white">{t('gmb.addGMBProfile', 'Add GMB Profile')}</DialogTitle>
             <DialogDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
-              Connect a Google My Business location
+              {t('gmb.connectGMBLocation', 'Connect a Google My Business location')}
             </DialogDescription>
           </DialogHeader>
           <Form {...profileForm}>
@@ -370,9 +372,9 @@ export default function GoogleMyBusiness() {
                 name="locationName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Location Name</FormLabel>
+                    <FormLabel>{t('gmb.locationName', 'Location Name')}</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="Downtown Auto Shop" data-testid="input-location-name" />
+                      <Input {...field} placeholder={t('gmb.locationNamePlaceholder', 'Downtown Auto Shop')} data-testid="input-location-name" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -383,7 +385,7 @@ export default function GoogleMyBusiness() {
                 name="locationId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Location ID</FormLabel>
+                    <FormLabel>{t('gmb.locationId', 'Location ID')}</FormLabel>
                     <FormControl>
                       <Input {...field} placeholder="accounts/.../locations/..." data-testid="input-location-id" />
                     </FormControl>
@@ -396,9 +398,9 @@ export default function GoogleMyBusiness() {
                 name="address"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Address</FormLabel>
+                    <FormLabel>{t('gmb.address', 'Address')}</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="123 Main St, City, State" data-testid="input-profile-address" />
+                      <Input {...field} placeholder={t('gmb.addressPlaceholder', '123 Main St, City, State')} data-testid="input-profile-address" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -410,7 +412,7 @@ export default function GoogleMyBusiness() {
                   name="phone"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Phone</FormLabel>
+                      <FormLabel>{t('gmb.phone', 'Phone')}</FormLabel>
                       <FormControl>
                         <Input {...field} placeholder="+1 (555) 123-4567" data-testid="input-profile-phone" />
                       </FormControl>
@@ -423,7 +425,7 @@ export default function GoogleMyBusiness() {
                   name="website"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Website</FormLabel>
+                      <FormLabel>{t('gmb.website', 'Website')}</FormLabel>
                       <FormControl>
                         <Input {...field} placeholder="https://example.com" data-testid="input-website" />
                       </FormControl>
@@ -434,7 +436,7 @@ export default function GoogleMyBusiness() {
               </div>
               <DialogFooter>
                 <Button type="submit" disabled={createProfileMutation.isPending} data-testid="button-submit-profile">
-                  {createProfileMutation.isPending ? "Adding..." : "Add Profile"}
+                  {createProfileMutation.isPending ? t('gmb.adding', 'Adding...') : t('gmb.addProfile', 'Add Profile')}
                 </Button>
               </DialogFooter>
             </form>
@@ -445,9 +447,9 @@ export default function GoogleMyBusiness() {
       <Dialog open={isPostDialogOpen} onOpenChange={setIsPostDialogOpen}>
         <DialogContent className="bg-white dark:bg-salis-black">
           <DialogHeader>
-            <DialogTitle className="font-montserrat text-salis-black dark:text-white">Create GMB Post</DialogTitle>
+            <DialogTitle className="font-montserrat text-salis-black dark:text-white">{t('gmb.createGMBPost', 'Create GMB Post')}</DialogTitle>
             <DialogDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
-              Create a new post for Google My Business
+              {t('gmb.createNewPostForGMB', 'Create a new post for Google My Business')}
             </DialogDescription>
           </DialogHeader>
           <Form {...postForm}>
@@ -457,11 +459,11 @@ export default function GoogleMyBusiness() {
                 name="profileId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Profile</FormLabel>
+                    <FormLabel>{t('gmb.profile', 'Profile')}</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger data-testid="select-profile">
-                          <SelectValue placeholder="Select profile" />
+                          <SelectValue placeholder={t('gmb.selectProfile', 'Select profile')} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -481,18 +483,18 @@ export default function GoogleMyBusiness() {
                 name="postType"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Post Type</FormLabel>
+                    <FormLabel>{t('gmb.postType', 'Post Type')}</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger data-testid="select-post-type">
-                          <SelectValue placeholder="Select type" />
+                          <SelectValue placeholder={t('gmb.selectType', 'Select type')} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="update">Update</SelectItem>
-                        <SelectItem value="offer">Offer</SelectItem>
-                        <SelectItem value="event">Event</SelectItem>
-                        <SelectItem value="product">Product</SelectItem>
+                        <SelectItem value="update">{t('gmb.update', 'Update')}</SelectItem>
+                        <SelectItem value="offer">{t('gmb.offer', 'Offer')}</SelectItem>
+                        <SelectItem value="event">{t('gmb.event', 'Event')}</SelectItem>
+                        <SelectItem value="product">{t('gmb.product', 'Product')}</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -504,9 +506,9 @@ export default function GoogleMyBusiness() {
                 name="content"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Content</FormLabel>
+                    <FormLabel>{t('gmb.content', 'Content')}</FormLabel>
                     <FormControl>
-                      <Textarea {...field} placeholder="Post content..." rows={4} data-testid="input-post-content" />
+                      <Textarea {...field} placeholder={t('gmb.postContentPlaceholder', 'Post content...')} rows={4} data-testid="input-post-content" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -514,7 +516,7 @@ export default function GoogleMyBusiness() {
               />
               <DialogFooter>
                 <Button type="submit" disabled={createPostMutation.isPending} data-testid="button-submit-post">
-                  {createPostMutation.isPending ? "Creating..." : "Create Post"}
+                  {createPostMutation.isPending ? t('gmb.creating', 'Creating...') : t('gmb.createPost', 'Create Post')}
                 </Button>
               </DialogFooter>
             </form>

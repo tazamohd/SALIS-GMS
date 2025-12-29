@@ -3,6 +3,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useTranslation } from "react-i18next";
 import { TabsPageLayout } from "@/components/layouts";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -97,6 +98,7 @@ interface BankTransaction {
 }
 
 export default function BankAccountManagement() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [isAccountDialogOpen, setIsAccountDialogOpen] = useState(false);
   const [isTransactionDialogOpen, setIsTransactionDialogOpen] = useState(false);
@@ -166,10 +168,10 @@ export default function BankAccountManagement() {
       setIsAccountDialogOpen(false);
       setEditingAccountId(null);
       accountForm.reset();
-      toast({ title: editingAccountId ? "Account updated" : "Account created" });
+      toast({ title: editingAccountId ? t('bankAccounts.accountUpdated', 'Account updated') : t('bankAccounts.accountCreated', 'Account created') });
     },
     onError: () => {
-      toast({ title: "Error saving account", variant: "destructive" });
+      toast({ title: t('bankAccounts.errorSaving', 'Error saving account'), variant: "destructive" });
     },
   });
 
@@ -182,10 +184,10 @@ export default function BankAccountManagement() {
       queryClient.invalidateQueries({ queryKey: ["/api/bank-accounts"] });
       setIsTransactionDialogOpen(false);
       transactionForm.reset();
-      toast({ title: "Transaction recorded" });
+      toast({ title: t('bankAccounts.transactionRecorded', 'Transaction recorded') });
     },
     onError: () => {
-      toast({ title: "Error recording transaction", variant: "destructive" });
+      toast({ title: t('bankAccounts.errorRecordingTransaction', 'Error recording transaction'), variant: "destructive" });
     },
   });
 
@@ -198,7 +200,7 @@ export default function BankAccountManagement() {
         <div className="grid grid-cols-3 gap-4">
           <Card data-testid="card-total-balance">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-500">Total Balance</CardTitle>
+              <CardTitle className="text-sm font-medium text-gray-500">{t('bankAccounts.totalBalance', 'Total Balance')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">SAR {totalBalance.toLocaleString()}</div>
@@ -206,7 +208,7 @@ export default function BankAccountManagement() {
           </Card>
           <Card data-testid="card-active-accounts">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-500">Active Accounts</CardTitle>
+              <CardTitle className="text-sm font-medium text-gray-500">{t('bankAccounts.activeAccounts', 'Active Accounts')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{activeAccounts}</div>
@@ -214,7 +216,7 @@ export default function BankAccountManagement() {
           </Card>
           <Card data-testid="card-total-accounts">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-500">Total Accounts</CardTitle>
+              <CardTitle className="text-sm font-medium text-gray-500">{t('bankAccounts.totalAccounts', 'Total Accounts')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{bankAccounts.length}</div>
@@ -223,19 +225,19 @@ export default function BankAccountManagement() {
         </div>
         <Button onClick={() => setIsAccountDialogOpen(true)} data-testid="button-add-account">
           <Plus className="h-4 w-4 mr-2" />
-          Add Bank Account
+          {t('bankAccounts.addBankAccount', 'Add Bank Account')}
         </Button>
       </div>
 
       <div className="grid gap-4">
         {accountsLoading ? (
           <Card>
-            <CardContent className="py-8 text-center">Loading accounts...</CardContent>
+            <CardContent className="py-8 text-center">{t('common.loading', 'Loading...')}</CardContent>
           </Card>
         ) : bankAccounts.length === 0 ? (
           <Card>
             <CardContent className="py-8 text-center text-gray-500">
-              No bank accounts configured. Add your first account to get started.
+              {t('bankAccounts.noAccountsConfigured', 'No bank accounts configured. Add your first account to get started.')}
             </CardContent>
           </Card>
         ) : (
@@ -251,32 +253,32 @@ export default function BankAccountManagement() {
                     <CardDescription>{account.bankName} - {account.accountNumber}</CardDescription>
                   </div>
                   <Badge variant={account.isActive ? "default" : "secondary"}>
-                    {account.isActive ? "Active" : "Inactive"}
+                    {account.isActive ? t('common.active', 'Active') : t('common.inactive', 'Inactive')}
                   </Badge>
                 </div>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-4 gap-4">
                   <div>
-                    <p className="text-sm text-gray-500">Account Type</p>
+                    <p className="text-sm text-gray-500">{t('bankAccounts.accountType', 'Account Type')}</p>
                     <p className="font-medium capitalize">{account.accountType}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">Currency</p>
+                    <p className="text-sm text-gray-500">{t('bankAccounts.currency', 'Currency')}</p>
                     <p className="font-medium">{account.currency}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">Opening Balance</p>
+                    <p className="text-sm text-gray-500">{t('bankAccounts.openingBalance', 'Opening Balance')}</p>
                     <p className="font-medium">{account.currency} {parseFloat(account.openingBalance).toLocaleString()}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">Current Balance</p>
+                    <p className="text-sm text-gray-500">{t('bankAccounts.currentBalance', 'Current Balance')}</p>
                     <p className="font-medium text-lg">{account.currency} {parseFloat(account.currentBalance).toLocaleString()}</p>
                   </div>
                 </div>
                 {account.iban && (
                   <div className="mt-4">
-                    <p className="text-sm text-gray-500">IBAN: {account.iban}</p>
+                    <p className="text-sm text-gray-500">{t('bankAccounts.iban', 'IBAN')}: {account.iban}</p>
                   </div>
                 )}
                 <div className="flex gap-2 mt-4">
@@ -291,7 +293,7 @@ export default function BankAccountManagement() {
                     data-testid={`button-add-transaction-${account.id}`}
                   >
                     <Plus className="h-4 w-4 mr-1" />
-                    Add Transaction
+                    {t('bankAccounts.addTransaction', 'Add Transaction')}
                   </Button>
                   <Button
                     variant="outline"
@@ -299,7 +301,7 @@ export default function BankAccountManagement() {
                     onClick={() => setSelectedAccountId(account.id)}
                     data-testid={`button-view-transactions-${account.id}`}
                   >
-                    View Transactions
+                    {t('bankAccounts.viewTransactions', 'View Transactions')}
                   </Button>
                   <Button
                     variant="outline"
@@ -311,7 +313,7 @@ export default function BankAccountManagement() {
                     data-testid={`button-reconcile-${account.id}`}
                   >
                     <RefreshCw className="h-4 w-4 mr-1" />
-                    Reconcile
+                    {t('bankAccounts.reconcile', 'Reconcile')}
                   </Button>
                 </div>
               </CardContent>
@@ -328,7 +330,7 @@ export default function BankAccountManagement() {
         <div className="flex items-center gap-4">
           <Select value={selectedAccountId} onValueChange={setSelectedAccountId}>
             <SelectTrigger className="w-64" data-testid="select-account-filter">
-              <SelectValue placeholder="Select account to view transactions" />
+              <SelectValue placeholder={t('bankAccounts.selectAccountToView', 'Select account to view transactions')} />
             </SelectTrigger>
             <SelectContent>
               {bankAccounts.map((account) => (
@@ -345,24 +347,24 @@ export default function BankAccountManagement() {
           data-testid="button-new-transaction"
         >
           <Plus className="h-4 w-4 mr-2" />
-          New Transaction
+          {t('bankAccounts.newTransaction', 'New Transaction')}
         </Button>
       </div>
 
       {!selectedAccountId ? (
         <Card>
           <CardContent className="py-8 text-center text-gray-500">
-            Select a bank account to view transactions
+            {t('bankAccounts.selectAccountPrompt', 'Select a bank account to view transactions')}
           </CardContent>
         </Card>
       ) : transactionsLoading ? (
         <Card>
-          <CardContent className="py-8 text-center">Loading transactions...</CardContent>
+          <CardContent className="py-8 text-center">{t('common.loading', 'Loading...')}</CardContent>
         </Card>
       ) : transactions.length === 0 ? (
         <Card>
           <CardContent className="py-8 text-center text-gray-500">
-            No transactions found for this account
+            {t('bankAccounts.noTransactionsFound', 'No transactions found for this account')}
           </CardContent>
         </Card>
       ) : (
@@ -370,12 +372,12 @@ export default function BankAccountManagement() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Date</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Description</TableHead>
-                <TableHead>Reference</TableHead>
-                <TableHead className="text-right">Amount</TableHead>
-                <TableHead>Status</TableHead>
+                <TableHead>{t('common.date', 'Date')}</TableHead>
+                <TableHead>{t('common.type', 'Type')}</TableHead>
+                <TableHead>{t('common.description', 'Description')}</TableHead>
+                <TableHead>{t('bankAccounts.reference', 'Reference')}</TableHead>
+                <TableHead className="text-right">{t('common.amount', 'Amount')}</TableHead>
+                <TableHead>{t('common.status', 'Status')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -408,12 +410,12 @@ export default function BankAccountManagement() {
                     {tx.reconciled ? (
                       <Badge variant="default" className="bg-green-100 text-green-800">
                         <CheckCircle className="h-3 w-3 mr-1" />
-                        Reconciled
+                        {t('bankAccounts.reconciled', 'Reconciled')}
                       </Badge>
                     ) : (
                       <Badge variant="secondary">
                         <Clock className="h-3 w-3 mr-1" />
-                        Pending
+                        {t('common.pending', 'Pending')}
                       </Badge>
                     )}
                   </TableCell>
@@ -430,9 +432,9 @@ export default function BankAccountManagement() {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Bank Reconciliation</CardTitle>
+          <CardTitle>{t('bankAccounts.bankReconciliation', 'Bank Reconciliation')}</CardTitle>
           <CardDescription>
-            Match your bank statements with recorded transactions to ensure accuracy
+            {t('bankAccounts.reconciliationDescription', 'Match your bank statements with recorded transactions to ensure accuracy')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -445,7 +447,7 @@ export default function BankAccountManagement() {
                 </div>
                 <div className="text-right">
                   <p className="font-medium">SAR {parseFloat(account.currentBalance).toLocaleString()}</p>
-                  <p className="text-sm text-gray-500">Current Balance</p>
+                  <p className="text-sm text-gray-500">{t('bankAccounts.currentBalance', 'Current Balance')}</p>
                 </div>
                 <Button
                   variant="outline"
@@ -456,7 +458,7 @@ export default function BankAccountManagement() {
                   data-testid={`button-reconcile-account-${account.id}`}
                 >
                   <RefreshCw className="h-4 w-4 mr-2" />
-                  Start Reconciliation
+                  {t('bankAccounts.startReconciliation', 'Start Reconciliation')}
                 </Button>
               </div>
             ))}
@@ -469,21 +471,21 @@ export default function BankAccountManagement() {
   return (
     <div className="p-6 space-y-6">
       <TabsPageLayout
-        title="Bank Account Management"
-        description="إدارة الحسابات البنكية - Manage bank accounts, transactions, and reconciliation"
+        title={t('bankAccounts.title', 'Bank Account Management')}
+        description={t('bankAccounts.description', 'إدارة الحسابات البنكية - Manage bank accounts, transactions, and reconciliation')}
         defaultTab="accounts"
         tabs={[
-          { id: "accounts", label: "Bank Accounts", icon: Building2, content: accountsTab },
-          { id: "transactions", label: "Transactions", icon: CreditCard, content: transactionsTab },
-          { id: "reconciliation", label: "Reconciliation", icon: RefreshCw, content: reconciliationTab },
+          { id: "accounts", label: t('bankAccounts.bankAccounts', 'Bank Accounts'), icon: Building2, content: accountsTab },
+          { id: "transactions", label: t('bankAccounts.transactions', 'Transactions'), icon: CreditCard, content: transactionsTab },
+          { id: "reconciliation", label: t('bankAccounts.reconciliation', 'Reconciliation'), icon: RefreshCw, content: reconciliationTab },
         ]}
       />
 
       <Dialog open={isAccountDialogOpen} onOpenChange={setIsAccountDialogOpen}>
         <DialogContent className="max-w-2xl" data-testid="modal-bank-account">
           <DialogHeader>
-            <DialogTitle>{editingAccountId ? "Edit Bank Account" : "Add Bank Account"}</DialogTitle>
-            <DialogDescription>Configure bank account details</DialogDescription>
+            <DialogTitle>{editingAccountId ? t('bankAccounts.editBankAccount', 'Edit Bank Account') : t('bankAccounts.addBankAccount', 'Add Bank Account')}</DialogTitle>
+            <DialogDescription>{t('bankAccounts.configureAccountDetails', 'Configure bank account details')}</DialogDescription>
           </DialogHeader>
           <Form {...accountForm}>
             <form onSubmit={accountForm.handleSubmit((data) => accountMutation.mutate(data))} className="space-y-4">
@@ -493,9 +495,9 @@ export default function BankAccountManagement() {
                   name="accountName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Account Name</FormLabel>
+                      <FormLabel>{t('bankAccounts.accountName', 'Account Name')}</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder="Main Business Account" data-testid="input-account-name" />
+                        <Input {...field} placeholder={t('bankAccounts.accountNamePlaceholder', 'Main Business Account')} data-testid="input-account-name" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -506,9 +508,9 @@ export default function BankAccountManagement() {
                   name="bankName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Bank Name</FormLabel>
+                      <FormLabel>{t('bankAccounts.bankName', 'Bank Name')}</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder="Al Rajhi Bank" data-testid="input-bank-name" />
+                        <Input {...field} placeholder={t('bankAccounts.bankNamePlaceholder', 'Al Rajhi Bank')} data-testid="input-bank-name" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -519,7 +521,7 @@ export default function BankAccountManagement() {
                   name="accountNumber"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Account Number</FormLabel>
+                      <FormLabel>{t('bankAccounts.accountNumber', 'Account Number')}</FormLabel>
                       <FormControl>
                         <Input {...field} placeholder="1234567890" data-testid="input-account-number" />
                       </FormControl>
@@ -532,7 +534,7 @@ export default function BankAccountManagement() {
                   name="iban"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>IBAN</FormLabel>
+                      <FormLabel>{t('bankAccounts.iban', 'IBAN')}</FormLabel>
                       <FormControl>
                         <Input {...field} placeholder="SA..." data-testid="input-iban" />
                       </FormControl>
@@ -545,18 +547,18 @@ export default function BankAccountManagement() {
                   name="accountType"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Account Type</FormLabel>
+                      <FormLabel>{t('bankAccounts.accountType', 'Account Type')}</FormLabel>
                       <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
                           <SelectTrigger data-testid="select-account-type">
-                            <SelectValue placeholder="Select type" />
+                            <SelectValue placeholder={t('bankAccounts.selectType', 'Select type')} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="checking">Checking</SelectItem>
-                          <SelectItem value="savings">Savings</SelectItem>
-                          <SelectItem value="business">Business</SelectItem>
-                          <SelectItem value="merchant">Merchant</SelectItem>
+                          <SelectItem value="checking">{t('bankAccounts.checking', 'Checking')}</SelectItem>
+                          <SelectItem value="savings">{t('bankAccounts.savings', 'Savings')}</SelectItem>
+                          <SelectItem value="business">{t('bankAccounts.business', 'Business')}</SelectItem>
+                          <SelectItem value="merchant">{t('bankAccounts.merchant', 'Merchant')}</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -568,19 +570,17 @@ export default function BankAccountManagement() {
                   name="currency"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Currency</FormLabel>
+                      <FormLabel>{t('bankAccounts.currency', 'Currency')}</FormLabel>
                       <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
                           <SelectTrigger data-testid="select-currency">
-                            <SelectValue placeholder="Select currency" />
+                            <SelectValue placeholder={t('bankAccounts.selectCurrency', 'Select currency')} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="SAR">SAR - Saudi Riyal</SelectItem>
-                          <SelectItem value="USD">USD - US Dollar</SelectItem>
-                          <SelectItem value="EUR">EUR - Euro</SelectItem>
-                          <SelectItem value="GBP">GBP - British Pound</SelectItem>
-                          <SelectItem value="AED">AED - UAE Dirham</SelectItem>
+                          <SelectItem value="SAR">{t('bankAccounts.sarCurrency', 'SAR - Saudi Riyal')}</SelectItem>
+                          <SelectItem value="USD">{t('bankAccounts.usdCurrency', 'USD - US Dollar')}</SelectItem>
+                          <SelectItem value="EUR">{t('bankAccounts.eurCurrency', 'EUR - Euro')}</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -592,9 +592,9 @@ export default function BankAccountManagement() {
                   name="openingBalance"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Opening Balance</FormLabel>
+                      <FormLabel>{t('bankAccounts.openingBalance', 'Opening Balance')}</FormLabel>
                       <FormControl>
-                        <Input {...field} type="number" step="0.01" placeholder="0.00" data-testid="input-opening-balance" />
+                        <Input {...field} type="number" placeholder="0" data-testid="input-opening-balance" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -602,37 +602,24 @@ export default function BankAccountManagement() {
                 />
                 <FormField
                   control={accountForm.control}
-                  name="swiftCode"
+                  name="notes"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>SWIFT Code</FormLabel>
+                      <FormLabel>{t('common.notes', 'Notes')}</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder="RJHISARI" data-testid="input-swift" />
+                        <Textarea {...field} placeholder={t('bankAccounts.notesPlaceholder', 'Additional notes...')} data-testid="input-notes" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
               </div>
-              <FormField
-                control={accountForm.control}
-                name="notes"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Notes</FormLabel>
-                    <FormControl>
-                      <Textarea {...field} placeholder="Additional notes..." data-testid="input-notes" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
               <DialogFooter>
                 <Button type="button" variant="outline" onClick={() => setIsAccountDialogOpen(false)}>
-                  Cancel
+                  {t('common.cancel', 'Cancel')}
                 </Button>
-                <Button type="submit" disabled={accountMutation.isPending} data-testid="button-save-account">
-                  {accountMutation.isPending ? "Saving..." : "Save Account"}
+                <Button type="submit" data-testid="button-save-account">
+                  {editingAccountId ? t('common.update', 'Update') : t('common.save', 'Save')}
                 </Button>
               </DialogFooter>
             </form>
@@ -641,110 +628,84 @@ export default function BankAccountManagement() {
       </Dialog>
 
       <Dialog open={isTransactionDialogOpen} onOpenChange={setIsTransactionDialogOpen}>
-        <DialogContent data-testid="modal-transaction">
+        <DialogContent className="max-w-lg" data-testid="modal-transaction">
           <DialogHeader>
-            <DialogTitle>Record Transaction</DialogTitle>
-            <DialogDescription>Add a new bank transaction</DialogDescription>
+            <DialogTitle>{t('bankAccounts.recordTransaction', 'Record Transaction')}</DialogTitle>
+            <DialogDescription>{t('bankAccounts.recordTransactionDescription', 'Add a new bank transaction')}</DialogDescription>
           </DialogHeader>
           <Form {...transactionForm}>
             <form onSubmit={transactionForm.handleSubmit((data) => transactionMutation.mutate(data))} className="space-y-4">
               <FormField
                 control={transactionForm.control}
-                name="bankAccountId"
+                name="transactionType"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Bank Account</FormLabel>
+                    <FormLabel>{t('bankAccounts.transactionType', 'Transaction Type')}</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
-                        <SelectTrigger data-testid="select-tx-account">
-                          <SelectValue placeholder="Select account" />
+                        <SelectTrigger data-testid="select-transaction-type">
+                          <SelectValue placeholder={t('bankAccounts.selectTransactionType', 'Select type')} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {bankAccounts.map((account) => (
-                          <SelectItem key={account.id} value={account.id}>
-                            {account.accountName}
-                          </SelectItem>
-                        ))}
+                        <SelectItem value="deposit">{t('bankAccounts.deposit', 'Deposit')}</SelectItem>
+                        <SelectItem value="withdrawal">{t('bankAccounts.withdrawal', 'Withdrawal')}</SelectItem>
+                        <SelectItem value="transfer">{t('bankAccounts.transfer', 'Transfer')}</SelectItem>
+                        <SelectItem value="fee">{t('bankAccounts.fee', 'Fee')}</SelectItem>
+                        <SelectItem value="interest">{t('bankAccounts.interest', 'Interest')}</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={transactionForm.control}
-                  name="transactionType"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Type</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
-                        <FormControl>
-                          <SelectTrigger data-testid="select-tx-type">
-                            <SelectValue placeholder="Select type" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="deposit">Deposit</SelectItem>
-                          <SelectItem value="withdrawal">Withdrawal</SelectItem>
-                          <SelectItem value="transfer">Transfer</SelectItem>
-                          <SelectItem value="fee">Bank Fee</SelectItem>
-                          <SelectItem value="interest">Interest</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={transactionForm.control}
-                  name="amount"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Amount</FormLabel>
-                      <FormControl>
-                        <Input {...field} type="number" step="0.01" placeholder="0.00" data-testid="input-tx-amount" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={transactionForm.control}
-                  name="transactionDate"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Date</FormLabel>
-                      <FormControl>
-                        <Input {...field} type="date" data-testid="input-tx-date" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={transactionForm.control}
-                  name="referenceNumber"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Reference Number</FormLabel>
-                      <FormControl>
-                        <Input {...field} placeholder="Optional" data-testid="input-tx-reference" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
+              <FormField
+                control={transactionForm.control}
+                name="amount"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('common.amount', 'Amount')}</FormLabel>
+                    <FormControl>
+                      <Input {...field} type="number" placeholder="0.00" data-testid="input-transaction-amount" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <FormField
                 control={transactionForm.control}
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Description</FormLabel>
+                    <FormLabel>{t('common.description', 'Description')}</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="Transaction description" data-testid="input-tx-description" />
+                      <Input {...field} placeholder={t('bankAccounts.transactionDescriptionPlaceholder', 'Transaction description')} data-testid="input-transaction-description" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={transactionForm.control}
+                name="transactionDate"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('common.date', 'Date')}</FormLabel>
+                    <FormControl>
+                      <Input {...field} type="date" data-testid="input-transaction-date" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={transactionForm.control}
+                name="referenceNumber"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('bankAccounts.referenceNumber', 'Reference Number')}</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder={t('common.optional', 'Optional')} data-testid="input-reference-number" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -752,10 +713,10 @@ export default function BankAccountManagement() {
               />
               <DialogFooter>
                 <Button type="button" variant="outline" onClick={() => setIsTransactionDialogOpen(false)}>
-                  Cancel
+                  {t('common.cancel', 'Cancel')}
                 </Button>
-                <Button type="submit" disabled={transactionMutation.isPending} data-testid="button-save-transaction">
-                  {transactionMutation.isPending ? "Saving..." : "Save Transaction"}
+                <Button type="submit" data-testid="button-save-transaction">
+                  {t('bankAccounts.recordTransaction', 'Record Transaction')}
                 </Button>
               </DialogFooter>
             </form>
@@ -764,10 +725,10 @@ export default function BankAccountManagement() {
       </Dialog>
 
       <Dialog open={isReconcileDialogOpen} onOpenChange={setIsReconcileDialogOpen}>
-        <DialogContent data-testid="modal-reconciliation">
+        <DialogContent className="max-w-lg" data-testid="modal-reconcile">
           <DialogHeader>
-            <DialogTitle>Bank Reconciliation</DialogTitle>
-            <DialogDescription>Enter bank statement details to reconcile</DialogDescription>
+            <DialogTitle>{t('bankAccounts.reconcileAccount', 'Reconcile Account')}</DialogTitle>
+            <DialogDescription>{t('bankAccounts.reconcileAccountDescription', 'Match bank statement with recorded balance')}</DialogDescription>
           </DialogHeader>
           <Form {...reconcileForm}>
             <form className="space-y-4">
@@ -776,7 +737,7 @@ export default function BankAccountManagement() {
                 name="statementDate"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Statement Date</FormLabel>
+                    <FormLabel>{t('bankAccounts.statementDate', 'Statement Date')}</FormLabel>
                     <FormControl>
                       <Input {...field} type="date" data-testid="input-statement-date" />
                     </FormControl>
@@ -789,9 +750,9 @@ export default function BankAccountManagement() {
                 name="statementBalance"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Statement Balance</FormLabel>
+                    <FormLabel>{t('bankAccounts.statementBalance', 'Statement Balance')}</FormLabel>
                     <FormControl>
-                      <Input {...field} type="number" step="0.01" placeholder="0.00" data-testid="input-statement-balance" />
+                      <Input {...field} type="number" placeholder="0.00" data-testid="input-statement-balance" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -802,9 +763,9 @@ export default function BankAccountManagement() {
                 name="notes"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Notes</FormLabel>
+                    <FormLabel>{t('common.notes', 'Notes')}</FormLabel>
                     <FormControl>
-                      <Textarea {...field} placeholder="Reconciliation notes..." data-testid="input-reconcile-notes" />
+                      <Textarea {...field} placeholder={t('bankAccounts.reconciliationNotes', 'Reconciliation notes...')} data-testid="input-reconcile-notes" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -812,10 +773,10 @@ export default function BankAccountManagement() {
               />
               <DialogFooter>
                 <Button type="button" variant="outline" onClick={() => setIsReconcileDialogOpen(false)}>
-                  Cancel
+                  {t('common.cancel', 'Cancel')}
                 </Button>
-                <Button type="submit" data-testid="button-complete-reconciliation">
-                  Complete Reconciliation
+                <Button type="button" data-testid="button-complete-reconciliation">
+                  {t('bankAccounts.completeReconciliation', 'Complete Reconciliation')}
                 </Button>
               </DialogFooter>
             </form>

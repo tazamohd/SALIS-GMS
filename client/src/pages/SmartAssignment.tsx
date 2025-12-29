@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { StandardPageLayout } from "@/components/layouts";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
@@ -21,6 +22,7 @@ interface Recommendation {
 }
 
 export function SmartAssignment() {
+  const { t } = useTranslation();
   const [selectedJobId, setSelectedJobId] = useState<string>("");
   const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
   const { toast } = useToast();
@@ -38,8 +40,8 @@ export function SmartAssignment() {
     },
     onError: (error: Error) => {
       toast({
-        title: "Error",
-        description: error.message || "Failed to get AI recommendations",
+        title: t('common.error', 'Error'),
+        description: error.message || t('smartAssignment.failedToGetRecommendations', 'Failed to get AI recommendations'),
         variant: "destructive",
       });
       setRecommendations([]);
@@ -52,8 +54,8 @@ export function SmartAssignment() {
     },
     onSuccess: () => {
       toast({
-        title: "Success",
-        description: "Technician assigned successfully",
+        title: t('common.success', 'Success'),
+        description: t('smartAssignment.technicianAssignedSuccessfully', 'Technician assigned successfully'),
       });
       queryClient.invalidateQueries({ queryKey: ["/api/job-cards"] });
       setRecommendations([]);
@@ -61,8 +63,8 @@ export function SmartAssignment() {
     },
     onError: (error: Error) => {
       toast({
-        title: "Error",
-        description: error.message || "Failed to assign technician",
+        title: t('common.error', 'Error'),
+        description: error.message || t('smartAssignment.failedToAssignTechnician', 'Failed to assign technician'),
         variant: "destructive",
       });
     },
@@ -81,9 +83,9 @@ export function SmartAssignment() {
   };
 
   const getConfidenceBadge = (confidence: number) => {
-    if (confidence >= 80) return <Badge className="bg-green-500" data-testid={`badge-confidence-${confidence}`}>High {confidence}%</Badge>;
-    if (confidence >= 60) return <Badge className="bg-yellow-500" data-testid={`badge-confidence-${confidence}`}>Medium {confidence}%</Badge>;
-    return <Badge className="bg-gray-500" data-testid={`badge-confidence-${confidence}`}>Low {confidence}%</Badge>;
+    if (confidence >= 80) return <Badge className="bg-green-500" data-testid={`badge-confidence-${confidence}`}>{t('smartAssignment.high', 'High')} {confidence}%</Badge>;
+    if (confidence >= 60) return <Badge className="bg-yellow-500" data-testid={`badge-confidence-${confidence}`}>{t('smartAssignment.medium', 'Medium')} {confidence}%</Badge>;
+    return <Badge className="bg-gray-500" data-testid={`badge-confidence-${confidence}`}>{t('smartAssignment.low', 'Low')} {confidence}%</Badge>;
   };
 
   const getWorkloadBadge = (workload: string) => {
@@ -97,15 +99,15 @@ export function SmartAssignment() {
 
   return (
     <StandardPageLayout
-      title="Smart Job Assignment"
-      description="AI-powered technician recommendations for optimal job assignments"
+      title={t('smartAssignment.title', 'Smart Job Assignment')}
+      description={t('smartAssignment.description', 'AI-powered technician recommendations for optimal job assignments')}
       icon={Brain}
     >
       <div className="grid md:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
-            <CardTitle>Unassigned Jobs</CardTitle>
-            <CardDescription>Select a job to get AI recommendations</CardDescription>
+            <CardTitle>{t('smartAssignment.unassignedJobs', 'Unassigned Jobs')}</CardTitle>
+            <CardDescription>{t('smartAssignment.selectJobForRecommendations', 'Select a job to get AI recommendations')}</CardDescription>
           </CardHeader>
           <CardContent>
             {jobsLoading ? (
@@ -114,7 +116,7 @@ export function SmartAssignment() {
               </div>
             ) : unassignedJobs.length === 0 ? (
               <p className="text-muted-foreground text-center py-8" data-testid="text-no-jobs">
-                No unassigned jobs available
+                {t('smartAssignment.noUnassignedJobs', 'No unassigned jobs available')}
               </p>
             ) : (
               <div className="space-y-3">
@@ -144,13 +146,13 @@ export function SmartAssignment() {
 
         <Card>
           <CardHeader>
-            <CardTitle>AI Recommendations</CardTitle>
-            <CardDescription>Top technician matches for selected job</CardDescription>
+            <CardTitle>{t('smartAssignment.aiRecommendations', 'AI Recommendations')}</CardTitle>
+            <CardDescription>{t('smartAssignment.topTechnicianMatches', 'Top technician matches for selected job')}</CardDescription>
           </CardHeader>
           <CardContent>
             {!selectedJobId ? (
               <p className="text-muted-foreground text-center py-8" data-testid="text-select-job">
-                Select a job to see AI recommendations
+                {t('smartAssignment.selectJobToSeeRecommendations', 'Select a job to see AI recommendations')}
               </p>
             ) : recommendationsMutation.isPending ? (
               <div className="space-y-3">
@@ -158,7 +160,7 @@ export function SmartAssignment() {
               </div>
             ) : recommendations.length === 0 ? (
               <p className="text-muted-foreground text-center py-8" data-testid="text-no-recommendations">
-                No recommendations available
+                {t('smartAssignment.noRecommendationsAvailable', 'No recommendations available')}
               </p>
             ) : (
               <div className="space-y-4">
@@ -211,7 +213,7 @@ export function SmartAssignment() {
                         data-testid={`button-assign-${rec.technicianId}`}
                       >
                         <CheckCircle className="h-4 w-4 mr-2" />
-                        {assignMutation.isPending ? "Assigning..." : "Assign to Job"}
+                        {assignMutation.isPending ? t('smartAssignment.assigning', 'Assigning...') : t('smartAssignment.assignToJob', 'Assign to Job')}
                       </Button>
                     </CardContent>
                   </Card>

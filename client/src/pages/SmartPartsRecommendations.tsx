@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -29,6 +30,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 
 export default function SmartPartsRecommendations() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [isGenerateDialogOpen, setIsGenerateDialogOpen] = useState(false);
@@ -57,8 +59,8 @@ export default function SmartPartsRecommendations() {
       queryClient.invalidateQueries({ queryKey: ["/api/ai/parts-recommendations"] });
       
       toast({
-        title: "Recommendation Generated",
-        description: "AI has analyzed compatibility and created parts recommendations.",
+        title: t('smartParts.recommendationGenerated', 'Recommendation Generated'),
+        description: t('smartParts.aiAnalyzedCompatibility', 'AI has analyzed compatibility and created parts recommendations.'),
       });
       
       setIsGenerateDialogOpen(false);
@@ -71,8 +73,8 @@ export default function SmartPartsRecommendations() {
       });
     } catch (error) {
       toast({
-        title: "Error",
-        description: "Failed to generate parts recommendation. Please try again.",
+        title: t('common.error', 'Error'),
+        description: t('smartParts.failedToGenerate', 'Failed to generate parts recommendation. Please try again.'),
         variant: "destructive",
       });
     }
@@ -88,13 +90,13 @@ export default function SmartPartsRecommendations() {
       queryClient.invalidateQueries({ queryKey: ["/api/ai/parts-recommendations"] });
       
       toast({
-        title: "Applied to Job Card",
-        description: "The parts recommendation has been applied successfully.",
+        title: t('smartParts.appliedToJobCard', 'Applied to Job Card'),
+        description: t('smartParts.recommendationApplied', 'The parts recommendation has been applied successfully.'),
       });
     } catch (error) {
       toast({
-        title: "Error",
-        description: "Failed to apply recommendation. Please try again.",
+        title: t('common.error', 'Error'),
+        description: t('smartParts.failedToApply', 'Failed to apply recommendation. Please try again.'),
         variant: "destructive",
       });
     }
@@ -115,16 +117,16 @@ export default function SmartPartsRecommendations() {
   };
 
   const metrics = [
-    { label: "Total Recommendations", value: stats.total.toString(), icon: Package },
-    { label: "Pending Review", value: stats.pending.toString(), icon: Brain },
-    { label: "Applied to Jobs", value: stats.applied.toString(), icon: CheckCircle },
-    { label: "Total Value", value: `$${stats.totalValue.toFixed(2)}`, icon: DollarSign },
+    { label: t('smartParts.totalRecommendations', 'Total Recommendations'), value: stats.total.toString(), icon: Package },
+    { label: t('smartParts.pendingReview', 'Pending Review'), value: stats.pending.toString(), icon: Brain },
+    { label: t('smartParts.appliedToJobs', 'Applied to Jobs'), value: stats.applied.toString(), icon: CheckCircle },
+    { label: t('smartParts.totalValue', 'Total Value'), value: `$${stats.totalValue.toFixed(2)}`, icon: DollarSign },
   ];
 
   return (
     <DashboardPage
-      title="Smart Parts Recommendations"
-      description="AI-powered parts recommendations with compatibility checking"
+      title={t('smartParts.title', 'Smart Parts Recommendations')}
+      description={t('smartParts.description', 'AI-powered parts recommendations with compatibility checking')}
       icon={Package}
       metrics={metrics}
     >
@@ -135,22 +137,22 @@ export default function SmartPartsRecommendations() {
                 data-testid="button-generate-recommendation"
               >
                 <Brain className="mr-2 h-4 w-4" />
-                Generate Recommendation
+                {t('smartParts.generateRecommendation', 'Generate Recommendation')}
               </Button>
             </DialogTrigger>
             <DialogContent className="bg-white dark:bg-salis-black">
               <DialogHeader>
                 <DialogTitle className="text-gray-900 dark:text-white">
-                  Generate Parts Recommendation
+                  {t('smartParts.generatePartsRecommendation', 'Generate Parts Recommendation')}
                 </DialogTitle>
                 <DialogDescription>
-                  AI will analyze compatibility and suggest the best parts for this vehicle.
+                  {t('smartParts.aiWillAnalyze', 'AI will analyze compatibility and suggest the best parts for this vehicle.')}
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-4">
                 <div className="grid grid-cols-3 gap-4">
                   <div>
-                    <Label htmlFor="vehicleMake">Make</Label>
+                    <Label htmlFor="vehicleMake">{t('smartParts.make', 'Make')}</Label>
                     <Input
                       id="vehicleMake"
                       value={formData.vehicleMake}
@@ -160,7 +162,7 @@ export default function SmartPartsRecommendations() {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="vehicleModel">Model</Label>
+                    <Label htmlFor="vehicleModel">{t('smartParts.model', 'Model')}</Label>
                     <Input
                       id="vehicleModel"
                       value={formData.vehicleModel}
@@ -170,7 +172,7 @@ export default function SmartPartsRecommendations() {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="vehicleYear">Year</Label>
+                    <Label htmlFor="vehicleYear">{t('smartParts.year', 'Year')}</Label>
                     <Input
                       id="vehicleYear"
                       type="number"
@@ -182,22 +184,22 @@ export default function SmartPartsRecommendations() {
                   </div>
                 </div>
                 <div>
-                  <Label htmlFor="serviceType">Service Type</Label>
+                  <Label htmlFor="serviceType">{t('smartParts.serviceType', 'Service Type')}</Label>
                   <Input
                     id="serviceType"
                     value={formData.serviceType}
                     onChange={(e) => setFormData({ ...formData, serviceType: e.target.value })}
-                    placeholder="Brake Service"
+                    placeholder={t('smartParts.brakeService', 'Brake Service')}
                     data-testid="input-service-type"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="description">Additional Details (Optional)</Label>
+                  <Label htmlFor="description">{t('smartParts.additionalDetails', 'Additional Details (Optional)')}</Label>
                   <Textarea
                     id="description"
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    placeholder="Any specific requirements or issues..."
+                    placeholder={t('smartParts.specificRequirements', 'Any specific requirements or issues...')}
                     data-testid="input-description"
                     rows={3}
                   />
@@ -207,38 +209,36 @@ export default function SmartPartsRecommendations() {
                   className="w-full bg-blue-600 hover:bg-blue-700 text-white"
                   data-testid="button-submit-generate"
                 >
-                  Generate AI Recommendation
+                  {t('smartParts.generateAIRecommendation', 'Generate AI Recommendation')}
                 </Button>
               </div>
             </DialogContent>
           </Dialog>
 
-        {/* Filters */}
         <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
           <CardHeader>
-            <CardTitle className="text-gray-900 dark:text-white">Filters</CardTitle>
+            <CardTitle className="text-gray-900 dark:text-white">{t('common.filter', 'Filters')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="w-full md:w-64">
               <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
-                Status
+                {t('common.status', 'Status')}
               </label>
               <Select value={statusFilter} onValueChange={setStatusFilter}>
                 <SelectTrigger data-testid="select-status">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Statuses</SelectItem>
-                  <SelectItem value="pending">Pending</SelectItem>
-                  <SelectItem value="applied">Applied</SelectItem>
-                  <SelectItem value="rejected">Rejected</SelectItem>
+                  <SelectItem value="all">{t('smartParts.allStatuses', 'All Statuses')}</SelectItem>
+                  <SelectItem value="pending">{t('common.pending', 'Pending')}</SelectItem>
+                  <SelectItem value="applied">{t('smartParts.applied', 'Applied')}</SelectItem>
+                  <SelectItem value="rejected">{t('smartParts.rejected', 'Rejected')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </CardContent>
         </Card>
 
-        {/* Recommendations List */}
         <div className="space-y-4">
           {isLoading ? (
             Array.from({ length: 3 }).map((_, i) => (
@@ -268,7 +268,7 @@ export default function SmartPartsRecommendations() {
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <CardTitle className="text-gray-900 dark:text-white mb-2">
-                          Parts Recommendation #{recommendation.id.slice(0, 8)}
+                          {t('smartParts.partsRecommendation', 'Parts Recommendation')} #{recommendation.id.slice(0, 8)}
                         </CardTitle>
                         <CardDescription className="flex items-center gap-4 flex-wrap">
                           <Badge
@@ -279,12 +279,12 @@ export default function SmartPartsRecommendations() {
                           </Badge>
                           {recommendation.confidence && (
                             <span className="text-sm text-gray-600 dark:text-gray-400">
-                              Confidence: {recommendation.confidence}%
+                              {t('smartParts.confidence', 'Confidence')}: {recommendation.confidence}%
                             </span>
                           )}
                           {recommendation.totalEstimatedCost && (
                             <span className="text-sm font-medium text-blue-600">
-                              Est. Cost: ${parseFloat(String(recommendation.totalEstimatedCost)).toFixed(2)}
+                              {t('smartParts.estimatedCost', 'Est. Cost')}: ${parseFloat(String(recommendation.totalEstimatedCost)).toFixed(2)}
                             </span>
                           )}
                         </CardDescription>
@@ -292,27 +292,25 @@ export default function SmartPartsRecommendations() {
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    {/* Reasoning */}
                     {recommendation.reasoning && (
                       <div className="flex items-start gap-3">
                         <Brain className="h-5 w-5 text-purple-600 mt-1 flex-shrink-0" />
                         <div>
                           <p className="text-sm font-medium text-gray-900 dark:text-white mb-1">
-                            AI Analysis
+                            {t('smartParts.aiAnalysis', 'AI Analysis')}
                           </p>
                           <p className="text-sm text-gray-600 dark:text-gray-400">
-                            {String(recommendation.reasoning || 'No analysis available')}
+                            {String(recommendation.reasoning || t('smartParts.noAnalysis', 'No analysis available'))}
                           </p>
                         </div>
                       </div>
                     )}
 
-                    {/* Recommended Parts */}
                     <div className="flex items-start gap-3">
                       <Wrench className="h-5 w-5 text-blue-600 mt-1 flex-shrink-0" />
                       <div className="flex-1">
                         <p className="text-sm font-medium text-gray-900 dark:text-white mb-2">
-                          Recommended Parts ({parts.length})
+                          {t('smartParts.recommendedParts', 'Recommended Parts')} ({parts.length})
                         </p>
                         <div className="space-y-2">
                           {parts.map((part: any, idx: number) => (
@@ -323,11 +321,11 @@ export default function SmartPartsRecommendations() {
                               <div className="flex justify-between items-start">
                                 <div>
                                   <p className="font-medium text-gray-900 dark:text-white">
-                                    {part.name || part.partName || `Part ${idx + 1}`}
+                                    {part.name || part.partName || `${t('smartParts.part', 'Part')} ${idx + 1}`}
                                   </p>
                                   {part.partNumber && (
                                     <p className="text-xs text-gray-500 dark:text-gray-400">
-                                      Part #: {part.partNumber}
+                                      {t('smartParts.partNumber', 'Part #')}: {part.partNumber}
                                     </p>
                                   )}
                                   {part.compatibility && (
@@ -342,7 +340,7 @@ export default function SmartPartsRecommendations() {
                                   </p>
                                   {part.quantity && (
                                     <p className="text-xs text-gray-500 dark:text-gray-400">
-                                      Qty: {part.quantity}
+                                      {t('common.quantity', 'Qty')}: {part.quantity}
                                     </p>
                                   )}
                                 </div>
@@ -353,7 +351,6 @@ export default function SmartPartsRecommendations() {
                       </div>
                     </div>
 
-                    {/* Actions */}
                     <div className="flex gap-2 pt-2">
                       {!recommendation.appliedToJobCard && recommendation.status === "pending" && (
                         <Button
@@ -363,12 +360,12 @@ export default function SmartPartsRecommendations() {
                           data-testid={`button-apply-${recommendation.id}`}
                         >
                           <CheckCircle className="mr-2 h-4 w-4" />
-                          Apply to Job Card
+                          {t('smartParts.applyToJobCard', 'Apply to Job Card')}
                         </Button>
                       )}
                       {recommendation.appliedToJobCard && (
                         <Badge className="bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400">
-                          Applied to Job Card
+                          {t('smartParts.appliedToJobCardBadge', 'Applied to Job Card')}
                         </Badge>
                       )}
                     </div>
@@ -381,9 +378,9 @@ export default function SmartPartsRecommendations() {
               <CardContent className="flex flex-col items-center justify-center py-12">
                 <Package className="h-16 w-16 text-gray-400 mb-4" />
                 <p className="text-gray-600 dark:text-gray-400 text-center">
-                  No parts recommendations found.
+                  {t('smartParts.noRecommendations', 'No parts recommendations found.')}
                   <br />
-                  Click "Generate Recommendation" to create AI-powered parts suggestions.
+                  {t('smartParts.clickGenerate', 'Click "Generate Recommendation" to create AI-powered parts suggestions.')}
                 </p>
               </CardContent>
             </Card>

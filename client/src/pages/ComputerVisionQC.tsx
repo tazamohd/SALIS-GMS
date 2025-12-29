@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -9,6 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import { TabsPageLayout, TabConfig } from '@/components/layouts';
 
 export default function ComputerVisionQC() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>('');
@@ -31,14 +33,14 @@ export default function ComputerVisionQC() {
       setAnalysisResult(data);
       queryClient.invalidateQueries({ queryKey: ['/api/nextgen/vision-quality-checks'] });
       toast({
-        title: 'Analysis Complete',
-        description: `Detected ${data.defects?.length || 0} potential defects using AI vision.`,
+        title: t('vision.analysisComplete', 'Analysis Complete'),
+        description: t('vision.detectedDefects', 'Detected {{count}} potential defects using AI vision.', { count: data.defects?.length || 0 }),
       });
     },
     onError: () => {
       toast({
-        title: 'Analysis Failed',
-        description: 'Failed to analyze image. Please try again.',
+        title: t('vision.analysisFailed', 'Analysis Failed'),
+        description: t('vision.analysisFailedDesc', 'Failed to analyze image. Please try again.'),
         variant: 'destructive',
       });
     },
@@ -57,8 +59,8 @@ export default function ComputerVisionQC() {
   const handleAnalyze = async () => {
     if (!selectedFile) {
       toast({
-        title: 'No Image Selected',
-        description: 'Please select an image to analyze.',
+        title: t('vision.noImageSelected', 'No Image Selected'),
+        description: t('vision.pleaseSelectImage', 'Please select an image to analyze.'),
         variant: 'destructive',
       });
       return;
@@ -88,7 +90,7 @@ export default function ComputerVisionQC() {
   const tabs: TabConfig[] = [
     {
       id: "analyze",
-      label: "Image Analysis",
+      label: t('vision.imageAnalysis', 'Image Analysis'),
       icon: Camera,
       content: (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -96,7 +98,7 @@ export default function ComputerVisionQC() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Upload className="h-5 w-5 text-blue-600" />
-                Upload Image for Analysis
+                {t('vision.uploadImage', 'Upload Image for Analysis')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -116,10 +118,10 @@ export default function ComputerVisionQC() {
                   <Camera className="h-12 w-12 text-gray-400" />
                   <div>
                     <p className="text-sm font-medium text-gray-900 dark:text-white">
-                      Click to upload image
+                      {t('vision.clickToUpload', 'Click to upload image')}
                     </p>
                     <p className="text-xs text-gray-500 dark:text-gray-400">
-                      PNG, JPG up to 10MB
+                      {t('vision.fileFormats', 'PNG, JPG up to 10MB')}
                     </p>
                   </div>
                 </label>
@@ -129,7 +131,7 @@ export default function ComputerVisionQC() {
                 <div className="space-y-3">
                   <img
                     src={previewUrl}
-                    alt="Preview"
+                    alt={t('vision.preview', 'Preview')}
                     className="w-full h-64 object-cover rounded-lg border border-gray-200 dark:border-gray-700"
                     data-testid="img-preview"
                   />
@@ -142,12 +144,12 @@ export default function ComputerVisionQC() {
                     {analyzeImageMutation.isPending ? (
                       <>
                         <Zap className="mr-2 h-4 w-4 animate-pulse" />
-                        Analyzing with AI...
+                        {t('vision.analyzingWithAI', 'Analyzing with AI...')}
                       </>
                     ) : (
                       <>
                         <Eye className="mr-2 h-4 w-4" />
-                        Analyze with GPT-5 Vision
+                        {t('vision.analyzeWithGPT', 'Analyze with GPT-5 Vision')}
                       </>
                     )}
                   </Button>
@@ -160,7 +162,7 @@ export default function ComputerVisionQC() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Zap className="h-5 w-5 text-purple-600" />
-                AI Analysis Results
+                {t('vision.aiResults', 'AI Analysis Results')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -168,7 +170,7 @@ export default function ComputerVisionQC() {
                 <div className="text-center py-12">
                   <Eye className="h-16 w-16 mx-auto mb-4 text-gray-400" />
                   <p className="text-gray-500 dark:text-gray-400">
-                    Upload an image and click analyze to see AI results
+                    {t('vision.uploadPrompt', 'Upload an image and click analyze to see AI results')}
                   </p>
                 </div>
               ) : (
@@ -176,7 +178,7 @@ export default function ComputerVisionQC() {
                   <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Quality Score
+                        {t('vision.qualityScore', 'Quality Score')}
                       </span>
                       <Badge className={getSeverityColor(analysisResult.overallQuality)}>
                         {analysisResult.qualityScore || 0}/100
@@ -193,7 +195,7 @@ export default function ComputerVisionQC() {
                   <div>
                     <h4 className="text-sm font-semibold mb-3 flex items-center gap-2">
                       <AlertTriangle className="h-4 w-4 text-orange-500" />
-                      Detected Issues ({analysisResult.defects?.length || 0})
+                      {t('vision.detectedIssues', 'Detected Issues')} ({analysisResult.defects?.length || 0})
                     </h4>
                     {analysisResult.defects && analysisResult.defects.length > 0 ? (
                       <div className="space-y-2">
@@ -205,18 +207,18 @@ export default function ComputerVisionQC() {
                           >
                             <div className="flex items-start justify-between mb-1">
                               <span className="font-medium text-sm text-gray-900 dark:text-white">
-                                {defect.type || 'Defect detected'}
+                                {defect.type || t('vision.defectDetected', 'Defect detected')}
                               </span>
                               <Badge variant="outline" className={getSeverityColor(defect.severity)}>
                                 {defect.severity}
                               </Badge>
                             </div>
                             <p className="text-xs text-gray-600 dark:text-gray-400">
-                              {defect.description || 'AI detected an anomaly in this area'}
+                              {defect.description || t('vision.aiDetectedAnomaly', 'AI detected an anomaly in this area')}
                             </p>
                             {defect.confidence && (
                               <p className="text-xs text-gray-500 mt-1">
-                                Confidence: {Math.round(defect.confidence * 100)}%
+                                {t('vision.confidence', 'Confidence')}: {Math.round(defect.confidence * 100)}%
                               </p>
                             )}
                           </div>
@@ -226,7 +228,7 @@ export default function ComputerVisionQC() {
                       <div className="text-center py-4">
                         <CheckCircle className="h-8 w-8 mx-auto mb-2 text-green-500" />
                         <p className="text-sm text-gray-600 dark:text-gray-400">
-                          No defects detected - Quality passed!
+                          {t('vision.noDefects', 'No defects detected - Quality passed!')}
                         </p>
                       </div>
                     )}
@@ -235,7 +237,7 @@ export default function ComputerVisionQC() {
                   {analysisResult.recommendations && (
                     <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
                       <h4 className="text-sm font-semibold mb-2 text-purple-900 dark:text-purple-200">
-                        AI Recommendations
+                        {t('vision.aiRecommendations', 'AI Recommendations')}
                       </h4>
                       <ul className="space-y-1">
                         {analysisResult.recommendations.map((rec: string, index: number) => (
@@ -256,19 +258,19 @@ export default function ComputerVisionQC() {
     },
     {
       id: "history",
-      label: "Inspection History",
+      label: t('vision.inspectionHistory', 'Inspection History'),
       icon: ImageIcon,
       content: (
         <Card className="bg-white dark:bg-salis-black">
           <CardHeader>
-            <CardTitle>Recent Quality Inspections</CardTitle>
+            <CardTitle>{t('vision.recentInspections', 'Recent Quality Inspections')}</CardTitle>
           </CardHeader>
           <CardContent>
             {(!Array.isArray(checks) || checks.length === 0) ? (
               <div className="text-center py-12">
                 <ImageIcon className="h-16 w-16 mx-auto mb-4 text-gray-400" />
                 <p className="text-gray-500 dark:text-gray-400">
-                  No inspection history yet
+                  {t('vision.noHistory', 'No inspection history yet')}
                 </p>
               </div>
             ) : (
@@ -276,11 +278,11 @@ export default function ComputerVisionQC() {
                 <table className="w-full">
                   <thead className="border-b">
                     <tr className="text-left text-sm">
-                      <th className="pb-3">Date</th>
-                      <th className="pb-3">Type</th>
-                      <th className="pb-3">Quality Score</th>
-                      <th className="pb-3">Defects</th>
-                      <th className="pb-3">Status</th>
+                      <th className="pb-3">{t('vision.date', 'Date')}</th>
+                      <th className="pb-3">{t('vision.type', 'Type')}</th>
+                      <th className="pb-3">{t('vision.qualityScore', 'Quality Score')}</th>
+                      <th className="pb-3">{t('vision.defects', 'Defects')}</th>
+                      <th className="pb-3">{t('vision.status', 'Status')}</th>
                     </tr>
                   </thead>
                   <tbody className="text-sm">
@@ -294,7 +296,7 @@ export default function ComputerVisionQC() {
                         <td className="py-3">{check.defectsFound || 0}</td>
                         <td className="py-3">
                           <Badge className={check.passed ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}>
-                            {check.passed ? 'Passed' : 'Failed'}
+                            {check.passed ? t('vision.passed', 'Passed') : t('vision.failed', 'Failed')}
                           </Badge>
                         </td>
                       </tr>
@@ -311,8 +313,8 @@ export default function ComputerVisionQC() {
 
   return (
     <TabsPageLayout
-      title="Computer Vision Quality Control"
-      description="AI-powered visual inspection using advanced computer vision and GPT-5 analysis"
+      title={t('vision.title', 'Computer Vision Quality Control')}
+      description={t('vision.description', 'AI-powered visual inspection using advanced computer vision and GPT-5 analysis')}
       icon={Eye}
       tabs={tabs}
       defaultTab="analyze"

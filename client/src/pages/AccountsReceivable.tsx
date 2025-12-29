@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Link } from "wouter";
+import { useTranslation } from "react-i18next";
 import { TabsPageLayout } from "@/components/layouts/TabsPageLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -173,6 +174,7 @@ const customers = [
 ];
 
 export default function AccountsReceivable() {
+  const { t } = useTranslation();
   const [isPaymentDialogOpen, setIsPaymentDialogOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -213,6 +215,16 @@ export default function AccountsReceivable() {
     return styles[status] || "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200";
   };
 
+  const getStatusLabel = (status: string) => {
+    const labels: Record<string, string> = {
+      Current: t('accounting.status.current', 'Current'),
+      Overdue: t('accounting.status.overdue', 'Overdue'),
+      "Past Due": t('accounting.status.pastDue', 'Past Due'),
+      Delinquent: t('accounting.status.delinquent', 'Delinquent'),
+    };
+    return labels[status] || status;
+  };
+
   const receivablesTab = (
     <div className="space-y-4">
       <div className="flex flex-col md:flex-row gap-4 justify-between">
@@ -220,7 +232,7 @@ export default function AccountsReceivable() {
           <div className="relative flex-1 max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search customers or invoices..."
+              placeholder={t('accounting.searchCustomersOrInvoices', 'Search customers or invoices...')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10"
@@ -229,34 +241,34 @@ export default function AccountsReceivable() {
           </div>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="w-[150px]" data-testid="select-status-filter">
-              <SelectValue placeholder="Status" />
+              <SelectValue placeholder={t('common.status', 'Status')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Status</SelectItem>
-              <SelectItem value="current">Current</SelectItem>
-              <SelectItem value="overdue">Overdue</SelectItem>
-              <SelectItem value="past-due">Past Due</SelectItem>
-              <SelectItem value="delinquent">Delinquent</SelectItem>
+              <SelectItem value="all">{t('accounting.allStatus', 'All Status')}</SelectItem>
+              <SelectItem value="current">{t('accounting.status.current', 'Current')}</SelectItem>
+              <SelectItem value="overdue">{t('accounting.status.overdue', 'Overdue')}</SelectItem>
+              <SelectItem value="past-due">{t('accounting.status.pastDue', 'Past Due')}</SelectItem>
+              <SelectItem value="delinquent">{t('accounting.status.delinquent', 'Delinquent')}</SelectItem>
             </SelectContent>
           </Select>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" data-testid="button-export">
             <Download className="h-4 w-4 mr-2" />
-            Export
+            {t('common.export', 'Export')}
           </Button>
           <Dialog open={isPaymentDialogOpen} onOpenChange={setIsPaymentDialogOpen}>
             <DialogTrigger asChild>
               <Button data-testid="button-record-payment">
                 <Plus className="h-4 w-4 mr-2" />
-                Record Payment
+                {t('accounting.recordPayment', 'Record Payment')}
               </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Record Payment</DialogTitle>
+                <DialogTitle>{t('accounting.recordPayment', 'Record Payment')}</DialogTitle>
                 <DialogDescription>
-                  Record a payment received from a customer
+                  {t('accounting.recordPaymentFromCustomer', 'Record a payment received from a customer')}
                 </DialogDescription>
               </DialogHeader>
               <Form {...form}>
@@ -266,11 +278,11 @@ export default function AccountsReceivable() {
                     name="customerId"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Customer</FormLabel>
+                        <FormLabel>{t('accounting.customer', 'Customer')}</FormLabel>
                         <Select onValueChange={field.onChange} value={field.value}>
                           <FormControl>
                             <SelectTrigger data-testid="select-customer">
-                              <SelectValue placeholder="Select customer" />
+                              <SelectValue placeholder={t('accounting.selectCustomer', 'Select customer')} />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
@@ -290,9 +302,9 @@ export default function AccountsReceivable() {
                     name="invoiceId"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Invoice</FormLabel>
+                        <FormLabel>{t('accounting.invoice', 'Invoice')}</FormLabel>
                         <FormControl>
-                          <Input placeholder="e.g., INV-2024-0089" {...field} data-testid="input-invoice" />
+                          <Input placeholder={t('accounting.invoicePlaceholderAR', 'e.g., INV-2024-0089')} {...field} data-testid="input-invoice" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -304,7 +316,7 @@ export default function AccountsReceivable() {
                       name="amount"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Amount (SAR)</FormLabel>
+                          <FormLabel>{t('accounting.amountSAR', 'Amount (SAR)')}</FormLabel>
                           <FormControl>
                             <Input type="number" placeholder="0.00" {...field} data-testid="input-amount" />
                           </FormControl>
@@ -317,7 +329,7 @@ export default function AccountsReceivable() {
                       name="paymentDate"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Payment Date</FormLabel>
+                          <FormLabel>{t('accounting.paymentDate', 'Payment Date')}</FormLabel>
                           <FormControl>
                             <Input type="date" {...field} data-testid="input-payment-date" />
                           </FormControl>
@@ -331,18 +343,18 @@ export default function AccountsReceivable() {
                     name="paymentMethod"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Payment Method</FormLabel>
+                        <FormLabel>{t('accounting.paymentMethod', 'Payment Method')}</FormLabel>
                         <Select onValueChange={field.onChange} value={field.value}>
                           <FormControl>
                             <SelectTrigger data-testid="select-payment-method">
-                              <SelectValue placeholder="Select method" />
+                              <SelectValue placeholder={t('accounting.selectMethod', 'Select method')} />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="cash">Cash</SelectItem>
-                            <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
-                            <SelectItem value="credit_card">Credit Card</SelectItem>
-                            <SelectItem value="check">Check</SelectItem>
+                            <SelectItem value="cash">{t('accounting.cash', 'Cash')}</SelectItem>
+                            <SelectItem value="bank_transfer">{t('accounting.bankTransfer', 'Bank Transfer')}</SelectItem>
+                            <SelectItem value="credit_card">{t('accounting.creditCard', 'Credit Card')}</SelectItem>
+                            <SelectItem value="check">{t('accounting.check', 'Check')}</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -354,9 +366,9 @@ export default function AccountsReceivable() {
                     name="reference"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Reference (Optional)</FormLabel>
+                        <FormLabel>{t('accounting.referenceOptional', 'Reference (Optional)')}</FormLabel>
                         <FormControl>
-                          <Input placeholder="e.g., Check #12345" {...field} data-testid="input-reference" />
+                          <Input placeholder={t('accounting.checkReferencePlaceholder', 'e.g., Check #12345')} {...field} data-testid="input-reference" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -364,10 +376,10 @@ export default function AccountsReceivable() {
                   />
                   <div className="flex justify-end gap-2">
                     <Button type="button" variant="outline" onClick={() => setIsPaymentDialogOpen(false)}>
-                      Cancel
+                      {t('common.cancel', 'Cancel')}
                     </Button>
                     <Button type="submit" data-testid="button-save-payment">
-                      Record Payment
+                      {t('accounting.recordPayment', 'Record Payment')}
                     </Button>
                   </div>
                 </form>
@@ -382,14 +394,14 @@ export default function AccountsReceivable() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Customer</TableHead>
-                <TableHead>Invoice</TableHead>
-                <TableHead>Due Date</TableHead>
-                <TableHead className="text-right">Original</TableHead>
-                <TableHead className="text-right">Paid</TableHead>
-                <TableHead className="text-right">Balance</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Actions</TableHead>
+                <TableHead>{t('accounting.customer', 'Customer')}</TableHead>
+                <TableHead>{t('accounting.invoice', 'Invoice')}</TableHead>
+                <TableHead>{t('accounting.dueDate', 'Due Date')}</TableHead>
+                <TableHead className="text-right">{t('accounting.original', 'Original')}</TableHead>
+                <TableHead className="text-right">{t('accounting.paid', 'Paid')}</TableHead>
+                <TableHead className="text-right">{t('accounting.balance', 'Balance')}</TableHead>
+                <TableHead>{t('common.status', 'Status')}</TableHead>
+                <TableHead>{t('common.actions', 'Actions')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -410,7 +422,7 @@ export default function AccountsReceivable() {
                     <div>
                       <p>{ar.dueDate}</p>
                       {ar.daysOverdue > 0 && (
-                        <p className="text-xs text-red-600">{ar.daysOverdue} days overdue</p>
+                        <p className="text-xs text-red-600">{t('accounting.daysOverdue', '{{days}} days overdue', { days: ar.daysOverdue })}</p>
                       )}
                     </div>
                   </TableCell>
@@ -424,7 +436,7 @@ export default function AccountsReceivable() {
                     {ar.balanceDue.toLocaleString()}
                   </TableCell>
                   <TableCell>
-                    <Badge className={getStatusBadge(ar.status)}>{ar.status}</Badge>
+                    <Badge className={getStatusBadge(ar.status)}>{getStatusLabel(ar.status)}</Badge>
                   </TableCell>
                   <TableCell>
                     <div className="flex gap-1">
@@ -455,12 +467,12 @@ export default function AccountsReceivable() {
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
               <DollarSign className="h-4 w-4" />
-              Total Receivables
+              {t('accounting.totalReceivables', 'Total Receivables')}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold">SAR {totalReceivables.toLocaleString()}</p>
-            <p className="text-xs text-muted-foreground">{receivables.length} invoices</p>
+            <p className="text-2xl font-bold">{t('common.sar', 'SAR')} {totalReceivables.toLocaleString()}</p>
+            <p className="text-xs text-muted-foreground">{t('accounting.invoicesCount', '{{count}} invoices', { count: receivables.length })}</p>
           </CardContent>
         </Card>
 
@@ -468,15 +480,15 @@ export default function AccountsReceivable() {
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
               <CheckCircle className="h-4 w-4 text-green-600" />
-              Current
+              {t('accounting.status.current', 'Current')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-bold text-green-600">
-              SAR {currentReceivables.toLocaleString()}
+              {t('common.sar', 'SAR')} {currentReceivables.toLocaleString()}
             </p>
             <p className="text-xs text-muted-foreground">
-              {((currentReceivables / totalReceivables) * 100).toFixed(0)}% of total
+              {t('accounting.percentOfTotal', '{{percent}}% of total', { percent: ((currentReceivables / totalReceivables) * 100).toFixed(0) })}
             </p>
           </CardContent>
         </Card>
@@ -485,15 +497,15 @@ export default function AccountsReceivable() {
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
               <AlertTriangle className="h-4 w-4 text-red-600" />
-              Overdue
+              {t('accounting.status.overdue', 'Overdue')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-bold text-red-600">
-              SAR {overdueReceivables.toLocaleString()}
+              {t('common.sar', 'SAR')} {overdueReceivables.toLocaleString()}
             </p>
             <p className="text-xs text-muted-foreground">
-              {((overdueReceivables / totalReceivables) * 100).toFixed(0)}% of total
+              {t('accounting.percentOfTotal', '{{percent}}% of total', { percent: ((overdueReceivables / totalReceivables) * 100).toFixed(0) })}
             </p>
           </CardContent>
         </Card>
@@ -502,33 +514,33 @@ export default function AccountsReceivable() {
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
               <Clock className="h-4 w-4" />
-              Avg Days Overdue
+              {t('accounting.avgDaysOverdue', 'Avg Days Overdue')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-bold">{avgDaysOverdue}</p>
-            <p className="text-xs text-muted-foreground">days average</p>
+            <p className="text-xs text-muted-foreground">{t('accounting.daysAverage', 'days average')}</p>
           </CardContent>
         </Card>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Aging Analysis</CardTitle>
-          <CardDescription>Receivables breakdown by age</CardDescription>
+          <CardTitle>{t('accounting.agingAnalysis', 'Aging Analysis')}</CardTitle>
+          <CardDescription>{t('accounting.receivablesBreakdownByAge', 'Receivables breakdown by age')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             {[
-              { label: "Current (0-30 days)", amount: 19500, percentage: 24 },
-              { label: "31-60 days", amount: 33500, percentage: 42 },
-              { label: "61-90 days", amount: 12000, percentage: 15 },
-              { label: "Over 90 days", amount: 15000, percentage: 19 },
+              { label: t('accounting.aging.current', 'Current (0-30 days)'), amount: 19500, percentage: 24 },
+              { label: t('accounting.aging.31to60', '31-60 days'), amount: 33500, percentage: 42 },
+              { label: t('accounting.aging.61to90', '61-90 days'), amount: 12000, percentage: 15 },
+              { label: t('accounting.aging.over90', 'Over 90 days'), amount: 15000, percentage: 19 },
             ].map((item, index) => (
               <div key={index}>
                 <div className="flex justify-between mb-1">
                   <span className="text-sm">{item.label}</span>
-                  <span className="text-sm font-bold">SAR {item.amount.toLocaleString()}</span>
+                  <span className="text-sm font-bold">{t('common.sar', 'SAR')} {item.amount.toLocaleString()}</span>
                 </div>
                 <Progress value={item.percentage} className="h-2" />
               </div>
@@ -539,36 +551,36 @@ export default function AccountsReceivable() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Related Modules</CardTitle>
-          <CardDescription>Navigate to related pages</CardDescription>
+          <CardTitle>{t('accounting.relatedModules', 'Related Modules')}</CardTitle>
+          <CardDescription>{t('accounting.navigateToRelatedPages', 'Navigate to related pages')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <Link href="/invoices">
               <Button variant="outline" className="w-full justify-start" data-testid="link-invoices">
                 <FileText className="h-4 w-4 mr-2" />
-                Invoices
+                {t('accounting.invoices', 'Invoices')}
                 <ExternalLink className="h-3 w-3 ml-auto" />
               </Button>
             </Link>
             <Link href="/customers">
               <Button variant="outline" className="w-full justify-start" data-testid="link-customers">
                 <Users className="h-4 w-4 mr-2" />
-                Customers
+                {t('accounting.customers', 'Customers')}
                 <ExternalLink className="h-3 w-3 ml-auto" />
               </Button>
             </Link>
             <Link href="/general-ledger">
               <Button variant="outline" className="w-full justify-start" data-testid="link-general-ledger">
                 <TrendingUp className="h-4 w-4 mr-2" />
-                General Ledger
+                {t('accounting.generalLedger', 'General Ledger')}
                 <ExternalLink className="h-3 w-3 ml-auto" />
               </Button>
             </Link>
             <Link href="/accounts-payable">
               <Button variant="outline" className="w-full justify-start" data-testid="link-accounts-payable">
                 <DollarSign className="h-4 w-4 mr-2" />
-                Accounts Payable
+                {t('accounting.accountsPayable', 'Accounts Payable')}
                 <ExternalLink className="h-3 w-3 ml-auto" />
               </Button>
             </Link>
@@ -582,14 +594,14 @@ export default function AccountsReceivable() {
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <div>
-          <h3 className="text-lg font-semibold">Collection Actions</h3>
+          <h3 className="text-lg font-semibold">{t('accounting.collectionActions', 'Collection Actions')}</h3>
           <p className="text-sm text-muted-foreground">
-            Track and manage collection efforts for overdue accounts
+            {t('accounting.trackCollectionEfforts', 'Track and manage collection efforts for overdue accounts')}
           </p>
         </div>
         <Button data-testid="button-send-reminders">
           <Send className="h-4 w-4 mr-2" />
-          Send Bulk Reminders
+          {t('accounting.sendBulkReminders', 'Send Bulk Reminders')}
         </Button>
       </div>
 
@@ -601,30 +613,30 @@ export default function AccountsReceivable() {
               <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-lg">{ar.customerName}</CardTitle>
-                  <Badge className={getStatusBadge(ar.status)}>{ar.status}</Badge>
+                  <Badge className={getStatusBadge(ar.status)}>{getStatusLabel(ar.status)}</Badge>
                 </div>
                 <CardDescription>{ar.invoiceNumber}</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Balance Due:</span>
+                    <span className="text-muted-foreground">{t('accounting.balanceDue', 'Balance Due')}:</span>
                     <span className="font-bold text-red-600">
-                      SAR {ar.balanceDue.toLocaleString()}
+                      {t('common.sar', 'SAR')} {ar.balanceDue.toLocaleString()}
                     </span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Days Overdue:</span>
+                    <span className="text-muted-foreground">{t('accounting.daysOverdueLabel', 'Days Overdue')}:</span>
                     <span className="font-bold">{ar.daysOverdue}</span>
                   </div>
                   <div className="flex gap-2 pt-2">
-                    <Button size="sm" variant="outline" className="flex-1" data-testid={`button-email-reminder-${ar.id}`}>
-                      <Mail className="h-4 w-4 mr-1" />
-                      Email
+                    <Button variant="outline" size="sm" className="flex-1" data-testid={`button-email-reminder-${ar.id}`}>
+                      <Mail className="h-3 w-3 mr-1" />
+                      {t('accounting.email', 'Email')}
                     </Button>
-                    <Button size="sm" variant="outline" className="flex-1" data-testid={`button-call-reminder-${ar.id}`}>
-                      <Phone className="h-4 w-4 mr-1" />
-                      Call
+                    <Button variant="outline" size="sm" className="flex-1" data-testid={`button-call-customer-${ar.id}`}>
+                      <Phone className="h-3 w-3 mr-1" />
+                      {t('accounting.call', 'Call')}
                     </Button>
                   </div>
                 </div>
@@ -636,18 +648,18 @@ export default function AccountsReceivable() {
   );
 
   const tabs = [
-    { id: "overview", label: "Overview", icon: TrendingUp, content: overviewTab },
-    { id: "receivables", label: "Receivables", icon: DollarSign, content: receivablesTab },
-    { id: "collections", label: "Collections", icon: AlertTriangle, content: collectionsTab },
+    { id: "receivables", label: t('accounting.receivables', 'Receivables'), icon: FileText, content: receivablesTab },
+    { id: "overview", label: t('accounting.overview', 'Overview'), icon: TrendingUp, content: overviewTab },
+    { id: "collections", label: t('accounting.collections', 'Collections'), icon: Calendar, content: collectionsTab },
   ];
 
   return (
     <TabsPageLayout
-      title="Accounts Receivable - حسابات المدينين"
-      description="Manage customer debts and collections"
+      title={t('accounting.accountsReceivableTitle', 'Accounts Receivable - الذمم المدينة')}
+      description={t('accounting.accountsReceivableDescription', 'Track customer invoices and payments')}
       icon={Users}
       tabs={tabs}
-      defaultTab="overview"
+      defaultTab="receivables"
     />
   );
 }

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { StandardTablePage } from "@/components/layouts";
 import { ClipboardList, User, Calendar, AlertCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -8,6 +9,7 @@ import type { JobCard } from "@shared/schema";
 import { TaskDetailsDialog } from "@/components/TaskDetailsDialog";
 
 export default function TaskManagement() {
+  const { t } = useTranslation();
   const [selectedTask, setSelectedTask] = useState<JobCard | null>(null);
   const [taskDetailsOpen, setTaskDetailsOpen] = useState(false);
   const [statusFilter, setStatusFilter] = useState("all");
@@ -45,7 +47,7 @@ export default function TaskManagement() {
 
   const columns = [
     {
-      header: "Task ID",
+      header: t('taskManagement.taskId', 'Task ID'),
       accessorKey: "id",
       cell: (row: JobCard) => (
         <span className="font-medium" data-testid={`task-id-${row.id}`}>
@@ -54,23 +56,23 @@ export default function TaskManagement() {
       ),
     },
     {
-      header: "Customer",
+      header: t('taskManagement.customer', 'Customer'),
       accessorKey: "vehicleInfo",
       cell: (row: JobCard) => (
         <span data-testid={`task-customer-${row.id}`}>
-          {(row.vehicleInfo as any)?.owner || 'N/A'}
+          {(row.vehicleInfo as any)?.owner || t('common.na', 'N/A')}
         </span>
       ),
     },
     {
-      header: "Service Type",
+      header: t('taskManagement.serviceType', 'Service Type'),
       accessorKey: "serviceType",
       cell: (row: JobCard) => (
         <span data-testid={`task-service-${row.id}`}>{row.serviceType}</span>
       ),
     },
     {
-      header: "Status",
+      header: t('common.status', 'Status'),
       accessorKey: "status",
       cell: (row: JobCard) => (
         <Badge className={`${getStatusBadge(row.status)} border-0`} data-testid={`task-status-${row.id}`}>
@@ -79,7 +81,7 @@ export default function TaskManagement() {
       ),
     },
     {
-      header: "Priority",
+      header: t('taskManagement.priority', 'Priority'),
       accessorKey: "priority",
       cell: (row: JobCard) => (
         <Badge className={`${getPriorityBadge(row.priority)} border-0`} data-testid={`task-priority-${row.id}`}>
@@ -88,16 +90,16 @@ export default function TaskManagement() {
       ),
     },
     {
-      header: "Due Date",
+      header: t('taskManagement.dueDate', 'Due Date'),
       accessorKey: "createdAt",
       cell: (row: JobCard) => (
         <span className="text-sm text-gray-600 dark:text-gray-400" data-testid={`task-date-${row.id}`}>
-          {row.createdAt ? new Date(row.createdAt).toLocaleDateString() : 'N/A'}
+          {row.createdAt ? new Date(row.createdAt).toLocaleDateString() : t('common.na', 'N/A')}
         </span>
       ),
     },
     {
-      header: "Action",
+      header: t('common.actions', 'Action'),
       accessorKey: "actions",
       cell: (row: JobCard) => (
         <Button
@@ -106,7 +108,7 @@ export default function TaskManagement() {
           onClick={() => handleViewTask(row)}
           data-testid={`button-view-${row.id}`}
         >
-          View
+          {t('common.view', 'View')}
         </Button>
       ),
     },
@@ -115,25 +117,25 @@ export default function TaskManagement() {
   const filters = [
     {
       id: "status",
-      label: "Status",
+      label: t('common.status', 'Status'),
       options: [
-        { value: "all", label: "All Status" },
-        { value: "pending", label: "Pending" },
-        { value: "in_progress", label: "In Progress" },
-        { value: "completed", label: "Completed" },
-        { value: "delivered", label: "Delivered" },
-        { value: "cancelled", label: "Cancelled" },
+        { value: "all", label: t('taskManagement.allStatus', 'All Status') },
+        { value: "pending", label: t('common.pending', 'Pending') },
+        { value: "in_progress", label: t('common.inProgress', 'In Progress') },
+        { value: "completed", label: t('common.completed', 'Completed') },
+        { value: "delivered", label: t('taskManagement.delivered', 'Delivered') },
+        { value: "cancelled", label: t('taskManagement.cancelled', 'Cancelled') },
       ],
       defaultValue: statusFilter,
     },
     {
       id: "priority",
-      label: "Priority",
+      label: t('taskManagement.priority', 'Priority'),
       options: [
-        { value: "all", label: "All Priority" },
-        { value: "high", label: "High" },
-        { value: "medium", label: "Medium" },
-        { value: "low", label: "Low" },
+        { value: "all", label: t('taskManagement.allPriority', 'All Priority') },
+        { value: "high", label: t('taskManagement.high', 'High') },
+        { value: "medium", label: t('taskManagement.medium', 'Medium') },
+        { value: "low", label: t('taskManagement.low', 'Low') },
       ],
       defaultValue: priorityFilter,
     },
@@ -142,18 +144,18 @@ export default function TaskManagement() {
   return (
     <>
       <StandardTablePage
-        title="Task Management"
-        description="Manage and track all service tasks and assignments"
+        title={t('taskManagement.title', 'Task Management')}
+        description={t('taskManagement.description', 'Manage and track all service tasks and assignments')}
         icon={ClipboardList}
         data={jobCards}
         isLoading={isLoading}
         columns={columns}
-        searchPlaceholder="Search tasks..."
+        searchPlaceholder={t('taskManagement.searchPlaceholder', 'Search tasks...')}
         filters={filters}
         emptyState={{
           icon: ClipboardList,
-          title: "No tasks found",
-          description: "There are no tasks available at the moment.",
+          title: t('taskManagement.noTasksFound', 'No tasks found'),
+          description: t('taskManagement.noTasksDescription', 'There are no tasks available at the moment.'),
         }}
       />
       

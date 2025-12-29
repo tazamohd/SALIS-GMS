@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { AnalyticsPage } from "@/components/layouts";
 import { Award, TrendingUp, Clock, Target } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from "recharts";
 
 export default function StaffPerformanceReview() {
+  const { t } = useTranslation();
   const [selectedPeriod, setSelectedPeriod] = useState("month");
   const [selectedDepartment, setSelectedDepartment] = useState("all");
 
@@ -19,51 +21,51 @@ export default function StaffPerformanceReview() {
   ];
 
   const monthlyTrends = [
-    { month: "Jan", average: 82, target: 85 },
-    { month: "Feb", average: 84, target: 85 },
-    { month: "Mar", average: 86, target: 85 },
-    { month: "Apr", average: 88, target: 85 },
-    { month: "May", average: 87, target: 85 },
-    { month: "Jun", average: 90, target: 85 },
+    { month: t('staffReview.months.jan', 'Jan'), average: 82, target: 85 },
+    { month: t('staffReview.months.feb', 'Feb'), average: 84, target: 85 },
+    { month: t('staffReview.months.mar', 'Mar'), average: 86, target: 85 },
+    { month: t('staffReview.months.apr', 'Apr'), average: 88, target: 85 },
+    { month: t('staffReview.months.may', 'May'), average: 87, target: 85 },
+    { month: t('staffReview.months.jun', 'Jun'), average: 90, target: 85 },
   ];
 
   const topPerformers = [
-    { name: "John Smith", role: "Senior Technician", score: 91.2, tasks: 145 },
-    { name: "Sarah Johnson", role: "Lead Mechanic", score: 90.8, tasks: 132 },
-    { name: "Emily Davis", role: "Technician", score: 89.8, tasks: 128 },
+    { name: "John Smith", role: t('staffReview.roles.seniorTechnician', 'Senior Technician'), score: 91.2, tasks: 145 },
+    { name: "Sarah Johnson", role: t('staffReview.roles.leadMechanic', 'Lead Mechanic'), score: 90.8, tasks: 132 },
+    { name: "Emily Davis", role: t('staffReview.roles.technician', 'Technician'), score: 89.8, tasks: 128 },
   ];
 
   const kpiData = [
-    { category: "Efficiency", value: 88 },
-    { category: "Quality", value: 89 },
-    { category: "Punctuality", value: 90 },
-    { category: "Teamwork", value: 90 },
-    { category: "Customer Satisfaction", value: 92 },
+    { category: t('staffReview.kpi.efficiency', 'Efficiency'), value: 88 },
+    { category: t('staffReview.kpi.quality', 'Quality'), value: 89 },
+    { category: t('staffReview.kpi.punctuality', 'Punctuality'), value: 90 },
+    { category: t('staffReview.kpi.teamwork', 'Teamwork'), value: 90 },
+    { category: t('staffReview.kpi.customerSatisfaction', 'Customer Satisfaction'), value: 92 },
   ];
 
   const filters = [
     {
       id: "period",
-      label: "Period",
+      label: t('staffReview.period', 'Period'),
       type: "select" as const,
       options: [
-        { value: "week", label: "This Week" },
-        { value: "month", label: "This Month" },
-        { value: "quarter", label: "This Quarter" },
-        { value: "year", label: "This Year" },
+        { value: "week", label: t('staffReview.periods.thisWeek', 'This Week') },
+        { value: "month", label: t('staffReview.periods.thisMonth', 'This Month') },
+        { value: "quarter", label: t('staffReview.periods.thisQuarter', 'This Quarter') },
+        { value: "year", label: t('staffReview.periods.thisYear', 'This Year') },
       ],
       value: selectedPeriod,
       onChange: setSelectedPeriod,
     },
     {
       id: "department",
-      label: "Department",
+      label: t('staffReview.department', 'Department'),
       type: "select" as const,
       options: [
-        { value: "all", label: "All Departments" },
-        { value: "mechanics", label: "Mechanics" },
-        { value: "service", label: "Service Advisors" },
-        { value: "admin", label: "Administration" },
+        { value: "all", label: t('staffReview.departments.all', 'All Departments') },
+        { value: "mechanics", label: t('staffReview.departments.mechanics', 'Mechanics') },
+        { value: "service", label: t('staffReview.departments.serviceAdvisors', 'Service Advisors') },
+        { value: "admin", label: t('staffReview.departments.administration', 'Administration') },
       ],
       value: selectedDepartment,
       onChange: setSelectedDepartment,
@@ -72,8 +74,8 @@ export default function StaffPerformanceReview() {
 
   const sections = [
     {
-      title: "Team Performance Overview",
-      description: "Individual performance metrics across key areas",
+      title: t('staffReview.sections.teamOverview', 'Team Performance Overview'),
+      description: t('staffReview.sections.teamOverviewDesc', 'Individual performance metrics across key areas'),
       content: (
         <ResponsiveContainer width="100%" height={400}>
           <BarChart data={performanceData}>
@@ -82,17 +84,17 @@ export default function StaffPerformanceReview() {
             <YAxis />
             <Tooltip contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))" }} />
             <Legend />
-            <Bar dataKey="efficiency" fill="#1f2937" name="Efficiency" />
-            <Bar dataKey="quality" fill="#4b5563" name="Quality" />
-            <Bar dataKey="punctuality" fill="#6b7280" name="Punctuality" />
-            <Bar dataKey="teamwork" fill="#9ca3af" name="Teamwork" />
+            <Bar dataKey="efficiency" fill="#1f2937" name={t('staffReview.kpi.efficiency', 'Efficiency')} />
+            <Bar dataKey="quality" fill="#4b5563" name={t('staffReview.kpi.quality', 'Quality')} />
+            <Bar dataKey="punctuality" fill="#6b7280" name={t('staffReview.kpi.punctuality', 'Punctuality')} />
+            <Bar dataKey="teamwork" fill="#9ca3af" name={t('staffReview.kpi.teamwork', 'Teamwork')} />
           </BarChart>
         </ResponsiveContainer>
       ),
     },
     {
-      title: "Performance Trends",
-      description: "Average team performance over time vs target",
+      title: t('staffReview.sections.performanceTrends', 'Performance Trends'),
+      description: t('staffReview.sections.performanceTrendsDesc', 'Average team performance over time vs target'),
       content: (
         <ResponsiveContainer width="100%" height={300}>
           <LineChart data={monthlyTrends}>
@@ -101,15 +103,15 @@ export default function StaffPerformanceReview() {
             <YAxis />
             <Tooltip contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))" }} />
             <Legend />
-            <Line type="monotone" dataKey="average" stroke="#1f2937" strokeWidth={2} name="Average Score" />
-            <Line type="monotone" dataKey="target" stroke="#9ca3af" strokeWidth={2} strokeDasharray="5 5" name="Target" />
+            <Line type="monotone" dataKey="average" stroke="#1f2937" strokeWidth={2} name={t('staffReview.averageScore', 'Average Score')} />
+            <Line type="monotone" dataKey="target" stroke="#9ca3af" strokeWidth={2} strokeDasharray="5 5" name={t('staffReview.target', 'Target')} />
           </LineChart>
         </ResponsiveContainer>
       ),
     },
     {
-      title: "Key Performance Indicators",
-      description: "Overall team KPIs radar chart",
+      title: t('staffReview.sections.kpiTitle', 'Key Performance Indicators'),
+      description: t('staffReview.sections.kpiDesc', 'Overall team KPIs radar chart'),
       content: (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <ResponsiveContainer width="100%" height={300}>
@@ -117,7 +119,7 @@ export default function StaffPerformanceReview() {
               <PolarGrid className="stroke-gray-200 dark:stroke-gray-700" />
               <PolarAngleAxis dataKey="category" className="text-xs" />
               <PolarRadiusAxis angle={90} domain={[0, 100]} />
-              <Radar name="Performance" dataKey="value" stroke="#1f2937" fill="#1f2937" fillOpacity={0.3} />
+              <Radar name={t('staffReview.performance', 'Performance')} dataKey="value" stroke="#1f2937" fill="#1f2937" fillOpacity={0.3} />
               <Tooltip contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))" }} />
             </RadarChart>
           </ResponsiveContainer>
@@ -139,8 +141,8 @@ export default function StaffPerformanceReview() {
 
   return (
     <AnalyticsPage
-      title="Staff Performance Review"
-      description="Comprehensive performance analytics and reviews"
+      title={t('staffReview.title', 'Staff Performance Review')}
+      description={t('staffReview.description', 'Comprehensive performance analytics and reviews')}
       icon={Award}
       filters={filters}
       sections={sections}
@@ -150,7 +152,7 @@ export default function StaffPerformanceReview() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <TrendingUp className="w-5 h-5" />
-            Top Performers
+            {t('staffReview.topPerformers', 'Top Performers')}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -172,7 +174,7 @@ export default function StaffPerformanceReview() {
                 </div>
                 <div className="text-right">
                   <p className="text-2xl font-bold text-gray-900 dark:text-white">{performer.score}</p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">{performer.tasks} tasks completed</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">{performer.tasks} {t('staffReview.tasksCompleted', 'tasks completed')}</p>
                 </div>
               </div>
             ))}

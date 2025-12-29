@@ -1,5 +1,6 @@
 import { useRoute } from 'wouter';
 import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Clock, CheckCircle2, Calendar, Car, AlertCircle, Loader2 } from 'lucide-react';
@@ -26,6 +27,7 @@ interface TrackingData {
 }
 
 export default function PublicTracking() {
+  const { t } = useTranslation();
   const [, params] = useRoute('/track/:token');
 
   const { data, isLoading: loading, error } = useQuery<TrackingData>({
@@ -35,7 +37,7 @@ export default function PublicTracking() {
       const response = await fetch(`/api/public/track/${params?.token}`);
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to load tracking data');
+        throw new Error(errorData.message || t('tracking.failedToLoadData', 'Failed to load tracking data'));
       }
       return response.json();
     },
@@ -78,7 +80,7 @@ export default function PublicTracking() {
       <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-salis-black">
         <div className="text-center">
           <Loader2 className="h-12 w-12 animate-spin mx-auto mb-4 text-gray-500" />
-          <p className="text-gray-600 dark:text-gray-400">Loading tracking information...</p>
+          <p className="text-gray-600 dark:text-gray-400">{t('tracking.loadingInfo', 'Loading tracking information...')}</p>
         </div>
       </div>
     );
@@ -92,13 +94,13 @@ export default function PublicTracking() {
             <div className="text-center">
               <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-                Unable to Load Tracking
+                {t('tracking.unableToLoad', 'Unable to Load Tracking')}
               </h2>
               <p className="text-gray-600 dark:text-gray-400 mb-4">
-                {error instanceof Error ? error.message : 'Failed to load tracking information'}
+                {error instanceof Error ? error.message : t('tracking.failedToLoadInfo', 'Failed to load tracking information')}
               </p>
               <p className="text-sm text-gray-500 dark:text-gray-500">
-                This tracking link may have expired or is invalid. Please contact the service center for assistance.
+                {t('tracking.linkExpiredOrInvalid', 'This tracking link may have expired or is invalid. Please contact the service center for assistance.')}
               </p>
             </div>
           </CardContent>
@@ -119,21 +121,20 @@ export default function PublicTracking() {
       <div className="max-w-4xl mx-auto">
         <div className="mb-8 text-center">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-            Service Tracking
+            {t('tracking.serviceTracking', 'Service Tracking')}
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            Track your vehicle's service progress in real-time
+            {t('tracking.trackVehicleProgress', "Track your vehicle's service progress in real-time")}
           </p>
         </div>
 
         <div className="space-y-6">
-          {/* Job Overview */}
           <Card className="bg-white dark:bg-salis-black" data-testid="card-job-overview">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle className="flex items-center gap-2">
                   <Car className="h-5 w-5" />
-                  Job #{jobCard.jobNumber}
+                  {t('tracking.jobNumber', 'Job #{{number}}', { number: jobCard.jobNumber })}
                 </CardTitle>
                 <Badge className={getStatusColor(jobCard.status)}>
                   {jobCard.status.replace('_', ' ').toUpperCase()}
@@ -143,21 +144,21 @@ export default function PublicTracking() {
             <CardContent className="space-y-4">
               <div>
                 <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
-                  Vehicle Information
+                  {t('tracking.vehicleInformation', 'Vehicle Information')}
                 </h3>
                 <p className="text-gray-600 dark:text-gray-400">
                   {vehicleInfo.make} {vehicleInfo.model} {vehicleInfo.year}
                 </p>
                 {vehicleInfo.licensePlate && (
                   <p className="text-sm text-gray-500 dark:text-gray-500">
-                    License Plate: {vehicleInfo.licensePlate}
+                    {t('tracking.licensePlate', 'License Plate')}: {vehicleInfo.licensePlate}
                   </p>
                 )}
               </div>
 
               <div>
                 <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
-                  Service Description
+                  {t('tracking.serviceDescription', 'Service Description')}
                 </h3>
                 <p className="text-gray-600 dark:text-gray-400">{jobCard.description}</p>
               </div>
@@ -167,7 +168,7 @@ export default function PublicTracking() {
                   <div>
                     <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-500 mb-1">
                       <Calendar className="h-4 w-4" />
-                      Scheduled
+                      {t('tracking.scheduled', 'Scheduled')}
                     </div>
                     <p className="font-medium text-gray-900 dark:text-white">
                       {format(new Date(jobCard.scheduledDate), 'PPp')}
@@ -179,7 +180,7 @@ export default function PublicTracking() {
                   <div>
                     <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-500 mb-1">
                       <Clock className="h-4 w-4" />
-                      Started
+                      {t('tracking.started', 'Started')}
                     </div>
                     <p className="font-medium text-gray-900 dark:text-white">
                       {format(new Date(jobCard.startedAt), 'PPp')}
@@ -191,7 +192,7 @@ export default function PublicTracking() {
                   <div>
                     <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-500 mb-1">
                       <Clock className="h-4 w-4" />
-                      Estimated Completion
+                      {t('tracking.estimatedCompletion', 'Estimated Completion')}
                     </div>
                     <p className="font-medium text-blue-600 dark:text-blue-400">
                       {format(new Date(jobCard.estimatedCompletionAt), 'PPp')}
@@ -203,7 +204,7 @@ export default function PublicTracking() {
                   <div>
                     <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-500 mb-1">
                       <CheckCircle2 className="h-4 w-4" />
-                      Completed
+                      {t('common.completed', 'Completed')}
                     </div>
                     <p className="font-medium text-green-600 dark:text-green-400">
                       {format(new Date(jobCard.completedAt), 'PPp')}
@@ -214,15 +215,14 @@ export default function PublicTracking() {
             </CardContent>
           </Card>
 
-          {/* Timeline */}
           <Card className="bg-white dark:bg-salis-black" data-testid="card-timeline">
             <CardHeader>
-              <CardTitle>Service Timeline</CardTitle>
+              <CardTitle>{t('tracking.serviceTimeline', 'Service Timeline')}</CardTitle>
             </CardHeader>
             <CardContent>
               {events.length === 0 ? (
                 <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-                  No updates available yet
+                  {t('tracking.noUpdatesYet', 'No updates available yet')}
                 </div>
               ) : (
                 <div className="relative">
@@ -256,10 +256,9 @@ export default function PublicTracking() {
             </CardContent>
           </Card>
 
-          {/* Footer */}
           <div className="text-center text-sm text-gray-500 dark:text-gray-500 pt-4">
-            <p>Questions about your service? Contact our service center.</p>
-            <p className="mt-1">This tracking link will expire in 7 days.</p>
+            <p>{t('tracking.contactServiceCenter', 'Questions about your service? Contact our service center.')}</p>
+            <p className="mt-1">{t('tracking.linkExpiry', 'This tracking link will expire in 7 days.')}</p>
           </div>
         </div>
       </div>

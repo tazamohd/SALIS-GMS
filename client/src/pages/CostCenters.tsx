@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Link } from "wouter";
+import { useTranslation } from "react-i18next";
 import { TabsPageLayout } from "@/components/layouts/TabsPageLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -167,6 +168,7 @@ const expensesByCenter = [
 ];
 
 export default function CostCenters() {
+  const { t } = useTranslation();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [departmentFilter, setDepartmentFilter] = useState("all");
@@ -223,12 +225,12 @@ export default function CostCenters() {
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
               <DollarSign className="h-4 w-4" />
-              Total Budget
+              {t('costCenters.totalBudget', 'Total Budget')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-bold">SAR {totalBudget.toLocaleString()}</p>
-            <p className="text-xs text-muted-foreground">{costCenters.length} cost centers</p>
+            <p className="text-xs text-muted-foreground">{costCenters.length} {t('costCenters.costCenters', 'cost centers')}</p>
           </CardContent>
         </Card>
 
@@ -236,13 +238,13 @@ export default function CostCenters() {
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
               <TrendingUp className="h-4 w-4" />
-              Actual Spend
+              {t('costCenters.actualSpend', 'Actual Spend')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-bold">SAR {totalActual.toLocaleString()}</p>
             <p className="text-xs text-muted-foreground">
-              {((totalActual / totalBudget) * 100).toFixed(1)}% of budget
+              {((totalActual / totalBudget) * 100).toFixed(1)}% {t('costCenters.ofBudget', 'of budget')}
             </p>
           </CardContent>
         </Card>
@@ -255,7 +257,7 @@ export default function CostCenters() {
               ) : (
                 <TrendingUp className="h-4 w-4 text-red-600" />
               )}
-              Total Variance
+              {t('costCenters.totalVariance', 'Total Variance')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -263,7 +265,7 @@ export default function CostCenters() {
               SAR {Math.abs(totalVariance).toLocaleString()}
             </p>
             <Badge variant={totalVariance >= 0 ? "default" : "destructive"}>
-              {totalVariance >= 0 ? "Under Budget" : "Over Budget"}
+              {totalVariance >= 0 ? t('costCenters.underBudget', 'Under Budget') : t('costCenters.overBudget', 'Over Budget')}
             </Badge>
           </CardContent>
         </Card>
@@ -272,18 +274,18 @@ export default function CostCenters() {
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
               <Target className="h-4 w-4" />
-              Center Status
+              {t('costCenters.centerStatus', 'Center Status')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex gap-4">
               <div className="text-center">
                 <p className="text-xl font-bold text-green-600">{underBudgetCount}</p>
-                <p className="text-xs text-muted-foreground">Under</p>
+                <p className="text-xs text-muted-foreground">{t('costCenters.under', 'Under')}</p>
               </div>
               <div className="text-center">
                 <p className="text-xl font-bold text-red-600">{overBudgetCount}</p>
-                <p className="text-xs text-muted-foreground">Over</p>
+                <p className="text-xs text-muted-foreground">{t('costCenters.over', 'Over')}</p>
               </div>
             </div>
           </CardContent>
@@ -293,8 +295,8 @@ export default function CostCenters() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
-            <CardTitle>Budget vs Actual by Center</CardTitle>
-            <CardDescription>Comparison of budget allocation and actual spend</CardDescription>
+            <CardTitle>{t('costCenters.budgetVsActual', 'Budget vs Actual by Center')}</CardTitle>
+            <CardDescription>{t('costCenters.comparisonOfBudget', 'Comparison of budget allocation and actual spend')}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -330,8 +332,8 @@ export default function CostCenters() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Department Summary</CardTitle>
-            <CardDescription>Spending by department</CardDescription>
+            <CardTitle>{t('costCenters.departmentSummary', 'Department Summary')}</CardTitle>
+            <CardDescription>{t('costCenters.spendingByDepartment', 'Spending by department')}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -349,14 +351,14 @@ export default function CostCenters() {
                       <div>
                         <p className="font-medium">{dept}</p>
                         <p className="text-xs text-muted-foreground">
-                          {deptCenters.length} center(s)
+                          {deptCenters.length} {t('costCenters.centers', 'center(s)')}
                         </p>
                       </div>
                     </div>
                     <div className="text-right">
                       <p className="font-mono font-bold">SAR {deptActual.toLocaleString()}</p>
                       <p className="text-xs text-muted-foreground">
-                        of SAR {deptBudget.toLocaleString()}
+                        {t('costCenters.of', 'of')} SAR {deptBudget.toLocaleString()}
                       </p>
                     </div>
                   </div>
@@ -369,36 +371,36 @@ export default function CostCenters() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Related Modules</CardTitle>
-          <CardDescription>Navigate to related pages</CardDescription>
+          <CardTitle>{t('costCenters.relatedModules', 'Related Modules')}</CardTitle>
+          <CardDescription>{t('costCenters.navigateToRelated', 'Navigate to related pages')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <Link href="/budget-management">
               <Button variant="outline" className="w-full justify-start" data-testid="link-budget">
                 <Target className="h-4 w-4 mr-2" />
-                Budget Management
+                {t('costCenters.budgetManagement', 'Budget Management')}
                 <ExternalLink className="h-3 w-3 ml-auto" />
               </Button>
             </Link>
             <Link href="/expenses-management">
               <Button variant="outline" className="w-full justify-start" data-testid="link-expenses">
                 <DollarSign className="h-4 w-4 mr-2" />
-                Expenses
+                {t('costCenters.expenses', 'Expenses')}
                 <ExternalLink className="h-3 w-3 ml-auto" />
               </Button>
             </Link>
             <Link href="/income-statement">
               <Button variant="outline" className="w-full justify-start" data-testid="link-income">
                 <TrendingUp className="h-4 w-4 mr-2" />
-                Income Statement
+                {t('costCenters.incomeStatement', 'Income Statement')}
                 <ExternalLink className="h-3 w-3 ml-auto" />
               </Button>
             </Link>
             <Link href="/general-ledger">
               <Button variant="outline" className="w-full justify-start" data-testid="link-ledger">
                 <FileText className="h-4 w-4 mr-2" />
-                General Ledger
+                {t('costCenters.generalLedger', 'General Ledger')}
                 <ExternalLink className="h-3 w-3 ml-auto" />
               </Button>
             </Link>
@@ -415,7 +417,7 @@ export default function CostCenters() {
           <div className="relative flex-1 max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search cost centers..."
+              placeholder={t('costCenters.searchCostCenters', 'Search cost centers...')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10"
@@ -424,35 +426,35 @@ export default function CostCenters() {
           </div>
           <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
             <SelectTrigger className="w-[180px]" data-testid="select-department">
-              <SelectValue placeholder="Department" />
+              <SelectValue placeholder={t('costCenters.department', 'Department')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Departments</SelectItem>
-              <SelectItem value="service">Service</SelectItem>
-              <SelectItem value="inventory">Inventory</SelectItem>
-              <SelectItem value="administration">Administration</SelectItem>
-              <SelectItem value="technical">Technical</SelectItem>
-              <SelectItem value="marketing">Marketing</SelectItem>
+              <SelectItem value="all">{t('costCenters.allDepartments', 'All Departments')}</SelectItem>
+              <SelectItem value="service">{t('costCenters.service', 'Service')}</SelectItem>
+              <SelectItem value="inventory">{t('costCenters.inventory', 'Inventory')}</SelectItem>
+              <SelectItem value="administration">{t('costCenters.administration', 'Administration')}</SelectItem>
+              <SelectItem value="technical">{t('costCenters.technical', 'Technical')}</SelectItem>
+              <SelectItem value="marketing">{t('costCenters.marketing', 'Marketing')}</SelectItem>
             </SelectContent>
           </Select>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" data-testid="button-export">
             <Download className="h-4 w-4 mr-2" />
-            Export
+            {t('common.export', 'Export')}
           </Button>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
               <Button data-testid="button-add-center">
                 <Plus className="h-4 w-4 mr-2" />
-                Add Cost Center
+                {t('costCenters.addCostCenter', 'Add Cost Center')}
               </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Create Cost Center</DialogTitle>
+                <DialogTitle>{t('costCenters.createCostCenter', 'Create Cost Center')}</DialogTitle>
                 <DialogDescription>
-                  Add a new cost center for expense tracking
+                  {t('costCenters.addNewCostCenter', 'Add a new cost center for expense tracking')}
                 </DialogDescription>
               </DialogHeader>
               <Form {...form}>
@@ -463,7 +465,7 @@ export default function CostCenters() {
                       name="code"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Code</FormLabel>
+                          <FormLabel>{t('costCenters.code', 'Code')}</FormLabel>
                           <FormControl>
                             <Input placeholder="e.g., SVC-BAY3" {...field} data-testid="input-code" />
                           </FormControl>
@@ -476,19 +478,19 @@ export default function CostCenters() {
                       name="department"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Department</FormLabel>
+                          <FormLabel>{t('costCenters.department', 'Department')}</FormLabel>
                           <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl>
                               <SelectTrigger data-testid="select-dept">
-                                <SelectValue placeholder="Select" />
+                                <SelectValue placeholder={t('common.select', 'Select')} />
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              <SelectItem value="Service">Service</SelectItem>
-                              <SelectItem value="Inventory">Inventory</SelectItem>
-                              <SelectItem value="Administration">Administration</SelectItem>
-                              <SelectItem value="Technical">Technical</SelectItem>
-                              <SelectItem value="Marketing">Marketing</SelectItem>
+                              <SelectItem value="Service">{t('costCenters.service', 'Service')}</SelectItem>
+                              <SelectItem value="Inventory">{t('costCenters.inventory', 'Inventory')}</SelectItem>
+                              <SelectItem value="Administration">{t('costCenters.administration', 'Administration')}</SelectItem>
+                              <SelectItem value="Technical">{t('costCenters.technical', 'Technical')}</SelectItem>
+                              <SelectItem value="Marketing">{t('costCenters.marketing', 'Marketing')}</SelectItem>
                             </SelectContent>
                           </Select>
                           <FormMessage />
@@ -502,9 +504,9 @@ export default function CostCenters() {
                       name="name"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Name (English)</FormLabel>
+                          <FormLabel>{t('costCenters.nameEnglish', 'Name (English)')}</FormLabel>
                           <FormControl>
-                            <Input placeholder="Cost center name" {...field} data-testid="input-name" />
+                            <Input placeholder={t('costCenters.costCenterName', 'Cost center name')} {...field} data-testid="input-name" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -515,7 +517,7 @@ export default function CostCenters() {
                       name="nameAr"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Name (Arabic)</FormLabel>
+                          <FormLabel>{t('costCenters.nameArabic', 'Name (Arabic)')}</FormLabel>
                           <FormControl>
                             <Input placeholder="اسم مركز التكلفة" dir="rtl" {...field} data-testid="input-name-ar" />
                           </FormControl>
@@ -530,9 +532,9 @@ export default function CostCenters() {
                       name="manager"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Manager</FormLabel>
+                          <FormLabel>{t('costCenters.manager', 'Manager')}</FormLabel>
                           <FormControl>
-                            <Input placeholder="Responsible manager" {...field} data-testid="input-manager" />
+                            <Input placeholder={t('costCenters.responsibleManager', 'Responsible manager')} {...field} data-testid="input-manager" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -543,7 +545,7 @@ export default function CostCenters() {
                       name="budgetAmount"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Budget (SAR)</FormLabel>
+                          <FormLabel>{t('costCenters.budgetSAR', 'Budget (SAR)')}</FormLabel>
                           <FormControl>
                             <Input type="number" placeholder="0" {...field} data-testid="input-budget" />
                           </FormControl>
@@ -557,9 +559,9 @@ export default function CostCenters() {
                     name="description"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Description (Optional)</FormLabel>
+                        <FormLabel>{t('costCenters.descriptionOptional', 'Description (Optional)')}</FormLabel>
                         <FormControl>
-                          <Textarea placeholder="Cost center description..." {...field} data-testid="input-description" />
+                          <Textarea placeholder={t('costCenters.costCenterDescription', 'Cost center description...')} {...field} data-testid="input-description" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -567,10 +569,10 @@ export default function CostCenters() {
                   />
                   <div className="flex justify-end gap-2">
                     <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
-                      Cancel
+                      {t('common.cancel', 'Cancel')}
                     </Button>
                     <Button type="submit" data-testid="button-save-center">
-                      Create Center
+                      {t('costCenters.createCenter', 'Create Center')}
                     </Button>
                   </div>
                 </form>
@@ -585,15 +587,15 @@ export default function CostCenters() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Code</TableHead>
-                <TableHead>Name</TableHead>
-                <TableHead>Department</TableHead>
-                <TableHead>Manager</TableHead>
-                <TableHead className="text-right">Budget</TableHead>
-                <TableHead className="text-right">Actual</TableHead>
-                <TableHead className="text-right">Variance</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Actions</TableHead>
+                <TableHead>{t('costCenters.code', 'Code')}</TableHead>
+                <TableHead>{t('costCenters.name', 'Name')}</TableHead>
+                <TableHead>{t('costCenters.department', 'Department')}</TableHead>
+                <TableHead>{t('costCenters.manager', 'Manager')}</TableHead>
+                <TableHead className="text-right">{t('costCenters.budget', 'Budget')}</TableHead>
+                <TableHead className="text-right">{t('costCenters.actual', 'Actual')}</TableHead>
+                <TableHead className="text-right">{t('costCenters.variance', 'Variance')}</TableHead>
+                <TableHead>{t('common.status', 'Status')}</TableHead>
+                <TableHead>{t('common.actions', 'Actions')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -646,8 +648,8 @@ export default function CostCenters() {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Expense Breakdown by Category</CardTitle>
-          <CardDescription>Detailed expense analysis across all cost centers</CardDescription>
+          <CardTitle>{t('costCenters.expenseBreakdownByCategory', 'Expense Breakdown by Category')}</CardTitle>
+          <CardDescription>{t('costCenters.detailedExpenseAnalysis', 'Detailed expense analysis across all cost centers')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -658,12 +660,12 @@ export default function CostCenters() {
               return (
                 <Card key={category} data-testid={`card-category-${category.toLowerCase()}`}>
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-sm">{category}</CardTitle>
+                    <CardTitle className="text-sm">{t(`costCenters.${category.toLowerCase()}`, category)}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <p className="text-xl font-bold">SAR {categoryTotal.toLocaleString()}</p>
                     <p className="text-xs text-muted-foreground">
-                      {((categoryTotal / totalActual) * 100).toFixed(1)}% of total
+                      {((categoryTotal / totalActual) * 100).toFixed(1)}% {t('costCenters.ofTotal', 'of total')}
                     </p>
                   </CardContent>
                 </Card>
@@ -675,8 +677,8 @@ export default function CostCenters() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Variance Analysis</CardTitle>
-          <CardDescription>Centers with significant budget variances</CardDescription>
+          <CardTitle>{t('costCenters.varianceAnalysis', 'Variance Analysis')}</CardTitle>
+          <CardDescription>{t('costCenters.centersWithSignificantVariance', 'Centers with significant budget variances')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -690,21 +692,21 @@ export default function CostCenters() {
                   </div>
                   <div className="grid grid-cols-4 gap-4 text-sm">
                     <div>
-                      <p className="text-muted-foreground">Budget</p>
+                      <p className="text-muted-foreground">{t('costCenters.budget', 'Budget')}</p>
                       <p className="font-mono font-bold">SAR {cc.budgetAmount.toLocaleString()}</p>
                     </div>
                     <div>
-                      <p className="text-muted-foreground">Actual</p>
+                      <p className="text-muted-foreground">{t('costCenters.actual', 'Actual')}</p>
                       <p className="font-mono font-bold">SAR {cc.actualSpend.toLocaleString()}</p>
                     </div>
                     <div>
-                      <p className="text-muted-foreground">Variance</p>
+                      <p className="text-muted-foreground">{t('costCenters.variance', 'Variance')}</p>
                       <p className={`font-mono font-bold ${cc.variance >= 0 ? "text-green-600" : "text-red-600"}`}>
                         SAR {Math.abs(cc.variance).toLocaleString()}
                       </p>
                     </div>
                     <div>
-                      <p className="text-muted-foreground">Utilization</p>
+                      <p className="text-muted-foreground">{t('costCenters.utilization', 'Utilization')}</p>
                       <Progress
                         value={Math.min((cc.actualSpend / cc.budgetAmount) * 100, 100)}
                         className="h-2 mt-2"
@@ -720,15 +722,15 @@ export default function CostCenters() {
   );
 
   const tabs = [
-    { id: "overview", label: "Overview", icon: BarChart3, content: overviewTab },
-    { id: "centers", label: "Cost Centers", icon: Target, content: centersTab },
-    { id: "analysis", label: "Analysis", icon: PieChart, content: analysisTab },
+    { id: "overview", label: t('costCenters.overview', 'Overview'), icon: BarChart3, content: overviewTab },
+    { id: "centers", label: t('costCenters.costCenters', 'Cost Centers'), icon: Target, content: centersTab },
+    { id: "analysis", label: t('costCenters.analysis', 'Analysis'), icon: PieChart, content: analysisTab },
   ];
 
   return (
     <TabsPageLayout
-      title="Cost Centers - مراكز التكلفة"
-      description="Track and allocate costs by department"
+      title={t('costCenters.title', 'Cost Centers - مراكز التكلفة')}
+      description={t('costCenters.description', 'Track and allocate costs by department')}
       icon={Target}
       tabs={tabs}
       defaultTab="overview"

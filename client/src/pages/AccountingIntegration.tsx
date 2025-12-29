@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -25,6 +26,7 @@ import { useToast } from "@/hooks/use-toast";
 import { TabsPageLayout, TabConfig } from "@/components/layouts";
 
 export default function AccountingIntegration() {
+  const { t } = useTranslation();
   const [selectedProvider, setSelectedProvider] = useState<string>("quickbooks");
   const { toast } = useToast();
 
@@ -41,7 +43,7 @@ export default function AccountingIntegration() {
       return await apiRequest("/api/accounting/connect", "POST", { provider });
     },
     onSuccess: () => {
-      toast({ title: "Connection initiated", description: "Please complete the authorization process." });
+      toast({ title: t('accounting.connectionInitiated', 'Connection initiated'), description: t('accounting.completeAuthorization', 'Please complete the authorization process.') });
       queryClient.invalidateQueries({ queryKey: ["/api/accounting/connections"] });
     },
   });
@@ -51,7 +53,7 @@ export default function AccountingIntegration() {
       return await apiRequest("/api/accounting/sync", "POST", { syncType });
     },
     onSuccess: () => {
-      toast({ title: "Sync started", description: "Data is being synchronized." });
+      toast({ title: t('accounting.syncStarted', 'Sync started'), description: t('accounting.dataSynchronizing', 'Data is being synchronized.') });
       queryClient.invalidateQueries({ queryKey: ["/api/accounting/sync-history"] });
     },
   });
@@ -99,9 +101,9 @@ export default function AccountingIntegration() {
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Total Synced</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">{t('accounting.totalSynced', 'Total Synced')}</p>
               <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">{syncStats.totalSynced}</h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Records</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{t('accounting.records', 'Records')}</p>
             </div>
             <CheckCircle className="h-12 w-12 text-green-600" />
           </div>
@@ -112,11 +114,11 @@ export default function AccountingIntegration() {
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Last Sync</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">{t('accounting.lastSync', 'Last Sync')}</p>
               <h3 className="text-xl font-bold mt-2 text-gray-900 dark:text-white">
                 {new Date(syncStats.lastSync).toLocaleTimeString()}
               </h3>
-              <p className="text-sm text-green-600 mt-1">Successfully completed</p>
+              <p className="text-sm text-green-600 mt-1">{t('accounting.successfullyCompleted', 'Successfully completed')}</p>
             </div>
             <RefreshCw className="h-12 w-12 text-blue-600" />
           </div>
@@ -127,9 +129,9 @@ export default function AccountingIntegration() {
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Pending</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">{t('common.pending', 'Pending')}</p>
               <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">{syncStats.pendingItems}</h3>
-              <p className="text-sm text-yellow-600 mt-1">Awaiting sync</p>
+              <p className="text-sm text-yellow-600 mt-1">{t('accounting.awaitingSync', 'Awaiting sync')}</p>
             </div>
             <AlertTriangle className="h-12 w-12 text-yellow-600" />
           </div>
@@ -140,9 +142,9 @@ export default function AccountingIntegration() {
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Failed</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">{t('common.failed', 'Failed')}</p>
               <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">{syncStats.failedItems}</h3>
-              <p className="text-sm text-red-600 mt-1">Needs attention</p>
+              <p className="text-sm text-red-600 mt-1">{t('accounting.needsAttention', 'Needs attention')}</p>
             </div>
             <XCircle className="h-12 w-12 text-red-600" />
           </div>
@@ -154,12 +156,12 @@ export default function AccountingIntegration() {
   const tabs: TabConfig[] = [
     {
       id: "connections",
-      label: "Connections",
+      label: t('accounting.connections', 'Connections'),
       icon: Link2,
       content: (
         <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
           <CardHeader>
-            <CardTitle>Connected Accounts</CardTitle>
+            <CardTitle>{t('accounting.connectedAccounts', 'Connected Accounts')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {mockConnections.length > 0 ? (
@@ -179,13 +181,13 @@ export default function AccountingIntegration() {
                       </h3>
                       <p className="text-sm text-gray-600 dark:text-gray-400">{connection.companyName}</p>
                       <p className="text-xs text-gray-500 mt-1">
-                        Last synced: {new Date(connection.lastSyncAt).toLocaleString()}
+                        {t('accounting.lastSynced', 'Last synced')}: {new Date(connection.lastSyncAt).toLocaleString()}
                       </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
                     <Badge variant={connection.isActive ? "default" : "secondary"}>
-                      {connection.isActive ? "Active" : "Inactive"}
+                      {connection.isActive ? t('common.active', 'Active') : t('common.inactive', 'Inactive')}
                     </Badge>
                     <Button
                       size="sm"
@@ -194,20 +196,20 @@ export default function AccountingIntegration() {
                       data-testid="button-sync-now"
                     >
                       <RefreshCw className="h-4 w-4 mr-2" />
-                      Sync Now
+                      {t('accounting.syncNow', 'Sync Now')}
                     </Button>
                   </div>
                 </div>
               ))
             ) : (
               <div className="text-center py-12">
-                <p className="text-gray-600 dark:text-gray-400 mb-4">No connections yet</p>
+                <p className="text-gray-600 dark:text-gray-400 mb-4">{t('accounting.noConnectionsYet', 'No connections yet')}</p>
                 <Button
                   onClick={() => connectMutation.mutate(selectedProvider)}
                   data-testid="button-connect"
                 >
                   <Link2 className="h-4 w-4 mr-2" />
-                  Connect {selectedProvider}
+                  {t('accounting.connect', 'Connect')} {selectedProvider}
                 </Button>
               </div>
             )}
@@ -217,16 +219,16 @@ export default function AccountingIntegration() {
     },
     {
       id: "sync",
-      label: "Sync History",
+      label: t('accounting.syncHistory', 'Sync History'),
       icon: RefreshCw,
       content: (
         <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
           <CardHeader>
             <div className="flex items-center justify-between">
-              <CardTitle>Sync History</CardTitle>
+              <CardTitle>{t('accounting.syncHistory', 'Sync History')}</CardTitle>
               <Button size="sm" onClick={() => syncMutation.mutate("all")} data-testid="button-refresh-history">
                 <RefreshCw className="h-4 w-4 mr-2" />
-                Refresh
+                {t('common.refresh', 'Refresh')}
               </Button>
             </div>
           </CardHeader>
@@ -241,19 +243,19 @@ export default function AccountingIntegration() {
                   <div className="flex items-center gap-4">
                     {getStatusIcon(item.status)}
                     <div>
-                      <h3 className="font-semibold text-gray-900 dark:text-white">{item.syncType}</h3>
+                      <h3 className="font-semibold text-gray-900 dark:text-white">{t(`accounting.syncType.${item.syncType.toLowerCase()}`, item.syncType)}</h3>
                       <p className="text-sm text-gray-600 dark:text-gray-400">
                         {new Date(item.timestamp).toLocaleString()}
                       </p>
                       {item.error && (
-                        <p className="text-sm text-red-600 mt-1">Error: {item.error}</p>
+                        <p className="text-sm text-red-600 mt-1">{t('common.error', 'Error')}: {item.error}</p>
                       )}
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="font-semibold text-gray-900 dark:text-white">{item.count} records</p>
+                    <p className="font-semibold text-gray-900 dark:text-white">{item.count} {t('accounting.records', 'records')}</p>
                     <Badge variant={item.status === "synced" ? "default" : "destructive"} className="mt-1">
-                      {item.status}
+                      {t(`accounting.status.${item.status}`, item.status)}
                     </Badge>
                   </div>
                 </div>
@@ -265,39 +267,39 @@ export default function AccountingIntegration() {
     },
     {
       id: "settings",
-      label: "Settings",
+      label: t('common.settings', 'Settings'),
       icon: Settings,
       content: (
         <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
           <CardHeader>
-            <CardTitle>Sync Settings</CardTitle>
+            <CardTitle>{t('accounting.syncSettings', 'Sync Settings')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="font-semibold text-gray-900 dark:text-white">Auto-Sync Invoices</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Automatically sync new invoices</p>
+                <h3 className="font-semibold text-gray-900 dark:text-white">{t('accounting.autoSyncInvoices', 'Auto-Sync Invoices')}</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('accounting.autoSyncInvoicesDesc', 'Automatically sync new invoices')}</p>
               </div>
               <Switch defaultChecked data-testid="switch-auto-sync-invoices" />
             </div>
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="font-semibold text-gray-900 dark:text-white">Auto-Sync Payments</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Automatically sync payment records</p>
+                <h3 className="font-semibold text-gray-900 dark:text-white">{t('accounting.autoSyncPayments', 'Auto-Sync Payments')}</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('accounting.autoSyncPaymentsDesc', 'Automatically sync payment records')}</p>
               </div>
               <Switch defaultChecked data-testid="switch-auto-sync-payments" />
             </div>
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="font-semibold text-gray-900 dark:text-white">Auto-Sync Customers</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Keep customer data in sync</p>
+                <h3 className="font-semibold text-gray-900 dark:text-white">{t('accounting.autoSyncCustomers', 'Auto-Sync Customers')}</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('accounting.autoSyncCustomersDesc', 'Keep customer data in sync')}</p>
               </div>
               <Switch data-testid="switch-auto-sync-customers" />
             </div>
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="font-semibold text-gray-900 dark:text-white">Auto-Sync Expenses</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Sync vendor bills and expenses</p>
+                <h3 className="font-semibold text-gray-900 dark:text-white">{t('accounting.autoSyncExpenses', 'Auto-Sync Expenses')}</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('accounting.autoSyncExpensesDesc', 'Sync vendor bills and expenses')}</p>
               </div>
               <Switch data-testid="switch-auto-sync-expenses" />
             </div>
@@ -309,8 +311,8 @@ export default function AccountingIntegration() {
 
   return (
     <TabsPageLayout
-      title="💼 Accounting Integration"
-      description="Sync with QuickBooks and Xero for automated bookkeeping"
+      title={t('accounting.title', '💼 Accounting Integration')}
+      description={t('accounting.description', 'Sync with QuickBooks and Xero for automated bookkeeping')}
       icon={DollarSign}
       headerContent={
         <>

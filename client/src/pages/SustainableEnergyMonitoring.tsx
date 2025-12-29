@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { AnalyticsPage } from "@/components/layouts";
 import { Zap, Leaf, TrendingDown, Battery } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -7,6 +8,7 @@ import { Progress } from "@/components/ui/progress";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar, Legend } from "recharts";
 
 export default function SustainableEnergyMonitoring() {
+  const { t } = useTranslation();
   const [selectedPeriod, setSelectedPeriod] = useState("month");
   const [selectedFacility, setSelectedFacility] = useState("all");
 
@@ -20,44 +22,44 @@ export default function SustainableEnergyMonitoring() {
   ];
 
   const energyBreakdown = [
-    { name: "Solar Energy", value: 45, color: "#fbbf24" },
-    { name: "Grid Power", value: 35, color: "#9ca3af" },
-    { name: "Energy Savings", value: 20, color: "#10b981" },
+    { name: t('energy.solarEnergy', 'Solar Energy'), value: 45, color: "#fbbf24" },
+    { name: t('energy.gridPower', 'Grid Power'), value: 35, color: "#9ca3af" },
+    { name: t('energy.energySavings', 'Energy Savings'), value: 20, color: "#10b981" },
   ];
 
   const monthlyComparison = [
-    { month: "Jan", consumption: 2400, savings: 300, cost: 1200 },
-    { month: "Feb", consumption: 2200, savings: 400, cost: 1100 },
-    { month: "Mar", consumption: 2100, savings: 450, cost: 1050 },
-    { month: "Apr", consumption: 2000, savings: 500, cost: 1000 },
-    { month: "May", consumption: 1900, savings: 550, cost: 950 },
-    { month: "Jun", consumption: 1850, savings: 600, cost: 925 },
+    { month: t('months.jan', 'Jan'), consumption: 2400, savings: 300, cost: 1200 },
+    { month: t('months.feb', 'Feb'), consumption: 2200, savings: 400, cost: 1100 },
+    { month: t('months.mar', 'Mar'), consumption: 2100, savings: 450, cost: 1050 },
+    { month: t('months.apr', 'Apr'), consumption: 2000, savings: 500, cost: 1000 },
+    { month: t('months.may', 'May'), consumption: 1900, savings: 550, cost: 950 },
+    { month: t('months.jun', 'Jun'), consumption: 1850, savings: 600, cost: 925 },
   ];
 
   const kpis = [
     {
-      label: "Total Energy Saved",
+      label: t('energy.totalEnergySaved', 'Total Energy Saved'),
       value: "2,400 kWh",
       change: "-15%",
       icon: TrendingDown,
       color: "text-green-600 dark:text-green-400",
     },
     {
-      label: "Solar Generation",
+      label: t('energy.solarGeneration', 'Solar Generation'),
       value: "1,850 kWh",
       change: "+22%",
       icon: Zap,
       color: "text-yellow-600 dark:text-yellow-400",
     },
     {
-      label: "Carbon Offset",
+      label: t('energy.carbonOffset', 'Carbon Offset'),
       value: "1.8 tons",
       change: "+18%",
       icon: Leaf,
       color: "text-green-600 dark:text-green-400",
     },
     {
-      label: "Battery Storage",
+      label: t('energy.batteryStorage', 'Battery Storage'),
       value: "85%",
       change: "+5%",
       icon: Battery,
@@ -68,26 +70,26 @@ export default function SustainableEnergyMonitoring() {
   const filters = [
     {
       id: "period",
-      label: "Period",
+      label: t('energy.period', 'Period'),
       type: "select" as const,
       options: [
-        { value: "day", label: "Today" },
-        { value: "week", label: "This Week" },
-        { value: "month", label: "This Month" },
-        { value: "year", label: "This Year" },
+        { value: "day", label: t('energy.today', 'Today') },
+        { value: "week", label: t('energy.thisWeek', 'This Week') },
+        { value: "month", label: t('energy.thisMonth', 'This Month') },
+        { value: "year", label: t('energy.thisYear', 'This Year') },
       ],
       value: selectedPeriod,
       onChange: setSelectedPeriod,
     },
     {
       id: "facility",
-      label: "Facility",
+      label: t('energy.facility', 'Facility'),
       type: "select" as const,
       options: [
-        { value: "all", label: "All Facilities" },
-        { value: "main", label: "Main Workshop" },
-        { value: "branch1", label: "Branch 1" },
-        { value: "branch2", label: "Branch 2" },
+        { value: "all", label: t('energy.allFacilities', 'All Facilities') },
+        { value: "main", label: t('energy.mainWorkshop', 'Main Workshop') },
+        { value: "branch1", label: t('energy.branch1', 'Branch 1') },
+        { value: "branch2", label: t('energy.branch2', 'Branch 2') },
       ],
       value: selectedFacility,
       onChange: setSelectedFacility,
@@ -96,8 +98,8 @@ export default function SustainableEnergyMonitoring() {
 
   const sections = [
     {
-      title: "Energy Consumption Timeline",
-      description: "Real-time energy usage from solar and grid sources",
+      title: t('energy.consumptionTimeline', 'Energy Consumption Timeline'),
+      description: t('energy.consumptionTimelineDesc', 'Real-time energy usage from solar and grid sources'),
       content: (
         <ResponsiveContainer width="100%" height={400}>
           <AreaChart data={energyConsumption}>
@@ -106,15 +108,15 @@ export default function SustainableEnergyMonitoring() {
             <YAxis />
             <Tooltip contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))" }} />
             <Legend />
-            <Area type="monotone" dataKey="solar" stackId="1" stroke="#fbbf24" fill="#fbbf24" fillOpacity={0.6} name="Solar" />
-            <Area type="monotone" dataKey="grid" stackId="1" stroke="#9ca3af" fill="#9ca3af" fillOpacity={0.6} name="Grid" />
+            <Area type="monotone" dataKey="solar" stackId="1" stroke="#fbbf24" fill="#fbbf24" fillOpacity={0.6} name={t('energy.solar', 'Solar')} />
+            <Area type="monotone" dataKey="grid" stackId="1" stroke="#9ca3af" fill="#9ca3af" fillOpacity={0.6} name={t('energy.grid', 'Grid')} />
           </AreaChart>
         </ResponsiveContainer>
       ),
     },
     {
-      title: "Energy Source Distribution",
-      description: "Breakdown of energy sources and savings",
+      title: t('energy.sourceDistribution', 'Energy Source Distribution'),
+      description: t('energy.sourceDistributionDesc', 'Breakdown of energy sources and savings'),
       content: (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <ResponsiveContainer width="100%" height={300}>
@@ -151,8 +153,8 @@ export default function SustainableEnergyMonitoring() {
       ),
     },
     {
-      title: "Monthly Trends & Cost Analysis",
-      description: "Energy consumption, savings, and cost over time",
+      title: t('energy.monthlyTrends', 'Monthly Trends & Cost Analysis'),
+      description: t('energy.monthlyTrendsDesc', 'Energy consumption, savings, and cost over time'),
       content: (
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={monthlyComparison}>
@@ -161,8 +163,8 @@ export default function SustainableEnergyMonitoring() {
             <YAxis />
             <Tooltip contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))" }} />
             <Legend />
-            <Bar dataKey="consumption" fill="#9ca3af" name="Consumption (kWh)" />
-            <Bar dataKey="savings" fill="#10b981" name="Savings (kWh)" />
+            <Bar dataKey="consumption" fill="#9ca3af" name={t('energy.consumptionKwh', 'Consumption (kWh)')} />
+            <Bar dataKey="savings" fill="#10b981" name={t('energy.savingsKwh', 'Savings (kWh)')} />
           </BarChart>
         </ResponsiveContainer>
       ),
@@ -171,8 +173,8 @@ export default function SustainableEnergyMonitoring() {
 
   return (
     <AnalyticsPage
-      title="Sustainable Energy Monitoring"
-      description="Track solar energy generation, consumption, and environmental impact"
+      title={t('energy.title', 'Sustainable Energy Monitoring')}
+      description={t('energy.description', 'Track solar energy generation, consumption, and environmental impact')}
       icon={Leaf}
       filters={filters}
       sections={sections}
@@ -200,24 +202,24 @@ export default function SustainableEnergyMonitoring() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Leaf className="w-5 h-5 text-green-600 dark:text-green-400" />
-            Environmental Impact
+            {t('energy.environmentalImpact', 'Environmental Impact')}
           </CardTitle>
-          <CardDescription>Your contribution to sustainability</CardDescription>
+          <CardDescription>{t('energy.sustainabilityContribution', 'Your contribution to sustainability')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">CO2 Reduction</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">{t('energy.co2Reduction', 'CO2 Reduction')}</p>
               <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">1.8 tons</p>
               <Progress value={75} className="h-2" />
             </div>
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Trees Equivalent</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">{t('energy.treesEquivalent', 'Trees Equivalent')}</p>
               <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">95 trees</p>
               <Progress value={65} className="h-2" />
             </div>
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Cost Savings</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">{t('energy.costSavings', 'Cost Savings')}</p>
               <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">$2,450</p>
               <Progress value={82} className="h-2" />
             </div>

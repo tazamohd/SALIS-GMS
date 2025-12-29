@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { AnalyticsPage } from "@/components/layouts";
 import { Users, TrendingUp, Clock, CheckCircle, Settings } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,6 +16,7 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/useAuth";
 
 export default function TechnicianPerformance() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const { user } = useAuth();
   const [selectedPeriod, setSelectedPeriod] = useState("month");
@@ -63,17 +65,17 @@ export default function TechnicianPerformance() {
     .slice(0, 4)
     .reverse()
     .map((rollup: any, index: number) => ({
-      week: `Week ${index + 1}`,
+      week: `${t('performance.week', 'Week')} ${index + 1}`,
       completed: rollup.jobsCompleted || 0,
       target: 40,
     }));
 
   const skillsData = [
-    { skill: "Engine Repair", proficiency: 90 },
-    { skill: "Diagnostics", proficiency: 85 },
-    { skill: "Electrical", proficiency: 80 },
-    { skill: "Brake Systems", proficiency: 95 },
-    { skill: "Transmission", proficiency: 75 },
+    { skill: t('performance.skills.engineRepair', 'Engine Repair'), proficiency: 90 },
+    { skill: t('performance.skills.diagnostics', 'Diagnostics'), proficiency: 85 },
+    { skill: t('performance.skills.electrical', 'Electrical'), proficiency: 80 },
+    { skill: t('performance.skills.brakeSystems', 'Brake Systems'), proficiency: 95 },
+    { skill: t('performance.skills.transmission', 'Transmission'), proficiency: 75 },
   ];
 
   const topPerformers = performanceData
@@ -82,7 +84,7 @@ export default function TechnicianPerformance() {
     .map((tech: any, index: number) => ({
       id: index + 1,
       name: tech.name,
-      role: "Technician",
+      role: t('performance.technician', 'Technician'),
       tasksCompleted: tech.tasksCompleted,
       rating: parseFloat(tech.quality),
       efficiency: tech.efficiency,
@@ -98,13 +100,13 @@ export default function TechnicianPerformance() {
       });
       queryClient.invalidateQueries({ queryKey: ['/api/technician-performance/metrics/preferences', userId] });
       toast({
-        title: "Preferences Updated",
-        description: "Your metric preferences have been saved.",
+        title: t('performance.preferencesUpdated', 'Preferences Updated'),
+        description: t('performance.preferencesSaved', 'Your metric preferences have been saved.'),
       });
     } catch (error) {
       toast({
-        title: "Error",
-        description: "Failed to update metric preferences.",
+        title: t('common.error', 'Error'),
+        description: t('performance.preferencesError', 'Failed to update metric preferences.'),
         variant: "destructive",
       });
     }
@@ -113,24 +115,24 @@ export default function TechnicianPerformance() {
   const filters = [
     {
       id: "period",
-      label: "Period",
+      label: t('performance.period', 'Period'),
       type: "select" as const,
       options: [
-        { value: "day", label: "Today" },
-        { value: "week", label: "This Week" },
-        { value: "month", label: "This Month" },
-        { value: "quarter", label: "This Quarter" },
-        { value: "year", label: "This Year" },
+        { value: "day", label: t('performance.periods.today', 'Today') },
+        { value: "week", label: t('performance.periods.thisWeek', 'This Week') },
+        { value: "month", label: t('performance.periods.thisMonth', 'This Month') },
+        { value: "quarter", label: t('performance.periods.thisQuarter', 'This Quarter') },
+        { value: "year", label: t('performance.periods.thisYear', 'This Year') },
       ],
       value: selectedPeriod,
       onChange: setSelectedPeriod,
     },
     {
       id: "technician",
-      label: "Technician",
+      label: t('performance.technician', 'Technician'),
       type: "select" as const,
       options: [
-        { value: "all", label: "All Technicians" },
+        { value: "all", label: t('performance.allTechnicians', 'All Technicians') },
         ...technicianList.map((tech: any) => ({
           value: tech.id,
           label: tech.fullName || tech.username,
@@ -143,8 +145,8 @@ export default function TechnicianPerformance() {
 
   const sections = [
     {
-      title: "Top Performing Technicians",
-      description: "Highest ranked technicians based on tasks completed",
+      title: t('performance.sections.topPerforming', 'Top Performing Technicians'),
+      description: t('performance.sections.topPerformingDesc', 'Highest ranked technicians based on tasks completed'),
       content: (
         <div className="space-y-4">
           {topPerformers.map((tech: any, index: number) => (
@@ -170,15 +172,15 @@ export default function TechnicianPerformance() {
               <div className="flex items-center gap-6">
                 <div className="text-center">
                   <p className="text-lg font-montserrat font-bold text-gray-900 dark:text-white">{tech.tasksCompleted}</p>
-                  <p className="text-xs font-poppins text-gray-600 dark:text-gray-400">Tasks</p>
+                  <p className="text-xs font-poppins text-gray-600 dark:text-gray-400">{t('performance.tasks', 'Tasks')}</p>
                 </div>
                 <div className="text-center">
                   <p className="text-lg font-montserrat font-bold text-gray-900 dark:text-white">{tech.rating}</p>
-                  <p className="text-xs font-poppins text-gray-600 dark:text-gray-400">Rating</p>
+                  <p className="text-xs font-poppins text-gray-600 dark:text-gray-400">{t('performance.rating', 'Rating')}</p>
                 </div>
                 <div className="text-center">
                   <Badge className="bg-gray-900 dark:bg-white text-white dark:text-gray-900 border-0">
-                    {tech.efficiency}% Efficiency
+                    {tech.efficiency}% {t('performance.efficiency', 'Efficiency')}
                   </Badge>
                 </div>
               </div>
@@ -188,8 +190,8 @@ export default function TechnicianPerformance() {
       ),
     },
     {
-      title: "Technician Performance Comparison",
-      description: "Compare key metrics across all technicians",
+      title: t('performance.sections.comparison', 'Technician Performance Comparison'),
+      description: t('performance.sections.comparisonDesc', 'Compare key metrics across all technicians'),
       content: (
         <ResponsiveContainer width="100%" height={400}>
           <BarChart data={performanceData}>
@@ -212,17 +214,17 @@ export default function TechnicianPerformance() {
               }} 
             />
             <Legend />
-            <Bar dataKey="tasksCompleted" fill="hsl(var(--foreground))" name="Tasks Completed" />
-            <Bar dataKey="efficiency" fill="hsl(var(--muted-foreground))" name="Efficiency %" />
+            <Bar dataKey="tasksCompleted" fill="hsl(var(--foreground))" name={t('performance.tasksCompleted', 'Tasks Completed')} />
+            <Bar dataKey="efficiency" fill="hsl(var(--muted-foreground))" name={t('performance.efficiencyPercent', 'Efficiency %')} />
           </BarChart>
         </ResponsiveContainer>
       ),
     },
     {
-      title: "Completion Trends",
+      title: t('performance.sections.completionTrends', 'Completion Trends'),
       description: selectedTechnician !== 'all' 
-        ? `Weekly task completion trends for selected technician` 
-        : "Select a technician to view completion trends",
+        ? t('performance.sections.completionTrendsDesc', 'Weekly task completion trends for selected technician')
+        : t('performance.sections.selectTechnician', 'Select a technician to view completion trends'),
       content: selectedTechnician !== 'all' && weeklyTrends.length > 0 ? (
         <ResponsiveContainer width="100%" height={300}>
           <LineChart data={weeklyTrends}>
@@ -244,19 +246,19 @@ export default function TechnicianPerformance() {
               }} 
             />
             <Legend />
-            <Line type="monotone" dataKey="completed" stroke="hsl(var(--foreground))" strokeWidth={2} name="Completed" />
-            <Line type="monotone" dataKey="target" stroke="hsl(var(--muted-foreground))" strokeWidth={2} strokeDasharray="5 5" name="Target" />
+            <Line type="monotone" dataKey="completed" stroke="hsl(var(--foreground))" strokeWidth={2} name={t('common.completed', 'Completed')} />
+            <Line type="monotone" dataKey="target" stroke="hsl(var(--muted-foreground))" strokeWidth={2} strokeDasharray="5 5" name={t('performance.target', 'Target')} />
           </LineChart>
         </ResponsiveContainer>
       ) : (
         <div className="flex items-center justify-center h-[300px] text-gray-600 dark:text-gray-400 font-poppins">
-          Select a specific technician to view completion trends
+          {t('performance.sections.selectTechnicianPrompt', 'Select a specific technician to view completion trends')}
         </div>
       ),
     },
     {
-      title: "Skills Proficiency",
-      description: "Technical skills assessment radar chart",
+      title: t('performance.sections.skillsProficiency', 'Skills Proficiency'),
+      description: t('performance.sections.skillsProficiencyDesc', 'Technical skills assessment radar chart'),
       content: (
         <ResponsiveContainer width="100%" height={400}>
           <RadarChart data={skillsData}>
@@ -274,7 +276,7 @@ export default function TechnicianPerformance() {
               style={{ fill: 'hsl(var(--foreground))' }}
             />
             <Radar 
-              name="Proficiency" 
+              name={t('performance.proficiency', 'Proficiency')}
               dataKey="proficiency" 
               stroke="hsl(var(--foreground))" 
               fill="hsl(var(--foreground))" 
@@ -295,8 +297,8 @@ export default function TechnicianPerformance() {
 
   return (
     <AnalyticsPage
-      title="Technician Performance"
-      description="Track and analyze technician productivity and performance metrics"
+      title={t('performance.title', 'Technician Performance')}
+      description={t('performance.description', 'Track and analyze technician productivity and performance metrics')}
       icon={Users}
       filters={filters}
       sections={sections}

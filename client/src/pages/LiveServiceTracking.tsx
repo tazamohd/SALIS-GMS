@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { StandardPageLayout } from "@/components/layouts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -15,6 +16,7 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { CheckCircle, Clock, Wrench, MapPin, Plus } from "lucide-react";
 
 export default function LiveServiceTracking() {
+  const { t } = useTranslation();
   const [selectedJobCard, setSelectedJobCard] = useState<string | null>(null);
   const [isAddUpdateOpen, setIsAddUpdateOpen] = useState(false);
   const [updateForm, setUpdateForm] = useState({
@@ -34,7 +36,7 @@ export default function LiveServiceTracking() {
     queryFn: async () => {
       if (!selectedJobCard) return [];
       const response = await fetch(`/api/service-tracking/${selectedJobCard}`);
-      if (!response.ok) throw new Error("Failed to fetch timeline");
+      if (!response.ok) throw new Error(t('liveTracking.failedFetchTimeline', 'Failed to fetch timeline'));
       return response.json();
     },
     enabled: !!selectedJobCard,
@@ -42,17 +44,17 @@ export default function LiveServiceTracking() {
 
   const postUpdateMutation = useMutation({
     mutationFn: async (data: typeof updateForm) => {
-      if (!selectedJobCard) throw new Error("No job card selected");
+      if (!selectedJobCard) throw new Error(t('liveTracking.noJobCardSelected', 'No job card selected'));
       return await apiRequest(`/api/service-tracking/${selectedJobCard}/update`, "POST", data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/service-tracking", selectedJobCard] });
-      toast({ title: "Update Posted", description: "Service tracking update has been posted successfully" });
+      toast({ title: t('liveTracking.updatePosted', 'Update Posted'), description: t('liveTracking.updatePostedSuccess', 'Service tracking update has been posted successfully') });
       setIsAddUpdateOpen(false);
       setUpdateForm({ status: "", message: "", photoUrl: "", estimatedCompletion: "" });
     },
     onError: (error: any) => {
-      toast({ title: "Error", description: error.message || "Failed to post service update", variant: "destructive" });
+      toast({ title: t('common.error', 'Error'), description: error.message || t('liveTracking.failedPostUpdate', 'Failed to post service update'), variant: "destructive" });
     },
   });
 
@@ -65,20 +67,20 @@ export default function LiveServiceTracking() {
       id: job.id || job.jobNumber || `missing-id-${index}`,
       jobNumber: job.jobNumber || 'N/A',
       status,
-      vehicle: vehicleStr || 'Unknown Vehicle',
-      customer: job.customerName || 'Unknown',
+      vehicle: vehicleStr || t('liveTracking.unknownVehicle', 'Unknown Vehicle'),
+      customer: job.customerName || t('liveTracking.unknown', 'Unknown'),
       progress: status === 'completed' ? 100 : status === 'in_progress' ? 50 : 10,
     };
   });
 
   return (
     <StandardPageLayout
-      title="Live Service Tracking"
-      description="Real-time service progress updates for customers"
+      title={t('liveTracking.title', 'Live Service Tracking')}
+      description={t('liveTracking.description', 'Real-time service progress updates for customers')}
       icon={MapPin}
       actions={[
         {
-          label: "Post Update",
+          label: t('liveTracking.postUpdate', 'Post Update'),
           icon: Plus,
           onClick: () => setIsAddUpdateOpen(true),
           variant: "default",
@@ -88,12 +90,12 @@ export default function LiveServiceTracking() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
           <CardHeader>
-            <CardTitle>Active Job Cards</CardTitle>
+            <CardTitle>{t('liveTracking.activeJobCards', 'Active Job Cards')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
               {transformedJobs.length === 0 ? (
-                <p className="text-center py-8 text-gray-500">No active job cards</p>
+                <p className="text-center py-8 text-gray-500">{t('liveTracking.noActiveJobCards', 'No active job cards')}</p>
               ) : (
                 transformedJobs.map((job) => (
                   <div
@@ -122,15 +124,15 @@ export default function LiveServiceTracking() {
 
         <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
           <CardHeader>
-            <CardTitle>Service Timeline</CardTitle>
+            <CardTitle>{t('liveTracking.serviceTimeline', 'Service Timeline')}</CardTitle>
           </CardHeader>
           <CardContent>
             {!selectedJobCard ? (
-              <p className="text-center py-8 text-gray-500">Select a job card to view timeline</p>
+              <p className="text-center py-8 text-gray-500">{t('liveTracking.selectJobCard', 'Select a job card to view timeline')}</p>
             ) : timelineLoading ? (
-              <p className="text-center py-8 text-gray-500">Loading timeline...</p>
+              <p className="text-center py-8 text-gray-500">{t('liveTracking.loadingTimeline', 'Loading timeline...')}</p>
             ) : selectedTimeline.length === 0 ? (
-              <p className="text-center py-8 text-gray-500">No updates yet</p>
+              <p className="text-center py-8 text-gray-500">{t('liveTracking.noUpdatesYet', 'No updates yet')}</p>
             ) : (
               <div className="space-y-4">
                 {(selectedTimeline as any[]).map((update, index) => (
@@ -165,26 +167,26 @@ export default function LiveServiceTracking() {
       <Dialog open={isAddUpdateOpen} onOpenChange={setIsAddUpdateOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Post Service Update</DialogTitle>
+            <DialogTitle>{t('liveTracking.postServiceUpdate', 'Post Service Update')}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div>
-              <Label>Status</Label>
+              <Label>{t('common.status', 'Status')}</Label>
               <Select value={updateForm.status} onValueChange={(value) => setUpdateForm({ ...updateForm, status: value })}>
                 <SelectTrigger className="mt-1" data-testid="select-status">
-                  <SelectValue placeholder="Select status" />
+                  <SelectValue placeholder={t('liveTracking.selectStatus', 'Select status')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="started">Started</SelectItem>
-                  <SelectItem value="in_progress">In Progress</SelectItem>
-                  <SelectItem value="completed">Completed</SelectItem>
+                  <SelectItem value="started">{t('liveTracking.statusStarted', 'Started')}</SelectItem>
+                  <SelectItem value="in_progress">{t('common.inProgress', 'In Progress')}</SelectItem>
+                  <SelectItem value="completed">{t('common.completed', 'Completed')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <Label>Message</Label>
+              <Label>{t('liveTracking.message', 'Message')}</Label>
               <Textarea
-                placeholder="Update message for customer..."
+                placeholder={t('liveTracking.updateMessagePlaceholder', 'Update message for customer...')}
                 value={updateForm.message}
                 onChange={(e) => setUpdateForm({ ...updateForm, message: e.target.value })}
                 className="mt-1"
@@ -197,7 +199,7 @@ export default function LiveServiceTracking() {
               disabled={!selectedJobCard || !updateForm.status || !updateForm.message}
               data-testid="button-post-update"
             >
-              Post Update
+              {t('liveTracking.postUpdate', 'Post Update')}
             </Button>
           </div>
         </DialogContent>

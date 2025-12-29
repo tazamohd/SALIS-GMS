@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "@/hooks/useAuth";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -16,6 +17,7 @@ interface Message {
 }
 
 export default function AIChatbotAssistant() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { toast } = useToast();
   const [conversationId, setConversationId] = useState<string | null>(null);
@@ -78,8 +80,8 @@ export default function AIChatbotAssistant() {
     },
     onError: () => {
       toast({
-        title: "Error",
-        description: "Failed to send message. Please try again.",
+        title: t('common.error', 'Error'),
+        description: t('aiChatbot.failedToSendMessage', 'Failed to send message. Please try again.'),
         variant: "destructive",
       });
     },
@@ -90,7 +92,7 @@ export default function AIChatbotAssistant() {
       return await apiRequest("POST", "/api/chatbot/diagnose", { symptoms });
     },
     onSuccess: (data) => {
-      const diagnosisMessage = `Based on your symptoms, here's what I found:\n\nPossible Issues:\n${data.possibleIssues.map((issue: string, i: number) => `${i + 1}. ${issue}`).join('\n')}\n\nRecommendations:\n${data.recommendations.map((rec: string, i: number) => `${i + 1}. ${rec}`).join('\n')}\n\nUrgency: ${data.urgency.toUpperCase()}\nEstimated Cost: ${data.estimatedCost || 'Contact us for quote'}`;
+      const diagnosisMessage = `${t('aiChatbot.basedOnSymptoms', 'Based on your symptoms, here\'s what I found')}:\n\n${t('aiChatbot.possibleIssues', 'Possible Issues')}:\n${data.possibleIssues.map((issue: string, i: number) => `${i + 1}. ${issue}`).join('\n')}\n\n${t('aiChatbot.recommendations', 'Recommendations')}:\n${data.recommendations.map((rec: string, i: number) => `${i + 1}. ${rec}`).join('\n')}\n\n${t('aiChatbot.urgency', 'Urgency')}: ${data.urgency.toUpperCase()}\n${t('aiChatbot.estimatedCost', 'Estimated Cost')}: ${data.estimatedCost || t('aiChatbot.contactUsForQuote', 'Contact us for quote')}`;
       
       setMessages((prev) => [...prev, { role: "assistant", content: diagnosisMessage }]);
     },
@@ -111,17 +113,17 @@ export default function AIChatbotAssistant() {
 
   return (
     <StandardPageLayout
-      title="AI Service Assistant"
-      description="Ask questions, book services, or get vehicle diagnostics"
+      title={t('aiChatbot.title', 'AI Service Assistant')}
+      description={t('aiChatbot.description', 'Ask questions, book services, or get vehicle diagnostics')}
       icon={Bot}
     >
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         <div className="lg:col-span-3">
           <Card className="h-[600px] flex flex-col">
             <CardHeader>
-              <CardTitle>Chat with AI Assistant</CardTitle>
+              <CardTitle>{t('aiChatbot.chatWithAssistant', 'Chat with AI Assistant')}</CardTitle>
               <CardDescription>
-                Get instant help with service questions and vehicle issues
+                {t('aiChatbot.getInstantHelp', 'Get instant help with service questions and vehicle issues')}
               </CardDescription>
             </CardHeader>
             <CardContent className="flex-1 flex flex-col">
@@ -129,12 +131,12 @@ export default function AIChatbotAssistant() {
                 {messages.length === 0 && (
                   <div className="text-center text-gray-500 dark:text-gray-400 py-12">
                     <Bot className="w-16 h-16 mx-auto mb-4 text-gray-300 dark:text-gray-600" />
-                    <p>Start a conversation! Ask me anything about:</p>
+                    <p>{t('aiChatbot.startConversation', 'Start a conversation! Ask me anything about')}:</p>
                     <ul className="mt-2 space-y-1 text-sm">
-                      <li>• Service pricing and availability</li>
-                      <li>• Booking appointments</li>
-                      <li>• Vehicle diagnostics and repairs</li>
-                      <li>• Maintenance recommendations</li>
+                      <li>• {t('aiChatbot.servicePricingAvailability', 'Service pricing and availability')}</li>
+                      <li>• {t('aiChatbot.bookingAppointments', 'Booking appointments')}</li>
+                      <li>• {t('aiChatbot.vehicleDiagnosticsRepairs', 'Vehicle diagnostics and repairs')}</li>
+                      <li>• {t('aiChatbot.maintenanceRecommendations', 'Maintenance recommendations')}</li>
                     </ul>
                   </div>
                 )}
@@ -186,7 +188,7 @@ export default function AIChatbotAssistant() {
                   value={inputMessage}
                   onChange={(e) => setInputMessage(e.target.value)}
                   onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
-                  placeholder="Type your message..."
+                  placeholder={t('aiChatbot.typeYourMessage', 'Type your message...')}
                   disabled={sendMessageMutation.isPending || !conversationId}
                   data-testid="chat-input"
                   className="flex-1"
@@ -210,60 +212,60 @@ export default function AIChatbotAssistant() {
         <div className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Quick Actions</CardTitle>
+              <CardTitle className="text-lg">{t('aiChatbot.quickActions', 'Quick Actions')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
               <Button
                 variant="outline"
                 className="w-full justify-start"
-                onClick={() => handleQuickAction("I need to book an oil change service")}
+                onClick={() => handleQuickAction(t('aiChatbot.bookOilChangeMessage', 'I need to book an oil change service'))}
                 data-testid="quick-oil-change"
               >
                 <Calendar className="w-4 h-4 mr-2" />
-                Book Oil Change
+                {t('aiChatbot.bookOilChange', 'Book Oil Change')}
               </Button>
               <Button
                 variant="outline"
                 className="w-full justify-start"
-                onClick={() => handleQuickAction("What services do you offer?")}
+                onClick={() => handleQuickAction(t('aiChatbot.viewServicesMessage', 'What services do you offer?'))}
                 data-testid="quick-services"
               >
                 <Wrench className="w-4 h-4 mr-2" />
-                View Services
+                {t('aiChatbot.viewServices', 'View Services')}
               </Button>
               <Button
                 variant="outline"
                 className="w-full justify-start"
-                onClick={() => handleQuickAction("My check engine light is on. What should I do?")}
+                onClick={() => handleQuickAction(t('aiChatbot.checkEngineLightMessage', 'My check engine light is on. What should I do?'))}
                 data-testid="quick-diagnosis"
               >
                 <AlertCircle className="w-4 h-4 mr-2" />
-                Check Engine Light
+                {t('aiChatbot.checkEngineLight', 'Check Engine Light')}
               </Button>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Features</CardTitle>
+              <CardTitle className="text-lg">{t('aiChatbot.features', 'Features')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2 text-sm">
               <div className="flex items-start gap-2">
-                <Badge variant="outline" className="mt-0.5">AI</Badge>
+                <Badge variant="outline" className="mt-0.5">{t('aiChatbot.aiBadge', 'AI')}</Badge>
                 <span className="text-gray-600 dark:text-gray-400">
-                  Natural language understanding
+                  {t('aiChatbot.naturalLanguageUnderstanding', 'Natural language understanding')}
                 </span>
               </div>
               <div className="flex items-start gap-2">
-                <Badge variant="outline" className="mt-0.5">24/7</Badge>
+                <Badge variant="outline" className="mt-0.5">{t('aiChatbot.alwaysAvailable', '24/7')}</Badge>
                 <span className="text-gray-600 dark:text-gray-400">
-                  Always available
+                  {t('aiChatbot.alwaysAvailableDesc', 'Always available')}
                 </span>
               </div>
               <div className="flex items-start gap-2">
-                <Badge variant="outline" className="mt-0.5">Smart</Badge>
+                <Badge variant="outline" className="mt-0.5">{t('aiChatbot.smartBadge', 'Smart')}</Badge>
                 <span className="text-gray-600 dark:text-gray-400">
-                  Context-aware responses
+                  {t('aiChatbot.contextAwareResponses', 'Context-aware responses')}
                 </span>
               </div>
             </CardContent>

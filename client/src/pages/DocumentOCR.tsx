@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { StandardPageLayout } from "@/components/layouts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -35,6 +36,7 @@ import {
 } from "@/components/ui/select";
 
 export default function DocumentOCR() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [uploadFile, setUploadFile] = useState<File | null>(null);
   const [documentType, setDocumentType] = useState<string>("invoice");
@@ -53,15 +55,15 @@ export default function DocumentOCR() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/ai/ocr-documents"] });
       toast({
-        title: "Document uploaded",
-        description: "OCR processing started. Results will appear shortly.",
+        title: t('documentOCR.documentUploaded', 'Document uploaded'),
+        description: t('documentOCR.ocrProcessingStarted', 'OCR processing started. Results will appear shortly.'),
       });
       setUploadFile(null);
     },
     onError: () => {
       toast({
-        title: "Upload failed",
-        description: "Failed to upload document for OCR processing.",
+        title: t('documentOCR.uploadFailed', 'Upload failed'),
+        description: t('documentOCR.uploadFailedDesc', 'Failed to upload document for OCR processing.'),
         variant: "destructive",
       });
     },
@@ -74,8 +76,8 @@ export default function DocumentOCR() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/ai/ocr-documents"] });
       toast({
-        title: "Document updated",
-        description: "Extracted data has been saved successfully.",
+        title: t('documentOCR.documentUpdated', 'Document updated'),
+        description: t('documentOCR.dataSaved', 'Extracted data has been saved successfully.'),
       });
       setEditMode(false);
       setSelectedDoc(null);
@@ -128,30 +130,37 @@ export default function DocumentOCR() {
       approved: "default",
       error: "destructive",
     };
+    const statusLabels: Record<string, string> = {
+      pending: t('common.pending', 'Pending'),
+      processing: t('documentOCR.processing', 'Processing'),
+      completed: t('common.completed', 'Completed'),
+      approved: t('documentOCR.approved', 'Approved'),
+      error: t('common.error', 'Error'),
+    };
     return (
       <Badge variant={variants[status] || "secondary"} className="capitalize">
-        {status}
+        {statusLabels[status] || status}
       </Badge>
     );
   };
 
   return (
     <StandardPageLayout
-      title="📄 Document OCR"
-      description="Automatically extract data from invoices and receipts using AI"
+      title={t('documentOCR.title', '📄 Document OCR')}
+      description={t('documentOCR.description', 'Automatically extract data from invoices and receipts using AI')}
       icon={FileText}
     >
       <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800 mb-6">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Upload className="h-5 w-5" />
-            Upload Document
+            {t('documentOCR.uploadDocument', 'Upload Document')}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="md:col-span-2">
-              <Label htmlFor="file-upload">Select File</Label>
+              <Label htmlFor="file-upload">{t('documentOCR.selectFile', 'Select File')}</Label>
               <Input
                 id="file-upload"
                 type="file"
@@ -161,21 +170,21 @@ export default function DocumentOCR() {
               />
               {uploadFile && (
                 <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                  Selected: {uploadFile.name}
+                  {t('documentOCR.selected', 'Selected')}: {uploadFile.name}
                 </p>
               )}
             </div>
             <div>
-              <Label htmlFor="doc-type">Document Type</Label>
+              <Label htmlFor="doc-type">{t('documentOCR.documentType', 'Document Type')}</Label>
               <Select value={documentType} onValueChange={setDocumentType}>
                 <SelectTrigger id="doc-type" data-testid="select-document-type">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="invoice">Invoice</SelectItem>
-                  <SelectItem value="receipt">Receipt</SelectItem>
-                  <SelectItem value="purchase_order">Purchase Order</SelectItem>
-                  <SelectItem value="estimate">Estimate</SelectItem>
+                  <SelectItem value="invoice">{t('documentOCR.invoice', 'Invoice')}</SelectItem>
+                  <SelectItem value="receipt">{t('documentOCR.receipt', 'Receipt')}</SelectItem>
+                  <SelectItem value="purchase_order">{t('documentOCR.purchaseOrder', 'Purchase Order')}</SelectItem>
+                  <SelectItem value="estimate">{t('documentOCR.estimate', 'Estimate')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -185,7 +194,7 @@ export default function DocumentOCR() {
             disabled={!uploadFile || uploadMutation.isPending}
             data-testid="button-upload-document"
           >
-            {uploadMutation.isPending ? "Uploading..." : "Upload & Process"}
+            {uploadMutation.isPending ? t('documentOCR.uploading', 'Uploading...') : t('documentOCR.uploadAndProcess', 'Upload & Process')}
           </Button>
         </CardContent>
       </Card>
@@ -194,15 +203,15 @@ export default function DocumentOCR() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <FileText className="h-5 w-5" />
-            Processed Documents
+            {t('documentOCR.processedDocuments', 'Processed Documents')}
           </CardTitle>
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <div className="text-center py-8 text-gray-500">Loading documents...</div>
+            <div className="text-center py-8 text-gray-500">{t('documentOCR.loadingDocuments', 'Loading documents...')}</div>
           ) : documents.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
-              No documents uploaded yet. Upload your first document to get started.
+              {t('documentOCR.noDocuments', 'No documents uploaded yet. Upload your first document to get started.')}
             </div>
           ) : (
             <div className="space-y-3">
@@ -216,14 +225,14 @@ export default function DocumentOCR() {
                     {getStatusIcon(doc.status)}
                     <div className="flex-1">
                       <h3 className="font-semibold text-gray-900 dark:text-white">
-                        {doc.fileName || "Untitled Document"}
+                        {doc.fileName || t('documentOCR.untitledDocument', 'Untitled Document')}
                       </h3>
                       <p className="text-sm text-gray-600 dark:text-gray-400 capitalize">
                         {doc.documentType} • {new Date(doc.createdAt).toLocaleDateString()}
                       </p>
                       {doc.extractedData?.total && (
                         <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mt-1">
-                          Total: ${doc.extractedData.total}
+                          {t('documentOCR.total', 'Total')}: ${doc.extractedData.total}
                         </p>
                       )}
                     </div>
@@ -242,7 +251,7 @@ export default function DocumentOCR() {
                           }}
                           data-testid={`button-view-${doc.id}`}
                         >
-                          View
+                          {t('common.view', 'View')}
                         </Button>
                         {doc.fileUrl && (
                           <Button
@@ -268,7 +277,7 @@ export default function DocumentOCR() {
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle className="flex items-center justify-between">
-              <span>Extracted Data</span>
+              <span>{t('documentOCR.extractedData', 'Extracted Data')}</span>
               {!editMode && (
                 <Button
                   variant="outline"
@@ -277,7 +286,7 @@ export default function DocumentOCR() {
                   data-testid="button-edit-data"
                 >
                   <Edit className="h-4 w-4 mr-2" />
-                  Edit
+                  {t('common.edit', 'Edit')}
                 </Button>
               )}
             </DialogTitle>
@@ -287,11 +296,11 @@ export default function DocumentOCR() {
             <div className="space-y-4 max-h-[60vh] overflow-y-auto">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label>Document Type</Label>
+                  <Label>{t('documentOCR.documentType', 'Document Type')}</Label>
                   <p className="text-sm font-medium capitalize">{selectedDoc.documentType}</p>
                 </div>
                 <div>
-                  <Label>Status</Label>
+                  <Label>{t('common.status', 'Status')}</Label>
                   <div>{getStatusBadge(selectedDoc.status)}</div>
                 </div>
               </div>
@@ -300,7 +309,7 @@ export default function DocumentOCR() {
                 <div className="space-y-4 border-t pt-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="edit-vendor">Vendor/Supplier</Label>
+                      <Label htmlFor="edit-vendor">{t('documentOCR.vendorSupplier', 'Vendor/Supplier')}</Label>
                       <Input
                         id="edit-vendor"
                         value={editedData.vendor || ""}
@@ -311,7 +320,7 @@ export default function DocumentOCR() {
                       />
                     </div>
                     <div>
-                      <Label htmlFor="edit-total">Total Amount</Label>
+                      <Label htmlFor="edit-total">{t('documentOCR.totalAmount', 'Total Amount')}</Label>
                       <Input
                         id="edit-total"
                         type="number"
@@ -327,11 +336,11 @@ export default function DocumentOCR() {
                   <DialogFooter>
                     <Button variant="outline" onClick={() => setEditMode(false)} data-testid="button-cancel-edit">
                       <X className="h-4 w-4 mr-2" />
-                      Cancel
+                      {t('common.cancel', 'Cancel')}
                     </Button>
                     <Button onClick={handleSaveEdits} disabled={updateMutation.isPending} data-testid="button-save-edit">
                       <Save className="h-4 w-4 mr-2" />
-                      {updateMutation.isPending ? "Saving..." : "Save Changes"}
+                      {updateMutation.isPending ? t('documentOCR.saving', 'Saving...') : t('documentOCR.saveChanges', 'Save Changes')}
                     </Button>
                   </DialogFooter>
                 </div>
@@ -339,13 +348,13 @@ export default function DocumentOCR() {
                 <div className="space-y-3 border-t pt-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <Label>Vendor/Supplier</Label>
-                      <p className="text-sm font-medium">{editedData.vendor || "N/A"}</p>
+                      <Label>{t('documentOCR.vendorSupplier', 'Vendor/Supplier')}</Label>
+                      <p className="text-sm font-medium">{editedData.vendor || t('common.notAvailable', 'N/A')}</p>
                     </div>
                     <div>
-                      <Label>Total Amount</Label>
+                      <Label>{t('documentOCR.totalAmount', 'Total Amount')}</Label>
                       <p className="text-sm font-medium">
-                        {editedData.total ? `$${editedData.total}` : "N/A"}
+                        {editedData.total ? `$${editedData.total}` : t('common.notAvailable', 'N/A')}
                       </p>
                     </div>
                   </div>

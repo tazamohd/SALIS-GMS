@@ -1,4 +1,5 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -8,6 +9,7 @@ import { Wrench, AlertCircle, CheckCircle, Clock } from "lucide-react";
 import { DashboardPage } from "@/components/layouts";
 
 export default function EquipmentCalibration() {
+  const { t } = useTranslation();
   const { toast } = useToast();
 
   const { data: records = [] } = useQuery<any[]>({
@@ -28,15 +30,15 @@ export default function EquipmentCalibration() {
     },
     onSuccess: () => {
       toast({
-        title: "Calibration Added",
-        description: "Calibration record has been added successfully",
+        title: t('calibration.calibrationAdded', 'Calibration Added'),
+        description: t('calibration.calibrationAddedSuccess', 'Calibration record has been added successfully'),
       });
       queryClient.invalidateQueries({ queryKey: ['/api/calibration/due'] });
     },
     onError: (error: any) => {
       toast({
-        title: "Failed to Add",
-        description: error.message || "Failed to add calibration record",
+        title: t('calibration.failedToAdd', 'Failed to Add'),
+        description: error.message || t('calibration.failedToAddCalibration', 'Failed to add calibration record'),
         variant: "destructive",
       });
     },
@@ -66,25 +68,25 @@ export default function EquipmentCalibration() {
 
   const metrics = [
     {
-      label: "Total Equipment",
+      label: t('calibration.totalEquipment', 'Total Equipment'),
       value: stats.totalEquipment,
       icon: Wrench,
       color: "text-blue-600",
     },
     {
-      label: "Valid",
+      label: t('calibration.valid', 'Valid'),
       value: stats.valid,
       icon: CheckCircle,
       color: "text-green-600",
     },
     {
-      label: "Due Soon",
+      label: t('calibration.dueSoon', 'Due Soon'),
       value: stats.due,
       icon: Clock,
       color: "text-yellow-600",
     },
     {
-      label: "Overdue",
+      label: t('calibration.overdue', 'Overdue'),
       value: stats.overdue,
       icon: AlertCircle,
       color: "text-red-600",
@@ -93,8 +95,8 @@ export default function EquipmentCalibration() {
 
   return (
     <DashboardPage
-      title="🔧 Equipment Calibration"
-      description="Track tool calibration and certifications"
+      title={t('calibration.equipmentCalibration', 'Equipment Calibration')}
+      description={t('calibration.description', 'Track tool calibration and certifications')}
       icon={Wrench}
       metrics={metrics}
     >
@@ -104,17 +106,17 @@ export default function EquipmentCalibration() {
         data-testid="button-add-calibration"
         className="absolute top-8 right-8"
       >
-        {addCalibrationMutation.isPending ? "Adding..." : "Add Calibration"}
+        {addCalibrationMutation.isPending ? t('calibration.adding', 'Adding...') : t('calibration.addCalibration', 'Add Calibration')}
       </Button>
 
       <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
         <CardHeader>
-          <CardTitle>Calibration Records</CardTitle>
+          <CardTitle>{t('calibration.calibrationRecords', 'Calibration Records')}</CardTitle>
         </CardHeader>
         <CardContent>
           {records.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
-              No calibration records available. Click "Add Calibration" to create a new record.
+              {t('calibration.noRecordsAvailable', 'No calibration records available. Click "Add Calibration" to create a new record.')}
             </div>
           ) : (
             <div className="space-y-3">
@@ -123,12 +125,12 @@ export default function EquipmentCalibration() {
                   <div className="flex-1">
                     <h3 className="font-semibold text-gray-900 dark:text-white">{record.toolName || `#${record.toolNumber}`}</h3>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
-                      {record.calibrationType || 'Standard Calibration'}
+                      {record.calibrationType || t('calibration.standardCalibration', 'Standard Calibration')}
                     </p>
                   </div>
                   <div className="text-right mr-4">
                     <p className="text-sm font-semibold text-gray-900 dark:text-white">
-                      Due: {record.nextCalibrationDue ? new Date(record.nextCalibrationDue).toLocaleDateString() : 'N/A'}
+                      {t('calibration.due', 'Due')}: {record.nextCalibrationDue ? new Date(record.nextCalibrationDue).toLocaleDateString() : t('common.notAvailable', 'N/A')}
                     </p>
                   </div>
                   {getStatusBadge(record.status)}

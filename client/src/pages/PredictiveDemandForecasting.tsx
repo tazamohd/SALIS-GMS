@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { DashboardPage } from "@/components/layouts";
 import { TrendingUp, Package, Users, Calendar, AlertTriangle } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function PredictiveDemandForecasting() {
+  const { t } = useTranslation();
   const [forecastPeriod, setForecastPeriod] = useState("30");
 
   const { data: forecastData } = useQuery({
@@ -15,41 +17,41 @@ export default function PredictiveDemandForecasting() {
   });
 
   const demandForecast = [
-    { week: "Week 1", predicted: 120, historical: 115, confidence: 95 },
-    { week: "Week 2", predicted: 135, historical: 128, confidence: 92 },
-    { week: "Week 3", predicted: 145, historical: 140, confidence: 90 },
-    { week: "Week 4", predicted: 130, historical: null, confidence: 88 },
+    { week: t('demandForecasting.week1', 'Week 1'), predicted: 120, historical: 115, confidence: 95 },
+    { week: t('demandForecasting.week2', 'Week 2'), predicted: 135, historical: 128, confidence: 92 },
+    { week: t('demandForecasting.week3', 'Week 3'), predicted: 145, historical: 140, confidence: 90 },
+    { week: t('demandForecasting.week4', 'Week 4'), predicted: 130, historical: null, confidence: 88 },
   ];
 
   const partsDemand = [
-    { part: "Oil Filters", current: 85, forecasted: 120, reorderPoint: 100 },
-    { part: "Brake Pads", current: 45, forecasted: 75, reorderPoint: 60 },
-    { part: "Air Filters", current: 92, forecasted: 95, reorderPoint: 80 },
-    { part: "Spark Plugs", current: 110, forecasted: 140, reorderPoint: 120 },
+    { part: t('demandForecasting.oilFilters', 'Oil Filters'), current: 85, forecasted: 120, reorderPoint: 100 },
+    { part: t('demandForecasting.brakePads', 'Brake Pads'), current: 45, forecasted: 75, reorderPoint: 60 },
+    { part: t('demandForecasting.airFilters', 'Air Filters'), current: 92, forecasted: 95, reorderPoint: 80 },
+    { part: t('demandForecasting.sparkPlugs', 'Spark Plugs'), current: 110, forecasted: 140, reorderPoint: 120 },
   ];
 
   const metrics = [
     {
-      label: "Forecast Accuracy",
+      label: t('demandForecasting.forecastAccuracy', 'Forecast Accuracy'),
       value: "93.5%",
       icon: TrendingUp,
       color: "text-green-500",
       trend: { value: "+2.5%", isPositive: true },
     },
     {
-      label: "Predicted Peak Day",
-      value: "Thursday",
+      label: t('demandForecasting.predictedPeakDay', 'Predicted Peak Day'),
+      value: t('demandForecasting.thursday', 'Thursday'),
       icon: Calendar,
       color: "text-blue-500",
     },
     {
-      label: "Parts Reorder Alerts",
+      label: t('demandForecasting.partsReorderAlerts', 'Parts Reorder Alerts'),
       value: "3",
       icon: Package,
       color: "text-orange-500",
     },
     {
-      label: "Avg Daily Appointments",
+      label: t('demandForecasting.avgDailyAppointments', 'Avg Daily Appointments'),
       value: "32",
       icon: Users,
       color: "text-purple-500",
@@ -59,8 +61,8 @@ export default function PredictiveDemandForecasting() {
 
   return (
     <DashboardPage
-      title="Predictive Demand Forecasting"
-      description="AI-powered forecasting for service demand and inventory planning"
+      title={t('demandForecasting.title', 'Predictive Demand Forecasting')}
+      description={t('demandForecasting.description', 'AI-powered forecasting for service demand and inventory planning')}
       icon={TrendingUp}
       metrics={metrics}
     >
@@ -70,9 +72,9 @@ export default function PredictiveDemandForecasting() {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="7">Next 7 Days</SelectItem>
-            <SelectItem value="30">Next 30 Days</SelectItem>
-            <SelectItem value="90">Next 90 Days</SelectItem>
+            <SelectItem value="7">{t('demandForecasting.next7Days', 'Next 7 Days')}</SelectItem>
+            <SelectItem value="30">{t('demandForecasting.next30Days', 'Next 30 Days')}</SelectItem>
+            <SelectItem value="90">{t('demandForecasting.next90Days', 'Next 90 Days')}</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -80,8 +82,8 @@ export default function PredictiveDemandForecasting() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <Card>
           <CardHeader>
-            <CardTitle>Service Demand Forecast</CardTitle>
-            <CardDescription>Predicted vs historical appointment demand</CardDescription>
+            <CardTitle>{t('demandForecasting.serviceDemandForecast', 'Service Demand Forecast')}</CardTitle>
+            <CardDescription>{t('demandForecasting.serviceDemandForecastDesc', 'Predicted vs historical appointment demand')}</CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -95,14 +97,14 @@ export default function PredictiveDemandForecasting() {
                   type="monotone"
                   dataKey="historical"
                   stroke="#8884d8"
-                  name="Historical"
+                  name={t('demandForecasting.historical', 'Historical')}
                   strokeWidth={2}
                 />
                 <Line
                   type="monotone"
                   dataKey="predicted"
                   stroke="#82ca9d"
-                  name="Predicted"
+                  name={t('demandForecasting.predicted', 'Predicted')}
                   strokeWidth={2}
                   strokeDasharray="5 5"
                 />
@@ -113,8 +115,8 @@ export default function PredictiveDemandForecasting() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Parts Inventory Forecast</CardTitle>
-            <CardDescription>Current stock vs forecasted demand</CardDescription>
+            <CardTitle>{t('demandForecasting.partsInventoryForecast', 'Parts Inventory Forecast')}</CardTitle>
+            <CardDescription>{t('demandForecasting.partsInventoryForecastDesc', 'Current stock vs forecasted demand')}</CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -124,9 +126,9 @@ export default function PredictiveDemandForecasting() {
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                <Bar dataKey="current" fill="#8884d8" name="Current Stock" />
-                <Bar dataKey="forecasted" fill="#82ca9d" name="Forecasted Need" />
-                <Bar dataKey="reorderPoint" fill="#ffc658" name="Reorder Point" />
+                <Bar dataKey="current" fill="#8884d8" name={t('demandForecasting.currentStock', 'Current Stock')} />
+                <Bar dataKey="forecasted" fill="#82ca9d" name={t('demandForecasting.forecastedNeed', 'Forecasted Need')} />
+                <Bar dataKey="reorderPoint" fill="#ffc658" name={t('demandForecasting.reorderPoint', 'Reorder Point')} />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
@@ -137,9 +139,9 @@ export default function PredictiveDemandForecasting() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <AlertTriangle className="h-5 w-5 text-orange-500" />
-            Reorder Recommendations
+            {t('demandForecasting.reorderRecommendations', 'Reorder Recommendations')}
           </CardTitle>
-          <CardDescription>Parts requiring attention based on forecasted demand</CardDescription>
+          <CardDescription>{t('demandForecasting.reorderRecommendationsDesc', 'Parts requiring attention based on forecasted demand')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
@@ -155,18 +157,18 @@ export default function PredictiveDemandForecasting() {
                     <div>
                       <p className="font-medium">{part.part}</p>
                       <p className="text-sm text-muted-foreground">
-                        Current: {part.current} units • Forecasted need: {part.forecasted} units
+                        {t('demandForecasting.current', 'Current')}: {part.current} {t('demandForecasting.units', 'units')} • {t('demandForecasting.forecastedNeedLabel', 'Forecasted need')}: {part.forecasted} {t('demandForecasting.units', 'units')}
                       </p>
                     </div>
                     <Badge className="bg-orange-500 text-white">
-                      Reorder {part.forecasted - part.current} units
+                      {t('demandForecasting.reorder', 'Reorder')} {part.forecasted - part.current} {t('demandForecasting.units', 'units')}
                     </Badge>
                   </div>
                 </div>
               ))}
             {partsDemand.filter((part) => part.current < part.reorderPoint).length === 0 && (
               <p className="text-center text-muted-foreground py-4">
-                All parts are adequately stocked
+                {t('demandForecasting.allPartsStocked', 'All parts are adequately stocked')}
               </p>
             )}
           </div>
@@ -175,8 +177,8 @@ export default function PredictiveDemandForecasting() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Forecast Confidence Levels</CardTitle>
-          <CardDescription>Prediction accuracy by forecast period</CardDescription>
+          <CardTitle>{t('demandForecasting.forecastConfidenceLevels', 'Forecast Confidence Levels')}</CardTitle>
+          <CardDescription>{t('demandForecasting.forecastConfidenceLevelsDesc', 'Prediction accuracy by forecast period')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">

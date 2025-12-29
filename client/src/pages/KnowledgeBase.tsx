@@ -3,6 +3,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useTranslation } from "react-i18next";
 import { TabsPageLayout, type TabConfig } from "@/components/layouts";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -85,6 +86,7 @@ const formatDate = (dateString: string | undefined) => {
 };
 
 export default function KnowledgeBase() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("articles");
   const [isCategoryDialogOpen, setIsCategoryDialogOpen] = useState(false);
@@ -151,12 +153,12 @@ export default function KnowledgeBase() {
     mutationFn: (data: CategoryFormData) => apiRequest("POST", "/api/knowledge-base/categories", data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/knowledge-base/categories"] });
-      toast({ title: "Success", description: "Category created successfully" });
+      toast({ title: t('common.success', 'Success'), description: t('knowledgeBase.categoryCreated', 'Category created successfully') });
       setIsCategoryDialogOpen(false);
       categoryForm.reset();
     },
     onError: () => {
-      toast({ title: "Error", description: "Failed to create category", variant: "destructive" });
+      toast({ title: t('common.error', 'Error'), description: t('knowledgeBase.categoryCreateFailed', 'Failed to create category'), variant: "destructive" });
     }
   });
 
@@ -164,12 +166,12 @@ export default function KnowledgeBase() {
     mutationFn: (data: ArticleFormData) => apiRequest("POST", "/api/knowledge-base/articles", data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/knowledge-base/articles"] });
-      toast({ title: "Success", description: "Article created successfully" });
+      toast({ title: t('common.success', 'Success'), description: t('knowledgeBase.articleCreated', 'Article created successfully') });
       setIsArticleDialogOpen(false);
       articleForm.reset();
     },
     onError: () => {
-      toast({ title: "Error", description: "Failed to create article", variant: "destructive" });
+      toast({ title: t('common.error', 'Error'), description: t('knowledgeBase.articleCreateFailed', 'Failed to create article'), variant: "destructive" });
     }
   });
 
@@ -177,12 +179,12 @@ export default function KnowledgeBase() {
     mutationFn: (data: DocumentFormData) => apiRequest("POST", "/api/documents", data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/documents"] });
-      toast({ title: "Success", description: "Document added successfully" });
+      toast({ title: t('common.success', 'Success'), description: t('knowledgeBase.documentAdded', 'Document added successfully') });
       setIsDocumentDialogOpen(false);
       documentForm.reset();
     },
     onError: () => {
-      toast({ title: "Error", description: "Failed to add document", variant: "destructive" });
+      toast({ title: t('common.error', 'Error'), description: t('knowledgeBase.documentAddFailed', 'Failed to add document'), variant: "destructive" });
     }
   });
 
@@ -190,10 +192,10 @@ export default function KnowledgeBase() {
     mutationFn: (id: string) => apiRequest("DELETE", `/api/documents/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/documents"] });
-      toast({ title: "Success", description: "Document deleted successfully" });
+      toast({ title: t('common.success', 'Success'), description: t('knowledgeBase.documentDeleted', 'Document deleted successfully') });
     },
     onError: () => {
-      toast({ title: "Error", description: "Failed to delete document", variant: "destructive" });
+      toast({ title: t('common.error', 'Error'), description: t('knowledgeBase.documentDeleteFailed', 'Failed to delete document'), variant: "destructive" });
     }
   });
 
@@ -211,22 +213,22 @@ export default function KnowledgeBase() {
   const tabs: TabConfig[] = [
     {
       id: "articles",
-      label: "Articles",
+      label: t('knowledgeBase.articles', 'Articles'),
       icon: BookOpen,
       badge: articles.length,
       content: (
         <Card className="border-salis-gray-light dark:border-salis-gray-dark bg-white dark:bg-[#010101]">
           <CardHeader>
-            <CardTitle className="font-montserrat text-salis-black dark:text-white">Knowledge Articles</CardTitle>
+            <CardTitle className="font-montserrat text-salis-black dark:text-white">{t('knowledgeBase.knowledgeArticles', 'Knowledge Articles')}</CardTitle>
             <CardDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
-              All documentation and FAQ articles
+              {t('knowledgeBase.articlesDescription', 'All documentation and FAQ articles')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             {articlesLoading ? (
-              <p className="text-salis-gray font-poppins" data-testid="text-loading">Loading articles...</p>
+              <p className="text-salis-gray font-poppins" data-testid="text-loading">{t('knowledgeBase.loadingArticles', 'Loading articles...')}</p>
             ) : filteredArticles.length === 0 ? (
-              <p className="text-salis-gray font-poppins" data-testid="text-no-articles">No articles found</p>
+              <p className="text-salis-gray font-poppins" data-testid="text-no-articles">{t('knowledgeBase.noArticlesFound', 'No articles found')}</p>
             ) : (
               <div className="grid gap-4">
                 {filteredArticles.map((article: any) => (
@@ -245,28 +247,28 @@ export default function KnowledgeBase() {
                             </h3>
                             {article.isFeatured && (
                               <Badge className="bg-salis-black text-white" data-testid={`badge-featured-${article.id}`}>
-                                Featured
+                                {t('knowledgeBase.featured', 'Featured')}
                               </Badge>
                             )}
                             {article.isPublished ? (
                               <Badge className="bg-green-500 text-white" data-testid={`badge-published-${article.id}`}>
-                                Published
+                                {t('knowledgeBase.published', 'Published')}
                               </Badge>
                             ) : (
                               <Badge className="bg-salis-gray text-white" data-testid={`badge-draft-${article.id}`}>
-                                Draft
+                                {t('common.draft', 'Draft')}
                               </Badge>
                             )}
                           </div>
                           <p className="text-sm text-salis-gray dark:text-salis-gray-light font-poppins mb-3" data-testid={`text-article-excerpt-${article.id}`}>
-                            {article.excerpt || "No excerpt available"}
+                            {article.excerpt || t('knowledgeBase.noExcerpt', 'No excerpt available')}
                           </p>
                           <div className="flex gap-4 text-sm text-salis-gray dark:text-salis-gray-light">
                             <span className="flex items-center gap-1" data-testid={`text-views-${article.id}`}>
-                              <Eye className="h-4 w-4" /> {article.viewCount || 0} views
+                              <Eye className="h-4 w-4" /> {article.viewCount || 0} {t('knowledgeBase.views', 'views')}
                             </span>
                             <span className="flex items-center gap-1" data-testid={`text-helpful-${article.id}`}>
-                              <ThumbsUp className="h-4 w-4" /> {article.helpfulCount || 0} helpful
+                              <ThumbsUp className="h-4 w-4" /> {article.helpfulCount || 0} {t('knowledgeBase.helpful', 'helpful')}
                             </span>
                           </div>
                         </div>
@@ -282,7 +284,7 @@ export default function KnowledgeBase() {
     },
     {
       id: "library",
-      label: "Document Library",
+      label: t('knowledgeBase.documentLibrary', 'Document Library'),
       icon: FileText,
       badge: documents.length,
       content: (
@@ -291,7 +293,7 @@ export default function KnowledgeBase() {
             <div className="relative max-w-md flex-1 mr-4">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-salis-gray" />
               <Input
-                placeholder="Search documents..."
+                placeholder={t('knowledgeBase.searchDocuments', 'Search documents...')}
                 value={documentSearchQuery}
                 onChange={(e) => setDocumentSearchQuery(e.target.value)}
                 className="pl-10"
@@ -304,37 +306,37 @@ export default function KnowledgeBase() {
               data-testid="button-add-document"
             >
               <FilePlus className="mr-2 h-4 w-4" />
-              Add Document
+              {t('knowledgeBase.addDocument', 'Add Document')}
             </Button>
           </div>
           <Card className="border-salis-gray-light dark:border-salis-gray-dark bg-white dark:bg-[#010101]">
             <CardHeader>
-              <CardTitle className="font-montserrat text-salis-black dark:text-white">Document Library</CardTitle>
+              <CardTitle className="font-montserrat text-salis-black dark:text-white">{t('knowledgeBase.documentLibrary', 'Document Library')}</CardTitle>
               <CardDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
-                Manage and organize your documents, manuals, and files
+                {t('knowledgeBase.documentLibraryDescription', 'Manage and organize your documents, manuals, and files')}
               </CardDescription>
             </CardHeader>
             <CardContent>
               {documentsLoading ? (
-                <p className="text-salis-gray font-poppins" data-testid="text-loading-documents">Loading documents...</p>
+                <p className="text-salis-gray font-poppins" data-testid="text-loading-documents">{t('knowledgeBase.loadingDocuments', 'Loading documents...')}</p>
               ) : filteredDocuments.length === 0 ? (
                 <div className="text-center py-12">
                   <FileText className="mx-auto h-12 w-12 text-salis-gray-light dark:text-salis-gray-dark mb-4" />
-                  <p className="text-salis-gray font-poppins" data-testid="text-no-documents">No documents found</p>
+                  <p className="text-salis-gray font-poppins" data-testid="text-no-documents">{t('knowledgeBase.noDocumentsFound', 'No documents found')}</p>
                   <p className="text-sm text-salis-gray-light dark:text-salis-gray-dark font-poppins mt-1">
-                    Add your first document to get started
+                    {t('knowledgeBase.addFirstDocument', 'Add your first document to get started')}
                   </p>
                 </div>
               ) : (
                 <Table>
                   <TableHeader>
                     <TableRow className="border-salis-gray-light dark:border-salis-gray-dark">
-                      <TableHead className="text-salis-gray dark:text-salis-gray-light">Document</TableHead>
-                      <TableHead className="text-salis-gray dark:text-salis-gray-light">Type</TableHead>
-                      <TableHead className="text-salis-gray dark:text-salis-gray-light">Size</TableHead>
-                      <TableHead className="text-salis-gray dark:text-salis-gray-light">Uploaded</TableHead>
-                      <TableHead className="text-salis-gray dark:text-salis-gray-light">Status</TableHead>
-                      <TableHead className="text-salis-gray dark:text-salis-gray-light text-right">Actions</TableHead>
+                      <TableHead className="text-salis-gray dark:text-salis-gray-light">{t('knowledgeBase.document', 'Document')}</TableHead>
+                      <TableHead className="text-salis-gray dark:text-salis-gray-light">{t('common.type', 'Type')}</TableHead>
+                      <TableHead className="text-salis-gray dark:text-salis-gray-light">{t('knowledgeBase.size', 'Size')}</TableHead>
+                      <TableHead className="text-salis-gray dark:text-salis-gray-light">{t('knowledgeBase.uploaded', 'Uploaded')}</TableHead>
+                      <TableHead className="text-salis-gray dark:text-salis-gray-light">{t('common.status', 'Status')}</TableHead>
+                      <TableHead className="text-salis-gray dark:text-salis-gray-light text-right">{t('common.actions', 'Actions')}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -379,7 +381,7 @@ export default function KnowledgeBase() {
                             <Badge 
                               className={doc.status === "active" ? "bg-green-500 text-white" : "bg-salis-gray text-white"}
                             >
-                              {doc.status || "Active"}
+                              {doc.status || t('common.active', 'Active')}
                             </Badge>
                           </TableCell>
                           <TableCell className="text-right">
@@ -419,7 +421,7 @@ export default function KnowledgeBase() {
     },
     {
       id: "categories",
-      label: "Categories",
+      label: t('knowledgeBase.categories', 'Categories'),
       icon: FolderPlus,
       badge: categories.length,
       content: (
@@ -431,21 +433,21 @@ export default function KnowledgeBase() {
               data-testid="button-create-category"
             >
               <FolderPlus className="mr-2 h-4 w-4" />
-              Create Category
+              {t('knowledgeBase.createCategory', 'Create Category')}
             </Button>
           </div>
           <Card className="border-salis-gray-light dark:border-salis-gray-dark bg-white dark:bg-[#010101]">
             <CardHeader>
-              <CardTitle className="font-montserrat text-salis-black dark:text-white">Article Categories</CardTitle>
+              <CardTitle className="font-montserrat text-salis-black dark:text-white">{t('knowledgeBase.articleCategories', 'Article Categories')}</CardTitle>
               <CardDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
-                Organize articles into categories
+                {t('knowledgeBase.organizeArticles', 'Organize articles into categories')}
               </CardDescription>
             </CardHeader>
             <CardContent>
               {categoriesLoading ? (
-                <p className="text-salis-gray font-poppins" data-testid="text-loading-categories">Loading categories...</p>
+                <p className="text-salis-gray font-poppins" data-testid="text-loading-categories">{t('knowledgeBase.loadingCategories', 'Loading categories...')}</p>
               ) : categories.length === 0 ? (
-                <p className="text-salis-gray font-poppins" data-testid="text-no-categories">No categories found</p>
+                <p className="text-salis-gray font-poppins" data-testid="text-no-categories">{t('knowledgeBase.noCategoriesFound', 'No categories found')}</p>
               ) : (
                 <div className="grid gap-4">
                   {categories.map((category: any) => (
@@ -455,7 +457,7 @@ export default function KnowledgeBase() {
                           {category.categoryName}
                         </h3>
                         <p className="text-sm text-salis-gray dark:text-salis-gray-light font-poppins" data-testid={`text-category-description-${category.id}`}>
-                          {category.description || "No description"}
+                          {category.description || t('knowledgeBase.noDescription', 'No description')}
                         </p>
                       </CardContent>
                     </Card>
@@ -472,11 +474,11 @@ export default function KnowledgeBase() {
   return (
     <>
       <TabsPageLayout
-        title="Knowledge Base & Library"
-        description="Manage documentation articles, FAQ resources, and document library"
+        title={t('knowledgeBase.title', 'Knowledge Base & Library')}
+        description={t('knowledgeBase.pageDescription', 'Manage documentation articles, FAQ resources, and document library')}
         icon={BookOpen}
         primaryAction={{
-          label: "Create Article",
+          label: t('knowledgeBase.createArticle', 'Create Article'),
           onClick: () => setIsArticleDialogOpen(true),
           icon: BookOpen,
           testId: "button-create-article",
@@ -489,7 +491,7 @@ export default function KnowledgeBase() {
             <div className="mb-6 relative max-w-md">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-salis-gray" />
               <Input
-                placeholder="Search articles..."
+                placeholder={t('knowledgeBase.searchArticles', 'Search articles...')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10"
@@ -503,9 +505,9 @@ export default function KnowledgeBase() {
       <Dialog open={isCategoryDialogOpen} onOpenChange={setIsCategoryDialogOpen}>
         <DialogContent className="bg-white dark:bg-salis-black">
           <DialogHeader>
-            <DialogTitle className="font-montserrat text-salis-black dark:text-white">Create Category</DialogTitle>
+            <DialogTitle className="font-montserrat text-salis-black dark:text-white">{t('knowledgeBase.createCategory', 'Create Category')}</DialogTitle>
             <DialogDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
-              Add a new article category
+              {t('knowledgeBase.addNewCategory', 'Add a new article category')}
             </DialogDescription>
           </DialogHeader>
           <Form {...categoryForm}>
@@ -515,9 +517,9 @@ export default function KnowledgeBase() {
                 name="categoryName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Category Name</FormLabel>
+                    <FormLabel>{t('knowledgeBase.categoryName', 'Category Name')}</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="Getting Started" data-testid="input-category-name" />
+                      <Input {...field} placeholder={t('knowledgeBase.categoryNamePlaceholder', 'Getting Started')} data-testid="input-category-name" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -528,9 +530,9 @@ export default function KnowledgeBase() {
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Description</FormLabel>
+                    <FormLabel>{t('common.description', 'Description')}</FormLabel>
                     <FormControl>
-                      <Textarea {...field} placeholder="Category description..." data-testid="input-category-description" />
+                      <Textarea {...field} placeholder={t('knowledgeBase.categoryDescriptionPlaceholder', 'Category description...')} data-testid="input-category-description" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -541,7 +543,7 @@ export default function KnowledgeBase() {
                 name="sortOrder"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Sort Order</FormLabel>
+                    <FormLabel>{t('knowledgeBase.sortOrder', 'Sort Order')}</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
@@ -556,7 +558,7 @@ export default function KnowledgeBase() {
               />
               <DialogFooter>
                 <Button type="submit" disabled={createCategoryMutation.isPending} data-testid="button-submit-category">
-                  {createCategoryMutation.isPending ? "Creating..." : "Create Category"}
+                  {createCategoryMutation.isPending ? t('knowledgeBase.creating', 'Creating...') : t('knowledgeBase.createCategory', 'Create Category')}
                 </Button>
               </DialogFooter>
             </form>
@@ -567,9 +569,9 @@ export default function KnowledgeBase() {
       <Dialog open={isArticleDialogOpen} onOpenChange={setIsArticleDialogOpen}>
         <DialogContent className="bg-white dark:bg-salis-black max-w-2xl">
           <DialogHeader>
-            <DialogTitle className="font-montserrat text-salis-black dark:text-white">Create Article</DialogTitle>
+            <DialogTitle className="font-montserrat text-salis-black dark:text-white">{t('knowledgeBase.createArticle', 'Create Article')}</DialogTitle>
             <DialogDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
-              Add a new knowledge base article
+              {t('knowledgeBase.addNewArticle', 'Add a new knowledge base article')}
             </DialogDescription>
           </DialogHeader>
           <Form {...articleForm}>
@@ -579,11 +581,11 @@ export default function KnowledgeBase() {
                 name="categoryId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Category</FormLabel>
+                    <FormLabel>{t('common.category', 'Category')}</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger data-testid="select-category">
-                          <SelectValue placeholder="Select category" />
+                          <SelectValue placeholder={t('knowledgeBase.selectCategory', 'Select category')} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -603,9 +605,9 @@ export default function KnowledgeBase() {
                 name="title"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Title</FormLabel>
+                    <FormLabel>{t('knowledgeBase.articleTitle', 'Title')}</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="How to..." data-testid="input-title" />
+                      <Input {...field} placeholder={t('knowledgeBase.titlePlaceholder', 'How to...')} data-testid="input-title" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -616,9 +618,9 @@ export default function KnowledgeBase() {
                 name="slug"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Slug</FormLabel>
+                    <FormLabel>{t('knowledgeBase.slug', 'Slug')}</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="how-to-example" data-testid="input-slug" />
+                      <Input {...field} placeholder={t('knowledgeBase.slugPlaceholder', 'how-to-example')} data-testid="input-slug" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -629,9 +631,9 @@ export default function KnowledgeBase() {
                 name="excerpt"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Excerpt</FormLabel>
+                    <FormLabel>{t('knowledgeBase.excerpt', 'Excerpt')}</FormLabel>
                     <FormControl>
-                      <Textarea {...field} placeholder="Brief summary..." data-testid="input-excerpt" />
+                      <Textarea {...field} placeholder={t('knowledgeBase.excerptPlaceholder', 'Brief summary...')} data-testid="input-excerpt" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -642,9 +644,9 @@ export default function KnowledgeBase() {
                 name="content"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Content</FormLabel>
+                    <FormLabel>{t('knowledgeBase.content', 'Content')}</FormLabel>
                     <FormControl>
-                      <Textarea {...field} placeholder="Full article content..." rows={6} data-testid="input-content" />
+                      <Textarea {...field} placeholder={t('knowledgeBase.contentPlaceholder', 'Full article content...')} rows={6} data-testid="input-content" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -652,7 +654,7 @@ export default function KnowledgeBase() {
               />
               <DialogFooter>
                 <Button type="submit" disabled={createArticleMutation.isPending} data-testid="button-submit-article">
-                  {createArticleMutation.isPending ? "Creating..." : "Create Article"}
+                  {createArticleMutation.isPending ? t('knowledgeBase.creating', 'Creating...') : t('knowledgeBase.createArticle', 'Create Article')}
                 </Button>
               </DialogFooter>
             </form>
@@ -663,9 +665,9 @@ export default function KnowledgeBase() {
       <Dialog open={isDocumentDialogOpen} onOpenChange={setIsDocumentDialogOpen}>
         <DialogContent className="bg-white dark:bg-salis-black max-w-2xl">
           <DialogHeader>
-            <DialogTitle className="font-montserrat text-salis-black dark:text-white">Add Document</DialogTitle>
+            <DialogTitle className="font-montserrat text-salis-black dark:text-white">{t('knowledgeBase.addDocument', 'Add Document')}</DialogTitle>
             <DialogDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
-              Add a new document to the library
+              {t('knowledgeBase.addNewDocument', 'Add a new document to the library')}
             </DialogDescription>
           </DialogHeader>
           <Form {...documentForm}>
@@ -675,9 +677,9 @@ export default function KnowledgeBase() {
                 name="documentName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Document Name</FormLabel>
+                    <FormLabel>{t('knowledgeBase.documentName', 'Document Name')}</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="User Manual v1.0" data-testid="input-doc-name" />
+                      <Input {...field} placeholder={t('knowledgeBase.documentNamePlaceholder', 'User Manual v1.0')} data-testid="input-doc-name" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -688,9 +690,9 @@ export default function KnowledgeBase() {
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Description</FormLabel>
+                    <FormLabel>{t('common.description', 'Description')}</FormLabel>
                     <FormControl>
-                      <Textarea {...field} placeholder="Brief description of the document..." data-testid="input-doc-description" />
+                      <Textarea {...field} placeholder={t('knowledgeBase.documentDescriptionPlaceholder', 'Brief description of the document...')} data-testid="input-doc-description" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -701,9 +703,9 @@ export default function KnowledgeBase() {
                 name="fileName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>File Name</FormLabel>
+                    <FormLabel>{t('knowledgeBase.fileName', 'File Name')}</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="manual.pdf" data-testid="input-file-name" />
+                      <Input {...field} placeholder={t('knowledgeBase.fileNamePlaceholder', 'manual.pdf')} data-testid="input-file-name" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -714,9 +716,9 @@ export default function KnowledgeBase() {
                 name="fileUrl"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>File URL</FormLabel>
+                    <FormLabel>{t('knowledgeBase.fileUrl', 'File URL')}</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="https://example.com/files/manual.pdf" data-testid="input-file-url" />
+                      <Input {...field} placeholder={t('knowledgeBase.fileUrlPlaceholder', 'https://example.com/files/manual.pdf')} data-testid="input-file-url" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -727,21 +729,21 @@ export default function KnowledgeBase() {
                 name="mimeType"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>File Type</FormLabel>
+                    <FormLabel>{t('knowledgeBase.fileType', 'File Type')}</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger data-testid="select-mime-type">
-                          <SelectValue placeholder="Select file type" />
+                          <SelectValue placeholder={t('knowledgeBase.selectFileType', 'Select file type')} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="application/pdf">PDF Document</SelectItem>
-                        <SelectItem value="application/msword">Word Document</SelectItem>
-                        <SelectItem value="application/vnd.ms-excel">Excel Spreadsheet</SelectItem>
-                        <SelectItem value="image/png">PNG Image</SelectItem>
-                        <SelectItem value="image/jpeg">JPEG Image</SelectItem>
-                        <SelectItem value="text/plain">Text File</SelectItem>
-                        <SelectItem value="application/zip">ZIP Archive</SelectItem>
+                        <SelectItem value="application/pdf">{t('knowledgeBase.pdfDocument', 'PDF Document')}</SelectItem>
+                        <SelectItem value="application/msword">{t('knowledgeBase.wordDocument', 'Word Document')}</SelectItem>
+                        <SelectItem value="application/vnd.ms-excel">{t('knowledgeBase.excelSpreadsheet', 'Excel Spreadsheet')}</SelectItem>
+                        <SelectItem value="image/png">{t('knowledgeBase.pngImage', 'PNG Image')}</SelectItem>
+                        <SelectItem value="image/jpeg">{t('knowledgeBase.jpegImage', 'JPEG Image')}</SelectItem>
+                        <SelectItem value="text/plain">{t('knowledgeBase.textFile', 'Text File')}</SelectItem>
+                        <SelectItem value="application/zip">{t('knowledgeBase.zipArchive', 'ZIP Archive')}</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -754,11 +756,11 @@ export default function KnowledgeBase() {
                   name="categoryId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Category (Optional)</FormLabel>
+                      <FormLabel>{t('knowledgeBase.categoryOptional', 'Category (Optional)')}</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger data-testid="select-doc-category">
-                            <SelectValue placeholder="Select category" />
+                            <SelectValue placeholder={t('knowledgeBase.selectCategory', 'Select category')} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -776,7 +778,7 @@ export default function KnowledgeBase() {
               )}
               <DialogFooter>
                 <Button type="submit" disabled={createDocumentMutation.isPending} data-testid="button-submit-document">
-                  {createDocumentMutation.isPending ? "Adding..." : "Add Document"}
+                  {createDocumentMutation.isPending ? t('knowledgeBase.adding', 'Adding...') : t('knowledgeBase.addDocument', 'Add Document')}
                 </Button>
               </DialogFooter>
             </form>

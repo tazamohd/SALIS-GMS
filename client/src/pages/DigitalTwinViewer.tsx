@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -7,6 +8,7 @@ import { Box, RotateCcw, Eye, Layers, Activity, Settings } from 'lucide-react';
 import { TabsPageLayout } from '@/components/layouts';
 
 export default function DigitalTwinViewer() {
+  const { t } = useTranslation();
   const [rotationX, setRotationX] = useState(20);
   const [rotationY, setRotationY] = useState(45);
   const [zoom, setZoom] = useState(100);
@@ -19,10 +21,10 @@ export default function DigitalTwinViewer() {
   };
 
   const vehicleStats = [
-    { label: 'Engine Temp', value: '92°C', status: 'normal', color: 'text-green-500' },
-    { label: 'Oil Pressure', value: '45 PSI', status: 'normal', color: 'text-green-500' },
-    { label: 'Battery', value: '12.6V', status: 'normal', color: 'text-green-500' },
-    { label: 'Tire Pressure', value: '32 PSI', status: 'warning', color: 'text-yellow-500' },
+    { label: t('digitalTwin.engineTemp', 'Engine Temp'), value: '92°C', status: 'normal', color: 'text-green-500' },
+    { label: t('digitalTwin.oilPressure', 'Oil Pressure'), value: '45 PSI', status: 'normal', color: 'text-green-500' },
+    { label: t('digitalTwin.battery', 'Battery'), value: '12.6V', status: 'normal', color: 'text-green-500' },
+    { label: t('digitalTwin.tirePressure', 'Tire Pressure'), value: '32 PSI', status: 'warning', color: 'text-yellow-500' },
   ];
 
   const viewerTab = (
@@ -32,12 +34,12 @@ export default function DigitalTwinViewer() {
           <CardTitle className="flex items-center justify-between">
             <span className="flex items-center gap-2">
               <Eye className="h-5 w-5 text-cyan-600" />
-              3D Vehicle Model
+              {t('digitalTwin.3dVehicleModel', '3D Vehicle Model')}
             </span>
             <div className="flex gap-2">
               <Button size="sm" variant="outline" onClick={resetView} data-testid="button-reset-view">
                 <RotateCcw className="h-4 w-4 mr-2" />
-                Reset View
+                {t('digitalTwin.resetView', 'Reset View')}
               </Button>
             </div>
           </CardTitle>
@@ -60,10 +62,10 @@ export default function DigitalTwinViewer() {
                 
                 {(activeLayer === 'sensors' || activeLayer === 'all') && (
                   <>
-                    <div className="absolute top-2 left-1/2 w-3 h-3 bg-green-400 rounded-full animate-pulse" title="Front sensor" />
-                    <div className="absolute bottom-2 left-4 w-3 h-3 bg-yellow-400 rounded-full animate-pulse" title="Wheel sensor" />
-                    <div className="absolute bottom-2 right-4 w-3 h-3 bg-yellow-400 rounded-full animate-pulse" title="Wheel sensor" />
-                    <div className="absolute top-1/2 right-2 w-3 h-3 bg-green-400 rounded-full animate-pulse" title="Side sensor" />
+                    <div className="absolute top-2 left-1/2 w-3 h-3 bg-green-400 rounded-full animate-pulse" title={t('digitalTwin.frontSensor', 'Front sensor')} />
+                    <div className="absolute bottom-2 left-4 w-3 h-3 bg-yellow-400 rounded-full animate-pulse" title={t('digitalTwin.wheelSensor', 'Wheel sensor')} />
+                    <div className="absolute bottom-2 right-4 w-3 h-3 bg-yellow-400 rounded-full animate-pulse" title={t('digitalTwin.wheelSensor', 'Wheel sensor')} />
+                    <div className="absolute top-1/2 right-2 w-3 h-3 bg-green-400 rounded-full animate-pulse" title={t('digitalTwin.sideSensor', 'Side sensor')} />
                   </>
                 )}
               </div>
@@ -85,7 +87,7 @@ export default function DigitalTwinViewer() {
             <div className="grid grid-cols-3 gap-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Rotation X: {rotationX}°
+                  {t('digitalTwin.rotationX', 'Rotation X')}: {rotationX}°
                 </label>
                 <Slider
                   value={[rotationX]}
@@ -98,7 +100,7 @@ export default function DigitalTwinViewer() {
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Rotation Y: {rotationY}°
+                  {t('digitalTwin.rotationY', 'Rotation Y')}: {rotationY}°
                 </label>
                 <Slider
                   value={[rotationY]}
@@ -111,7 +113,7 @@ export default function DigitalTwinViewer() {
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Zoom: {zoom}%
+                  {t('digitalTwin.zoom', 'Zoom')}: {zoom}%
                 </label>
                 <Slider
                   value={[zoom]}
@@ -131,7 +133,7 @@ export default function DigitalTwinViewer() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Layers className="h-5 w-5 text-purple-600" />
-            View Layers
+            {t('digitalTwin.viewLayers', 'View Layers')}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
@@ -141,7 +143,7 @@ export default function DigitalTwinViewer() {
             onClick={() => setActiveLayer('all')}
             data-testid="button-layer-all"
           >
-            All Layers
+            {t('digitalTwin.allLayers', 'All Layers')}
           </Button>
           <Button
             variant={activeLayer === 'sensors' ? 'default' : 'outline'}
@@ -149,7 +151,7 @@ export default function DigitalTwinViewer() {
             onClick={() => setActiveLayer('sensors')}
             data-testid="button-layer-sensors"
           >
-            Sensors Only
+            {t('digitalTwin.sensorsOnly', 'Sensors Only')}
           </Button>
           <Button
             variant={activeLayer === 'structure' ? 'default' : 'outline'}
@@ -157,14 +159,14 @@ export default function DigitalTwinViewer() {
             onClick={() => setActiveLayer('structure')}
             data-testid="button-layer-structure"
           >
-            Structure Only
+            {t('digitalTwin.structureOnly', 'Structure Only')}
           </Button>
         </CardContent>
 
         <CardHeader className="pt-6">
           <CardTitle className="flex items-center gap-2">
             <Activity className="h-5 w-5 text-green-600" />
-            Live Telemetry
+            {t('digitalTwin.liveTelemetry', 'Live Telemetry')}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
@@ -184,56 +186,56 @@ export default function DigitalTwinViewer() {
   const diagnosticsTab = (
     <div className="grid grid-cols-3 gap-4">
       <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
-        <h4 className="font-semibold text-green-900 dark:text-green-200 mb-2">Engine Status</h4>
-        <p className="text-sm text-green-700 dark:text-green-300">All systems operational</p>
+        <h4 className="font-semibold text-green-900 dark:text-green-200 mb-2">{t('digitalTwin.engineStatus', 'Engine Status')}</h4>
+        <p className="text-sm text-green-700 dark:text-green-300">{t('digitalTwin.allSystemsOperational', 'All systems operational')}</p>
       </div>
       <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
-        <h4 className="font-semibold text-yellow-900 dark:text-yellow-200 mb-2">Tire Pressure</h4>
-        <p className="text-sm text-yellow-700 dark:text-yellow-300">Front left: 30 PSI (low)</p>
+        <h4 className="font-semibold text-yellow-900 dark:text-yellow-200 mb-2">{t('digitalTwin.tirePressure', 'Tire Pressure')}</h4>
+        <p className="text-sm text-yellow-700 dark:text-yellow-300">{t('digitalTwin.frontLeftLow', 'Front left: 30 PSI (low)')}</p>
       </div>
       <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
-        <h4 className="font-semibold text-green-900 dark:text-green-200 mb-2">Brake System</h4>
-        <p className="text-sm text-green-700 dark:text-green-300">Optimal performance</p>
+        <h4 className="font-semibold text-green-900 dark:text-green-200 mb-2">{t('digitalTwin.brakeSystem', 'Brake System')}</h4>
+        <p className="text-sm text-green-700 dark:text-green-300">{t('digitalTwin.optimalPerformance', 'Optimal performance')}</p>
       </div>
     </div>
   );
 
   const historyTab = (
     <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-      <p>No simulation history available</p>
+      <p>{t('digitalTwin.noSimulationHistory', 'No simulation history available')}</p>
     </div>
   );
 
   return (
     <TabsPageLayout
-      title="Digital Twin 3D Viewer"
-      description="Interactive 3D vehicle visualization with real-time sensor data and diagnostic overlays"
+      title={t('digitalTwin.title', 'Digital Twin 3D Viewer')}
+      description={t('digitalTwin.description', 'Interactive 3D vehicle visualization with real-time sensor data and diagnostic overlays')}
       icon={Box}
       tabs={[
         {
           id: "viewer",
-          label: "3D Viewer",
+          label: t('digitalTwin.3dViewer', '3D Viewer'),
           icon: Eye,
           content: viewerTab,
         },
         {
           id: "diagnostics",
-          label: "Diagnostics",
+          label: t('digitalTwin.diagnostics', 'Diagnostics'),
           icon: Activity,
           content: diagnosticsTab,
         },
         {
           id: "history",
-          label: "History",
+          label: t('digitalTwin.history', 'History'),
           content: historyTab,
         },
         {
           id: "settings",
-          label: "Settings",
+          label: t('common.settings', 'Settings'),
           icon: Settings,
           content: (
             <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-              <p>Settings coming soon</p>
+              <p>{t('common.comingSoon', 'Settings coming soon')}</p>
             </div>
           ),
         },

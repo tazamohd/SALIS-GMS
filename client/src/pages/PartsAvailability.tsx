@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { Search, RefreshCw, Package, DollarSign, Clock, CheckCircle, XCircle, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,6 +14,7 @@ import type { SupplierPartsAvailability } from "@shared/schema";
 import { StandardPageLayout } from "@/components/layouts/StandardPageLayout";
 
 export function PartsAvailability() {
+  const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const { toast } = useToast();
@@ -35,13 +37,13 @@ export function PartsAvailability() {
     onSuccess: (result: any) => {
       queryClient.invalidateQueries({ queryKey: ['/api/supplier-availability/search'] });
       toast({
-        title: "Sync Complete",
-        description: result.message || "Supplier availability synced successfully",
+        title: t('partsAvailability.syncComplete', 'Sync Complete'),
+        description: result.message || t('partsAvailability.syncedSuccessfully', 'Supplier availability synced successfully'),
       });
     },
     onError: (error: Error) => {
       toast({
-        title: "Sync Failed",
+        title: t('partsAvailability.syncFailed', 'Sync Failed'),
         description: error.message,
         variant: "destructive",
       });
@@ -102,22 +104,22 @@ export function PartsAvailability() {
 
   const getStatusBadge = (status: string, quantity: number) => {
     if (status === 'backordered' || quantity === 0) {
-      return <Badge variant="destructive" data-testid={`badge-status-${status}`}><XCircle className="w-3 h-3 mr-1" />Out of Stock</Badge>;
+      return <Badge variant="destructive" data-testid={`badge-status-${status}`}><XCircle className="w-3 h-3 mr-1" />{t('partsAvailability.outOfStock', 'Out of Stock')}</Badge>;
     }
     if (quantity < 5) {
-      return <Badge variant="outline" className="text-yellow-600 border-yellow-600" data-testid="badge-status-low"><AlertCircle className="w-3 h-3 mr-1" />Low Stock</Badge>;
+      return <Badge variant="outline" className="text-yellow-600 border-yellow-600" data-testid="badge-status-low"><AlertCircle className="w-3 h-3 mr-1" />{t('partsAvailability.lowStock', 'Low Stock')}</Badge>;
     }
-    return <Badge variant="default" className="bg-green-600" data-testid="badge-status-available"><CheckCircle className="w-3 h-3 mr-1" />In Stock</Badge>;
+    return <Badge variant="default" className="bg-green-600" data-testid="badge-status-available"><CheckCircle className="w-3 h-3 mr-1" />{t('partsAvailability.inStock', 'In Stock')}</Badge>;
   };
 
   return (
     <StandardPageLayout
-      title="Parts Availability Tracker"
-      description="Real-time multi-supplier parts availability"
+      title={t('partsAvailability.title', 'Parts Availability Tracker')}
+      description={t('partsAvailability.description', 'Real-time multi-supplier parts availability')}
       icon={Package}
       actions={[
         {
-          label: "Sync Mock Data",
+          label: t('partsAvailability.syncMockData', 'Sync Mock Data'),
           icon: RefreshCw,
           onClick: handleMockSync,
           variant: "default",
@@ -126,13 +128,13 @@ export function PartsAvailability() {
     >
       <Card>
         <CardHeader>
-          <CardTitle>Search Parts</CardTitle>
-          <CardDescription>Search for parts across all suppliers</CardDescription>
+          <CardTitle>{t('partsAvailability.searchParts', 'Search Parts')}</CardTitle>
+          <CardDescription>{t('partsAvailability.searchDescription', 'Search for parts across all suppliers')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex gap-2">
             <Input
-              placeholder="Enter part name, SKU, or number..."
+              placeholder={t('partsAvailability.searchPlaceholder', 'Enter part name, SKU, or number...')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -140,7 +142,7 @@ export function PartsAvailability() {
             />
             <Button onClick={handleSearch} data-testid="button-search">
               <Search className="w-4 h-4 mr-2" />
-              Search
+              {t('common.search', 'Search')}
             </Button>
           </div>
         </CardContent>
@@ -165,8 +167,8 @@ export function PartsAvailability() {
         <Card>
           <CardContent className="py-12 text-center">
             <Package className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
-            <p className="text-lg font-medium" data-testid="text-no-results">No parts availability found</p>
-            <p className="text-sm text-muted-foreground">Try searching or syncing supplier data</p>
+            <p className="text-lg font-medium" data-testid="text-no-results">{t('partsAvailability.noPartsFound', 'No parts availability found')}</p>
+            <p className="text-sm text-muted-foreground">{t('partsAvailability.trySearching', 'Try searching or syncing supplier data')}</p>
           </CardContent>
         </Card>
       ) : (
@@ -177,10 +179,10 @@ export function PartsAvailability() {
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
                     <CardTitle className="text-lg" data-testid={`text-part-number-${item.id}`}>
-                      {item.externalPartNumber || 'Unknown Part'}
+                      {item.externalPartNumber || t('partsAvailability.unknownPart', 'Unknown Part')}
                     </CardTitle>
                     <CardDescription data-testid={`text-sku-${item.id}`}>
-                      SKU: {item.externalSku || 'N/A'}
+                      {t('partsAvailability.sku', 'SKU')}: {item.externalSku || t('common.na', 'N/A')}
                     </CardDescription>
                   </div>
                   {getStatusBadge(item.status || 'active', item.quantityAvailable || 0)}
@@ -190,21 +192,21 @@ export function PartsAvailability() {
                 <div className="flex items-center text-sm">
                   <Package className="w-4 h-4 mr-2 text-muted-foreground" />
                   <span data-testid={`text-quantity-${item.id}`}>
-                    <strong>Quantity:</strong> {item.quantityAvailable || 0} units
+                    <strong>{t('partsAvailability.quantity', 'Quantity')}:</strong> {item.quantityAvailable || 0} {t('partsAvailability.units', 'units')}
                   </span>
                 </div>
                 
                 <div className="flex items-center text-sm">
                   <DollarSign className="w-4 h-4 mr-2 text-muted-foreground" />
                   <span data-testid={`text-price-${item.id}`}>
-                    <strong>Price:</strong> {item.pricePerUnit ? `${item.pricePerUnit} ${item.currency}` : 'N/A'}
+                    <strong>{t('partsAvailability.price', 'Price')}:</strong> {item.pricePerUnit ? `${item.pricePerUnit} ${item.currency}` : t('common.na', 'N/A')}
                   </span>
                 </div>
                 
                 <div className="flex items-center text-sm">
                   <Clock className="w-4 h-4 mr-2 text-muted-foreground" />
                   <span data-testid={`text-lead-time-${item.id}`}>
-                    <strong>Lead Time:</strong> {item.leadTimeDays ? `${item.leadTimeDays} days` : 'N/A'}
+                    <strong>{t('partsAvailability.leadTime', 'Lead Time')}:</strong> {item.leadTimeDays ? `${item.leadTimeDays} ${t('partsAvailability.days', 'days')}` : t('common.na', 'N/A')}
                   </span>
                 </div>
 
@@ -216,7 +218,7 @@ export function PartsAvailability() {
 
                 {item.lastSyncedAt && (
                   <p className="text-xs text-muted-foreground">
-                    <strong>Last synced:</strong> {formatDistanceToNow(new Date(item.lastSyncedAt), { addSuffix: true })}
+                    <strong>{t('partsAvailability.lastSynced', 'Last synced')}:</strong> {formatDistanceToNow(new Date(item.lastSyncedAt), { addSuffix: true })}
                   </p>
                 )}
               </CardContent>

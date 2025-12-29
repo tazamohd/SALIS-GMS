@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,24 +23,26 @@ interface Recommendation {
   reason: string;
 }
 
-const initialMessages: Message[] = [
-  {
-    role: "assistant",
-    content: "Hello! I'm your AI Service Advisor. I can help you diagnose vehicle issues, recommend services, and provide cost estimates. How can I assist you today?",
-    timestamp: new Date().toISOString()
-  }
-];
-
 export default function AIServiceAdvisor() {
+  const { t } = useTranslation();
+  
+  const initialMessages: Message[] = [
+    {
+      role: "assistant",
+      content: t('aiServiceAdvisor.welcomeMessage', "Hello! I'm your AI Service Advisor. I can help you diagnose vehicle issues, recommend services, and provide cost estimates. How can I assist you today?"),
+      timestamp: new Date().toISOString()
+    }
+  ];
+
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
 
   const exampleQueries = [
-    "My car is making a squeaking noise when I brake",
-    "What maintenance does my 2019 Honda Civic need at 50,000 miles?",
-    "Check engine light is on, what could be wrong?",
-    "How much does a complete brake service cost?"
+    t('aiServiceAdvisor.exampleBrakeNoise', 'My car is making a squeaking noise when I brake'),
+    t('aiServiceAdvisor.exampleMaintenance', 'What maintenance does my 2019 Honda Civic need at 50,000 miles?'),
+    t('aiServiceAdvisor.exampleCheckEngine', 'Check engine light is on, what could be wrong?'),
+    t('aiServiceAdvisor.exampleBrakeCost', 'How much does a complete brake service cost?')
   ];
 
   const handleSend = async () => {
@@ -61,75 +64,75 @@ export default function AIServiceAdvisor() {
     let response = "";
 
     if (input.toLowerCase().includes("brake") || input.toLowerCase().includes("squeak")) {
-      response = "Based on the squeaking noise when braking, I've identified potential issues. Here are my recommendations:";
+      response = t('aiServiceAdvisor.brakeNoiseResponse', "Based on the squeaking noise when braking, I've identified potential issues. Here are my recommendations:");
       recommendations.push(
         {
-          service: "Brake Pad Replacement",
+          service: t('aiServiceAdvisor.brakePadReplacement', 'Brake Pad Replacement'),
           urgency: "high",
           cost: 280,
           duration: 2,
-          reason: "Worn brake pads are the most common cause of squeaking. Your vehicle history shows brake pads are at 3mm (replace at 2mm)."
+          reason: t('aiServiceAdvisor.brakePadReason', 'Worn brake pads are the most common cause of squeaking. Your vehicle history shows brake pads are at 3mm (replace at 2mm).')
         },
         {
-          service: "Brake Rotor Inspection",
+          service: t('aiServiceAdvisor.brakeRotorInspection', 'Brake Rotor Inspection'),
           urgency: "medium",
           cost: 0,
           duration: 0.5,
-          reason: "Free inspection to check for warping or scoring that could cause noise."
+          reason: t('aiServiceAdvisor.brakeRotorReason', 'Free inspection to check for warping or scoring that could cause noise.')
         },
         {
-          service: "Brake Fluid Flush",
+          service: t('aiServiceAdvisor.brakeFluidFlush', 'Brake Fluid Flush'),
           urgency: "low",
           cost: 120,
           duration: 1,
-          reason: "Recommended every 30,000 miles. Your vehicle is at 28,500 miles."
+          reason: t('aiServiceAdvisor.brakeFluidReason', 'Recommended every 30,000 miles. Your vehicle is at 28,500 miles.')
         }
       );
     } else if (input.toLowerCase().includes("maintenance") || input.toLowerCase().includes("miles")) {
-      response = "For a 2019 Honda Civic at 50,000 miles, here's the recommended maintenance schedule:";
+      response = t('aiServiceAdvisor.maintenanceResponse', "For a 2019 Honda Civic at 50,000 miles, here's the recommended maintenance schedule:");
       recommendations.push(
         {
-          service: "Major Service Package",
+          service: t('aiServiceAdvisor.majorServicePackage', 'Major Service Package'),
           urgency: "high",
           cost: 450,
           duration: 3,
-          reason: "50K miles is a major service interval including oil change, filter replacements, and inspections."
+          reason: t('aiServiceAdvisor.majorServiceReason', '50K miles is a major service interval including oil change, filter replacements, and inspections.')
         },
         {
-          service: "Transmission Fluid Service",
+          service: t('aiServiceAdvisor.transmissionFluidService', 'Transmission Fluid Service'),
           urgency: "medium",
           cost: 180,
           duration: 1.5,
-          reason: "Honda recommends transmission fluid service at 45-60K miles for CVT transmissions."
+          reason: t('aiServiceAdvisor.transmissionFluidReason', 'Honda recommends transmission fluid service at 45-60K miles for CVT transmissions.')
         },
         {
-          service: "Tire Rotation & Alignment",
+          service: t('aiServiceAdvisor.tireRotationAlignment', 'Tire Rotation & Alignment'),
           urgency: "medium",
           cost: 95,
           duration: 1,
-          reason: "Regular rotation extends tire life. Alignment check prevents uneven wear."
+          reason: t('aiServiceAdvisor.tireRotationReason', 'Regular rotation extends tire life. Alignment check prevents uneven wear.')
         }
       );
     } else if (input.toLowerCase().includes("check engine") || input.toLowerCase().includes("light")) {
-      response = "The check engine light can indicate various issues. I recommend a diagnostic scan first:";
+      response = t('aiServiceAdvisor.checkEngineResponse', "The check engine light can indicate various issues. I recommend a diagnostic scan first:");
       recommendations.push(
         {
-          service: "OBD-II Diagnostic Scan",
+          service: t('aiServiceAdvisor.obdDiagnosticScan', 'OBD-II Diagnostic Scan'),
           urgency: "high",
           cost: 95,
           duration: 0.5,
-          reason: "Identifies the specific error code(s) causing the check engine light. Essential first step."
+          reason: t('aiServiceAdvisor.obdDiagnosticReason', 'Identifies the specific error code(s) causing the check engine light. Essential first step.')
         },
         {
-          service: "Oxygen Sensor Inspection",
+          service: t('aiServiceAdvisor.oxygenSensorInspection', 'Oxygen Sensor Inspection'),
           urgency: "medium",
           cost: 220,
           duration: 1.5,
-          reason: "O2 sensors are a common cause of check engine lights (accounts for 35% of cases)."
+          reason: t('aiServiceAdvisor.oxygenSensorReason', 'O2 sensors are a common cause of check engine lights (accounts for 35% of cases).')
         }
       );
     } else {
-      response = "I can help you with various automotive services and diagnostics. Could you provide more details about your vehicle issue or what service you're interested in?";
+      response = t('aiServiceAdvisor.genericResponse', "I can help you with various automotive services and diagnostics. Could you provide more details about your vehicle issue or what service you're interested in?");
     }
 
     const assistantMessage: Message = {
@@ -152,10 +155,19 @@ export default function AIServiceAdvisor() {
     }
   };
 
+  const getUrgencyLabel = (urgency: string) => {
+    switch (urgency) {
+      case "high": return t('aiServiceAdvisor.urgencyHigh', 'high');
+      case "medium": return t('aiServiceAdvisor.urgencyMedium', 'medium');
+      case "low": return t('aiServiceAdvisor.urgencyLow', 'low');
+      default: return urgency;
+    }
+  };
+
   return (
     <StandardPageLayout
-      title="AI Service Advisor"
-      description="Natural language service recommendations powered by advanced AI"
+      title={t('aiServiceAdvisor.title', 'AI Service Advisor')}
+      description={t('aiServiceAdvisor.description', 'Natural language service recommendations powered by advanced AI')}
       icon={Bot}
     >
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -163,10 +175,10 @@ export default function AIServiceAdvisor() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Bot className="w-5 h-5 text-blue-500" />
-              AI Assistant
+              {t('aiServiceAdvisor.aiAssistant', 'AI Assistant')}
             </CardTitle>
             <CardDescription>
-              Describe your issue or ask about recommended services
+              {t('aiServiceAdvisor.describeIssue', 'Describe your issue or ask about recommended services')}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -201,7 +213,7 @@ export default function AIServiceAdvisor() {
                                         {rec.service}
                                       </h4>
                                       <Badge variant="outline" className={getUrgencyColor(rec.urgency)} data-testid={`badge-urgency-${recIdx}`}>
-                                        {rec.urgency}
+                                        {getUrgencyLabel(rec.urgency)}
                                       </Badge>
                                     </div>
                                     <p className="text-xs text-gray-600 dark:text-gray-400" data-testid={`text-reason-${recIdx}`}>
@@ -217,10 +229,10 @@ export default function AIServiceAdvisor() {
                                   </div>
                                   <div className="flex items-center gap-1">
                                     <Clock className="w-3 h-3" />
-                                    <span data-testid={`text-duration-${recIdx}`}>{rec.duration} hrs</span>
+                                    <span data-testid={`text-duration-${recIdx}`}>{rec.duration} {t('aiServiceAdvisor.hours', 'hrs')}</span>
                                   </div>
                                   <Button size="sm" variant="outline" className="ml-auto" data-testid={`button-book-${recIdx}`}>
-                                    Book Service
+                                    {t('aiServiceAdvisor.bookService', 'Book Service')}
                                   </Button>
                                 </div>
                               </CardContent>
@@ -261,7 +273,7 @@ export default function AIServiceAdvisor() {
 
             <div className="flex gap-2">
               <Input
-                placeholder="Describe your issue or ask a question..."
+                placeholder={t('aiServiceAdvisor.inputPlaceholder', 'Describe your issue or ask a question...')}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyPress={(e) => e.key === "Enter" && handleSend()}
@@ -277,8 +289,8 @@ export default function AIServiceAdvisor() {
         <div className="space-y-6">
           <Card className="border-gray-200 dark:border-gray-800">
             <CardHeader>
-              <CardTitle className="text-lg">Quick Questions</CardTitle>
-              <CardDescription>Try these common queries</CardDescription>
+              <CardTitle className="text-lg">{t('aiServiceAdvisor.quickQuestions', 'Quick Questions')}</CardTitle>
+              <CardDescription>{t('aiServiceAdvisor.tryCommonQueries', 'Try these common queries')}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-2">
               {exampleQueries.map((query, idx) => (
@@ -298,15 +310,15 @@ export default function AIServiceAdvisor() {
 
           <Card className="border-gray-200 dark:border-gray-800" data-testid="card-insights">
             <CardHeader>
-              <CardTitle className="text-lg">AI Insights</CardTitle>
+              <CardTitle className="text-lg">{t('aiServiceAdvisor.aiInsights', 'AI Insights')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="flex items-center gap-3 p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg" data-testid="card-accuracy">
                 <CheckCircle className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                 <div>
-                  <p className="text-sm font-medium text-gray-900 dark:text-white" data-testid="text-accuracy">95% Accuracy</p>
+                  <p className="text-sm font-medium text-gray-900 dark:text-white" data-testid="text-accuracy">{t('aiServiceAdvisor.accuracy', '95% Accuracy')}</p>
                   <p className="text-xs text-gray-600 dark:text-gray-400">
-                    AI diagnostic accuracy rate
+                    {t('aiServiceAdvisor.aiDiagnosticAccuracyRate', 'AI diagnostic accuracy rate')}
                   </p>
                 </div>
               </div>
@@ -314,9 +326,9 @@ export default function AIServiceAdvisor() {
               <div className="flex items-center gap-3 p-3 bg-green-50 dark:bg-green-950/20 rounded-lg" data-testid="card-response-time">
                 <Wrench className="w-5 h-5 text-green-600 dark:text-green-400" />
                 <div>
-                  <p className="text-sm font-medium text-gray-900 dark:text-white" data-testid="text-response-time">2.3 Min</p>
+                  <p className="text-sm font-medium text-gray-900 dark:text-white" data-testid="text-response-time">{t('aiServiceAdvisor.responseTime', '2.3 Min')}</p>
                   <p className="text-xs text-gray-600 dark:text-gray-400">
-                    Average response time
+                    {t('aiServiceAdvisor.averageResponseTime', 'Average response time')}
                   </p>
                 </div>
               </div>
@@ -324,9 +336,9 @@ export default function AIServiceAdvisor() {
               <div className="flex items-center gap-3 p-3 bg-purple-50 dark:bg-purple-950/20 rounded-lg" data-testid="card-avg-cost">
                 <DollarSign className="w-5 h-5 text-purple-600 dark:text-purple-400" />
                 <div>
-                  <p className="text-sm font-medium text-gray-900 dark:text-white" data-testid="text-avg-cost">$420 Avg</p>
+                  <p className="text-sm font-medium text-gray-900 dark:text-white" data-testid="text-avg-cost">{t('aiServiceAdvisor.avgCost', '$420 Avg')}</p>
                   <p className="text-xs text-gray-600 dark:text-gray-400">
-                    Per recommended service
+                    {t('aiServiceAdvisor.perRecommendedService', 'Per recommended service')}
                   </p>
                 </div>
               </div>

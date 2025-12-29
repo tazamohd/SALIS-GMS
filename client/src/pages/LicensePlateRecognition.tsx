@@ -1,4 +1,5 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,6 +9,7 @@ import { Camera, Car, CheckCircle, Clock } from "lucide-react";
 import { StandardPageLayout } from "@/components/layouts";
 
 export default function LicensePlateRecognition() {
+  const { t } = useTranslation();
   const { toast } = useToast();
 
   const { data: scans = [], isLoading: loadingScans } = useQuery<any[]>({
@@ -32,15 +34,15 @@ export default function LicensePlateRecognition() {
       queryClient.invalidateQueries({ queryKey: ["/api/license-plate/scans"] });
       queryClient.invalidateQueries({ queryKey: ["/api/license-plate/entry-logs"] });
       toast({
-        title: "Success",
-        description: "License plate scan recorded successfully",
+        title: t('common.success', 'Success'),
+        description: t('licensePlate.scanRecorded', 'License plate scan recorded successfully'),
       });
     },
     onError: (error: any) => {
       toast({
         variant: "destructive",
-        title: "Error",
-        description: error.message || "Failed to record scan",
+        title: t('common.error', 'Error'),
+        description: error.message || t('licensePlate.scanFailed', 'Failed to record scan'),
       });
     },
   });
@@ -68,12 +70,12 @@ export default function LicensePlateRecognition() {
 
   return (
     <StandardPageLayout
-      title="🚗 License Plate Recognition"
-      description="Automatic vehicle identification and entry tracking"
+      title={t('licensePlate.title', '🚗 License Plate Recognition')}
+      description={t('licensePlate.description', 'Automatic vehicle identification and entry tracking')}
       icon={Camera}
       actions={[
         {
-          label: "Simulate Scan",
+          label: t('licensePlate.simulateScan', 'Simulate Scan'),
           onClick: simulateScan,
         },
       ]}
@@ -83,7 +85,7 @@ export default function LicensePlateRecognition() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Today's Scans</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('licensePlate.todaysScans', "Today's Scans")}</p>
                 <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="stat-today-scans">{stats.todayScans}</h3>
               </div>
               <Camera className="h-12 w-12 text-blue-600" />
@@ -94,7 +96,7 @@ export default function LicensePlateRecognition() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Auto-Matched</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('licensePlate.autoMatched', 'Auto-Matched')}</p>
                 <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="stat-auto-matched">{stats.autoMatched}</h3>
               </div>
               <CheckCircle className="h-12 w-12 text-green-600" />
@@ -105,7 +107,7 @@ export default function LicensePlateRecognition() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Manual Review</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('licensePlate.manualReview', 'Manual Review')}</p>
                 <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="stat-manual-review">{stats.manualReview}</h3>
               </div>
               <Clock className="h-12 w-12 text-yellow-600" />
@@ -116,7 +118,7 @@ export default function LicensePlateRecognition() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Avg Confidence</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('licensePlate.avgConfidence', 'Avg Confidence')}</p>
                 <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="stat-avg-confidence">{stats.avgConfidence}%</h3>
               </div>
               <Car className="h-12 w-12 text-purple-600" />
@@ -127,16 +129,16 @@ export default function LicensePlateRecognition() {
 
       <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
         <CardHeader>
-          <CardTitle>Recent Plate Scans</CardTitle>
+          <CardTitle>{t('licensePlate.recentPlateScans', 'Recent Plate Scans')}</CardTitle>
         </CardHeader>
         <CardContent>
           {loadingScans ? (
             <div className="text-center py-8">
-              <p className="text-gray-600 dark:text-gray-400">Loading scans...</p>
+              <p className="text-gray-600 dark:text-gray-400">{t('licensePlate.loadingScans', 'Loading scans...')}</p>
             </div>
           ) : scans.length === 0 ? (
             <div className="text-center py-8">
-              <p className="text-gray-600 dark:text-gray-400">No license plate scans recorded yet. Scans will appear here automatically.</p>
+              <p className="text-gray-600 dark:text-gray-400">{t('licensePlate.noScansYet', 'No license plate scans recorded yet. Scans will appear here automatically.')}</p>
             </div>
           ) : (
             <div className="space-y-3">
@@ -150,21 +152,21 @@ export default function LicensePlateRecognition() {
                       <h3 className="font-semibold text-gray-900 dark:text-white">
                         {scan.vehicleMake && scan.vehicleModel 
                           ? `${scan.vehicleMake} ${scan.vehicleModel}` 
-                          : "Unknown Vehicle"}
+                          : t('licensePlate.unknownVehicle', 'Unknown Vehicle')}
                       </h3>
                       <p className="text-sm text-gray-600 dark:text-gray-400">
-                        {scan.customerName || "No match found"} • Confidence: {parseFloat(scan.confidence).toFixed(1)}%
+                        {scan.customerName || t('licensePlate.noMatchFound', 'No match found')} • {t('licensePlate.confidence', 'Confidence')}: {parseFloat(scan.confidence).toFixed(1)}%
                       </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
                     <Badge variant={scan.scanType === "entry" ? "default" : "secondary"}>
-                      {scan.scanType}
+                      {scan.scanType === "entry" ? t('licensePlate.entry', 'entry') : t('licensePlate.exit', 'exit')}
                     </Badge>
                     {scan.matchedAutomatically ? (
                       <CheckCircle className="h-5 w-5 text-green-600" />
                     ) : (
-                      <Button size="sm" variant="outline">Match Manually</Button>
+                      <Button size="sm" variant="outline">{t('licensePlate.matchManually', 'Match Manually')}</Button>
                     )}
                   </div>
                 </div>
@@ -176,16 +178,16 @@ export default function LicensePlateRecognition() {
 
       <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
         <CardHeader>
-          <CardTitle>Vehicle Entry Log</CardTitle>
+          <CardTitle>{t('licensePlate.vehicleEntryLog', 'Vehicle Entry Log')}</CardTitle>
         </CardHeader>
         <CardContent>
           {loadingLogs ? (
             <div className="text-center py-8">
-              <p className="text-gray-600 dark:text-gray-400">Loading entry logs...</p>
+              <p className="text-gray-600 dark:text-gray-400">{t('licensePlate.loadingEntryLogs', 'Loading entry logs...')}</p>
             </div>
           ) : entryLogs.length === 0 ? (
             <div className="text-center py-8">
-              <p className="text-gray-600 dark:text-gray-400">No entry logs recorded yet.</p>
+              <p className="text-gray-600 dark:text-gray-400">{t('licensePlate.noEntryLogsYet', 'No entry logs recorded yet.')}</p>
             </div>
           ) : (
             <div className="space-y-3">
@@ -197,23 +199,23 @@ export default function LicensePlateRecognition() {
                         ? `${log.vehicleMake} ${log.vehicleModel} (${log.plateNumber})` 
                         : log.plateNumber}
                     </h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">{log.customerName || "Unknown"}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">{log.customerName || t('licensePlate.unknown', 'Unknown')}</p>
                   </div>
                   <div className="text-right">
                     <p className="text-sm text-gray-600 dark:text-gray-400">
-                      Entry: {log.entryTime ? new Date(log.entryTime).toLocaleTimeString() : ""}
+                      {t('licensePlate.entryTime', 'Entry')}: {log.entryTime ? new Date(log.entryTime).toLocaleTimeString() : ""}
                     </p>
                     {log.exitTime ? (
                       <>
                         <p className="text-sm text-gray-600 dark:text-gray-400">
-                          Exit: {new Date(log.exitTime).toLocaleTimeString()}
+                          {t('licensePlate.exitTime', 'Exit')}: {new Date(log.exitTime).toLocaleTimeString()}
                         </p>
                         <p className="text-sm font-semibold text-gray-900 dark:text-white">
-                          Duration: {log.duration} min
+                          {t('licensePlate.duration', 'Duration')}: {log.duration} {t('licensePlate.min', 'min')}
                         </p>
                       </>
                     ) : (
-                      <Badge variant="secondary">In Progress</Badge>
+                      <Badge variant="secondary">{t('common.inProgress', 'In Progress')}</Badge>
                     )}
                   </div>
                 </div>

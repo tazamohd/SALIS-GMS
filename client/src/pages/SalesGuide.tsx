@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { TabsPageLayout } from "@/components/layouts";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -236,6 +237,7 @@ const performanceTips = [
 ];
 
 export default function SalesGuide() {
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState("");
 
   const processTab = (
@@ -243,7 +245,7 @@ export default function SalesGuide() {
       <div className="relative">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
         <Input
-          placeholder="Search processes..."
+          placeholder={t('salesGuide.searchProcesses', 'Search processes...')}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="pl-10"
@@ -283,7 +285,7 @@ export default function SalesGuide() {
                     <div>
                       <h4 className="font-medium mb-2 flex items-center gap-2">
                         <CheckCircle className="h-4 w-4 text-green-500" />
-                        Steps
+                        {t('salesGuide.steps', 'Steps')}
                       </h4>
                       <ol className="list-decimal list-inside space-y-1 text-sm">
                         {process.steps.map((step, i) => (
@@ -294,7 +296,7 @@ export default function SalesGuide() {
                     <div>
                       <h4 className="font-medium mb-2 flex items-center gap-2">
                         <Lightbulb className="h-4 w-4 text-yellow-500" />
-                        Pro Tips
+                        {t('salesGuide.proTips', 'Pro Tips')}
                       </h4>
                       <ul className="list-disc list-inside space-y-1 text-sm">
                         {process.tips.map((tip, i) => (
@@ -330,13 +332,13 @@ export default function SalesGuide() {
                 <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
                   <h4 className="font-medium mb-2 flex items-center gap-2">
                     <PlayCircle className="h-4 w-4" />
-                    Opening Script
+                    {t('salesGuide.openingScript', 'Opening Script')}
                   </h4>
                   <p className="italic">"{script.script}"</p>
                 </div>
                 
                 <div>
-                  <h4 className="font-medium mb-3">Common Objections & Responses</h4>
+                  <h4 className="font-medium mb-3">{t('salesGuide.commonObjections', 'Common Objections & Responses')}</h4>
                   <div className="space-y-3">
                     {script.objections.map((obj, i) => (
                       <div key={i} className="border-l-4 border-gray-300 pl-4">
@@ -388,7 +390,7 @@ export default function SalesGuide() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Award className="h-5 w-5" />
-            Sales Excellence Metrics
+            {t('salesGuide.salesExcellenceMetrics', 'Sales Excellence Metrics')}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -396,22 +398,22 @@ export default function SalesGuide() {
             <div className="text-center p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
               <DollarSign className="h-8 w-8 mx-auto text-green-500" />
               <p className="mt-2 text-2xl font-bold">85%</p>
-              <p className="text-sm text-gray-500">Quote Conversion Target</p>
+              <p className="text-sm text-gray-500">{t('salesGuide.quoteConversionTarget', 'Quote Conversion Target')}</p>
             </div>
             <div className="text-center p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
               <Phone className="h-8 w-8 mx-auto text-blue-500" />
-              <p className="mt-2 text-2xl font-bold">2 hrs</p>
-              <p className="text-sm text-gray-500">Max Response Time</p>
+              <p className="mt-2 text-2xl font-bold">2 {t('salesGuide.hrs', 'hrs')}</p>
+              <p className="text-sm text-gray-500">{t('salesGuide.maxResponseTime', 'Max Response Time')}</p>
             </div>
             <div className="text-center p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
               <Star className="h-8 w-8 mx-auto text-yellow-500" />
               <p className="mt-2 text-2xl font-bold">4.5+</p>
-              <p className="text-sm text-gray-500">Customer Rating Target</p>
+              <p className="text-sm text-gray-500">{t('salesGuide.customerRatingTarget', 'Customer Rating Target')}</p>
             </div>
             <div className="text-center p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
               <TrendingUp className="h-8 w-8 mx-auto text-purple-500" />
               <p className="mt-2 text-2xl font-bold">20%</p>
-              <p className="text-sm text-gray-500">Upsell Rate Target</p>
+              <p className="text-sm text-gray-500">{t('salesGuide.upsellRateTarget', 'Upsell Rate Target')}</p>
             </div>
           </div>
         </CardContent>
@@ -424,26 +426,26 @@ export default function SalesGuide() {
       <div className="grid md:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
-            <CardTitle>Quick Reference Cards</CardTitle>
-            <CardDescription>Printable guides for common scenarios</CardDescription>
+            <CardTitle>{t('salesGuide.quickReferenceCards', 'Quick Reference Cards')}</CardTitle>
+            <CardDescription>{t('salesGuide.printableGuides', 'Printable guides for common scenarios')}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
               <Button variant="outline" className="w-full justify-start" data-testid="button-pricing-guide">
                 <FileText className="h-4 w-4 mr-2" />
-                Service Pricing Guide
+                {t('salesGuide.servicePricingGuide', 'Service Pricing Guide')}
               </Button>
               <Button variant="outline" className="w-full justify-start" data-testid="button-comparison-chart">
                 <FileText className="h-4 w-4 mr-2" />
-                Package Comparison Chart
+                {t('salesGuide.packageComparisonChart', 'Package Comparison Chart')}
               </Button>
               <Button variant="outline" className="w-full justify-start" data-testid="button-warranty-info">
                 <FileText className="h-4 w-4 mr-2" />
-                Warranty Information
+                {t('salesGuide.warrantyInformation', 'Warranty Information')}
               </Button>
               <Button variant="outline" className="w-full justify-start" data-testid="button-promotions">
                 <FileText className="h-4 w-4 mr-2" />
-                Current Promotions
+                {t('salesGuide.currentPromotions', 'Current Promotions')}
               </Button>
             </div>
           </CardContent>
@@ -451,26 +453,26 @@ export default function SalesGuide() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Training Videos</CardTitle>
-            <CardDescription>Watch and learn from the best</CardDescription>
+            <CardTitle>{t('salesGuide.trainingVideos', 'Training Videos')}</CardTitle>
+            <CardDescription>{t('salesGuide.watchAndLearn', 'Watch and learn from the best')}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
               <Button variant="outline" className="w-full justify-start" data-testid="button-video-greeting">
                 <PlayCircle className="h-4 w-4 mr-2" />
-                Customer Greeting Techniques
+                {t('salesGuide.customerGreetingTechniques', 'Customer Greeting Techniques')}
               </Button>
               <Button variant="outline" className="w-full justify-start" data-testid="button-video-objections">
                 <PlayCircle className="h-4 w-4 mr-2" />
-                Handling Price Objections
+                {t('salesGuide.handlingPriceObjections', 'Handling Price Objections')}
               </Button>
               <Button variant="outline" className="w-full justify-start" data-testid="button-video-upselling">
                 <PlayCircle className="h-4 w-4 mr-2" />
-                Effective Upselling
+                {t('salesGuide.effectiveUpselling', 'Effective Upselling')}
               </Button>
               <Button variant="outline" className="w-full justify-start" data-testid="button-video-closing">
                 <PlayCircle className="h-4 w-4 mr-2" />
-                Closing Techniques
+                {t('salesGuide.closingTechniques', 'Closing Techniques')}
               </Button>
             </div>
           </CardContent>
@@ -479,18 +481,18 @@ export default function SalesGuide() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Contact Support</CardTitle>
-          <CardDescription>Need help? Reach out to the sales team lead</CardDescription>
+          <CardTitle>{t('salesGuide.contactSupport', 'Contact Support')}</CardTitle>
+          <CardDescription>{t('salesGuide.needHelp', 'Need help? Reach out to the sales team lead')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex gap-4">
             <Button variant="outline" data-testid="button-call-support">
               <Phone className="h-4 w-4 mr-2" />
-              Call Sales Manager
+              {t('salesGuide.callSalesManager', 'Call Sales Manager')}
             </Button>
             <Button variant="outline" data-testid="button-email-support">
               <Mail className="h-4 w-4 mr-2" />
-              Email Support
+              {t('salesGuide.emailSupport', 'Email Support')}
             </Button>
           </div>
         </CardContent>
@@ -501,14 +503,14 @@ export default function SalesGuide() {
   return (
     <div className="p-6 space-y-6">
       <TabsPageLayout
-        title="Sales Guide"
-        description="دليل المبيعات - Comprehensive sales training and resources for service advisors"
+        title={t('salesGuide.title', 'Sales Guide')}
+        description={t('salesGuide.description', 'دليل المبيعات - Comprehensive sales training and resources for service advisors')}
         defaultTab="process"
         tabs={[
-          { id: "process", label: "Sales Process", icon: Target, content: processTab },
-          { id: "scripts", label: "Scripts & Responses", icon: MessageSquare, content: scriptsTab },
-          { id: "tips", label: "Performance Tips", icon: TrendingUp, content: tipsTab },
-          { id: "resources", label: "Resources", icon: BookOpen, content: resourcesTab },
+          { id: "process", label: t('salesGuide.salesProcess', 'Sales Process'), icon: Target, content: processTab },
+          { id: "scripts", label: t('salesGuide.scriptsResponses', 'Scripts & Responses'), icon: MessageSquare, content: scriptsTab },
+          { id: "tips", label: t('salesGuide.performanceTips', 'Performance Tips'), icon: TrendingUp, content: tipsTab },
+          { id: "resources", label: t('salesGuide.resources', 'Resources'), icon: BookOpen, content: resourcesTab },
         ]}
       />
     </div>

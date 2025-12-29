@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Cpu, Activity, FileText, Wifi, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -18,6 +19,7 @@ import { insertObdDeviceSchema, insertObdSessionSchema } from "@shared/schema";
 import { TabsPageLayout } from "@/components/layouts/TabsPageLayout";
 
 export default function DiagnosticsOBDHub() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [showDeviceDialog, setShowDeviceDialog] = useState(false);
   const [showSessionDialog, setShowSessionDialog] = useState(false);
@@ -38,12 +40,12 @@ export default function DiagnosticsOBDHub() {
 
   const createDeviceMutation = useMutation({
     mutationFn: (data: InsertObdDevice) => apiRequest("/api/obd-devices", "POST", data),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/obd-devices"] }); setShowDeviceDialog(false); toast({ title: "Device registered" }); },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/obd-devices"] }); setShowDeviceDialog(false); toast({ title: t('diagnosticsOBD.deviceRegistered', 'Device registered') }); },
   });
 
   const createSessionMutation = useMutation({
     mutationFn: (data: InsertObdSession) => apiRequest("/api/obd-sessions", "POST", data),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/obd-sessions"] }); setShowSessionDialog(false); toast({ title: "Session started" }); },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/obd-sessions"] }); setShowSessionDialog(false); toast({ title: t('diagnosticsOBD.sessionStarted', 'Session started') }); },
   });
 
   const getManufacturerBadge = (manufacturer: string) => {
@@ -71,7 +73,7 @@ export default function DiagnosticsOBDHub() {
     return (
       <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${config.bg} ${config.text}`}>
         <span>{config.icon}</span>
-        {status.charAt(0).toUpperCase() + status.slice(1)}
+        {status === 'active' ? t('common.active', 'Active') : status === 'completed' ? t('common.completed', 'Completed') : t('common.error', 'Error')}
       </span>
     );
   };
@@ -86,7 +88,7 @@ export default function DiagnosticsOBDHub() {
     return (
       <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${config.bg} ${config.text}`}>
         <span>{config.icon}</span>
-        {severity.charAt(0).toUpperCase() + severity.slice(1)}
+        {severity === 'critical' ? t('diagnosticsOBD.critical', 'Critical') : severity === 'warning' ? t('common.warning', 'Warning') : t('common.info', 'Info')}
       </span>
     );
   };
@@ -94,10 +96,10 @@ export default function DiagnosticsOBDHub() {
   const devicesTab = (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">OBD Devices</h2>
+        <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">{t('diagnosticsOBD.obdDevices', 'OBD Devices')}</h2>
         <Button onClick={() => { deviceForm.reset(); setShowDeviceDialog(true); }} data-testid="button-add-device">
           <Plus className="h-4 w-4 mr-2" />
-          Register Device
+          {t('diagnosticsOBD.registerDevice', 'Register Device')}
         </Button>
       </div>
 
@@ -106,11 +108,11 @@ export default function DiagnosticsOBDHub() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Serial #</TableHead>
-                <TableHead>Manufacturer</TableHead>
-                <TableHead>Model</TableHead>
-                <TableHead>Firmware</TableHead>
-                <TableHead>Status</TableHead>
+                <TableHead>{t('diagnosticsOBD.serialNumber', 'Serial #')}</TableHead>
+                <TableHead>{t('diagnosticsOBD.manufacturer', 'Manufacturer')}</TableHead>
+                <TableHead>{t('diagnosticsOBD.model', 'Model')}</TableHead>
+                <TableHead>{t('diagnosticsOBD.firmware', 'Firmware')}</TableHead>
+                <TableHead>{t('common.status', 'Status')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -118,11 +120,11 @@ export default function DiagnosticsOBDHub() {
                 <TableRow key={device.id}>
                   <TableCell className="font-mono font-semibold">{device.deviceId}</TableCell>
                   <TableCell>{getManufacturerBadge(device.manufacturer || '')}</TableCell>
-                  <TableCell>{device.model || 'N/A'}</TableCell>
-                  <TableCell className="font-mono text-xs">{device.firmwareVersion || 'N/A'}</TableCell>
+                  <TableCell>{device.model || t('common.notAvailable', 'N/A')}</TableCell>
+                  <TableCell className="font-mono text-xs">{device.firmwareVersion || t('common.notAvailable', 'N/A')}</TableCell>
                   <TableCell>
                     <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${device.status === 'active' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'}`}>
-                      {device.status === 'active' ? '🟢 Online' : '○ Offline'}
+                      {device.status === 'active' ? `🟢 ${t('diagnosticsOBD.online', 'Online')}` : `○ ${t('diagnosticsOBD.offline', 'Offline')}`}
                     </span>
                   </TableCell>
                 </TableRow>
@@ -137,10 +139,10 @@ export default function DiagnosticsOBDHub() {
   const sessionsTab = (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">Active Diagnostic Sessions</h2>
+        <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">{t('diagnosticsOBD.activeDiagnosticSessions', 'Active Diagnostic Sessions')}</h2>
         <Button onClick={() => { sessionForm.reset(); setShowSessionDialog(true); }} data-testid="button-start-session">
           <Plus className="h-4 w-4 mr-2" />
-          Start Session
+          {t('diagnosticsOBD.startSession', 'Start Session')}
         </Button>
       </div>
 
@@ -149,19 +151,19 @@ export default function DiagnosticsOBDHub() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Session ID</TableHead>
-                <TableHead>Device</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Started</TableHead>
+                <TableHead>{t('diagnosticsOBD.sessionId', 'Session ID')}</TableHead>
+                <TableHead>{t('diagnosticsOBD.device', 'Device')}</TableHead>
+                <TableHead>{t('common.status', 'Status')}</TableHead>
+                <TableHead>{t('diagnosticsOBD.started', 'Started')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {sessions.map((session) => (
                 <TableRow key={session.id}>
                   <TableCell className="font-mono text-xs">{session.id.substring(0, 8)}</TableCell>
-                  <TableCell>{devices.find(d => d.id === session.deviceId)?.deviceId || 'N/A'}</TableCell>
+                  <TableCell>{devices.find(d => d.id === session.deviceId)?.deviceId || t('common.notAvailable', 'N/A')}</TableCell>
                   <TableCell>{getSessionStatusBadge(session.status || '')}</TableCell>
-                  <TableCell>{session.startTime ? new Date(session.startTime).toLocaleString() : 'N/A'}</TableCell>
+                  <TableCell>{session.startTime ? new Date(session.startTime).toLocaleString() : t('common.notAvailable', 'N/A')}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -174,7 +176,7 @@ export default function DiagnosticsOBDHub() {
   const reportsTab = (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">Diagnostic Reports</h2>
+        <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">{t('diagnosticsOBD.diagnosticReports', 'Diagnostic Reports')}</h2>
       </div>
 
       <Card className="border border-gray-200 dark:border-salis-gray-dark bg-white dark:bg-salis-black">
@@ -182,11 +184,11 @@ export default function DiagnosticsOBDHub() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Report ID</TableHead>
-                <TableHead>Session</TableHead>
-                <TableHead>Severity</TableHead>
-                <TableHead>DTC Codes</TableHead>
-                <TableHead>Generated</TableHead>
+                <TableHead>{t('diagnosticsOBD.reportId', 'Report ID')}</TableHead>
+                <TableHead>{t('diagnosticsOBD.session', 'Session')}</TableHead>
+                <TableHead>{t('diagnosticsOBD.severity', 'Severity')}</TableHead>
+                <TableHead>{t('diagnosticsOBD.dtcCodes', 'DTC Codes')}</TableHead>
+                <TableHead>{t('diagnosticsOBD.generated', 'Generated')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -195,8 +197,8 @@ export default function DiagnosticsOBDHub() {
                   <TableCell className="font-mono text-xs">{report.id.substring(0, 8)}</TableCell>
                   <TableCell className="font-mono text-xs">{report.sessionId.substring(0, 8)}</TableCell>
                   <TableCell>{getSeverityBadge(report.severity || '')}</TableCell>
-                  <TableCell className="font-mono text-xs">{Array.isArray(report.faultCodes) ? report.faultCodes.join(', ') : 'None'}</TableCell>
-                  <TableCell>{report.generatedAt ? new Date(report.generatedAt).toLocaleString() : 'N/A'}</TableCell>
+                  <TableCell className="font-mono text-xs">{Array.isArray(report.faultCodes) ? report.faultCodes.join(', ') : t('common.none', 'None')}</TableCell>
+                  <TableCell>{report.generatedAt ? new Date(report.generatedAt).toLocaleString() : t('common.notAvailable', 'N/A')}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -209,7 +211,7 @@ export default function DiagnosticsOBDHub() {
   const assignmentsTab = (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">Device Assignments</h2>
+        <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">{t('diagnosticsOBD.deviceAssignments', 'Device Assignments')}</h2>
       </div>
 
       <Card className="border border-gray-200 dark:border-salis-gray-dark bg-white dark:bg-salis-black">
@@ -217,21 +219,21 @@ export default function DiagnosticsOBDHub() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Device</TableHead>
-                <TableHead>Branch</TableHead>
-                <TableHead>Assigned Date</TableHead>
-                <TableHead>Status</TableHead>
+                <TableHead>{t('diagnosticsOBD.device', 'Device')}</TableHead>
+                <TableHead>{t('diagnosticsOBD.branch', 'Branch')}</TableHead>
+                <TableHead>{t('diagnosticsOBD.assignedDate', 'Assigned Date')}</TableHead>
+                <TableHead>{t('common.status', 'Status')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {assignments.map((assignment) => (
                 <TableRow key={assignment.id}>
-                  <TableCell>{devices.find(d => d.id === assignment.deviceId)?.deviceId || 'N/A'}</TableCell>
-                  <TableCell>{assignment.technicianId || 'Unassigned'}</TableCell>
-                  <TableCell>{assignment.assignedAt ? new Date(assignment.assignedAt).toLocaleDateString() : 'N/A'}</TableCell>
+                  <TableCell>{devices.find(d => d.id === assignment.deviceId)?.deviceId || t('common.notAvailable', 'N/A')}</TableCell>
+                  <TableCell>{assignment.technicianId || t('diagnosticsOBD.unassigned', 'Unassigned')}</TableCell>
+                  <TableCell>{assignment.assignedAt ? new Date(assignment.assignedAt).toLocaleDateString() : t('common.notAvailable', 'N/A')}</TableCell>
                   <TableCell>
                     <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${assignment.status === 'active' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'}`}>
-                      {assignment.status === 'active' ? '✅ Active' : '○ Inactive'}
+                      {assignment.status === 'active' ? `✅ ${t('common.active', 'Active')}` : `○ ${t('common.inactive', 'Inactive')}`}
                     </span>
                   </TableCell>
                 </TableRow>
@@ -246,31 +248,31 @@ export default function DiagnosticsOBDHub() {
   return (
     <>
       <TabsPageLayout
-        title="Diagnostics & OBD Hub"
-        description="Manage OBD diagnostic devices, real-time vehicle monitoring, and diagnostic reports"
+        title={t('diagnosticsOBD.title', 'Diagnostics & OBD Hub')}
+        description={t('diagnosticsOBD.pageDescription', 'Manage OBD diagnostic devices, real-time vehicle monitoring, and diagnostic reports')}
         icon={Cpu}
         tabs={[
           {
             id: "devices",
-            label: "OBD Devices",
+            label: t('diagnosticsOBD.obdDevices', 'OBD Devices'),
             icon: Cpu,
             content: devicesTab,
           },
           {
             id: "sessions",
-            label: "Live Sessions",
+            label: t('diagnosticsOBD.liveSessions', 'Live Sessions'),
             icon: Activity,
             content: sessionsTab,
           },
           {
             id: "reports",
-            label: "Diagnostic Reports",
+            label: t('diagnosticsOBD.diagnosticReports', 'Diagnostic Reports'),
             icon: FileText,
             content: reportsTab,
           },
           {
             id: "assignments",
-            label: "Device Assignments",
+            label: t('diagnosticsOBD.deviceAssignments', 'Device Assignments'),
             icon: Wifi,
             content: assignmentsTab,
           },
@@ -281,25 +283,25 @@ export default function DiagnosticsOBDHub() {
       <Dialog open={showDeviceDialog} onOpenChange={setShowDeviceDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Register OBD Device</DialogTitle>
+            <DialogTitle>{t('diagnosticsOBD.registerOBDDevice', 'Register OBD Device')}</DialogTitle>
           </DialogHeader>
           <Form {...deviceForm}>
             <form onSubmit={deviceForm.handleSubmit((data) => createDeviceMutation.mutate(data))} className="space-y-4">
               <FormField control={deviceForm.control} name="deviceId" render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Device ID</FormLabel>
+                  <FormLabel>{t('diagnosticsOBD.deviceId', 'Device ID')}</FormLabel>
                   <FormControl><Input {...field} placeholder="BSH-2024-001" /></FormControl>
                 </FormItem>
               )} />
               <FormField control={deviceForm.control} name="deviceName" render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Device Name</FormLabel>
-                  <FormControl><Input {...field} placeholder="OBD Scanner 1" /></FormControl>
+                  <FormLabel>{t('diagnosticsOBD.deviceName', 'Device Name')}</FormLabel>
+                  <FormControl><Input {...field} placeholder={t('diagnosticsOBD.obdScanner', 'OBD Scanner 1')} /></FormControl>
                 </FormItem>
               )} />
               <FormField control={deviceForm.control} name="manufacturer" render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Manufacturer</FormLabel>
+                  <FormLabel>{t('diagnosticsOBD.manufacturer', 'Manufacturer')}</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value || undefined}>
                     <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
                     <SelectContent>
@@ -312,18 +314,18 @@ export default function DiagnosticsOBDHub() {
               )} />
               <FormField control={deviceForm.control} name="model" render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Model</FormLabel>
+                  <FormLabel>{t('diagnosticsOBD.model', 'Model')}</FormLabel>
                   <FormControl><Input {...field} value={field.value || ''} placeholder="KTS 590" /></FormControl>
                 </FormItem>
               )} />
               <FormField control={deviceForm.control} name="firmwareVersion" render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Firmware Version</FormLabel>
+                  <FormLabel>{t('diagnosticsOBD.firmwareVersion', 'Firmware Version')}</FormLabel>
                   <FormControl><Input {...field} value={field.value || ''} placeholder="v2.5.1" /></FormControl>
                 </FormItem>
               )} />
               <Button type="submit" className="w-full" disabled={createDeviceMutation.isPending}>
-                {createDeviceMutation.isPending ? "Registering..." : "Register Device"}
+                {createDeviceMutation.isPending ? t('diagnosticsOBD.registering', 'Registering...') : t('diagnosticsOBD.registerDevice', 'Register Device')}
               </Button>
             </form>
           </Form>

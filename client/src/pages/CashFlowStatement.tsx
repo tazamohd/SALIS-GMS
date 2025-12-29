@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "wouter";
+import { useTranslation } from "react-i18next";
 import { TabsPageLayout } from "@/components/layouts/TabsPageLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -64,6 +65,7 @@ const financingActivities = [
 ];
 
 export default function CashFlowStatement() {
+  const { t } = useTranslation();
   const [period, setPeriod] = useState("2024-01");
 
   const netOperatingCash = operatingActivities
@@ -93,50 +95,50 @@ export default function CashFlowStatement() {
         <div className="flex gap-4">
           <Select value={period} onValueChange={setPeriod}>
             <SelectTrigger className="w-[180px]" data-testid="select-period">
-              <SelectValue placeholder="Select Period" />
+              <SelectValue placeholder={t('accounting.selectPeriod', 'Select Period')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="2024-01">January 2024</SelectItem>
-              <SelectItem value="2024-q1">Q1 2024</SelectItem>
-              <SelectItem value="2023">Full Year 2023</SelectItem>
-              <SelectItem value="2023-q4">Q4 2023</SelectItem>
+              <SelectItem value="2024-01">{t('accounting.periods.jan2024', 'January 2024')}</SelectItem>
+              <SelectItem value="2024-q1">{t('accounting.periods.q12024', 'Q1 2024')}</SelectItem>
+              <SelectItem value="2023">{t('accounting.periods.fullYear2023', 'Full Year 2023')}</SelectItem>
+              <SelectItem value="2023-q4">{t('accounting.periods.q42023', 'Q4 2023')}</SelectItem>
             </SelectContent>
           </Select>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" data-testid="button-print">
             <Printer className="h-4 w-4 mr-2" />
-            Print
+            {t('common.print', 'Print')}
           </Button>
           <Button variant="outline" data-testid="button-export">
             <Download className="h-4 w-4 mr-2" />
-            Export
+            {t('common.export', 'Export')}
           </Button>
         </div>
       </div>
 
       <Card>
         <CardHeader className="text-center border-b">
-          <CardTitle className="text-xl">SALIS AUTO</CardTitle>
+          <CardTitle className="text-xl">{t('app.name', 'SALIS AUTO')}</CardTitle>
           <CardDescription className="text-base">
-            Cash Flow Statement (قائمة التدفقات النقدية)
+            {t('accounting.cashFlowStatement', 'Cash Flow Statement')} (قائمة التدفقات النقدية)
           </CardDescription>
           <p className="text-sm text-muted-foreground">
-            For the Period Ending January 31, 2024
+            {t('accounting.forPeriodEnding', 'For the Period Ending January 31, 2024')}
           </p>
         </CardHeader>
         <CardContent className="p-0">
           <Table>
             <TableHeader>
               <TableRow className="bg-muted/50">
-                <TableHead>Description</TableHead>
-                <TableHead className="text-right w-[200px]">Amount (SAR)</TableHead>
+                <TableHead>{t('common.description', 'Description')}</TableHead>
+                <TableHead className="text-right w-[200px]">{t('accounting.amountSARHeader', 'Amount (SAR)')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               <TableRow className="bg-green-50 dark:bg-green-900/20">
                 <TableCell colSpan={2} className="font-bold text-green-700 dark:text-green-400">
-                  CASH FLOWS FROM OPERATING ACTIVITIES
+                  {t('accounting.cashFlowsFromOperating', 'CASH FLOWS FROM OPERATING ACTIVITIES')}
                 </TableCell>
               </TableRow>
               {operatingActivities.map((item, index) => (
@@ -154,7 +156,7 @@ export default function CashFlowStatement() {
                 </TableRow>
               ))}
               <TableRow className="bg-green-100 dark:bg-green-900/40 font-bold">
-                <TableCell className="pl-6">Net Cash from Operating Activities</TableCell>
+                <TableCell className="pl-6">{t('accounting.netCashFromOperating', 'Net Cash from Operating Activities')}</TableCell>
                 <TableCell className="text-right font-mono text-green-700 dark:text-green-300">
                   {netOperatingCash.toLocaleString()}
                 </TableCell>
@@ -162,7 +164,7 @@ export default function CashFlowStatement() {
 
               <TableRow className="bg-blue-50 dark:bg-blue-900/20">
                 <TableCell colSpan={2} className="font-bold text-blue-700 dark:text-blue-400">
-                  CASH FLOWS FROM INVESTING ACTIVITIES
+                  {t('accounting.cashFlowsFromInvesting', 'CASH FLOWS FROM INVESTING ACTIVITIES')}
                 </TableCell>
               </TableRow>
               {investingActivities.map((item, index) => (
@@ -174,7 +176,7 @@ export default function CashFlowStatement() {
                 </TableRow>
               ))}
               <TableRow className="bg-blue-100 dark:bg-blue-900/40 font-bold">
-                <TableCell className="pl-6">Net Cash from Investing Activities</TableCell>
+                <TableCell className="pl-6">{t('accounting.netCashFromInvesting', 'Net Cash from Investing Activities')}</TableCell>
                 <TableCell className={`text-right font-mono ${netInvestingCash >= 0 ? "text-green-600" : "text-red-600"}`}>
                   {netInvestingCash >= 0 ? netInvestingCash.toLocaleString() : `(${Math.abs(netInvestingCash).toLocaleString()})`}
                 </TableCell>
@@ -182,7 +184,7 @@ export default function CashFlowStatement() {
 
               <TableRow className="bg-purple-50 dark:bg-purple-900/20">
                 <TableCell colSpan={2} className="font-bold text-purple-700 dark:text-purple-400">
-                  CASH FLOWS FROM FINANCING ACTIVITIES
+                  {t('accounting.cashFlowsFromFinancing', 'CASH FLOWS FROM FINANCING ACTIVITIES')}
                 </TableCell>
               </TableRow>
               {financingActivities.map((item, index) => (
@@ -194,30 +196,30 @@ export default function CashFlowStatement() {
                 </TableRow>
               ))}
               <TableRow className="bg-purple-100 dark:bg-purple-900/40 font-bold">
-                <TableCell className="pl-6">Net Cash from Financing Activities</TableCell>
+                <TableCell className="pl-6">{t('accounting.netCashFromFinancing', 'Net Cash from Financing Activities')}</TableCell>
                 <TableCell className={`text-right font-mono ${netFinancingCash >= 0 ? "text-green-600" : "text-red-600"}`}>
                   {netFinancingCash >= 0 ? netFinancingCash.toLocaleString() : `(${Math.abs(netFinancingCash).toLocaleString()})`}
                 </TableCell>
               </TableRow>
 
               <TableRow className="bg-muted/50 font-bold">
-                <TableCell>Net Change in Cash</TableCell>
+                <TableCell>{t('accounting.netChangeInCash', 'Net Change in Cash')}</TableCell>
                 <TableCell className={`text-right font-mono ${netCashChange >= 0 ? "text-green-600" : "text-red-600"}`}>
                   {netCashChange >= 0 ? netCashChange.toLocaleString() : `(${Math.abs(netCashChange).toLocaleString()})`}
                 </TableCell>
               </TableRow>
 
               <TableRow>
-                <TableCell>Beginning Cash Balance</TableCell>
+                <TableCell>{t('accounting.beginningCashBalance', 'Beginning Cash Balance')}</TableCell>
                 <TableCell className="text-right font-mono">
                   {beginningCash.toLocaleString()}
                 </TableCell>
               </TableRow>
 
               <TableRow className="bg-green-100 dark:bg-green-900/40 font-bold text-lg">
-                <TableCell>ENDING CASH BALANCE</TableCell>
+                <TableCell>{t('accounting.endingCashBalance', 'ENDING CASH BALANCE')}</TableCell>
                 <TableCell className="text-right font-mono text-green-700 dark:text-green-300">
-                  SAR {endingCash.toLocaleString()}
+                  {t('common.sar', 'SAR')} {endingCash.toLocaleString()}
                 </TableCell>
               </TableRow>
             </TableBody>
@@ -234,14 +236,14 @@ export default function CashFlowStatement() {
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
               <TrendingUp className="h-4 w-4 text-green-600" />
-              Operating Cash Flow
+              {t('accounting.operatingCashFlow', 'Operating Cash Flow')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-bold text-green-600">
-              SAR {netOperatingCash.toLocaleString()}
+              {t('common.sar', 'SAR')} {netOperatingCash.toLocaleString()}
             </p>
-            <Badge variant="default">Positive</Badge>
+            <Badge variant="default">{t('accounting.positive', 'Positive')}</Badge>
           </CardContent>
         </Card>
 
@@ -249,15 +251,15 @@ export default function CashFlowStatement() {
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
               <Building2 className="h-4 w-4 text-blue-600" />
-              Investing Cash Flow
+              {t('accounting.investingCashFlow', 'Investing Cash Flow')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className={`text-2xl font-bold ${netInvestingCash >= 0 ? "text-green-600" : "text-red-600"}`}>
-              SAR {Math.abs(netInvestingCash).toLocaleString()}
+              {t('common.sar', 'SAR')} {Math.abs(netInvestingCash).toLocaleString()}
             </p>
             <Badge variant={netInvestingCash >= 0 ? "default" : "secondary"}>
-              {netInvestingCash >= 0 ? "Inflow" : "Outflow"}
+              {netInvestingCash >= 0 ? t('accounting.inflow', 'Inflow') : t('accounting.outflow', 'Outflow')}
             </Badge>
           </CardContent>
         </Card>
@@ -266,15 +268,15 @@ export default function CashFlowStatement() {
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
               <Wallet className="h-4 w-4 text-purple-600" />
-              Financing Cash Flow
+              {t('accounting.financingCashFlow', 'Financing Cash Flow')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className={`text-2xl font-bold ${netFinancingCash >= 0 ? "text-green-600" : "text-red-600"}`}>
-              SAR {Math.abs(netFinancingCash).toLocaleString()}
+              {t('common.sar', 'SAR')} {Math.abs(netFinancingCash).toLocaleString()}
             </p>
             <Badge variant={netFinancingCash >= 0 ? "default" : "destructive"}>
-              {netFinancingCash >= 0 ? "Inflow" : "Outflow"}
+              {netFinancingCash >= 0 ? t('accounting.inflow', 'Inflow') : t('accounting.outflow', 'Outflow')}
             </Badge>
           </CardContent>
         </Card>
@@ -283,12 +285,12 @@ export default function CashFlowStatement() {
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
               <Banknote className="h-4 w-4 text-green-600" />
-              Ending Cash Balance
+              {t('accounting.endingCashBalance', 'Ending Cash Balance')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-bold text-green-600">
-              SAR {endingCash.toLocaleString()}
+              {t('common.sar', 'SAR')} {endingCash.toLocaleString()}
             </p>
             <div className="flex items-center gap-1 text-sm">
               {netCashChange >= 0 ? (
@@ -306,27 +308,27 @@ export default function CashFlowStatement() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Cash Flow Analysis</CardTitle>
-          <CardDescription>Breakdown of cash movements by category</CardDescription>
+          <CardTitle>{t('accounting.cashFlowAnalysis', 'Cash Flow Analysis')}</CardTitle>
+          <CardDescription>{t('accounting.breakdownOfCashMovements', 'Breakdown of cash movements by category')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-6">
             <div className="p-4 border rounded-lg">
               <h4 className="font-semibold mb-3 flex items-center gap-2">
                 <TrendingUp className="h-4 w-4 text-green-600" />
-                Operating Activities Breakdown
+                {t('accounting.operatingActivitiesBreakdown', 'Operating Activities Breakdown')}
               </h4>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-sm text-muted-foreground">Cash Generated</p>
+                  <p className="text-sm text-muted-foreground">{t('accounting.cashGenerated', 'Cash Generated')}</p>
                   <p className="text-lg font-mono font-bold text-green-600">
-                    SAR {(141000 + 30500 + 13500 + 3000 + 3000 + 4000).toLocaleString()}
+                    {t('common.sar', 'SAR')} {(141000 + 30500 + 13500 + 3000 + 3000 + 4000).toLocaleString()}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">Cash Used</p>
+                  <p className="text-sm text-muted-foreground">{t('accounting.cashUsed', 'Cash Used')}</p>
                   <p className="text-lg font-mono font-bold text-red-600">
-                    SAR {(11500 + 7000 + 3000).toLocaleString()}
+                    {t('common.sar', 'SAR')} {(11500 + 7000 + 3000).toLocaleString()}
                   </p>
                 </div>
               </div>
@@ -335,30 +337,30 @@ export default function CashFlowStatement() {
             <div className="p-4 border rounded-lg">
               <h4 className="font-semibold mb-3 flex items-center gap-2">
                 <DollarSign className="h-4 w-4 text-blue-600" />
-                Free Cash Flow
+                {t('accounting.freeCashFlow', 'Free Cash Flow')}
               </h4>
               <p className="text-2xl font-mono font-bold text-blue-600">
-                SAR {(netOperatingCash + netInvestingCash).toLocaleString()}
+                {t('common.sar', 'SAR')} {(netOperatingCash + netInvestingCash).toLocaleString()}
               </p>
               <p className="text-sm text-muted-foreground mt-1">
-                Operating Cash Flow + Investing Cash Flow
+                {t('accounting.freeCashFlowFormula', 'Operating Cash Flow + Investing Cash Flow')}
               </p>
             </div>
 
             <div className="p-4 border rounded-lg">
               <h4 className="font-semibold mb-3 flex items-center gap-2">
                 <BarChart3 className="h-4 w-4 text-purple-600" />
-                Cash Flow Coverage Ratios
+                {t('accounting.cashFlowCoverageRatios', 'Cash Flow Coverage Ratios')}
               </h4>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-sm text-muted-foreground">Operating Cash to Debt</p>
+                  <p className="text-sm text-muted-foreground">{t('accounting.operatingCashToDebt', 'Operating Cash to Debt')}</p>
                   <p className="text-lg font-bold">
                     {((netOperatingCash / 100000) * 100).toFixed(1)}%
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">Cash Flow to Sales</p>
+                  <p className="text-sm text-muted-foreground">{t('accounting.cashFlowToSales', 'Cash Flow to Sales')}</p>
                   <p className="text-lg font-bold">
                     {((netOperatingCash / 530000) * 100).toFixed(1)}%
                   </p>
@@ -371,36 +373,36 @@ export default function CashFlowStatement() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Related Reports</CardTitle>
-          <CardDescription>Navigate to related financial statements</CardDescription>
+          <CardTitle>{t('accounting.relatedReports', 'Related Reports')}</CardTitle>
+          <CardDescription>{t('accounting.navigateToRelatedStatements', 'Navigate to related financial statements')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <Link href="/income-statement">
               <Button variant="outline" className="w-full justify-start" data-testid="link-income-statement">
                 <TrendingUp className="h-4 w-4 mr-2" />
-                Income Statement
+                {t('accounting.incomeStatement', 'Income Statement')}
                 <ExternalLink className="h-3 w-3 ml-auto" />
               </Button>
             </Link>
             <Link href="/balance-sheet">
               <Button variant="outline" className="w-full justify-start" data-testid="link-balance-sheet">
                 <Scale className="h-4 w-4 mr-2" />
-                Balance Sheet
+                {t('accounting.balanceSheet', 'Balance Sheet')}
                 <ExternalLink className="h-3 w-3 ml-auto" />
               </Button>
             </Link>
             <Link href="/bank-account-management">
               <Button variant="outline" className="w-full justify-start" data-testid="link-bank-accounts">
                 <Banknote className="h-4 w-4 mr-2" />
-                Bank Accounts
+                {t('accounting.bankAccounts', 'Bank Accounts')}
                 <ExternalLink className="h-3 w-3 ml-auto" />
               </Button>
             </Link>
             <Link href="/general-ledger">
               <Button variant="outline" className="w-full justify-start" data-testid="link-general-ledger">
                 <FileText className="h-4 w-4 mr-2" />
-                General Ledger
+                {t('accounting.generalLedger', 'General Ledger')}
                 <ExternalLink className="h-3 w-3 ml-auto" />
               </Button>
             </Link>
@@ -414,41 +416,41 @@ export default function CashFlowStatement() {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Historical Cash Flow</CardTitle>
-          <CardDescription>Monthly cash flow trends over time</CardDescription>
+          <CardTitle>{t('accounting.historicalCashFlow', 'Historical Cash Flow')}</CardTitle>
+          <CardDescription>{t('accounting.monthlyCashFlowTrends', 'Monthly cash flow trends over time')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             {[
-              { month: "January 2024", operating: 173500, investing: 5000, financing: -74000, net: 104500 },
-              { month: "December 2023", operating: 165000, investing: -25000, financing: -24000, net: 116000 },
-              { month: "November 2023", operating: 158000, investing: -15000, financing: -24000, net: 119000 },
-              { month: "October 2023", operating: 162000, investing: -8000, financing: -24000, net: 130000 },
-              { month: "September 2023", operating: 155000, investing: -45000, financing: 0, net: 110000 },
-              { month: "August 2023", operating: 148000, investing: -12000, financing: -24000, net: 112000 },
+              { month: t('accounting.periods.jan2024', 'January 2024'), operating: 173500, investing: 5000, financing: -74000, net: 104500 },
+              { month: t('accounting.periods.dec2023', 'December 2023'), operating: 165000, investing: -25000, financing: -24000, net: 116000 },
+              { month: t('accounting.periods.nov2023', 'November 2023'), operating: 158000, investing: -15000, financing: -24000, net: 119000 },
+              { month: t('accounting.periods.oct2023', 'October 2023'), operating: 162000, investing: -8000, financing: -24000, net: 130000 },
+              { month: t('accounting.periods.sep2023', 'September 2023'), operating: 155000, investing: -45000, financing: 0, net: 110000 },
+              { month: t('accounting.periods.aug2023', 'August 2023'), operating: 148000, investing: -12000, financing: -24000, net: 112000 },
             ].map((item, index) => (
               <div key={index} className="p-4 border rounded-lg" data-testid={`trend-row-${index}`}>
                 <div className="flex justify-between items-center mb-2">
                   <span className="font-medium">{item.month}</span>
                   <Badge variant={item.net > 0 ? "default" : "destructive"}>
-                    Net: SAR {item.net.toLocaleString()}
+                    {t('accounting.net', 'Net')}: {t('common.sar', 'SAR')} {item.net.toLocaleString()}
                   </Badge>
                 </div>
                 <div className="grid grid-cols-3 gap-4 text-sm">
                   <div>
-                    <p className="text-muted-foreground">Operating</p>
+                    <p className="text-muted-foreground">{t('accounting.operating', 'Operating')}</p>
                     <p className="font-mono font-bold text-green-600">
                       {item.operating.toLocaleString()}
                     </p>
                   </div>
                   <div>
-                    <p className="text-muted-foreground">Investing</p>
+                    <p className="text-muted-foreground">{t('accounting.investing', 'Investing')}</p>
                     <p className={`font-mono font-bold ${item.investing >= 0 ? "text-green-600" : "text-red-600"}`}>
                       {item.investing >= 0 ? item.investing.toLocaleString() : `(${Math.abs(item.investing).toLocaleString()})`}
                     </p>
                   </div>
                   <div>
-                    <p className="text-muted-foreground">Financing</p>
+                    <p className="text-muted-foreground">{t('accounting.financing', 'Financing')}</p>
                     <p className={`font-mono font-bold ${item.financing >= 0 ? "text-green-600" : "text-red-600"}`}>
                       {item.financing >= 0 ? item.financing.toLocaleString() : `(${Math.abs(item.financing).toLocaleString()})`}
                     </p>
@@ -463,15 +465,15 @@ export default function CashFlowStatement() {
   );
 
   const tabs = [
-    { id: "statement", label: "Cash Flow Statement", icon: Banknote, content: statementTab },
-    { id: "analysis", label: "Analysis", icon: BarChart3, content: analysisTab },
-    { id: "trends", label: "Trends", icon: TrendingUp, content: trendsTab },
+    { id: "statement", label: t('accounting.cashFlowStatement', 'Cash Flow Statement'), icon: Banknote, content: statementTab },
+    { id: "analysis", label: t('accounting.analysis', 'Analysis'), icon: BarChart3, content: analysisTab },
+    { id: "trends", label: t('accounting.trends', 'Trends'), icon: TrendingUp, content: trendsTab },
   ];
 
   return (
     <TabsPageLayout
-      title="Cash Flow Statement - قائمة التدفقات النقدية"
-      description="Track cash inflows and outflows"
+      title={t('accounting.cashFlowStatementTitle', 'Cash Flow Statement - قائمة التدفقات النقدية')}
+      description={t('accounting.cashFlowStatementDescription', 'Track cash inflows and outflows')}
       icon={Banknote}
       tabs={tabs}
       defaultTab="statement"

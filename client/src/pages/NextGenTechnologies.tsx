@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { StandardPageLayout } from "@/components/layouts";
 
 export default function NextGenTechnologies() {
+  const { t } = useTranslation();
   const { toast } = useToast();
 
   const { data: neuralDiagnostics, isLoading: loadingNeural } = useQuery<{ data: any[] }>({
@@ -135,8 +137,8 @@ export default function NextGenTechnologies() {
     },
     onSuccess: () => {
       toast({
-        title: "Sample Data Seeded",
-        description: "Successfully populated all 15 next-gen technology modules with realistic data",
+        title: t('nextGen.sampleDataSeeded', 'Sample Data Seeded'),
+        description: t('nextGen.seedSuccessDesc', 'Successfully populated all 15 next-gen technology modules with realistic data'),
       });
       queryClient.invalidateQueries({ 
         predicate: (query) => {
@@ -147,8 +149,8 @@ export default function NextGenTechnologies() {
     },
     onError: (error: any) => {
       toast({
-        title: "Seeding Failed",
-        description: error.message || "Failed to seed sample data",
+        title: t('nextGen.seedingFailed', 'Seeding Failed'),
+        description: error.message || t('nextGen.seedFailedDesc', 'Failed to seed sample data'),
         variant: "destructive",
       });
     },
@@ -156,150 +158,150 @@ export default function NextGenTechnologies() {
 
   const modules = [
     {
-      name: "Neural Network Diagnostics",
+      name: t('nextGen.neuralNetworkDiagnostics', 'Neural Network Diagnostics'),
       icon: Brain,
       color: "text-purple-500 dark:text-purple-400",
       data: [
-        { label: "Diagnostics", count: neuralDiagnostics?.data?.length || 0, loading: loadingNeural },
-        { label: "Training Sessions", count: neuralTrainingSessions?.data?.length || 0, loading: loadingTraining },
+        { label: t('nextGen.diagnostics', 'Diagnostics'), count: neuralDiagnostics?.data?.length || 0, loading: loadingNeural },
+        { label: t('nextGen.trainingSessions', 'Training Sessions'), count: neuralTrainingSessions?.data?.length || 0, loading: loadingTraining },
       ],
     },
     {
-      name: "Computer Vision QC",
+      name: t('nextGen.computerVisionQC', 'Computer Vision QC'),
       icon: Eye,
       color: "text-blue-500 dark:text-blue-400",
       data: [
-        { label: "Quality Checks", count: visionQualityChecks?.data?.length || 0, loading: loadingVision },
-        { label: "Defects Detected", count: visionDefects?.data?.length || 0, loading: loadingDefects },
+        { label: t('nextGen.qualityChecks', 'Quality Checks'), count: visionQualityChecks?.data?.length || 0, loading: loadingVision },
+        { label: t('nextGen.defectsDetected', 'Defects Detected'), count: visionDefects?.data?.length || 0, loading: loadingDefects },
       ],
     },
     {
-      name: "NLP Service Writer",
+      name: t('nextGen.nlpServiceWriter', 'NLP Service Writer'),
       icon: MessageSquare,
       color: "text-green-500 dark:text-green-400",
       data: [
-        { label: "Service Requests", count: nlpServiceRequests?.data?.length || 0, loading: loadingNLP },
-        { label: "Training Data", count: nlpTrainingData?.data?.length || 0, loading: loadingNLPData },
+        { label: t('nextGen.serviceRequests', 'Service Requests'), count: nlpServiceRequests?.data?.length || 0, loading: loadingNLP },
+        { label: t('nextGen.trainingData', 'Training Data'), count: nlpTrainingData?.data?.length || 0, loading: loadingNLPData },
       ],
     },
     {
-      name: "RL Parts Optimizer",
+      name: t('nextGen.rlPartsOptimizer', 'RL Parts Optimizer'),
       icon: Package,
       color: "text-orange-500 dark:text-orange-400",
       data: [
-        { label: "Optimizations", count: rlPartsOptimizations?.data?.length || 0, loading: loadingRL },
-        { label: "Learning Episodes", count: rlLearningEpisodes?.data?.length || 0, loading: loadingRLEpisodes },
+        { label: t('nextGen.optimizations', 'Optimizations'), count: rlPartsOptimizations?.data?.length || 0, loading: loadingRL },
+        { label: t('nextGen.learningEpisodes', 'Learning Episodes'), count: rlLearningEpisodes?.data?.length || 0, loading: loadingRLEpisodes },
       ],
     },
     {
-      name: "Metaverse Showroom",
+      name: t('nextGen.metaverseShowroom', 'Metaverse Showroom'),
       icon: MonitorPlay,
       color: "text-pink-500 dark:text-pink-400",
       data: [
-        { label: "Showrooms", count: metaverseShowrooms?.data?.length || 0, loading: loadingMetaverse },
-        { label: "Virtual Visits", count: metaverseVisits?.data?.length || 0, loading: loadingVisits },
+        { label: t('nextGen.showrooms', 'Showrooms'), count: metaverseShowrooms?.data?.length || 0, loading: loadingMetaverse },
+        { label: t('nextGen.virtualVisits', 'Virtual Visits'), count: metaverseVisits?.data?.length || 0, loading: loadingVisits },
       ],
     },
     {
-      name: "Holographic Guides",
+      name: t('nextGen.holographicGuides', 'Holographic Guides'),
       icon: Glasses,
       color: "text-cyan-500 dark:text-cyan-400",
       data: [
-        { label: "Repair Guides", count: holographicGuides?.data?.length || 0, loading: loadingHolo },
-        { label: "Active Sessions", count: holographicSessions?.data?.length || 0, loading: loadingHoloSessions },
+        { label: t('nextGen.repairGuides', 'Repair Guides'), count: holographicGuides?.data?.length || 0, loading: loadingHolo },
+        { label: t('nextGen.activeSessions', 'Active Sessions'), count: holographicSessions?.data?.length || 0, loading: loadingHoloSessions },
       ],
     },
     {
-      name: "Spatial Computing",
+      name: t('nextGen.spatialComputing', 'Spatial Computing'),
       icon: Network,
       color: "text-indigo-500 dark:text-indigo-400",
       data: [
-        { label: "Workstations", count: spatialWorkstations?.data?.length || 0, loading: loadingSpatial },
-        { label: "Diagnostic Sessions", count: spatialDiagnosticSessions?.data?.length || 0, loading: loadingSpatialSessions },
+        { label: t('nextGen.workstations', 'Workstations'), count: spatialWorkstations?.data?.length || 0, loading: loadingSpatial },
+        { label: t('nextGen.diagnosticSessions', 'Diagnostic Sessions'), count: spatialDiagnosticSessions?.data?.length || 0, loading: loadingSpatialSessions },
       ],
     },
     {
-      name: "Autonomous Robots",
+      name: t('nextGen.autonomousRobots', 'Autonomous Robots'),
       icon: Bot,
       color: "text-red-500 dark:text-red-400",
       data: [
-        { label: "Robots", count: autonomousRobots?.data?.length || 0, loading: loadingRobots },
-        { label: "Tasks Completed", count: robotTasks?.data?.length || 0, loading: loadingTasks },
+        { label: t('nextGen.robots', 'Robots'), count: autonomousRobots?.data?.length || 0, loading: loadingRobots },
+        { label: t('nextGen.tasksCompleted', 'Tasks Completed'), count: robotTasks?.data?.length || 0, loading: loadingTasks },
       ],
     },
     {
-      name: "Drone Fleet",
+      name: t('nextGen.droneFleet', 'Drone Fleet'),
       icon: Plane,
       color: "text-sky-500 dark:text-sky-400",
       data: [
-        { label: "Drones", count: droneFleets?.data?.length || 0, loading: loadingDrones },
-        { label: "Missions", count: droneMissions?.data?.length || 0, loading: loadingMissions },
+        { label: t('nextGen.drones', 'Drones'), count: droneFleets?.data?.length || 0, loading: loadingDrones },
+        { label: t('nextGen.missions', 'Missions'), count: droneMissions?.data?.length || 0, loading: loadingMissions },
       ],
     },
     {
-      name: "Smart Contracts",
+      name: t('nextGen.smartContracts', 'Smart Contracts'),
       icon: FileCode,
       color: "text-amber-500 dark:text-amber-400",
       data: [
-        { label: "Contracts", count: smartContracts?.data?.length || 0, loading: loadingContracts },
-        { label: "Events", count: contractEvents?.data?.length || 0, loading: loadingEvents },
+        { label: t('nextGen.contracts', 'Contracts'), count: smartContracts?.data?.length || 0, loading: loadingContracts },
+        { label: t('nextGen.events', 'Events'), count: contractEvents?.data?.length || 0, loading: loadingEvents },
       ],
     },
     {
-      name: "Carbon Credits",
+      name: t('nextGen.carbonCredits', 'Carbon Credits'),
       icon: Leaf,
       color: "text-emerald-500 dark:text-emerald-400",
       data: [
-        { label: "Credits", count: carbonCredits?.data?.length || 0, loading: loadingCarbon },
-        { label: "Emissions Tracked", count: carbonEmissions?.data?.length || 0, loading: loadingEmissions },
+        { label: t('nextGen.credits', 'Credits'), count: carbonCredits?.data?.length || 0, loading: loadingCarbon },
+        { label: t('nextGen.emissionsTracked', 'Emissions Tracked'), count: carbonEmissions?.data?.length || 0, loading: loadingEmissions },
       ],
     },
     {
-      name: "Green Energy",
+      name: t('nextGen.greenEnergy', 'Green Energy'),
       icon: Zap,
       color: "text-yellow-500 dark:text-yellow-400",
       data: [
-        { label: "Energy Assets", count: greenEnergyAssets?.data?.length || 0, loading: loadingEnergy },
-        { label: "EV Charging Stations", count: evChargingStations?.data?.length || 0, loading: loadingEV },
+        { label: t('nextGen.energyAssets', 'Energy Assets'), count: greenEnergyAssets?.data?.length || 0, loading: loadingEnergy },
+        { label: t('nextGen.evChargingStations', 'EV Charging Stations'), count: evChargingStations?.data?.length || 0, loading: loadingEV },
       ],
     },
     {
-      name: "Circular Economy",
+      name: t('nextGen.circularEconomy', 'Circular Economy'),
       icon: Recycle,
       color: "text-teal-500 dark:text-teal-400",
       data: [
-        { label: "Recycled Parts", count: recycledParts?.data?.length || 0, loading: loadingRecycled },
-        { label: "Sustainability Metrics", count: sustainabilityMetrics?.data?.length || 0, loading: loadingSustainability },
+        { label: t('nextGen.recycledParts', 'Recycled Parts'), count: recycledParts?.data?.length || 0, loading: loadingRecycled },
+        { label: t('nextGen.sustainabilityMetrics', 'Sustainability Metrics'), count: sustainabilityMetrics?.data?.length || 0, loading: loadingSustainability },
       ],
     },
     {
-      name: "Satellite Connectivity",
+      name: t('nextGen.satelliteConnectivity', 'Satellite Connectivity'),
       icon: Satellite,
       color: "text-violet-500 dark:text-violet-400",
       data: [
-        { label: "Connections", count: satelliteConnections?.data?.length || 0, loading: loadingSatellite },
-        { label: "Usage Logs", count: satelliteUsageLogs?.data?.length || 0, loading: loadingSatelliteUsage },
+        { label: t('nextGen.connections', 'Connections'), count: satelliteConnections?.data?.length || 0, loading: loadingSatellite },
+        { label: t('nextGen.usageLogs', 'Usage Logs'), count: satelliteUsageLogs?.data?.length || 0, loading: loadingSatelliteUsage },
       ],
     },
     {
-      name: "Quantum Encryption",
+      name: t('nextGen.quantumEncryption', 'Quantum Encryption'),
       icon: Shield,
       color: "text-fuchsia-500 dark:text-fuchsia-400",
       data: [
-        { label: "Encryption Keys", count: quantumEncryptionKeys?.data?.length || 0, loading: loadingQuantum },
-        { label: "Secure Messages", count: quantumSecureMessages?.data?.length || 0, loading: loadingQuantumMessages },
+        { label: t('nextGen.encryptionKeys', 'Encryption Keys'), count: quantumEncryptionKeys?.data?.length || 0, loading: loadingQuantum },
+        { label: t('nextGen.secureMessages', 'Secure Messages'), count: quantumSecureMessages?.data?.length || 0, loading: loadingQuantumMessages },
       ],
     },
   ];
 
   return (
     <StandardPageLayout
-      title="Next-Generation Technologies"
-      description="Cutting-edge automotive ERP features powered by AI, XR, blockchain, and quantum computing"
+      title={t('nextGen.title', 'Next-Generation Technologies')}
+      description={t('nextGen.description', 'Cutting-edge automotive ERP features powered by AI, XR, blockchain, and quantum computing')}
       icon={Brain}
       actions={[
         {
-          label: seedMutation.isPending ? "Seeding..." : "Seed Sample Data",
+          label: seedMutation.isPending ? t('nextGen.seeding', 'Seeding...') : t('nextGen.seedSampleData', 'Seed Sample Data'),
           onClick: () => seedMutation.mutate(),
         },
       ]}
@@ -339,47 +341,47 @@ export default function NextGenTechnologies() {
 
       <Card className="bg-card dark:bg-gray-900 border-border dark:border-gray-800">
         <CardHeader>
-          <CardTitle className="text-foreground dark:text-white">Phase 10: Next-Generation Features</CardTitle>
+          <CardTitle className="text-foreground dark:text-white">{t('nextGen.phase10Title', 'Phase 10: Next-Generation Features')}</CardTitle>
         </CardHeader>
         <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-muted-foreground dark:text-gray-400">
           <div className="space-y-2">
-            <h3 className="font-semibold text-foreground dark:text-white">AI & Machine Learning</h3>
+            <h3 className="font-semibold text-foreground dark:text-white">{t('nextGen.aiMachineLearning', 'AI & Machine Learning')}</h3>
             <ul className="list-disc list-inside space-y-1">
-              <li>Neural network vehicle diagnostics with failure prediction</li>
-              <li>Computer vision quality control for defect detection</li>
-              <li>NLP service writer for automated work orders</li>
-              <li>Reinforcement learning for inventory optimization</li>
+              <li>{t('nextGen.neuralNetworkDiagnosticsDesc', 'Neural network vehicle diagnostics with failure prediction')}</li>
+              <li>{t('nextGen.computerVisionQCDesc', 'Computer vision quality control for defect detection')}</li>
+              <li>{t('nextGen.nlpServiceWriterDesc', 'NLP service writer for automated work orders')}</li>
+              <li>{t('nextGen.rlInventoryDesc', 'Reinforcement learning for inventory optimization')}</li>
             </ul>
           </div>
           <div className="space-y-2">
-            <h3 className="font-semibold text-foreground dark:text-white">Extended Reality</h3>
+            <h3 className="font-semibold text-foreground dark:text-white">{t('nextGen.extendedReality', 'Extended Reality')}</h3>
             <ul className="list-disc list-inside space-y-1">
-              <li>Metaverse virtual showroom for customer experiences</li>
-              <li>Holographic repair instructions for technicians</li>
-              <li>Spatial computing with Apple Vision Pro integration</li>
+              <li>{t('nextGen.metaverseShowroomDesc', 'Metaverse virtual showroom for customer experiences')}</li>
+              <li>{t('nextGen.holographicGuidesDesc', 'Holographic repair instructions for technicians')}</li>
+              <li>{t('nextGen.spatialComputingDesc', 'Spatial computing with Apple Vision Pro integration')}</li>
             </ul>
           </div>
           <div className="space-y-2">
-            <h3 className="font-semibold text-foreground dark:text-white">Advanced Automation</h3>
+            <h3 className="font-semibold text-foreground dark:text-white">{t('nextGen.advancedAutomation', 'Advanced Automation')}</h3>
             <ul className="list-disc list-inside space-y-1">
-              <li>Autonomous robots for parts retrieval and basic maintenance</li>
-              <li>Drone fleet for large facility inspections</li>
-              <li>Smart contracts for automated warranty processing</li>
+              <li>{t('nextGen.autonomousRobotsDesc', 'Autonomous robots for parts retrieval and basic maintenance')}</li>
+              <li>{t('nextGen.droneFleetDesc', 'Drone fleet for large facility inspections')}</li>
+              <li>{t('nextGen.smartContractsDesc', 'Smart contracts for automated warranty processing')}</li>
             </ul>
           </div>
           <div className="space-y-2">
-            <h3 className="font-semibold text-foreground dark:text-white">Sustainability</h3>
+            <h3 className="font-semibold text-foreground dark:text-white">{t('nextGen.sustainability', 'Sustainability')}</h3>
             <ul className="list-disc list-inside space-y-1">
-              <li>Carbon credit trading and emissions tracking</li>
-              <li>Green energy management with solar and EV charging</li>
-              <li>Circular economy with parts recycling tracking</li>
+              <li>{t('nextGen.carbonCreditDesc', 'Carbon credit trading and emissions tracking')}</li>
+              <li>{t('nextGen.greenEnergyDesc', 'Green energy management with solar and EV charging')}</li>
+              <li>{t('nextGen.circularEconomyDesc', 'Circular economy with parts recycling tracking')}</li>
             </ul>
           </div>
           <div className="space-y-2">
-            <h3 className="font-semibold text-foreground dark:text-white">Advanced Infrastructure</h3>
+            <h3 className="font-semibold text-foreground dark:text-white">{t('nextGen.advancedInfrastructure', 'Advanced Infrastructure')}</h3>
             <ul className="list-disc list-inside space-y-1">
-              <li>Satellite connectivity for remote operations</li>
-              <li>Quantum-encrypted secure communications</li>
+              <li>{t('nextGen.satelliteConnectivityDesc', 'Satellite connectivity for remote operations')}</li>
+              <li>{t('nextGen.quantumEncryptionDesc', 'Quantum-encrypted secure communications')}</li>
             </ul>
           </div>
         </CardContent>

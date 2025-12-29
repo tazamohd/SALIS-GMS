@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Link } from "wouter";
+import { useTranslation } from "react-i18next";
 import { TabsPageLayout } from "@/components/layouts/TabsPageLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -77,6 +78,7 @@ const withdrawalSchema = z.object({
 type WithdrawalFormData = z.infer<typeof withdrawalSchema>;
 
 export default function PartnersCurrentAccount() {
+  const { t } = useTranslation();
   const [isTransactionDialogOpen, setIsTransactionDialogOpen] = useState(false);
   const [isWithdrawalDialogOpen, setIsWithdrawalDialogOpen] = useState(false);
 
@@ -139,7 +141,7 @@ export default function PartnersCurrentAccount() {
   const tabs = [
     {
       id: "overview",
-      label: "Overview",
+      label: t('partners.overview', 'Overview'),
       icon: Wallet,
       content: (
         <div className="space-y-6">
@@ -148,7 +150,7 @@ export default function PartnersCurrentAccount() {
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Total Balance</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{t('partners.totalBalance', 'Total Balance')}</p>
                     <p className="text-2xl font-bold font-montserrat" data-testid="text-total-balance">SAR 205,000</p>
                   </div>
                   <Wallet className="h-8 w-8 text-blue-600" />
@@ -159,7 +161,7 @@ export default function PartnersCurrentAccount() {
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Total Credits</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{t('partners.totalCredits', 'Total Credits')}</p>
                     <p className="text-2xl font-bold font-montserrat text-green-600" data-testid="text-total-credits">SAR 260,000</p>
                   </div>
                   <TrendingUp className="h-8 w-8 text-green-600" />
@@ -170,7 +172,7 @@ export default function PartnersCurrentAccount() {
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Total Debits</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{t('partners.totalDebits', 'Total Debits')}</p>
                     <p className="text-2xl font-bold font-montserrat text-red-600" data-testid="text-total-debits">SAR 155,000</p>
                   </div>
                   <TrendingDown className="h-8 w-8 text-red-600" />
@@ -181,7 +183,7 @@ export default function PartnersCurrentAccount() {
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Active Partners</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{t('partners.activePartners', 'Active Partners')}</p>
                     <p className="text-2xl font-bold font-montserrat" data-testid="text-active-partners">3</p>
                   </div>
                   <Users className="h-8 w-8 text-purple-600" />
@@ -194,19 +196,19 @@ export default function PartnersCurrentAccount() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Users className="h-5 w-5" />
-                Partners Current Account Summary
+                {t('partners.partnersCurrentAccountSummary', 'Partners Current Account Summary')}
               </CardTitle>
             </CardHeader>
             <CardContent className="p-0">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Partner</TableHead>
-                    <TableHead className="text-right">Opening Balance</TableHead>
-                    <TableHead className="text-right">Credits</TableHead>
-                    <TableHead className="text-right">Debits</TableHead>
-                    <TableHead className="text-right">Current Balance</TableHead>
-                    <TableHead className="text-right">Ownership %</TableHead>
+                    <TableHead>{t('partners.partner', 'Partner')}</TableHead>
+                    <TableHead className="text-right">{t('partners.openingBalance', 'Opening Balance')}</TableHead>
+                    <TableHead className="text-right">{t('partners.credits', 'Credits')}</TableHead>
+                    <TableHead className="text-right">{t('partners.debits', 'Debits')}</TableHead>
+                    <TableHead className="text-right">{t('partners.currentBalance', 'Current Balance')}</TableHead>
+                    <TableHead className="text-right">{t('partners.ownershipPercent', 'Ownership %')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -229,22 +231,22 @@ export default function PartnersCurrentAccount() {
     },
     {
       id: "transactions",
-      label: "Transactions",
+      label: t('partners.transactions', 'Transactions'),
       icon: RefreshCw,
       content: (
         <div className="space-y-4">
           <div className="flex justify-between items-center">
-            <h3 className="text-lg font-semibold">Account Transactions</h3>
+            <h3 className="text-lg font-semibold">{t('partners.accountTransactions', 'Account Transactions')}</h3>
             <Dialog open={isTransactionDialogOpen} onOpenChange={setIsTransactionDialogOpen}>
               <DialogTrigger asChild>
                 <Button data-testid="button-add-transaction">
                   <Plus className="h-4 w-4 mr-2" />
-                  Add Transaction
+                  {t('partners.addTransaction', 'Add Transaction')}
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-md">
                 <DialogHeader>
-                  <DialogTitle>Add Transaction</DialogTitle>
+                  <DialogTitle>{t('partners.addTransaction', 'Add Transaction')}</DialogTitle>
                 </DialogHeader>
                 <Form {...transactionForm}>
                   <form onSubmit={transactionForm.handleSubmit(onTransactionSubmit)} className="space-y-4">
@@ -253,11 +255,11 @@ export default function PartnersCurrentAccount() {
                       name="partnerId"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Partner</FormLabel>
+                          <FormLabel>{t('partners.partner', 'Partner')}</FormLabel>
                           <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl>
                               <SelectTrigger data-testid="select-partner">
-                                <SelectValue placeholder="Select partner" />
+                                <SelectValue placeholder={t('partners.selectPartner', 'Select partner')} />
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
@@ -277,18 +279,18 @@ export default function PartnersCurrentAccount() {
                       name="transactionType"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Transaction Type</FormLabel>
+                          <FormLabel>{t('partners.transactionType', 'Transaction Type')}</FormLabel>
                           <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl>
                               <SelectTrigger data-testid="select-transaction-type">
-                                <SelectValue placeholder="Select type" />
+                                <SelectValue placeholder={t('partners.selectType', 'Select type')} />
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              <SelectItem value="credit">Credit (Deposit)</SelectItem>
-                              <SelectItem value="debit">Debit (Withdrawal)</SelectItem>
-                              <SelectItem value="profit">Profit Distribution</SelectItem>
-                              <SelectItem value="advance">Advance Payment</SelectItem>
+                              <SelectItem value="credit">{t('partners.creditDeposit', 'Credit (Deposit)')}</SelectItem>
+                              <SelectItem value="debit">{t('partners.debitWithdrawal', 'Debit (Withdrawal)')}</SelectItem>
+                              <SelectItem value="profit">{t('partners.profitDistribution', 'Profit Distribution')}</SelectItem>
+                              <SelectItem value="advance">{t('partners.advancePayment', 'Advance Payment')}</SelectItem>
                             </SelectContent>
                           </Select>
                           <FormMessage />
@@ -301,7 +303,7 @@ export default function PartnersCurrentAccount() {
                         name="amount"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Amount (SAR)</FormLabel>
+                            <FormLabel>{t('partners.amountSAR', 'Amount (SAR)')}</FormLabel>
                             <FormControl>
                               <Input type="number" {...field} data-testid="input-transaction-amount" />
                             </FormControl>
@@ -314,7 +316,7 @@ export default function PartnersCurrentAccount() {
                         name="date"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Date</FormLabel>
+                            <FormLabel>{t('common.date', 'Date')}</FormLabel>
                             <FormControl>
                               <Input type="date" {...field} data-testid="input-transaction-date" />
                             </FormControl>
@@ -328,7 +330,7 @@ export default function PartnersCurrentAccount() {
                       name="description"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Description</FormLabel>
+                          <FormLabel>{t('common.description', 'Description')}</FormLabel>
                           <FormControl>
                             <Textarea {...field} data-testid="input-transaction-description" />
                           </FormControl>
@@ -337,7 +339,7 @@ export default function PartnersCurrentAccount() {
                       )}
                     />
                     <Button type="submit" className="w-full" data-testid="button-submit-transaction">
-                      Add Transaction
+                      {t('partners.addTransaction', 'Add Transaction')}
                     </Button>
                   </form>
                 </Form>
@@ -350,11 +352,11 @@ export default function PartnersCurrentAccount() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Partner</TableHead>
-                    <TableHead>Type</TableHead>
-                    <TableHead>Description</TableHead>
-                    <TableHead className="text-right">Amount</TableHead>
+                    <TableHead>{t('common.date', 'Date')}</TableHead>
+                    <TableHead>{t('partners.partner', 'Partner')}</TableHead>
+                    <TableHead>{t('common.type', 'Type')}</TableHead>
+                    <TableHead>{t('common.description', 'Description')}</TableHead>
+                    <TableHead className="text-right">{t('common.amount', 'Amount')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -369,7 +371,7 @@ export default function PartnersCurrentAccount() {
                           ) : (
                             <ArrowUpRight className="h-3 w-3 mr-1" />
                           )}
-                          {transaction.type}
+                          {transaction.type === "Credit" ? t('partners.credit', 'Credit') : t('partners.debit', 'Debit')}
                         </Badge>
                       </TableCell>
                       <TableCell>{transaction.description}</TableCell>
@@ -387,22 +389,22 @@ export default function PartnersCurrentAccount() {
     },
     {
       id: "withdrawals",
-      label: "Withdrawals",
+      label: t('partners.withdrawals', 'Withdrawals'),
       icon: ArrowUpRight,
       content: (
         <div className="space-y-4">
           <div className="flex justify-between items-center">
-            <h3 className="text-lg font-semibold">Partner Withdrawals</h3>
+            <h3 className="text-lg font-semibold">{t('partners.partnerWithdrawals', 'Partner Withdrawals')}</h3>
             <Dialog open={isWithdrawalDialogOpen} onOpenChange={setIsWithdrawalDialogOpen}>
               <DialogTrigger asChild>
                 <Button data-testid="button-add-withdrawal">
                   <Plus className="h-4 w-4 mr-2" />
-                  New Withdrawal
+                  {t('partners.newWithdrawal', 'New Withdrawal')}
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-md">
                 <DialogHeader>
-                  <DialogTitle>New Withdrawal</DialogTitle>
+                  <DialogTitle>{t('partners.newWithdrawal', 'New Withdrawal')}</DialogTitle>
                 </DialogHeader>
                 <Form {...withdrawalForm}>
                   <form onSubmit={withdrawalForm.handleSubmit(onWithdrawalSubmit)} className="space-y-4">
@@ -411,17 +413,17 @@ export default function PartnersCurrentAccount() {
                       name="partnerId"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Partner</FormLabel>
+                          <FormLabel>{t('partners.partner', 'Partner')}</FormLabel>
                           <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl>
                               <SelectTrigger data-testid="select-withdrawal-partner">
-                                <SelectValue placeholder="Select partner" />
+                                <SelectValue placeholder={t('partners.selectPartner', 'Select partner')} />
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
                               {partners.map((partner) => (
                                 <SelectItem key={partner.id} value={partner.id.toString()}>
-                                  {partner.name} (Balance: SAR {partner.currentBalance.toLocaleString()})
+                                  {partner.name} ({t('partners.balance', 'Balance')}: SAR {partner.currentBalance.toLocaleString()})
                                 </SelectItem>
                               ))}
                             </SelectContent>
@@ -435,18 +437,18 @@ export default function PartnersCurrentAccount() {
                       name="withdrawalType"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Withdrawal Type</FormLabel>
+                          <FormLabel>{t('partners.withdrawalType', 'Withdrawal Type')}</FormLabel>
                           <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl>
                               <SelectTrigger data-testid="select-withdrawal-type">
-                                <SelectValue placeholder="Select type" />
+                                <SelectValue placeholder={t('partners.selectType', 'Select type')} />
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              <SelectItem value="personal">Personal Withdrawal</SelectItem>
-                              <SelectItem value="advance">Advance Against Profit</SelectItem>
-                              <SelectItem value="loan">Partner Loan</SelectItem>
-                              <SelectItem value="expense">Business Expense</SelectItem>
+                              <SelectItem value="personal">{t('partners.personalWithdrawal', 'Personal Withdrawal')}</SelectItem>
+                              <SelectItem value="advance">{t('partners.advanceAgainstProfit', 'Advance Against Profit')}</SelectItem>
+                              <SelectItem value="loan">{t('partners.partnerLoan', 'Partner Loan')}</SelectItem>
+                              <SelectItem value="expense">{t('partners.businessExpense', 'Business Expense')}</SelectItem>
                             </SelectContent>
                           </Select>
                           <FormMessage />
@@ -459,7 +461,7 @@ export default function PartnersCurrentAccount() {
                         name="amount"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Amount (SAR)</FormLabel>
+                            <FormLabel>{t('partners.amountSAR', 'Amount (SAR)')}</FormLabel>
                             <FormControl>
                               <Input type="number" {...field} data-testid="input-withdrawal-amount" />
                             </FormControl>
@@ -472,7 +474,7 @@ export default function PartnersCurrentAccount() {
                         name="date"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Date</FormLabel>
+                            <FormLabel>{t('common.date', 'Date')}</FormLabel>
                             <FormControl>
                               <Input type="date" {...field} data-testid="input-withdrawal-date" />
                             </FormControl>
@@ -486,17 +488,17 @@ export default function PartnersCurrentAccount() {
                       name="paymentMethod"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Payment Method</FormLabel>
+                          <FormLabel>{t('partners.paymentMethod', 'Payment Method')}</FormLabel>
                           <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl>
                               <SelectTrigger data-testid="select-withdrawal-method">
-                                <SelectValue placeholder="Select method" />
+                                <SelectValue placeholder={t('partners.selectMethod', 'Select method')} />
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
-                              <SelectItem value="cash">Cash</SelectItem>
-                              <SelectItem value="check">Check</SelectItem>
+                              <SelectItem value="bank_transfer">{t('partners.bankTransfer', 'Bank Transfer')}</SelectItem>
+                              <SelectItem value="cash">{t('partners.cash', 'Cash')}</SelectItem>
+                              <SelectItem value="check">{t('partners.check', 'Check')}</SelectItem>
                             </SelectContent>
                           </Select>
                           <FormMessage />
@@ -508,7 +510,7 @@ export default function PartnersCurrentAccount() {
                       name="reason"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Reason (Optional)</FormLabel>
+                          <FormLabel>{t('partners.reasonOptional', 'Reason (Optional)')}</FormLabel>
                           <FormControl>
                             <Textarea {...field} data-testid="input-withdrawal-reason" />
                           </FormControl>
@@ -517,7 +519,7 @@ export default function PartnersCurrentAccount() {
                       )}
                     />
                     <Button type="submit" className="w-full" data-testid="button-submit-withdrawal">
-                      Process Withdrawal
+                      {t('partners.processWithdrawal', 'Process Withdrawal')}
                     </Button>
                   </form>
                 </Form>
@@ -530,12 +532,12 @@ export default function PartnersCurrentAccount() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Partner</TableHead>
-                    <TableHead>Type</TableHead>
-                    <TableHead>Payment Method</TableHead>
-                    <TableHead className="text-right">Amount</TableHead>
-                    <TableHead>Status</TableHead>
+                    <TableHead>{t('common.date', 'Date')}</TableHead>
+                    <TableHead>{t('partners.partner', 'Partner')}</TableHead>
+                    <TableHead>{t('common.type', 'Type')}</TableHead>
+                    <TableHead>{t('common.amount', 'Amount')}</TableHead>
+                    <TableHead>{t('partners.method', 'Method')}</TableHead>
+                    <TableHead>{t('common.status', 'Status')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -543,16 +545,12 @@ export default function PartnersCurrentAccount() {
                     <TableRow key={withdrawal.id} data-testid={`row-withdrawal-${withdrawal.id}`}>
                       <TableCell className="font-montserrat">{withdrawal.date}</TableCell>
                       <TableCell>{withdrawal.partner}</TableCell>
-                      <TableCell>
-                        <Badge variant="outline">{withdrawal.type}</Badge>
-                      </TableCell>
+                      <TableCell>{withdrawal.type}</TableCell>
+                      <TableCell className="font-montserrat text-red-600">SAR {withdrawal.amount.toLocaleString()}</TableCell>
                       <TableCell>{withdrawal.method}</TableCell>
-                      <TableCell className="text-right font-montserrat text-red-600">
-                        -SAR {withdrawal.amount.toLocaleString()}
-                      </TableCell>
                       <TableCell>
                         <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100">
-                          {withdrawal.status}
+                          {t('partners.completed', 'Completed')}
                         </Badge>
                       </TableCell>
                     </TableRow>
@@ -565,44 +563,51 @@ export default function PartnersCurrentAccount() {
       ),
     },
     {
-      id: "statements",
-      label: "Statements",
+      id: "reports",
+      label: t('partners.reports', 'Reports'),
       icon: FileText,
       content: (
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold">Partner Account Statements</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {partners.map((partner) => (
-              <Card key={partner.id} className="bg-gray-50 dark:bg-salis-gray-dark/30" data-testid={`card-statement-${partner.id}`}>
-                <CardHeader>
-                  <CardTitle className="text-lg">{partner.name}</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-500">Opening Balance</span>
-                      <span className="font-montserrat">SAR {partner.openingBalance.toLocaleString()}</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-500">Total Credits</span>
-                      <span className="font-montserrat text-green-600">+SAR {partner.credits.toLocaleString()}</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-500">Total Debits</span>
-                      <span className="font-montserrat text-red-600">-SAR {partner.debits.toLocaleString()}</span>
-                    </div>
-                    <div className="border-t pt-2 flex justify-between font-bold">
-                      <span>Current Balance</span>
-                      <span className="font-montserrat text-blue-600">SAR {partner.currentBalance.toLocaleString()}</span>
-                    </div>
-                  </div>
-                  <Button variant="outline" className="w-full" data-testid={`button-download-statement-${partner.id}`}>
-                    <FileText className="h-4 w-4 mr-2" />
-                    Download Statement
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
+          <h3 className="text-lg font-semibold">{t('partners.partnerReports', 'Partner Reports')}</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <Card className="cursor-pointer hover:border-primary transition-colors" data-testid="card-report-statement">
+              <CardHeader className="pb-2">
+                <FileText className="h-8 w-8 text-blue-600 mb-2" />
+                <CardTitle className="text-lg">{t('partners.partnerStatement', 'Partner Statement')}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground mb-4">{t('partners.partnerStatementDesc', 'Detailed account statement for each partner')}</p>
+                <Button variant="outline" className="w-full">
+                  {t('partners.generateReport', 'Generate Report')}
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card className="cursor-pointer hover:border-primary transition-colors" data-testid="card-report-profit">
+              <CardHeader className="pb-2">
+                <TrendingUp className="h-8 w-8 text-green-600 mb-2" />
+                <CardTitle className="text-lg">{t('partners.profitDistribution', 'Profit Distribution')}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground mb-4">{t('partners.profitDistributionDesc', 'Profit sharing analysis by partner')}</p>
+                <Button variant="outline" className="w-full">
+                  {t('partners.generateReport', 'Generate Report')}
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card className="cursor-pointer hover:border-primary transition-colors" data-testid="card-report-withdrawals">
+              <CardHeader className="pb-2">
+                <ArrowUpRight className="h-8 w-8 text-red-600 mb-2" />
+                <CardTitle className="text-lg">{t('partners.withdrawalHistory', 'Withdrawal History')}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground mb-4">{t('partners.withdrawalHistoryDesc', 'Complete withdrawal records')}</p>
+                <Button variant="outline" className="w-full">
+                  {t('partners.generateReport', 'Generate Report')}
+                </Button>
+              </CardContent>
+            </Card>
           </div>
         </div>
       ),
@@ -610,14 +615,12 @@ export default function PartnersCurrentAccount() {
   ];
 
   return (
-    <TabsPageLayout
-      title="Partners Current Account"
-      titleArabic="جاري الشركاء"
-      description="Manage partner current accounts, transactions, and withdrawals"
-      descriptionArabic="إدارة حسابات الشركاء الجارية والمعاملات والسحوبات"
-      icon={Users}
-      tabs={tabs}
-      defaultTab="overview"
-    />
+    <div className="p-6">
+      <TabsPageLayout
+        title={t('partners.partnersCurrentAccount', 'Partners Current Account')}
+        subtitle={t('partners.partnersCurrentAccountSubtitle', 'جاري الشركاء - Track partner balances, transactions, and withdrawals')}
+        tabs={tabs}
+      />
+    </div>
   );
 }

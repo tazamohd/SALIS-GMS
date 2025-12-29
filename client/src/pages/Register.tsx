@@ -8,8 +8,10 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import logoImage from "@assets/Logo_blue_orange_1760743036292.png";
 import { Link } from "wouter";
+import { useTranslation } from "react-i18next";
 
 export default function Register() {
+  const { t } = useTranslation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
@@ -25,15 +27,15 @@ export default function Register() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
       toast({
-        title: "Success",
-        description: "Account created successfully",
+        title: t('common.success', 'Success'),
+        description: t('auth.accountCreated', 'Account created successfully'),
       });
       window.location.href = "/login-dashboard";
     },
     onError: (error: Error) => {
       toast({
-        title: "Registration Failed",
-        description: error.message || "Failed to create account",
+        title: t('auth.registrationFailed', 'Registration Failed'),
+        description: error.message || t('auth.failedToCreateAccount', 'Failed to create account'),
         variant: "destructive",
       });
     },
@@ -43,8 +45,8 @@ export default function Register() {
     e.preventDefault();
     if (!email || !password || !fullName) {
       toast({
-        title: "Error",
-        description: "Please fill in all required fields",
+        title: t('common.error', 'Error'),
+        description: t('auth.fillRequiredFields', 'Please fill in all required fields'),
         variant: "destructive",
       });
       return;
@@ -59,24 +61,24 @@ export default function Register() {
           <div className="flex justify-center">
             <img 
               src={logoImage} 
-              alt="SALIS AUTO" 
+              alt={t('app.name', 'SALIS AUTO')} 
               className="w-40 h-auto"
               data-testid="logo-salis-auto"
             />
           </div>
-          <CardTitle className="text-2xl text-center font-montserrat">Create Account</CardTitle>
+          <CardTitle className="text-2xl text-center font-montserrat">{t('auth.createAccount', 'Create Account')}</CardTitle>
           <CardDescription className="text-center font-poppins">
-            Register to get started with SALIS AUTO
+            {t('auth.registerToGetStarted', 'Register to get started with SALIS AUTO')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="fullName" className="font-poppins">Full Name *</Label>
+              <Label htmlFor="fullName" className="font-poppins">{t('auth.fullName', 'Full Name')} *</Label>
               <Input
                 id="fullName"
                 type="text"
-                placeholder="John Doe"
+                placeholder={t('auth.fullNamePlaceholder', 'John Doe')}
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
                 required
@@ -85,11 +87,11 @@ export default function Register() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="email" className="font-poppins">Email *</Label>
+              <Label htmlFor="email" className="font-poppins">{t('auth.email', 'Email')} *</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="your@email.com"
+                placeholder={t('auth.emailPlaceholder', 'your@email.com')}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -98,7 +100,7 @@ export default function Register() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="phone" className="font-poppins">Phone</Label>
+              <Label htmlFor="phone" className="font-poppins">{t('auth.phone', 'Phone')}</Label>
               <Input
                 id="phone"
                 type="tel"
@@ -110,7 +112,7 @@ export default function Register() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password" className="font-poppins">Password *</Label>
+              <Label htmlFor="password" className="font-poppins">{t('auth.password', 'Password')} *</Label>
               <Input
                 id="password"
                 type="password"
@@ -128,12 +130,12 @@ export default function Register() {
               disabled={registerMutation.isPending}
               data-testid="button-register"
             >
-              {registerMutation.isPending ? "Creating account..." : "Create Account"}
+              {registerMutation.isPending ? t('auth.creatingAccount', 'Creating account...') : t('auth.createAccount', 'Create Account')}
             </Button>
             <p className="text-center text-sm font-poppins text-gray-600 dark:text-gray-400">
-              Already have an account?{" "}
+              {t('auth.alreadyHaveAccount', 'Already have an account?')}{" "}
               <Link href="/login" className="text-salis-orange hover:underline" data-testid="link-login">
-                Sign In
+                {t('auth.signIn', 'Sign In')}
               </Link>
             </p>
           </form>

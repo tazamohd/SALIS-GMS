@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -52,6 +53,7 @@ const formSchema = insertServiceTemplateSchema.extend({
 type FormData = z.infer<typeof formSchema>;
 
 export default function ServiceTemplates() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [selectedGarage, setSelectedGarage] = useState<string>("all");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
@@ -101,14 +103,14 @@ export default function ServiceTemplates() {
           return key === "/api/service-templates" || key === "/api/service-templates/all";
         }
       });
-      toast({ title: "Service template created successfully" });
+      toast({ title: t('serviceTemplates.templateCreatedSuccessfully', 'Service template created successfully') });
       setCreateDialogOpen(false);
       form.reset();
       setTaskSteps([{ stepName: "", description: "", estimatedMinutes: 0 }]);
     },
     onError: (error: any) => {
       toast({
-        title: "Error creating service template",
+        title: t('serviceTemplates.errorCreatingTemplate', 'Error creating service template'),
         description: error.message,
         variant: "destructive",
       });
@@ -126,19 +128,18 @@ export default function ServiceTemplates() {
           return key === "/api/service-templates" || key === "/api/service-templates/all";
         }
       });
-      toast({ title: "Service template deleted successfully" });
+      toast({ title: t('serviceTemplates.templateDeletedSuccessfully', 'Service template deleted successfully') });
       setDetailsDialogOpen(false);
     },
     onError: (error: any) => {
       toast({
-        title: "Error deleting service template",
+        title: t('serviceTemplates.errorDeletingTemplate', 'Error deleting service template'),
         description: error.message,
         variant: "destructive",
       });
     },
   });
 
-  // Fetch all templates when "all" is selected
   const { data: allTemplates, isLoading: allIsLoading } = useQuery<ServiceTemplate[]>({
     queryKey: ["/api/service-templates/all"],
     enabled: !!garages && garages.length > 0 && selectedGarage === "all",
@@ -187,22 +188,22 @@ export default function ServiceTemplates() {
 
   return (
     <StandardPageLayout
-      title="Service Templates"
-      description="Create and manage reusable service templates"
+      title={t('serviceTemplates.title', 'Service Templates')}
+      description={t('serviceTemplates.description', 'Create and manage reusable service templates')}
       icon={Wrench}
     >
       <>
       <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
         <DialogTrigger asChild>
           <Button data-testid="button-create-template">
-            <Plus className="mr-2 h-4 w-4" /> Create Template
+            <Plus className="mr-2 h-4 w-4" /> {t('serviceTemplates.createTemplate', 'Create Template')}
           </Button>
         </DialogTrigger>
           <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>Create Service Template</DialogTitle>
+              <DialogTitle>{t('serviceTemplates.createServiceTemplate', 'Create Service Template')}</DialogTitle>
               <DialogDescription>
-                Create a reusable service template with predefined steps
+                {t('serviceTemplates.createReusableTemplate', 'Create a reusable service template with predefined steps')}
               </DialogDescription>
             </DialogHeader>
             <Form {...form}>
@@ -212,11 +213,11 @@ export default function ServiceTemplates() {
                   name="garageId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Garage</FormLabel>
+                      <FormLabel>{t('serviceTemplates.garage', 'Garage')}</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger data-testid="select-garage">
-                            <SelectValue placeholder="Select garage" />
+                            <SelectValue placeholder={t('serviceTemplates.selectGarage', 'Select garage')} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -237,9 +238,9 @@ export default function ServiceTemplates() {
                   name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Template Name</FormLabel>
+                      <FormLabel>{t('serviceTemplates.templateName', 'Template Name')}</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder="e.g., Oil Change Service" data-testid="input-name" />
+                        <Input {...field} placeholder={t('serviceTemplates.templateNamePlaceholder', 'e.g., Oil Change Service')} data-testid="input-name" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -251,17 +252,17 @@ export default function ServiceTemplates() {
                   name="category"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Category</FormLabel>
+                      <FormLabel>{t('common.category', 'Category')}</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger data-testid="select-category">
-                            <SelectValue placeholder="Select category" />
+                            <SelectValue placeholder={t('serviceTemplates.selectCategory', 'Select category')} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="maintenance">Maintenance</SelectItem>
-                          <SelectItem value="repair">Repair</SelectItem>
-                          <SelectItem value="diagnostic">Diagnostic</SelectItem>
+                          <SelectItem value="maintenance">{t('serviceTemplates.maintenance', 'Maintenance')}</SelectItem>
+                          <SelectItem value="repair">{t('serviceTemplates.repair', 'Repair')}</SelectItem>
+                          <SelectItem value="diagnostic">{t('serviceTemplates.diagnostic', 'Diagnostic')}</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -274,9 +275,9 @@ export default function ServiceTemplates() {
                   name="description"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Description</FormLabel>
+                      <FormLabel>{t('common.description', 'Description')}</FormLabel>
                       <FormControl>
-                        <Textarea {...field} value={field.value || ""} placeholder="Describe this service template..." data-testid="input-description" />
+                        <Textarea {...field} value={field.value || ""} placeholder={t('serviceTemplates.describeTemplate', 'Describe this service template...')} data-testid="input-description" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -289,7 +290,7 @@ export default function ServiceTemplates() {
                     name="estimatedHours"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Estimated Hours</FormLabel>
+                        <FormLabel>{t('serviceTemplates.estimatedHours', 'Estimated Hours')}</FormLabel>
                         <FormControl>
                           <Input type="number" step="0.25" {...field} value={field.value || ""} data-testid="input-estimated-hours" />
                         </FormControl>
@@ -303,7 +304,7 @@ export default function ServiceTemplates() {
                     name="standardCost"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Standard Cost</FormLabel>
+                        <FormLabel>{t('serviceTemplates.standardCost', 'Standard Cost')}</FormLabel>
                         <FormControl>
                           <Input type="number" step="0.01" {...field} value={field.value || ""} data-testid="input-standard-cost" />
                         </FormControl>
@@ -315,9 +316,9 @@ export default function ServiceTemplates() {
 
                 <div className="space-y-3">
                   <div className="flex justify-between items-center">
-                    <FormLabel>Task Steps</FormLabel>
+                    <FormLabel>{t('serviceTemplates.taskSteps', 'Task Steps')}</FormLabel>
                     <Button type="button" variant="outline" size="sm" onClick={addTaskStep} data-testid="button-add-step">
-                      <Plus className="h-3 w-3 mr-1" /> Add Step
+                      <Plus className="h-3 w-3 mr-1" /> {t('serviceTemplates.addStep', 'Add Step')}
                     </Button>
                   </div>
                   {taskSteps.map((step, index) => (
@@ -325,7 +326,7 @@ export default function ServiceTemplates() {
                       <div className="space-y-2">
                         <div className="flex justify-between items-start gap-2">
                           <Input
-                            placeholder="Step name"
+                            placeholder={t('serviceTemplates.stepName', 'Step name')}
                             value={step.stepName}
                             onChange={(e) => updateTaskStep(index, "stepName", e.target.value)}
                             data-testid={`input-step-name-${index}`}
@@ -343,14 +344,14 @@ export default function ServiceTemplates() {
                           )}
                         </div>
                         <Input
-                          placeholder="Description (optional)"
+                          placeholder={t('serviceTemplates.descriptionOptional', 'Description (optional)')}
                           value={step.description || ""}
                           onChange={(e) => updateTaskStep(index, "description", e.target.value)}
                           data-testid={`input-step-description-${index}`}
                         />
                         <Input
                           type="number"
-                          placeholder="Estimated minutes"
+                          placeholder={t('serviceTemplates.estimatedMinutes', 'Estimated minutes')}
                           value={step.estimatedMinutes || 0}
                           onChange={(e) => updateTaskStep(index, "estimatedMinutes", parseInt(e.target.value))}
                           data-testid={`input-step-minutes-${index}`}
@@ -367,10 +368,10 @@ export default function ServiceTemplates() {
                     onClick={() => setCreateDialogOpen(false)}
                     data-testid="button-cancel-create"
                   >
-                    Cancel
+                    {t('common.cancel', 'Cancel')}
                   </Button>
                   <Button type="submit" disabled={createMutation.isPending} data-testid="button-submit-create">
-                    {createMutation.isPending ? "Creating..." : "Create Template"}
+                    {createMutation.isPending ? t('common.creating', 'Creating...') : t('serviceTemplates.createTemplate', 'Create Template')}
                   </Button>
                 </DialogFooter>
               </form>
@@ -378,14 +379,13 @@ export default function ServiceTemplates() {
           </DialogContent>
         </Dialog>
 
-      {/* Filters */}
       <div className="flex gap-4">
         <Select value={selectedGarage} onValueChange={setSelectedGarage}>
           <SelectTrigger className="w-[200px]" data-testid="filter-garage">
-            <SelectValue placeholder="All Garages" />
+            <SelectValue placeholder={t('serviceTemplates.allGarages', 'All Garages')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Garages</SelectItem>
+            <SelectItem value="all">{t('serviceTemplates.allGarages', 'All Garages')}</SelectItem>
             {garages?.map((garage) => (
               <SelectItem key={garage.id} value={garage.id}>
                 {garage.name}
@@ -396,21 +396,20 @@ export default function ServiceTemplates() {
 
         <Select value={selectedCategory} onValueChange={setSelectedCategory}>
           <SelectTrigger className="w-[200px]" data-testid="filter-category">
-            <SelectValue placeholder="All Categories" />
+            <SelectValue placeholder={t('serviceTemplates.allCategories', 'All Categories')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Categories</SelectItem>
-            <SelectItem value="maintenance">Maintenance</SelectItem>
-            <SelectItem value="repair">Repair</SelectItem>
-            <SelectItem value="diagnostic">Diagnostic</SelectItem>
+            <SelectItem value="all">{t('serviceTemplates.allCategories', 'All Categories')}</SelectItem>
+            <SelectItem value="maintenance">{t('serviceTemplates.maintenance', 'Maintenance')}</SelectItem>
+            <SelectItem value="repair">{t('serviceTemplates.repair', 'Repair')}</SelectItem>
+            <SelectItem value="diagnostic">{t('serviceTemplates.diagnostic', 'Diagnostic')}</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
-      {/* Templates Grid */}
       {activeLoading ? (
         <div className="text-center py-12">
-          <p className="text-gray-900 dark:text-white/60">Loading templates...</p>
+          <p className="text-gray-900 dark:text-white/60">{t('serviceTemplates.loadingTemplates', 'Loading templates...')}</p>
         </div>
       ) : filteredTemplates && filteredTemplates.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -430,7 +429,7 @@ export default function ServiceTemplates() {
                   <div className="flex gap-4 text-sm text-gray-900 dark:text-white/60">
                     <div className="flex items-center gap-1">
                       <Clock className="h-4 w-4" />
-                      <span>{template.estimatedHours || 0}h</span>
+                      <span>{template.estimatedHours || 0}{t('serviceTemplates.hoursAbbrev', 'h')}</span>
                     </div>
                     <div className="flex items-center gap-1">
                       <DollarSign className="h-4 w-4" />
@@ -440,11 +439,11 @@ export default function ServiceTemplates() {
                   <div className="flex items-center gap-2">
                     {template.isActive ? (
                       <Badge variant="outline" className="bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200">
-                        <CheckCircle className="h-3 w-3 mr-1" /> Active
+                        <CheckCircle className="h-3 w-3 mr-1" /> {t('common.active', 'Active')}
                       </Badge>
                     ) : (
                       <Badge variant="outline" className="bg-gray-100 text-gray-700 dark:bg-gray-950 dark:text-gray-300">
-                        <XCircle className="h-3 w-3 mr-1" /> Inactive
+                        <XCircle className="h-3 w-3 mr-1" /> {t('common.inactive', 'Inactive')}
                       </Badge>
                     )}
                   </div>
@@ -455,53 +454,52 @@ export default function ServiceTemplates() {
         </div>
       ) : (
         <div className="text-center py-12">
-          <p className="text-gray-900 dark:text-white/60">No service templates found</p>
-          <p className="text-sm text-gray-900 dark:text-white/60 mt-2">Create your first template to get started</p>
+          <p className="text-gray-900 dark:text-white/60">{t('serviceTemplates.noTemplatesFound', 'No service templates found')}</p>
+          <p className="text-sm text-gray-900 dark:text-white/60 mt-2">{t('serviceTemplates.createFirstTemplate', 'Create your first template to get started')}</p>
         </div>
       )}
 
-      {/* Details Dialog */}
       <Dialog open={detailsDialogOpen} onOpenChange={setDetailsDialogOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>{selectedTemplate?.name}</DialogTitle>
-            <DialogDescription>Service template details</DialogDescription>
+            <DialogDescription>{t('serviceTemplates.templateDetails', 'Service template details')}</DialogDescription>
           </DialogHeader>
           {selectedTemplate && (
             <div className="space-y-4">
               <div>
-                <h4 className="font-semibold mb-2">Category</h4>
+                <h4 className="font-semibold mb-2">{t('common.category', 'Category')}</h4>
                 <Badge className={getCategoryBadge(selectedTemplate.category)}>{selectedTemplate.category}</Badge>
               </div>
               {selectedTemplate.description && (
                 <div>
-                  <h4 className="font-semibold mb-2">Description</h4>
+                  <h4 className="font-semibold mb-2">{t('common.description', 'Description')}</h4>
                   <p className="text-sm text-gray-900 dark:text-white/60">{selectedTemplate.description}</p>
                 </div>
               )}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <h4 className="font-semibold mb-2">Estimated Hours</h4>
-                  <p className="text-sm">{selectedTemplate.estimatedHours || 0} hours</p>
+                  <h4 className="font-semibold mb-2">{t('serviceTemplates.estimatedHours', 'Estimated Hours')}</h4>
+                  <p className="text-sm">{selectedTemplate.estimatedHours || 0} {t('serviceTemplates.hours', 'hours')}</p>
                 </div>
                 <div>
-                  <h4 className="font-semibold mb-2">Standard Cost</h4>
+                  <h4 className="font-semibold mb-2">{t('serviceTemplates.standardCost', 'Standard Cost')}</h4>
                   <p className="text-sm">${selectedTemplate.standardCost || 0}</p>
                 </div>
               </div>
               <div>
-                <h4 className="font-semibold mb-2">Task Steps</h4>
+                <h4 className="font-semibold mb-2">{t('serviceTemplates.taskSteps', 'Task Steps')}</h4>
                 <div className="space-y-2">
                   {Array.isArray(selectedTemplate.taskSteps) && selectedTemplate.taskSteps.length > 0 ? (
                     (selectedTemplate.taskSteps as any[]).map((step: any, index: number) => (
                       <Card key={index} className="p-3">
                         <p className="font-medium">{index + 1}. {step.stepName}</p>
                         {step.description && <p className="text-sm text-gray-900 dark:text-white/60 mt-1">{step.description}</p>}
-                        {step.estimatedMinutes && <p className="text-xs text-gray-900 dark:text-white/60 mt-1">~{step.estimatedMinutes} minutes</p>}
+                        {step.estimatedMinutes && <p className="text-xs text-gray-900 dark:text-white/60 mt-1">~{step.estimatedMinutes} {t('serviceTemplates.minutes', 'minutes')}</p>}
                       </Card>
                     ))
                   ) : (
-                    <p className="text-sm text-gray-900 dark:text-white/60">No task steps defined</p>
+                    <p className="text-sm text-gray-900 dark:text-white/60">{t('serviceTemplates.noTaskStepsDefined', 'No task steps defined')}</p>
                   )}
                 </div>
               </div>
@@ -512,7 +510,7 @@ export default function ServiceTemplates() {
                   disabled={deleteMutation.isPending}
                   data-testid="button-delete-template"
                 >
-                  {deleteMutation.isPending ? "Deleting..." : "Delete Template"}
+                  {deleteMutation.isPending ? t('common.deleting', 'Deleting...') : t('serviceTemplates.deleteTemplate', 'Delete Template')}
                 </Button>
               </DialogFooter>
             </div>

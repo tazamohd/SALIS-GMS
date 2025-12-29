@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { StandardTablePage, Column } from "@/components/layouts/StandardTablePage";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -11,6 +12,7 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
 export default function VideoConsultations() {
+  const { t } = useTranslation();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const { toast } = useToast();
 
@@ -23,7 +25,7 @@ export default function VideoConsultations() {
       return await apiRequest("/api/video/consultations", "POST", data);
     },
     onSuccess: () => {
-      toast({ title: "Consultation scheduled", description: "Video meeting link sent to customer." });
+      toast({ title: t('videoConsultations.consultationScheduled', 'Consultation scheduled'), description: t('videoConsultations.meetingLinkSent', 'Video meeting link sent to customer.') });
       setIsCreateDialogOpen(false);
       queryClient.invalidateQueries({ queryKey: ["/api/video/consultations"] });
     },
@@ -37,7 +39,7 @@ export default function VideoConsultations() {
       if (data.meetingUrl) {
         window.open(data.meetingUrl, "_blank");
       }
-      toast({ title: "Meeting started", description: "Opening video consultation..." });
+      toast({ title: t('videoConsultations.meetingStarted', 'Meeting started'), description: t('videoConsultations.openingConsultation', 'Opening video consultation...') });
     },
   });
 
@@ -96,17 +98,23 @@ export default function VideoConsultations() {
       completed: "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300",
       cancelled: "",
     };
-    return <Badge variant={variants[status] || "secondary"} className={statusColors[status]}>{status.replace("_", " ")}</Badge>;
+    const statusLabels: Record<string, string> = {
+      scheduled: t('common.scheduled', 'Scheduled'),
+      in_progress: t('common.inProgress', 'In Progress'),
+      completed: t('common.completed', 'Completed'),
+      cancelled: t('common.cancelled', 'Cancelled'),
+    };
+    return <Badge variant={variants[status] || "secondary"} className={statusColors[status]}>{statusLabels[status] || status}</Badge>;
   };
 
   const copyMeetingLink = (url: string) => {
     navigator.clipboard.writeText(url);
-    toast({ title: "Link copied", description: "Meeting link copied to clipboard." });
+    toast({ title: t('videoConsultations.linkCopied', 'Link copied'), description: t('videoConsultations.meetingLinkCopied', 'Meeting link copied to clipboard.') });
   };
 
   const columns: Column<typeof mockConsultations[0]>[] = [
     {
-      header: "Customer",
+      header: t('customers.customer', 'Customer'),
       accessorKey: "customerName",
       cell: (row) => (
         <div>
@@ -116,31 +124,31 @@ export default function VideoConsultations() {
       ),
     },
     {
-      header: "Technician",
+      header: t('technicians.technician', 'Technician'),
       accessorKey: "technicianName",
     },
     {
-      header: "Platform",
+      header: t('videoConsultations.platform', 'Platform'),
       accessorKey: "platform",
       cell: (row) => <Badge variant="outline">{row.platform}</Badge>,
     },
     {
-      header: "Scheduled",
+      header: t('common.scheduled', 'Scheduled'),
       accessorKey: "scheduledAt",
       cell: (row) => new Date(row.scheduledAt).toLocaleString(),
     },
     {
-      header: "Duration",
+      header: t('videoConsultations.duration', 'Duration'),
       accessorKey: "duration",
-      cell: (row) => `${row.duration} min`,
+      cell: (row) => `${row.duration} ${t('common.min', 'min')}`,
     },
     {
-      header: "Status",
+      header: t('common.status', 'Status'),
       accessorKey: "status",
       cell: (row) => getStatusBadge(row.status),
     },
     {
-      header: "Actions",
+      header: t('common.actions', 'Actions'),
       accessorKey: "id",
       cell: (row) => (
         <div className="flex items-center gap-2">
@@ -152,7 +160,7 @@ export default function VideoConsultations() {
                 data-testid={`button-start-${row.id}`}
               >
                 <PlayCircle className="h-3 w-3 mr-1" />
-                Start
+                {t('common.start', 'Start')}
               </Button>
               <Button
                 size="sm"
@@ -171,7 +179,7 @@ export default function VideoConsultations() {
               onClick={() => window.open(row.meetingUrl, "_blank")}
               data-testid={`button-join-${row.id}`}
             >
-              Join
+              {t('videoConsultations.join', 'Join')}
             </Button>
           )}
           {row.status === "completed" && row.recordingUrl && (
@@ -181,7 +189,7 @@ export default function VideoConsultations() {
               onClick={() => window.open(row.recordingUrl, "_blank")}
               data-testid={`button-recording-${row.id}`}
             >
-              Recording
+              {t('videoConsultations.recording', 'Recording')}
             </Button>
           )}
         </div>
@@ -192,12 +200,12 @@ export default function VideoConsultations() {
   return (
     <>
       <StandardTablePage
-        title="Video Consultations"
-        description="Remote vehicle diagnostics and customer consultations"
+        title={t('videoConsultations.title', 'Video Consultations')}
+        description={t('videoConsultations.description', 'Remote vehicle diagnostics and customer consultations')}
         icon={Video}
         actions={[
           {
-            label: "Schedule Consultation",
+            label: t('videoConsultations.scheduleConsultation', 'Schedule Consultation'),
             onClick: () => setIsCreateDialogOpen(true),
             variant: "default",
           },
@@ -205,41 +213,41 @@ export default function VideoConsultations() {
         data={mockConsultations}
         columns={columns}
         isLoading={isLoading}
-        searchPlaceholder="Search consultations..."
+        searchPlaceholder={t('videoConsultations.searchPlaceholder', 'Search consultations...')}
         filters={[
           {
             id: "status",
-            label: "Status",
+            label: t('common.status', 'Status'),
             options: [
-              { value: "all", label: "All Statuses" },
-              { value: "scheduled", label: "Scheduled" },
-              { value: "in_progress", label: "In Progress" },
-              { value: "completed", label: "Completed" },
+              { value: "all", label: t('common.allStatuses', 'All Statuses') },
+              { value: "scheduled", label: t('common.scheduled', 'Scheduled') },
+              { value: "in_progress", label: t('common.inProgress', 'In Progress') },
+              { value: "completed", label: t('common.completed', 'Completed') },
             ],
           },
         ]}
         emptyState={{
           icon: Video,
-          title: "No consultations",
-          description: "No video consultations scheduled yet.",
+          title: t('videoConsultations.noConsultations', 'No consultations'),
+          description: t('videoConsultations.noConsultationsDesc', 'No video consultations scheduled yet.'),
         }}
       />
 
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Schedule Video Consultation</DialogTitle>
+            <DialogTitle>{t('videoConsultations.scheduleVideoConsultation', 'Schedule Video Consultation')}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div>
-              <label className="text-sm font-medium">Customer</label>
-              <Input placeholder="Select customer..." className="mt-1" data-testid="input-customer" />
+              <label className="text-sm font-medium">{t('customers.customer', 'Customer')}</label>
+              <Input placeholder={t('videoConsultations.selectCustomer', 'Select customer...')} className="mt-1" data-testid="input-customer" />
             </div>
             <div>
-              <label className="text-sm font-medium">Platform</label>
+              <label className="text-sm font-medium">{t('videoConsultations.platform', 'Platform')}</label>
               <Select>
                 <SelectTrigger className="mt-1" data-testid="select-platform">
-                  <SelectValue placeholder="Select platform" />
+                  <SelectValue placeholder={t('videoConsultations.selectPlatform', 'Select platform')} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="zoom">Zoom</SelectItem>
@@ -249,11 +257,11 @@ export default function VideoConsultations() {
               </Select>
             </div>
             <div>
-              <label className="text-sm font-medium">Scheduled Time</label>
+              <label className="text-sm font-medium">{t('videoConsultations.scheduledTime', 'Scheduled Time')}</label>
               <Input type="datetime-local" className="mt-1" data-testid="input-scheduled-time" />
             </div>
             <Button className="w-full" onClick={() => createConsultation.mutate({})} data-testid="button-schedule">
-              Schedule Consultation
+              {t('videoConsultations.scheduleConsultation', 'Schedule Consultation')}
             </Button>
           </div>
         </DialogContent>

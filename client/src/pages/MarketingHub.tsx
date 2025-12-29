@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -93,6 +94,7 @@ const MOCK_COMMENTS = [
 ];
 
 export default function MarketingHub() {
+  const { t } = useTranslation();
   const [selectedTab, setSelectedTab] = useState("overview");
   const [isConnectDialogOpen, setIsConnectDialogOpen] = useState(false);
   const [selectedPlatform, setSelectedPlatform] = useState<string | null>(null);
@@ -131,9 +133,9 @@ export default function MarketingHub() {
             <div className="flex items-center gap-3">
               <DollarSign className="h-8 w-8 text-green-500" />
               <div>
-                <p className="text-sm text-muted-foreground">Total Spend</p>
+                <p className="text-sm text-muted-foreground">{t('marketing.totalSpend', 'Total Spend')}</p>
                 <p className="text-2xl font-bold">${totalSpend.toLocaleString()}</p>
-                <p className="text-xs text-muted-foreground">of ${totalBudget.toLocaleString()} budget</p>
+                <p className="text-xs text-muted-foreground">{t('marketing.ofBudget', 'of ${{budget}} budget', { budget: totalBudget.toLocaleString() })}</p>
               </div>
             </div>
           </CardContent>
@@ -144,7 +146,7 @@ export default function MarketingHub() {
             <div className="flex items-center gap-3">
               <Eye className="h-8 w-8 text-blue-500" />
               <div>
-                <p className="text-sm text-muted-foreground">Impressions</p>
+                <p className="text-sm text-muted-foreground">{t('marketing.impressions', 'Impressions')}</p>
                 <p className="text-2xl font-bold">{(totalImpressions / 1000).toFixed(1)}K</p>
               </div>
             </div>
@@ -156,9 +158,9 @@ export default function MarketingHub() {
             <div className="flex items-center gap-3">
               <MousePointer className="h-8 w-8 text-purple-500" />
               <div>
-                <p className="text-sm text-muted-foreground">Clicks</p>
+                <p className="text-sm text-muted-foreground">{t('marketing.clicks', 'Clicks')}</p>
                 <p className="text-2xl font-bold">{totalClicks.toLocaleString()}</p>
-                <p className="text-xs text-muted-foreground">{avgCTR}% CTR</p>
+                <p className="text-xs text-muted-foreground">{avgCTR}% {t('marketing.ctr', 'CTR')}</p>
               </div>
             </div>
           </CardContent>
@@ -169,9 +171,9 @@ export default function MarketingHub() {
             <div className="flex items-center gap-3">
               <TrendingUp className="h-8 w-8 text-orange-500" />
               <div>
-                <p className="text-sm text-muted-foreground">Conversions</p>
+                <p className="text-sm text-muted-foreground">{t('marketing.conversions', 'Conversions')}</p>
                 <p className="text-2xl font-bold">{totalConversions}</p>
-                <p className="text-xs text-muted-foreground">${(totalSpend / Math.max(totalConversions, 1)).toFixed(2)} CPA</p>
+                <p className="text-xs text-muted-foreground">${(totalSpend / Math.max(totalConversions, 1)).toFixed(2)} {t('marketing.cpa', 'CPA')}</p>
               </div>
             </div>
           </CardContent>
@@ -183,9 +185,9 @@ export default function MarketingHub() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <LinkIcon className="h-5 w-5" />
-              Connected Platforms
+              {t('marketing.connectedPlatforms', 'Connected Platforms')}
             </CardTitle>
-            <CardDescription>Manage your advertising platform connections</CardDescription>
+            <CardDescription>{t('marketing.managePlatformConnections', 'Manage your advertising platform connections')}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
@@ -227,7 +229,7 @@ export default function MarketingHub() {
               data-testid="button-connect-platform"
             >
               <Plus className="h-4 w-4 mr-2" />
-              Connect New Platform
+              {t('marketing.connectNewPlatform', 'Connect New Platform')}
             </Button>
           </CardContent>
         </Card>
@@ -236,9 +238,9 @@ export default function MarketingHub() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Clock className="h-5 w-5" />
-              Pending Tasks
+              {t('marketing.pendingTasks', 'Pending Tasks')}
             </CardTitle>
-            <CardDescription>Marketing tasks requiring attention</CardDescription>
+            <CardDescription>{t('marketing.tasksRequiringAttention', 'Marketing tasks requiring attention')}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
@@ -256,7 +258,7 @@ export default function MarketingHub() {
                     )}
                     <div>
                       <p className="font-medium text-sm">{task.title}</p>
-                      <p className="text-xs text-muted-foreground">Due: {new Date(task.dueDate).toLocaleDateString()}</p>
+                      <p className="text-xs text-muted-foreground">{t('marketing.due', 'Due')}: {new Date(task.dueDate).toLocaleDateString()}</p>
                     </div>
                   </div>
                   <Badge variant={task.priority === "high" ? "destructive" : "outline"}>
@@ -273,9 +275,9 @@ export default function MarketingHub() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <BarChart3 className="h-5 w-5" />
-            Active Campaigns
+            {t('marketing.activeCampaigns', 'Active Campaigns')}
           </CardTitle>
-          <CardDescription>Performance overview of running campaigns</CardDescription>
+          <CardDescription>{t('marketing.performanceOverview', 'Performance overview of running campaigns')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
@@ -299,19 +301,19 @@ export default function MarketingHub() {
                   </div>
                   <div className="grid grid-cols-4 gap-6 text-center text-sm">
                     <div>
-                      <p className="text-muted-foreground">Spent</p>
+                      <p className="text-muted-foreground">{t('marketing.spent', 'Spent')}</p>
                       <p className="font-medium">${campaign.spent.toLocaleString()}</p>
                     </div>
                     <div>
-                      <p className="text-muted-foreground">Impressions</p>
+                      <p className="text-muted-foreground">{t('marketing.impressions', 'Impressions')}</p>
                       <p className="font-medium">{(campaign.impressions / 1000).toFixed(1)}K</p>
                     </div>
                     <div>
-                      <p className="text-muted-foreground">CTR</p>
+                      <p className="text-muted-foreground">{t('marketing.ctr', 'CTR')}</p>
                       <p className="font-medium">{campaign.ctr}%</p>
                     </div>
                     <div>
-                      <p className="text-muted-foreground">Conv.</p>
+                      <p className="text-muted-foreground">{t('marketing.conv', 'Conv.')}</p>
                       <p className="font-medium">{campaign.conversions}</p>
                     </div>
                   </div>
@@ -329,12 +331,12 @@ export default function MarketingHub() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h3 className="text-lg font-semibold">Platform Accounts</h3>
-          <p className="text-sm text-muted-foreground">Manage your advertising platform connections</p>
+          <h3 className="text-lg font-semibold">{t('marketing.platformAccounts', 'Platform Accounts')}</h3>
+          <p className="text-sm text-muted-foreground">{t('marketing.managePlatformConnections', 'Manage your advertising platform connections')}</p>
         </div>
         <Button onClick={() => setIsConnectDialogOpen(true)} data-testid="button-add-account">
           <Plus className="h-4 w-4 mr-2" />
-          Add Account
+          {t('marketing.addAccount', 'Add Account')}
         </Button>
       </div>
 
@@ -353,10 +355,10 @@ export default function MarketingHub() {
                     </div>
                     <div>
                       <h4 className="font-semibold">{platform.name}</h4>
-                      <p className="text-sm text-muted-foreground capitalize">{platform.type} advertising</p>
+                      <p className="text-sm text-muted-foreground capitalize">{platform.type} {t('marketing.advertising', 'advertising')}</p>
                       {accounts.length > 0 && (
                         <p className="text-xs text-muted-foreground mt-1">
-                          {accounts.length} account(s) connected
+                          {t('marketing.accountsConnected', '{{count}} account(s) connected', { count: accounts.length })}
                         </p>
                       )}
                     </div>
@@ -373,12 +375,12 @@ export default function MarketingHub() {
                         data-testid={`button-connect-${platform.id}`}
                       >
                         <LinkIcon className="h-4 w-4 mr-2" />
-                        Connect
+                        {t('marketing.connect', 'Connect')}
                       </Button>
                     ) : (
                       <Button variant="outline" size="sm" data-testid={`button-manage-${platform.id}`}>
                         <Settings className="h-4 w-4 mr-2" />
-                        Manage
+                        {t('marketing.manage', 'Manage')}
                       </Button>
                     )}
                   </div>
@@ -419,22 +421,22 @@ export default function MarketingHub() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h3 className="text-lg font-semibold">All Campaigns</h3>
-          <p className="text-sm text-muted-foreground">Manage campaigns across all platforms</p>
+          <h3 className="text-lg font-semibold">{t('marketing.allCampaigns', 'All Campaigns')}</h3>
+          <p className="text-sm text-muted-foreground">{t('marketing.manageCampaignsAcrossPlatforms', 'Manage campaigns across all platforms')}</p>
         </div>
         <Button data-testid="button-create-campaign">
           <Plus className="h-4 w-4 mr-2" />
-          Create Campaign
+          {t('marketing.createCampaign', 'Create Campaign')}
         </Button>
       </div>
 
       <div className="flex gap-4 mb-4">
         <Select defaultValue="all">
           <SelectTrigger className="w-[180px]" data-testid="select-platform-filter">
-            <SelectValue placeholder="All Platforms" />
+            <SelectValue placeholder={t('marketing.allPlatforms', 'All Platforms')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Platforms</SelectItem>
+            <SelectItem value="all">{t('marketing.allPlatforms', 'All Platforms')}</SelectItem>
             {PLATFORMS.map(p => (
               <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
             ))}
@@ -443,14 +445,14 @@ export default function MarketingHub() {
 
         <Select defaultValue="all">
           <SelectTrigger className="w-[180px]" data-testid="select-status-filter">
-            <SelectValue placeholder="All Status" />
+            <SelectValue placeholder={t('marketing.allStatus', 'All Status')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Status</SelectItem>
-            <SelectItem value="active">Active</SelectItem>
-            <SelectItem value="paused">Paused</SelectItem>
-            <SelectItem value="draft">Draft</SelectItem>
-            <SelectItem value="completed">Completed</SelectItem>
+            <SelectItem value="all">{t('marketing.allStatus', 'All Status')}</SelectItem>
+            <SelectItem value="active">{t('common.active', 'Active')}</SelectItem>
+            <SelectItem value="paused">{t('marketing.paused', 'Paused')}</SelectItem>
+            <SelectItem value="draft">{t('common.draft', 'Draft')}</SelectItem>
+            <SelectItem value="completed">{t('common.completed', 'Completed')}</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -473,42 +475,35 @@ export default function MarketingHub() {
                         <p className="font-semibold">{campaign.name}</p>
                         {getStatusBadge(campaign.status)}
                       </div>
-                      <p className="text-sm text-muted-foreground capitalize">
-                        {platform?.name} • {campaign.objective}
-                      </p>
+                      <p className="text-xs text-muted-foreground capitalize">{campaign.objective} • {platform?.name}</p>
                     </div>
                   </div>
-                  
-                  <div className="flex items-center gap-8">
-                    <div className="text-center">
-                      <p className="text-sm text-muted-foreground">Budget</p>
-                      <p className="font-medium">${campaign.spent.toLocaleString()} / ${campaign.budget.toLocaleString()}</p>
-                      <Progress value={budgetPercent} className="w-24 h-1 mt-1" />
+                  <div className="grid grid-cols-5 gap-6 text-center text-sm">
+                    <div>
+                      <p className="text-muted-foreground">{t('marketing.budget', 'Budget')}</p>
+                      <p className="font-medium">${campaign.budget}</p>
+                      <Progress value={budgetPercent} className="w-16 h-1 mt-1" />
                     </div>
-                    <div className="text-center">
-                      <p className="text-sm text-muted-foreground">Impressions</p>
-                      <p className="font-medium">{campaign.impressions.toLocaleString()}</p>
+                    <div>
+                      <p className="text-muted-foreground">{t('marketing.impressions', 'Impressions')}</p>
+                      <p className="font-medium">{campaign.impressions > 0 ? `${(campaign.impressions / 1000).toFixed(1)}K` : "-"}</p>
                     </div>
-                    <div className="text-center">
-                      <p className="text-sm text-muted-foreground">Clicks</p>
-                      <p className="font-medium">{campaign.clicks.toLocaleString()}</p>
+                    <div>
+                      <p className="text-muted-foreground">{t('marketing.clicks', 'Clicks')}</p>
+                      <p className="font-medium">{campaign.clicks || "-"}</p>
                     </div>
-                    <div className="text-center">
-                      <p className="text-sm text-muted-foreground">CTR</p>
-                      <p className="font-medium">{campaign.ctr}%</p>
+                    <div>
+                      <p className="text-muted-foreground">{t('marketing.ctr', 'CTR')}</p>
+                      <p className="font-medium">{campaign.ctr > 0 ? `${campaign.ctr}%` : "-"}</p>
                     </div>
-                    <div className="text-center">
-                      <p className="text-sm text-muted-foreground">CPC</p>
-                      <p className="font-medium">${campaign.cpc}</p>
+                    <div>
+                      <p className="text-muted-foreground">{t('marketing.conversions', 'Conversions')}</p>
+                      <p className="font-medium">{campaign.conversions || "-"}</p>
                     </div>
-                    <div className="text-center">
-                      <p className="text-sm text-muted-foreground">Conversions</p>
-                      <p className="font-medium">{campaign.conversions}</p>
-                    </div>
-                    <Button variant="ghost" size="icon" data-testid={`button-edit-campaign-${campaign.id}`}>
-                      <Settings className="h-4 w-4" />
-                    </Button>
                   </div>
+                  <Button variant="ghost" size="sm">
+                    <Settings className="h-4 w-4" />
+                  </Button>
                 </div>
               </CardContent>
             </Card>
@@ -518,302 +513,125 @@ export default function MarketingHub() {
     </div>
   );
 
-  const reportsContent = (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h3 className="text-lg font-semibold">Performance Reports</h3>
-          <p className="text-sm text-muted-foreground">Unified analytics across all marketing platforms</p>
-        </div>
-        <div className="flex gap-2">
-          <Select defaultValue="7d">
-            <SelectTrigger className="w-[150px]" data-testid="select-date-range">
-              <SelectValue placeholder="Date Range" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="7d">Last 7 Days</SelectItem>
-              <SelectItem value="30d">Last 30 Days</SelectItem>
-              <SelectItem value="90d">Last 90 Days</SelectItem>
-              <SelectItem value="ytd">Year to Date</SelectItem>
-            </SelectContent>
-          </Select>
-          <Button variant="outline" data-testid="button-export-report">
-            Export Report
-          </Button>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="p-6 text-center">
-            <p className="text-sm text-muted-foreground mb-1">Total Ad Spend</p>
-            <p className="text-3xl font-bold text-green-600">${totalSpend.toLocaleString()}</p>
-            <p className="text-xs text-muted-foreground mt-1">+12.5% vs last period</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-6 text-center">
-            <p className="text-sm text-muted-foreground mb-1">Total Impressions</p>
-            <p className="text-3xl font-bold text-blue-600">{(totalImpressions / 1000).toFixed(0)}K</p>
-            <p className="text-xs text-muted-foreground mt-1">+8.3% vs last period</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-6 text-center">
-            <p className="text-sm text-muted-foreground mb-1">Avg. CTR</p>
-            <p className="text-3xl font-bold text-purple-600">{avgCTR}%</p>
-            <p className="text-xs text-muted-foreground mt-1">+0.5% vs last period</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-6 text-center">
-            <p className="text-sm text-muted-foreground mb-1">Total Conversions</p>
-            <p className="text-3xl font-bold text-orange-600">{totalConversions}</p>
-            <p className="text-xs text-muted-foreground mt-1">+15.2% vs last period</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      <Card data-testid="card-platform-breakdown">
-        <CardHeader>
-          <CardTitle>Platform Performance Breakdown</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {MOCK_ACCOUNTS.filter(a => a.status === "connected").map(account => {
-              const platform = getPlatformInfo(account.providerId);
-              const PlatformIcon = platform.icon;
-              const ctr = account.impressions > 0 ? ((account.clicks / account.impressions) * 100).toFixed(2) : "0";
-              const cpc = account.clicks > 0 ? (account.spend / account.clicks).toFixed(2) : "0";
-              const cpa = account.conversions > 0 ? (account.spend / account.conversions).toFixed(2) : "0";
-              
-              return (
-                <div 
-                  key={account.id} 
-                  className="flex items-center justify-between p-4 rounded-lg border"
-                  data-testid={`report-platform-${account.id}`}
-                >
-                  <div className="flex items-center gap-4">
-                    <PlatformIcon className={`h-8 w-8 ${platform.color}`} />
-                    <div>
-                      <p className="font-semibold">{platform.name}</p>
-                      <p className="text-sm text-muted-foreground">{account.name}</p>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-6 gap-8 text-center">
-                    <div>
-                      <p className="text-sm text-muted-foreground">Spend</p>
-                      <p className="font-medium">${account.spend.toLocaleString()}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">Impressions</p>
-                      <p className="font-medium">{(account.impressions / 1000).toFixed(1)}K</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">Clicks</p>
-                      <p className="font-medium">{account.clicks.toLocaleString()}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">CTR</p>
-                      <p className="font-medium">{ctr}%</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">CPC</p>
-                      <p className="font-medium">${cpc}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">Conversions</p>
-                      <p className="font-medium">{account.conversions}</p>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card data-testid="card-campaign-performance">
-        <CardHeader>
-          <CardTitle>Campaign Performance</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {MOCK_CAMPAIGNS.filter(c => c.status === "active" || c.status === "paused").map(campaign => {
-              const account = MOCK_ACCOUNTS.find(a => a.id === campaign.accountId);
-              const platform = account ? getPlatformInfo(account.providerId) : null;
-              const roas = campaign.conversions > 0 ? ((campaign.conversions * 50) / campaign.spent).toFixed(2) : "0";
-              
-              return (
-                <div 
-                  key={campaign.id} 
-                  className="flex items-center justify-between p-3 rounded-lg border"
-                  data-testid={`report-campaign-${campaign.id}`}
-                >
-                  <div className="flex items-center gap-3">
-                    {getStatusBadge(campaign.status)}
-                    <div>
-                      <p className="font-medium text-sm">{campaign.name}</p>
-                      <p className="text-xs text-muted-foreground">{platform?.name}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-6 text-sm">
-                    <div className="text-right">
-                      <p className="text-muted-foreground">Spend</p>
-                      <p className="font-medium">${campaign.spent.toLocaleString()}</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-muted-foreground">CTR</p>
-                      <p className="font-medium">{campaign.ctr}%</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-muted-foreground">Conv.</p>
-                      <p className="font-medium">{campaign.conversions}</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-muted-foreground">ROAS</p>
-                      <p className="font-medium">{roas}x</p>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
-
   const inboxContent = (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h3 className="text-lg font-semibold">Unified Inbox</h3>
-          <p className="text-sm text-muted-foreground">All your social media messages in one place</p>
+          <h3 className="text-lg font-semibold">{t('marketing.unifiedInbox', 'Unified Inbox')}</h3>
+          <p className="text-sm text-muted-foreground">{t('marketing.manageConversations', 'Manage all conversations from one place')}</p>
         </div>
         <div className="flex gap-2">
-          <Select defaultValue="all">
-            <SelectTrigger className="w-[150px]" data-testid="select-inbox-platform">
-              <SelectValue placeholder="All Platforms" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Platforms</SelectItem>
-              <SelectItem value="facebook">Facebook</SelectItem>
-              <SelectItem value="instagram">Instagram</SelectItem>
-              <SelectItem value="twitter">X (Twitter)</SelectItem>
-              <SelectItem value="linkedin">LinkedIn</SelectItem>
-            </SelectContent>
-          </Select>
-          <Select defaultValue="open">
-            <SelectTrigger className="w-[120px]" data-testid="select-inbox-status">
-              <SelectValue placeholder="Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Status</SelectItem>
-              <SelectItem value="open">Open</SelectItem>
-              <SelectItem value="pending">Pending</SelectItem>
-              <SelectItem value="resolved">Resolved</SelectItem>
-            </SelectContent>
-          </Select>
+          <Badge variant="outline">{t('marketing.open', 'Open')}: {MOCK_CONVERSATIONS.filter(c => c.status === "open").length}</Badge>
+          <Badge variant="secondary">{t('marketing.pending', 'Pending')}: {MOCK_CONVERSATIONS.filter(c => c.status === "pending").length}</Badge>
         </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">
-        <Card className="md:col-span-1">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base flex items-center gap-2">
-              <Inbox className="h-4 w-4" />
-              Conversations
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-2">
-            <div className="space-y-1">
-              {MOCK_CONVERSATIONS.map(conv => {
-                const platform = getPlatformInfo(conv.providerId);
-                const PlatformIcon = platform.icon;
-                
-                return (
-                  <div 
-                    key={conv.id}
-                    className={`flex items-start gap-3 p-3 rounded-lg cursor-pointer hover:bg-muted transition-colors ${conv.id === "1" ? "bg-muted" : ""}`}
-                    data-testid={`conversation-${conv.id}`}
-                  >
-                    <div className="relative">
-                      <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center">
-                        <User className="h-5 w-5 text-muted-foreground" />
+        <div className="md:col-span-1 space-y-2">
+          <Card>
+            <CardHeader className="py-3">
+              <CardTitle className="text-sm font-medium flex items-center gap-2">
+                <Inbox className="h-4 w-4" />
+                {t('marketing.conversations', 'Conversations')}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-0">
+              <div className="divide-y">
+                {MOCK_CONVERSATIONS.map(conv => {
+                  const platform = getPlatformInfo(conv.providerId);
+                  const PlatformIcon = platform.icon;
+                  
+                  return (
+                    <div 
+                      key={conv.id}
+                      className="p-3 hover:bg-muted/50 cursor-pointer"
+                      data-testid={`conversation-${conv.id}`}
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="relative">
+                          <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
+                            <User className="h-5 w-5" />
+                          </div>
+                          <div className="absolute -bottom-1 -right-1">
+                            <PlatformIcon className={`h-4 w-4 ${platform.color}`} />
+                          </div>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between">
+                            <p className="font-medium text-sm truncate">{conv.name}</p>
+                            <span className="text-xs text-muted-foreground">{conv.lastMessageTime}</span>
+                          </div>
+                          <p className="text-xs text-muted-foreground truncate">{conv.lastMessage}</p>
+                          <div className="flex items-center gap-2 mt-1">
+                            <Badge variant={conv.status === "open" ? "default" : conv.status === "resolved" ? "secondary" : "outline"} className="text-xs">
+                              {conv.status}
+                            </Badge>
+                            {conv.unread > 0 && (
+                              <Badge variant="destructive" className="text-xs">{conv.unread}</Badge>
+                            )}
+                          </div>
+                        </div>
                       </div>
-                      <PlatformIcon className={`absolute -bottom-1 -right-1 h-4 w-4 ${platform.color}`} />
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between">
-                        <p className="font-medium text-sm truncate">{conv.name}</p>
-                        <span className="text-xs text-muted-foreground">{conv.lastMessageTime}</span>
-                      </div>
-                      <p className="text-xs text-muted-foreground truncate">{conv.lastMessage}</p>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className="text-xs text-muted-foreground">{conv.platform}</span>
-                        {conv.unread > 0 && (
-                          <Badge variant="default" className="h-5 px-1.5 text-xs">{conv.unread}</Badge>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </CardContent>
-        </Card>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
 
-        <Card className="md:col-span-2">
-          <CardHeader className="pb-2 border-b">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center">
-                  <User className="h-5 w-5 text-muted-foreground" />
-                </div>
-                <div>
-                  <CardTitle className="text-base">Ahmed Al-Rashid</CardTitle>
-                  <CardDescription>@ahmed_rashid • via Messenger</CardDescription>
-                </div>
-              </div>
-              <div className="flex gap-2">
-                <Button variant="outline" size="sm" data-testid="button-archive-conv">
-                  <Archive className="h-4 w-4 mr-1" />
-                  Archive
-                </Button>
-                <Button variant="outline" size="sm" data-testid="button-tag-conv">
-                  <Tag className="h-4 w-4 mr-1" />
-                  Tag
-                </Button>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="p-4">
-            <div className="space-y-4 min-h-[300px] max-h-[400px] overflow-y-auto">
-              {MOCK_MESSAGES.map(msg => (
-                <div 
-                  key={msg.id}
-                  className={`flex ${msg.direction === "outbound" ? "justify-end" : "justify-start"}`}
-                  data-testid={`message-${msg.id}`}
-                >
-                  <div className={`max-w-[70%] p-3 rounded-lg ${msg.direction === "outbound" ? "bg-primary text-primary-foreground" : "bg-muted"}`}>
-                    <p className="text-sm">{msg.content}</p>
-                    <p className={`text-xs mt-1 ${msg.direction === "outbound" ? "text-primary-foreground/70" : "text-muted-foreground"}`}>{msg.time}</p>
+        <div className="md:col-span-2">
+          <Card className="h-full">
+            <CardHeader className="py-3 border-b">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
+                    <User className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <p className="font-medium">Ahmed Al-Rashid</p>
+                    <p className="text-xs text-muted-foreground">@ahmed_rashid • Messenger</p>
                   </div>
                 </div>
-              ))}
-            </div>
-            <div className="mt-4 pt-4 border-t">
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm">
+                    <Archive className="h-4 w-4 mr-2" />
+                    {t('marketing.archive', 'Archive')}
+                  </Button>
+                  <Button variant="outline" size="sm">
+                    <Tag className="h-4 w-4 mr-2" />
+                    {t('marketing.tag', 'Tag')}
+                  </Button>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="p-4">
+              <div className="space-y-4 mb-4">
+                {MOCK_MESSAGES.map(msg => (
+                  <div 
+                    key={msg.id}
+                    className={`flex ${msg.direction === "outbound" ? "justify-end" : "justify-start"}`}
+                  >
+                    <div className={`max-w-[70%] p-3 rounded-lg ${
+                      msg.direction === "outbound" 
+                        ? "bg-primary text-primary-foreground" 
+                        : "bg-muted"
+                    }`}>
+                      <p className="text-sm">{msg.content}</p>
+                      <p className="text-xs opacity-70 mt-1">{msg.time}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
               <div className="flex gap-2">
-                <Input placeholder="Type your message..." className="flex-1" data-testid="input-message" />
-                <Button data-testid="button-send-message">
-                  <Send className="h-4 w-4 mr-2" />
-                  Send
+                <Input placeholder={t('marketing.typeMessage', 'Type your message...')} className="flex-1" />
+                <Button>
+                  <Send className="h-4 w-4" />
                 </Button>
               </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );
@@ -822,64 +640,34 @@ export default function MarketingHub() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h3 className="text-lg font-semibold">Comment Management</h3>
-          <p className="text-sm text-muted-foreground">Reply to comments on your posts and ads</p>
+          <h3 className="text-lg font-semibold">{t('marketing.commentManagement', 'Comment Management')}</h3>
+          <p className="text-sm text-muted-foreground">{t('marketing.respondToComments', 'Respond to comments across all platforms')}</p>
         </div>
-        <div className="flex gap-2">
-          <Select defaultValue="all">
-            <SelectTrigger className="w-[150px]" data-testid="select-comments-platform">
-              <SelectValue placeholder="All Platforms" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Platforms</SelectItem>
-              <SelectItem value="facebook">Facebook</SelectItem>
-              <SelectItem value="instagram">Instagram</SelectItem>
-              <SelectItem value="youtube">YouTube</SelectItem>
-            </SelectContent>
-          </Select>
-          <Select defaultValue="unreplied">
-            <SelectTrigger className="w-[140px]" data-testid="select-comments-filter">
-              <SelectValue placeholder="Filter" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Comments</SelectItem>
-              <SelectItem value="unreplied">Unreplied</SelectItem>
-              <SelectItem value="positive">Positive</SelectItem>
-              <SelectItem value="negative">Negative</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        <Badge variant="destructive">{t('marketing.unreplied', 'Unreplied')}: {MOCK_COMMENT_THREADS.reduce((sum, t) => sum + t.unreplied, 0)}</Badge>
       </div>
 
-      <div className="grid gap-4">
+      <div className="space-y-4">
         {MOCK_COMMENT_THREADS.map(thread => {
           const platform = getPlatformInfo(thread.providerId);
           const PlatformIcon = platform.icon;
           const threadComments = MOCK_COMMENTS.filter(c => c.threadId === thread.id);
           
           return (
-            <Card key={thread.id} data-testid={`comment-thread-${thread.id}`}>
-              <CardHeader className="pb-3">
+            <Card key={thread.id} data-testid={`thread-${thread.id}`}>
+              <CardHeader className="py-3">
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
                     <PlatformIcon className={`h-6 w-6 ${platform.color}`} />
                     <div>
-                      <CardTitle className="text-base">{thread.platform} Post</CardTitle>
-                      <CardDescription className="line-clamp-1">{thread.postContent}</CardDescription>
+                      <p className="font-medium text-sm">{thread.platform}</p>
+                      <p className="text-xs text-muted-foreground line-clamp-1">{thread.postContent}</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <Badge variant={thread.sentiment === "positive" ? "default" : "secondary"}>
-                      {thread.sentiment}
-                    </Badge>
-                    <div className="text-center">
-                      <p className="text-sm font-medium">{thread.totalComments}</p>
-                      <p className="text-xs text-muted-foreground">comments</p>
-                    </div>
-                    <div className="text-center">
-                      <p className="text-sm font-medium text-orange-500">{thread.unreplied}</p>
-                      <p className="text-xs text-muted-foreground">unreplied</p>
-                    </div>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="outline">{thread.totalComments} {t('marketing.comments', 'comments')}</Badge>
+                    {thread.unreplied > 0 && (
+                      <Badge variant="destructive">{thread.unreplied} {t('marketing.unreplied', 'unreplied')}</Badge>
+                    )}
                   </div>
                 </div>
               </CardHeader>
@@ -888,12 +676,11 @@ export default function MarketingHub() {
                   {threadComments.map(comment => (
                     <div 
                       key={comment.id}
-                      className={`p-3 rounded-lg border ${comment.hasReplied ? "bg-muted/30" : "bg-muted"}`}
-                      data-testid={`comment-${comment.id}`}
+                      className={`p-3 rounded-lg border ${!comment.hasReplied ? "border-yellow-500/50 bg-yellow-50/50 dark:bg-yellow-900/10" : ""}`}
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex items-center gap-2">
-                          <div className="h-8 w-8 rounded-full bg-muted-foreground/20 flex items-center justify-center">
+                          <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
                             <User className="h-4 w-4" />
                           </div>
                           <div>
@@ -902,30 +689,18 @@ export default function MarketingHub() {
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
-                          <Badge 
-                            variant={comment.sentiment === "positive" ? "default" : comment.sentiment === "negative" ? "destructive" : "secondary"}
-                            className="text-xs"
-                          >
-                            {comment.sentiment}
-                          </Badge>
-                          {comment.hasReplied && (
-                            <CheckCircle className="h-4 w-4 text-green-500" />
+                          <span className="text-xs text-muted-foreground flex items-center gap-1">
+                            <ThumbsUp className="h-3 w-3" /> {comment.likes}
+                          </span>
+                          {!comment.hasReplied && (
+                            <Button size="sm" variant="outline">
+                              <Reply className="h-3 w-3 mr-1" />
+                              {t('marketing.reply', 'Reply')}
+                            </Button>
                           )}
                         </div>
                       </div>
-                      <p className="mt-2 text-sm">{comment.content}</p>
-                      <div className="mt-3 flex items-center justify-between">
-                        <div className="flex items-center gap-2 text-muted-foreground">
-                          <ThumbsUp className="h-4 w-4" />
-                          <span className="text-xs">{comment.likes} likes</span>
-                        </div>
-                        {!comment.hasReplied && (
-                          <Button size="sm" variant="outline" data-testid={`button-reply-${comment.id}`}>
-                            <Reply className="h-4 w-4 mr-1" />
-                            Reply
-                          </Button>
-                        )}
-                      </div>
+                      <p className="text-sm mt-2">{comment.content}</p>
                     </div>
                   ))}
                 </div>
@@ -940,81 +715,94 @@ export default function MarketingHub() {
   return (
     <>
       <TabsPageLayout
-        title="Marketing Platform Hub"
-        description="Unified management for all your advertising platforms"
+        title={t('nav.marketing_hub', 'Marketing Hub')}
+        description={t('marketing.hubDescription', 'Unified platform for managing all your marketing campaigns and social media')}
         icon={LayoutDashboard}
         tabs={[
-          { id: "overview", label: "Overview", icon: LayoutDashboard, content: overviewContent },
-          { id: "inbox", label: "Inbox", icon: Inbox, content: inboxContent },
-          { id: "comments", label: "Comments", icon: MessageCircle, content: commentsContent },
-          { id: "accounts", label: "Accounts", icon: LinkIcon, content: accountsContent },
-          { id: "campaigns", label: "Campaigns", icon: BarChart3, content: campaignsContent },
-          { id: "reports", label: "Reports", icon: TrendingUp, content: reportsContent },
+          {
+            id: "overview",
+            label: t('marketing.overview', 'Overview'),
+            icon: LayoutDashboard,
+            content: overviewContent,
+          },
+          {
+            id: "accounts",
+            label: t('marketing.accounts', 'Accounts'),
+            icon: LinkIcon,
+            content: accountsContent,
+          },
+          {
+            id: "campaigns",
+            label: t('marketing.campaigns', 'Campaigns'),
+            icon: BarChart3,
+            content: campaignsContent,
+          },
+          {
+            id: "inbox",
+            label: t('marketing.inbox', 'Inbox'),
+            icon: MessageCircle,
+            content: inboxContent,
+            badge: MOCK_CONVERSATIONS.filter(c => c.unread > 0).length,
+          },
+          {
+            id: "comments",
+            label: t('marketing.comments', 'Comments'),
+            icon: MessageCircle,
+            content: commentsContent,
+            badge: MOCK_COMMENT_THREADS.reduce((sum, t) => sum + t.unreplied, 0),
+          },
         ]}
         activeTab={selectedTab}
         onTabChange={setSelectedTab}
-        primaryAction={{
-          label: "Sync All",
-          icon: RefreshCw,
-          onClick: () => console.log("Syncing all platforms...")
-        }}
       />
 
       <Dialog open={isConnectDialogOpen} onOpenChange={setIsConnectDialogOpen}>
-        <DialogContent className="sm:max-w-lg">
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Connect Advertising Platform</DialogTitle>
+            <DialogTitle>{t('marketing.connectAdPlatform', 'Connect Advertising Platform')}</DialogTitle>
             <DialogDescription>
-              Choose a platform to connect and start managing your ads
+              {t('marketing.connectAdPlatformDesc', 'Link your advertising account to manage campaigns from one place')}
             </DialogDescription>
           </DialogHeader>
-          <div className="grid grid-cols-2 gap-3 py-4">
-            {PLATFORMS.map(platform => {
-              const PlatformIcon = platform.icon;
-              const isConnected = MOCK_ACCOUNTS.some(a => a.providerId === platform.id);
-              
-              return (
-                <Button
-                  key={platform.id}
-                  variant={selectedPlatform === platform.id ? "default" : "outline"}
-                  className="h-20 flex-col gap-2"
-                  onClick={() => setSelectedPlatform(platform.id)}
-                  disabled={isConnected}
-                  data-testid={`button-select-${platform.id}`}
-                >
-                  <PlatformIcon className={`h-6 w-6 ${isConnected ? "" : platform.color}`} />
-                  <span className="text-sm">{platform.name}</span>
-                  {isConnected && <span className="text-xs text-muted-foreground">Connected</span>}
-                </Button>
-              );
-            })}
-          </div>
-          {selectedPlatform && (
-            <div className="space-y-4 pt-4 border-t">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Account Name</label>
-                <Input placeholder="Enter account name" data-testid="input-account-name" />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium">API Key / Account ID</label>
-                <Input placeholder="Enter your API key or account ID" data-testid="input-api-key" />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Monthly Budget</label>
-                <Input type="number" placeholder="5000" data-testid="input-budget" />
-              </div>
+          <div className="space-y-4 py-4">
+            <div className="grid grid-cols-2 gap-3">
+              {PLATFORMS.map(platform => {
+                const PlatformIcon = platform.icon;
+                const isSelected = selectedPlatform === platform.id;
+                
+                return (
+                  <Button
+                    key={platform.id}
+                    variant={isSelected ? "default" : "outline"}
+                    className="h-auto py-4 flex flex-col items-center gap-2"
+                    onClick={() => setSelectedPlatform(platform.id)}
+                    data-testid={`platform-button-${platform.id}`}
+                  >
+                    <PlatformIcon className={`h-8 w-8 ${isSelected ? "" : platform.color}`} />
+                    <span className="text-xs">{platform.name}</span>
+                  </Button>
+                );
+              })}
             </div>
-          )}
+            {selectedPlatform && (
+              <div className="space-y-3">
+                <div>
+                  <label className="text-sm font-medium">{t('marketing.accountName', 'Account Name')}</label>
+                  <Input placeholder={t('marketing.accountNamePlaceholder', 'My Campaign Account')} className="mt-1" data-testid="input-account-name" />
+                </div>
+                <div>
+                  <label className="text-sm font-medium">{t('marketing.apiKeyOrAccountId', 'API Key / Account ID')}</label>
+                  <Input placeholder={t('marketing.enterApiKey', 'Enter your API key or account ID')} data-testid="input-api-key" />
+                </div>
+              </div>
+            )}
+          </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsConnectDialogOpen(false)}>
-              Cancel
+              {t('common.cancel', 'Cancel')}
             </Button>
-            <Button 
-              disabled={!selectedPlatform}
-              onClick={() => setIsConnectDialogOpen(false)}
-              data-testid="button-confirm-connect"
-            >
-              Connect Platform
+            <Button disabled={!selectedPlatform} data-testid="button-connect-account">
+              {t('marketing.connectAccount', 'Connect Account')}
             </Button>
           </DialogFooter>
         </DialogContent>

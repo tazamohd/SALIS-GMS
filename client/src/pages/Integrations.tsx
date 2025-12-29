@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -22,6 +23,7 @@ import {
 import { TabsPageLayout, TabConfig } from "@/components/layouts";
 
 export default function Integrations() {
+  const { t } = useTranslation();
   const { toast } = useToast();
 
   const { data: connections = [], isLoading: connectionsLoading } = useQuery({
@@ -46,14 +48,14 @@ export default function Integrations() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/integrations/connections'] });
       toast({
-        title: "Success",
-        description: "Integration status updated successfully",
+        title: t('common.success', 'Success'),
+        description: t('integrations.statusUpdated', 'Integration status updated successfully'),
       });
     },
     onError: () => {
       toast({
-        title: "Error",
-        description: "Failed to update integration status",
+        title: t('common.error', 'Error'),
+        description: t('integrations.statusUpdateFailed', 'Failed to update integration status'),
         variant: "destructive",
       });
     },
@@ -69,20 +71,20 @@ export default function Integrations() {
       queryClient.invalidateQueries({ queryKey: ['/api/integrations/sync-logs'] });
       if (result.success) {
         toast({
-          title: "Success",
-          description: "Accounting data synced successfully",
+          title: t('common.success', 'Success'),
+          description: t('integrations.accountingSynced', 'Accounting data synced successfully'),
         });
       } else {
         toast({
-          title: "Information",
-          description: result.message || "Accounting integration not configured",
+          title: t('common.info', 'Information'),
+          description: result.message || t('integrations.accountingNotConfigured', 'Accounting integration not configured'),
         });
       }
     },
     onError: () => {
       toast({
-        title: "Error",
-        description: "Failed to sync accounting data",
+        title: t('common.error', 'Error'),
+        description: t('integrations.accountingSyncFailed', 'Failed to sync accounting data'),
         variant: "destructive",
       });
     },
@@ -97,20 +99,20 @@ export default function Integrations() {
     onSuccess: (result) => {
       if (result.success) {
         toast({
-          title: "Success",
-          description: "OBD diagnostic scan completed",
+          title: t('common.success', 'Success'),
+          description: t('integrations.obdScanCompleted', 'OBD diagnostic scan completed'),
         });
       } else {
         toast({
-          title: "Information",
-          description: result.message || "OBD-II diagnostics not configured",
+          title: t('common.info', 'Information'),
+          description: result.message || t('integrations.obdNotConfigured', 'OBD-II diagnostics not configured'),
         });
       }
     },
     onError: () => {
       toast({
-        title: "Error",
-        description: "Failed to perform OBD scan",
+        title: t('common.error', 'Error'),
+        description: t('integrations.obdScanFailed', 'Failed to perform OBD scan'),
         variant: "destructive",
       });
     },
@@ -119,50 +121,50 @@ export default function Integrations() {
   const integrationCards = [
     {
       id: 'google-calendar',
-      name: 'Google Calendar',
-      description: 'Sync appointments to Google Calendar automatically',
+      name: t('integrations.googleCalendar', 'Google Calendar'),
+      description: t('integrations.googleCalendarDesc', 'Sync appointments to Google Calendar automatically'),
       icon: Calendar,
       color: 'text-gray-700 dark:text-gray-300',
       bgColor: 'bg-gray-100 dark:bg-gray-800',
       status: 'active',
-      type: 'Connected'
+      type: t('integrations.connected', 'Connected')
     },
     {
       id: 'gmail',
-      name: 'Gmail',
-      description: 'Send automated email notifications via Gmail',
+      name: t('integrations.gmail', 'Gmail'),
+      description: t('integrations.gmailDesc', 'Send automated email notifications via Gmail'),
       icon: Mail,
       color: 'text-gray-800 dark:text-gray-200',
       bgColor: 'bg-gray-200 dark:bg-gray-700',
       status: 'active',
-      type: 'Connected'
+      type: t('integrations.connected', 'Connected')
     },
     {
       id: 'accounting',
-      name: 'Accounting Software',
-      description: 'Sync invoices and transactions with QuickBooks or Xero',
+      name: t('integrations.accountingSoftware', 'Accounting Software'),
+      description: t('integrations.accountingSoftwareDesc', 'Sync invoices and transactions with QuickBooks or Xero'),
       icon: DollarSign,
       color: 'text-gray-600 dark:text-gray-400',
       bgColor: 'bg-gray-100 dark:bg-gray-800',
       status: 'inactive',
-      type: 'Available'
+      type: t('integrations.available', 'Available')
     },
     {
       id: 'obd',
-      name: 'OBD-II Diagnostics',
-      description: 'Connect OBD-II adapters for vehicle diagnostics',
+      name: t('integrations.obdDiagnostics', 'OBD-II Diagnostics'),
+      description: t('integrations.obdDiagnosticsDesc', 'Connect OBD-II adapters for vehicle diagnostics'),
       icon: Activity,
       color: 'text-gray-700 dark:text-gray-300',
       bgColor: 'bg-gray-200 dark:bg-gray-700',
       status: 'inactive',
-      type: 'Available'
+      type: t('integrations.available', 'Available')
     },
   ];
 
   const tabs: TabConfig[] = [
     {
       id: 'overview',
-      label: 'Overview',
+      label: t('integrations.overview', 'Overview'),
       icon: LinkIcon,
       content: (
         <div className="space-y-6">
@@ -198,7 +200,7 @@ export default function Integrations() {
                           <XCircle className="h-5 w-5 text-gray-900 dark:text-white/50" />
                         )}
                         <span className={`text-sm ${isActive ? 'text-gray-700 dark:text-gray-300' : 'text-gray-900 dark:text-white/60'}`}>
-                          {isActive ? 'Active' : 'Not Configured'}
+                          {isActive ? t('common.active', 'Active') : t('integrations.notConfigured', 'Not Configured')}
                         </span>
                       </div>
                       {integration.id === 'accounting' && (
@@ -210,7 +212,7 @@ export default function Integrations() {
                           data-testid="button-sync-accounting"
                         >
                           <RefreshCw className={`h-4 w-4 mr-2 ${syncAccountingMutation.isPending ? 'animate-spin' : ''}`} />
-                          Sync
+                          {t('integrations.sync', 'Sync')}
                         </Button>
                       )}
                       {integration.id === 'obd' && (
@@ -222,7 +224,7 @@ export default function Integrations() {
                           data-testid="button-scan-obd"
                         >
                           <Activity className={`h-4 w-4 mr-2 ${obdScanMutation.isPending ? 'animate-spin' : ''}`} />
-                          Scan
+                          {t('integrations.scan', 'Scan')}
                         </Button>
                       )}
                       {isActive && (
@@ -243,14 +245,14 @@ export default function Integrations() {
 
           <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
             <CardHeader>
-              <CardTitle className="text-black dark:text-white">Integration Status</CardTitle>
-              <CardDescription className="text-gray-900 dark:text-white/60">Recent sync activity and status</CardDescription>
+              <CardTitle className="text-black dark:text-white">{t('integrations.integrationStatus', 'Integration Status')}</CardTitle>
+              <CardDescription className="text-gray-900 dark:text-white/60">{t('integrations.recentSyncActivity', 'Recent sync activity and status')}</CardDescription>
             </CardHeader>
             <CardContent>
               {logsLoading ? (
-                <div className="text-center py-8 text-gray-900 dark:text-white/60">Loading sync logs...</div>
+                <div className="text-center py-8 text-gray-900 dark:text-white/60">{t('integrations.loadingSyncLogs', 'Loading sync logs...')}</div>
               ) : syncLogs.length === 0 ? (
-                <div className="text-center py-8 text-gray-900 dark:text-white/60">No sync activity yet</div>
+                <div className="text-center py-8 text-gray-900 dark:text-white/60">{t('integrations.noSyncActivity', 'No sync activity yet')}</div>
               ) : (
                 <div className="space-y-3">
                   {syncLogs.slice(0, 5).map((log: any, index: number) => (
@@ -277,12 +279,12 @@ export default function Integrations() {
                             {log.syncType?.replace(/-/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
                           </p>
                           <p className="text-xs text-gray-900 dark:text-white/60">
-                            {log.recordsProcessed} record{log.recordsProcessed !== 1 ? 's' : ''} • {new Date(log.createdAt).toLocaleString()}
+                            {log.recordsProcessed} {t('integrations.records', 'record(s)')} • {new Date(log.createdAt).toLocaleString()}
                           </p>
                         </div>
                       </div>
                       <Badge variant={log.status === 'success' ? 'default' : 'destructive'}>
-                        {log.status}
+                        {log.status === 'success' ? t('common.success', 'Success') : t('common.failed', 'Failed')}
                       </Badge>
                     </div>
                   ))}
@@ -295,20 +297,20 @@ export default function Integrations() {
     },
     {
       id: 'sync-logs',
-      label: 'Sync Logs',
+      label: t('integrations.syncLogs', 'Sync Logs'),
       icon: Clock,
       content: (
         <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
           <CardHeader>
-            <CardTitle className="text-black dark:text-white">Sync History</CardTitle>
-            <CardDescription className="text-gray-900 dark:text-white/60">Detailed history of all integration syncs</CardDescription>
+            <CardTitle className="text-black dark:text-white">{t('integrations.syncHistory', 'Sync History')}</CardTitle>
+            <CardDescription className="text-gray-900 dark:text-white/60">{t('integrations.detailedSyncHistory', 'Detailed history of all integration syncs')}</CardDescription>
           </CardHeader>
           <CardContent>
             <ScrollArea className="h-[600px]">
               {logsLoading ? (
-                <div className="text-center py-8 text-gray-900 dark:text-white/60">Loading...</div>
+                <div className="text-center py-8 text-gray-900 dark:text-white/60">{t('common.loading', 'Loading...')}</div>
               ) : syncLogs.length === 0 ? (
-                <div className="text-center py-8 text-gray-900 dark:text-white/60">No sync logs available</div>
+                <div className="text-center py-8 text-gray-900 dark:text-white/60">{t('integrations.noSyncLogs', 'No sync logs available')}</div>
               ) : (
                 <div className="space-y-3">
                   {syncLogs.map((log: any, index: number) => (
@@ -324,14 +326,14 @@ export default function Integrations() {
                               {log.syncType?.replace(/-/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
                             </h4>
                             <Badge variant={log.status === 'success' ? 'default' : 'destructive'}>
-                              {log.status}
+                              {log.status === 'success' ? t('common.success', 'Success') : t('common.failed', 'Failed')}
                             </Badge>
                           </div>
                           <div className="space-y-1 text-sm text-gray-900 dark:text-white/70">
-                            <p>Records: {log.recordsProcessed}</p>
-                            <p>Time: {new Date(log.createdAt).toLocaleString()}</p>
+                            <p>{t('integrations.recordsLabel', 'Records')}: {log.recordsProcessed}</p>
+                            <p>{t('integrations.timeLabel', 'Time')}: {new Date(log.createdAt).toLocaleString()}</p>
                             {log.errorMessage && (
-                              <p className="text-gray-700 dark:text-gray-300">Error: {log.errorMessage}</p>
+                              <p className="text-gray-700 dark:text-gray-300">{t('common.error', 'Error')}: {log.errorMessage}</p>
                             )}
                           </div>
                         </div>
@@ -347,15 +349,15 @@ export default function Integrations() {
     },
     {
       id: 'accounting',
-      label: 'Accounting',
+      label: t('integrations.accounting', 'Accounting'),
       icon: DollarSign,
       content: (
         <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle className="text-black dark:text-white">Accounting Transactions</CardTitle>
-                <CardDescription className="text-gray-900 dark:text-white/60">Transactions pending sync with accounting software</CardDescription>
+                <CardTitle className="text-black dark:text-white">{t('integrations.accountingTransactions', 'Accounting Transactions')}</CardTitle>
+                <CardDescription className="text-gray-900 dark:text-white/60">{t('integrations.transactionsPendingSync', 'Transactions pending sync with accounting software')}</CardDescription>
               </div>
               <Button
                 onClick={() => syncAccountingMutation.mutate()}
@@ -363,20 +365,20 @@ export default function Integrations() {
                 data-testid="button-sync-all-accounting"
               >
                 <RefreshCw className={`h-4 w-4 mr-2 ${syncAccountingMutation.isPending ? 'animate-spin' : ''}`} />
-                Sync All
+                {t('integrations.syncAll', 'Sync All')}
               </Button>
             </div>
           </CardHeader>
           <CardContent>
             <ScrollArea className="h-[600px]">
               {accountingLoading ? (
-                <div className="text-center py-8 text-gray-900 dark:text-white/60">Loading...</div>
+                <div className="text-center py-8 text-gray-900 dark:text-white/60">{t('common.loading', 'Loading...')}</div>
               ) : accountingTransactions.length === 0 ? (
                 <div className="text-center py-8">
                   <DollarSign className="h-12 w-12 mx-auto text-gray-300 dark:text-gray-700 mb-3" />
-                  <p className="text-gray-900 dark:text-white/60 mb-2">No accounting transactions</p>
+                  <p className="text-gray-900 dark:text-white/60 mb-2">{t('integrations.noAccountingTransactions', 'No accounting transactions')}</p>
                   <p className="text-sm text-gray-900 dark:text-white/50">
-                    Configure QuickBooks or Xero integration to sync transactions
+                    {t('integrations.configureAccountingIntegration', 'Configure QuickBooks or Xero integration to sync transactions')}
                   </p>
                 </div>
               ) : (
@@ -399,7 +401,7 @@ export default function Integrations() {
                             {transaction.currency} {transaction.amount}
                           </p>
                           <Badge variant={transaction.syncStatus === 'synced' ? 'default' : 'secondary'}>
-                            {transaction.syncStatus}
+                            {transaction.syncStatus === 'synced' ? t('integrations.synced', 'Synced') : t('common.pending', 'Pending')}
                           </Badge>
                         </div>
                       </div>
@@ -416,8 +418,8 @@ export default function Integrations() {
 
   return (
     <TabsPageLayout
-      title="Integrations"
-      description="Connect and manage third-party services"
+      title={t('integrations.title', 'Integrations')}
+      description={t('integrations.pageDescription', 'Connect and manage third-party services')}
       icon={LinkIcon}
       tabs={tabs}
       defaultTab="overview"

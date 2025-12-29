@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -115,6 +116,7 @@ function getAvailabilityBadge(availability: string) {
 }
 
 export default function VendorSupplierPortal() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("suppliers");
   const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(null);
@@ -224,12 +226,12 @@ export default function VendorSupplierPortal() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/suppliers"] });
-      toast({ title: "Supplier created successfully" });
+      toast({ title: t('vendor.supplierCreatedSuccessfully', 'Supplier created successfully') });
       setIsSupplierDialogOpen(false);
       supplierForm.reset();
     },
     onError: () => {
-      toast({ title: "Failed to create supplier", variant: "destructive" });
+      toast({ title: t('vendor.failedToCreateSupplier', 'Failed to create supplier'), variant: "destructive" });
     },
   });
 
@@ -239,12 +241,12 @@ export default function VendorSupplierPortal() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/suppliers"] });
-      toast({ title: "Supplier updated successfully" });
+      toast({ title: t('vendor.supplierUpdatedSuccessfully', 'Supplier updated successfully') });
       setIsSupplierDialogOpen(false);
       setSelectedSupplier(null);
     },
     onError: () => {
-      toast({ title: "Failed to update supplier", variant: "destructive" });
+      toast({ title: t('vendor.failedToUpdateSupplier', 'Failed to update supplier'), variant: "destructive" });
     },
   });
 
@@ -254,10 +256,10 @@ export default function VendorSupplierPortal() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/suppliers"] });
-      toast({ title: "Supplier deleted successfully" });
+      toast({ title: t('vendor.supplierDeletedSuccessfully', 'Supplier deleted successfully') });
     },
     onError: () => {
-      toast({ title: "Failed to delete supplier", variant: "destructive" });
+      toast({ title: t('vendor.failedToDeleteSupplier', 'Failed to delete supplier'), variant: "destructive" });
     },
   });
 
@@ -268,12 +270,12 @@ export default function VendorSupplierPortal() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/supplier-price-lists"] });
-      toast({ title: "Price list entry created successfully" });
+      toast({ title: t('vendor.priceListCreatedSuccessfully', 'Price list entry created successfully') });
       setIsPriceListDialogOpen(false);
       priceListForm.reset();
     },
     onError: () => {
-      toast({ title: "Failed to create price list entry", variant: "destructive" });
+      toast({ title: t('vendor.failedToCreatePriceList', 'Failed to create price list entry'), variant: "destructive" });
     },
   });
 
@@ -283,12 +285,12 @@ export default function VendorSupplierPortal() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/supplier-price-lists"] });
-      toast({ title: "Price list entry updated successfully" });
+      toast({ title: t('vendor.priceListUpdatedSuccessfully', 'Price list entry updated successfully') });
       setIsPriceListDialogOpen(false);
       setSelectedPriceList(null);
     },
     onError: () => {
-      toast({ title: "Failed to update price list entry", variant: "destructive" });
+      toast({ title: t('vendor.failedToUpdatePriceList', 'Failed to update price list entry'), variant: "destructive" });
     },
   });
 
@@ -298,10 +300,10 @@ export default function VendorSupplierPortal() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/supplier-price-lists"] });
-      toast({ title: "Price list entry deleted successfully" });
+      toast({ title: t('vendor.priceListDeletedSuccessfully', 'Price list entry deleted successfully') });
     },
     onError: () => {
-      toast({ title: "Failed to delete price list entry", variant: "destructive" });
+      toast({ title: t('vendor.failedToDeletePriceList', 'Failed to delete price list entry'), variant: "destructive" });
     },
   });
 
@@ -312,12 +314,12 @@ export default function VendorSupplierPortal() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/supplier-performance"] });
-      toast({ title: "Performance record created successfully" });
+      toast({ title: t('vendor.performanceCreatedSuccessfully', 'Performance record created successfully') });
       setIsPerformanceDialogOpen(false);
       performanceForm.reset();
     },
     onError: () => {
-      toast({ title: "Failed to create performance record", variant: "destructive" });
+      toast({ title: t('vendor.failedToCreatePerformance', 'Failed to create performance record'), variant: "destructive" });
     },
   });
 
@@ -327,12 +329,12 @@ export default function VendorSupplierPortal() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/supplier-performance"] });
-      toast({ title: "Performance record updated successfully" });
+      toast({ title: t('vendor.performanceUpdatedSuccessfully', 'Performance record updated successfully') });
       setIsPerformanceDialogOpen(false);
       setSelectedPerformance(null);
     },
     onError: () => {
-      toast({ title: "Failed to update performance record", variant: "destructive" });
+      toast({ title: t('vendor.failedToUpdatePerformance', 'Failed to update performance record'), variant: "destructive" });
     },
   });
 
@@ -342,10 +344,10 @@ export default function VendorSupplierPortal() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/supplier-performance"] });
-      toast({ title: "Performance record deleted successfully" });
+      toast({ title: t('vendor.performanceDeletedSuccessfully', 'Performance record deleted successfully') });
     },
     onError: () => {
-      toast({ title: "Failed to delete performance record", variant: "destructive" });
+      toast({ title: t('vendor.failedToDeletePerformance', 'Failed to delete performance record'), variant: "destructive" });
     },
   });
 
@@ -356,12 +358,12 @@ export default function VendorSupplierPortal() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/reorder-settings"] });
-      toast({ title: "Reorder rule created successfully" });
+      toast({ title: t('vendor.reorderRuleCreatedSuccessfully', 'Reorder rule created successfully') });
       setIsReorderDialogOpen(false);
       reorderForm.reset();
     },
     onError: () => {
-      toast({ title: "Failed to create reorder rule", variant: "destructive" });
+      toast({ title: t('vendor.failedToCreateReorderRule', 'Failed to create reorder rule'), variant: "destructive" });
     },
   });
 
@@ -371,12 +373,12 @@ export default function VendorSupplierPortal() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/reorder-settings"] });
-      toast({ title: "Reorder rule updated successfully" });
+      toast({ title: t('vendor.reorderRuleUpdatedSuccessfully', 'Reorder rule updated successfully') });
       setIsReorderDialogOpen(false);
       setSelectedReorder(null);
     },
     onError: () => {
-      toast({ title: "Failed to update reorder rule", variant: "destructive" });
+      toast({ title: t('vendor.failedToUpdateReorderRule', 'Failed to update reorder rule'), variant: "destructive" });
     },
   });
 
@@ -386,10 +388,10 @@ export default function VendorSupplierPortal() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/reorder-settings"] });
-      toast({ title: "Reorder rule deleted successfully" });
+      toast({ title: t('vendor.reorderRuleDeletedSuccessfully', 'Reorder rule deleted successfully') });
     },
     onError: () => {
-      toast({ title: "Failed to delete reorder rule", variant: "destructive" });
+      toast({ title: t('vendor.failedToDeleteReorderRule', 'Failed to delete reorder rule'), variant: "destructive" });
     },
   });
 
@@ -522,10 +524,10 @@ export default function VendorSupplierPortal() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-montserrat font-semibold text-salis-black dark:text-white">
-            Vendor/Supplier Portal
+            {t('vendor.vendorSupplierPortal', 'Vendor/Supplier Portal')}
           </h1>
           <p className="text-salis-gray dark:text-salis-gray-light font-poppins mt-1">
-            Manage suppliers, price lists, performance tracking, and automated reordering
+            {t('vendor.manageSuppliersPriceLists', 'Manage suppliers, price lists, performance tracking, and automated reordering')}
           </p>
         </div>
       </div>
@@ -538,7 +540,7 @@ export default function VendorSupplierPortal() {
             className="data-[state=active]:bg-salis-black data-[state=active]:text-white dark:data-[state=active]:bg-white dark:data-[state=active]:text-salis-black"
           >
             <Store className="h-4 w-4 mr-2" />
-            Suppliers
+            {t('vendor.suppliers', 'Suppliers')}
           </TabsTrigger>
           <TabsTrigger
             value="price-lists"
@@ -546,7 +548,7 @@ export default function VendorSupplierPortal() {
             className="data-[state=active]:bg-salis-black data-[state=active]:text-white dark:data-[state=active]:bg-white dark:data-[state=active]:text-salis-black"
           >
             <DollarSign className="h-4 w-4 mr-2" />
-            Price Lists
+            {t('vendor.priceLists', 'Price Lists')}
           </TabsTrigger>
           <TabsTrigger
             value="performance"
@@ -554,7 +556,7 @@ export default function VendorSupplierPortal() {
             className="data-[state=active]:bg-salis-black data-[state=active]:text-white dark:data-[state=active]:bg-white dark:data-[state=active]:text-salis-black"
           >
             <TrendingUp className="h-4 w-4 mr-2" />
-            Performance
+            {t('vendor.performance', 'Performance')}
           </TabsTrigger>
           <TabsTrigger
             value="reorder"
@@ -562,7 +564,7 @@ export default function VendorSupplierPortal() {
             className="data-[state=active]:bg-salis-black data-[state=active]:text-white dark:data-[state=active]:bg-white dark:data-[state=active]:text-salis-black"
           >
             <RefreshCw className="h-4 w-4 mr-2" />
-            Reorder Rules
+            {t('vendor.reorderRules', 'Reorder Rules')}
           </TabsTrigger>
         </TabsList>
 
@@ -570,7 +572,7 @@ export default function VendorSupplierPortal() {
         <TabsContent value="suppliers" className="space-y-4">
           <div className="flex justify-between items-center">
             <h2 className="text-xl font-montserrat font-medium text-salis-black dark:text-white">
-              Suppliers
+              {t('vendor.suppliers', 'Suppliers')}
             </h2>
             <Button
               onClick={handleCreateSupplier}
@@ -578,26 +580,26 @@ export default function VendorSupplierPortal() {
               className="bg-salis-black text-white hover:bg-salis-gray-dark dark:bg-white dark:text-salis-black dark:hover:bg-salis-gray-light"
             >
               <Plus className="h-4 w-4 mr-2" />
-              Add Supplier
+              {t('vendor.addSupplier', 'Add Supplier')}
             </Button>
           </div>
 
           {suppliersLoading ? (
             <div className="text-center py-8 text-salis-gray dark:text-salis-gray-light">
-              Loading suppliers...
+              {t('vendor.loadingSuppliers', 'Loading suppliers...')}
             </div>
           ) : (
             <div className="border border-salis-gray-light dark:border-salis-gray rounded-lg overflow-hidden">
               <Table>
                 <TableHeader className="bg-salis-gray-light dark:bg-salis-gray-dark">
                   <TableRow className="border-b border-salis-gray-light dark:border-salis-gray">
-                    <TableHead className="text-salis-black dark:text-white font-montserrat">Name</TableHead>
-                    <TableHead className="text-salis-black dark:text-white font-montserrat">Contact</TableHead>
-                    <TableHead className="text-salis-black dark:text-white font-montserrat">Email</TableHead>
-                    <TableHead className="text-salis-black dark:text-white font-montserrat">Phone</TableHead>
-                    <TableHead className="text-salis-black dark:text-white font-montserrat">City</TableHead>
-                    <TableHead className="text-salis-black dark:text-white font-montserrat">Status</TableHead>
-                    <TableHead className="text-salis-black dark:text-white font-montserrat text-right">Actions</TableHead>
+                    <TableHead className="text-salis-black dark:text-white font-montserrat">{t('common.name', 'Name')}</TableHead>
+                    <TableHead className="text-salis-black dark:text-white font-montserrat">{t('vendor.contact', 'Contact')}</TableHead>
+                    <TableHead className="text-salis-black dark:text-white font-montserrat">{t('auth.email', 'Email')}</TableHead>
+                    <TableHead className="text-salis-black dark:text-white font-montserrat">{t('auth.phone', 'Phone')}</TableHead>
+                    <TableHead className="text-salis-black dark:text-white font-montserrat">{t('vendor.city', 'City')}</TableHead>
+                    <TableHead className="text-salis-black dark:text-white font-montserrat">{t('common.status', 'Status')}</TableHead>
+                    <TableHead className="text-salis-black dark:text-white font-montserrat text-right">{t('common.actions', 'Actions')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody className="bg-white dark:bg-salis-black">
@@ -631,7 +633,7 @@ export default function VendorSupplierPortal() {
                               : "bg-salis-gray text-white"
                           }
                         >
-                          {supplier.isActive ? "Active" : "Inactive"}
+                          {supplier.isActive ? t('common.active', 'Active') : t('common.inactive', 'Inactive')}
                         </Badge>
                       </TableCell>
                       <TableCell className="text-right space-x-2">
@@ -666,7 +668,7 @@ export default function VendorSupplierPortal() {
         <TabsContent value="price-lists" className="space-y-4">
           <div className="flex justify-between items-center">
             <h2 className="text-xl font-montserrat font-medium text-salis-black dark:text-white">
-              Price Lists
+              {t('vendor.priceLists', 'Price Lists')}
             </h2>
             <div className="flex gap-2">
               <div className="relative">
@@ -675,7 +677,7 @@ export default function VendorSupplierPortal() {
                     data-testid="select-compare-part"
                     className="w-64 bg-white dark:bg-salis-gray-dark text-salis-black dark:text-white border-salis-gray-light dark:border-salis-gray"
                   >
-                    <SelectValue placeholder="Compare prices for part..." />
+                    <SelectValue placeholder={t('vendor.comparePricesForPart', 'Compare prices for part...')} />
                   </SelectTrigger>
                   <SelectContent className="bg-white dark:bg-salis-gray-dark border-salis-gray-light dark:border-salis-gray">
                     {spareParts.map((part) => (
@@ -692,7 +694,7 @@ export default function VendorSupplierPortal() {
                 className="bg-salis-black text-white hover:bg-salis-gray-dark dark:bg-white dark:text-salis-black dark:hover:bg-salis-gray-light"
               >
                 <Plus className="h-4 w-4 mr-2" />
-                Add Price Entry
+                {t('vendor.addPriceEntry', 'Add Price Entry')}
               </Button>
             </div>
           </div>
@@ -700,7 +702,7 @@ export default function VendorSupplierPortal() {
           {priceComparePartId && priceComparison.length > 0 && (
             <div className="bg-salis-gray-light dark:bg-salis-gray-dark p-4 rounded-lg border border-salis-gray-light dark:border-salis-gray">
               <h3 className="font-montserrat font-medium text-salis-black dark:text-white mb-3">
-                Price Comparison
+                {t('vendor.priceComparison', 'Price Comparison')}
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {priceComparison.map((price) => {
@@ -718,10 +720,10 @@ export default function VendorSupplierPortal() {
                         {price.currency} {price.unitPrice}
                       </div>
                       <div className="text-sm text-salis-gray dark:text-salis-gray-light mt-1">
-                        Min Order: {price.minimumOrderQuantity}
+                        {t('vendor.minOrder', 'Min Order')}: {price.minimumOrderQuantity}
                       </div>
                       <div className="text-sm text-salis-gray dark:text-salis-gray-light">
-                        Lead Time: {price.leadTimeDays || "—"} days
+                        {t('vendor.leadTime', 'Lead Time')}: {price.leadTimeDays || "—"} {t('vendor.days', 'days')}
                       </div>
                       <Badge className={`mt-2 ${getAvailabilityBadge(price.availability ?? "in_stock")}`}>
                         {price.availability}
@@ -735,21 +737,21 @@ export default function VendorSupplierPortal() {
 
           {priceListsLoading ? (
             <div className="text-center py-8 text-salis-gray dark:text-salis-gray-light">
-              Loading price lists...
+              {t('vendor.loadingPriceLists', 'Loading price lists...')}
             </div>
           ) : (
             <div className="border border-salis-gray-light dark:border-salis-gray rounded-lg overflow-hidden">
               <Table>
                 <TableHeader className="bg-salis-gray-light dark:bg-salis-gray-dark">
                   <TableRow className="border-b border-salis-gray-light dark:border-salis-gray">
-                    <TableHead className="text-salis-black dark:text-white font-montserrat">Supplier</TableHead>
-                    <TableHead className="text-salis-black dark:text-white font-montserrat">Part Name</TableHead>
-                    <TableHead className="text-salis-black dark:text-white font-montserrat">Part Number</TableHead>
-                    <TableHead className="text-salis-black dark:text-white font-montserrat">Unit Price</TableHead>
-                    <TableHead className="text-salis-black dark:text-white font-montserrat">Min Order</TableHead>
-                    <TableHead className="text-salis-black dark:text-white font-montserrat">Lead Time</TableHead>
-                    <TableHead className="text-salis-black dark:text-white font-montserrat">Availability</TableHead>
-                    <TableHead className="text-salis-black dark:text-white font-montserrat text-right">Actions</TableHead>
+                    <TableHead className="text-salis-black dark:text-white font-montserrat">{t('vendor.supplier', 'Supplier')}</TableHead>
+                    <TableHead className="text-salis-black dark:text-white font-montserrat">{t('vendor.partName', 'Part Name')}</TableHead>
+                    <TableHead className="text-salis-black dark:text-white font-montserrat">{t('vendor.partNumber', 'Part Number')}</TableHead>
+                    <TableHead className="text-salis-black dark:text-white font-montserrat">{t('vendor.unitPrice', 'Unit Price')}</TableHead>
+                    <TableHead className="text-salis-black dark:text-white font-montserrat">{t('vendor.minOrder', 'Min Order')}</TableHead>
+                    <TableHead className="text-salis-black dark:text-white font-montserrat">{t('vendor.leadTime', 'Lead Time')}</TableHead>
+                    <TableHead className="text-salis-black dark:text-white font-montserrat">{t('vendor.availability', 'Availability')}</TableHead>
+                    <TableHead className="text-salis-black dark:text-white font-montserrat text-right">{t('common.actions', 'Actions')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody className="bg-white dark:bg-salis-black">
@@ -777,7 +779,7 @@ export default function VendorSupplierPortal() {
                           {priceList.minimumOrderQuantity}
                         </TableCell>
                         <TableCell className="font-poppins text-salis-gray dark:text-salis-gray-light">
-                          {priceList.leadTimeDays || "—"} days
+                          {priceList.leadTimeDays || "—"} {t('vendor.days', 'days')}
                         </TableCell>
                         <TableCell>
                           <Badge
@@ -820,7 +822,7 @@ export default function VendorSupplierPortal() {
         <TabsContent value="performance" className="space-y-4">
           <div className="flex justify-between items-center">
             <h2 className="text-xl font-montserrat font-medium text-salis-black dark:text-white">
-              Supplier Performance
+              {t('vendor.supplierPerformance', 'Supplier Performance')}
             </h2>
             <Button
               onClick={handleCreatePerformance}
@@ -828,27 +830,27 @@ export default function VendorSupplierPortal() {
               className="bg-salis-black text-white hover:bg-salis-gray-dark dark:bg-white dark:text-salis-black dark:hover:bg-salis-gray-light"
             >
               <Plus className="h-4 w-4 mr-2" />
-              Add Performance Record
+              {t('vendor.addPerformanceRecord', 'Add Performance Record')}
             </Button>
           </div>
 
           {performanceLoading ? (
             <div className="text-center py-8 text-salis-gray dark:text-salis-gray-light">
-              Loading performance data...
+              {t('vendor.loadingPerformanceData', 'Loading performance data...')}
             </div>
           ) : (
             <div className="border border-salis-gray-light dark:border-salis-gray rounded-lg overflow-hidden">
               <Table>
                 <TableHeader className="bg-salis-gray-light dark:bg-salis-gray-dark">
                   <TableRow className="border-b border-salis-gray-light dark:border-salis-gray">
-                    <TableHead className="text-salis-black dark:text-white font-montserrat">Supplier</TableHead>
-                    <TableHead className="text-salis-black dark:text-white font-montserrat">Period</TableHead>
-                    <TableHead className="text-salis-black dark:text-white font-montserrat">Orders</TableHead>
-                    <TableHead className="text-salis-black dark:text-white font-montserrat">Total Value</TableHead>
-                    <TableHead className="text-salis-black dark:text-white font-montserrat">On-Time %</TableHead>
-                    <TableHead className="text-salis-black dark:text-white font-montserrat">Quality Score</TableHead>
-                    <TableHead className="text-salis-black dark:text-white font-montserrat">Rating</TableHead>
-                    <TableHead className="text-salis-black dark:text-white font-montserrat text-right">Actions</TableHead>
+                    <TableHead className="text-salis-black dark:text-white font-montserrat">{t('vendor.supplier', 'Supplier')}</TableHead>
+                    <TableHead className="text-salis-black dark:text-white font-montserrat">{t('vendor.period', 'Period')}</TableHead>
+                    <TableHead className="text-salis-black dark:text-white font-montserrat">{t('vendor.orders', 'Orders')}</TableHead>
+                    <TableHead className="text-salis-black dark:text-white font-montserrat">{t('vendor.totalValue', 'Total Value')}</TableHead>
+                    <TableHead className="text-salis-black dark:text-white font-montserrat">{t('vendor.onTimePercent', 'On-Time %')}</TableHead>
+                    <TableHead className="text-salis-black dark:text-white font-montserrat">{t('vendor.qualityScore', 'Quality Score')}</TableHead>
+                    <TableHead className="text-salis-black dark:text-white font-montserrat">{t('vendor.rating', 'Rating')}</TableHead>
+                    <TableHead className="text-salis-black dark:text-white font-montserrat text-right">{t('common.actions', 'Actions')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody className="bg-white dark:bg-salis-black">
@@ -919,7 +921,7 @@ export default function VendorSupplierPortal() {
         <TabsContent value="reorder" className="space-y-4">
           <div className="flex justify-between items-center">
             <h2 className="text-xl font-montserrat font-medium text-salis-black dark:text-white">
-              Automated Reorder Rules
+              {t('vendor.automatedReorderRules', 'Automated Reorder Rules')}
             </h2>
             <Button
               onClick={handleCreateReorder}
@@ -927,27 +929,27 @@ export default function VendorSupplierPortal() {
               className="bg-salis-black text-white hover:bg-salis-gray-dark dark:bg-white dark:text-salis-black dark:hover:bg-salis-gray-light"
             >
               <Plus className="h-4 w-4 mr-2" />
-              Add Reorder Rule
+              {t('vendor.addReorderRule', 'Add Reorder Rule')}
             </Button>
           </div>
 
           {reorderLoading ? (
             <div className="text-center py-8 text-salis-gray dark:text-salis-gray-light">
-              Loading reorder rules...
+              {t('vendor.loadingReorderRules', 'Loading reorder rules...')}
             </div>
           ) : (
             <div className="border border-salis-gray-light dark:border-salis-gray rounded-lg overflow-hidden">
               <Table>
                 <TableHeader className="bg-salis-gray-light dark:bg-salis-gray-dark">
                   <TableRow className="border-b border-salis-gray-light dark:border-salis-gray">
-                    <TableHead className="text-salis-black dark:text-white font-montserrat">Part ID</TableHead>
-                    <TableHead className="text-salis-black dark:text-white font-montserrat">Reorder Point</TableHead>
-                    <TableHead className="text-salis-black dark:text-white font-montserrat">Reorder Qty</TableHead>
-                    <TableHead className="text-salis-black dark:text-white font-montserrat">Max Stock</TableHead>
-                    <TableHead className="text-salis-black dark:text-white font-montserrat">Supplier</TableHead>
-                    <TableHead className="text-salis-black dark:text-white font-montserrat">Lead Time</TableHead>
-                    <TableHead className="text-salis-black dark:text-white font-montserrat">Auto Enabled</TableHead>
-                    <TableHead className="text-salis-black dark:text-white font-montserrat text-right">Actions</TableHead>
+                    <TableHead className="text-salis-black dark:text-white font-montserrat">{t('vendor.partId', 'Part ID')}</TableHead>
+                    <TableHead className="text-salis-black dark:text-white font-montserrat">{t('vendor.reorderPoint', 'Reorder Point')}</TableHead>
+                    <TableHead className="text-salis-black dark:text-white font-montserrat">{t('vendor.reorderQty', 'Reorder Qty')}</TableHead>
+                    <TableHead className="text-salis-black dark:text-white font-montserrat">{t('vendor.maxStock', 'Max Stock')}</TableHead>
+                    <TableHead className="text-salis-black dark:text-white font-montserrat">{t('vendor.supplier', 'Supplier')}</TableHead>
+                    <TableHead className="text-salis-black dark:text-white font-montserrat">{t('vendor.leadTime', 'Lead Time')}</TableHead>
+                    <TableHead className="text-salis-black dark:text-white font-montserrat">{t('vendor.autoEnabled', 'Auto Enabled')}</TableHead>
+                    <TableHead className="text-salis-black dark:text-white font-montserrat text-right">{t('common.actions', 'Actions')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody className="bg-white dark:bg-salis-black">
@@ -976,7 +978,7 @@ export default function VendorSupplierPortal() {
                           {supplier?.name || "—"}
                         </TableCell>
                         <TableCell className="font-poppins text-salis-gray dark:text-salis-gray-light">
-                          {reorder.leadTimeDays} days
+                          {reorder.leadTimeDays} {t('vendor.days', 'days')}
                         </TableCell>
                         <TableCell>
                           <Badge
@@ -987,7 +989,7 @@ export default function VendorSupplierPortal() {
                                 : "bg-salis-gray text-white"
                             }
                           >
-                            {reorder.isAutoReorderEnabled ? "Enabled" : "Disabled"}
+                            {reorder.isAutoReorderEnabled ? t('common.enabled', 'Enabled') : t('common.disabled', 'Disabled')}
                           </Badge>
                         </TableCell>
                         <TableCell className="text-right space-x-2">
@@ -1025,7 +1027,7 @@ export default function VendorSupplierPortal() {
         <DialogContent className="max-w-2xl bg-white dark:bg-salis-gray-dark border-salis-gray-light dark:border-salis-gray">
           <DialogHeader>
             <DialogTitle className="text-salis-black dark:text-white font-montserrat">
-              {selectedSupplier ? "Edit Supplier" : "Add Supplier"}
+              {selectedSupplier ? t('vendor.editSupplier', 'Edit Supplier') : t('vendor.addSupplier', 'Add Supplier')}
             </DialogTitle>
           </DialogHeader>
           <Form {...supplierForm}>
@@ -1036,7 +1038,7 @@ export default function VendorSupplierPortal() {
                   name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">Supplier Name *</FormLabel>
+                      <FormLabel className="text-salis-black dark:text-white">{t('vendor.supplierName', 'Supplier Name')} *</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -1053,7 +1055,7 @@ export default function VendorSupplierPortal() {
                   name="contactPerson"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">Contact Person</FormLabel>
+                      <FormLabel className="text-salis-black dark:text-white">{t('vendor.contactPerson', 'Contact Person')}</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -1074,7 +1076,7 @@ export default function VendorSupplierPortal() {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">Email</FormLabel>
+                      <FormLabel className="text-salis-black dark:text-white">{t('auth.email', 'Email')}</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -1093,7 +1095,7 @@ export default function VendorSupplierPortal() {
                   name="phone"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">Phone</FormLabel>
+                      <FormLabel className="text-salis-black dark:text-white">{t('auth.phone', 'Phone')}</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -1113,7 +1115,7 @@ export default function VendorSupplierPortal() {
                 name="address"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-salis-black dark:text-white">Address</FormLabel>
+                    <FormLabel className="text-salis-black dark:text-white">{t('vendor.address', 'Address')}</FormLabel>
                     <FormControl>
                       <Textarea
                         {...field}
@@ -1133,7 +1135,7 @@ export default function VendorSupplierPortal() {
                   name="city"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">City</FormLabel>
+                      <FormLabel className="text-salis-black dark:text-white">{t('vendor.city', 'City')}</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -1151,7 +1153,7 @@ export default function VendorSupplierPortal() {
                   name="country"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">Country</FormLabel>
+                      <FormLabel className="text-salis-black dark:text-white">{t('vendor.country', 'Country')}</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -1169,7 +1171,7 @@ export default function VendorSupplierPortal() {
                   name="taxId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">Tax ID</FormLabel>
+                      <FormLabel className="text-salis-black dark:text-white">{t('vendor.taxId', 'Tax ID')}</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -1189,7 +1191,7 @@ export default function VendorSupplierPortal() {
                 name="paymentTerms"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-salis-black dark:text-white">Payment Terms</FormLabel>
+                    <FormLabel className="text-salis-black dark:text-white">{t('vendor.paymentTerms', 'Payment Terms')}</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
@@ -1209,7 +1211,7 @@ export default function VendorSupplierPortal() {
                 name="notes"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-salis-black dark:text-white">Notes</FormLabel>
+                    <FormLabel className="text-salis-black dark:text-white">{t('common.notes', 'Notes')}</FormLabel>
                     <FormControl>
                       <Textarea
                         {...field}
@@ -1236,7 +1238,7 @@ export default function VendorSupplierPortal() {
                       />
                     </FormControl>
                     <FormLabel className="text-salis-black dark:text-white !mt-0">
-                      Active Supplier
+                      {t('vendor.activeSupplier', 'Active Supplier')}
                     </FormLabel>
                   </FormItem>
                 )}
@@ -1250,7 +1252,7 @@ export default function VendorSupplierPortal() {
                   data-testid="button-cancel-supplier"
                   className="border-salis-gray-light dark:border-salis-gray text-salis-black dark:text-white"
                 >
-                  Cancel
+                  {t('common.cancel', 'Cancel')}
                 </Button>
                 <Button
                   type="submit"
@@ -1259,8 +1261,8 @@ export default function VendorSupplierPortal() {
                   className="bg-salis-black text-white hover:bg-salis-gray-dark dark:bg-white dark:text-salis-black dark:hover:bg-salis-gray-light"
                 >
                   {createSupplierMutation.isPending || updateSupplierMutation.isPending
-                    ? "Saving..."
-                    : "Save Supplier"}
+                    ? t('common.saving', 'Saving...')
+                    : t('vendor.saveSupplier', 'Save Supplier')}
                 </Button>
               </div>
             </form>
@@ -1273,7 +1275,7 @@ export default function VendorSupplierPortal() {
         <DialogContent className="max-w-2xl bg-white dark:bg-salis-gray-dark border-salis-gray-light dark:border-salis-gray">
           <DialogHeader>
             <DialogTitle className="text-salis-black dark:text-white font-montserrat">
-              {selectedPriceList ? "Edit Price List Entry" : "Add Price List Entry"}
+              {selectedPriceList ? t('vendor.editPriceListEntry', 'Edit Price List Entry') : t('vendor.addPriceListEntry', 'Add Price List Entry')}
             </DialogTitle>
           </DialogHeader>
           <Form {...priceListForm}>
@@ -1283,14 +1285,14 @@ export default function VendorSupplierPortal() {
                 name="supplierId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-salis-black dark:text-white">Supplier *</FormLabel>
+                    <FormLabel className="text-salis-black dark:text-white">{t('vendor.supplier', 'Supplier')} *</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger
                           data-testid="select-supplier"
                           className="bg-white dark:bg-salis-gray-dark text-salis-black dark:text-white border-salis-gray-light dark:border-salis-gray"
                         >
-                          <SelectValue placeholder="Select supplier" />
+                          <SelectValue placeholder={t('vendor.selectSupplier', 'Select supplier')} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent className="bg-white dark:bg-salis-gray-dark border-salis-gray-light dark:border-salis-gray">
@@ -1312,7 +1314,7 @@ export default function VendorSupplierPortal() {
                   name="partName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">Part Name *</FormLabel>
+                      <FormLabel className="text-salis-black dark:text-white">{t('vendor.partName', 'Part Name')} *</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -1329,7 +1331,7 @@ export default function VendorSupplierPortal() {
                   name="partNumber"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">Part Number</FormLabel>
+                      <FormLabel className="text-salis-black dark:text-white">{t('vendor.partNumber', 'Part Number')}</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -1350,7 +1352,7 @@ export default function VendorSupplierPortal() {
                   name="unitPrice"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">Unit Price *</FormLabel>
+                      <FormLabel className="text-salis-black dark:text-white">{t('vendor.unitPrice', 'Unit Price')} *</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -1369,7 +1371,7 @@ export default function VendorSupplierPortal() {
                   name="currency"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">Currency</FormLabel>
+                      <FormLabel className="text-salis-black dark:text-white">{t('vendor.currency', 'Currency')}</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -1390,7 +1392,7 @@ export default function VendorSupplierPortal() {
                   name="minimumOrderQuantity"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">Min Order Quantity</FormLabel>
+                      <FormLabel className="text-salis-black dark:text-white">{t('vendor.minOrderQuantity', 'Min Order Quantity')}</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -1408,7 +1410,7 @@ export default function VendorSupplierPortal() {
                   name="leadTimeDays"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">Lead Time (Days)</FormLabel>
+                      <FormLabel className="text-salis-black dark:text-white">{t('vendor.leadTimeDays', 'Lead Time (Days)')}</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -1428,7 +1430,7 @@ export default function VendorSupplierPortal() {
                 name="availability"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-salis-black dark:text-white">Availability</FormLabel>
+                    <FormLabel className="text-salis-black dark:text-white">{t('vendor.availability', 'Availability')}</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value ?? undefined}>
                       <FormControl>
                         <SelectTrigger
@@ -1439,10 +1441,10 @@ export default function VendorSupplierPortal() {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent className="bg-white dark:bg-salis-gray-dark border-salis-gray-light dark:border-salis-gray">
-                        <SelectItem value="in_stock">In Stock</SelectItem>
-                        <SelectItem value="limited">Limited</SelectItem>
-                        <SelectItem value="out_of_stock">Out of Stock</SelectItem>
-                        <SelectItem value="discontinued">Discontinued</SelectItem>
+                        <SelectItem value="in_stock">{t('vendor.inStock', 'In Stock')}</SelectItem>
+                        <SelectItem value="limited">{t('vendor.limited', 'Limited')}</SelectItem>
+                        <SelectItem value="out_of_stock">{t('vendor.outOfStock', 'Out of Stock')}</SelectItem>
+                        <SelectItem value="discontinued">{t('vendor.discontinued', 'Discontinued')}</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -1463,7 +1465,7 @@ export default function VendorSupplierPortal() {
                       />
                     </FormControl>
                     <FormLabel className="text-salis-black dark:text-white !mt-0">
-                      Active Price
+                      {t('vendor.activePrice', 'Active Price')}
                     </FormLabel>
                   </FormItem>
                 )}
@@ -1477,7 +1479,7 @@ export default function VendorSupplierPortal() {
                   data-testid="button-cancel-price-list"
                   className="border-salis-gray-light dark:border-salis-gray text-salis-black dark:text-white"
                 >
-                  Cancel
+                  {t('common.cancel', 'Cancel')}
                 </Button>
                 <Button
                   type="submit"
@@ -1486,8 +1488,8 @@ export default function VendorSupplierPortal() {
                   className="bg-salis-black text-white hover:bg-salis-gray-dark dark:bg-white dark:text-salis-black dark:hover:bg-salis-gray-light"
                 >
                   {createPriceListMutation.isPending || updatePriceListMutation.isPending
-                    ? "Saving..."
-                    : "Save Price Entry"}
+                    ? t('common.saving', 'Saving...')
+                    : t('vendor.savePriceEntry', 'Save Price Entry')}
                 </Button>
               </div>
             </form>
@@ -1500,7 +1502,7 @@ export default function VendorSupplierPortal() {
         <DialogContent className="max-w-2xl bg-white dark:bg-salis-gray-dark border-salis-gray-light dark:border-salis-gray max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-salis-black dark:text-white font-montserrat">
-              {selectedPerformance ? "Edit Performance Record" : "Add Performance Record"}
+              {selectedPerformance ? t('vendor.editPerformanceRecord', 'Edit Performance Record') : t('vendor.addPerformanceRecord', 'Add Performance Record')}
             </DialogTitle>
           </DialogHeader>
           <Form {...performanceForm}>
@@ -1511,14 +1513,14 @@ export default function VendorSupplierPortal() {
                   name="supplierId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">Supplier *</FormLabel>
+                      <FormLabel className="text-salis-black dark:text-white">{t('vendor.supplier', 'Supplier')} *</FormLabel>
                       <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
                           <SelectTrigger
                             data-testid="select-performance-supplier"
                             className="bg-white dark:bg-salis-gray-dark text-salis-black dark:text-white border-salis-gray-light dark:border-salis-gray"
                           >
-                            <SelectValue placeholder="Select supplier" />
+                            <SelectValue placeholder={t('vendor.selectSupplier', 'Select supplier')} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent className="bg-white dark:bg-salis-gray-dark border-salis-gray-light dark:border-salis-gray">
@@ -1538,11 +1540,11 @@ export default function VendorSupplierPortal() {
                   name="period"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">Period *</FormLabel>
+                      <FormLabel className="text-salis-black dark:text-white">{t('vendor.period', 'Period')} *</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
-                          placeholder="e.g., 2025-01 or 2025-Q1"
+                          placeholder={t('vendor.periodPlaceholder', 'e.g., 2025-01 or 2025-Q1')}
                           data-testid="input-period"
                           className="bg-white dark:bg-salis-gray-dark text-salis-black dark:text-white border-salis-gray-light dark:border-salis-gray"
                         />
@@ -1559,7 +1561,7 @@ export default function VendorSupplierPortal() {
                   name="totalOrders"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">Total Orders</FormLabel>
+                      <FormLabel className="text-salis-black dark:text-white">{t('vendor.totalOrders', 'Total Orders')}</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -1577,7 +1579,7 @@ export default function VendorSupplierPortal() {
                   name="totalValue"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">Total Value ($)</FormLabel>
+                      <FormLabel className="text-salis-black dark:text-white">{t('vendor.totalValueDollar', 'Total Value ($)')}</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -1599,7 +1601,7 @@ export default function VendorSupplierPortal() {
                   name="onTimeDeliveryRate"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">On-Time Delivery Rate (%)</FormLabel>
+                      <FormLabel className="text-salis-black dark:text-white">{t('vendor.onTimeDeliveryRate', 'On-Time Delivery Rate (%)')}</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -1618,7 +1620,7 @@ export default function VendorSupplierPortal() {
                   name="qualityScore"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">Quality Score (0-100)</FormLabel>
+                      <FormLabel className="text-salis-black dark:text-white">{t('vendor.qualityScoreRange', 'Quality Score (0-100)')}</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -1640,7 +1642,7 @@ export default function VendorSupplierPortal() {
                   name="defectRate"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">Defect Rate (%)</FormLabel>
+                      <FormLabel className="text-salis-black dark:text-white">{t('vendor.defectRate', 'Defect Rate (%)')}</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -1659,7 +1661,7 @@ export default function VendorSupplierPortal() {
                   name="averageLeadTime"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">Avg Lead Time (Days)</FormLabel>
+                      <FormLabel className="text-salis-black dark:text-white">{t('vendor.avgLeadTimeDays', 'Avg Lead Time (Days)')}</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -1681,7 +1683,7 @@ export default function VendorSupplierPortal() {
                   name="priceCompetitiveness"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">Price Competitiveness (0-100)</FormLabel>
+                      <FormLabel className="text-salis-black dark:text-white">{t('vendor.priceCompetitiveness', 'Price Competitiveness (0-100)')}</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -1700,7 +1702,7 @@ export default function VendorSupplierPortal() {
                   name="overallRating"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">Overall Rating (0-5)</FormLabel>
+                      <FormLabel className="text-salis-black dark:text-white">{t('vendor.overallRating', 'Overall Rating (0-5)')}</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -1721,7 +1723,7 @@ export default function VendorSupplierPortal() {
                 name="notes"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-salis-black dark:text-white">Notes</FormLabel>
+                    <FormLabel className="text-salis-black dark:text-white">{t('common.notes', 'Notes')}</FormLabel>
                     <FormControl>
                       <Textarea
                         {...field}
@@ -1743,7 +1745,7 @@ export default function VendorSupplierPortal() {
                   data-testid="button-cancel-performance"
                   className="border-salis-gray-light dark:border-salis-gray text-salis-black dark:text-white"
                 >
-                  Cancel
+                  {t('common.cancel', 'Cancel')}
                 </Button>
                 <Button
                   type="submit"
@@ -1752,8 +1754,8 @@ export default function VendorSupplierPortal() {
                   className="bg-salis-black text-white hover:bg-salis-gray-dark dark:bg-white dark:text-salis-black dark:hover:bg-salis-gray-light"
                 >
                   {createPerformanceMutation.isPending || updatePerformanceMutation.isPending
-                    ? "Saving..."
-                    : "Save Performance"}
+                    ? t('common.saving', 'Saving...')
+                    : t('vendor.savePerformance', 'Save Performance')}
                 </Button>
               </div>
             </form>
@@ -1766,7 +1768,7 @@ export default function VendorSupplierPortal() {
         <DialogContent className="max-w-2xl bg-white dark:bg-salis-gray-dark border-salis-gray-light dark:border-salis-gray">
           <DialogHeader>
             <DialogTitle className="text-salis-black dark:text-white font-montserrat">
-              {selectedReorder ? "Edit Reorder Rule" : "Add Reorder Rule"}
+              {selectedReorder ? t('vendor.editReorderRule', 'Edit Reorder Rule') : t('vendor.addReorderRule', 'Add Reorder Rule')}
             </DialogTitle>
           </DialogHeader>
           <Form {...reorderForm}>
@@ -1776,14 +1778,14 @@ export default function VendorSupplierPortal() {
                 name="sparePartId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-salis-black dark:text-white">Spare Part *</FormLabel>
+                    <FormLabel className="text-salis-black dark:text-white">{t('vendor.sparePart', 'Spare Part')} *</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger
                           data-testid="select-spare-part"
                           className="bg-white dark:bg-salis-gray-dark text-salis-black dark:text-white border-salis-gray-light dark:border-salis-gray"
                         >
-                          <SelectValue placeholder="Select spare part" />
+                          <SelectValue placeholder={t('vendor.selectSparePart', 'Select spare part')} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent className="bg-white dark:bg-salis-gray-dark border-salis-gray-light dark:border-salis-gray">
@@ -1805,7 +1807,7 @@ export default function VendorSupplierPortal() {
                   name="reorderPoint"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">Reorder Point *</FormLabel>
+                      <FormLabel className="text-salis-black dark:text-white">{t('vendor.reorderPoint', 'Reorder Point')} *</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -1823,7 +1825,7 @@ export default function VendorSupplierPortal() {
                   name="reorderQuantity"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">Reorder Quantity *</FormLabel>
+                      <FormLabel className="text-salis-black dark:text-white">{t('vendor.reorderQuantity', 'Reorder Quantity')} *</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -1841,7 +1843,7 @@ export default function VendorSupplierPortal() {
                   name="maxStockLevel"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">Max Stock Level</FormLabel>
+                      <FormLabel className="text-salis-black dark:text-white">{t('vendor.maxStockLevel', 'Max Stock Level')}</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -1862,14 +1864,14 @@ export default function VendorSupplierPortal() {
                   name="supplierId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">Preferred Supplier</FormLabel>
+                      <FormLabel className="text-salis-black dark:text-white">{t('vendor.preferredSupplier', 'Preferred Supplier')}</FormLabel>
                       <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
                           <SelectTrigger
                             data-testid="select-reorder-supplier"
                             className="bg-white dark:bg-salis-gray-dark text-salis-black dark:text-white border-salis-gray-light dark:border-salis-gray"
                           >
-                            <SelectValue placeholder="Select supplier (optional)" />
+                            <SelectValue placeholder={t('vendor.selectSupplierOptional', 'Select supplier (optional)')} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent className="bg-white dark:bg-salis-gray-dark border-salis-gray-light dark:border-salis-gray">
@@ -1889,7 +1891,7 @@ export default function VendorSupplierPortal() {
                   name="leadTimeDays"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">Lead Time (Days)</FormLabel>
+                      <FormLabel className="text-salis-black dark:text-white">{t('vendor.leadTimeDays', 'Lead Time (Days)')}</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -1917,7 +1919,7 @@ export default function VendorSupplierPortal() {
                       />
                     </FormControl>
                     <FormLabel className="text-salis-black dark:text-white !mt-0">
-                      Enable Automatic Reordering
+                      {t('vendor.enableAutoReordering', 'Enable Automatic Reordering')}
                     </FormLabel>
                   </FormItem>
                 )}
@@ -1931,7 +1933,7 @@ export default function VendorSupplierPortal() {
                   data-testid="button-cancel-reorder"
                   className="border-salis-gray-light dark:border-salis-gray text-salis-black dark:text-white"
                 >
-                  Cancel
+                  {t('common.cancel', 'Cancel')}
                 </Button>
                 <Button
                   type="submit"
@@ -1940,8 +1942,8 @@ export default function VendorSupplierPortal() {
                   className="bg-salis-black text-white hover:bg-salis-gray-dark dark:bg-white dark:text-salis-black dark:hover:bg-salis-gray-light"
                 >
                   {createReorderMutation.isPending || updateReorderMutation.isPending
-                    ? "Saving..."
-                    : "Save Reorder Rule"}
+                    ? t('common.saving', 'Saving...')
+                    : t('vendor.saveReorderRule', 'Save Reorder Rule')}
                 </Button>
               </div>
             </form>

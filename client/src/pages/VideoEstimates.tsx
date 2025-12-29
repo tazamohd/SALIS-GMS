@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { StandardTablePage, Column } from "@/components/layouts/StandardTablePage";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -8,6 +9,7 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
 export default function VideoEstimates() {
+  const { t } = useTranslation();
   const { toast } = useToast();
 
   const { data: userResponse } = useQuery({
@@ -33,18 +35,18 @@ export default function VideoEstimates() {
       return await apiRequest(`/api/video-estimates/${id}/approve`, "PATCH", {});
     },
     onSuccess: () => {
-      toast({ title: "Estimate approved", description: "Video estimate has been approved." });
+      toast({ title: t('videoEstimates.estimateApproved', 'Estimate approved'), description: t('videoEstimates.estimateApprovedDesc', 'Video estimate has been approved.') });
       queryClient.invalidateQueries({ queryKey: ["/api/video-estimates", customerId] });
     },
   });
 
   const getStatusBadge = (status: string) => {
     const variants: Record<string, any> = {
-      pending: { variant: "secondary", label: "Pending" },
-      sent: { variant: "default", label: "Sent" },
-      viewed: { variant: "default", label: "Viewed" },
-      approved: { variant: "default", label: "Approved" },
-      declined: { variant: "destructive", label: "Declined" },
+      pending: { variant: "secondary", label: t('common.pending', 'Pending') },
+      sent: { variant: "default", label: t('videoEstimates.sent', 'Sent') },
+      viewed: { variant: "default", label: t('videoEstimates.viewed', 'Viewed') },
+      approved: { variant: "default", label: t('videoEstimates.approved', 'Approved') },
+      declined: { variant: "destructive", label: t('videoEstimates.declined', 'Declined') },
     };
     const config = variants[status] || { variant: "secondary", label: status };
     return <Badge variant={config.variant}>{config.label}</Badge>;
@@ -52,22 +54,22 @@ export default function VideoEstimates() {
 
   const columns: Column<any>[] = [
     {
-      header: "Vehicle",
+      header: t('vehicles.vehicle', 'Vehicle'),
       accessorKey: "vehicleId",
-      cell: (row) => row.vehicleId || "N/A",
+      cell: (row) => row.vehicleId || t('common.notAvailable', 'N/A'),
     },
     {
-      header: "Estimated Cost",
+      header: t('videoEstimates.estimatedCost', 'Estimated Cost'),
       accessorKey: "estimatedCost",
       cell: (row) => `$${row.estimatedCost || 0}`,
     },
     {
-      header: "Status",
+      header: t('common.status', 'Status'),
       accessorKey: "status",
       cell: (row) => getStatusBadge(row.status),
     },
     {
-      header: "Actions",
+      header: t('common.actions', 'Actions'),
       accessorKey: "id",
       cell: (row) => (
         <div className="flex items-center gap-2">
@@ -79,7 +81,7 @@ export default function VideoEstimates() {
               data-testid={`button-play-${row.id}`}
             >
               <Play className="h-3 w-3 mr-1" />
-              Watch
+              {t('videoEstimates.watch', 'Watch')}
             </Button>
           )}
           {row.status !== "approved" && row.status !== "declined" && (
@@ -89,7 +91,7 @@ export default function VideoEstimates() {
               data-testid={`button-approve-${row.id}`}
             >
               <CheckCircle className="h-3 w-3 mr-1" />
-              Approve
+              {t('videoEstimates.approve', 'Approve')}
             </Button>
           )}
         </div>
@@ -99,31 +101,31 @@ export default function VideoEstimates() {
 
   return (
     <StandardTablePage
-      title="Video Estimates"
-      description="Visual repair estimates with video walkarounds"
+      title={t('videoEstimates.title', 'Video Estimates')}
+      description={t('videoEstimates.description', 'Visual repair estimates with video walkarounds')}
       icon={Video}
       data={estimates}
       columns={columns}
       isLoading={isLoading}
-      searchPlaceholder="Search estimates..."
+      searchPlaceholder={t('videoEstimates.searchPlaceholder', 'Search estimates...')}
       filters={[
         {
           id: "status",
-          label: "Status",
+          label: t('common.status', 'Status'),
           options: [
-            { value: "all", label: "All Statuses" },
-            { value: "pending", label: "Pending" },
-            { value: "sent", label: "Sent" },
-            { value: "viewed", label: "Viewed" },
-            { value: "approved", label: "Approved" },
-            { value: "declined", label: "Declined" },
+            { value: "all", label: t('common.allStatuses', 'All Statuses') },
+            { value: "pending", label: t('common.pending', 'Pending') },
+            { value: "sent", label: t('videoEstimates.sent', 'Sent') },
+            { value: "viewed", label: t('videoEstimates.viewed', 'Viewed') },
+            { value: "approved", label: t('videoEstimates.approved', 'Approved') },
+            { value: "declined", label: t('videoEstimates.declined', 'Declined') },
           ],
         },
       ]}
       emptyState={{
         icon: Video,
-        title: "No estimates",
-        description: "No video estimates available.",
+        title: t('videoEstimates.noEstimates', 'No estimates'),
+        description: t('videoEstimates.noEstimatesDesc', 'No video estimates available.'),
       }}
     />
   );

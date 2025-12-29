@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { StandardPageLayout } from "@/components/layouts";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -7,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Facebook, Twitter, Instagram, Linkedin, MessageSquare, ThumbsUp, Share2, TrendingUp } from "lucide-react";
 
 export default function SocialMediaMonitoring() {
+  const { t } = useTranslation();
   const [selectedPlatform, setSelectedPlatform] = useState("all");
   const [selectedPeriod, setSelectedPeriod] = useState("7days");
 
@@ -18,10 +20,10 @@ export default function SocialMediaMonitoring() {
   ];
 
   const metrics = [
-    { label: "Total Mentions", value: "1,247", change: "+12%", icon: MessageSquare },
-    { label: "Engagement Rate", value: "8.5%", change: "+2.3%", icon: TrendingUp },
-    { label: "Total Likes", value: "3,892", change: "+18%", icon: ThumbsUp },
-    { label: "Total Shares", value: "456", change: "+25%", icon: Share2 },
+    { label: t('social.totalMentions', 'Total Mentions'), value: "1,247", change: "+12%", icon: MessageSquare },
+    { label: t('social.engagementRate', 'Engagement Rate'), value: "8.5%", change: "+2.3%", icon: TrendingUp },
+    { label: t('social.totalLikes', 'Total Likes'), value: "3,892", change: "+18%", icon: ThumbsUp },
+    { label: t('social.totalShares', 'Total Shares'), value: "456", change: "+25%", icon: Share2 },
   ];
 
   const recentPosts = [
@@ -30,7 +32,7 @@ export default function SocialMediaMonitoring() {
       platform: "facebook",
       content: "Great service at SalisAuto! My car runs like new after their maintenance check.",
       author: "Sarah Johnson",
-      timestamp: "2 hours ago",
+      timestamp: t('social.hoursAgo', '{{count}} hours ago', { count: 2 }),
       likes: 45,
       shares: 12,
       sentiment: "positive"
@@ -40,7 +42,7 @@ export default function SocialMediaMonitoring() {
       platform: "twitter",
       content: "Thanks @SalisAuto for the quick turnaround on my brake repair!",
       author: "Mike Chen",
-      timestamp: "5 hours ago",
+      timestamp: t('social.hoursAgo', '{{count}} hours ago', { count: 5 }),
       likes: 28,
       shares: 5,
       sentiment: "positive"
@@ -50,7 +52,7 @@ export default function SocialMediaMonitoring() {
       platform: "instagram",
       content: "Check out SalisAuto's new facility! Modern and professional.",
       author: "Emily Davis",
-      timestamp: "1 day ago",
+      timestamp: t('social.dayAgo', '1 day ago'),
       likes: 156,
       shares: 23,
       sentiment: "positive"
@@ -77,25 +79,25 @@ export default function SocialMediaMonitoring() {
 
   return (
     <StandardPageLayout
-      title="Social Media Monitoring"
-      description="Track and analyze social media mentions and engagement"
+      title={t('nav.social_media_monitoring', 'Social Media Monitoring')}
+      description={t('social.monitoringDescription', 'Track and analyze social media mentions and engagement')}
       icon={MessageSquare}
     >
       {/* Filters */}
       <Card className="mb-6">
         <CardHeader>
-          <CardTitle className="text-lg">Filters</CardTitle>
+          <CardTitle className="text-lg">{t('common.filter', 'Filters')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium">Platform</label>
+              <label className="text-sm font-medium">{t('social.platform', 'Platform')}</label>
               <Select value={selectedPlatform} onValueChange={setSelectedPlatform}>
                 <SelectTrigger data-testid="select-platform">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Platforms</SelectItem>
+                  <SelectItem value="all">{t('social.allPlatforms', 'All Platforms')}</SelectItem>
                   {platforms.map(platform => (
                     <SelectItem key={platform.id} value={platform.id}>
                       {platform.name}
@@ -105,16 +107,16 @@ export default function SocialMediaMonitoring() {
               </Select>
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium">Time Period</label>
+              <label className="text-sm font-medium">{t('social.timePeriod', 'Time Period')}</label>
               <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
                 <SelectTrigger data-testid="select-period">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="24hours">Last 24 Hours</SelectItem>
-                  <SelectItem value="7days">Last 7 Days</SelectItem>
-                  <SelectItem value="30days">Last 30 Days</SelectItem>
-                  <SelectItem value="90days">Last 90 Days</SelectItem>
+                  <SelectItem value="24hours">{t('social.last24Hours', 'Last 24 Hours')}</SelectItem>
+                  <SelectItem value="7days">{t('social.last7Days', 'Last 7 Days')}</SelectItem>
+                  <SelectItem value="30days">{t('social.last30Days', 'Last 30 Days')}</SelectItem>
+                  <SelectItem value="90days">{t('social.last90Days', 'Last 90 Days')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -149,16 +151,16 @@ export default function SocialMediaMonitoring() {
                 <platform.icon className={`w-8 h-8 ${platform.color}`} />
                 <div>
                   <h3 className="font-semibold text-gray-900 dark:text-white">{platform.name}</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Active</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">{t('common.active', 'Active')}</p>
                 </div>
               </div>
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600 dark:text-gray-400">Followers</span>
+                  <span className="text-gray-600 dark:text-gray-400">{t('social.followers', 'Followers')}</span>
                   <span className="font-medium text-gray-900 dark:text-white">2,450</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600 dark:text-gray-400">Engagement</span>
+                  <span className="text-gray-600 dark:text-gray-400">{t('social.engagement', 'Engagement')}</span>
                   <span className="font-medium text-gray-900 dark:text-white">7.2%</span>
                 </div>
               </div>
@@ -170,8 +172,8 @@ export default function SocialMediaMonitoring() {
       {/* Recent Mentions */}
       <Card>
         <CardHeader>
-          <CardTitle>Recent Mentions</CardTitle>
-          <CardDescription>Latest social media posts mentioning your business</CardDescription>
+          <CardTitle>{t('social.recentMentions', 'Recent Mentions')}</CardTitle>
+          <CardDescription>{t('social.recentMentionsDesc', 'Latest social media posts mentioning your business')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -192,7 +194,7 @@ export default function SocialMediaMonitoring() {
                         <p className="text-sm text-gray-600 dark:text-gray-400">{post.timestamp}</p>
                       </div>
                       <Badge className={getSentimentColor(post.sentiment)}>
-                        {post.sentiment}
+                        {t(`social.sentiment.${post.sentiment}`, post.sentiment)}
                       </Badge>
                     </div>
                     <p className="text-gray-700 dark:text-gray-300 mb-3">{post.content}</p>
@@ -206,7 +208,7 @@ export default function SocialMediaMonitoring() {
                         {post.shares}
                       </span>
                       <Button variant="ghost" size="sm" data-testid={`button-reply-${post.id}`}>
-                        Reply
+                        {t('social.reply', 'Reply')}
                       </Button>
                     </div>
                   </div>

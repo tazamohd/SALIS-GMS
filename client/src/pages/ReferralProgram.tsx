@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { StandardTablePage, Column } from "@/components/layouts/StandardTablePage";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -10,6 +11,7 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
 export default function ReferralProgram() {
+  const { t } = useTranslation();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [customerId, setCustomerId] = useState("");
   const { toast } = useToast();
@@ -30,7 +32,7 @@ export default function ReferralProgram() {
       return await apiRequest("/api/referrals/generate-code", "POST", data);
     },
     onSuccess: () => {
-      toast({ title: "Referral code generated", description: "Referral code created successfully." });
+      toast({ title: t('referral.codeGenerated', 'Referral code generated'), description: t('referral.codeCreatedSuccessfully', 'Referral code created successfully.') });
       setIsCreateDialogOpen(false);
       setCustomerId("");
       queryClient.invalidateQueries({ queryKey: ["/api/referrals"] });
@@ -51,22 +53,22 @@ export default function ReferralProgram() {
 
   const copyReferralCode = (code: string) => {
     navigator.clipboard.writeText(code);
-    toast({ title: "Code copied", description: "Referral code copied to clipboard." });
+    toast({ title: t('referral.codeCopied', 'Code copied'), description: t('referral.codeCopiedToClipboard', 'Referral code copied to clipboard.') });
   };
 
   const columns: Column<any>[] = [
     {
-      header: "Referrer",
+      header: t('referral.referrer', 'Referrer'),
       accessorKey: "referrerName",
-      cell: (row) => row.referrerName || "N/A",
+      cell: (row) => row.referrerName || t('common.notAvailable', 'N/A'),
     },
     {
-      header: "Referral Code",
+      header: t('referral.referralCode', 'Referral Code'),
       accessorKey: "referralCode",
       cell: (row) => (
         <div className="flex items-center gap-2">
           <code className="bg-gray-200 dark:bg-gray-800 px-2 py-1 rounded text-sm">
-            {row.referralCode || "N/A"}
+            {row.referralCode || t('common.notAvailable', 'N/A')}
           </code>
           {row.referralCode && (
             <Button
@@ -82,17 +84,17 @@ export default function ReferralProgram() {
       ),
     },
     {
-      header: "Referred Customer",
+      header: t('referral.referredCustomer', 'Referred Customer'),
       accessorKey: "referredCustomerName",
       cell: (row) => row.referredCustomerName || "-",
     },
     {
-      header: "Status",
+      header: t('common.status', 'Status'),
       accessorKey: "status",
       cell: (row) => getStatusBadge(row.status),
     },
     {
-      header: "Reward",
+      header: t('referral.reward', 'Reward'),
       accessorKey: "rewardAmount",
       cell: (row) => row.rewardAmount ? `$${row.rewardAmount}` : "-",
     },
@@ -101,12 +103,12 @@ export default function ReferralProgram() {
   return (
     <>
       <StandardTablePage
-        title="Referral Program"
-        description="Track customer referrals and rewards"
+        title={t('referral.referralProgram', 'Referral Program')}
+        description={t('referral.trackCustomerReferrals', 'Track customer referrals and rewards')}
         icon={Users}
         actions={[
           {
-            label: "Generate Code",
+            label: t('referral.generateCode', 'Generate Code'),
             onClick: () => setIsCreateDialogOpen(true),
             variant: "default",
           },
@@ -114,37 +116,37 @@ export default function ReferralProgram() {
         data={referralsArray}
         columns={columns}
         isLoading={referralsLoading}
-        searchPlaceholder="Search referrals..."
+        searchPlaceholder={t('referral.searchReferrals', 'Search referrals...')}
         filters={[
           {
             id: "status",
-            label: "Status",
+            label: t('common.status', 'Status'),
             options: [
-              { value: "all", label: "All Statuses" },
-              { value: "pending", label: "Pending" },
-              { value: "active", label: "Active" },
-              { value: "completed", label: "Completed" },
-              { value: "rewarded", label: "Rewarded" },
+              { value: "all", label: t('common.allStatuses', 'All Statuses') },
+              { value: "pending", label: t('common.pending', 'Pending') },
+              { value: "active", label: t('common.active', 'Active') },
+              { value: "completed", label: t('common.completed', 'Completed') },
+              { value: "rewarded", label: t('referral.rewarded', 'Rewarded') },
             ],
           },
         ]}
         emptyState={{
           icon: Users,
-          title: "No referrals",
-          description: "No referrals found.",
+          title: t('referral.noReferrals', 'No referrals'),
+          description: t('referral.noReferralsFound', 'No referrals found.'),
         }}
       />
 
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Generate Referral Code</DialogTitle>
+            <DialogTitle>{t('referral.generateReferralCode', 'Generate Referral Code')}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div>
-              <label className="text-sm font-medium">Customer ID</label>
+              <label className="text-sm font-medium">{t('customers.customerId', 'Customer ID')}</label>
               <Input
-                placeholder="Enter customer ID..."
+                placeholder={t('referral.enterCustomerId', 'Enter customer ID...')}
                 value={customerId}
                 onChange={(e) => setCustomerId(e.target.value)}
                 className="mt-1"
@@ -157,7 +159,7 @@ export default function ReferralProgram() {
               disabled={!customerId}
               data-testid="button-generate"
             >
-              Generate Code
+              {t('referral.generateCode', 'Generate Code')}
             </Button>
           </div>
         </DialogContent>

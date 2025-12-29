@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Link } from "wouter";
+import { useTranslation } from "react-i18next";
 import { TabsPageLayout } from "@/components/layouts/TabsPageLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -79,6 +80,7 @@ const capitalStructureSchema = z.object({
 type CapitalStructureFormData = z.infer<typeof capitalStructureSchema>;
 
 export default function CapitalManagement() {
+  const { t } = useTranslation();
   const [isContributionDialogOpen, setIsContributionDialogOpen] = useState(false);
   const [isStructureDialogOpen, setIsStructureDialogOpen] = useState(false);
 
@@ -138,7 +140,7 @@ export default function CapitalManagement() {
   const tabs = [
     {
       id: "overview",
-      label: "Overview",
+      label: t('capital.overview', 'Overview'),
       icon: Landmark,
       content: (
         <div className="space-y-6">
@@ -147,7 +149,7 @@ export default function CapitalManagement() {
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Total Capital</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{t('capital.totalCapital', 'Total Capital')}</p>
                     <p className="text-2xl font-bold font-montserrat" data-testid="text-total-capital">SAR 1,000,000</p>
                   </div>
                   <DollarSign className="h-8 w-8 text-green-600" />
@@ -158,7 +160,7 @@ export default function CapitalManagement() {
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Total Shareholders</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{t('capital.totalShareholders', 'Total Shareholders')}</p>
                     <p className="text-2xl font-bold font-montserrat" data-testid="text-total-shareholders">3</p>
                   </div>
                   <Users className="h-8 w-8 text-blue-600" />
@@ -169,7 +171,7 @@ export default function CapitalManagement() {
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Issued Shares</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{t('capital.issuedShares', 'Issued Shares')}</p>
                     <p className="text-2xl font-bold font-montserrat" data-testid="text-issued-shares">100,000</p>
                   </div>
                   <PieChart className="h-8 w-8 text-purple-600" />
@@ -180,7 +182,7 @@ export default function CapitalManagement() {
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Par Value</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{t('capital.parValue', 'Par Value')}</p>
                     <p className="text-2xl font-bold font-montserrat" data-testid="text-par-value">SAR 10</p>
                   </div>
                   <Landmark className="h-8 w-8 text-amber-600" />
@@ -193,7 +195,7 @@ export default function CapitalManagement() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <PieChart className="h-5 w-5" />
-                Ownership Distribution
+                {t('capital.ownershipDistribution', 'Ownership Distribution')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -215,22 +217,22 @@ export default function CapitalManagement() {
     },
     {
       id: "shareholders",
-      label: "Shareholders",
+      label: t('capital.shareholders', 'Shareholders'),
       icon: Users,
       content: (
         <div className="space-y-4">
           <div className="flex justify-between items-center">
-            <h3 className="text-lg font-semibold">Shareholder Registry</h3>
+            <h3 className="text-lg font-semibold">{t('capital.shareholderRegistry', 'Shareholder Registry')}</h3>
             <Dialog open={isContributionDialogOpen} onOpenChange={setIsContributionDialogOpen}>
               <DialogTrigger asChild>
                 <Button data-testid="button-add-contribution">
                   <Plus className="h-4 w-4 mr-2" />
-                  Add Contribution
+                  {t('capital.addContribution', 'Add Contribution')}
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-md">
                 <DialogHeader>
-                  <DialogTitle>Add Capital Contribution</DialogTitle>
+                  <DialogTitle>{t('capital.addCapitalContribution', 'Add Capital Contribution')}</DialogTitle>
                 </DialogHeader>
                 <Form {...contributionForm}>
                   <form onSubmit={contributionForm.handleSubmit(onContributionSubmit)} className="space-y-4">
@@ -239,7 +241,7 @@ export default function CapitalManagement() {
                       name="shareholderName"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Shareholder Name</FormLabel>
+                          <FormLabel>{t('capital.shareholderName', 'Shareholder Name')}</FormLabel>
                           <FormControl>
                             <Input {...field} data-testid="input-shareholder-name" />
                           </FormControl>
@@ -252,18 +254,18 @@ export default function CapitalManagement() {
                       name="contributionType"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Contribution Type</FormLabel>
+                          <FormLabel>{t('capital.contributionType', 'Contribution Type')}</FormLabel>
                           <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl>
                               <SelectTrigger data-testid="select-contribution-type">
-                                <SelectValue placeholder="Select type" />
+                                <SelectValue placeholder={t('capital.selectType', 'Select type')} />
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              <SelectItem value="cash">Cash</SelectItem>
-                              <SelectItem value="equipment">Equipment</SelectItem>
-                              <SelectItem value="property">Property</SelectItem>
-                              <SelectItem value="intellectual">Intellectual Property</SelectItem>
+                              <SelectItem value="cash">{t('capital.cash', 'Cash')}</SelectItem>
+                              <SelectItem value="equipment">{t('capital.equipment', 'Equipment')}</SelectItem>
+                              <SelectItem value="property">{t('capital.property', 'Property')}</SelectItem>
+                              <SelectItem value="intellectual">{t('capital.intellectualProperty', 'Intellectual Property')}</SelectItem>
                             </SelectContent>
                           </Select>
                           <FormMessage />
@@ -276,7 +278,7 @@ export default function CapitalManagement() {
                         name="amount"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Amount (SAR)</FormLabel>
+                            <FormLabel>{t('capital.amountSAR', 'Amount (SAR)')}</FormLabel>
                             <FormControl>
                               <Input type="number" {...field} data-testid="input-contribution-amount" />
                             </FormControl>
@@ -289,7 +291,7 @@ export default function CapitalManagement() {
                         name="sharePercentage"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Share %</FormLabel>
+                            <FormLabel>{t('capital.sharePercent', 'Share %')}</FormLabel>
                             <FormControl>
                               <Input type="number" {...field} data-testid="input-share-percentage" />
                             </FormControl>
@@ -303,7 +305,7 @@ export default function CapitalManagement() {
                       name="contributionDate"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Date</FormLabel>
+                          <FormLabel>{t('common.date', 'Date')}</FormLabel>
                           <FormControl>
                             <Input type="date" {...field} data-testid="input-contribution-date" />
                           </FormControl>
@@ -316,17 +318,17 @@ export default function CapitalManagement() {
                       name="paymentMethod"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Payment Method</FormLabel>
+                          <FormLabel>{t('capital.paymentMethod', 'Payment Method')}</FormLabel>
                           <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl>
                               <SelectTrigger data-testid="select-payment-method">
-                                <SelectValue placeholder="Select method" />
+                                <SelectValue placeholder={t('capital.selectMethod', 'Select method')} />
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
-                              <SelectItem value="cash">Cash</SelectItem>
-                              <SelectItem value="check">Check</SelectItem>
+                              <SelectItem value="bank_transfer">{t('capital.bankTransfer', 'Bank Transfer')}</SelectItem>
+                              <SelectItem value="cash">{t('capital.cash', 'Cash')}</SelectItem>
+                              <SelectItem value="check">{t('capital.check', 'Check')}</SelectItem>
                             </SelectContent>
                           </Select>
                           <FormMessage />
@@ -334,7 +336,7 @@ export default function CapitalManagement() {
                       )}
                     />
                     <Button type="submit" className="w-full" data-testid="button-submit-contribution">
-                      Add Contribution
+                      {t('capital.addContribution', 'Add Contribution')}
                     </Button>
                   </form>
                 </Form>
@@ -347,12 +349,12 @@ export default function CapitalManagement() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Shareholder</TableHead>
-                    <TableHead>Type</TableHead>
-                    <TableHead className="text-right">Shares</TableHead>
-                    <TableHead className="text-right">Ownership %</TableHead>
-                    <TableHead className="text-right">Contribution</TableHead>
-                    <TableHead>Status</TableHead>
+                    <TableHead>{t('capital.shareholder', 'Shareholder')}</TableHead>
+                    <TableHead>{t('common.type', 'Type')}</TableHead>
+                    <TableHead className="text-right">{t('capital.shares', 'Shares')}</TableHead>
+                    <TableHead className="text-right">{t('capital.ownershipPercent', 'Ownership %')}</TableHead>
+                    <TableHead className="text-right">{t('capital.contribution', 'Contribution')}</TableHead>
+                    <TableHead>{t('common.status', 'Status')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -367,7 +369,7 @@ export default function CapitalManagement() {
                       <TableCell className="text-right font-montserrat">SAR {shareholder.contribution.toLocaleString()}</TableCell>
                       <TableCell>
                         <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100">
-                          {shareholder.status}
+                          {t('common.active', 'Active')}
                         </Badge>
                       </TableCell>
                     </TableRow>
@@ -381,22 +383,22 @@ export default function CapitalManagement() {
     },
     {
       id: "structure",
-      label: "Capital Structure",
+      label: t('capital.capitalStructure', 'Capital Structure'),
       icon: Building2,
       content: (
         <div className="space-y-4">
           <div className="flex justify-between items-center">
-            <h3 className="text-lg font-semibold">Share Classes</h3>
+            <h3 className="text-lg font-semibold">{t('capital.shareClasses', 'Share Classes')}</h3>
             <Dialog open={isStructureDialogOpen} onOpenChange={setIsStructureDialogOpen}>
               <DialogTrigger asChild>
                 <Button data-testid="button-add-share-class">
                   <Plus className="h-4 w-4 mr-2" />
-                  Add Share Class
+                  {t('capital.addShareClass', 'Add Share Class')}
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-md">
                 <DialogHeader>
-                  <DialogTitle>Add Share Class</DialogTitle>
+                  <DialogTitle>{t('capital.addShareClass', 'Add Share Class')}</DialogTitle>
                 </DialogHeader>
                 <Form {...structureForm}>
                   <form onSubmit={structureForm.handleSubmit(onStructureSubmit)} className="space-y-4">
@@ -405,7 +407,7 @@ export default function CapitalManagement() {
                       name="shareClass"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Share Class Name</FormLabel>
+                          <FormLabel>{t('capital.shareClassName', 'Share Class Name')}</FormLabel>
                           <FormControl>
                             <Input {...field} data-testid="input-share-class" />
                           </FormControl>
@@ -419,7 +421,7 @@ export default function CapitalManagement() {
                         name="authorizedShares"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Authorized Shares</FormLabel>
+                            <FormLabel>{t('capital.authorizedShares', 'Authorized Shares')}</FormLabel>
                             <FormControl>
                               <Input type="number" {...field} data-testid="input-authorized-shares" />
                             </FormControl>
@@ -432,7 +434,7 @@ export default function CapitalManagement() {
                         name="issuedShares"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Issued Shares</FormLabel>
+                            <FormLabel>{t('capital.issuedShares', 'Issued Shares')}</FormLabel>
                             <FormControl>
                               <Input type="number" {...field} data-testid="input-issued-shares" />
                             </FormControl>
@@ -446,7 +448,7 @@ export default function CapitalManagement() {
                       name="parValue"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Par Value (SAR)</FormLabel>
+                          <FormLabel>{t('capital.parValueSAR', 'Par Value (SAR)')}</FormLabel>
                           <FormControl>
                             <Input type="number" {...field} data-testid="input-par-value" />
                           </FormControl>
@@ -459,17 +461,17 @@ export default function CapitalManagement() {
                       name="votingRights"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Voting Rights</FormLabel>
+                          <FormLabel>{t('capital.votingRights', 'Voting Rights')}</FormLabel>
                           <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl>
                               <SelectTrigger data-testid="select-voting-rights">
-                                <SelectValue placeholder="Select voting rights" />
+                                <SelectValue placeholder={t('capital.selectVotingRights', 'Select voting rights')} />
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              <SelectItem value="1_vote">1 Vote Per Share</SelectItem>
-                              <SelectItem value="no_vote">No Voting Rights</SelectItem>
-                              <SelectItem value="2_votes">2 Votes Per Share</SelectItem>
+                              <SelectItem value="1_vote">{t('capital.oneVotePerShare', '1 Vote Per Share')}</SelectItem>
+                              <SelectItem value="no_vote">{t('capital.noVotingRights', 'No Voting Rights')}</SelectItem>
+                              <SelectItem value="2_votes">{t('capital.twoVotesPerShare', '2 Votes Per Share')}</SelectItem>
                             </SelectContent>
                           </Select>
                           <FormMessage />
@@ -477,7 +479,7 @@ export default function CapitalManagement() {
                       )}
                     />
                     <Button type="submit" className="w-full" data-testid="button-submit-share-class">
-                      Add Share Class
+                      {t('capital.addShareClass', 'Add Share Class')}
                     </Button>
                   </form>
                 </Form>
@@ -490,12 +492,12 @@ export default function CapitalManagement() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Share Class</TableHead>
-                    <TableHead className="text-right">Authorized</TableHead>
-                    <TableHead className="text-right">Issued</TableHead>
-                    <TableHead className="text-right">Available</TableHead>
-                    <TableHead className="text-right">Par Value</TableHead>
-                    <TableHead>Voting Rights</TableHead>
+                    <TableHead>{t('capital.shareClass', 'Share Class')}</TableHead>
+                    <TableHead className="text-right">{t('capital.authorized', 'Authorized')}</TableHead>
+                    <TableHead className="text-right">{t('capital.issued', 'Issued')}</TableHead>
+                    <TableHead className="text-right">{t('capital.available', 'Available')}</TableHead>
+                    <TableHead className="text-right">{t('capital.parValue', 'Par Value')}</TableHead>
+                    <TableHead>{t('capital.votingRights', 'Voting Rights')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -518,21 +520,21 @@ export default function CapitalManagement() {
     },
     {
       id: "history",
-      label: "Capital History",
+      label: t('capital.capitalHistory', 'Capital History'),
       icon: Calendar,
       content: (
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold">Capital Transaction History</h3>
+          <h3 className="text-lg font-semibold">{t('capital.capitalTransactionHistory', 'Capital Transaction History')}</h3>
           <Card className="bg-gray-50 dark:bg-salis-gray-dark/30">
             <CardContent className="p-0">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Transaction Type</TableHead>
-                    <TableHead>Shareholder</TableHead>
-                    <TableHead>Payment Method</TableHead>
-                    <TableHead className="text-right">Amount</TableHead>
+                    <TableHead>{t('common.date', 'Date')}</TableHead>
+                    <TableHead>{t('capital.transactionType', 'Transaction Type')}</TableHead>
+                    <TableHead>{t('capital.shareholder', 'Shareholder')}</TableHead>
+                    <TableHead>{t('capital.paymentMethod', 'Payment Method')}</TableHead>
+                    <TableHead className="text-right">{t('common.amount', 'Amount')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -540,9 +542,7 @@ export default function CapitalManagement() {
                     <TableRow key={transaction.id} data-testid={`row-capital-history-${transaction.id}`}>
                       <TableCell className="font-montserrat">{transaction.date}</TableCell>
                       <TableCell>
-                        <Badge variant="outline" className="bg-blue-50 dark:bg-blue-900/30">
-                          {transaction.type}
-                        </Badge>
+                        <Badge variant="outline">{transaction.type}</Badge>
                       </TableCell>
                       <TableCell>{transaction.shareholder}</TableCell>
                       <TableCell>{transaction.method}</TableCell>
@@ -561,14 +561,13 @@ export default function CapitalManagement() {
   ];
 
   return (
-    <TabsPageLayout
-      title="Capital Management"
-      titleArabic="إدارة رأس المال"
-      description="Manage share capital, ownership structure, and capital contributions"
-      descriptionArabic="إدارة رأس المال والهيكل التملكي ومساهمات رأس المال"
-      icon={Landmark}
-      tabs={tabs}
-      defaultTab="overview"
-    />
+    <div className="p-6 space-y-6">
+      <TabsPageLayout
+        title={t('capital.title', 'Capital Management')}
+        description={t('capital.description', 'إدارة رأس المال - Manage shareholders, equity, and capital structure')}
+        defaultTab="overview"
+        tabs={tabs}
+      />
+    </div>
   );
 }

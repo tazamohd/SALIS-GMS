@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -44,6 +45,7 @@ import { TabsPageLayout, TabConfig } from "@/components/layouts/TabsPageLayout";
 const COLORS = ['#000000', '#4B5563', '#6B7280', '#9CA3AF'];
 
 export default function BusinessIntelligenceDashboard() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [selectedPeriod, setSelectedPeriod] = useState("month");
   const [createReportOpen, setCreateReportOpen] = useState(false);
@@ -69,8 +71,8 @@ export default function BusinessIntelligenceDashboard() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/analytics/custom-reports"] });
       toast({
-        title: "Report created",
-        description: "Your custom report has been created successfully.",
+        title: t('bi.reportCreated', 'Report created'),
+        description: t('bi.reportCreatedDesc', 'Your custom report has been created successfully.'),
       });
       setCreateReportOpen(false);
       setReportConfig({ name: "", description: "", reportType: "revenue", schedule: "manual" });
@@ -83,32 +85,32 @@ export default function BusinessIntelligenceDashboard() {
     },
     onSuccess: () => {
       toast({
-        title: "Report generated",
-        description: "Your report is ready for download.",
+        title: t('bi.reportGenerated', 'Report generated'),
+        description: t('bi.reportReadyDownload', 'Your report is ready for download.'),
       });
     },
   });
 
   const revenueData = [
-    { month: "Jan", revenue: 45000, expenses: 32000 },
-    { month: "Feb", revenue: 52000, expenses: 35000 },
-    { month: "Mar", revenue: 48000, expenses: 33000 },
-    { month: "Apr", revenue: 61000, expenses: 38000 },
-    { month: "May", revenue: 55000, expenses: 36000 },
-    { month: "Jun", revenue: 67000, expenses: 40000 },
+    { month: t('months.jan', 'Jan'), revenue: 45000, expenses: 32000 },
+    { month: t('months.feb', 'Feb'), revenue: 52000, expenses: 35000 },
+    { month: t('months.mar', 'Mar'), revenue: 48000, expenses: 33000 },
+    { month: t('months.apr', 'Apr'), revenue: 61000, expenses: 38000 },
+    { month: t('months.may', 'May'), revenue: 55000, expenses: 36000 },
+    { month: t('months.jun', 'Jun'), revenue: 67000, expenses: 40000 },
   ];
 
   const serviceTypeData = [
-    { name: "Oil Change", value: 35 },
-    { name: "Brake Service", value: 25 },
-    { name: "Tire Rotation", value: 20 },
-    { name: "Diagnostics", value: 15 },
-    { name: "Other", value: 5 },
+    { name: t('services.oilChange', 'Oil Change'), value: 35 },
+    { name: t('services.brakeService', 'Brake Service'), value: 25 },
+    { name: t('services.tireRotation', 'Tire Rotation'), value: 20 },
+    { name: t('services.diagnostics', 'Diagnostics'), value: 15 },
+    { name: t('common.other', 'Other'), value: 5 },
   ];
 
   const kpiCards = [
     {
-      title: "Total Revenue",
+      title: t('bi.totalRevenue', 'Total Revenue'),
       value: "$328,000",
       change: "+12.5%",
       trend: "up",
@@ -116,7 +118,7 @@ export default function BusinessIntelligenceDashboard() {
       color: "text-green-600",
     },
     {
-      title: "Active Customers",
+      title: t('bi.activeCustomers', 'Active Customers'),
       value: "1,284",
       change: "+8.2%",
       trend: "up",
@@ -124,7 +126,7 @@ export default function BusinessIntelligenceDashboard() {
       color: "text-blue-600",
     },
     {
-      title: "Job Cards",
+      title: t('bi.jobCards', 'Job Cards'),
       value: "856",
       change: "-2.1%",
       trend: "down",
@@ -132,7 +134,7 @@ export default function BusinessIntelligenceDashboard() {
       color: "text-orange-600",
     },
     {
-      title: "Profit Margin",
+      title: t('bi.profitMargin', 'Profit Margin'),
       value: "32.4%",
       change: "+3.7%",
       trend: "up",
@@ -144,7 +146,7 @@ export default function BusinessIntelligenceDashboard() {
   const tabs: TabConfig[] = [
     {
       id: "overview",
-      label: "Overview",
+      label: t('bi.tabs.overview', 'Overview'),
       content: (
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -189,7 +191,7 @@ export default function BusinessIntelligenceDashboard() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <BarChart3 className="h-5 w-5" />
-                Revenue vs Expenses
+                {t('bi.revenueVsExpenses', 'Revenue vs Expenses')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -200,8 +202,8 @@ export default function BusinessIntelligenceDashboard() {
                   <YAxis />
                   <Tooltip />
                   <Legend />
-                  <Bar dataKey="revenue" fill="#000000" name="Revenue" />
-                  <Bar dataKey="expenses" fill="#6B7280" name="Expenses" />
+                  <Bar dataKey="revenue" fill="#000000" name={t('bi.revenue', 'Revenue')} />
+                  <Bar dataKey="expenses" fill="#6B7280" name={t('bi.expenses', 'Expenses')} />
                 </BarChart>
               </ResponsiveContainer>
             </CardContent>
@@ -212,7 +214,7 @@ export default function BusinessIntelligenceDashboard() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <PieChart className="h-5 w-5" />
-                  Service Distribution
+                  {t('bi.serviceDistribution', 'Service Distribution')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -242,7 +244,7 @@ export default function BusinessIntelligenceDashboard() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <TrendingUp className="h-5 w-5" />
-                  Top Performers
+                  {t('bi.topPerformers', 'Top Performers')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -250,7 +252,7 @@ export default function BusinessIntelligenceDashboard() {
                   <div>
                     <div className="flex justify-between mb-2">
                       <span className="text-sm text-gray-600 dark:text-gray-400">
-                        Best Technician
+                        {t('bi.bestTechnician', 'Best Technician')}
                       </span>
                       <span className="font-semibold text-gray-900 dark:text-white">
                         John Smith
@@ -258,7 +260,7 @@ export default function BusinessIntelligenceDashboard() {
                     </div>
                     <div className="flex justify-between mb-2">
                       <span className="text-sm text-gray-600 dark:text-gray-400">
-                        Revenue Generated
+                        {t('bi.revenueGenerated', 'Revenue Generated')}
                       </span>
                       <span className="font-semibold text-gray-900 dark:text-white">
                         $48,500
@@ -268,7 +270,7 @@ export default function BusinessIntelligenceDashboard() {
                   <div>
                     <div className="flex justify-between mb-2">
                       <span className="text-sm text-gray-600 dark:text-gray-400">
-                        Top Customer
+                        {t('bi.topCustomer', 'Top Customer')}
                       </span>
                       <span className="font-semibold text-gray-900 dark:text-white">
                         ABC Fleet Services
@@ -276,7 +278,7 @@ export default function BusinessIntelligenceDashboard() {
                     </div>
                     <div className="flex justify-between mb-2">
                       <span className="text-sm text-gray-600 dark:text-gray-400">
-                        Lifetime Value
+                        {t('bi.lifetimeValue', 'Lifetime Value')}
                       </span>
                       <span className="font-semibold text-gray-900 dark:text-white">
                         $125,800
@@ -286,15 +288,15 @@ export default function BusinessIntelligenceDashboard() {
                   <div>
                     <div className="flex justify-between mb-2">
                       <span className="text-sm text-gray-600 dark:text-gray-400">
-                        Most Popular Service
+                        {t('bi.mostPopularService', 'Most Popular Service')}
                       </span>
                       <span className="font-semibold text-gray-900 dark:text-white">
-                        Oil Change
+                        {t('services.oilChange', 'Oil Change')}
                       </span>
                     </div>
                     <div className="flex justify-between mb-2">
                       <span className="text-sm text-gray-600 dark:text-gray-400">
-                        Jobs This Month
+                        {t('bi.jobsThisMonth', 'Jobs This Month')}
                       </span>
                       <span className="font-semibold text-gray-900 dark:text-white">
                         324
@@ -310,28 +312,28 @@ export default function BusinessIntelligenceDashboard() {
     },
     {
       id: "reports",
-      label: "Custom Reports",
+      label: t('bi.tabs.customReports', 'Custom Reports'),
       icon: FileText,
       content: (
         <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <FileText className="h-5 w-5" />
-              Custom Reports
+              {t('bi.customReports', 'Custom Reports')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             {customReports.length === 0 ? (
               <div className="text-center py-12 text-gray-500">
                 <FileText className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-                <p>No custom reports created yet.</p>
+                <p>{t('bi.noReportsYet', 'No custom reports created yet.')}</p>
                 <Button
                   onClick={() => setCreateReportOpen(true)}
                   className="mt-4"
                   data-testid="button-create-first-report"
                 >
                   <Plus className="h-4 w-4 mr-2" />
-                  Create Your First Report
+                  {t('bi.createFirstReport', 'Create Your First Report')}
                 </Button>
               </div>
             ) : (
@@ -370,7 +372,7 @@ export default function BusinessIntelligenceDashboard() {
                         data-testid={`button-run-${report.id}`}
                       >
                         <Play className="h-4 w-4 mr-2" />
-                        Run
+                        {t('bi.run', 'Run')}
                       </Button>
                       <Button
                         variant="outline"
@@ -390,22 +392,29 @@ export default function BusinessIntelligenceDashboard() {
     },
     {
       id: "widgets",
-      label: "Widgets",
+      label: t('bi.tabs.widgets', 'Widgets'),
       icon: Settings,
       content: (
         <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Settings className="h-5 w-5" />
-              Dashboard Widgets
+              {t('bi.dashboardWidgets', 'Dashboard Widgets')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-gray-600 dark:text-gray-400 mb-4">
-              Customize your dashboard by adding, removing, and rearranging widgets to display the metrics that matter most to you.
+              {t('bi.customizeWidgetsDesc', 'Customize your dashboard by adding, removing, and rearranging widgets to display the metrics that matter most to you.')}
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {["Revenue Tracker", "Appointment Calendar", "Top Customers", "Inventory Alerts", "Technician Performance", "Service Queue"].map((widget, index) => (
+              {[
+                t('bi.widgets.revenueTracker', 'Revenue Tracker'),
+                t('bi.widgets.appointmentCalendar', 'Appointment Calendar'),
+                t('bi.widgets.topCustomers', 'Top Customers'),
+                t('bi.widgets.inventoryAlerts', 'Inventory Alerts'),
+                t('bi.widgets.technicianPerformance', 'Technician Performance'),
+                t('bi.widgets.serviceQueue', 'Service Queue')
+              ].map((widget, index) => (
                 <div
                   key={index}
                   className="p-4 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg text-center"
@@ -414,7 +423,7 @@ export default function BusinessIntelligenceDashboard() {
                   <p className="font-medium text-gray-900 dark:text-white">{widget}</p>
                   <Button variant="outline" size="sm" className="mt-2">
                     <Plus className="h-4 w-4 mr-2" />
-                    Add Widget
+                    {t('bi.addWidget', 'Add Widget')}
                   </Button>
                 </div>
               ))}
@@ -428,8 +437,8 @@ export default function BusinessIntelligenceDashboard() {
   return (
     <>
       <TabsPageLayout
-        title="📊 Business Intelligence"
-        description="Advanced analytics and custom reporting"
+        title={t('bi.title', '📊 Business Intelligence')}
+        description={t('bi.description', 'Advanced analytics and custom reporting')}
         icon={BarChart3}
         tabs={tabs}
         defaultTab="overview"
@@ -441,7 +450,7 @@ export default function BusinessIntelligenceDashboard() {
           },
         ]}
         primaryAction={{
-          label: "Create Report",
+          label: t('bi.createReport', 'Create Report'),
           onClick: () => setCreateReportOpen(true),
           icon: Plus,
           variant: "default",
@@ -453,10 +462,10 @@ export default function BusinessIntelligenceDashboard() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="week">Last 7 Days</SelectItem>
-                <SelectItem value="month">Last 30 Days</SelectItem>
-                <SelectItem value="quarter">Last Quarter</SelectItem>
-                <SelectItem value="year">Last Year</SelectItem>
+                <SelectItem value="week">{t('bi.periods.last7Days', 'Last 7 Days')}</SelectItem>
+                <SelectItem value="month">{t('bi.periods.last30Days', 'Last 30 Days')}</SelectItem>
+                <SelectItem value="quarter">{t('bi.periods.lastQuarter', 'Last Quarter')}</SelectItem>
+                <SelectItem value="year">{t('bi.periods.lastYear', 'Last Year')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -466,36 +475,36 @@ export default function BusinessIntelligenceDashboard() {
       <Dialog open={createReportOpen} onOpenChange={setCreateReportOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Create Custom Report</DialogTitle>
+            <DialogTitle>{t('bi.createCustomReport', 'Create Custom Report')}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label htmlFor="report-name">Report Name</Label>
+              <Label htmlFor="report-name">{t('bi.reportName', 'Report Name')}</Label>
               <Input
                 id="report-name"
                 value={reportConfig.name}
                 onChange={(e) =>
                   setReportConfig({ ...reportConfig, name: e.target.value })
                 }
-                placeholder="e.g., Monthly Revenue Analysis"
+                placeholder={t('bi.reportNamePlaceholder', 'e.g., Monthly Revenue Analysis')}
                 data-testid="input-report-name"
               />
             </div>
             <div>
-              <Label htmlFor="report-description">Description</Label>
+              <Label htmlFor="report-description">{t('bi.reportDescription', 'Description')}</Label>
               <Textarea
                 id="report-description"
                 value={reportConfig.description}
                 onChange={(e) =>
                   setReportConfig({ ...reportConfig, description: e.target.value })
                 }
-                placeholder="Describe what this report tracks"
+                placeholder={t('bi.reportDescriptionPlaceholder', 'Describe what this report tracks')}
                 rows={3}
                 data-testid="textarea-report-description"
               />
             </div>
             <div>
-              <Label htmlFor="report-type">Report Type</Label>
+              <Label htmlFor="report-type">{t('bi.reportType', 'Report Type')}</Label>
               <Select
                 value={reportConfig.reportType}
                 onValueChange={(value) =>
@@ -506,16 +515,16 @@ export default function BusinessIntelligenceDashboard() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="revenue">Revenue Analysis</SelectItem>
-                  <SelectItem value="expenses">Expense Tracking</SelectItem>
-                  <SelectItem value="inventory">Inventory Report</SelectItem>
-                  <SelectItem value="performance">Performance Metrics</SelectItem>
-                  <SelectItem value="custom">Custom Query</SelectItem>
+                  <SelectItem value="revenue">{t('bi.reportTypes.revenueAnalysis', 'Revenue Analysis')}</SelectItem>
+                  <SelectItem value="expenses">{t('bi.reportTypes.expenseTracking', 'Expense Tracking')}</SelectItem>
+                  <SelectItem value="inventory">{t('bi.reportTypes.inventoryReport', 'Inventory Report')}</SelectItem>
+                  <SelectItem value="performance">{t('bi.reportTypes.performanceMetrics', 'Performance Metrics')}</SelectItem>
+                  <SelectItem value="custom">{t('bi.reportTypes.customQuery', 'Custom Query')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <Label htmlFor="report-schedule">Schedule</Label>
+              <Label htmlFor="report-schedule">{t('bi.schedule', 'Schedule')}</Label>
               <Select
                 value={reportConfig.schedule}
                 onValueChange={(value) =>
@@ -526,10 +535,10 @@ export default function BusinessIntelligenceDashboard() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="manual">Manual (Run on demand)</SelectItem>
-                  <SelectItem value="daily">Daily</SelectItem>
-                  <SelectItem value="weekly">Weekly</SelectItem>
-                  <SelectItem value="monthly">Monthly</SelectItem>
+                  <SelectItem value="manual">{t('bi.schedules.manual', 'Manual (Run on demand)')}</SelectItem>
+                  <SelectItem value="daily">{t('bi.schedules.daily', 'Daily')}</SelectItem>
+                  <SelectItem value="weekly">{t('bi.schedules.weekly', 'Weekly')}</SelectItem>
+                  <SelectItem value="monthly">{t('bi.schedules.monthly', 'Monthly')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -540,14 +549,14 @@ export default function BusinessIntelligenceDashboard() {
               onClick={() => setCreateReportOpen(false)}
               data-testid="button-cancel-report"
             >
-              Cancel
+              {t('common.cancel', 'Cancel')}
             </Button>
             <Button
               onClick={() => createReportMutation.mutate(reportConfig)}
               disabled={!reportConfig.name || createReportMutation.isPending}
               data-testid="button-save-report"
             >
-              {createReportMutation.isPending ? "Creating..." : "Create Report"}
+              {createReportMutation.isPending ? t('bi.creating', 'Creating...') : t('bi.createReport', 'Create Report')}
             </Button>
           </DialogFooter>
         </DialogContent>

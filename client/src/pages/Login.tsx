@@ -8,8 +8,10 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import logoImage from "@assets/Logo_blue_orange_1760743036292.png";
 import { Link } from "wouter";
+import { useTranslation } from "react-i18next";
 
 export default function Login() {
+  const { t } = useTranslation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { toast } = useToast();
@@ -23,15 +25,15 @@ export default function Login() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
       toast({
-        title: "Success",
-        description: "Logged in successfully",
+        title: t('common.success', 'Success'),
+        description: t('auth.loggedInSuccessfully', 'Logged in successfully'),
       });
       window.location.href = "/";
     },
     onError: (error: Error) => {
       toast({
-        title: "Login Failed",
-        description: error.message || "Invalid email or password",
+        title: t('auth.loginFailed', 'Login Failed'),
+        description: error.message || t('auth.invalidCredentials', 'Invalid email or password'),
         variant: "destructive",
       });
     },
@@ -41,8 +43,8 @@ export default function Login() {
     e.preventDefault();
     if (!email || !password) {
       toast({
-        title: "Error",
-        description: "Please fill in all fields",
+        title: t('common.error', 'Error'),
+        description: t('auth.fillAllFields', 'Please fill in all fields'),
         variant: "destructive",
       });
       return;
@@ -57,24 +59,24 @@ export default function Login() {
           <div className="flex justify-center">
             <img 
               src={logoImage} 
-              alt="SALIS AUTO" 
+              alt={t('app.name', 'SALIS AUTO')} 
               className="w-40 h-auto"
               data-testid="logo-salis-auto"
             />
           </div>
-          <CardTitle className="text-2xl text-center font-montserrat">Sign In</CardTitle>
+          <CardTitle className="text-2xl text-center font-montserrat">{t('auth.signIn', 'Sign In')}</CardTitle>
           <CardDescription className="text-center font-poppins">
-            Enter your credentials to access your account
+            {t('auth.enterCredentials', 'Enter your credentials to access your account')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email" className="font-poppins">Email</Label>
+              <Label htmlFor="email" className="font-poppins">{t('auth.email', 'Email')}</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="your@email.com"
+                placeholder={t('auth.emailPlaceholder', 'your@email.com')}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -83,7 +85,7 @@ export default function Login() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password" className="font-poppins">Password</Label>
+              <Label htmlFor="password" className="font-poppins">{t('auth.password', 'Password')}</Label>
               <Input
                 id="password"
                 type="password"
@@ -101,12 +103,12 @@ export default function Login() {
               disabled={loginMutation.isPending}
               data-testid="login-submit"
             >
-              {loginMutation.isPending ? "Signing in..." : "Sign In"}
+              {loginMutation.isPending ? t('auth.signingIn', 'Signing in...') : t('auth.signIn', 'Sign In')}
             </Button>
             <p className="text-center text-sm font-poppins text-gray-600 dark:text-gray-400">
-              Don't have an account?{" "}
+              {t('auth.dontHaveAccount', "Don't have an account?")}{" "}
               <Link href="/register" className="text-salis-orange hover:underline" data-testid="link-register">
-                Register
+                {t('auth.register', 'Register')}
               </Link>
             </p>
           </form>

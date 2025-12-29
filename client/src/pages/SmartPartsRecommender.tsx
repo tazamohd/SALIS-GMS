@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -13,6 +14,7 @@ import { useToast } from '@/hooks/use-toast';
 import { StandardPageLayout } from '@/components/layouts';
 
 export default function SmartPartsRecommender() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [vehicleMake, setVehicleMake] = useState('');
   const [vehicleModel, setVehicleModel] = useState('');
@@ -33,14 +35,14 @@ export default function SmartPartsRecommender() {
       setRecommendations(data.recommendations || []);
       queryClient.invalidateQueries({ queryKey: ['/api/ai/parts-recommendations'] });
       toast({
-        title: 'AI Analysis Complete',
-        description: `Found ${data.recommendations?.length || 0} recommended parts using GPT-5.`,
+        title: t('smartParts.aiAnalysisComplete', 'AI Analysis Complete'),
+        description: t('smartParts.foundRecommendedParts', `Found ${data.recommendations?.length || 0} recommended parts using GPT-5.`),
       });
     },
     onError: () => {
       toast({
-        title: 'Analysis Failed',
-        description: 'Failed to get AI recommendations. Please try again.',
+        title: t('smartParts.analysisFailed', 'Analysis Failed'),
+        description: t('smartParts.failedToGetRecommendations', 'Failed to get AI recommendations. Please try again.'),
         variant: 'destructive',
       });
     },
@@ -49,8 +51,8 @@ export default function SmartPartsRecommender() {
   const handleGetRecommendations = () => {
     if (!vehicleMake || !vehicleModel || !vehicleYear || !serviceType) {
       toast({
-        title: 'Missing Information',
-        description: 'Please fill in all vehicle and service details.',
+        title: t('smartParts.missingInformation', 'Missing Information'),
+        description: t('smartParts.fillAllDetails', 'Please fill in all vehicle and service details.'),
         variant: 'destructive',
       });
       return;
@@ -80,8 +82,8 @@ export default function SmartPartsRecommender() {
 
   return (
     <StandardPageLayout
-      title="Smart Parts Recommender"
-      description="AI-powered parts recommendations using GPT-5 analysis and vehicle compatibility data"
+      title={t('smartParts.title', 'Smart Parts Recommender')}
+      description={t('smartParts.description', 'AI-powered parts recommendations using GPT-5 analysis and vehicle compatibility data')}
       icon={Brain}
     >
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -90,15 +92,15 @@ export default function SmartPartsRecommender() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-purple-600" />
-              Vehicle & Service Details
+              {t('smartParts.vehicleServiceDetails', 'Vehicle & Service Details')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="make">Vehicle Make</Label>
+              <Label htmlFor="make">{t('smartParts.vehicleMake', 'Vehicle Make')}</Label>
               <Input
                 id="make"
-                placeholder="e.g., Toyota"
+                placeholder={t('smartParts.vehicleMakePlaceholder', 'e.g., Toyota')}
                 value={vehicleMake}
                 onChange={(e) => setVehicleMake(e.target.value)}
                 data-testid="input-make"
@@ -106,10 +108,10 @@ export default function SmartPartsRecommender() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="model">Vehicle Model</Label>
+              <Label htmlFor="model">{t('smartParts.vehicleModel', 'Vehicle Model')}</Label>
               <Input
                 id="model"
-                placeholder="e.g., Camry"
+                placeholder={t('smartParts.vehicleModelPlaceholder', 'e.g., Camry')}
                 value={vehicleModel}
                 onChange={(e) => setVehicleModel(e.target.value)}
                 data-testid="input-model"
@@ -117,11 +119,11 @@ export default function SmartPartsRecommender() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="year">Year</Label>
+              <Label htmlFor="year">{t('smartParts.year', 'Year')}</Label>
               <Input
                 id="year"
                 type="number"
-                placeholder="e.g., 2020"
+                placeholder={t('smartParts.yearPlaceholder', 'e.g., 2020')}
                 value={vehicleYear}
                 onChange={(e) => setVehicleYear(e.target.value)}
                 data-testid="input-year"
@@ -129,29 +131,29 @@ export default function SmartPartsRecommender() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="service-type">Service Type</Label>
+              <Label htmlFor="service-type">{t('smartParts.serviceType', 'Service Type')}</Label>
               <Select value={serviceType} onValueChange={setServiceType}>
                 <SelectTrigger id="service-type" data-testid="select-service-type">
-                  <SelectValue placeholder="Select service type" />
+                  <SelectValue placeholder={t('smartParts.selectServiceType', 'Select service type')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="brake_service">Brake Service</SelectItem>
-                  <SelectItem value="oil_change">Oil Change</SelectItem>
-                  <SelectItem value="tire_replacement">Tire Replacement</SelectItem>
-                  <SelectItem value="engine_repair">Engine Repair</SelectItem>
-                  <SelectItem value="transmission">Transmission Service</SelectItem>
-                  <SelectItem value="electrical">Electrical Repair</SelectItem>
-                  <SelectItem value="suspension">Suspension Service</SelectItem>
-                  <SelectItem value="cooling_system">Cooling System</SelectItem>
+                  <SelectItem value="brake_service">{t('smartParts.brakeService', 'Brake Service')}</SelectItem>
+                  <SelectItem value="oil_change">{t('smartParts.oilChange', 'Oil Change')}</SelectItem>
+                  <SelectItem value="tire_replacement">{t('smartParts.tireReplacement', 'Tire Replacement')}</SelectItem>
+                  <SelectItem value="engine_repair">{t('smartParts.engineRepair', 'Engine Repair')}</SelectItem>
+                  <SelectItem value="transmission">{t('smartParts.transmissionService', 'Transmission Service')}</SelectItem>
+                  <SelectItem value="electrical">{t('smartParts.electricalRepair', 'Electrical Repair')}</SelectItem>
+                  <SelectItem value="suspension">{t('smartParts.suspensionService', 'Suspension Service')}</SelectItem>
+                  <SelectItem value="cooling_system">{t('smartParts.coolingSystem', 'Cooling System')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="symptoms">Symptoms (Optional)</Label>
+              <Label htmlFor="symptoms">{t('smartParts.symptomsOptional', 'Symptoms (Optional)')}</Label>
               <Textarea
                 id="symptoms"
-                placeholder="Describe any specific symptoms or issues..."
+                placeholder={t('smartParts.symptomsPlaceholder', 'Describe any specific symptoms or issues...')}
                 value={symptoms}
                 onChange={(e) => setSymptoms(e.target.value)}
                 rows={3}
@@ -168,12 +170,12 @@ export default function SmartPartsRecommender() {
               {getRecommendationsMutation.isPending ? (
                 <>
                   <Brain className="mr-2 h-4 w-4 animate-pulse" />
-                  AI Analyzing...
+                  {t('smartParts.aiAnalyzing', 'AI Analyzing...')}
                 </>
               ) : (
                 <>
                   <Sparkles className="mr-2 h-4 w-4" />
-                  Get AI Recommendations
+                  {t('smartParts.getAiRecommendations', 'Get AI Recommendations')}
                 </>
               )}
             </Button>
@@ -185,7 +187,7 @@ export default function SmartPartsRecommender() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Package className="h-5 w-5 text-blue-600" />
-              AI-Recommended Parts
+              {t('smartParts.aiRecommendedParts', 'AI-Recommended Parts')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -193,10 +195,10 @@ export default function SmartPartsRecommender() {
               <div className="text-center py-12">
                 <Brain className="h-16 w-16 mx-auto mb-4 text-gray-400" />
                 <p className="text-gray-500 dark:text-gray-400 mb-2">
-                  No recommendations yet
+                  {t('smartParts.noRecommendationsYet', 'No recommendations yet')}
                 </p>
                 <p className="text-sm text-gray-400 dark:text-gray-500">
-                  Enter vehicle details and click 'Get AI Recommendations' to start
+                  {t('smartParts.enterVehicleDetails', "Enter vehicle details and click 'Get AI Recommendations' to start")}
                 </p>
               </div>
             ) : (
@@ -210,14 +212,14 @@ export default function SmartPartsRecommender() {
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex-1">
                         <h3 className="font-semibold text-lg text-gray-900 dark:text-white">
-                          {rec.partName || `Part ${index + 1}`}
+                          {rec.partName || `${t('smartParts.part', 'Part')} ${index + 1}`}
                         </h3>
                         <p className="text-sm text-gray-600 dark:text-gray-400">
-                          Part #: {rec.partNumber || 'N/A'}
+                          {t('smartParts.partNumber', 'Part #')}: {rec.partNumber || t('common.notAvailable', 'N/A')}
                         </p>
                       </div>
                       <Badge className={getPriorityColor(rec.priority)}>
-                        {rec.priority || 'standard'}
+                        {rec.priority || t('smartParts.standard', 'standard')}
                       </Badge>
                     </div>
 
@@ -225,13 +227,13 @@ export default function SmartPartsRecommender() {
                       <div className="flex items-center gap-2">
                         <CheckCircle className="h-4 w-4 text-green-500" />
                         <span className="text-sm">
-                          Compatibility: <strong>{rec.compatibility || 95}%</strong>
+                          {t('smartParts.compatibility', 'Compatibility')}: <strong>{rec.compatibility || 95}%</strong>
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
                         <TrendingUp className="h-4 w-4 text-blue-500" />
                         <span className="text-sm">
-                          Est. Cost: <strong>${rec.estimatedCost || 0}</strong>
+                          {t('smartParts.estCost', 'Est. Cost')}: <strong>${rec.estimatedCost || 0}</strong>
                         </span>
                       </div>
                     </div>
@@ -239,7 +241,7 @@ export default function SmartPartsRecommender() {
                     {rec.reason && (
                       <div className="p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
                         <p className="text-xs font-semibold text-purple-900 dark:text-purple-200 mb-1">
-                          AI Reasoning:
+                          {t('smartParts.aiReasoning', 'AI Reasoning')}:
                         </p>
                         <p className="text-sm text-gray-700 dark:text-gray-300">
                           {rec.reason}
@@ -249,10 +251,10 @@ export default function SmartPartsRecommender() {
 
                     <div className="flex gap-2 mt-3">
                       <Button size="sm" variant="outline" data-testid={`button-add-${index}`}>
-                        Add to Job Card
+                        {t('smartParts.addToJobCard', 'Add to Job Card')}
                       </Button>
                       <Button size="sm" variant="ghost" data-testid={`button-check-stock-${index}`}>
-                        Check Stock
+                        {t('smartParts.checkStock', 'Check Stock')}
                       </Button>
                     </div>
                   </div>
@@ -266,23 +268,23 @@ export default function SmartPartsRecommender() {
       {/* Recent Recommendations */}
       <Card className="mt-6 bg-white dark:bg-salis-black">
         <CardHeader>
-          <CardTitle>Recent AI Recommendations</CardTitle>
+          <CardTitle>{t('smartParts.recentAiRecommendations', 'Recent AI Recommendations')}</CardTitle>
         </CardHeader>
         <CardContent>
           {(!Array.isArray(recentRecommendations) || recentRecommendations.length === 0) ? (
             <div className="text-center py-8">
-              <p className="text-gray-500 dark:text-gray-400">No recommendation history yet</p>
+              <p className="text-gray-500 dark:text-gray-400">{t('smartParts.noRecommendationHistory', 'No recommendation history yet')}</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead className="border-b">
                   <tr className="text-left">
-                    <th className="pb-3">Date</th>
-                    <th className="pb-3">Vehicle</th>
-                    <th className="pb-3">Service Type</th>
-                    <th className="pb-3">Parts Recommended</th>
-                    <th className="pb-3">Status</th>
+                    <th className="pb-3">{t('common.date', 'Date')}</th>
+                    <th className="pb-3">{t('smartParts.vehicle', 'Vehicle')}</th>
+                    <th className="pb-3">{t('smartParts.serviceType', 'Service Type')}</th>
+                    <th className="pb-3">{t('smartParts.partsRecommended', 'Parts Recommended')}</th>
+                    <th className="pb-3">{t('common.status', 'Status')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -291,7 +293,7 @@ export default function SmartPartsRecommender() {
                       <td className="py-3">{new Date(rec.createdAt).toLocaleDateString()}</td>
                       <td className="py-3">{rec.vehicleYear} {rec.vehicleMake} {rec.vehicleModel}</td>
                       <td className="py-3">{rec.serviceType}</td>
-                      <td className="py-3">{rec.recommendedParts?.length || 0} parts</td>
+                      <td className="py-3">{rec.recommendedParts?.length || 0} {t('smartParts.parts', 'parts')}</td>
                       <td className="py-3">
                         <Badge variant="outline">{rec.status}</Badge>
                       </td>

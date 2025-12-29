@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { StandardTablePage } from "@/components/layouts";
 import { Smartphone, Plus, Trash2, Edit, Shield, Battery, Wifi } from "lucide-react";
@@ -33,6 +34,7 @@ type Device = {
 };
 
 export default function MobileDeviceManagement() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [selectedDevice, setSelectedDevice] = useState<Device | null>(null);
@@ -60,8 +62,8 @@ export default function MobileDeviceManagement() {
       setIsCreateOpen(false);
       form.reset();
       toast({
-        title: "Success",
-        description: "Device created successfully",
+        title: t('common.success', 'Success'),
+        description: t('mdm.deviceCreated', 'Device created successfully'),
       });
     },
   });
@@ -73,8 +75,8 @@ export default function MobileDeviceManagement() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/mobile-devices"] });
       toast({
-        title: "Success",
-        description: "Device deleted successfully",
+        title: t('common.success', 'Success'),
+        description: t('mdm.deviceDeleted', 'Device deleted successfully'),
       });
     },
   });
@@ -82,7 +84,7 @@ export default function MobileDeviceManagement() {
   const columns: Column<Device>[] = [
     {
       key: "deviceName",
-      label: "Device Name",
+      label: t('mdm.deviceName', 'Device Name'),
       render: (device) => (
         <div className="flex items-center gap-2">
           <Smartphone className="h-4 w-4 text-primary" />
@@ -92,21 +94,23 @@ export default function MobileDeviceManagement() {
     },
     {
       key: "deviceType",
-      label: "Type",
+      label: t('common.type', 'Type'),
       render: (device) => (
         <Badge variant="outline" className="capitalize">
-          {device.deviceType}
+          {device.deviceType === 'tablet' ? t('mdm.tablet', 'Tablet') : 
+           device.deviceType === 'phone' ? t('mdm.phone', 'Phone') : 
+           t('mdm.scanner', 'Scanner')}
         </Badge>
       ),
     },
     {
       key: "assignedTo",
-      label: "Assigned To",
-      render: (device) => device.assignedTo || "Unassigned",
+      label: t('mdm.assignedTo', 'Assigned To'),
+      render: (device) => device.assignedTo || t('mdm.unassigned', 'Unassigned'),
     },
     {
       key: "status",
-      label: "Status",
+      label: t('common.status', 'Status'),
       render: (device) => (
         <Badge
           className={
@@ -117,13 +121,15 @@ export default function MobileDeviceManagement() {
               : "bg-gray-100 text-gray-700 dark:bg-gray-900/30"
           }
         >
-          {device.status}
+          {device.status === 'active' ? t('common.active', 'Active') : 
+           device.status === 'maintenance' ? t('mdm.maintenance', 'Maintenance') : 
+           t('common.inactive', 'Inactive')}
         </Badge>
       ),
     },
     {
       key: "batteryLevel",
-      label: "Battery",
+      label: t('mdm.battery', 'Battery'),
       render: (device) =>
         device.batteryLevel ? (
           <div className="flex items-center gap-2">
@@ -131,12 +137,12 @@ export default function MobileDeviceManagement() {
             <span>{device.batteryLevel}%</span>
           </div>
         ) : (
-          "N/A"
+          t('drone.na', 'N/A')
         ),
     },
     {
       key: "actions",
-      label: "Actions",
+      label: t('common.actions', 'Actions'),
       render: (device) => (
         <div className="flex gap-2">
           <Button
@@ -163,27 +169,27 @@ export default function MobileDeviceManagement() {
   return (
     <>
       <StandardTablePage
-        title="Mobile Device Management"
-        description="Manage tablets, phones, and scanners used by technicians"
+        title={t('mdm.title', 'Mobile Device Management')}
+        description={t('mdm.description', 'Manage tablets, phones, and scanners used by technicians')}
         icon={Smartphone}
         data={devices}
         isLoading={isLoading}
         columns={columns}
-        searchPlaceholder="Search devices..."
+        searchPlaceholder={t('mdm.searchDevices', 'Search devices...')}
         actions={[
           {
-            label: "Add Device",
+            label: t('mdm.addDevice', 'Add Device'),
             onClick: () => setIsCreateOpen(true),
             icon: Plus,
           },
         ]}
         emptyState={{
           icon: Smartphone,
-          title: "No devices found",
-          description: "Add your first mobile device to get started",
+          title: t('mdm.noDevicesFound', 'No devices found'),
+          description: t('mdm.addFirstDevice', 'Add your first mobile device to get started'),
           actions: [
             {
-              label: "Add Device",
+              label: t('mdm.addDevice', 'Add Device'),
               onClick: () => setIsCreateOpen(true),
               icon: Plus,
             },
@@ -194,8 +200,8 @@ export default function MobileDeviceManagement() {
       <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Add New Device</DialogTitle>
-            <DialogDescription>Register a new mobile device</DialogDescription>
+            <DialogTitle>{t('mdm.addNewDevice', 'Add New Device')}</DialogTitle>
+            <DialogDescription>{t('mdm.registerNewDevice', 'Register a new mobile device')}</DialogDescription>
           </DialogHeader>
           <Form {...form}>
             <form onSubmit={form.handleSubmit((data) => createDeviceMutation.mutate(data))} className="space-y-4">
@@ -204,7 +210,7 @@ export default function MobileDeviceManagement() {
                 name="deviceName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Device Name</FormLabel>
+                    <FormLabel>{t('mdm.deviceName', 'Device Name')}</FormLabel>
                     <FormControl>
                       <Input {...field} placeholder="Tablet-001" data-testid="input-device-name" />
                     </FormControl>
@@ -217,7 +223,7 @@ export default function MobileDeviceManagement() {
                 name="deviceType"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Device Type</FormLabel>
+                    <FormLabel>{t('mdm.deviceType', 'Device Type')}</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger data-testid="select-device-type">
@@ -225,9 +231,9 @@ export default function MobileDeviceManagement() {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="tablet">Tablet</SelectItem>
-                        <SelectItem value="phone">Phone</SelectItem>
-                        <SelectItem value="scanner">Scanner</SelectItem>
+                        <SelectItem value="tablet">{t('mdm.tablet', 'Tablet')}</SelectItem>
+                        <SelectItem value="phone">{t('mdm.phone', 'Phone')}</SelectItem>
+                        <SelectItem value="scanner">{t('mdm.scanner', 'Scanner')}</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -239,9 +245,9 @@ export default function MobileDeviceManagement() {
                 name="assignedTo"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Assigned To</FormLabel>
+                    <FormLabel>{t('mdm.assignedTo', 'Assigned To')}</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="Technician name" data-testid="input-assigned-to" />
+                      <Input {...field} placeholder={t('mdm.technicianName', 'Technician name')} data-testid="input-assigned-to" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -252,7 +258,7 @@ export default function MobileDeviceManagement() {
                 name="status"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Status</FormLabel>
+                    <FormLabel>{t('common.status', 'Status')}</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger data-testid="select-status">
@@ -260,9 +266,9 @@ export default function MobileDeviceManagement() {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="active">Active</SelectItem>
-                        <SelectItem value="inactive">Inactive</SelectItem>
-                        <SelectItem value="maintenance">Maintenance</SelectItem>
+                        <SelectItem value="active">{t('common.active', 'Active')}</SelectItem>
+                        <SelectItem value="inactive">{t('common.inactive', 'Inactive')}</SelectItem>
+                        <SelectItem value="maintenance">{t('mdm.maintenance', 'Maintenance')}</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -271,10 +277,10 @@ export default function MobileDeviceManagement() {
               />
               <div className="flex justify-end gap-2">
                 <Button type="button" variant="outline" onClick={() => setIsCreateOpen(false)} data-testid="button-cancel">
-                  Cancel
+                  {t('common.cancel', 'Cancel')}
                 </Button>
                 <Button type="submit" data-testid="button-submit">
-                  Add Device
+                  {t('mdm.addDevice', 'Add Device')}
                 </Button>
               </div>
             </form>

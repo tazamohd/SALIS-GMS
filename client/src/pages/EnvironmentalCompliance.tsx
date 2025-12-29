@@ -1,4 +1,5 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { DashboardPage } from "@/components/layouts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,6 +9,7 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Leaf, Droplet, Battery, Recycle } from "lucide-react";
 
 export default function EnvironmentalCompliance() {
+  const { t } = useTranslation();
   const { toast } = useToast();
 
   const { data: records = [], isLoading: recordsLoading } = useQuery<any[]>({
@@ -35,32 +37,32 @@ export default function EnvironmentalCompliance() {
     },
     onSuccess: () => {
       toast({
-        title: "Record Created",
-        description: "Environmental compliance record created successfully",
+        title: t('environmental.recordCreated', 'Record Created'),
+        description: t('environmental.recordCreatedSuccess', 'Environmental compliance record created successfully'),
       });
       queryClient.invalidateQueries({ queryKey: ['/api/compliance/environmental'] });
       queryClient.invalidateQueries({ queryKey: ['/api/compliance/environmental/analytics'] });
     },
     onError: (error: any) => {
       toast({
-        title: "Creation Failed",
-        description: error.message || "Failed to create compliance record",
+        title: t('environmental.creationFailed', 'Creation Failed'),
+        description: error.message || t('environmental.failedToCreateRecord', 'Failed to create compliance record'),
         variant: "destructive",
       });
     },
   });
 
   const metrics = [
-    { label: "Total This Month", value: stats.totalDisposals, icon: Leaf, color: "text-green-600" },
-    { label: "Compliance Rate", value: `${stats.complianceRate}%`, icon: Droplet, color: "text-blue-600" },
-    { label: "Disposal Costs", value: `$${Math.round(stats.thisMonthCost)}`, icon: Battery, color: "text-yellow-600" },
-    { label: "Recycling Rate", value: `${stats.recyclingRate}%`, icon: Recycle, color: "text-purple-600" },
+    { label: t('environmental.totalThisMonth', 'Total This Month'), value: stats.totalDisposals, icon: Leaf, color: "text-green-600" },
+    { label: t('environmental.complianceRate', 'Compliance Rate'), value: `${stats.complianceRate}%`, icon: Droplet, color: "text-blue-600" },
+    { label: t('environmental.disposalCosts', 'Disposal Costs'), value: `$${Math.round(stats.thisMonthCost)}`, icon: Battery, color: "text-yellow-600" },
+    { label: t('environmental.recyclingRate', 'Recycling Rate'), value: `${stats.recyclingRate}%`, icon: Recycle, color: "text-purple-600" },
   ];
 
   return (
     <DashboardPage
-      title="🌱 Environmental Compliance"
-      description="Track waste disposal and environmental compliance"
+      title={t('environmental.environmentalCompliance', 'Environmental Compliance')}
+      description={t('environmental.description', 'Track waste disposal and environmental compliance')}
       icon={Leaf}
       metrics={metrics}
     >
@@ -82,18 +84,18 @@ export default function EnvironmentalCompliance() {
         data-testid="button-add-record"
         className="mb-6"
       >
-        {createRecordMutation.isPending ? "Adding..." : "Add Disposal Record"}
+        {createRecordMutation.isPending ? t('environmental.adding', 'Adding...') : t('environmental.addDisposalRecord', 'Add Disposal Record')}
       </Button>
 
       <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
         <CardHeader>
-          <CardTitle>Recent Disposal Records</CardTitle>
+          <CardTitle>{t('environmental.recentDisposalRecords', 'Recent Disposal Records')}</CardTitle>
         </CardHeader>
         <CardContent>
           {recordsLoading ? (
-            <div className="text-center py-8 text-gray-500">Loading records...</div>
+            <div className="text-center py-8 text-gray-500">{t('environmental.loadingRecords', 'Loading records...')}</div>
           ) : records.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">No disposal records found</div>
+            <div className="text-center py-8 text-gray-500">{t('environmental.noDisposalRecordsFound', 'No disposal records found')}</div>
           ) : (
             <div className="space-y-3">
               {records.map((record) => (

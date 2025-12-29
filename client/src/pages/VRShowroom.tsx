@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { StandardPageLayout } from "@/components/layouts";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,6 +10,7 @@ import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
 
 export default function VRShowroom() {
+  const { t } = useTranslation();
   const [isPlaying, setIsPlaying] = useState(false);
   const [rotation, setRotation] = useState([0]);
   const [zoom, setZoom] = useState([1]);
@@ -17,28 +19,28 @@ export default function VRShowroom() {
     {
       id: 1,
       name: "2024 Toyota Camry",
-      category: "Sedan",
-      color: "Silver",
+      category: t('vrShowroom.sedan', 'Sedan'),
+      color: t('vrShowroom.silver', 'Silver'),
       price: "$28,500",
-      features: ["Hybrid Engine", "Leather Seats", "Sunroof"],
+      features: [t('vrShowroom.hybridEngine', 'Hybrid Engine'), t('vrShowroom.leatherSeats', 'Leather Seats'), t('vrShowroom.sunroof', 'Sunroof')],
       status: "available"
     },
     {
       id: 2,
       name: "2024 Honda CR-V",
-      category: "SUV",
-      color: "Blue",
+      category: t('vrShowroom.suv', 'SUV'),
+      color: t('vrShowroom.blue', 'Blue'),
       price: "$32,000",
-      features: ["AWD", "Panoramic Roof", "Advanced Safety"],
+      features: [t('vrShowroom.awd', 'AWD'), t('vrShowroom.panoramicRoof', 'Panoramic Roof'), t('vrShowroom.advancedSafety', 'Advanced Safety')],
       status: "available"
     },
     {
       id: 3,
       name: "2024 Ford F-150",
-      category: "Truck",
-      color: "Black",
+      category: t('vrShowroom.truck', 'Truck'),
+      color: t('vrShowroom.black', 'Black'),
       price: "$45,000",
-      features: ["4WD", "Towing Package", "Extended Cab"],
+      features: [t('vrShowroom.fourWD', '4WD'), t('vrShowroom.towingPackage', 'Towing Package'), t('vrShowroom.extendedCab', 'Extended Cab')],
       status: "available"
     },
   ];
@@ -46,21 +48,20 @@ export default function VRShowroom() {
   const [selectedVehicle, setSelectedVehicle] = useState(vehicles[0]);
 
   const viewModes = [
-    { id: "exterior", label: "Exterior", icon: RotateCw },
-    { id: "interior", label: "Interior", icon: Maximize },
-    { id: "details", label: "Details", icon: Info },
+    { id: "exterior", label: t('vrShowroom.exterior', 'Exterior'), icon: RotateCw },
+    { id: "interior", label: t('vrShowroom.interior', 'Interior'), icon: Maximize },
+    { id: "details", label: t('common.details', 'Details'), icon: Info },
   ];
 
   const [viewMode, setViewMode] = useState("exterior");
 
   return (
     <StandardPageLayout
-      title="VR Showroom"
-      description="Interactive virtual reality vehicle showroom"
+      title={t('vrShowroom.title', 'VR Showroom')}
+      description={t('vrShowroom.description', 'Interactive virtual reality vehicle showroom')}
       icon={Glasses}
     >
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* VR Viewer */}
         <div className="lg:col-span-2 space-y-6">
           <Card>
             <CardHeader>
@@ -75,20 +76,18 @@ export default function VRShowroom() {
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
-              {/* VR Viewport */}
               <div className="relative aspect-video bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 rounded-lg flex items-center justify-center">
                 <div className="text-center">
                   <Glasses className="w-16 h-16 mx-auto mb-4 text-gray-400 dark:text-gray-600" />
                   <p className="text-lg font-medium text-gray-700 dark:text-gray-300">
-                    3D Model Viewer
+                    {t('vrShowroom.3dModelViewer', '3D Model Viewer')}
                   </p>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Interactive 360° view
+                    {t('vrShowroom.interactive360View', 'Interactive 360° view')}
                   </p>
                 </div>
               </div>
 
-              {/* View Controls */}
               <Tabs value={viewMode} onValueChange={setViewMode}>
                 <TabsList className="grid w-full grid-cols-3">
                   {viewModes.map(mode => (
@@ -100,7 +99,6 @@ export default function VRShowroom() {
                 </TabsList>
               </Tabs>
 
-              {/* Playback Controls */}
               <div className="flex items-center justify-center gap-4">
                 <Button
                   variant="outline"
@@ -128,9 +126,8 @@ export default function VRShowroom() {
                 </Button>
               </div>
 
-              {/* Rotation Slider */}
               <div className="space-y-2">
-                <Label>Rotation</Label>
+                <Label>{t('vrShowroom.rotation', 'Rotation')}</Label>
                 <Slider
                   value={rotation}
                   onValueChange={setRotation}
@@ -141,9 +138,8 @@ export default function VRShowroom() {
                 <p className="text-sm text-gray-600 dark:text-gray-400">{rotation[0]}°</p>
               </div>
 
-              {/* Zoom Slider */}
               <div className="space-y-2">
-                <Label>Zoom</Label>
+                <Label>{t('vrShowroom.zoom', 'Zoom')}</Label>
                 <Slider
                   value={zoom}
                   onValueChange={setZoom}
@@ -157,10 +153,9 @@ export default function VRShowroom() {
             </CardContent>
           </Card>
 
-          {/* Vehicle Features */}
           <Card>
             <CardHeader>
-              <CardTitle>Features & Specifications</CardTitle>
+              <CardTitle>{t('vrShowroom.featuresAndSpecs', 'Features & Specifications')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -179,12 +174,11 @@ export default function VRShowroom() {
           </Card>
         </div>
 
-        {/* Vehicle List Sidebar */}
         <div className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Available Vehicles</CardTitle>
-              <CardDescription>Select a vehicle to view</CardDescription>
+              <CardTitle>{t('vrShowroom.availableVehicles', 'Available Vehicles')}</CardTitle>
+              <CardDescription>{t('vrShowroom.selectVehicleToView', 'Select a vehicle to view')}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
@@ -205,7 +199,7 @@ export default function VRShowroom() {
                         <p className="text-sm text-gray-600 dark:text-gray-400">{vehicle.category}</p>
                       </div>
                       <Badge className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 border-0">
-                        {vehicle.status}
+                        {t('vrShowroom.available', 'available')}
                       </Badge>
                     </div>
                     <div className="flex items-center justify-between">
@@ -218,54 +212,52 @@ export default function VRShowroom() {
             </CardContent>
           </Card>
 
-          {/* VR Equipment */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Glasses className="w-5 h-5" />
-                VR Equipment
+                {t('vrShowroom.vrEquipment', 'VR Equipment')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600 dark:text-gray-400">Headset Status</span>
+                <span className="text-sm text-gray-600 dark:text-gray-400">{t('vrShowroom.headsetStatus', 'Headset Status')}</span>
                 <Badge className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 border-0">
-                  Connected
+                  {t('vrShowroom.connected', 'Connected')}
                 </Badge>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600 dark:text-gray-400">Controllers</span>
+                <span className="text-sm text-gray-600 dark:text-gray-400">{t('vrShowroom.controllers', 'Controllers')}</span>
                 <Badge className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 border-0">
-                  2 Active
+                  {t('vrShowroom.twoActive', '2 Active')}
                 </Badge>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600 dark:text-gray-400">Tracking</span>
+                <span className="text-sm text-gray-600 dark:text-gray-400">{t('vrShowroom.tracking', 'Tracking')}</span>
                 <Badge className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 border-0">
-                  Optimal
+                  {t('vrShowroom.optimal', 'Optimal')}
                 </Badge>
               </div>
               <Button className="w-full" variant="outline" data-testid="button-launch-vr">
                 <Glasses className="w-4 h-4 mr-2" />
-                Launch VR Mode
+                {t('vrShowroom.launchVRMode', 'Launch VR Mode')}
               </Button>
             </CardContent>
           </Card>
 
-          {/* Actions */}
           <Card>
             <CardHeader>
-              <CardTitle>Actions</CardTitle>
+              <CardTitle>{t('common.actions', 'Actions')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
               <Button className="w-full" data-testid="button-schedule">
-                Schedule Test Drive
+                {t('vrShowroom.scheduleTestDrive', 'Schedule Test Drive')}
               </Button>
               <Button className="w-full" variant="outline" data-testid="button-share">
-                Share VR Experience
+                {t('vrShowroom.shareVRExperience', 'Share VR Experience')}
               </Button>
               <Button className="w-full" variant="outline" data-testid="button-save">
-                Save to Favorites
+                {t('vrShowroom.saveToFavorites', 'Save to Favorites')}
               </Button>
             </CardContent>
           </Card>

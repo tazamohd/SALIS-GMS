@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Link } from "wouter";
+import { useTranslation } from "react-i18next";
 import { TabsPageLayout } from "@/components/layouts/TabsPageLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -126,6 +127,7 @@ const dividendHistory = [
 ];
 
 export default function EquityManagement() {
+  const { t } = useTranslation();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
 
   const form = useForm<CapitalFormData>({
@@ -159,7 +161,7 @@ export default function EquityManagement() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card data-testid="card-total-equity">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Total Equity</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t('equity.totalEquity', 'Total Equity')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-600">
@@ -167,42 +169,42 @@ export default function EquityManagement() {
             </div>
             <div className="flex items-center text-xs text-green-600 mt-1">
               <ArrowUpRight className="h-3 w-3 mr-1" />
-              +5.4% from last year
+              {t('equity.fromLastYear', '+5.4% from last year')}
             </div>
           </CardContent>
         </Card>
 
         <Card data-testid="card-share-capital">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Share Capital</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t('equity.shareCapital', 'Share Capital')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-blue-600">
               SAR {shareCapital.toLocaleString()}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">رأس المال</p>
+            <p className="text-xs text-muted-foreground mt-1">{t('equity.shareCapitalAr', 'رأس المال')}</p>
           </CardContent>
         </Card>
 
         <Card data-testid="card-retained-earnings">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Retained Earnings</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t('equity.retainedEarnings', 'Retained Earnings')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-purple-600">
               SAR {retainedEarnings.toLocaleString()}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">الأرباح المحتجزة</p>
+            <p className="text-xs text-muted-foreground mt-1">{t('equity.retainedEarningsAr', 'الأرباح المحتجزة')}</p>
           </CardContent>
         </Card>
 
         <Card data-testid="card-roe">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Return on Equity</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t('equity.returnOnEquity', 'Return on Equity')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">15.2%</div>
-            <p className="text-xs text-green-600 mt-1">العائد على حقوق الملكية</p>
+            <p className="text-xs text-green-600 mt-1">{t('equity.returnOnEquityAr', 'العائد على حقوق الملكية')}</p>
           </CardContent>
         </Card>
       </div>
@@ -210,14 +212,14 @@ export default function EquityManagement() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
-            <CardTitle>Equity Composition</CardTitle>
-            <CardDescription>تكوين حقوق الملكية</CardDescription>
+            <CardTitle>{t('equity.equityComposition', 'Equity Composition')}</CardTitle>
+            <CardDescription>{t('equity.equityCompositionAr', 'تكوين حقوق الملكية')}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               <div data-testid="bar-share-capital">
                 <div className="flex justify-between mb-1">
-                  <span className="text-sm font-medium">Share Capital</span>
+                  <span className="text-sm font-medium">{t('equity.shareCapital', 'Share Capital')}</span>
                   <span className="text-sm text-muted-foreground">
                     SAR {shareCapital.toLocaleString()} ({Math.round((shareCapital / totalEquity) * 100)}%)
                   </span>
@@ -226,7 +228,7 @@ export default function EquityManagement() {
               </div>
               <div data-testid="bar-retained-earnings">
                 <div className="flex justify-between mb-1">
-                  <span className="text-sm font-medium">Retained Earnings</span>
+                  <span className="text-sm font-medium">{t('equity.retainedEarnings', 'Retained Earnings')}</span>
                   <span className="text-sm text-muted-foreground">
                     SAR {retainedEarnings.toLocaleString()} ({Math.round((retainedEarnings / totalEquity) * 100)}%)
                   </span>
@@ -239,8 +241,8 @@ export default function EquityManagement() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Equity Growth Trend</CardTitle>
-            <CardDescription>اتجاه نمو حقوق الملكية - Last 6 years</CardDescription>
+            <CardTitle>{t('equity.equityGrowthTrend', 'Equity Growth Trend')}</CardTitle>
+            <CardDescription>{t('equity.equityGrowthTrendDesc', 'اتجاه نمو حقوق الملكية - Last 6 years')}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
@@ -260,30 +262,30 @@ export default function EquityManagement() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Key Financial Ratios</CardTitle>
-          <CardDescription>النسب المالية الرئيسية</CardDescription>
+          <CardTitle>{t('equity.keyFinancialRatios', 'Key Financial Ratios')}</CardTitle>
+          <CardDescription>{t('equity.keyFinancialRatiosAr', 'النسب المالية الرئيسية')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="p-4 border rounded-lg text-center" data-testid="card-ratio-equity">
               <Scale className="h-8 w-8 mx-auto text-blue-600 mb-2" />
               <p className="text-2xl font-bold">0.65</p>
-              <p className="text-sm text-muted-foreground">Debt to Equity</p>
+              <p className="text-sm text-muted-foreground">{t('equity.debtToEquity', 'Debt to Equity')}</p>
             </div>
             <div className="p-4 border rounded-lg text-center" data-testid="card-ratio-roe">
               <TrendingUp className="h-8 w-8 mx-auto text-green-600 mb-2" />
               <p className="text-2xl font-bold">15.2%</p>
-              <p className="text-sm text-muted-foreground">Return on Equity</p>
+              <p className="text-sm text-muted-foreground">{t('equity.returnOnEquity', 'Return on Equity')}</p>
             </div>
             <div className="p-4 border rounded-lg text-center" data-testid="card-ratio-book">
               <Coins className="h-8 w-8 mx-auto text-purple-600 mb-2" />
               <p className="text-2xl font-bold">SAR 1,765</p>
-              <p className="text-sm text-muted-foreground">Book Value/Share</p>
+              <p className="text-sm text-muted-foreground">{t('equity.bookValuePerShare', 'Book Value/Share')}</p>
             </div>
             <div className="p-4 border rounded-lg text-center" data-testid="card-ratio-payout">
               <Award className="h-8 w-8 mx-auto text-orange-600 mb-2" />
               <p className="text-2xl font-bold">23.5%</p>
-              <p className="text-sm text-muted-foreground">Dividend Payout</p>
+              <p className="text-sm text-muted-foreground">{t('equity.dividendPayout', 'Dividend Payout')}</p>
             </div>
           </div>
         </CardContent>
@@ -291,8 +293,8 @@ export default function EquityManagement() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Related Equity Modules</CardTitle>
-          <CardDescription>وحدات حقوق الملكية ذات الصلة - Quick access to equity sub-categories</CardDescription>
+          <CardTitle>{t('equity.relatedEquityModules', 'Related Equity Modules')}</CardTitle>
+          <CardDescription>{t('equity.relatedEquityModulesDesc', 'وحدات حقوق الملكية ذات الصلة - Quick access to equity sub-categories')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -303,11 +305,11 @@ export default function EquityManagement() {
                     <Landmark className="h-8 w-8 text-blue-600" />
                     <ExternalLink className="h-4 w-4 text-muted-foreground" />
                   </div>
-                  <CardTitle className="text-lg">Capital Management</CardTitle>
-                  <CardDescription>رأس المال</CardDescription>
+                  <CardTitle className="text-lg">{t('equity.capitalManagement', 'Capital Management')}</CardTitle>
+                  <CardDescription>{t('equity.capitalManagementAr', 'رأس المال')}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm text-muted-foreground">Manage share capital, ownership structure, and capital contributions</p>
+                  <p className="text-sm text-muted-foreground">{t('equity.capitalManagementDesc', 'Manage share capital, ownership structure, and capital contributions')}</p>
                 </CardContent>
               </Card>
             </Link>
@@ -319,11 +321,11 @@ export default function EquityManagement() {
                     <Users className="h-8 w-8 text-green-600" />
                     <ExternalLink className="h-4 w-4 text-muted-foreground" />
                   </div>
-                  <CardTitle className="text-lg">Partners Account</CardTitle>
-                  <CardDescription>جاري الشركاء</CardDescription>
+                  <CardTitle className="text-lg">{t('equity.partnersAccount', 'Partners Account')}</CardTitle>
+                  <CardDescription>{t('equity.partnersAccountAr', 'جاري الشركاء')}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm text-muted-foreground">Track partner balances, transactions, and withdrawals</p>
+                  <p className="text-sm text-muted-foreground">{t('equity.partnersAccountDesc', 'Track partner balances, transactions, and withdrawals')}</p>
                 </CardContent>
               </Card>
             </Link>
@@ -335,11 +337,11 @@ export default function EquityManagement() {
                     <PiggyBank className="h-8 w-8 text-purple-600" />
                     <ExternalLink className="h-4 w-4 text-muted-foreground" />
                   </div>
-                  <CardTitle className="text-lg">Retained Earnings</CardTitle>
-                  <CardDescription>الاحتياطات والأرباح</CardDescription>
+                  <CardTitle className="text-lg">{t('equity.retainedEarnings', 'Retained Earnings')}</CardTitle>
+                  <CardDescription>{t('equity.retainedEarningsLinkAr', 'الاحتياطات والأرباح')}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm text-muted-foreground">Manage profit reserves, distributions, and retained earnings</p>
+                  <p className="text-sm text-muted-foreground">{t('equity.retainedEarningsDesc', 'Manage profit reserves, distributions, and retained earnings')}</p>
                 </CardContent>
               </Card>
             </Link>
@@ -355,20 +357,20 @@ export default function EquityManagement() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>Capital Structure</CardTitle>
-              <CardDescription>هيكل رأس المال - Owner's investments and equity</CardDescription>
+              <CardTitle>{t('equity.capitalStructure', 'Capital Structure')}</CardTitle>
+              <CardDescription>{t('equity.capitalStructureDesc', 'هيكل رأس المال - Owner\'s investments and equity')}</CardDescription>
             </div>
             <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
               <DialogTrigger asChild>
                 <Button data-testid="button-add-capital">
                   <Plus className="h-4 w-4 mr-2" />
-                  Add Entry
+                  {t('equity.addEntry', 'Add Entry')}
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-2xl" data-testid="modal-add-capital">
                 <DialogHeader>
-                  <DialogTitle>Add Capital Entry</DialogTitle>
-                  <DialogDescription>إضافة قيد رأس المال</DialogDescription>
+                  <DialogTitle>{t('equity.addCapitalEntry', 'Add Capital Entry')}</DialogTitle>
+                  <DialogDescription>{t('equity.addCapitalEntryAr', 'إضافة قيد رأس المال')}</DialogDescription>
                 </DialogHeader>
                 <Form {...form}>
                   <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -378,19 +380,19 @@ export default function EquityManagement() {
                         name="type"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Type</FormLabel>
+                            <FormLabel>{t('common.type', 'Type')}</FormLabel>
                             <Select onValueChange={field.onChange} value={field.value}>
                               <FormControl>
                                 <SelectTrigger data-testid="select-type">
-                                  <SelectValue placeholder="Select type" />
+                                  <SelectValue placeholder={t('equity.selectType', 'Select type')} />
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                <SelectItem value="Share Capital">Share Capital</SelectItem>
-                                <SelectItem value="Additional Capital">Additional Capital</SelectItem>
-                                <SelectItem value="Capital Withdrawal">Capital Withdrawal</SelectItem>
-                                <SelectItem value="Retained Earnings">Retained Earnings</SelectItem>
-                                <SelectItem value="Dividend Distribution">Dividend Distribution</SelectItem>
+                                <SelectItem value="Share Capital">{t('equity.shareCapital', 'Share Capital')}</SelectItem>
+                                <SelectItem value="Additional Capital">{t('equity.additionalCapital', 'Additional Capital')}</SelectItem>
+                                <SelectItem value="Capital Withdrawal">{t('equity.capitalWithdrawal', 'Capital Withdrawal')}</SelectItem>
+                                <SelectItem value="Retained Earnings">{t('equity.retainedEarnings', 'Retained Earnings')}</SelectItem>
+                                <SelectItem value="Dividend Distribution">{t('equity.dividendDistribution', 'Dividend Distribution')}</SelectItem>
                               </SelectContent>
                             </Select>
                             <FormMessage />
@@ -402,7 +404,7 @@ export default function EquityManagement() {
                         name="amount"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Amount (SAR)</FormLabel>
+                            <FormLabel>{t('equity.amountSAR', 'Amount (SAR)')}</FormLabel>
                             <FormControl>
                               <Input {...field} type="number" placeholder="0.00" data-testid="input-amount" />
                             </FormControl>
@@ -415,9 +417,9 @@ export default function EquityManagement() {
                         name="description"
                         render={({ field }) => (
                           <FormItem className="col-span-2">
-                            <FormLabel>Description</FormLabel>
+                            <FormLabel>{t('common.description', 'Description')}</FormLabel>
                             <FormControl>
-                              <Input {...field} placeholder="Enter description" data-testid="input-description" />
+                              <Input {...field} placeholder={t('equity.enterDescription', 'Enter description')} data-testid="input-description" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -428,7 +430,7 @@ export default function EquityManagement() {
                         name="date"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Date</FormLabel>
+                            <FormLabel>{t('common.date', 'Date')}</FormLabel>
                             <FormControl>
                               <Input {...field} type="date" data-testid="input-date" />
                             </FormControl>
@@ -441,9 +443,9 @@ export default function EquityManagement() {
                         name="investor"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Investor/Owner</FormLabel>
+                            <FormLabel>{t('equity.investorOwner', 'Investor/Owner')}</FormLabel>
                             <FormControl>
-                              <Input {...field} placeholder="Optional" data-testid="input-investor" />
+                              <Input {...field} placeholder={t('common.optional', 'Optional')} data-testid="input-investor" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -454,9 +456,9 @@ export default function EquityManagement() {
                         name="notes"
                         render={({ field }) => (
                           <FormItem className="col-span-2">
-                            <FormLabel>Notes</FormLabel>
+                            <FormLabel>{t('common.notes', 'Notes')}</FormLabel>
                             <FormControl>
-                              <Textarea {...field} placeholder="Additional notes" data-testid="input-notes" />
+                              <Textarea {...field} placeholder={t('equity.additionalNotes', 'Additional notes')} data-testid="input-notes" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -465,9 +467,9 @@ export default function EquityManagement() {
                     </div>
                     <div className="flex justify-end gap-2">
                       <Button type="button" variant="outline" onClick={() => setIsAddDialogOpen(false)}>
-                        Cancel
+                        {t('common.cancel', 'Cancel')}
                       </Button>
-                      <Button type="submit" data-testid="button-save-capital">Save Entry</Button>
+                      <Button type="submit" data-testid="button-save-capital">{t('equity.saveEntry', 'Save Entry')}</Button>
                     </div>
                   </form>
                 </Form>
@@ -479,11 +481,11 @@ export default function EquityManagement() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Type</TableHead>
-                <TableHead>Description</TableHead>
-                <TableHead>Investor/Owner</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>Amount</TableHead>
+                <TableHead>{t('common.type', 'Type')}</TableHead>
+                <TableHead>{t('common.description', 'Description')}</TableHead>
+                <TableHead>{t('equity.investorOwner', 'Investor/Owner')}</TableHead>
+                <TableHead>{t('common.date', 'Date')}</TableHead>
+                <TableHead>{t('common.amount', 'Amount')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -512,40 +514,40 @@ export default function EquityManagement() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Users className="h-5 w-5 text-blue-600" />
-              Ownership Structure
+              {t('equity.ownershipStructure', 'Ownership Structure')}
             </CardTitle>
-            <CardDescription>هيكل الملكية</CardDescription>
+            <CardDescription>{t('equity.ownershipStructureAr', 'هيكل الملكية')}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               <div className="flex items-center justify-between p-3 border rounded-lg" data-testid="card-owner-1">
                 <div>
                   <p className="font-medium">Mohammed Al-Salem</p>
-                  <p className="text-sm text-muted-foreground">Founder & CEO</p>
+                  <p className="text-sm text-muted-foreground">{t('equity.founderCEO', 'Founder & CEO')}</p>
                 </div>
                 <div className="text-right">
                   <p className="font-bold">60%</p>
-                  <p className="text-sm text-muted-foreground">1,200 shares</p>
+                  <p className="text-sm text-muted-foreground">{t('equity.shares', '1,200 shares')}</p>
                 </div>
               </div>
               <div className="flex items-center justify-between p-3 border rounded-lg" data-testid="card-owner-2">
                 <div>
                   <p className="font-medium">Ahmed Al-Salem</p>
-                  <p className="text-sm text-muted-foreground">Co-owner</p>
+                  <p className="text-sm text-muted-foreground">{t('equity.coOwner', 'Co-owner')}</p>
                 </div>
                 <div className="text-right">
                   <p className="font-bold">25%</p>
-                  <p className="text-sm text-muted-foreground">500 shares</p>
+                  <p className="text-sm text-muted-foreground">{t('equity.shares500', '500 shares')}</p>
                 </div>
               </div>
               <div className="flex items-center justify-between p-3 border rounded-lg" data-testid="card-owner-3">
                 <div>
                   <p className="font-medium">Fatima Al-Salem</p>
-                  <p className="text-sm text-muted-foreground">Co-owner</p>
+                  <p className="text-sm text-muted-foreground">{t('equity.coOwner', 'Co-owner')}</p>
                 </div>
                 <div className="text-right">
                   <p className="font-bold">15%</p>
-                  <p className="text-sm text-muted-foreground">300 shares</p>
+                  <p className="text-sm text-muted-foreground">{t('equity.shares300', '300 shares')}</p>
                 </div>
               </div>
             </div>
@@ -556,29 +558,33 @@ export default function EquityManagement() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Shield className="h-5 w-5 text-green-600" />
-              Reserves & Provisions
+              {t('equity.reservesProvisions', 'Reserves & Provisions')}
             </CardTitle>
-            <CardDescription>الاحتياطيات والمخصصات</CardDescription>
+            <CardDescription>{t('equity.reservesProvisionsAr', 'الاحتياطيات والمخصصات')}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               <div className="flex items-center justify-between" data-testid="card-reserve-legal">
-                <span className="text-sm font-medium">Legal Reserve (10%)</span>
-                <span className="font-medium">SAR 250,000</span>
+                <div>
+                  <p className="font-medium">{t('equity.legalReserve', 'Legal Reserve')}</p>
+                  <p className="text-sm text-muted-foreground">{t('equity.legalReserveDesc', '10% of net income')}</p>
+                </div>
+                <p className="font-bold text-green-600">SAR 250,000</p>
               </div>
-              <Progress value={100} className="h-2" />
-              
               <div className="flex items-center justify-between" data-testid="card-reserve-general">
-                <span className="text-sm font-medium">General Reserve</span>
-                <span className="font-medium">SAR 150,000</span>
+                <div>
+                  <p className="font-medium">{t('equity.generalReserve', 'General Reserve')}</p>
+                  <p className="text-sm text-muted-foreground">{t('equity.generalReserveDesc', 'Discretionary reserve')}</p>
+                </div>
+                <p className="font-bold text-green-600">SAR 150,000</p>
               </div>
-              <Progress value={75} className="h-2" />
-              
               <div className="flex items-center justify-between" data-testid="card-reserve-expansion">
-                <span className="text-sm font-medium">Expansion Reserve</span>
-                <span className="font-medium">SAR 100,000</span>
+                <div>
+                  <p className="font-medium">{t('equity.expansionReserve', 'Expansion Reserve')}</p>
+                  <p className="text-sm text-muted-foreground">{t('equity.expansionReserveDesc', 'Future growth fund')}</p>
+                </div>
+                <p className="font-bold text-green-600">SAR 100,000</p>
               </div>
-              <Progress value={50} className="h-2" />
             </div>
           </CardContent>
         </Card>
@@ -591,112 +597,65 @@ export default function EquityManagement() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card data-testid="card-total-dividends">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Total Dividends (All Time)</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t('equity.totalDividendsPaid', 'Total Dividends Paid')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-600">SAR 630,000</div>
-            <p className="text-xs text-muted-foreground mt-1">إجمالي الأرباح الموزعة</p>
-          </CardContent>
-        </Card>
-
-        <Card data-testid="card-latest-dividend">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Latest Dividend</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-blue-600">SAR 200,000</div>
-            <p className="text-xs text-muted-foreground mt-1">2023 Distribution</p>
+            <p className="text-xs text-muted-foreground mt-1">{t('equity.since2020', 'Since 2020')}</p>
           </CardContent>
         </Card>
 
         <Card data-testid="card-dividend-yield">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Dividend Yield</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t('equity.dividendYield', 'Dividend Yield')}</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">5.7%</div>
-            <p className="text-xs text-muted-foreground mt-1">عائد الأرباح</p>
+            <div className="text-2xl font-bold text-blue-600">5.7%</div>
+            <p className="text-xs text-muted-foreground mt-1">{t('equity.currentYield', 'Current yield')}</p>
+          </CardContent>
+        </Card>
+
+        <Card data-testid="card-payout-ratio">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t('equity.payoutRatio', 'Payout Ratio')}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-purple-600">23.5%</div>
+            <p className="text-xs text-muted-foreground mt-1">{t('equity.ofNetIncome', 'Of net income')}</p>
           </CardContent>
         </Card>
       </div>
 
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>Dividend History</CardTitle>
-              <CardDescription>سجل توزيعات الأرباح</CardDescription>
-            </div>
-            <Button variant="outline" data-testid="button-export-dividends">
-              <Download className="h-4 w-4 mr-2" />
-              Export
-            </Button>
-          </div>
+          <CardTitle>{t('equity.dividendHistory', 'Dividend History')}</CardTitle>
+          <CardDescription>{t('equity.dividendHistoryAr', 'سجل توزيعات الأرباح')}</CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Year</TableHead>
-                <TableHead>Declared</TableHead>
-                <TableHead>Paid</TableHead>
-                <TableHead>Per Share</TableHead>
-                <TableHead>Payment Date</TableHead>
-                <TableHead>Status</TableHead>
+                <TableHead>{t('equity.year', 'Year')}</TableHead>
+                <TableHead>{t('equity.declared', 'Declared')}</TableHead>
+                <TableHead>{t('equity.paid', 'Paid')}</TableHead>
+                <TableHead>{t('equity.perShare', 'Per Share')}</TableHead>
+                <TableHead>{t('equity.paymentDate', 'Payment Date')}</TableHead>
+                <TableHead>{t('common.status', 'Status')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {dividendHistory.map((div, index) => (
-                <TableRow key={index} data-testid={`row-dividend-${div.year}`}>
-                  <TableCell className="font-medium">{div.year}</TableCell>
-                  <TableCell>SAR {div.declared.toLocaleString()}</TableCell>
-                  <TableCell>SAR {div.paid.toLocaleString()}</TableCell>
-                  <TableCell>SAR {div.perShare}</TableCell>
-                  <TableCell>{div.paymentDate}</TableCell>
+              {dividendHistory.map((dividend, index) => (
+                <TableRow key={index} data-testid={`row-dividend-${dividend.year}`}>
+                  <TableCell className="font-medium">{dividend.year}</TableCell>
+                  <TableCell>SAR {dividend.declared.toLocaleString()}</TableCell>
+                  <TableCell>SAR {dividend.paid.toLocaleString()}</TableCell>
+                  <TableCell>SAR {dividend.perShare}</TableCell>
+                  <TableCell>{dividend.paymentDate}</TableCell>
                   <TableCell>
-                    <Badge className="bg-green-600">Paid</Badge>
+                    <Badge className="bg-green-600">{t('equity.paid', 'Paid')}</Badge>
                   </TableCell>
                 </TableRow>
               ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Dividend Distribution by Owner</CardTitle>
-          <CardDescription>توزيع الأرباح حسب المالك - 2023</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Owner</TableHead>
-                <TableHead>Ownership %</TableHead>
-                <TableHead>Shares</TableHead>
-                <TableHead>Dividend Amount</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              <TableRow data-testid="row-dividend-owner-1">
-                <TableCell className="font-medium">Mohammed Al-Salem</TableCell>
-                <TableCell>60%</TableCell>
-                <TableCell>1,200</TableCell>
-                <TableCell className="text-green-600 font-medium">SAR 120,000</TableCell>
-              </TableRow>
-              <TableRow data-testid="row-dividend-owner-2">
-                <TableCell className="font-medium">Ahmed Al-Salem</TableCell>
-                <TableCell>25%</TableCell>
-                <TableCell>500</TableCell>
-                <TableCell className="text-green-600 font-medium">SAR 50,000</TableCell>
-              </TableRow>
-              <TableRow data-testid="row-dividend-owner-3">
-                <TableCell className="font-medium">Fatima Al-Salem</TableCell>
-                <TableCell>15%</TableCell>
-                <TableCell>300</TableCell>
-                <TableCell className="text-green-600 font-medium">SAR 30,000</TableCell>
-              </TableRow>
             </TableBody>
           </Table>
         </CardContent>
@@ -706,111 +665,70 @@ export default function EquityManagement() {
 
   const reportsTab = (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <Card className="cursor-pointer hover:border-primary transition-colors" data-testid="card-report-equity">
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <Wallet className="h-5 w-5 text-blue-600" />
-              <CardTitle className="text-lg">Statement of Equity</CardTitle>
-            </div>
-            <CardDescription>قائمة التغيرات في حقوق الملكية</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button className="w-full" variant="outline" data-testid="button-generate-equity">
-              Generate Report
-            </Button>
-          </CardContent>
-        </Card>
+      <Card>
+        <CardHeader>
+          <CardTitle>{t('equity.equityReports', 'Equity Reports')}</CardTitle>
+          <CardDescription>{t('equity.equityReportsDesc', 'Generate and download equity-related reports')}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <Card className="cursor-pointer hover:border-primary transition-colors" data-testid="card-report-equity-statement">
+              <CardHeader className="pb-2">
+                <FileText className="h-8 w-8 text-blue-600 mb-2" />
+                <CardTitle className="text-lg">{t('equity.equityStatement', 'Statement of Equity')}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground mb-4">{t('equity.equityStatementDesc', 'Complete statement of changes in equity')}</p>
+                <Button variant="outline" className="w-full">
+                  <Download className="h-4 w-4 mr-2" />
+                  {t('common.download', 'Download')}
+                </Button>
+              </CardContent>
+            </Card>
 
-        <Card className="cursor-pointer hover:border-primary transition-colors" data-testid="card-report-capital">
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <Building2 className="h-5 w-5 text-green-600" />
-              <CardTitle className="text-lg">Capital Movement</CardTitle>
-            </div>
-            <CardDescription>حركة رأس المال</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button className="w-full" variant="outline" data-testid="button-generate-capital">
-              Generate Report
-            </Button>
-          </CardContent>
-        </Card>
+            <Card className="cursor-pointer hover:border-primary transition-colors" data-testid="card-report-ownership">
+              <CardHeader className="pb-2">
+                <Users className="h-8 w-8 text-green-600 mb-2" />
+                <CardTitle className="text-lg">{t('equity.ownershipReport', 'Ownership Report')}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground mb-4">{t('equity.ownershipReportDesc', 'Detailed ownership structure and shares')}</p>
+                <Button variant="outline" className="w-full">
+                  <Download className="h-4 w-4 mr-2" />
+                  {t('common.download', 'Download')}
+                </Button>
+              </CardContent>
+            </Card>
 
-        <Card className="cursor-pointer hover:border-primary transition-colors" data-testid="card-report-dividend">
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <DollarSign className="h-5 w-5 text-purple-600" />
-              <CardTitle className="text-lg">Dividend Report</CardTitle>
-            </div>
-            <CardDescription>تقرير توزيعات الأرباح</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button className="w-full" variant="outline" data-testid="button-generate-dividend">
-              Generate Report
-            </Button>
-          </CardContent>
-        </Card>
-
-        <Card className="cursor-pointer hover:border-primary transition-colors" data-testid="card-report-ownership">
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <Users className="h-5 w-5 text-orange-600" />
-              <CardTitle className="text-lg">Ownership Report</CardTitle>
-            </div>
-            <CardDescription>تقرير الملكية</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button className="w-full" variant="outline" data-testid="button-generate-ownership">
-              Generate Report
-            </Button>
-          </CardContent>
-        </Card>
-
-        <Card className="cursor-pointer hover:border-primary transition-colors" data-testid="card-report-reserves">
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <Shield className="h-5 w-5 text-teal-600" />
-              <CardTitle className="text-lg">Reserves Statement</CardTitle>
-            </div>
-            <CardDescription>بيان الاحتياطيات</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button className="w-full" variant="outline" data-testid="button-generate-reserves">
-              Generate Report
-            </Button>
-          </CardContent>
-        </Card>
-
-        <Card className="cursor-pointer hover:border-primary transition-colors" data-testid="card-report-ratios">
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <PieChart className="h-5 w-5 text-red-600" />
-              <CardTitle className="text-lg">Financial Ratios</CardTitle>
-            </div>
-            <CardDescription>النسب المالية</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button className="w-full" variant="outline" data-testid="button-generate-ratios">
-              Generate Report
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
+            <Card className="cursor-pointer hover:border-primary transition-colors" data-testid="card-report-dividends">
+              <CardHeader className="pb-2">
+                <PieChart className="h-8 w-8 text-purple-600 mb-2" />
+                <CardTitle className="text-lg">{t('equity.dividendReport', 'Dividend Report')}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground mb-4">{t('equity.dividendReportDesc', 'Historical dividend payments and analysis')}</p>
+                <Button variant="outline" className="w-full">
+                  <Download className="h-4 w-4 mr-2" />
+                  {t('common.download', 'Download')}
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-6">
       <TabsPageLayout
-        title="Equity Management"
-        description="حقوق الملكية - Track owner's equity, capital, and retained earnings"
-        defaultTab="overview"
+        title={t('equity.equityManagement', 'Equity Management')}
+        subtitle={t('equity.equityManagementSubtitle', 'إدارة حقوق الملكية - Track and manage owner\'s equity and capital')}
         tabs={[
-          { id: "overview", label: "Overview", icon: PieChart, content: overviewTab },
-          { id: "capital", label: "Capital Structure", icon: Building2, content: capitalTab },
-          { id: "dividends", label: "Dividends", icon: DollarSign, content: dividendsTab },
-          { id: "reports", label: "Reports", icon: FileText, content: reportsTab },
+          { id: "overview", label: t('equity.overview', 'Overview'), icon: Wallet, content: overviewTab },
+          { id: "capital", label: t('equity.capital', 'Capital'), icon: Landmark, content: capitalTab },
+          { id: "dividends", label: t('equity.dividends', 'Dividends'), icon: Coins, content: dividendsTab },
+          { id: "reports", label: t('equity.reports', 'Reports'), icon: FileText, content: reportsTab },
         ]}
       />
     </div>

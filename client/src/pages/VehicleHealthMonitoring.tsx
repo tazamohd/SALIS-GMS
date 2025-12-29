@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { StandardPageLayout } from "@/components/layouts";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -20,88 +21,90 @@ const sensorData = [
   { time: "11:15", temp: 210, pressure: 31, rpm: 2500, voltage: 13.9 },
 ];
 
-const sensors = [
-  {
-    name: "Engine Temperature",
-    value: "210°F",
-    status: "warning",
-    icon: Thermometer,
-    trend: "+5°F",
-    healthy: "195-220°F",
-    metric: 95
-  },
-  {
-    name: "Oil Pressure",
-    value: "31 PSI",
-    status: "healthy",
-    icon: Droplet,
-    trend: "-1 PSI",
-    healthy: "25-65 PSI",
-    metric: 88
-  },
-  {
-    name: "Battery Voltage",
-    value: "13.9V",
-    status: "healthy",
-    icon: Battery,
-    trend: "-0.3V",
-    healthy: "12.6-14.7V",
-    metric: 92
-  },
-  {
-    name: "Tire Pressure (Avg)",
-    value: "31.5 PSI",
-    status: "critical",
-    icon: Wind,
-    trend: "-2.5 PSI",
-    healthy: "32-35 PSI",
-    metric: 68
-  },
-  {
-    name: "Engine RPM",
-    value: "2,500",
-    status: "healthy",
-    icon: Gauge,
-    trend: "+200",
-    healthy: "600-6,000",
-    metric: 90
-  },
-  {
-    name: "Fuel Level",
-    value: "42%",
-    status: "healthy",
-    icon: Droplet,
-    trend: "-8%",
-    healthy: "10-100%",
-    metric: 85
-  },
-];
-
-const alerts = [
-  {
-    severity: "critical",
-    title: "Low Tire Pressure Detected",
-    description: "Rear right tire at 28 PSI (recommended: 32-35 PSI)",
-    time: "5 min ago",
-    action: "Inflate tire or check for leak"
-  },
-  {
-    severity: "warning",
-    title: "Engine Temperature Rising",
-    description: "Currently at 210°F, approaching upper limit of 220°F",
-    time: "12 min ago",
-    action: "Monitor coolant levels and check for leaks"
-  },
-  {
-    severity: "info",
-    title: "Oil Change Due Soon",
-    description: "Next service in 450 miles or 2 weeks",
-    time: "1 hour ago",
-    action: "Schedule maintenance appointment"
-  },
-];
-
 export default function VehicleHealthMonitoring() {
+  const { t } = useTranslation();
+
+  const sensors = [
+    {
+      name: t('vehicleHealth.engineTemperature', 'Engine Temperature'),
+      value: "210°F",
+      status: "warning",
+      icon: Thermometer,
+      trend: "+5°F",
+      healthy: "195-220°F",
+      metric: 95
+    },
+    {
+      name: t('vehicleHealth.oilPressure', 'Oil Pressure'),
+      value: "31 PSI",
+      status: "healthy",
+      icon: Droplet,
+      trend: "-1 PSI",
+      healthy: "25-65 PSI",
+      metric: 88
+    },
+    {
+      name: t('vehicleHealth.batteryVoltage', 'Battery Voltage'),
+      value: "13.9V",
+      status: "healthy",
+      icon: Battery,
+      trend: "-0.3V",
+      healthy: "12.6-14.7V",
+      metric: 92
+    },
+    {
+      name: t('vehicleHealth.tirePressure', 'Tire Pressure (Avg)'),
+      value: "31.5 PSI",
+      status: "critical",
+      icon: Wind,
+      trend: "-2.5 PSI",
+      healthy: "32-35 PSI",
+      metric: 68
+    },
+    {
+      name: t('vehicleHealth.engineRPM', 'Engine RPM'),
+      value: "2,500",
+      status: "healthy",
+      icon: Gauge,
+      trend: "+200",
+      healthy: "600-6,000",
+      metric: 90
+    },
+    {
+      name: t('vehicleHealth.fuelLevel', 'Fuel Level'),
+      value: "42%",
+      status: "healthy",
+      icon: Droplet,
+      trend: "-8%",
+      healthy: "10-100%",
+      metric: 85
+    },
+  ];
+
+  const alerts = [
+    {
+      severity: "critical",
+      title: t('vehicleHealth.lowTirePressure', 'Low Tire Pressure Detected'),
+      description: t('vehicleHealth.lowTirePressureDesc', 'Rear right tire at 28 PSI (recommended: 32-35 PSI)'),
+      time: t('vehicleHealth.minAgo', '5 min ago'),
+      action: t('vehicleHealth.inflateTire', 'Inflate tire or check for leak')
+    },
+    {
+      severity: "warning",
+      title: t('vehicleHealth.engineTempRising', 'Engine Temperature Rising'),
+      description: t('vehicleHealth.engineTempRisingDesc', 'Currently at 210°F, approaching upper limit of 220°F'),
+      time: t('vehicleHealth.minAgo12', '12 min ago'),
+      action: t('vehicleHealth.monitorCoolant', 'Monitor coolant levels and check for leaks')
+    },
+    {
+      severity: "info",
+      title: t('vehicleHealth.oilChangeDue', 'Oil Change Due Soon'),
+      description: t('vehicleHealth.oilChangeDueDesc', 'Next service in 450 miles or 2 weeks'),
+      time: t('vehicleHealth.hourAgo', '1 hour ago'),
+      action: t('vehicleHealth.scheduleMaintenance', 'Schedule maintenance appointment')
+    },
+  ];
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case "critical": return "text-red-600 dark:text-red-400 bg-red-500/10 border-red-200 dark:border-red-900";
@@ -120,10 +123,19 @@ export default function VehicleHealthMonitoring() {
     }
   };
 
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case "critical": return t('common.critical', 'Critical');
+      case "warning": return t('common.warning', 'Warning');
+      case "healthy": return t('common.healthy', 'Healthy');
+      default: return status;
+    }
+  };
+
   return (
     <StandardPageLayout
-      title="Real-Time Vehicle Health Monitoring"
-      description="IoT sensor integration with predictive maintenance alerts"
+      title={t('vehicleHealth.title', 'Real-Time Vehicle Health Monitoring')}
+      description={t('vehicleHealth.description', 'IoT sensor integration with predictive maintenance alerts')}
       icon={Activity}
     >
       <div className="space-y-6">
@@ -135,29 +147,29 @@ export default function VehicleHealthMonitoring() {
                   <Car className="w-10 h-10 text-blue-600 dark:text-blue-400" />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Overall Health Score</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">{t('vehicleHealth.overallHealthScore', 'Overall Health Score')}</p>
                   <div className="flex items-baseline gap-2">
                     <p className="text-4xl font-bold text-gray-900 dark:text-white" data-testid="text-health-score">{healthScore}</p>
                     <p className="text-gray-500">/100</p>
                   </div>
                   <p className="text-sm text-green-600 dark:text-green-400 mt-1" data-testid="text-health-trend">
                     <TrendingUp className="w-4 h-4 inline mr-1" />
-                    +3 from last week
+                    {t('vehicleHealth.fromLastWeek', '+3 from last week')}
                   </p>
                 </div>
               </div>
               
               <div className="text-right space-y-2">
                 <Badge variant="outline" className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-200" data-testid="badge-health-status">
-                  Healthy
+                  {t('common.healthy', 'Healthy')}
                 </Badge>
                 <div>
-                  <p className="text-xs text-gray-500">Connected Since</p>
+                  <p className="text-xs text-gray-500">{t('vehicleHealth.connectedSince', 'Connected Since')}</p>
                   <p className="text-sm font-medium text-gray-900 dark:text-white" data-testid="text-connection-time">10:00 AM</p>
                 </div>
                 <div className="flex items-center gap-1 text-green-600 dark:text-green-400" data-testid="badge-live-status">
                   <Radio className="w-3 h-3 animate-pulse" />
-                  <span className="text-xs">Live</span>
+                  <span className="text-xs">{t('common.live', 'Live')}</span>
                 </div>
               </div>
             </div>
@@ -187,7 +199,7 @@ export default function VehicleHealthMonitoring() {
                       </div>
                     </div>
                     <Badge variant="outline" className={getStatusColor(sensor.status)} data-testid={`badge-sensor-status-${idx}`}>
-                      {sensor.status}
+                      {getStatusLabel(sensor.status)}
                     </Badge>
                   </div>
                   
@@ -211,18 +223,18 @@ export default function VehicleHealthMonitoring() {
 
         <Card className="border-gray-200 dark:border-gray-800">
           <CardHeader>
-            <CardTitle>Live Sensor Telemetry</CardTitle>
+            <CardTitle>{t('vehicleHealth.liveSensorTelemetry', 'Live Sensor Telemetry')}</CardTitle>
             <CardDescription>
-              Real-time monitoring of critical vehicle systems
+              {t('vehicleHealth.realTimeMonitoring', 'Real-time monitoring of critical vehicle systems')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="temp" className="w-full">
               <TabsList className="grid w-full grid-cols-4">
-                <TabsTrigger value="temp" data-testid="tab-temperature">Temperature</TabsTrigger>
-                <TabsTrigger value="pressure" data-testid="tab-pressure">Pressure</TabsTrigger>
-                <TabsTrigger value="rpm" data-testid="tab-rpm">RPM</TabsTrigger>
-                <TabsTrigger value="voltage" data-testid="tab-voltage">Voltage</TabsTrigger>
+                <TabsTrigger value="temp" data-testid="tab-temperature">{t('vehicleHealth.temperature', 'Temperature')}</TabsTrigger>
+                <TabsTrigger value="pressure" data-testid="tab-pressure">{t('vehicleHealth.pressure', 'Pressure')}</TabsTrigger>
+                <TabsTrigger value="rpm" data-testid="tab-rpm">{t('vehicleHealth.rpm', 'RPM')}</TabsTrigger>
+                <TabsTrigger value="voltage" data-testid="tab-voltage">{t('vehicleHealth.voltage', 'Voltage')}</TabsTrigger>
               </TabsList>
               
               <TabsContent value="temp" className="space-y-4">
@@ -244,7 +256,7 @@ export default function VehicleHealthMonitoring() {
                       stroke="#EF4444" 
                       fill="#FEE2E2" 
                       fillOpacity={0.3}
-                      name="Engine Temp (°F)"
+                      name={t('vehicleHealth.engineTempF', 'Engine Temp (°F)')}
                     />
                   </AreaChart>
                 </ResponsiveContainer>
@@ -268,7 +280,7 @@ export default function VehicleHealthMonitoring() {
                       dataKey="pressure" 
                       stroke="#3B82F6" 
                       strokeWidth={2}
-                      name="Oil Pressure (PSI)"
+                      name={t('vehicleHealth.oilPressurePSI', 'Oil Pressure (PSI)')}
                       dot={{ r: 4 }}
                     />
                   </LineChart>
@@ -294,7 +306,7 @@ export default function VehicleHealthMonitoring() {
                       stroke="#8B5CF6" 
                       fill="#EDE9FE" 
                       fillOpacity={0.3}
-                      name="Engine RPM"
+                      name={t('vehicleHealth.engineRPM', 'Engine RPM')}
                     />
                   </AreaChart>
                 </ResponsiveContainer>
@@ -318,7 +330,7 @@ export default function VehicleHealthMonitoring() {
                       dataKey="voltage" 
                       stroke="#10B981" 
                       strokeWidth={2}
-                      name="Battery Voltage (V)"
+                      name={t('vehicleHealth.batteryVoltageV', 'Battery Voltage (V)')}
                       dot={{ r: 4 }}
                     />
                   </LineChart>
@@ -330,9 +342,9 @@ export default function VehicleHealthMonitoring() {
 
         <Card className="border-gray-200 dark:border-gray-800">
           <CardHeader>
-            <CardTitle>Active Alerts & Recommendations</CardTitle>
+            <CardTitle>{t('vehicleHealth.activeAlerts', 'Active Alerts & Recommendations')}</CardTitle>
             <CardDescription>
-              IoT-triggered notifications and predictive maintenance suggestions
+              {t('vehicleHealth.iotNotifications', 'IoT-triggered notifications and predictive maintenance suggestions')}
             </CardDescription>
           </CardHeader>
           <CardContent>

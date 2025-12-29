@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { DashboardPage } from "@/components/layouts/DashboardPage";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -32,6 +33,7 @@ interface BayWithSession extends ServiceBay {
 }
 
 export default function ServiceBayDashboard() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [selectedBayType, setSelectedBayType] = useState<string>("all");
   const [isConnected, setIsConnected] = useState(false);
@@ -59,10 +61,10 @@ export default function ServiceBayDashboard() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/service-bays'] });
-      toast({ title: "Bay status updated" });
+      toast({ title: t('serviceBay.bayStatusUpdated', 'Bay status updated') });
     },
     onError: (error: any) => {
-      toast({ title: "Error updating bay status", description: error.message, variant: "destructive" });
+      toast({ title: t('serviceBay.errorUpdatingStatus', 'Error updating bay status'), description: error.message, variant: "destructive" });
     },
   });
 
@@ -72,10 +74,10 @@ export default function ServiceBayDashboard() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/service-bays'] });
-      toast({ title: "Session started" });
+      toast({ title: t('serviceBay.sessionStarted', 'Session started') });
     },
     onError: (error: any) => {
-      toast({ title: "Error starting session", description: error.message, variant: "destructive" });
+      toast({ title: t('serviceBay.errorStartingSession', 'Error starting session'), description: error.message, variant: "destructive" });
     },
   });
 
@@ -85,10 +87,10 @@ export default function ServiceBayDashboard() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/service-bays'] });
-      toast({ title: "Session ended" });
+      toast({ title: t('serviceBay.sessionEnded', 'Session ended') });
     },
     onError: (error: any) => {
-      toast({ title: "Error ending session", description: error.message, variant: "destructive" });
+      toast({ title: t('serviceBay.errorEndingSession', 'Error ending session'), description: error.message, variant: "destructive" });
     },
   });
 
@@ -180,25 +182,25 @@ export default function ServiceBayDashboard() {
 
   const metrics = [
     {
-      label: "Total Bays",
+      label: t('serviceBay.totalBays', 'Total Bays'),
       value: statistics?.totalBays || 0,
       icon: Wrench,
       color: "text-blue-500",
     },
     {
-      label: "Occupied",
+      label: t('serviceBay.occupied', 'Occupied'),
       value: statistics?.occupiedBays || 0,
       icon: Car,
       color: "text-green-500",
     },
     {
-      label: "Available",
+      label: t('serviceBay.available', 'Available'),
       value: statistics?.availableBays || 0,
       icon: CheckCircle2,
       color: "text-emerald-500",
     },
     {
-      label: "Today's Sessions",
+      label: t('serviceBay.todaySessions', "Today's Sessions"),
       value: statistics?.todayCompletedSessions || 0,
       icon: TrendingUp,
       color: "text-purple-500",
@@ -206,19 +208,19 @@ export default function ServiceBayDashboard() {
   ];
 
   const bayTypes = [
-    { value: "all", label: "All Types" },
-    { value: "general", label: "General Service" },
-    { value: "diagnostic", label: "Diagnostic" },
-    { value: "alignment", label: "Alignment" },
-    { value: "paint", label: "Paint Booth" },
-    { value: "wash", label: "Wash Bay" },
-    { value: "quick", label: "Quick Service" },
+    { value: "all", label: t('serviceBay.allTypes', 'All Types') },
+    { value: "general", label: t('serviceBay.generalService', 'General Service') },
+    { value: "diagnostic", label: t('serviceBay.diagnostic', 'Diagnostic') },
+    { value: "alignment", label: t('serviceBay.alignment', 'Alignment') },
+    { value: "paint", label: t('serviceBay.paintBooth', 'Paint Booth') },
+    { value: "wash", label: t('serviceBay.washBay', 'Wash Bay') },
+    { value: "quick", label: t('serviceBay.quickService', 'Quick Service') },
   ];
 
   return (
     <DashboardPage
-      title="Service Bay Dashboard"
-      description="Real-time monitoring of all service bays and their occupancy status"
+      title={t('serviceBay.title', 'Service Bay Dashboard')}
+      description={t('serviceBay.description', 'Real-time monitoring of all service bays and their occupancy status')}
       icon={Wrench}
       metrics={metrics}
     >
@@ -227,7 +229,7 @@ export default function ServiceBayDashboard() {
           <div className="flex items-center gap-4">
             <Select value={selectedBayType} onValueChange={setSelectedBayType}>
               <SelectTrigger className="w-48" data-testid="select-bay-type">
-                <SelectValue placeholder="Filter by type" />
+                <SelectValue placeholder={t('serviceBay.filterByType', 'Filter by type')} />
               </SelectTrigger>
               <SelectContent>
                 {bayTypes.map((type) => (
@@ -239,7 +241,7 @@ export default function ServiceBayDashboard() {
             </Select>
             <Badge variant={isConnected ? "default" : "destructive"} className="flex items-center gap-1" data-testid="badge-connection-status">
               <Zap className="w-3 h-3" />
-              {isConnected ? "Live" : "Disconnected"}
+              {isConnected ? t('serviceBay.live', 'Live') : t('serviceBay.disconnected', 'Disconnected')}
             </Badge>
           </div>
           <Button 
@@ -249,7 +251,7 @@ export default function ServiceBayDashboard() {
             data-testid="button-refresh-bays"
           >
             <RefreshCw className={`w-4 h-4 mr-2 ${loadingBays ? 'animate-spin' : ''}`} />
-            Refresh
+            {t('common.refresh', 'Refresh')}
           </Button>
         </div>
 
@@ -257,14 +259,14 @@ export default function ServiceBayDashboard() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Activity className="w-5 h-5" />
-              Occupancy Overview
+              {t('serviceBay.occupancyOverview', 'Occupancy Overview')}
             </CardTitle>
-            <CardDescription>Current workshop capacity utilization</CardDescription>
+            <CardDescription>{t('serviceBay.workshopCapacity', 'Current workshop capacity utilization')}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">Overall Occupancy</span>
+                <span className="text-sm font-medium">{t('serviceBay.overallOccupancy', 'Overall Occupancy')}</span>
                 <span className="text-sm text-muted-foreground" data-testid="text-occupancy-rate">{occupancyRate}%</span>
               </div>
               <Progress value={occupancyRate} className="h-3" data-testid="progress-occupancy" />
@@ -272,35 +274,35 @@ export default function ServiceBayDashboard() {
                 <div className="text-center" data-testid="stat-available">
                   <div className="flex items-center justify-center gap-1 text-green-500 mb-1">
                     <CheckCircle2 className="w-4 h-4" />
-                    <span className="text-sm font-medium">Available</span>
+                    <span className="text-sm font-medium">{t('serviceBay.available', 'Available')}</span>
                   </div>
                   <span className="text-2xl font-bold" data-testid="text-available-count">{statistics?.availableBays || 0}</span>
                 </div>
                 <div className="text-center" data-testid="stat-occupied">
                   <div className="flex items-center justify-center gap-1 text-blue-500 mb-1">
                     <Car className="w-4 h-4" />
-                    <span className="text-sm font-medium">Occupied</span>
+                    <span className="text-sm font-medium">{t('serviceBay.occupied', 'Occupied')}</span>
                   </div>
                   <span className="text-2xl font-bold" data-testid="text-occupied-count">{statistics?.occupiedBays || 0}</span>
                 </div>
                 <div className="text-center" data-testid="stat-maintenance">
                   <div className="flex items-center justify-center gap-1 text-yellow-500 mb-1">
                     <Wrench className="w-4 h-4" />
-                    <span className="text-sm font-medium">Maintenance</span>
+                    <span className="text-sm font-medium">{t('serviceBay.maintenance', 'Maintenance')}</span>
                   </div>
                   <span className="text-2xl font-bold" data-testid="text-maintenance-count">{statistics?.maintenanceBays || 0}</span>
                 </div>
                 <div className="text-center" data-testid="stat-avg-time">
                   <div className="flex items-center justify-center gap-1 text-purple-500 mb-1">
                     <Timer className="w-4 h-4" />
-                    <span className="text-sm font-medium">Avg. Time</span>
+                    <span className="text-sm font-medium">{t('serviceBay.avgTime', 'Avg. Time')}</span>
                   </div>
                   <span className="text-2xl font-bold" data-testid="text-avg-duration">{formatDuration(statistics?.avgSessionDuration || 0)}</span>
                 </div>
                 <div className="text-center" data-testid="stat-today">
                   <div className="flex items-center justify-center gap-1 text-indigo-500 mb-1">
                     <TrendingUp className="w-4 h-4" />
-                    <span className="text-sm font-medium">Today</span>
+                    <span className="text-sm font-medium">{t('serviceBay.today', 'Today')}</span>
                   </div>
                   <span className="text-2xl font-bold" data-testid="text-today-count">{statistics?.todayCompletedSessions || 0}</span>
                 </div>
@@ -313,9 +315,9 @@ export default function ServiceBayDashboard() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Wrench className="w-5 h-5" />
-              Service Bays ({filteredBays.length})
+              {t('serviceBay.serviceBays', 'Service Bays')} ({filteredBays.length})
             </CardTitle>
-            <CardDescription>Click on a bay for quick actions</CardDescription>
+            <CardDescription>{t('serviceBay.clickForActions', 'Click on a bay for quick actions')}</CardDescription>
           </CardHeader>
           <CardContent>
             {loadingBays ? (
@@ -327,8 +329,8 @@ export default function ServiceBayDashboard() {
             ) : filteredBays.length === 0 ? (
               <div className="text-center py-12">
                 <Wrench className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-                <p className="text-muted-foreground">No service bays found</p>
-                <p className="text-sm text-muted-foreground mt-1">Configure bays in system settings</p>
+                <p className="text-muted-foreground">{t('serviceBay.noBaysFound', 'No service bays found')}</p>
+                <p className="text-sm text-muted-foreground mt-1">{t('serviceBay.configureBays', 'Configure bays in system settings')}</p>
               </div>
             ) : (
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
@@ -377,7 +379,7 @@ export default function ServiceBayDashboard() {
                           disabled={endSessionMutation.isPending}
                           data-testid={`button-end-session-${bay.id}`}
                         >
-                          End Session
+                          {t('serviceBay.endSession', 'End Session')}
                         </Button>
                       </div>
                     )}
@@ -395,7 +397,7 @@ export default function ServiceBayDashboard() {
                           disabled={startSessionMutation.isPending}
                           data-testid={`button-start-session-${bay.id}`}
                         >
-                          Start Session
+                          {t('serviceBay.startSession', 'Start Session')}
                         </Button>
                       </div>
                     )}
@@ -413,7 +415,7 @@ export default function ServiceBayDashboard() {
                           disabled={updateBayStatusMutation.isPending}
                           data-testid={`button-complete-maintenance-${bay.id}`}
                         >
-                          Complete
+                          {t('serviceBay.complete', 'Complete')}
                         </Button>
                       </div>
                     )}

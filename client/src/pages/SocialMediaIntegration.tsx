@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { TabsPageLayout, TabConfig } from "@/components/layouts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,7 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
 export default function SocialMediaIntegration() {
+  const { t } = useTranslation();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [selectedPlatform, setSelectedPlatform] = useState("facebook");
   const { toast } = useToast();
@@ -30,8 +32,8 @@ export default function SocialMediaIntegration() {
       return await apiRequest("/api/social/posts", "POST", data);
     },
     onSuccess: () => {
-      toast({ title: "Post created", description: "Your post has been scheduled." });
-      setIsOrderDialogOpen(false);
+      toast({ title: t('social.postCreated', 'Post created'), description: t('social.postScheduled', 'Your post has been scheduled.') });
+      setIsCreateDialogOpen(false);
       queryClient.invalidateQueries({ queryKey: ["/api/social/posts"] });
     },
   });
@@ -115,7 +117,7 @@ export default function SocialMediaIntegration() {
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Total Posts</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">{t('social.totalPosts', 'Total Posts')}</p>
               <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">{stats.totalPosts}</h3>
             </div>
             <MessageCircle className="h-12 w-12 text-blue-600" />
@@ -126,7 +128,7 @@ export default function SocialMediaIntegration() {
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Total Reviews</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">{t('social.totalReviews', 'Total Reviews')}</p>
               <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">{stats.totalReviews}</h3>
             </div>
             <Star className="h-12 w-12 text-yellow-500" />
@@ -137,7 +139,7 @@ export default function SocialMediaIntegration() {
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Avg Rating</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">{t('social.avgRating', 'Avg Rating')}</p>
               <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">{stats.averageRating} ⭐</h3>
             </div>
             <ThumbsUp className="h-12 w-12 text-green-600" />
@@ -148,7 +150,7 @@ export default function SocialMediaIntegration() {
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Response Rate</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">{t('social.responseRate', 'Response Rate')}</p>
               <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">{stats.responseRate}%</h3>
             </div>
             <MessageCircle className="h-12 w-12 text-purple-600" />
@@ -159,7 +161,7 @@ export default function SocialMediaIntegration() {
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Followers</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">{t('social.followers', 'Followers')}</p>
               <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">{stats.totalFollowers}</h3>
             </div>
             <Users className="h-12 w-12 text-indigo-600" />
@@ -171,7 +173,7 @@ export default function SocialMediaIntegration() {
 
   const postsContent = (
     <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
-      <CardHeader><CardTitle>Social Media Posts</CardTitle></CardHeader>
+      <CardHeader><CardTitle>{t('social.socialMediaPosts', 'Social Media Posts')}</CardTitle></CardHeader>
       <CardContent>
         <div className="space-y-3">
           {mockPosts.map((post) => (
@@ -193,13 +195,13 @@ export default function SocialMediaIntegration() {
                       <span className="flex items-center gap-1"><ThumbsUp className="h-4 w-4" /> {post.likes}</span>
                       <span className="flex items-center gap-1"><Share2 className="h-4 w-4" /> {post.shares}</span>
                       <span className="flex items-center gap-1"><MessageCircle className="h-4 w-4" /> {post.comments}</span>
-                      <span>Reach: {post.reach}</span>
+                      <span>{t('social.reach', 'Reach')}: {post.reach}</span>
                     </div>
                   )}
                   {post.status === "scheduled" && (
                     <p className="text-sm text-blue-600 mt-2 flex items-center gap-1">
                       <Calendar className="h-4 w-4" />
-                      Scheduled for: {new Date(post.scheduledAt!).toLocaleString()}
+                      {t('social.scheduledFor', 'Scheduled for')}: {new Date(post.scheduledAt!).toLocaleString()}
                     </p>
                   )}
                 </div>
@@ -213,7 +215,7 @@ export default function SocialMediaIntegration() {
 
   const reviewsContent = (
     <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
-      <CardHeader><CardTitle>Customer Reviews</CardTitle></CardHeader>
+      <CardHeader><CardTitle>{t('social.customerReviews', 'Customer Reviews')}</CardTitle></CardHeader>
       <CardContent>
         <div className="space-y-3">
           {mockReviews.map((review) => (
@@ -243,10 +245,10 @@ export default function SocialMediaIntegration() {
                   </div>
                 </div>
                 {review.responded ? (
-                  <Badge variant="default">Responded</Badge>
+                  <Badge variant="default">{t('social.responded', 'Responded')}</Badge>
                 ) : (
                   <Button size="sm" variant="outline" data-testid={`button-respond-${review.id}`}>
-                    Respond
+                    {t('social.respond', 'Respond')}
                   </Button>
                 )}
               </div>
@@ -261,14 +263,14 @@ export default function SocialMediaIntegration() {
   const tabs: TabConfig[] = [
     {
       id: "posts",
-      label: "Posts",
+      label: t('social.posts', 'Posts'),
       icon: MessageCircle,
       content: postsContent,
       badge: mockPosts.length,
     },
     {
       id: "reviews",
-      label: "Reviews",
+      label: t('social.reviews', 'Reviews'),
       icon: Star,
       content: reviewsContent,
       badge: mockReviews.filter(r => !r.responded).length,
@@ -277,11 +279,11 @@ export default function SocialMediaIntegration() {
 
   return (
     <TabsPageLayout
-      title="Social Media & Reviews"
-      description="Manage social posts and respond to customer reviews"
+      title={t('nav.social_media_integration', 'Social Media & Reviews')}
+      description={t('social.pageDescription', 'Manage social posts and respond to customer reviews')}
       icon={Share2}
       primaryAction={{
-        label: "Create Post",
+        label: t('social.createPost', 'Create Post'),
         icon: Plus,
         onClick: () => setIsCreateDialogOpen(true),
         testId: "button-create-post",
@@ -293,11 +295,11 @@ export default function SocialMediaIntegration() {
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
         <DialogContent className="sm:max-w-xl">
           <DialogHeader>
-            <DialogTitle>Create Social Media Post</DialogTitle>
+            <DialogTitle>{t('social.createSocialMediaPost', 'Create Social Media Post')}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div>
-              <label className="text-sm font-medium">Platform</label>
+              <label className="text-sm font-medium">{t('social.platform', 'Platform')}</label>
               <Select value={selectedPlatform} onValueChange={setSelectedPlatform}>
                 <SelectTrigger className="mt-1" data-testid="select-platform">
                   <SelectValue />
@@ -305,21 +307,21 @@ export default function SocialMediaIntegration() {
                 <SelectContent>
                   <SelectItem value="facebook">Facebook</SelectItem>
                   <SelectItem value="instagram">Instagram</SelectItem>
-                  <SelectItem value="google">Google Business</SelectItem>
+                  <SelectItem value="google">{t('social.googleBusiness', 'Google Business')}</SelectItem>
                   <SelectItem value="yelp">Yelp</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <label className="text-sm font-medium">Content</label>
+              <label className="text-sm font-medium">{t('social.content', 'Content')}</label>
               <Textarea
-                placeholder="Write your post..."
+                placeholder={t('social.writeYourPost', 'Write your post...')}
                 className="mt-1 h-32"
                 data-testid="textarea-content"
               />
             </div>
             <div>
-              <label className="text-sm font-medium">Schedule (Optional)</label>
+              <label className="text-sm font-medium">{t('social.scheduleOptional', 'Schedule (Optional)')}</label>
               <div className="flex gap-2">
                 <Input type="datetime-local" className="mt-1" data-testid="input-schedule" />
               </div>
@@ -331,7 +333,7 @@ export default function SocialMediaIntegration() {
                 status: "draft"
               });
             }} data-testid="button-save-post">
-              Create Post
+              {t('social.createPost', 'Create Post')}
             </Button>
           </div>
         </DialogContent>

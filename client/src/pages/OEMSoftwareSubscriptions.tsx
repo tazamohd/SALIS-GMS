@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { Package, Key, FileText, Shield, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -17,6 +18,7 @@ import { insertVendorCatalogSchema, insertOemProductSchema, insertSubscriptionLi
 import { TabsPageLayout } from "@/components/layouts/TabsPageLayout";
 
 export default function OEMSoftwareSubscriptions() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("catalogs");
   const [showCatalogDialog, setShowCatalogDialog] = useState(false);
@@ -43,17 +45,17 @@ export default function OEMSoftwareSubscriptions() {
 
   const createCatalogMutation = useMutation({
     mutationFn: (data: InsertVendorCatalog) => apiRequest("/api/vendor-catalogs", "POST", data),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/vendor-catalogs"] }); setShowCatalogDialog(false); toast({ title: "Catalog created" }); },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/vendor-catalogs"] }); setShowCatalogDialog(false); toast({ title: t('oem.catalogCreated', 'Catalog created') }); },
   });
 
   const createProductMutation = useMutation({
     mutationFn: (data: InsertOemProduct) => apiRequest("/api/oem-products", "POST", data),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/oem-products"] }); setShowProductDialog(false); toast({ title: "Product created" }); },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/oem-products"] }); setShowProductDialog(false); toast({ title: t('oem.productCreated', 'Product created') }); },
   });
 
   const createLicenseMutation = useMutation({
     mutationFn: (data: InsertSubscriptionLicense) => apiRequest("/api/subscription-licenses", "POST", data),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/subscription-licenses"] }); setShowLicenseDialog(false); toast({ title: "License created" }); },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/subscription-licenses"] }); setShowLicenseDialog(false); toast({ title: t('oem.licenseCreated', 'License created') }); },
   });
 
   const getVendorBadge = (vendorName: string) => {
@@ -104,10 +106,10 @@ export default function OEMSoftwareSubscriptions() {
   const catalogsContent = (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">Vendor Catalogs</h2>
+        <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">{t('oem.vendorCatalogs', 'Vendor Catalogs')}</h2>
         <Button onClick={() => { catalogForm.reset(); setShowCatalogDialog(true); }} data-testid="button-add-catalog">
           <Plus className="h-4 w-4 mr-2" />
-          Add Vendor
+          {t('oem.addVendor', 'Add Vendor')}
         </Button>
       </div>
 
@@ -116,10 +118,10 @@ export default function OEMSoftwareSubscriptions() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Vendor</TableHead>
-                <TableHead>Code</TableHead>
-                <TableHead>Contact</TableHead>
-                <TableHead>Status</TableHead>
+                <TableHead>{t('oem.vendor', 'Vendor')}</TableHead>
+                <TableHead>{t('oem.code', 'Code')}</TableHead>
+                <TableHead>{t('oem.contact', 'Contact')}</TableHead>
+                <TableHead>{t('common.status', 'Status')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -127,10 +129,10 @@ export default function OEMSoftwareSubscriptions() {
                 <TableRow key={catalog.id}>
                   <TableCell>{getVendorBadge(catalog.vendorName)}</TableCell>
                   <TableCell className="font-mono">{catalog.vendorCode}</TableCell>
-                  <TableCell>{catalog.supportEmail || 'N/A'}</TableCell>
+                  <TableCell>{catalog.supportEmail || t('common.notAvailable', 'N/A')}</TableCell>
                   <TableCell>
                     <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${catalog.isActive ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'}`}>
-                      {catalog.isActive ? '✅ Active' : '○ Inactive'}
+                      {catalog.isActive ? `✅ ${t('common.active', 'Active')}` : `○ ${t('common.inactive', 'Inactive')}`}
                     </span>
                   </TableCell>
                 </TableRow>
@@ -145,10 +147,10 @@ export default function OEMSoftwareSubscriptions() {
   const productsContent = (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">OEM Products</h2>
+        <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">{t('oem.oemProducts', 'OEM Products')}</h2>
         <Button onClick={() => { productForm.reset(); setShowProductDialog(true); }} data-testid="button-add-product">
           <Plus className="h-4 w-4 mr-2" />
-          Add Product
+          {t('oem.addProduct', 'Add Product')}
         </Button>
       </div>
 
@@ -157,23 +159,23 @@ export default function OEMSoftwareSubscriptions() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Product Name</TableHead>
-                <TableHead>Vendor</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Version</TableHead>
-                <TableHead>Status</TableHead>
+                <TableHead>{t('oem.productName', 'Product Name')}</TableHead>
+                <TableHead>{t('oem.vendor', 'Vendor')}</TableHead>
+                <TableHead>{t('common.type', 'Type')}</TableHead>
+                <TableHead>{t('oem.version', 'Version')}</TableHead>
+                <TableHead>{t('common.status', 'Status')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {products.map((product) => (
                 <TableRow key={product.id}>
                   <TableCell className="font-semibold">{product.productName}</TableCell>
-                  <TableCell>{catalogs.find(c => c.id === product.vendorCatalogId)?.vendorName || 'N/A'}</TableCell>
+                  <TableCell>{catalogs.find(c => c.id === product.vendorCatalogId)?.vendorName || t('common.notAvailable', 'N/A')}</TableCell>
                   <TableCell>{getProductTypeBadge(product.softwareType || '')}</TableCell>
-                  <TableCell className="font-mono text-xs">{product.version || 'N/A'}</TableCell>
+                  <TableCell className="font-mono text-xs">{product.version || t('common.notAvailable', 'N/A')}</TableCell>
                   <TableCell>
                     <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${product.isActive ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'}`}>
-                      {product.isActive ? '✅ Active' : '○ Inactive'}
+                      {product.isActive ? `✅ ${t('common.active', 'Active')}` : `○ ${t('common.inactive', 'Inactive')}`}
                     </span>
                   </TableCell>
                 </TableRow>
@@ -188,10 +190,10 @@ export default function OEMSoftwareSubscriptions() {
   const licensesContent = (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">Software Licenses</h2>
+        <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">{t('oem.softwareLicenses', 'Software Licenses')}</h2>
         <Button onClick={() => { licenseForm.reset(); setShowLicenseDialog(true); }} data-testid="button-add-license">
           <Plus className="h-4 w-4 mr-2" />
-          Add License
+          {t('oem.addLicense', 'Add License')}
         </Button>
       </div>
 
@@ -200,17 +202,17 @@ export default function OEMSoftwareSubscriptions() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>License Key</TableHead>
-                <TableHead>Product</TableHead>
-                <TableHead>Expires</TableHead>
-                <TableHead>Status</TableHead>
+                <TableHead>{t('oem.licenseKey', 'License Key')}</TableHead>
+                <TableHead>{t('oem.product', 'Product')}</TableHead>
+                <TableHead>{t('oem.expires', 'Expires')}</TableHead>
+                <TableHead>{t('common.status', 'Status')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {licenses.map((license) => (
                 <TableRow key={license.id}>
                   <TableCell className="font-mono text-xs">{license.licenseKey.substring(0, 16)}...</TableCell>
-                  <TableCell>{products.find(p => p.id === license.oemProductId)?.productName || 'N/A'}</TableCell>
+                  <TableCell>{products.find(p => p.id === license.oemProductId)?.productName || t('common.notAvailable', 'N/A')}</TableCell>
                   <TableCell>{new Date(license.endDate).toLocaleDateString()}</TableCell>
                   <TableCell>{getLicenseStatusBadge(license.status || '')}</TableCell>
                 </TableRow>
@@ -225,7 +227,7 @@ export default function OEMSoftwareSubscriptions() {
   const auditContent = (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">License Audit Logs</h2>
+        <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">{t('oem.licenseAuditLogs', 'License Audit Logs')}</h2>
       </div>
 
       <Card className="border border-gray-200 dark:border-salis-gray-dark bg-white dark:bg-salis-black">
@@ -233,19 +235,19 @@ export default function OEMSoftwareSubscriptions() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>License</TableHead>
-                <TableHead>Event</TableHead>
-                <TableHead>User</TableHead>
-                <TableHead>Timestamp</TableHead>
+                <TableHead>{t('oem.license', 'License')}</TableHead>
+                <TableHead>{t('oem.event', 'Event')}</TableHead>
+                <TableHead>{t('oem.user', 'User')}</TableHead>
+                <TableHead>{t('oem.timestamp', 'Timestamp')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {auditLogs.map((log) => (
                 <TableRow key={log.id}>
-                  <TableCell className="font-mono text-xs">{licenses.find(l => l.id === log.licenseId)?.licenseKey.substring(0, 12) || 'N/A'}</TableCell>
+                  <TableCell className="font-mono text-xs">{licenses.find(l => l.id === log.licenseId)?.licenseKey.substring(0, 12) || t('common.notAvailable', 'N/A')}</TableCell>
                   <TableCell>{log.eventType}</TableCell>
-                  <TableCell>{log.userId || 'System'}</TableCell>
-                  <TableCell>{log.timestamp ? new Date(log.timestamp).toLocaleString() : 'N/A'}</TableCell>
+                  <TableCell>{log.userId || t('oem.system', 'System')}</TableCell>
+                  <TableCell>{log.timestamp ? new Date(log.timestamp).toLocaleString() : t('common.notAvailable', 'N/A')}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -258,31 +260,31 @@ export default function OEMSoftwareSubscriptions() {
   return (
     <>
       <TabsPageLayout
-        title="OEM Software Subscriptions"
-        description="Manage OEM software catalogs, licenses, and compliance for BMW ISTA, Mercedes Xentry, Toyota Techstream, and more"
+        title={t('oem.title', 'OEM Software Subscriptions')}
+        description={t('oem.description', 'Manage OEM software catalogs, licenses, and compliance for BMW ISTA, Mercedes Xentry, Toyota Techstream, and more')}
         icon={Package}
         tabs={[
           {
             id: "catalogs",
-            label: "Vendor Catalogs",
+            label: t('oem.vendorCatalogs', 'Vendor Catalogs'),
             icon: Package,
             content: catalogsContent,
           },
           {
             id: "products",
-            label: "OEM Products",
+            label: t('oem.oemProducts', 'OEM Products'),
             icon: FileText,
             content: productsContent,
           },
           {
             id: "licenses",
-            label: "Licenses",
+            label: t('oem.licenses', 'Licenses'),
             icon: Key,
             content: licensesContent,
           },
           {
             id: "audit",
-            label: "Audit Logs",
+            label: t('oem.auditLogs', 'Audit Logs'),
             icon: Shield,
             content: auditContent,
           },
@@ -294,30 +296,30 @@ export default function OEMSoftwareSubscriptions() {
       <Dialog open={showCatalogDialog} onOpenChange={setShowCatalogDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Add Vendor Catalog</DialogTitle>
+            <DialogTitle>{t('oem.addVendorCatalog', 'Add Vendor Catalog')}</DialogTitle>
           </DialogHeader>
           <Form {...catalogForm}>
             <form onSubmit={catalogForm.handleSubmit((data) => createCatalogMutation.mutate(data))} className="space-y-4">
               <FormField control={catalogForm.control} name="vendorName" render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Vendor Name</FormLabel>
+                  <FormLabel>{t('oem.vendorName', 'Vendor Name')}</FormLabel>
                   <FormControl><Input {...field} placeholder="BMW" /></FormControl>
                 </FormItem>
               )} />
               <FormField control={catalogForm.control} name="vendorCode" render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Vendor Code</FormLabel>
+                  <FormLabel>{t('oem.vendorCode', 'Vendor Code')}</FormLabel>
                   <FormControl><Input {...field} placeholder="BMW-001" /></FormControl>
                 </FormItem>
               )} />
               <FormField control={catalogForm.control} name="isActive" render={({ field }) => (
                 <FormItem className="flex items-center justify-between">
-                  <FormLabel>Active</FormLabel>
+                  <FormLabel>{t('common.active', 'Active')}</FormLabel>
                   <FormControl><Switch checked={field.value ?? false} onCheckedChange={field.onChange} /></FormControl>
                 </FormItem>
               )} />
               <Button type="submit" className="w-full" disabled={createCatalogMutation.isPending}>
-                {createCatalogMutation.isPending ? "Creating..." : "Create Vendor"}
+                {createCatalogMutation.isPending ? t('oem.creating', 'Creating...') : t('oem.createVendor', 'Create Vendor')}
               </Button>
             </form>
           </Form>

@@ -1,4 +1,5 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -8,6 +9,7 @@ import { AlertTriangle, Shield, Activity, Users } from "lucide-react";
 import { StandardPageLayout } from "@/components/layouts";
 
 export default function SafetyIncidents() {
+  const { t } = useTranslation();
   const { toast } = useToast();
 
   const { data: incidents = [], isLoading: incidentsLoading } = useQuery<any[]>({
@@ -31,16 +33,16 @@ export default function SafetyIncidents() {
     },
     onSuccess: () => {
       toast({
-        title: "Incident Reported",
-        description: "Safety incident created successfully",
+        title: t('safety.incidentReported', 'Incident Reported'),
+        description: t('safety.incidentCreatedSuccess', 'Safety incident created successfully'),
       });
       queryClient.invalidateQueries({ queryKey: ['/api/safety/incidents'] });
       queryClient.invalidateQueries({ queryKey: ['/api/safety/analytics'] });
     },
     onError: (error: any) => {
       toast({
-        title: "Report Failed",
-        description: error.message || "Failed to report incident",
+        title: t('safety.reportFailed', 'Report Failed'),
+        description: error.message || t('safety.failedToReportIncident', 'Failed to report incident'),
         variant: "destructive",
       });
     },
@@ -52,12 +54,12 @@ export default function SafetyIncidents() {
 
   return (
     <StandardPageLayout
-      title="⚠️ Safety Incident Reporting"
-      description="Track and investigate workplace safety incidents"
+      title={t('safety.safetyIncidentReporting', 'Safety Incident Reporting')}
+      description={t('safety.description', 'Track and investigate workplace safety incidents')}
       icon={AlertTriangle}
       actions={[
         {
-          label: createIncidentMutation.isPending ? "Reporting..." : "Report Incident",
+          label: createIncidentMutation.isPending ? t('safety.reporting', 'Reporting...') : t('safety.reportIncident', 'Report Incident'),
           onClick: () => {
             createIncidentMutation.mutate({
               incidentNumber: `SI-${Date.now()}`,
@@ -79,7 +81,7 @@ export default function SafetyIncidents() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Total This Year</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('safety.totalThisYear', 'Total This Year')}</p>
                 <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="text-total-incidents">{stats.totalIncidents}</h3>
               </div>
               <AlertTriangle className="h-12 w-12 text-yellow-600" />
@@ -90,7 +92,7 @@ export default function SafetyIncidents() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Investigating</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('safety.investigating', 'Investigating')}</p>
                 <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="text-open-investigations">{stats.openInvestigations}</h3>
               </div>
               <Activity className="h-12 w-12 text-blue-600" />
@@ -101,7 +103,7 @@ export default function SafetyIncidents() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">OSHA Recordable</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('safety.oshaRecordable', 'OSHA Recordable')}</p>
                 <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="text-osha-recordable">{stats.oshaRecordable}</h3>
               </div>
               <Shield className="h-12 w-12 text-red-600" />
@@ -112,7 +114,7 @@ export default function SafetyIncidents() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Days Without</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('safety.daysWithout', 'Days Without')}</p>
                 <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="text-days-without">{stats.daysWithoutIncident}</h3>
               </div>
               <Users className="h-12 w-12 text-green-600" />
@@ -123,13 +125,13 @@ export default function SafetyIncidents() {
 
       <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
         <CardHeader>
-          <CardTitle>Recent Incidents</CardTitle>
+          <CardTitle>{t('safety.recentIncidents', 'Recent Incidents')}</CardTitle>
         </CardHeader>
         <CardContent>
           {incidentsLoading ? (
-            <div className="text-center py-8 text-gray-500">Loading incidents...</div>
+            <div className="text-center py-8 text-gray-500">{t('safety.loadingIncidents', 'Loading incidents...')}</div>
           ) : incidents.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">No incidents found</div>
+            <div className="text-center py-8 text-gray-500">{t('safety.noIncidentsFound', 'No incidents found')}</div>
           ) : (
             <div className="space-y-3">
               {incidents.map((incident) => (

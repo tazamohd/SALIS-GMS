@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "wouter";
+import { useTranslation } from "react-i18next";
 import { TabsPageLayout } from "@/components/layouts/TabsPageLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -58,6 +59,7 @@ const trialBalanceData = [
 ];
 
 export default function TrialBalance() {
+  const { t } = useTranslation();
   const [period, setPeriod] = useState("2024-01");
   const [showAdjusted, setShowAdjusted] = useState(false);
 
@@ -114,15 +116,15 @@ export default function TrialBalance() {
         <div className="flex gap-2">
           <Button variant="outline" data-testid="button-refresh">
             <RefreshCw className="h-4 w-4 mr-2" />
-            Refresh
+            {t('common.refresh', 'Refresh')}
           </Button>
           <Button variant="outline" data-testid="button-print">
             <Printer className="h-4 w-4 mr-2" />
-            Print
+            {t('common.print', 'Print')}
           </Button>
           <Button variant="outline" data-testid="button-export">
             <Download className="h-4 w-4 mr-2" />
-            Export
+            {t('common.export', 'Export')}
           </Button>
         </div>
       </div>
@@ -131,7 +133,7 @@ export default function TrialBalance() {
         <Card data-testid="card-total-debits">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              Total Debits
+              {t('accounting.totalDebits', 'Total Debits')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -144,7 +146,7 @@ export default function TrialBalance() {
         <Card data-testid="card-total-credits">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              Total Credits
+              {t('accounting.totalCredits', 'Total Credits')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -157,7 +159,7 @@ export default function TrialBalance() {
         <Card data-testid="card-balance-status">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              Balance Status
+              {t('accounting.balanceStatus', 'Balance Status')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -165,13 +167,13 @@ export default function TrialBalance() {
               {isBalanced ? (
                 <>
                   <CheckCircle className="h-6 w-6 text-green-600" />
-                  <span className="text-lg font-bold text-green-600">Balanced</span>
+                  <span className="text-lg font-bold text-green-600">{t('accounting.balanced', 'Balanced')}</span>
                 </>
               ) : (
                 <>
                   <AlertTriangle className="h-6 w-6 text-red-600" />
                   <span className="text-lg font-bold text-red-600">
-                    Difference: SAR {difference.toLocaleString()}
+                    {t('accounting.difference', 'Difference')}: SAR {difference.toLocaleString()}
                   </span>
                 </>
               )}
@@ -184,13 +186,13 @@ export default function TrialBalance() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>Trial Balance Report</CardTitle>
+              <CardTitle>{t('accounting.trialBalanceReport', 'Trial Balance Report')}</CardTitle>
               <CardDescription>
-                As of {period === "2024-01" ? "January 31, 2024" : period}
+                {t('accounting.asOf', 'As of')} {period === "2024-01" ? "January 31, 2024" : period}
               </CardDescription>
             </div>
             <Badge variant={isBalanced ? "default" : "destructive"} className="text-sm">
-              {isBalanced ? "✓ Balanced" : "⚠ Unbalanced"}
+              {isBalanced ? t('accounting.balanced', '✓ Balanced') : t('accounting.unbalanced', '⚠ Unbalanced')}
             </Badge>
           </div>
         </CardHeader>
@@ -198,11 +200,11 @@ export default function TrialBalance() {
           <Table>
             <TableHeader>
               <TableRow className="bg-muted/50">
-                <TableHead>Account Code</TableHead>
-                <TableHead>Account Name</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead className="text-right">Debit (SAR)</TableHead>
-                <TableHead className="text-right">Credit (SAR)</TableHead>
+                <TableHead>{t('accounting.accountCode', 'Account Code')}</TableHead>
+                <TableHead>{t('accounting.accountName', 'Account Name')}</TableHead>
+                <TableHead>{t('common.type', 'Type')}</TableHead>
+                <TableHead className="text-right">{t('accounting.debitSAR', 'Debit (SAR)')}</TableHead>
+                <TableHead className="text-right">{t('accounting.creditSAR', 'Credit (SAR)')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -225,7 +227,7 @@ export default function TrialBalance() {
               ))}
               <TableRow className="bg-muted/50 font-bold">
                 <TableCell colSpan={3} className="text-right">
-                  TOTALS
+                  {t('accounting.totals', 'TOTALS')}
                 </TableCell>
                 <TableCell className="text-right font-mono text-green-600">
                   {totalDebit.toLocaleString()}
@@ -257,25 +259,25 @@ export default function TrialBalance() {
               <CardContent>
                 <div className="space-y-1">
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Debit:</span>
+                    <span className="text-muted-foreground">{t('accounting.debit', 'Debit')}:</span>
                     <span className="font-mono text-green-600">
                       {totals.debit.toLocaleString()}
                     </span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Credit:</span>
+                    <span className="text-muted-foreground">{t('accounting.credit', 'Credit')}:</span>
                     <span className="font-mono text-red-600">
                       {totals.credit.toLocaleString()}
                     </span>
                   </div>
                   <div className="flex justify-between text-sm font-bold pt-2 border-t">
-                    <span>Net:</span>
+                    <span>{t('accounting.net', 'Net')}:</span>
                     <span className={`font-mono ${netBalance >= 0 ? "text-green-600" : "text-red-600"}`}>
                       {Math.abs(netBalance).toLocaleString()}
                     </span>
                   </div>
                   <p className="text-xs text-muted-foreground text-center pt-1">
-                    {totals.count} accounts
+                    {totals.count} {t('accounting.accounts', 'accounts')}
                   </p>
                 </div>
               </CardContent>
@@ -286,18 +288,18 @@ export default function TrialBalance() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Balance Verification</CardTitle>
-          <CardDescription>Accounting equation verification</CardDescription>
+          <CardTitle>{t('accounting.balanceVerification', 'Balance Verification')}</CardTitle>
+          <CardDescription>{t('accounting.accountingEquationVerification', 'Accounting equation verification')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             <div className="p-4 bg-muted/50 rounded-lg">
               <p className="text-center text-lg font-medium mb-4">
-                Assets = Liabilities + Equity
+                {t('accounting.assetsEquation', 'Assets = Liabilities + Equity')}
               </p>
               <div className="grid grid-cols-3 gap-4 text-center">
                 <div>
-                  <p className="text-sm text-muted-foreground">Total Assets</p>
+                  <p className="text-sm text-muted-foreground">{t('accounting.totalAssets', 'Total Assets')}</p>
                   <p className="text-xl font-bold text-blue-600">
                     SAR {(getTypeTotals("Asset").debit - getTypeTotals("Asset").credit).toLocaleString()}
                   </p>
@@ -306,7 +308,7 @@ export default function TrialBalance() {
                   <span className="text-2xl">=</span>
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">Liabilities + Equity</p>
+                  <p className="text-sm text-muted-foreground">{t('accounting.liabilitiesPlusEquity', 'Liabilities + Equity')}</p>
                   <p className="text-xl font-bold text-purple-600">
                     SAR {(getTypeTotals("Liability").credit + getTypeTotals("Equity").credit).toLocaleString()}
                   </p>
@@ -316,23 +318,23 @@ export default function TrialBalance() {
 
             <div className="p-4 bg-muted/50 rounded-lg">
               <p className="text-center text-lg font-medium mb-4">
-                Revenue - Expenses = Net Income
+                {t('accounting.netIncomeEquation', 'Revenue - Expenses = Net Income')}
               </p>
               <div className="grid grid-cols-3 gap-4 text-center">
                 <div>
-                  <p className="text-sm text-muted-foreground">Total Revenue</p>
+                  <p className="text-sm text-muted-foreground">{t('accounting.totalRevenue', 'Total Revenue')}</p>
                   <p className="text-xl font-bold text-green-600">
                     SAR {getTypeTotals("Revenue").credit.toLocaleString()}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">Total Expenses</p>
+                  <p className="text-sm text-muted-foreground">{t('accounting.totalExpenses', 'Total Expenses')}</p>
                   <p className="text-xl font-bold text-red-600">
                     SAR {getTypeTotals("Expense").debit.toLocaleString()}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">Net Income</p>
+                  <p className="text-sm text-muted-foreground">{t('accounting.netIncome', 'Net Income')}</p>
                   <p className="text-xl font-bold text-blue-600">
                     SAR {(getTypeTotals("Revenue").credit - getTypeTotals("Expense").debit).toLocaleString()}
                   </p>
@@ -345,36 +347,36 @@ export default function TrialBalance() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Related Reports</CardTitle>
-          <CardDescription>Navigate to related financial statements</CardDescription>
+          <CardTitle>{t('accounting.relatedReports', 'Related Reports')}</CardTitle>
+          <CardDescription>{t('accounting.relatedReportsDescription', 'Navigate to related financial statements')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <Link href="/general-ledger">
               <Button variant="outline" className="w-full justify-start" data-testid="link-general-ledger">
                 <BookOpen className="h-4 w-4 mr-2" />
-                General Ledger
+                {t('nav.general_ledger', 'General Ledger')}
                 <ExternalLink className="h-3 w-3 ml-auto" />
               </Button>
             </Link>
             <Link href="/income-statement">
               <Button variant="outline" className="w-full justify-start" data-testid="link-income-statement">
                 <TrendingUp className="h-4 w-4 mr-2" />
-                Income Statement
+                {t('nav.income_statement', 'Income Statement')}
                 <ExternalLink className="h-3 w-3 ml-auto" />
               </Button>
             </Link>
             <Link href="/balance-sheet">
               <Button variant="outline" className="w-full justify-start" data-testid="link-balance-sheet">
                 <Scale className="h-4 w-4 mr-2" />
-                Balance Sheet
+                {t('nav.balance_sheet', 'Balance Sheet')}
                 <ExternalLink className="h-3 w-3 ml-auto" />
               </Button>
             </Link>
             <Link href="/journal-entries">
               <Button variant="outline" className="w-full justify-start" data-testid="link-journal-entries">
                 <FileText className="h-4 w-4 mr-2" />
-                Journal Entries
+                {t('nav.journal_entries', 'Journal Entries')}
                 <ExternalLink className="h-3 w-3 ml-auto" />
               </Button>
             </Link>
@@ -388,14 +390,14 @@ export default function TrialBalance() {
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <div>
-          <h3 className="text-lg font-semibold">Historical Trial Balances</h3>
+          <h3 className="text-lg font-semibold">{t('accounting.historicalTrialBalances', 'Historical Trial Balances')}</h3>
           <p className="text-sm text-muted-foreground">
-            View and compare previous period trial balances
+            {t('accounting.historicalTrialBalancesDescription', 'View and compare previous period trial balances')}
           </p>
         </div>
         <Select defaultValue="2024">
           <SelectTrigger className="w-[150px]" data-testid="select-year">
-            <SelectValue placeholder="Year" />
+            <SelectValue placeholder={t('common.year', 'Year')} />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="2024">2024</SelectItem>
@@ -428,17 +430,17 @@ export default function TrialBalance() {
             <CardContent>
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Total Debit:</span>
+                  <span className="text-muted-foreground">{t('accounting.totalDebit', 'Total Debit')}:</span>
                   <span className="font-mono text-green-600">{item.debit.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Total Credit:</span>
+                  <span className="text-muted-foreground">{t('accounting.totalCredit', 'Total Credit')}:</span>
                   <span className="font-mono text-red-600">{item.credit.toLocaleString()}</span>
                 </div>
               </div>
               <Button variant="outline" className="w-full mt-4" data-testid={`button-view-history-${index}`}>
                 <Eye className="h-4 w-4 mr-2" />
-                View Details
+                {t('common.viewDetails', 'View Details')}
               </Button>
             </CardContent>
           </Card>
@@ -448,15 +450,15 @@ export default function TrialBalance() {
   );
 
   const tabs = [
-    { id: "trial-balance", label: "Trial Balance", icon: Scale, content: trialBalanceTab },
-    { id: "summary", label: "Summary", icon: BarChart3, content: summaryTab },
-    { id: "history", label: "History", icon: Calendar, content: historyTab },
+    { id: "trial-balance", label: t('accounting.trialBalance.tabs.trialBalance', 'Trial Balance'), icon: Scale, content: trialBalanceTab },
+    { id: "summary", label: t('accounting.trialBalance.tabs.summary', 'Summary'), icon: BarChart3, content: summaryTab },
+    { id: "history", label: t('accounting.trialBalance.tabs.history', 'History'), icon: Calendar, content: historyTab },
   ];
 
   return (
     <TabsPageLayout
-      title="Trial Balance - ميزان المراجعة"
-      description="Verify debits equal credits across all accounts"
+      title={t('accounting.trialBalance.title', 'Trial Balance - ميزان المراجعة')}
+      description={t('accounting.trialBalance.description', 'Verify debits equal credits across all accounts')}
       icon={Scale}
       tabs={tabs}
       defaultTab="trial-balance"

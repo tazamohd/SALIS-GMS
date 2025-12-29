@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { StandardPageLayout } from "@/components/layouts";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,6 +16,7 @@ import { AlertCircle, Brain, CheckCircle, Gauge, Thermometer, Droplet, Battery, 
 import type { Vehicle } from "@shared/schema";
 
 export default function PredictiveDiagnostics() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { toast } = useToast();
   const [selectedVehicleId, setSelectedVehicleId] = useState<string>("");
@@ -52,14 +54,14 @@ export default function PredictiveDiagnostics() {
       setPrediction(data);
       queryClient.invalidateQueries({ queryKey: ["/api/ai/maintenance-predictions"] });
       toast({
-        title: "Prediction Generated",
-        description: "AI has analyzed the vehicle data successfully.",
+        title: t('predictiveDiagnostics.predictionGenerated', 'Prediction Generated'),
+        description: t('predictiveDiagnostics.predictionGeneratedDesc', 'AI has analyzed the vehicle data successfully.'),
       });
     },
     onError: () => {
       toast({
-        title: "Error",
-        description: "Failed to generate prediction. Please try again.",
+        title: t('common.error', 'Error'),
+        description: t('predictiveDiagnostics.predictionError', 'Failed to generate prediction. Please try again.'),
         variant: "destructive",
       });
     },
@@ -70,8 +72,8 @@ export default function PredictiveDiagnostics() {
   const handleAnalyze = () => {
     if (!selectedVehicleId) {
       toast({
-        title: "Select Vehicle",
-        description: "Please select a vehicle first.",
+        title: t('predictiveDiagnostics.selectVehicle', 'Select Vehicle'),
+        description: t('predictiveDiagnostics.selectVehicleFirst', 'Please select a vehicle first.'),
         variant: "destructive",
       });
       return;
@@ -100,10 +102,10 @@ export default function PredictiveDiagnostics() {
 
   const getSeverityBadge = (severity: string) => {
     const variants: Record<string, { label: string; className: string; icon: any }> = {
-      low: { label: "Low Risk", className: "bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300", icon: CheckCircle },
-      medium: { label: "Medium Risk", className: "bg-yellow-100 dark:bg-yellow-900 text-yellow-700 dark:text-yellow-300", icon: AlertCircle },
-      high: { label: "High Risk", className: "bg-orange-100 dark:bg-orange-900 text-orange-700 dark:text-orange-300", icon: AlertTriangle },
-      critical: { label: "Critical", className: "bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300", icon: AlertCircle },
+      low: { label: t('predictiveDiagnostics.lowRisk', 'Low Risk'), className: "bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300", icon: CheckCircle },
+      medium: { label: t('predictiveDiagnostics.mediumRisk', 'Medium Risk'), className: "bg-yellow-100 dark:bg-yellow-900 text-yellow-700 dark:text-yellow-300", icon: AlertCircle },
+      high: { label: t('predictiveDiagnostics.highRisk', 'High Risk'), className: "bg-orange-100 dark:bg-orange-900 text-orange-700 dark:text-orange-300", icon: AlertTriangle },
+      critical: { label: t('predictiveDiagnostics.critical', 'Critical'), className: "bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300", icon: AlertCircle },
     };
     const variant = variants[severity?.toLowerCase()] || variants.medium;
     const Icon = variant.icon;
@@ -117,24 +119,22 @@ export default function PredictiveDiagnostics() {
 
   return (
     <StandardPageLayout
-      title="AI-Powered Predictive Diagnostics"
-      description="Analyze vehicle data to predict potential failures and maintenance needs using advanced AI"
+      title={t('predictiveDiagnostics.title', 'AI-Powered Predictive Diagnostics')}
+      description={t('predictiveDiagnostics.description', 'Analyze vehicle data to predict potential failures and maintenance needs using advanced AI')}
       icon={Brain}
     >
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8" data-testid="predictive-diagnostics-page">
-        {/* Input Form */}
         <Card>
           <CardHeader>
-            <CardTitle>Vehicle Data Input</CardTitle>
-            <CardDescription>Enter vehicle parameters for AI analysis</CardDescription>
+            <CardTitle>{t('predictiveDiagnostics.vehicleDataInput', 'Vehicle Data Input')}</CardTitle>
+            <CardDescription>{t('predictiveDiagnostics.vehicleDataInputDesc', 'Enter vehicle parameters for AI analysis')}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {/* Vehicle Selection */}
             <div>
-              <Label>Select Vehicle</Label>
+              <Label>{t('predictiveDiagnostics.selectVehicle', 'Select Vehicle')}</Label>
               <Select value={selectedVehicleId} onValueChange={setSelectedVehicleId}>
                 <SelectTrigger data-testid="select-vehicle">
-                  <SelectValue placeholder="Choose a vehicle" />
+                  <SelectValue placeholder={t('predictiveDiagnostics.chooseVehicle', 'Choose a vehicle')} />
                 </SelectTrigger>
                 <SelectContent>
                   {vehicles?.map((vehicle) => (
@@ -146,110 +146,102 @@ export default function PredictiveDiagnostics() {
               </Select>
             </div>
 
-            {/* Mileage */}
             <div>
               <Label className="flex items-center gap-2">
                 <Gauge className="w-4 h-4" />
-                Mileage (miles) *
+                {t('predictiveDiagnostics.mileage', 'Mileage (miles)')} *
               </Label>
               <Input
                 type="number"
                 data-testid="input-mileage"
-                placeholder="e.g., 75000"
+                placeholder={t('predictiveDiagnostics.mileagePlaceholder', 'e.g., 75000')}
                 value={formData.mileage}
                 onChange={(e) => setFormData({ ...formData, mileage: e.target.value })}
               />
             </div>
 
-            {/* Engine Temperature */}
             <div>
               <Label className="flex items-center gap-2">
                 <Thermometer className="w-4 h-4" />
-                Engine Temperature (°F)
+                {t('predictiveDiagnostics.engineTemperature', 'Engine Temperature (°F)')}
               </Label>
               <Input
                 type="number"
                 data-testid="input-engine-temp"
-                placeholder="e.g., 195"
+                placeholder={t('predictiveDiagnostics.engineTempPlaceholder', 'e.g., 195')}
                 value={formData.engineTemperature}
                 onChange={(e) => setFormData({ ...formData, engineTemperature: e.target.value })}
               />
             </div>
 
-            {/* Oil Pressure */}
             <div>
               <Label className="flex items-center gap-2">
                 <Droplet className="w-4 h-4" />
-                Oil Pressure (PSI)
+                {t('predictiveDiagnostics.oilPressure', 'Oil Pressure (PSI)')}
               </Label>
               <Input
                 type="number"
                 data-testid="input-oil-pressure"
-                placeholder="e.g., 40"
+                placeholder={t('predictiveDiagnostics.oilPressurePlaceholder', 'e.g., 40')}
                 value={formData.oilPressure}
                 onChange={(e) => setFormData({ ...formData, oilPressure: e.target.value })}
               />
             </div>
 
-            {/* Brake Pad Wear */}
             <div>
-              <Label>Brake Pad Wear (%)</Label>
+              <Label>{t('predictiveDiagnostics.brakePadWear', 'Brake Pad Wear (%)')}</Label>
               <Input
                 type="number"
                 data-testid="input-brake-wear"
-                placeholder="e.g., 60"
+                placeholder={t('predictiveDiagnostics.brakePadWearPlaceholder', 'e.g., 60')}
                 value={formData.brakePadWear}
                 onChange={(e) => setFormData({ ...formData, brakePadWear: e.target.value })}
               />
             </div>
 
-            {/* Battery Voltage */}
             <div>
               <Label className="flex items-center gap-2">
                 <Battery className="w-4 h-4" />
-                Battery Voltage (V)
+                {t('predictiveDiagnostics.batteryVoltage', 'Battery Voltage (V)')}
               </Label>
               <Input
                 type="number"
                 step="0.1"
                 data-testid="input-battery"
-                placeholder="e.g., 12.6"
+                placeholder={t('predictiveDiagnostics.batteryVoltagePlaceholder', 'e.g., 12.6')}
                 value={formData.batteryVoltage}
                 onChange={(e) => setFormData({ ...formData, batteryVoltage: e.target.value })}
               />
             </div>
 
-            {/* Fuel Level */}
             <div>
-              <Label>Fuel Level (%)</Label>
+              <Label>{t('predictiveDiagnostics.fuelLevel', 'Fuel Level (%)')}</Label>
               <Input
                 type="number"
                 data-testid="input-fuel"
-                placeholder="e.g., 75"
+                placeholder={t('predictiveDiagnostics.fuelLevelPlaceholder', 'e.g., 75')}
                 value={formData.fuelLevel}
                 onChange={(e) => setFormData({ ...formData, fuelLevel: e.target.value })}
               />
             </div>
 
-            {/* Tire Condition */}
             <div>
-              <Label>Tire Condition</Label>
+              <Label>{t('predictiveDiagnostics.tireCondition', 'Tire Condition')}</Label>
               <Select value={formData.tireCondition} onValueChange={(val) => setFormData({ ...formData, tireCondition: val })}>
                 <SelectTrigger data-testid="select-tire-condition">
-                  <SelectValue placeholder="Select condition" />
+                  <SelectValue placeholder={t('predictiveDiagnostics.selectCondition', 'Select condition')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="excellent">Excellent</SelectItem>
-                  <SelectItem value="good">Good</SelectItem>
-                  <SelectItem value="fair">Fair</SelectItem>
-                  <SelectItem value="poor">Poor</SelectItem>
+                  <SelectItem value="excellent">{t('predictiveDiagnostics.excellent', 'Excellent')}</SelectItem>
+                  <SelectItem value="good">{t('predictiveDiagnostics.good', 'Good')}</SelectItem>
+                  <SelectItem value="fair">{t('predictiveDiagnostics.fair', 'Fair')}</SelectItem>
+                  <SelectItem value="poor">{t('predictiveDiagnostics.poor', 'Poor')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
-            {/* Last Service Date */}
             <div>
-              <Label>Last Service Date</Label>
+              <Label>{t('predictiveDiagnostics.lastServiceDate', 'Last Service Date')}</Label>
               <Input
                 type="date"
                 data-testid="input-last-service"
@@ -258,7 +250,6 @@ export default function PredictiveDiagnostics() {
               />
             </div>
 
-            {/* Check Engine Light */}
             <div className="flex items-center space-x-2">
               <input
                 type="checkbox"
@@ -268,27 +259,25 @@ export default function PredictiveDiagnostics() {
                 onChange={(e) => setFormData({ ...formData, checkEngineLightOn: e.target.checked })}
                 className="h-4 w-4 rounded border-gray-300"
               />
-              <Label htmlFor="check-engine">Check Engine Light On</Label>
+              <Label htmlFor="check-engine">{t('predictiveDiagnostics.checkEngineLightOn', 'Check Engine Light On')}</Label>
             </div>
 
-            {/* Unusual Noises */}
             <div>
-              <Label>Unusual Noises or Vibrations</Label>
+              <Label>{t('predictiveDiagnostics.unusualNoises', 'Unusual Noises or Vibrations')}</Label>
               <Textarea
                 data-testid="textarea-noises"
-                placeholder="Describe any unusual sounds, vibrations, or smells..."
+                placeholder={t('predictiveDiagnostics.unusualNoisesPlaceholder', 'Describe any unusual sounds, vibrations, or smells...')}
                 value={formData.unusualNoises}
                 onChange={(e) => setFormData({ ...formData, unusualNoises: e.target.value })}
                 rows={2}
               />
             </div>
 
-            {/* Additional Symptoms */}
             <div>
-              <Label>Additional Symptoms</Label>
+              <Label>{t('predictiveDiagnostics.additionalSymptoms', 'Additional Symptoms')}</Label>
               <Textarea
                 data-testid="textarea-symptoms"
-                placeholder="Any other issues or observations..."
+                placeholder={t('predictiveDiagnostics.additionalSymptomsPlaceholder', 'Any other issues or observations...')}
                 value={formData.additionalSymptoms}
                 onChange={(e) => setFormData({ ...formData, additionalSymptoms: e.target.value })}
                 rows={2}
@@ -304,60 +293,59 @@ export default function PredictiveDiagnostics() {
               {predictMutation.isPending ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Analyzing...
+                  {t('predictiveDiagnostics.analyzing', 'Analyzing...')}
                 </>
               ) : (
                 <>
                   <Brain className="w-4 h-4 mr-2" />
-                  Generate AI Prediction
+                  {t('predictiveDiagnostics.generateAIPrediction', 'Generate AI Prediction')}
                 </>
               )}
             </Button>
           </CardContent>
         </Card>
 
-        {/* Results */}
         <div className="space-y-6">
           {prediction && (
             <Card className="border-2 border-blue-500 dark:border-blue-700" data-testid="prediction-result">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Brain className="w-6 h-6 text-blue-600" />
-                  AI Prediction Results
+                  {t('predictiveDiagnostics.aiPredictionResults', 'AI Prediction Results')}
                 </CardTitle>
                 <CardDescription>
-                  Confidence: {(prediction.confidence * 100).toFixed(0)}%
+                  {t('predictiveDiagnostics.confidence', 'Confidence')}: {(prediction.confidence * 100).toFixed(0)}%
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <Label className="text-sm text-gray-600 dark:text-gray-400">Severity</Label>
+                  <Label className="text-sm text-gray-600 dark:text-gray-400">{t('predictiveDiagnostics.severity', 'Severity')}</Label>
                   <div className="mt-1">{getSeverityBadge(prediction.severity)}</div>
                 </div>
 
                 <div>
-                  <Label className="text-sm text-gray-600 dark:text-gray-400">Predicted Issue</Label>
+                  <Label className="text-sm text-gray-600 dark:text-gray-400">{t('predictiveDiagnostics.predictedIssue', 'Predicted Issue')}</Label>
                   <p className="mt-1 text-lg font-semibold text-gray-900 dark:text-white">
                     {prediction.predictedIssue}
                   </p>
                 </div>
 
                 <div>
-                  <Label className="text-sm text-gray-600 dark:text-gray-400">Risk Level</Label>
+                  <Label className="text-sm text-gray-600 dark:text-gray-400">{t('predictiveDiagnostics.riskLevel', 'Risk Level')}</Label>
                   <p className="mt-1 text-gray-900 dark:text-white">
                     {prediction.riskLevel}
                   </p>
                 </div>
 
                 <div>
-                  <Label className="text-sm text-gray-600 dark:text-gray-400">Recommended Action</Label>
+                  <Label className="text-sm text-gray-600 dark:text-gray-400">{t('predictiveDiagnostics.recommendedAction', 'Recommended Action')}</Label>
                   <p className="mt-1 text-gray-900 dark:text-white">
                     {prediction.recommendedAction}
                   </p>
                 </div>
 
                 <div>
-                  <Label className="text-sm text-gray-600 dark:text-gray-400">Timeframe</Label>
+                  <Label className="text-sm text-gray-600 dark:text-gray-400">{t('predictiveDiagnostics.timeframe', 'Timeframe')}</Label>
                   <p className="mt-1 font-medium text-gray-900 dark:text-white">
                     {prediction.estimatedTimeframe}
                   </p>
@@ -365,7 +353,7 @@ export default function PredictiveDiagnostics() {
 
                 {prediction.additionalDetails && (
                   <div>
-                    <Label className="text-sm text-gray-600 dark:text-gray-400">Additional Details</Label>
+                    <Label className="text-sm text-gray-600 dark:text-gray-400">{t('predictiveDiagnostics.additionalDetails', 'Additional Details')}</Label>
                     <p className="mt-1 text-sm text-gray-700 dark:text-gray-300">
                       {prediction.additionalDetails}
                     </p>
@@ -375,14 +363,13 @@ export default function PredictiveDiagnostics() {
             </Card>
           )}
 
-          {/* Recent Predictions */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Car className="w-5 h-5" />
-                Recent Predictions
+                {t('predictiveDiagnostics.recentPredictions', 'Recent Predictions')}
               </CardTitle>
-              <CardDescription>AI-generated maintenance predictions</CardDescription>
+              <CardDescription>{t('predictiveDiagnostics.recentPredictionsDesc', 'AI-generated maintenance predictions')}</CardDescription>
             </CardHeader>
             <CardContent>
               {predictions && predictions.length > 0 ? (
@@ -404,7 +391,7 @@ export default function PredictiveDiagnostics() {
                 </div>
               ) : (
                 <p className="text-gray-500 dark:text-gray-400 text-center py-8">
-                  No predictions yet. Analyze a vehicle to get started.
+                  {t('predictiveDiagnostics.noPredictionsYet', 'No predictions yet. Analyze a vehicle to get started.')}
                 </p>
               )}
             </CardContent>

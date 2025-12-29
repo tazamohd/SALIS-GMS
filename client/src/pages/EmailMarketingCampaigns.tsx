@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { DashboardPage } from "@/components/layouts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,7 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
 export default function EmailMarketingCampaigns() {
+  const { t } = useTranslation();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const { toast } = useToast();
 
@@ -25,7 +27,7 @@ export default function EmailMarketingCampaigns() {
       return await apiRequest("/api/email/campaigns", "POST", data);
     },
     onSuccess: () => {
-      toast({ title: "Campaign created", description: "Your email campaign has been created successfully." });
+      toast({ title: t('emailMarketing.campaignCreated', 'Campaign created'), description: t('emailMarketing.campaignCreatedSuccess', 'Your email campaign has been created successfully.') });
       setIsCreateDialogOpen(false);
       queryClient.invalidateQueries({ queryKey: ["/api/email/campaigns"] });
     },
@@ -36,7 +38,7 @@ export default function EmailMarketingCampaigns() {
       return await apiRequest(`/api/email/campaigns/${id}/send`, "POST", {});
     },
     onSuccess: () => {
-      toast({ title: "Campaign sent", description: "Your email campaign is being sent." });
+      toast({ title: t('emailMarketing.campaignSent', 'Campaign sent'), description: t('emailMarketing.campaignSending', 'Your email campaign is being sent.') });
       queryClient.invalidateQueries({ queryKey: ["/api/email/campaigns"] });
     },
   });
@@ -93,16 +95,16 @@ export default function EmailMarketingCampaigns() {
   };
 
   const metrics = [
-    { label: "Total Campaigns", value: stats.totalCampaigns, icon: Mail, color: "text-blue-600" },
-    { label: "Sent This Month", value: stats.sentThisMonth, icon: Send, color: "text-green-600" },
-    { label: "Avg Open Rate", value: `${stats.averageOpenRate}%`, icon: Eye, color: "text-purple-600" },
-    { label: "Avg Click Rate", value: `${stats.averageClickRate}%`, icon: MousePointer, color: "text-orange-600" },
+    { label: t('emailMarketing.totalCampaigns', 'Total Campaigns'), value: stats.totalCampaigns, icon: Mail, color: "text-blue-600" },
+    { label: t('emailMarketing.sentThisMonth', 'Sent This Month'), value: stats.sentThisMonth, icon: Send, color: "text-green-600" },
+    { label: t('emailMarketing.avgOpenRate', 'Avg Open Rate'), value: `${stats.averageOpenRate}%`, icon: Eye, color: "text-purple-600" },
+    { label: t('emailMarketing.avgClickRate', 'Avg Click Rate'), value: `${stats.averageClickRate}%`, icon: MousePointer, color: "text-orange-600" },
   ];
 
   return (
     <DashboardPage
-      title="📧 Email Marketing"
-      description="Create and manage automated email campaigns"
+      title={t('emailMarketing.title', '📧 Email Marketing')}
+      description={t('emailMarketing.description', 'Create and manage automated email campaigns')}
       icon={Mail}
       metrics={metrics}
     >
@@ -110,40 +112,40 @@ export default function EmailMarketingCampaigns() {
         <DialogTrigger asChild>
           <Button data-testid="button-create-campaign" className="mb-6">
             <Plus className="h-4 w-4 mr-2" />
-            Create Campaign
+            {t('emailMarketing.createCampaign', 'Create Campaign')}
           </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-xl">
           <DialogHeader>
-            <DialogTitle>Create Email Campaign</DialogTitle>
+            <DialogTitle>{t('emailMarketing.createEmailCampaign', 'Create Email Campaign')}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div>
-              <label className="text-sm font-medium">Campaign Name</label>
-              <Input placeholder="e.g., Spring Promotion" className="mt-1" data-testid="input-campaign-name" />
+              <label className="text-sm font-medium">{t('emailMarketing.campaignName', 'Campaign Name')}</label>
+              <Input placeholder={t('emailMarketing.campaignNamePlaceholder', 'e.g., Spring Promotion')} className="mt-1" data-testid="input-campaign-name" />
             </div>
             <div>
-              <label className="text-sm font-medium">Subject Line</label>
-              <Input placeholder="e.g., Get 20% Off All Services" className="mt-1" data-testid="input-subject" />
+              <label className="text-sm font-medium">{t('emailMarketing.subjectLine', 'Subject Line')}</label>
+              <Input placeholder={t('emailMarketing.subjectPlaceholder', 'e.g., Get 20% Off All Services')} className="mt-1" data-testid="input-subject" />
             </div>
             <div>
-              <label className="text-sm font-medium">Target Audience</label>
+              <label className="text-sm font-medium">{t('emailMarketing.targetAudience', 'Target Audience')}</label>
               <Select>
                 <SelectTrigger className="mt-1" data-testid="select-audience">
-                  <SelectValue placeholder="Select audience" />
+                  <SelectValue placeholder={t('emailMarketing.selectAudience', 'Select audience')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Customers</SelectItem>
-                  <SelectItem value="new_customers">New Customers</SelectItem>
-                  <SelectItem value="inactive">Inactive Customers</SelectItem>
-                  <SelectItem value="vip">VIP Customers</SelectItem>
+                  <SelectItem value="all">{t('emailMarketing.allCustomers', 'All Customers')}</SelectItem>
+                  <SelectItem value="new_customers">{t('emailMarketing.newCustomers', 'New Customers')}</SelectItem>
+                  <SelectItem value="inactive">{t('emailMarketing.inactiveCustomers', 'Inactive Customers')}</SelectItem>
+                  <SelectItem value="vip">{t('emailMarketing.vipCustomers', 'VIP Customers')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <label className="text-sm font-medium">Message</label>
+              <label className="text-sm font-medium">{t('emailMarketing.message', 'Message')}</label>
               <Textarea
-                placeholder="Write your email content..."
+                placeholder={t('emailMarketing.messagePlaceholder', 'Write your email content...')}
                 className="mt-1 h-32"
                 data-testid="textarea-message"
               />
@@ -155,7 +157,7 @@ export default function EmailMarketingCampaigns() {
                 targetAudience: "all"
               });
             }} data-testid="button-save-campaign">
-              Create Campaign
+              {t('emailMarketing.createCampaign', 'Create Campaign')}
             </Button>
           </div>
         </DialogContent>
@@ -163,7 +165,7 @@ export default function EmailMarketingCampaigns() {
 
       <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
         <CardHeader>
-          <CardTitle>Campaigns</CardTitle>
+          <CardTitle>{t('emailMarketing.campaigns', 'Campaigns')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
@@ -181,14 +183,14 @@ export default function EmailMarketingCampaigns() {
                   <p className="text-sm text-gray-600 dark:text-gray-400">{campaign.subject}</p>
                   {campaign.status === "sent" && (
                     <div className="flex gap-4 mt-2 text-sm text-gray-600 dark:text-gray-400">
-                      <span>Sent: {campaign.emailsSent}</span>
-                      <span>Opened: {campaign.emailsOpened} ({((campaign.emailsOpened! / campaign.emailsSent!) * 100).toFixed(1)}%)</span>
-                      <span>Clicks: {campaign.clickThroughs}</span>
+                      <span>{t('emailMarketing.sent', 'Sent')}: {campaign.emailsSent}</span>
+                      <span>{t('emailMarketing.opened', 'Opened')}: {campaign.emailsOpened} ({((campaign.emailsOpened! / campaign.emailsSent!) * 100).toFixed(1)}%)</span>
+                      <span>{t('emailMarketing.clicks', 'Clicks')}: {campaign.clickThroughs}</span>
                     </div>
                   )}
                   {campaign.status === "scheduled" && (
                     <p className="text-sm text-blue-600 mt-1">
-                      Scheduled for: {new Date(campaign.scheduledAt!).toLocaleString()}
+                      {t('emailMarketing.scheduledFor', 'Scheduled for')}: {new Date(campaign.scheduledAt!).toLocaleString()}
                     </p>
                   )}
                 </div>
@@ -196,11 +198,11 @@ export default function EmailMarketingCampaigns() {
                   {campaign.status === "draft" && (
                     <Button size="sm" onClick={() => sendCampaign.mutate(campaign.id)} data-testid={`button-send-${campaign.id}`}>
                       <Send className="h-4 w-4 mr-2" />
-                      Send
+                      {t('emailMarketing.send', 'Send')}
                     </Button>
                   )}
                   <Button size="sm" variant="outline" data-testid={`button-view-${campaign.id}`}>
-                    View Stats
+                    {t('emailMarketing.viewStats', 'View Stats')}
                   </Button>
                 </div>
               </div>

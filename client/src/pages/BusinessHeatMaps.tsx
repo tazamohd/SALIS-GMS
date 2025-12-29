@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -20,6 +21,7 @@ import {
 import { TabsPageLayout, TabConfig } from "@/components/layouts";
 
 export default function BusinessHeatMaps() {
+  const { t } = useTranslation();
   const [selectedPeriod, setSelectedPeriod] = useState("week");
   const [heatmapType, setHeatmapType] = useState("time_demand");
 
@@ -27,27 +29,35 @@ export default function BusinessHeatMaps() {
     queryKey: ["/api/analytics/heatmaps", heatmapType, selectedPeriod],
   });
 
-  const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  const days = [
+    t('heatmaps.days.mon', 'Mon'),
+    t('heatmaps.days.tue', 'Tue'),
+    t('heatmaps.days.wed', 'Wed'),
+    t('heatmaps.days.thu', 'Thu'),
+    t('heatmaps.days.fri', 'Fri'),
+    t('heatmaps.days.sat', 'Sat'),
+    t('heatmaps.days.sun', 'Sun')
+  ];
   const hours = ["8am", "9am", "10am", "11am", "12pm", "1pm", "2pm", "3pm", "4pm", "5pm"];
   
-  const timeHeatmap = days.map(day => 
+  const timeHeatmap = days.map((day, dayIndex) => 
     hours.map((hour, hourIndex) => {
       const baseValue = Math.random() * 20 + 5;
       const peakBonus = (hourIndex >= 3 && hourIndex <= 6) ? 15 : 0;
-      const weekendPenalty = (day === "Sat" || day === "Sun") ? -10 : 0;
+      const weekendPenalty = (dayIndex === 5 || dayIndex === 6) ? -10 : 0;
       return Math.max(0, Math.round(baseValue + peakBonus + weekendPenalty));
     })
   );
 
   const serviceTypes = [
-    { name: "Oil Change", demand: 85 },
-    { name: "Brake Service", demand: 72 },
-    { name: "Tire Rotation", demand: 68 },
-    { name: "Diagnostics", demand: 58 },
-    { name: "Engine Repair", demand: 45 },
-    { name: "Transmission", demand: 32 },
-    { name: "AC Service", demand: 54 },
-    { name: "Battery Replace", demand: 48 },
+    { name: t('services.oilChange', 'Oil Change'), demand: 85 },
+    { name: t('services.brakeService', 'Brake Service'), demand: 72 },
+    { name: t('services.tireRotation', 'Tire Rotation'), demand: 68 },
+    { name: t('services.diagnostics', 'Diagnostics'), demand: 58 },
+    { name: t('services.engineRepair', 'Engine Repair'), demand: 45 },
+    { name: t('services.transmission', 'Transmission'), demand: 32 },
+    { name: t('services.acService', 'AC Service'), demand: 54 },
+    { name: t('services.batteryReplace', 'Battery Replace'), demand: 48 },
   ];
 
   const technicianUtilization = [
@@ -71,9 +81,9 @@ export default function BusinessHeatMaps() {
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Peak Hour</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">{t('heatmaps.peakHour', 'Peak Hour')}</p>
               <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">11am-12pm</h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Busiest time</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{t('heatmaps.busiestTime', 'Busiest time')}</p>
             </div>
             <Clock className="h-12 w-12 text-blue-600" />
           </div>
@@ -84,9 +94,9 @@ export default function BusinessHeatMaps() {
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Peak Day</p>
-              <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">Wednesday</h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Highest demand</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">{t('heatmaps.peakDay', 'Peak Day')}</p>
+              <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">{t('heatmaps.days.wed', 'Wednesday')}</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{t('heatmaps.highestDemand', 'Highest demand')}</p>
             </div>
             <Calendar className="h-12 w-12 text-green-600" />
           </div>
@@ -97,9 +107,9 @@ export default function BusinessHeatMaps() {
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Avg Utilization</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">{t('heatmaps.avgUtilization', 'Avg Utilization')}</p>
               <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">88.5%</h3>
-              <p className="text-sm text-green-600 mt-1">+3.2% vs last period</p>
+              <p className="text-sm text-green-600 mt-1">{t('heatmaps.vsLastPeriod', '+3.2% vs last period')}</p>
             </div>
             <TrendingUp className="h-12 w-12 text-purple-600" />
           </div>
@@ -110,9 +120,9 @@ export default function BusinessHeatMaps() {
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Top Service</p>
-              <h3 className="text-xl font-bold mt-2 text-gray-900 dark:text-white">Oil Change</h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">85% demand share</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">{t('heatmaps.topService', 'Top Service')}</p>
+              <h3 className="text-xl font-bold mt-2 text-gray-900 dark:text-white">{t('services.oilChange', 'Oil Change')}</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{t('heatmaps.demandShare', '85% demand share')}</p>
             </div>
             <Wrench className="h-12 w-12 text-orange-600" />
           </div>
@@ -124,14 +134,14 @@ export default function BusinessHeatMaps() {
   const tabs: TabConfig[] = [
     {
       id: "time",
-      label: "Time Demand",
+      label: t('heatmaps.tabs.timeDemand', 'Time Demand'),
       icon: Clock,
       content: (
         <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Clock className="h-5 w-5" />
-              Appointment Demand by Time & Day
+              {t('heatmaps.appointmentDemand', 'Appointment Demand by Time & Day')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -139,7 +149,7 @@ export default function BusinessHeatMaps() {
               <table className="w-full border-collapse">
                 <thead>
                   <tr>
-                    <th className="p-2 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">Hour</th>
+                    <th className="p-2 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">{t('heatmaps.hour', 'Hour')}</th>
                     {days.map(day => (
                       <th key={day} className="p-2 text-center text-sm font-semibold text-gray-700 dark:text-gray-300">
                         {day}
@@ -170,23 +180,23 @@ export default function BusinessHeatMaps() {
               </table>
             </div>
             <div className="mt-4 flex items-center gap-4">
-              <span className="text-sm text-gray-600 dark:text-gray-400">Legend:</span>
+              <span className="text-sm text-gray-600 dark:text-gray-400">{t('heatmaps.legend', 'Legend')}:</span>
               <div className="flex gap-2">
                 <div className="flex items-center gap-2">
                   <div className="h-4 w-4 bg-gray-200 rounded"></div>
-                  <span className="text-sm">Low (0-7)</span>
+                  <span className="text-sm">{t('heatmaps.low', 'Low')} (0-7)</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="h-4 w-4 bg-gray-400 rounded"></div>
-                  <span className="text-sm">Medium (8-15)</span>
+                  <span className="text-sm">{t('heatmaps.medium', 'Medium')} (8-15)</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="h-4 w-4 bg-gray-700 rounded"></div>
-                  <span className="text-sm">High (16-22)</span>
+                  <span className="text-sm">{t('heatmaps.high', 'High')} (16-22)</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="h-4 w-4 bg-black rounded"></div>
-                  <span className="text-sm">Peak (23+)</span>
+                  <span className="text-sm">{t('heatmaps.peak', 'Peak')} (23+)</span>
                 </div>
               </div>
             </div>
@@ -196,14 +206,14 @@ export default function BusinessHeatMaps() {
     },
     {
       id: "service",
-      label: "Service Demand",
+      label: t('heatmaps.tabs.serviceDemand', 'Service Demand'),
       icon: Wrench,
       content: (
         <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Wrench className="h-5 w-5" />
-              Service Type Demand
+              {t('heatmaps.serviceTypeDemand', 'Service Type Demand')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -215,7 +225,7 @@ export default function BusinessHeatMaps() {
                       {service.name}
                     </span>
                     <span className="text-sm text-gray-600 dark:text-gray-400">
-                      {service.demand}% demand
+                      {service.demand}% {t('heatmaps.demand', 'demand')}
                     </span>
                   </div>
                   <div className="h-8 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden">
@@ -235,14 +245,14 @@ export default function BusinessHeatMaps() {
     },
     {
       id: "technician",
-      label: "Technician Utilization",
+      label: t('heatmaps.tabs.technicianUtilization', 'Technician Utilization'),
       icon: Users,
       content: (
         <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Users className="h-5 w-5" />
-              Technician Utilization
+              {t('heatmaps.technicianUtilization', 'Technician Utilization')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -250,13 +260,13 @@ export default function BusinessHeatMaps() {
               <table className="w-full border-collapse">
                 <thead>
                   <tr>
-                    <th className="p-2 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">Technician</th>
+                    <th className="p-2 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">{t('heatmaps.technician', 'Technician')}</th>
                     {days.map(day => (
                       <th key={day} className="p-2 text-center text-sm font-semibold text-gray-700 dark:text-gray-300">
                         {day}
                       </th>
                     ))}
-                    <th className="p-2 text-center text-sm font-semibold text-gray-700 dark:text-gray-300">Avg</th>
+                    <th className="p-2 text-center text-sm font-semibold text-gray-700 dark:text-gray-300">{t('heatmaps.avg', 'Avg')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -295,11 +305,11 @@ export default function BusinessHeatMaps() {
               </table>
             </div>
             <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
-              <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Insights</h4>
+              <h4 className="font-semibold text-gray-900 dark:text-white mb-2">{t('heatmaps.insights', 'Insights')}</h4>
               <ul className="space-y-1 text-sm text-gray-600 dark:text-gray-400">
-                <li>• Average team utilization: 88.5% (optimal range: 75-90%)</li>
-                <li>• All technicians maintaining high productivity</li>
-                <li>• Consider cross-training for weekend coverage</li>
+                <li>• {t('heatmaps.insight1', 'Average team utilization: 88.5% (optimal range: 75-90%)')}</li>
+                <li>• {t('heatmaps.insight2', 'All technicians maintaining high productivity')}</li>
+                <li>• {t('heatmaps.insight3', 'Consider cross-training for weekend coverage')}</li>
               </ul>
             </div>
           </CardContent>
@@ -310,8 +320,8 @@ export default function BusinessHeatMaps() {
 
   return (
     <TabsPageLayout
-      title="🗺️ Business Heat Maps"
-      description="Visualize demand patterns, peak hours, and resource utilization"
+      title={t('heatmaps.title', '🗺️ Business Heat Maps')}
+      description={t('heatmaps.description', 'Visualize demand patterns, peak hours, and resource utilization')}
       icon={MapPin}
       headerContent={
         <>
@@ -321,9 +331,9 @@ export default function BusinessHeatMaps() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="week">This Week</SelectItem>
-                <SelectItem value="month">This Month</SelectItem>
-                <SelectItem value="quarter">This Quarter</SelectItem>
+                <SelectItem value="week">{t('heatmaps.periods.thisWeek', 'This Week')}</SelectItem>
+                <SelectItem value="month">{t('heatmaps.periods.thisMonth', 'This Month')}</SelectItem>
+                <SelectItem value="quarter">{t('heatmaps.periods.thisQuarter', 'This Quarter')}</SelectItem>
               </SelectContent>
             </Select>
           </div>

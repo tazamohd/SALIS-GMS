@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { TabsPageLayout, type TabConfig } from "@/components/layouts";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -11,6 +12,7 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
 export default function VoiceCommands() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState("");
@@ -24,8 +26,8 @@ export default function VoiceCommands() {
   useEffect(() => {
     if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
       toast({
-        title: "Not Supported",
-        description: "Voice commands are not supported in this browser. Please use Chrome or Edge.",
+        title: t('voiceCommands.notSupported', 'Not Supported'),
+        description: t('voiceCommands.browserNotSupported', 'Voice commands are not supported in this browser. Please use Chrome or Edge.'),
         variant: "destructive",
       });
       return;
@@ -41,8 +43,8 @@ export default function VoiceCommands() {
     recognition.onstart = () => {
       setIsListening(true);
       toast({
-        title: "Listening...",
-        description: "Voice command recognition started",
+        title: t('voiceCommands.listening', 'Listening...'),
+        description: t('voiceCommands.recognitionStarted', 'Voice command recognition started'),
       });
     };
 
@@ -71,8 +73,8 @@ export default function VoiceCommands() {
       console.error('Speech recognition error:', event.error);
       setIsListening(false);
       toast({
-        title: "Recognition Error",
-        description: `Error: ${event.error}`,
+        title: t('voiceCommands.recognitionError', 'Recognition Error'),
+        description: `${t('common.error', 'Error')}: ${event.error}`,
         variant: "destructive",
       });
     };
@@ -88,7 +90,7 @@ export default function VoiceCommands() {
         recognitionRef.current.stop();
       }
     };
-  }, [toast]);
+  }, [toast, t]);
 
   const processCommand = async (command: string) => {
     const lowerCommand = command.toLowerCase().trim();
@@ -103,8 +105,8 @@ export default function VoiceCommands() {
 
       if (result.actionExecuted) {
         toast({
-          title: "Command Executed",
-          description: result.message || `Executed: ${result.actionExecuted}`,
+          title: t('voiceCommands.commandExecuted', 'Command Executed'),
+          description: result.message || `${t('voiceCommands.executed', 'Executed')}: ${result.actionExecuted}`,
         });
 
         if (result.intent === 'navigate' && result.path) {
@@ -112,16 +114,16 @@ export default function VoiceCommands() {
         }
       } else {
         toast({
-          title: "Command Not Recognized",
-          description: "Please try a different command.",
+          title: t('voiceCommands.commandNotRecognized', 'Command Not Recognized'),
+          description: t('voiceCommands.tryDifferentCommand', 'Please try a different command.'),
           variant: "destructive",
         });
       }
     } catch (error) {
       console.error('Error processing command:', error);
       toast({
-        title: "Processing Error",
-        description: "Failed to process voice command.",
+        title: t('voiceCommands.processingError', 'Processing Error'),
+        description: t('voiceCommands.failedToProcess', 'Failed to process voice command.'),
         variant: "destructive",
       });
     }
@@ -149,9 +151,9 @@ export default function VoiceCommands() {
   const voiceControlContent = (
     <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
       <CardHeader>
-        <CardTitle className="text-gray-900 dark:text-white">Voice Control</CardTitle>
+        <CardTitle className="text-gray-900 dark:text-white">{t('voiceCommands.voiceControl', 'Voice Control')}</CardTitle>
         <CardDescription>
-          Click the microphone to start voice commands. Try saying "Open job cards" or "Create new appointment"
+          {t('voiceCommands.clickMicToStart', 'Click the microphone to start voice commands. Try saying "Open job cards" or "Create new appointment"')}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -172,14 +174,14 @@ export default function VoiceCommands() {
             )}
           </Button>
           <p className="mt-4 text-lg font-medium text-gray-900 dark:text-white">
-            {isListening ? "Listening..." : "Click to Start"}
+            {isListening ? t('voiceCommands.listening', 'Listening...') : t('voiceCommands.clickToStart', 'Click to Start')}
           </p>
         </div>
 
         {(transcript || interimTranscript) && (
           <div className="space-y-2">
             <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
-              Transcript:
+              {t('voiceCommands.transcript', 'Transcript')}:
             </p>
             <div className="bg-gray-50 dark:bg-gray-900 p-4 rounded-md min-h-[100px]">
               <p className="text-gray-900 dark:text-white">
@@ -196,18 +198,18 @@ export default function VoiceCommands() {
 
         <div className="border-t border-gray-200 dark:border-gray-800 pt-4">
           <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-            Example Commands:
+            {t('voiceCommands.exampleCommands', 'Example Commands')}:
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
             {[
-              "Open job cards",
-              "Create new appointment",
-              "Show customers",
-              "View inventory",
-              "Open settings",
-              "Show reports",
-              "Create invoice",
-              "Search parts",
+              t('voiceCommands.openJobCards', 'Open job cards'),
+              t('voiceCommands.createNewAppointment', 'Create new appointment'),
+              t('voiceCommands.showCustomers', 'Show customers'),
+              t('voiceCommands.viewInventory', 'View inventory'),
+              t('voiceCommands.openSettings', 'Open settings'),
+              t('voiceCommands.showReports', 'Show reports'),
+              t('voiceCommands.createInvoice', 'Create invoice'),
+              t('voiceCommands.searchParts', 'Search parts'),
             ].map((cmd, idx) => (
               <Badge
                 key={idx}
@@ -230,7 +232,7 @@ export default function VoiceCommands() {
         <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
-              Total Commands
+              {t('voiceCommands.totalCommands', 'Total Commands')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -243,7 +245,7 @@ export default function VoiceCommands() {
         <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
-              Recognized
+              {t('voiceCommands.recognized', 'Recognized')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -256,7 +258,7 @@ export default function VoiceCommands() {
         <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
-              Successful
+              {t('voiceCommands.successful', 'Successful')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -269,7 +271,7 @@ export default function VoiceCommands() {
         <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
-              Failed
+              {t('common.failed', 'Failed')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -285,8 +287,8 @@ export default function VoiceCommands() {
   const historyContent = (
     <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
       <CardHeader>
-        <CardTitle className="text-gray-900 dark:text-white">Recent Commands</CardTitle>
-        <CardDescription>Your latest voice command history</CardDescription>
+        <CardTitle className="text-gray-900 dark:text-white">{t('voiceCommands.recentCommands', 'Recent Commands')}</CardTitle>
+        <CardDescription>{t('voiceCommands.latestVoiceHistory', 'Your latest voice command history')}</CardDescription>
       </CardHeader>
       <CardContent>
         {isLoading ? (
@@ -318,7 +320,7 @@ export default function VoiceCommands() {
                   </div>
                   {command.actionExecuted && (
                     <p className="text-sm text-gray-600 dark:text-gray-400">
-                      Action: {String(command.actionExecuted)}
+                      {t('voiceCommands.action', 'Action')}: {String(command.actionExecuted)}
                     </p>
                   )}
                 </div>
@@ -332,11 +334,11 @@ export default function VoiceCommands() {
                         : "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400"
                     }
                   >
-                    {command.success === true ? "executed" : command.success === false ? "failed" : "pending"}
+                    {command.success === true ? t('voiceCommands.executed', 'executed') : command.success === false ? t('common.failed', 'failed') : t('common.pending', 'pending')}
                   </Badge>
                   {command.confidence && (
                     <span className="text-xs text-gray-500 dark:text-gray-400">
-                      {command.confidence}% confidence
+                      {command.confidence}% {t('voiceCommands.confidence', 'confidence')}
                     </span>
                   )}
                 </div>
@@ -347,9 +349,9 @@ export default function VoiceCommands() {
           <div className="flex flex-col items-center justify-center py-12">
             <Mic className="h-16 w-16 text-gray-400 mb-4" />
             <p className="text-gray-600 dark:text-gray-400 text-center">
-              No voice commands yet.
+              {t('voiceCommands.noCommandsYet', 'No voice commands yet.')}
               <br />
-              Start using voice commands to see your history here.
+              {t('voiceCommands.startUsingVoice', 'Start using voice commands to see your history here.')}
             </p>
           </div>
         )}
@@ -360,19 +362,19 @@ export default function VoiceCommands() {
   const tabs: TabConfig[] = [
     {
       id: "voice-control",
-      label: "Voice Control",
+      label: t('voiceCommands.voiceControl', 'Voice Control'),
       icon: Mic,
       content: voiceControlContent,
     },
     {
       id: "stats",
-      label: "Statistics",
+      label: t('voiceCommands.statistics', 'Statistics'),
       icon: Activity,
       content: statsContent,
     },
     {
       id: "history",
-      label: "History",
+      label: t('voiceCommands.history', 'History'),
       icon: CheckCircle,
       badge: stats.total,
       content: historyContent,
@@ -381,8 +383,8 @@ export default function VoiceCommands() {
 
   return (
     <TabsPageLayout
-      title="Voice Commands"
-      description="Hands-free operations using voice recognition"
+      title={t('voiceCommands.title', 'Voice Commands')}
+      description={t('voiceCommands.description', 'Hands-free operations using voice recognition')}
       icon={Volume2}
       tabs={tabs}
       defaultTab="voice-control"

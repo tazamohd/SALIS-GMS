@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { StandardTablePage } from "@/components/layouts";
 import { DollarSign, CheckCircle, XCircle, Clock, Download } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -19,6 +20,7 @@ type Payment = {
 };
 
 export default function Payments() {
+  const { t } = useTranslation();
   const { data: payments = [], isLoading } = useQuery<Payment[]>({
     queryKey: ["/api/payments"],
   });
@@ -26,14 +28,14 @@ export default function Payments() {
   const columns: Column<Payment>[] = [
     {
       key: "invoiceId",
-      label: "Invoice #",
+      label: t('payments.invoiceNumber', 'Invoice #'),
       render: (payment) => (
         <span className="font-mono text-sm">{payment.invoiceId}</span>
       ),
     },
     {
       key: "customerName",
-      label: "Customer",
+      label: t('payments.customer', 'Customer'),
       render: (payment) => (
         <div>
           <p className="font-medium">{payment.customerName}</p>
@@ -42,14 +44,14 @@ export default function Payments() {
     },
     {
       key: "amount",
-      label: "Amount",
+      label: t('common.amount', 'Amount'),
       render: (payment) => (
         <span className="font-semibold">${payment.amount.toFixed(2)}</span>
       ),
     },
     {
       key: "method",
-      label: "Payment Method",
+      label: t('payments.paymentMethod', 'Payment Method'),
       render: (payment) => (
         <Badge variant="outline" className="capitalize">
           {payment.method}
@@ -58,7 +60,7 @@ export default function Payments() {
     },
     {
       key: "status",
-      label: "Status",
+      label: t('common.status', 'Status'),
       render: (payment) => {
         const statusConfig = {
           completed: { icon: CheckCircle, className: "bg-green-100 text-green-700 dark:bg-green-900/30" },
@@ -79,7 +81,7 @@ export default function Payments() {
     },
     {
       key: "transactionId",
-      label: "Transaction ID",
+      label: t('payments.transactionId', 'Transaction ID'),
       render: (payment) =>
         payment.transactionId ? (
           <span className="font-mono text-xs">{payment.transactionId}</span>
@@ -89,13 +91,13 @@ export default function Payments() {
     },
     {
       key: "paidAt",
-      label: "Paid Date",
+      label: t('payments.paidDate', 'Paid Date'),
       render: (payment) =>
         payment.paidAt ? new Date(payment.paidAt).toLocaleDateString() : "-",
     },
     {
       key: "actions",
-      label: "Actions",
+      label: t('common.actions', 'Actions'),
       render: (payment) => (
         <Button
           size="sm"
@@ -103,7 +105,7 @@ export default function Payments() {
           data-testid={`button-receipt-${payment.id}`}
         >
           <Download className="h-4 w-4 mr-1" />
-          Receipt
+          {t('payments.receipt', 'Receipt')}
         </Button>
       ),
     },
@@ -112,24 +114,24 @@ export default function Payments() {
   const filters = [
     {
       id: "status",
-      label: "Status",
+      label: t('common.status', 'Status'),
       options: [
-        { value: "all", label: "All Statuses" },
-        { value: "completed", label: "Completed" },
-        { value: "pending", label: "Pending" },
-        { value: "failed", label: "Failed" },
-        { value: "refunded", label: "Refunded" },
+        { value: "all", label: t('payments.allStatuses', 'All Statuses') },
+        { value: "completed", label: t('common.completed', 'Completed') },
+        { value: "pending", label: t('common.pending', 'Pending') },
+        { value: "failed", label: t('common.failed', 'Failed') },
+        { value: "refunded", label: t('payments.refunded', 'Refunded') },
       ],
     },
     {
       id: "method",
-      label: "Method",
+      label: t('payments.method', 'Method'),
       options: [
-        { value: "all", label: "All Methods" },
-        { value: "card", label: "Card" },
-        { value: "cash", label: "Cash" },
-        { value: "bank_transfer", label: "Bank Transfer" },
-        { value: "check", label: "Check" },
+        { value: "all", label: t('payments.allMethods', 'All Methods') },
+        { value: "card", label: t('payments.card', 'Card') },
+        { value: "cash", label: t('payments.cash', 'Cash') },
+        { value: "bank_transfer", label: t('payments.bankTransfer', 'Bank Transfer') },
+        { value: "check", label: t('payments.check', 'Check') },
       ],
     },
   ];
@@ -144,30 +146,30 @@ export default function Payments() {
 
   return (
     <StandardTablePage
-      title="Payments"
-      description="Track and manage all payment transactions"
+      title={t('payments.title', 'Payments')}
+      description={t('payments.description', 'Track and manage all payment transactions')}
       icon={DollarSign}
       data={payments}
       isLoading={isLoading}
       columns={columns}
-      searchPlaceholder="Search payments..."
+      searchPlaceholder={t('payments.searchPayments', 'Search payments...')}
       filters={filters}
       additionalContent={
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           <div className="p-4 bg-card border rounded-lg">
-            <p className="text-sm text-muted-foreground">Total Received</p>
+            <p className="text-sm text-muted-foreground">{t('payments.totalReceived', 'Total Received')}</p>
             <p className="text-2xl font-bold text-green-600">${totalAmount.toFixed(2)}</p>
           </div>
           <div className="p-4 bg-card border rounded-lg">
-            <p className="text-sm text-muted-foreground">Pending</p>
+            <p className="text-sm text-muted-foreground">{t('common.pending', 'Pending')}</p>
             <p className="text-2xl font-bold text-yellow-600">${pendingAmount.toFixed(2)}</p>
           </div>
           <div className="p-4 bg-card border rounded-lg">
-            <p className="text-sm text-muted-foreground">Total Transactions</p>
+            <p className="text-sm text-muted-foreground">{t('payments.totalTransactions', 'Total Transactions')}</p>
             <p className="text-2xl font-bold">{payments.length}</p>
           </div>
           <div className="p-4 bg-card border rounded-lg">
-            <p className="text-sm text-muted-foreground">Success Rate</p>
+            <p className="text-sm text-muted-foreground">{t('payments.successRate', 'Success Rate')}</p>
             <p className="text-2xl font-bold">
               {payments.length > 0
                 ? ((payments.filter((p) => p.status === "completed").length / payments.length) * 100).toFixed(1)
@@ -179,8 +181,8 @@ export default function Payments() {
       }
       emptyState={{
         icon: DollarSign,
-        title: "No payments found",
-        description: "Payment transactions will appear here once customers make payments",
+        title: t('payments.noPaymentsFound', 'No payments found'),
+        description: t('payments.noPaymentsDescription', 'Payment transactions will appear here once customers make payments'),
       }}
     />
   );

@@ -259,14 +259,14 @@ export default function ContractManagement() {
   const tabs: TabConfig[] = [
     {
       id: "overview",
-      label: "Overview",
+      label: t('payments.contracts.overview', 'Overview'),
       content: (
         <div className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2">
             <Card data-testid="card-utilization-chart">
               <CardHeader>
-                <CardTitle>Contract Utilization Overview</CardTitle>
-                <CardDescription>Service spending vs. contract cap</CardDescription>
+                <CardTitle>{t('payments.contracts.contractUtilizationOverview', 'Contract Utilization Overview')}</CardTitle>
+                <CardDescription>{t('payments.contracts.serviceSpendingVsCap', 'Service spending vs. contract cap')}</CardDescription>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
@@ -285,8 +285,8 @@ export default function ContractManagement() {
 
             <Card data-testid="card-sla-chart">
               <CardHeader>
-                <CardTitle>SLA Performance</CardTitle>
-                <CardDescription>Compliance status by contract</CardDescription>
+                <CardTitle>{t('payments.contracts.slaPerformance', 'SLA Performance')}</CardTitle>
+                <CardDescription>{t('payments.contracts.complianceByContract', 'Compliance status by contract')}</CardDescription>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
@@ -307,8 +307,8 @@ export default function ContractManagement() {
 
           <Card data-testid="card-contracts-list">
             <CardHeader>
-              <CardTitle>All Contracts</CardTitle>
-              <CardDescription>Click on a contract to view details</CardDescription>
+              <CardTitle>{t('payments.contracts.allContracts', 'All Contracts')}</CardTitle>
+              <CardDescription>{t('payments.contracts.clickToViewDetails', 'Click on a contract to view details')}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
@@ -344,19 +344,19 @@ export default function ContractManagement() {
                             </Badge>
                           </div>
                           <p className="text-sm text-muted-foreground">
-                            {contract.fleetGroup?.companyName || "Unknown Fleet"}
+                            {contract.fleetGroup?.companyName || t('payments.contracts.unknownFleet', 'Unknown Fleet')}
                           </p>
                           <div className="flex gap-4 text-sm">
-                            <span>Type: {contract.contractType}</span>
-                            <span>Expires: {format(new Date(contract.endDate), "MMM dd, yyyy")}</span>
+                            <span>{t('common.type', 'Type')}: {contract.contractType}</span>
+                            <span>{t('payments.contracts.expires', 'Expires')}: {format(new Date(contract.endDate), "MMM dd, yyyy")}</span>
                             <span className={daysUntilExpiry <= 30 ? "text-orange-500 font-medium" : ""}>
-                              ({daysUntilExpiry} days)
+                              ({daysUntilExpiry} {t('payments.contracts.days', 'days')})
                             </span>
                           </div>
                         </div>
                         <div className="text-right space-y-2">
                           <div className="text-sm font-medium">
-                            Utilization: {utilizationPercentage.toFixed(1)}%
+                            {t('payments.contracts.utilization', 'Utilization')}: {utilizationPercentage.toFixed(1)}%
                           </div>
                           <Progress value={utilizationPercentage} className="w-24" />
                           <div className="text-xs text-muted-foreground">
@@ -375,14 +375,14 @@ export default function ContractManagement() {
     },
     {
       id: "utilization",
-      label: "Utilization",
+      label: t('payments.contracts.utilization', 'Utilization'),
       content: selectedContract ? (
         <ContractUtilizationDetail contract={selectedContract} />
       ) : (
         <Card>
           <CardContent className="py-8">
             <p className="text-center text-muted-foreground">
-              Select a contract from the Overview tab to view detailed utilization
+              {t('payments.contracts.selectContractUtilization', 'Select a contract from the Overview tab to view detailed utilization')}
             </p>
           </CardContent>
         </Card>
@@ -390,14 +390,14 @@ export default function ContractManagement() {
     },
     {
       id: "sla",
-      label: "SLA Compliance",
+      label: t('payments.contracts.slaComplianceTab', 'SLA Compliance'),
       content: selectedContract ? (
         <ContractSLADetail contract={selectedContract} />
       ) : (
         <Card>
           <CardContent className="py-8">
             <p className="text-center text-muted-foreground">
-              Select a contract from the Overview tab to view SLA compliance details
+              {t('payments.contracts.selectContractSLA', 'Select a contract from the Overview tab to view SLA compliance details')}
             </p>
           </CardContent>
         </Card>
@@ -405,19 +405,19 @@ export default function ContractManagement() {
     },
     {
       id: "renewals",
-      label: "Renewals",
+      label: t('payments.contracts.renewals', 'Renewals'),
       content: <ContractRenewalsTab contracts={contracts} onAcceptRenewal={acceptRenewalMutation.mutate} />,
     },
   ];
 
   return (
     <TabsPageLayout
-      title="Contract Management & SLA Tracking"
-      description="Monitor contract utilization, SLA compliance, and automated renewal workflows"
+      title={t('payments.contracts.pageTitle', 'Contract Management & SLA Tracking')}
+      description={t('payments.contracts.pageDescription', 'Monitor contract utilization, SLA compliance, and automated renewal workflows')}
       icon={FileText}
       secondaryActions={[
         {
-          label: "Back to Fleet",
+          label: t('payments.contracts.backToFleet', 'Back to Fleet'),
           icon: FileText,
           onClick: () => window.location.href = "/fleet-management",
           variant: "outline",

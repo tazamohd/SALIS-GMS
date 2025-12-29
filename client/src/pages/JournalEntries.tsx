@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Link } from "wouter";
+import { useTranslation } from "react-i18next";
 import { TabsPageLayout } from "@/components/layouts/TabsPageLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -183,6 +184,7 @@ const accounts = [
 ];
 
 export default function JournalEntries() {
+  const { t } = useTranslation();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -234,7 +236,7 @@ export default function JournalEntries() {
           <div className="relative flex-1 max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search entries..."
+              placeholder={t('accounting.searchEntries', 'Search entries...')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10"
@@ -256,20 +258,20 @@ export default function JournalEntries() {
         <div className="flex gap-2">
           <Button variant="outline" data-testid="button-export-entries">
             <Download className="h-4 w-4 mr-2" />
-            Export
+            {t('common.export', 'Export')}
           </Button>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
               <Button data-testid="button-new-entry">
                 <Plus className="h-4 w-4 mr-2" />
-                New Entry
+                {t('accounting.newEntry', 'New Entry')}
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-2xl">
               <DialogHeader>
-                <DialogTitle>Create Journal Entry</DialogTitle>
+                <DialogTitle>{t('accounting.createJournalEntry', 'Create Journal Entry')}</DialogTitle>
                 <DialogDescription>
-                  Record a new journal entry with debit and credit accounts
+                  {t('accounting.createJournalEntryDescription', 'Record a new journal entry with debit and credit accounts')}
                 </DialogDescription>
               </DialogHeader>
               <Form {...form}>
@@ -280,7 +282,7 @@ export default function JournalEntries() {
                       name="date"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Date</FormLabel>
+                          <FormLabel>{t('common.date', 'Date')}</FormLabel>
                           <FormControl>
                             <Input type="date" {...field} data-testid="input-entry-date" />
                           </FormControl>
@@ -293,9 +295,9 @@ export default function JournalEntries() {
                       name="reference"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Reference</FormLabel>
+                          <FormLabel>{t('accounting.reference', 'Reference')}</FormLabel>
                           <FormControl>
-                            <Input placeholder="e.g., INV-2024-001" {...field} data-testid="input-entry-reference" />
+                            <Input placeholder={t('accounting.referencePlaceholder', 'e.g., INV-2024-001')} {...field} data-testid="input-entry-reference" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -307,9 +309,9 @@ export default function JournalEntries() {
                     name="description"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Description</FormLabel>
+                        <FormLabel>{t('common.description', 'Description')}</FormLabel>
                         <FormControl>
-                          <Input placeholder="Description of the transaction" {...field} data-testid="input-entry-description" />
+                          <Input placeholder={t('accounting.transactionDescriptionPlaceholder', 'Description of the transaction')} {...field} data-testid="input-entry-description" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -321,11 +323,11 @@ export default function JournalEntries() {
                       name="debitAccount"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Debit Account</FormLabel>
+                          <FormLabel>{t('accounting.debitAccount', 'Debit Account')}</FormLabel>
                           <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl>
                               <SelectTrigger data-testid="select-debit-account">
-                                <SelectValue placeholder="Select account" />
+                                <SelectValue placeholder={t('accounting.selectAccount', 'Select account')} />
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
@@ -345,11 +347,11 @@ export default function JournalEntries() {
                       name="creditAccount"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Credit Account</FormLabel>
+                          <FormLabel>{t('accounting.creditAccount', 'Credit Account')}</FormLabel>
                           <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl>
                               <SelectTrigger data-testid="select-credit-account">
-                                <SelectValue placeholder="Select account" />
+                                <SelectValue placeholder={t('accounting.selectAccount', 'Select account')} />
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
@@ -370,7 +372,7 @@ export default function JournalEntries() {
                     name="amount"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Amount (SAR)</FormLabel>
+                        <FormLabel>{t('accounting.amountSAR', 'Amount (SAR)')}</FormLabel>
                         <FormControl>
                           <Input type="number" placeholder="0.00" {...field} data-testid="input-entry-amount" />
                         </FormControl>
@@ -383,9 +385,9 @@ export default function JournalEntries() {
                     name="notes"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Notes (Optional)</FormLabel>
+                        <FormLabel>{t('accounting.notesOptional', 'Notes (Optional)')}</FormLabel>
                         <FormControl>
-                          <Textarea placeholder="Additional notes..." {...field} data-testid="input-entry-notes" />
+                          <Textarea placeholder={t('accounting.additionalNotesPlaceholder', 'Additional notes...')} {...field} data-testid="input-entry-notes" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -393,10 +395,10 @@ export default function JournalEntries() {
                   />
                   <div className="flex justify-end gap-2">
                     <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)} data-testid="button-cancel-entry">
-                      Cancel
+                      {t('common.cancel', 'Cancel')}
                     </Button>
                     <Button type="submit" data-testid="button-save-entry">
-                      Create Entry
+                      {t('accounting.createEntry', 'Create Entry')}
                     </Button>
                   </div>
                 </form>
@@ -411,14 +413,14 @@ export default function JournalEntries() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Entry ID</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>Description</TableHead>
-                <TableHead>Reference</TableHead>
-                <TableHead className="text-right">Debit</TableHead>
-                <TableHead className="text-right">Credit</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Actions</TableHead>
+                <TableHead>{t('accounting.entryId', 'Entry ID')}</TableHead>
+                <TableHead>{t('common.date', 'Date')}</TableHead>
+                <TableHead>{t('common.description', 'Description')}</TableHead>
+                <TableHead>{t('accounting.reference', 'Reference')}</TableHead>
+                <TableHead className="text-right">{t('accounting.debit', 'Debit')}</TableHead>
+                <TableHead className="text-right">{t('accounting.credit', 'Credit')}</TableHead>
+                <TableHead>{t('common.status', 'Status')}</TableHead>
+                <TableHead>{t('common.actions', 'Actions')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -462,12 +464,12 @@ export default function JournalEntries() {
         <Card data-testid="card-total-entries">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              Total Entries
+              {t('accounting.totalEntries', 'Total Entries')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-bold">{journalEntries.length}</p>
-            <p className="text-xs text-muted-foreground">This month</p>
+            <p className="text-xs text-muted-foreground">{t('accounting.thisMonth', 'This month')}</p>
           </CardContent>
         </Card>
 
@@ -475,12 +477,12 @@ export default function JournalEntries() {
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
               <CheckCircle className="h-4 w-4 text-green-600" />
-              Posted
+              {t('accounting.posted', 'Posted')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-bold text-green-600">{totalPosted}</p>
-            <p className="text-xs text-muted-foreground">Completed entries</p>
+            <p className="text-xs text-muted-foreground">{t('accounting.completedEntries', 'Completed entries')}</p>
           </CardContent>
         </Card>
 
@@ -488,32 +490,32 @@ export default function JournalEntries() {
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
               <Clock className="h-4 w-4 text-yellow-600" />
-              Pending
+              {t('common.pending', 'Pending')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-bold text-yellow-600">{totalPending}</p>
-            <p className="text-xs text-muted-foreground">Awaiting approval</p>
+            <p className="text-xs text-muted-foreground">{t('accounting.awaitingApproval', 'Awaiting approval')}</p>
           </CardContent>
         </Card>
 
         <Card data-testid="card-total-amount">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              Total Amount
+              {t('accounting.totalAmount', 'Total Amount')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-bold">SAR {totalAmount.toLocaleString()}</p>
-            <p className="text-xs text-muted-foreground">Total transactions</p>
+            <p className="text-xs text-muted-foreground">{t('accounting.totalTransactions', 'Total transactions')}</p>
           </CardContent>
         </Card>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Recent Activity</CardTitle>
-          <CardDescription>Latest journal entries and their status</CardDescription>
+          <CardTitle>{t('accounting.recentActivity', 'Recent Activity')}</CardTitle>
+          <CardDescription>{t('accounting.recentActivityDescription', 'Latest journal entries and their status')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -549,36 +551,36 @@ export default function JournalEntries() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Related Modules</CardTitle>
-          <CardDescription>Navigate to related accounting pages</CardDescription>
+          <CardTitle>{t('accounting.relatedModules', 'Related Modules')}</CardTitle>
+          <CardDescription>{t('accounting.relatedModulesDescription', 'Navigate to related accounting pages')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <Link href="/general-ledger">
               <Button variant="outline" className="w-full justify-start" data-testid="link-general-ledger">
                 <BookOpen className="h-4 w-4 mr-2" />
-                General Ledger
+                {t('nav.general_ledger', 'General Ledger')}
                 <ExternalLink className="h-3 w-3 ml-auto" />
               </Button>
             </Link>
             <Link href="/chart-of-accounts">
               <Button variant="outline" className="w-full justify-start" data-testid="link-chart-of-accounts">
                 <FileText className="h-4 w-4 mr-2" />
-                Chart of Accounts
+                {t('nav.chart_of_accounts', 'Chart of Accounts')}
                 <ExternalLink className="h-3 w-3 ml-auto" />
               </Button>
             </Link>
             <Link href="/trial-balance">
               <Button variant="outline" className="w-full justify-start" data-testid="link-trial-balance">
                 <ArrowUpRight className="h-4 w-4 mr-2" />
-                Trial Balance
+                {t('nav.trial_balance', 'Trial Balance')}
                 <ExternalLink className="h-3 w-3 ml-auto" />
               </Button>
             </Link>
             <Link href="/income-statement">
               <Button variant="outline" className="w-full justify-start" data-testid="link-income-statement">
                 <ArrowDownRight className="h-4 w-4 mr-2" />
-                Income Statement
+                {t('nav.income_statement', 'Income Statement')}
                 <ExternalLink className="h-3 w-3 ml-auto" />
               </Button>
             </Link>
@@ -592,14 +594,14 @@ export default function JournalEntries() {
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <div>
-          <h3 className="text-lg font-semibold">Entry Templates</h3>
+          <h3 className="text-lg font-semibold">{t('accounting.entryTemplates', 'Entry Templates')}</h3>
           <p className="text-sm text-muted-foreground">
-            Pre-configured templates for common transactions
+            {t('accounting.entryTemplatesDescription', 'Pre-configured templates for common transactions')}
           </p>
         </div>
         <Button data-testid="button-create-template">
           <Plus className="h-4 w-4 mr-2" />
-          Create Template
+          {t('accounting.createTemplate', 'Create Template')}
         </Button>
       </div>
 
@@ -650,16 +652,16 @@ export default function JournalEntries() {
             <CardContent>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Debit:</span>
+                  <span className="text-muted-foreground">{t('accounting.debit', 'Debit')}:</span>
                   <Badge variant="outline" className="text-green-600">{template.debit}</Badge>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Credit:</span>
+                  <span className="text-muted-foreground">{t('accounting.credit', 'Credit')}:</span>
                   <Badge variant="outline" className="text-red-600">{template.credit}</Badge>
                 </div>
               </div>
               <Button className="w-full mt-4" variant="outline" data-testid={`button-use-template-${index}`}>
-                Use Template
+                {t('accounting.useTemplate', 'Use Template')}
               </Button>
             </CardContent>
           </Card>
@@ -669,15 +671,15 @@ export default function JournalEntries() {
   );
 
   const tabs = [
-    { id: "entries", label: "Journal Entries", icon: FileText, content: entriesTab },
-    { id: "summary", label: "Summary", icon: Calendar, content: summaryTab },
-    { id: "templates", label: "Templates", icon: Copy, content: templatesTab },
+    { id: "entries", label: t('accounting.journalEntries.tabs.entries', 'Journal Entries'), icon: FileText, content: entriesTab },
+    { id: "summary", label: t('accounting.journalEntries.tabs.summary', 'Summary'), icon: Calendar, content: summaryTab },
+    { id: "templates", label: t('accounting.journalEntries.tabs.templates', 'Templates'), icon: Copy, content: templatesTab },
   ];
 
   return (
     <TabsPageLayout
-      title="Journal Entries - القيود اليومية"
-      description="Record and manage daily accounting transactions"
+      title={t('accounting.journalEntries.title', 'Journal Entries - القيود اليومية')}
+      description={t('accounting.journalEntries.description', 'Record and manage daily accounting transactions')}
       icon={FileText}
       tabs={tabs}
       defaultTab="entries"

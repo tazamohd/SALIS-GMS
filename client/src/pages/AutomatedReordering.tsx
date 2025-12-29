@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { TabsPageLayout } from "@/components/layouts/TabsPageLayout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -56,6 +57,7 @@ interface ReorderRule {
 }
 
 export default function AutomatedReordering() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [selectedTimeframe, setSelectedTimeframe] = useState("30d");
 
@@ -77,28 +79,28 @@ export default function AutomatedReordering() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/inventory/forecasts'] });
-      toast({ title: "Forecast updated", description: "AI demand predictions have been refreshed" });
+      toast({ title: t('autoReorder.forecastUpdated', 'Forecast updated'), description: t('autoReorder.aiPredictionsRefreshed', 'AI demand predictions have been refreshed') });
     },
     onError: (error: any) => {
-      toast({ title: "Forecast failed", description: error.message, variant: "destructive" });
+      toast({ title: t('autoReorder.forecastFailed', 'Forecast failed'), description: error.message, variant: "destructive" });
     },
   });
 
   const demandTrendData = [
-    { month: "Jan", actual: 120, predicted: 115, variance: 5 },
-    { month: "Feb", actual: 135, predicted: 140, variance: -5 },
-    { month: "Mar", actual: 150, predicted: 148, variance: 2 },
-    { month: "Apr", actual: 145, predicted: 155, variance: -10 },
-    { month: "May", actual: 160, predicted: 158, variance: 2 },
-    { month: "Jun", actual: 175, predicted: 172, variance: 3 },
+    { month: t('months.jan', 'Jan'), actual: 120, predicted: 115, variance: 5 },
+    { month: t('months.feb', 'Feb'), actual: 135, predicted: 140, variance: -5 },
+    { month: t('months.mar', 'Mar'), actual: 150, predicted: 148, variance: 2 },
+    { month: t('months.apr', 'Apr'), actual: 145, predicted: 155, variance: -10 },
+    { month: t('months.may', 'May'), actual: 160, predicted: 158, variance: 2 },
+    { month: t('months.jun', 'Jun'), actual: 175, predicted: 172, variance: 3 },
   ];
 
   const stockLevelData = [
-    { name: "Oil Filters", current: 45, min: 20, reorder: 30, max: 100 },
-    { name: "Brake Pads", current: 15, min: 10, reorder: 25, max: 80 },
-    { name: "Air Filters", current: 28, min: 15, reorder: 30, max: 60 },
-    { name: "Spark Plugs", current: 60, min: 25, reorder: 40, max: 120 },
-    { name: "Coolant", current: 8, min: 5, reorder: 15, max: 50 },
+    { name: t('autoReorder.oilFilters', 'Oil Filters'), current: 45, min: 20, reorder: 30, max: 100 },
+    { name: t('autoReorder.brakePads', 'Brake Pads'), current: 15, min: 10, reorder: 25, max: 80 },
+    { name: t('autoReorder.airFilters', 'Air Filters'), current: 28, min: 15, reorder: 30, max: 60 },
+    { name: t('autoReorder.sparkPlugs', 'Spark Plugs'), current: 60, min: 25, reorder: 40, max: 120 },
+    { name: t('autoReorder.coolant', 'Coolant'), current: 8, min: 5, reorder: 15, max: 50 },
   ];
 
   const criticalItems = stockLevelData.filter(item => item.current <= item.reorder);
@@ -111,7 +113,7 @@ export default function AutomatedReordering() {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Critical Stock</p>
+                <p className="text-sm text-muted-foreground">{t('autoReorder.criticalStock', 'Critical Stock')}</p>
                 <p className="text-3xl font-bold text-red-500" data-testid="text-critical-count">{criticalItems.length}</p>
               </div>
               <AlertTriangle className="w-8 h-8 text-red-500" />
@@ -122,7 +124,7 @@ export default function AutomatedReordering() {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Low Stock</p>
+                <p className="text-sm text-muted-foreground">{t('autoReorder.lowStock', 'Low Stock')}</p>
                 <p className="text-3xl font-bold text-yellow-500" data-testid="text-lowstock-count">{lowStockItems.length}</p>
               </div>
               <Package className="w-8 h-8 text-yellow-500" />
@@ -133,7 +135,7 @@ export default function AutomatedReordering() {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Pending Orders</p>
+                <p className="text-sm text-muted-foreground">{t('autoReorder.pendingOrders', 'Pending Orders')}</p>
                 <p className="text-3xl font-bold" data-testid="text-pending-count">{pendingOrders.length}</p>
               </div>
               <ShoppingCart className="w-8 h-8 text-blue-500" />
@@ -144,7 +146,7 @@ export default function AutomatedReordering() {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Forecast Accuracy</p>
+                <p className="text-sm text-muted-foreground">{t('autoReorder.forecastAccuracy', 'Forecast Accuracy')}</p>
                 <p className="text-3xl font-bold text-green-500" data-testid="text-accuracy">94%</p>
               </div>
               <Brain className="w-8 h-8 text-green-500" />
@@ -158,9 +160,9 @@ export default function AutomatedReordering() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <TrendingUp className="w-5 h-5" />
-              Demand Forecast vs Actual
+              {t('autoReorder.demandForecastVsActual', 'Demand Forecast vs Actual')}
             </CardTitle>
-            <CardDescription>AI-predicted demand compared to actual usage</CardDescription>
+            <CardDescription>{t('autoReorder.aiPredictedDemand', 'AI-predicted demand compared to actual usage')}</CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -170,8 +172,8 @@ export default function AutomatedReordering() {
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                <Line type="monotone" dataKey="actual" stroke="#10b981" name="Actual" strokeWidth={2} />
-                <Line type="monotone" dataKey="predicted" stroke="#6366f1" name="Predicted" strokeWidth={2} strokeDasharray="5 5" />
+                <Line type="monotone" dataKey="actual" stroke="#10b981" name={t('autoReorder.actual', 'Actual')} strokeWidth={2} />
+                <Line type="monotone" dataKey="predicted" stroke="#6366f1" name={t('autoReorder.predicted', 'Predicted')} strokeWidth={2} strokeDasharray="5 5" />
               </LineChart>
             </ResponsiveContainer>
           </CardContent>
@@ -181,9 +183,9 @@ export default function AutomatedReordering() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <BarChart3 className="w-5 h-5" />
-              Stock Levels
+              {t('autoReorder.stockLevels', 'Stock Levels')}
             </CardTitle>
-            <CardDescription>Current stock vs reorder points</CardDescription>
+            <CardDescription>{t('autoReorder.currentStockVsReorderPoints', 'Current stock vs reorder points')}</CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -193,8 +195,8 @@ export default function AutomatedReordering() {
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                <Bar dataKey="current" fill="#10b981" name="Current Stock" />
-                <Bar dataKey="reorder" fill="#f59e0b" name="Reorder Point" />
+                <Bar dataKey="current" fill="#10b981" name={t('autoReorder.currentStock', 'Current Stock')} />
+                <Bar dataKey="reorder" fill="#f59e0b" name={t('autoReorder.reorderPoint', 'Reorder Point')} />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
@@ -206,9 +208,9 @@ export default function AutomatedReordering() {
           <div>
             <CardTitle className="flex items-center gap-2">
               <Zap className="w-5 h-5" />
-              AI Demand Predictions
+              {t('autoReorder.aiDemandPredictions', 'AI Demand Predictions')}
             </CardTitle>
-            <CardDescription>Machine learning based demand forecasting</CardDescription>
+            <CardDescription>{t('autoReorder.mlBasedForecasting', 'Machine learning based demand forecasting')}</CardDescription>
           </div>
           <Button 
             onClick={() => runForecastMutation.mutate()} 
@@ -216,7 +218,7 @@ export default function AutomatedReordering() {
             data-testid="button-run-forecast"
           >
             <RefreshCw className={`w-4 h-4 mr-2 ${runForecastMutation.isPending ? 'animate-spin' : ''}`} />
-            Run Forecast
+            {t('autoReorder.runForecast', 'Run Forecast')}
           </Button>
         </CardHeader>
         <CardContent>
@@ -234,7 +236,7 @@ export default function AutomatedReordering() {
                       <div>
                         <p className="font-medium">{item.name}</p>
                         <p className="text-sm text-muted-foreground">
-                          {item.current} units in stock ({daysUntilStockout} days supply)
+                          {t('autoReorder.unitsInStock', '{{count}} units in stock ({{days}} days supply)', { count: item.current, days: daysUntilStockout })}
                         </p>
                       </div>
                     </div>
@@ -242,25 +244,25 @@ export default function AutomatedReordering() {
                       {isLow && (
                         <Badge variant="destructive" className="flex items-center gap-1">
                           <AlertTriangle className="w-3 h-3" />
-                          Reorder Now
+                          {t('autoReorder.reorderNow', 'Reorder Now')}
                         </Badge>
                       )}
                       <Badge variant="outline" className="flex items-center gap-1">
                         <TrendingUp className="w-3 h-3" />
-                        +12% demand
+                        {t('autoReorder.demandIncrease', '+12% demand')}
                       </Badge>
                     </div>
                   </div>
                   <div className="space-y-1">
                     <div className="flex justify-between text-xs text-muted-foreground">
-                      <span>Stock Level</span>
+                      <span>{t('autoReorder.stockLevel', 'Stock Level')}</span>
                       <span>{stockPercent.toFixed(0)}%</span>
                     </div>
                     <Progress value={stockPercent} className={`h-2 ${isLow ? '[&>div]:bg-red-500' : ''}`} />
                     <div className="flex justify-between text-xs text-muted-foreground">
-                      <span>Min: {item.min}</span>
-                      <span>Reorder: {item.reorder}</span>
-                      <span>Max: {item.max}</span>
+                      <span>{t('autoReorder.min', 'Min')}: {item.min}</span>
+                      <span>{t('autoReorder.reorder', 'Reorder')}: {item.reorder}</span>
+                      <span>{t('autoReorder.max', 'Max')}: {item.max}</span>
                     </div>
                   </div>
                 </div>
@@ -277,12 +279,12 @@ export default function AutomatedReordering() {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
-            <CardTitle>Reorder Rules</CardTitle>
-            <CardDescription>Configure automatic reordering rules for inventory items</CardDescription>
+            <CardTitle>{t('autoReorder.reorderRules', 'Reorder Rules')}</CardTitle>
+            <CardDescription>{t('autoReorder.configureRulesDescription', 'Configure automatic reordering rules for inventory items')}</CardDescription>
           </div>
           <Button data-testid="button-add-reorder-rule">
             <Settings className="w-4 h-4 mr-2" />
-            Add Rule
+            {t('autoReorder.addRule', 'Add Rule')}
           </Button>
         </CardHeader>
         <CardContent>
@@ -294,13 +296,13 @@ export default function AutomatedReordering() {
                   <div>
                     <p className="font-medium">{item.name}</p>
                     <p className="text-sm text-muted-foreground">
-                      Reorder {item.reorder * 2} units when stock falls below {item.reorder}
+                      {t('autoReorder.ruleDescription', 'Reorder {{qty}} units when stock falls below {{threshold}}', { qty: item.reorder * 2, threshold: item.reorder })}
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
-                  <Badge variant="outline">Auto-approve: Off</Badge>
-                  <Button variant="ghost" size="sm" data-testid={`button-edit-rule-${idx}`}>Edit</Button>
+                  <Badge variant="outline">{t('autoReorder.autoApproveOff', 'Auto-approve: Off')}</Badge>
+                  <Button variant="ghost" size="sm" data-testid={`button-edit-rule-${idx}`}>{t('common.edit', 'Edit')}</Button>
                 </div>
               </div>
             ))}
@@ -314,14 +316,14 @@ export default function AutomatedReordering() {
     <div className="space-y-6" data-testid="auto-reorder-orders">
       <Card>
         <CardHeader>
-          <CardTitle>Pending Replenishment Orders</CardTitle>
-          <CardDescription>Review and approve auto-generated orders</CardDescription>
+          <CardTitle>{t('autoReorder.pendingReplenishmentOrders', 'Pending Replenishment Orders')}</CardTitle>
+          <CardDescription>{t('autoReorder.reviewAndApprove', 'Review and approve auto-generated orders')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="text-center py-12 text-muted-foreground">
             <ShoppingCart className="w-12 h-12 mx-auto mb-4 opacity-50" />
-            <p>No pending orders</p>
-            <p className="text-sm">Orders will appear here when stock levels trigger reorder rules</p>
+            <p>{t('autoReorder.noPendingOrders', 'No pending orders')}</p>
+            <p className="text-sm">{t('autoReorder.ordersWillAppear', 'Orders will appear here when stock levels trigger reorder rules')}</p>
           </div>
         </CardContent>
       </Card>
@@ -332,8 +334,8 @@ export default function AutomatedReordering() {
     <div className="space-y-6" data-testid="auto-reorder-analytics">
       <Card>
         <CardHeader>
-          <CardTitle>Forecast Performance</CardTitle>
-          <CardDescription>Track accuracy of AI predictions over time</CardDescription>
+          <CardTitle>{t('autoReorder.forecastPerformance', 'Forecast Performance')}</CardTitle>
+          <CardDescription>{t('autoReorder.trackAccuracy', 'Track accuracy of AI predictions over time')}</CardDescription>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={300}>
@@ -343,7 +345,7 @@ export default function AutomatedReordering() {
               <YAxis />
               <Tooltip />
               <Legend />
-              <Area type="monotone" dataKey="variance" fill="#f59e0b" stroke="#f59e0b" name="Variance %" />
+              <Area type="monotone" dataKey="variance" fill="#f59e0b" stroke="#f59e0b" name={t('autoReorder.variancePercent', 'Variance %')} />
             </AreaChart>
           </ResponsiveContainer>
         </CardContent>
@@ -352,16 +354,16 @@ export default function AutomatedReordering() {
   );
 
   const tabs = [
-    { id: "overview", label: "Overview", icon: PackageSearch, content: overviewTab },
-    { id: "rules", label: "Reorder Rules", icon: Settings, content: rulesTab },
-    { id: "orders", label: "Pending Orders", icon: ShoppingCart, content: ordersTab },
-    { id: "analytics", label: "Analytics", icon: BarChart3, content: analyticsTab },
+    { id: "overview", label: t('autoReorder.overview', 'Overview'), icon: PackageSearch, content: overviewTab },
+    { id: "rules", label: t('autoReorder.reorderRules', 'Reorder Rules'), icon: Settings, content: rulesTab },
+    { id: "orders", label: t('autoReorder.pendingOrders', 'Pending Orders'), icon: ShoppingCart, content: ordersTab },
+    { id: "analytics", label: t('autoReorder.analytics', 'Analytics'), icon: BarChart3, content: analyticsTab },
   ];
 
   return (
     <TabsPageLayout
-      title="Automated Inventory Reordering"
-      description="AI-powered demand forecasting and automatic replenishment"
+      title={t('autoReorder.title', 'Automated Inventory Reordering')}
+      description={t('autoReorder.description', 'AI-powered demand forecasting and automatic replenishment')}
       icon={PackageSearch}
       tabs={tabs}
       defaultTab="overview"

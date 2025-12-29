@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -18,6 +19,7 @@ import {
 } from "@/components/ui/select";
 
 export default function PredictiveMaintenance() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [severityFilter, setSeverityFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -31,13 +33,13 @@ export default function PredictiveMaintenance() {
       await apiRequest(`/api/ai/maintenance-predictions/${predictionId}/acknowledge`, "POST", {});
       queryClient.invalidateQueries({ queryKey: ["/api/ai/maintenance-predictions"] });
       toast({
-        title: "Prediction Acknowledged",
-        description: "The maintenance prediction has been marked as acknowledged.",
+        title: t('predictiveMaintenance.predictionAcknowledged', 'Prediction Acknowledged'),
+        description: t('predictiveMaintenance.markedAsAcknowledged', 'The maintenance prediction has been marked as acknowledged.'),
       });
     } catch (error) {
       toast({
-        title: "Error",
-        description: "Failed to acknowledge prediction. Please try again.",
+        title: t('common.error', 'Error'),
+        description: t('predictiveMaintenance.failedToAcknowledge', 'Failed to acknowledge prediction. Please try again.'),
         variant: "destructive",
       });
     }
@@ -46,8 +48,8 @@ export default function PredictiveMaintenance() {
   const handleRunAnalysis = async () => {
     try {
       toast({
-        title: "Analysis Started",
-        description: "AI is analyzing service history patterns...",
+        title: t('predictiveMaintenance.analysisStarted', 'Analysis Started'),
+        description: t('predictiveMaintenance.aiAnalyzing', 'AI is analyzing service history patterns...'),
       });
       
       await apiRequest("/api/ai/maintenance-predictions/analyze", "POST", {});
@@ -55,13 +57,13 @@ export default function PredictiveMaintenance() {
       queryClient.invalidateQueries({ queryKey: ["/api/ai/maintenance-predictions"] });
       
       toast({
-        title: "Analysis Complete",
-        description: "New maintenance predictions have been generated.",
+        title: t('predictiveMaintenance.analysisComplete', 'Analysis Complete'),
+        description: t('predictiveMaintenance.newPredictionsGenerated', 'New maintenance predictions have been generated.'),
       });
     } catch (error) {
       toast({
-        title: "Analysis Failed",
-        description: "Failed to run predictive analysis. Please try again.",
+        title: t('predictiveMaintenance.analysisFailed', 'Analysis Failed'),
+        description: t('predictiveMaintenance.failedToRunAnalysis', 'Failed to run predictive analysis. Please try again.'),
         variant: "destructive",
       });
     }
@@ -97,12 +99,12 @@ export default function PredictiveMaintenance() {
 
   return (
     <StandardPageLayout
-      title="Predictive Maintenance"
-      description="AI-powered maintenance predictions based on service history analysis"
+      title={t('predictiveMaintenance.title', 'Predictive Maintenance')}
+      description={t('predictiveMaintenance.description', 'AI-powered maintenance predictions based on service history analysis')}
       icon={Brain}
       actions={[
         {
-          label: "Run Analysis",
+          label: t('predictiveMaintenance.runAnalysis', 'Run Analysis'),
           onClick: handleRunAnalysis,
           icon: TrendingUp,
           variant: "default",
@@ -110,12 +112,11 @@ export default function PredictiveMaintenance() {
       ]}
     >
       <div className="space-y-6">
-        {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                Total Predictions
+                {t('predictiveMaintenance.totalPredictions', 'Total Predictions')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -128,7 +129,7 @@ export default function PredictiveMaintenance() {
           <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                Pending Review
+                {t('predictiveMaintenance.pendingReview', 'Pending Review')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -141,7 +142,7 @@ export default function PredictiveMaintenance() {
           <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                Critical Issues
+                {t('predictiveMaintenance.criticalIssues', 'Critical Issues')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -154,7 +155,7 @@ export default function PredictiveMaintenance() {
           <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                Acknowledged
+                {t('predictiveMaintenance.acknowledged', 'Acknowledged')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -165,44 +166,43 @@ export default function PredictiveMaintenance() {
           </Card>
         </div>
 
-        {/* Filters */}
         <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
           <CardHeader>
-            <CardTitle className="text-gray-900 dark:text-white">Filters</CardTitle>
+            <CardTitle className="text-gray-900 dark:text-white">{t('common.filter', 'Filters')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
-                  Severity
+                  {t('predictiveMaintenance.severity', 'Severity')}
                 </label>
                 <Select value={severityFilter} onValueChange={setSeverityFilter}>
                   <SelectTrigger data-testid="select-severity">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Severities</SelectItem>
-                    <SelectItem value="critical">Critical</SelectItem>
-                    <SelectItem value="high">High</SelectItem>
-                    <SelectItem value="medium">Medium</SelectItem>
-                    <SelectItem value="low">Low</SelectItem>
+                    <SelectItem value="all">{t('predictiveMaintenance.allSeverities', 'All Severities')}</SelectItem>
+                    <SelectItem value="critical">{t('predictiveMaintenance.critical', 'Critical')}</SelectItem>
+                    <SelectItem value="high">{t('predictiveMaintenance.high', 'High')}</SelectItem>
+                    <SelectItem value="medium">{t('predictiveMaintenance.medium', 'Medium')}</SelectItem>
+                    <SelectItem value="low">{t('predictiveMaintenance.low', 'Low')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div>
                 <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
-                  Status
+                  {t('common.status', 'Status')}
                 </label>
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
                   <SelectTrigger data-testid="select-status">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Statuses</SelectItem>
-                    <SelectItem value="pending">Pending</SelectItem>
-                    <SelectItem value="acknowledged">Acknowledged</SelectItem>
-                    <SelectItem value="resolved">Resolved</SelectItem>
+                    <SelectItem value="all">{t('predictiveMaintenance.allStatuses', 'All Statuses')}</SelectItem>
+                    <SelectItem value="pending">{t('common.pending', 'Pending')}</SelectItem>
+                    <SelectItem value="acknowledged">{t('predictiveMaintenance.acknowledged', 'Acknowledged')}</SelectItem>
+                    <SelectItem value="resolved">{t('predictiveMaintenance.resolved', 'Resolved')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -210,7 +210,6 @@ export default function PredictiveMaintenance() {
           </CardContent>
         </Card>
 
-        {/* Predictions List */}
         <div className="space-y-4">
           {isLoading ? (
             Array.from({ length: 3 }).map((_, i) => (
@@ -252,7 +251,7 @@ export default function PredictiveMaintenance() {
                         </Badge>
                         {prediction.confidence && (
                           <span className="text-sm text-gray-600 dark:text-gray-400">
-                            Confidence: {String(prediction.confidence)}%
+                            {t('predictiveMaintenance.confidence', 'Confidence')}: {String(prediction.confidence)}%
                           </span>
                         )}
                       </div>
@@ -260,26 +259,24 @@ export default function PredictiveMaintenance() {
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {/* Recommended Action */}
                   <div className="flex items-start gap-3">
                     <Wrench className="h-5 w-5 text-blue-600 mt-1 flex-shrink-0" />
                     <div>
                       <p className="text-sm font-medium text-gray-900 dark:text-white mb-1">
-                        Recommended Action
+                        {t('predictiveMaintenance.recommendedAction', 'Recommended Action')}
                       </p>
                       <p className="text-sm text-gray-600 dark:text-gray-400">
-                        {String(prediction.recommendedAction || 'No recommendation available')}
+                        {String(prediction.recommendedAction || t('predictiveMaintenance.noRecommendation', 'No recommendation available'))}
                       </p>
                     </div>
                   </div>
 
-                  {/* Estimated Timeframe */}
                   {prediction.estimatedTimeframe ? (
                     <div className="flex items-start gap-3">
                       <Clock className="h-5 w-5 text-purple-600 mt-1 flex-shrink-0" />
                       <div>
                         <p className="text-sm font-medium text-gray-900 dark:text-white mb-1">
-                          Estimated Timeframe
+                          {t('predictiveMaintenance.estimatedTimeframe', 'Estimated Timeframe')}
                         </p>
                         <p className="text-sm text-gray-600 dark:text-gray-400">
                           {String(prediction.estimatedTimeframe)}
@@ -288,13 +285,12 @@ export default function PredictiveMaintenance() {
                     </div>
                   ) : null}
 
-                  {/* Analysis Data */}
                   {prediction.basedOnData ? (
                     <div className="flex items-start gap-3">
                       <Brain className="h-5 w-5 text-indigo-600 mt-1 flex-shrink-0" />
                       <div className="flex-1">
                         <p className="text-sm font-medium text-gray-900 dark:text-white mb-1">
-                          Analysis Based On
+                          {t('predictiveMaintenance.analysisBasedOn', 'Analysis Based On')}
                         </p>
                         <div className="text-sm text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-900 p-3 rounded-md">
                           <pre className="whitespace-pre-wrap font-mono text-xs">
@@ -310,7 +306,6 @@ export default function PredictiveMaintenance() {
                     </div>
                   ) : null}
 
-                  {/* Actions */}
                   <div className="flex gap-2 pt-2">
                     {prediction.status === "pending" && (
                       <Button
@@ -321,7 +316,7 @@ export default function PredictiveMaintenance() {
                         data-testid={`button-acknowledge-${prediction.id}`}
                       >
                         <CheckCircle className="mr-2 h-4 w-4" />
-                        Acknowledge
+                        {t('predictiveMaintenance.acknowledge', 'Acknowledge')}
                       </Button>
                     )}
                     <Button
@@ -330,7 +325,7 @@ export default function PredictiveMaintenance() {
                       data-testid={`button-view-vehicle-${prediction.id}`}
                     >
                       <Car className="mr-2 h-4 w-4" />
-                      View Vehicle
+                      {t('predictiveMaintenance.viewVehicle', 'View Vehicle')}
                     </Button>
                   </div>
                 </CardContent>
@@ -341,9 +336,9 @@ export default function PredictiveMaintenance() {
               <CardContent className="flex flex-col items-center justify-center py-12">
                 <Brain className="h-16 w-16 text-gray-400 mb-4" />
                 <p className="text-gray-600 dark:text-gray-400 text-center">
-                  No maintenance predictions found.
+                  {t('predictiveMaintenance.noPredictions', 'No maintenance predictions found.')}
                   <br />
-                  Click "Run Analysis" to generate predictions based on service history.
+                  {t('predictiveMaintenance.clickRunAnalysis', 'Click "Run Analysis" to generate predictions based on service history.')}
                 </p>
               </CardContent>
             </Card>

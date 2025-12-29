@@ -1,4 +1,5 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -29,6 +30,7 @@ const reminderSchema = z.object({
 type ReminderFormValues = z.infer<typeof reminderSchema>;
 
 export default function ServiceReminders() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { toast } = useToast();
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -72,8 +74,8 @@ export default function ServiceReminders() {
       setDialogOpen(false);
       form.reset();
       toast({
-        title: "Reminder Created",
-        description: "Your service reminder has been set successfully.",
+        title: t('serviceReminders.reminderCreated', 'Reminder Created'),
+        description: t('serviceReminders.reminderSetSuccess', 'Your service reminder has been set successfully.'),
       });
     },
   });
@@ -98,12 +100,12 @@ export default function ServiceReminders() {
   return (
     <>
       <StandardPageLayout
-        title="Service Reminders"
-        description="Stay on top of your vehicle maintenance schedule"
+        title={t('serviceReminders.title', 'Service Reminders')}
+        description={t('serviceReminders.description', 'Stay on top of your vehicle maintenance schedule')}
         icon={Bell}
         actions={[
           {
-            label: "Add Reminder",
+            label: t('serviceReminders.addReminder', 'Add Reminder'),
             icon: Plus,
             onClick: () => setDialogOpen(true),
             variant: "default",
@@ -113,8 +115,8 @@ export default function ServiceReminders() {
         {/* Active Reminders */}
         <Card data-testid="card-active-reminders">
           <CardHeader>
-            <CardTitle>Active Reminders ({activeReminders.length})</CardTitle>
-            <CardDescription>Upcoming maintenance and service reminders</CardDescription>
+            <CardTitle>{t('serviceReminders.activeReminders', 'Active Reminders')} ({activeReminders.length})</CardTitle>
+            <CardDescription>{t('serviceReminders.upcomingMaintenance', 'Upcoming maintenance and service reminders')}</CardDescription>
           </CardHeader>
           <CardContent>
             {isLoading ? (
@@ -125,7 +127,7 @@ export default function ServiceReminders() {
             ) : activeReminders.length === 0 ? (
               <div className="text-center py-12 text-muted-foreground">
                 <Bell className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                <p>No active reminders</p>
+                <p>{t('serviceReminders.noActiveReminders', 'No active reminders')}</p>
               </div>
             ) : (
               <div className="space-y-4">
@@ -155,7 +157,7 @@ export default function ServiceReminders() {
                       )}
                       {reminder.mileageDue && (
                         <p className="text-xs text-muted-foreground">
-                          Due at: {reminder.mileageDue.toLocaleString()} km
+                          {t('serviceReminders.dueAt', 'Due at')}: {reminder.mileageDue.toLocaleString()} {t('serviceReminders.km', 'km')}
                         </p>
                       )}
                     </div>
@@ -170,8 +172,8 @@ export default function ServiceReminders() {
         {completedReminders.length > 0 && (
           <Card data-testid="card-completed-reminders">
             <CardHeader>
-              <CardTitle>Completed</CardTitle>
-              <CardDescription>Recently completed service reminders</CardDescription>
+              <CardTitle>{t('serviceReminders.completed', 'Completed')}</CardTitle>
+              <CardDescription>{t('serviceReminders.recentlyCompleted', 'Recently completed service reminders')}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
@@ -193,7 +195,7 @@ export default function ServiceReminders() {
                       </div>
                     </div>
                     <Badge variant="outline" className="text-xs">
-                      Completed
+                      {t('serviceReminders.completed', 'Completed')}
                     </Badge>
                   </div>
                 ))}
@@ -206,9 +208,9 @@ export default function ServiceReminders() {
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="max-w-md">
             <DialogHeader>
-              <DialogTitle>Create Service Reminder</DialogTitle>
+              <DialogTitle>{t('serviceReminders.createReminder', 'Create Service Reminder')}</DialogTitle>
               <DialogDescription>
-                Set up a reminder for upcoming vehicle maintenance
+                {t('serviceReminders.setupReminder', 'Set up a reminder for upcoming vehicle maintenance')}
               </DialogDescription>
             </DialogHeader>
             <Form {...form}>
@@ -218,11 +220,11 @@ export default function ServiceReminders() {
                   name="vehicleId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Vehicle</FormLabel>
+                      <FormLabel>{t('serviceReminders.vehicle', 'Vehicle')}</FormLabel>
                       <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
                           <SelectTrigger data-testid="select-vehicle">
-                            <SelectValue placeholder="Select vehicle" />
+                            <SelectValue placeholder={t('serviceReminders.selectVehicle', 'Select vehicle')} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -243,20 +245,20 @@ export default function ServiceReminders() {
                   name="reminderType"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Reminder Type</FormLabel>
+                      <FormLabel>{t('serviceReminders.reminderType', 'Reminder Type')}</FormLabel>
                       <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
                           <SelectTrigger data-testid="select-type">
-                            <SelectValue placeholder="Select type" />
+                            <SelectValue placeholder={t('serviceReminders.selectType', 'Select type')} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="oil_change">Oil Change</SelectItem>
-                          <SelectItem value="tire_rotation">Tire Rotation</SelectItem>
-                          <SelectItem value="brake_inspection">Brake Inspection</SelectItem>
-                          <SelectItem value="registration">Registration Renewal</SelectItem>
-                          <SelectItem value="inspection">Annual Inspection</SelectItem>
-                          <SelectItem value="other">Other</SelectItem>
+                          <SelectItem value="oil_change">{t('serviceReminders.oilChange', 'Oil Change')}</SelectItem>
+                          <SelectItem value="tire_rotation">{t('serviceReminders.tireRotation', 'Tire Rotation')}</SelectItem>
+                          <SelectItem value="brake_inspection">{t('serviceReminders.brakeInspection', 'Brake Inspection')}</SelectItem>
+                          <SelectItem value="registration">{t('serviceReminders.registrationRenewal', 'Registration Renewal')}</SelectItem>
+                          <SelectItem value="inspection">{t('serviceReminders.annualInspection', 'Annual Inspection')}</SelectItem>
+                          <SelectItem value="other">{t('serviceReminders.other', 'Other')}</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -269,7 +271,7 @@ export default function ServiceReminders() {
                   name="dueDate"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Due Date</FormLabel>
+                      <FormLabel>{t('serviceReminders.dueDate', 'Due Date')}</FormLabel>
                       <FormControl>
                         <Input type="date" {...field} data-testid="input-due-date" />
                       </FormControl>
@@ -283,11 +285,11 @@ export default function ServiceReminders() {
                   name="mileageDue"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Mileage Due (Optional)</FormLabel>
+                      <FormLabel>{t('serviceReminders.mileageDueOptional', 'Mileage Due (Optional)')}</FormLabel>
                       <FormControl>
                         <Input
                           type="number"
-                          placeholder="e.g., 50000"
+                          placeholder={t('serviceReminders.mileagePlaceholder', 'e.g., 50000')}
                           {...field}
                           data-testid="input-mileage"
                         />
@@ -302,10 +304,10 @@ export default function ServiceReminders() {
                   name="description"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Description</FormLabel>
+                      <FormLabel>{t('common.description', 'Description')}</FormLabel>
                       <FormControl>
                         <Textarea
-                          placeholder="Additional notes about this service..."
+                          placeholder={t('serviceReminders.additionalNotes', 'Additional notes about this service...')}
                           {...field}
                           data-testid="input-description"
                         />
@@ -323,7 +325,7 @@ export default function ServiceReminders() {
                     className="flex-1"
                     data-testid="button-cancel"
                   >
-                    Cancel
+                    {t('common.cancel', 'Cancel')}
                   </Button>
                   <Button
                     type="submit"
@@ -331,7 +333,7 @@ export default function ServiceReminders() {
                     className="flex-1"
                     data-testid="button-submit"
                   >
-                    {createMutation.isPending ? "Creating..." : "Create Reminder"}
+                    {createMutation.isPending ? t('serviceReminders.creating', 'Creating...') : t('serviceReminders.createReminder', 'Create Reminder')}
                   </Button>
                 </div>
               </form>

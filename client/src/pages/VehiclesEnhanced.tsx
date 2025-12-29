@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -29,6 +30,7 @@ import { format } from "date-fns";
 import { StandardPageLayout } from "@/components/layouts";
 
 export default function VehiclesEnhanced() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
@@ -36,7 +38,6 @@ export default function VehiclesEnhanced() {
   const [activeTab, setActiveTab] = useState("overview");
   const [vinDecoding, setVinDecoding] = useState(false);
 
-  // Vehicle queries
   const { data: vehicles = [], isLoading } = useQuery<Vehicle[]>({
     queryKey: ['/api/vehicles'],
   });
@@ -49,7 +50,6 @@ export default function VehiclesEnhanced() {
     queryKey: ['/api/garages'],
   });
 
-  // Enhanced data queries for selected vehicle
   const { data: serviceHistory = [] } = useQuery<VehicleServiceHistory[]>({
     queryKey: ['/api/vehicles', selectedVehicle?.id, 'service-history'],
     enabled: !!selectedVehicle,
@@ -92,19 +92,17 @@ export default function VehiclesEnhanced() {
     },
   });
 
-  // Set garageId when garages load
   useEffect(() => {
     if (garages.length > 0 && !form.getValues("garageId")) {
       form.setValue("garageId", garages[0].id);
     }
   }, [garages, form]);
 
-  // VIN decoder
   const decodeVIN = async (vin: string) => {
     if (!vin || vin.length < 17) {
       toast({
-        title: "Invalid VIN",
-        description: "VIN must be 17 characters long",
+        title: t('vehicles.invalidVin', 'Invalid VIN'),
+        description: t('vehicles.vinMustBe17', 'VIN must be 17 characters long'),
         variant: "destructive",
       });
       return;
@@ -114,7 +112,6 @@ export default function VehiclesEnhanced() {
     try {
       const data = await apiRequest('GET', `/api/decode-vin/${vin}`) as any[];
       
-      // Extract relevant fields from NHTSA response
       const makeField = data?.find((item: any) => item.Variable === "Make")?.Value;
       const modelField = data?.find((item: any) => item.Variable === "Model")?.Value;
       const yearField = data?.find((item: any) => item.Variable === "Model Year")?.Value;
@@ -125,13 +122,13 @@ export default function VehiclesEnhanced() {
       if (yearField) form.setValue("year", parseInt(yearField));
       
       toast({
-        title: "VIN Decoded",
-        description: "Vehicle information populated from VIN",
+        title: t('vehicles.vinDecoded', 'VIN Decoded'),
+        description: t('vehicles.vinPopulated', 'Vehicle information populated from VIN'),
       });
     } catch (error: any) {
       toast({
-        title: "VIN Decode Failed",
-        description: error.message || "Could not decode VIN",
+        title: t('vehicles.vinDecodeFailed', 'VIN Decode Failed'),
+        description: error.message || t('vehicles.couldNotDecodeVin', 'Could not decode VIN'),
         variant: "destructive",
       });
     } finally {
@@ -139,14 +136,13 @@ export default function VehiclesEnhanced() {
     }
   };
 
-  // Mutations
   const createVehicleMutation = useMutation({
     mutationFn: async (data: InsertVehicle) => {
       return await apiRequest('POST', '/api/vehicles', data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/vehicles'] });
-      toast({ title: "Success", description: "Vehicle added successfully" });
+      toast({ title: t('common.success', 'Success'), description: t('vehicles.vehicleAdded', 'Vehicle added successfully') });
       setIsDialogOpen(false);
       form.reset({
         customerId: "",
@@ -165,7 +161,7 @@ export default function VehiclesEnhanced() {
       });
     },
     onError: (error: any) => {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({ title: t('common.error', 'Error'), description: error.message, variant: "destructive" });
     },
   });
 
@@ -175,7 +171,7 @@ export default function VehiclesEnhanced() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/vehicles'] });
-      toast({ title: "Success", description: "Vehicle updated successfully" });
+      toast({ title: t('common.success', 'Success'), description: t('vehicles.vehicleUpdated', 'Vehicle updated successfully') });
       setIsDialogOpen(false);
       form.reset({
         customerId: "",
@@ -194,7 +190,7 @@ export default function VehiclesEnhanced() {
       });
     },
     onError: (error: any) => {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({ title: t('common.error', 'Error'), description: error.message, variant: "destructive" });
     },
   });
 
@@ -221,8 +217,8 @@ export default function VehiclesEnhanced() {
 
   return (
     <StandardPageLayout
-      title="Vehicle Management"
-      description="Track vehicles, service history, maintenance schedules, and more"
+      title={t('vehicles.management', 'Vehicle Management')}
+      description={t('vehicles.managementDescription', 'Track vehicles, service history, maintenance schedules, and more')}
       icon={Car}
     >
       <>
@@ -247,11 +243,11 @@ export default function VehiclesEnhanced() {
             setIsDialogOpen(true);
           }} data-testid="button-add-vehicle">
             <Plus className="w-4 h-4 mr-2" />
-            Add Vehicle
+            {t('vehicles.addVehicle', 'Add Vehicle')}
           </Button>
           <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>{selectedVehicle ? "Edit Vehicle" : "Add New Vehicle"}</DialogTitle>
+              <DialogTitle>{selectedVehicle ? t('vehicles.editVehicle', 'Edit Vehicle') : t('vehicles.addNewVehicle', 'Add New Vehicle')}</DialogTitle>
             </DialogHeader>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -261,10 +257,10 @@ export default function VehiclesEnhanced() {
                     name="vin"
                     render={({ field }) => (
                       <FormItem className="col-span-2">
-                        <FormLabel>VIN</FormLabel>
+                        <FormLabel>{t('vehicles.vin', 'VIN')}</FormLabel>
                         <div className="flex gap-2">
                           <FormControl>
-                            <Input {...field} value={field.value || ""} placeholder="17-character VIN" data-testid="input-vin" />
+                            <Input {...field} value={field.value || ""} placeholder={t('vehicles.vinPlaceholder', '17-character VIN')} data-testid="input-vin" />
                           </FormControl>
                           <Button
                             type="button"
@@ -273,7 +269,7 @@ export default function VehiclesEnhanced() {
                             disabled={vinDecoding}
                             data-testid="button-decode-vin"
                           >
-                            {vinDecoding ? "Decoding..." : "Decode VIN"}
+                            {vinDecoding ? t('vehicles.decoding', 'Decoding...') : t('vehicles.decodeVin', 'Decode VIN')}
                           </Button>
                         </div>
                         <FormMessage />
@@ -286,11 +282,11 @@ export default function VehiclesEnhanced() {
                     name="customerId"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Owner</FormLabel>
+                        <FormLabel>{t('vehicles.owner', 'Owner')}</FormLabel>
                         <Select onValueChange={field.onChange} value={field.value}>
                           <FormControl>
                             <SelectTrigger data-testid="select-customer">
-                              <SelectValue placeholder="Select owner" />
+                              <SelectValue placeholder={t('vehicles.selectOwner', 'Select owner')} />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
@@ -311,11 +307,11 @@ export default function VehiclesEnhanced() {
                     name="garageId"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Garage</FormLabel>
+                        <FormLabel>{t('vehicles.garage', 'Garage')}</FormLabel>
                         <Select onValueChange={field.onChange} value={field.value}>
                           <FormControl>
                             <SelectTrigger data-testid="select-garage">
-                              <SelectValue placeholder="Select garage" />
+                              <SelectValue placeholder={t('vehicles.selectGarage', 'Select garage')} />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
@@ -336,7 +332,7 @@ export default function VehiclesEnhanced() {
                     name="make"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Make</FormLabel>
+                        <FormLabel>{t('vehicles.make', 'Make')}</FormLabel>
                         <FormControl>
                           <Input {...field} placeholder="Toyota" data-testid="input-make" />
                         </FormControl>
@@ -350,7 +346,7 @@ export default function VehiclesEnhanced() {
                     name="model"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Model</FormLabel>
+                        <FormLabel>{t('vehicles.model', 'Model')}</FormLabel>
                         <FormControl>
                           <Input {...field} placeholder="Camry" data-testid="input-model" />
                         </FormControl>
@@ -364,7 +360,7 @@ export default function VehiclesEnhanced() {
                     name="year"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Year</FormLabel>
+                        <FormLabel>{t('vehicles.year', 'Year')}</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
@@ -383,7 +379,7 @@ export default function VehiclesEnhanced() {
                     name="licensePlate"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>License Plate</FormLabel>
+                        <FormLabel>{t('vehicles.licensePlate', 'License Plate')}</FormLabel>
                         <FormControl>
                           <Input {...field} placeholder="ABC123" data-testid="input-license-plate" />
                         </FormControl>
@@ -397,9 +393,9 @@ export default function VehiclesEnhanced() {
                     name="color"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Color</FormLabel>
+                        <FormLabel>{t('vehicles.color', 'Color')}</FormLabel>
                         <FormControl>
-                          <Input {...field} value={field.value || ""} placeholder="Silver" data-testid="input-color" />
+                          <Input {...field} value={field.value || ""} placeholder={t('vehicles.colorPlaceholder', 'Silver')} data-testid="input-color" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -411,7 +407,7 @@ export default function VehiclesEnhanced() {
                     name="mileage"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Mileage</FormLabel>
+                        <FormLabel>{t('vehicles.mileage', 'Mileage')}</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
@@ -431,18 +427,18 @@ export default function VehiclesEnhanced() {
                     name="engineType"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Engine Type</FormLabel>
+                        <FormLabel>{t('vehicles.engineType', 'Engine Type')}</FormLabel>
                         <Select onValueChange={field.onChange} value={field.value || ""}>
                           <FormControl>
                             <SelectTrigger data-testid="select-engine-type">
-                              <SelectValue placeholder="Select engine type" />
+                              <SelectValue placeholder={t('vehicles.selectEngineType', 'Select engine type')} />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="gasoline">Gasoline</SelectItem>
-                            <SelectItem value="diesel">Diesel</SelectItem>
-                            <SelectItem value="electric">Electric</SelectItem>
-                            <SelectItem value="hybrid">Hybrid</SelectItem>
+                            <SelectItem value="gasoline">{t('vehicles.gasoline', 'Gasoline')}</SelectItem>
+                            <SelectItem value="diesel">{t('vehicles.diesel', 'Diesel')}</SelectItem>
+                            <SelectItem value="electric">{t('vehicles.electric', 'Electric')}</SelectItem>
+                            <SelectItem value="hybrid">{t('vehicles.hybrid', 'Hybrid')}</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -455,16 +451,16 @@ export default function VehiclesEnhanced() {
                     name="transmissionType"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Transmission</FormLabel>
+                        <FormLabel>{t('vehicles.transmission', 'Transmission')}</FormLabel>
                         <Select onValueChange={field.onChange} value={field.value || ""}>
                           <FormControl>
                             <SelectTrigger data-testid="select-transmission">
-                              <SelectValue placeholder="Select transmission" />
+                              <SelectValue placeholder={t('vehicles.selectTransmission', 'Select transmission')} />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="automatic">Automatic</SelectItem>
-                            <SelectItem value="manual">Manual</SelectItem>
+                            <SelectItem value="automatic">{t('vehicles.automatic', 'Automatic')}</SelectItem>
+                            <SelectItem value="manual">{t('vehicles.manual', 'Manual')}</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -477,9 +473,9 @@ export default function VehiclesEnhanced() {
                     name="warrantyProvider"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Warranty Provider</FormLabel>
+                        <FormLabel>{t('vehicles.warrantyProvider', 'Warranty Provider')}</FormLabel>
                         <FormControl>
-                          <Input {...field} value={field.value || ""} placeholder="Manufacturer" data-testid="input-warranty-provider" />
+                          <Input {...field} value={field.value || ""} placeholder={t('vehicles.manufacturer', 'Manufacturer')} data-testid="input-warranty-provider" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -491,18 +487,18 @@ export default function VehiclesEnhanced() {
                     name="warrantyType"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Warranty Type</FormLabel>
+                        <FormLabel>{t('vehicles.warrantyType', 'Warranty Type')}</FormLabel>
                         <Select onValueChange={field.onChange} value={field.value || ""}>
                           <FormControl>
                             <SelectTrigger data-testid="select-warranty-type">
-                              <SelectValue placeholder="Select warranty type" />
+                              <SelectValue placeholder={t('vehicles.selectWarrantyType', 'Select warranty type')} />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="manufacturer">Manufacturer</SelectItem>
-                            <SelectItem value="extended">Extended</SelectItem>
-                            <SelectItem value="powertrain">Powertrain</SelectItem>
-                            <SelectItem value="bumper-to-bumper">Bumper-to-Bumper</SelectItem>
+                            <SelectItem value="manufacturer">{t('vehicles.manufacturerWarranty', 'Manufacturer')}</SelectItem>
+                            <SelectItem value="extended">{t('vehicles.extendedWarranty', 'Extended')}</SelectItem>
+                            <SelectItem value="powertrain">{t('vehicles.powertrainWarranty', 'Powertrain')}</SelectItem>
+                            <SelectItem value="bumper-to-bumper">{t('vehicles.bumperToBumper', 'Bumper-to-Bumper')}</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -515,7 +511,7 @@ export default function VehiclesEnhanced() {
                     name="warrantyEndDate"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Warranty End Date</FormLabel>
+                        <FormLabel>{t('vehicles.warrantyEndDate', 'Warranty End Date')}</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
@@ -535,7 +531,7 @@ export default function VehiclesEnhanced() {
                     name="warrantyMileageLimit"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Warranty Mileage Limit</FormLabel>
+                        <FormLabel>{t('vehicles.warrantyMileageLimit', 'Warranty Mileage Limit')}</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
@@ -556,9 +552,9 @@ export default function VehiclesEnhanced() {
                   name="notes"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Notes</FormLabel>
+                      <FormLabel>{t('common.notes', 'Notes')}</FormLabel>
                       <FormControl>
-                        <Textarea {...field} value={field.value || ""} placeholder="Additional notes..." data-testid="input-notes" />
+                        <Textarea {...field} value={field.value || ""} placeholder={t('vehicles.additionalNotes', 'Additional notes...')} data-testid="input-notes" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -567,14 +563,14 @@ export default function VehiclesEnhanced() {
 
                 <DialogFooter>
                   <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
-                    Cancel
+                    {t('common.cancel', 'Cancel')}
                   </Button>
                   <Button
                     type="submit"
                     disabled={createVehicleMutation.isPending || updateVehicleMutation.isPending}
                     data-testid="button-submit"
                   >
-                    {createVehicleMutation.isPending || updateVehicleMutation.isPending ? "Saving..." : "Save Vehicle"}
+                    {createVehicleMutation.isPending || updateVehicleMutation.isPending ? t('common.saving', 'Saving...') : t('vehicles.saveVehicle', 'Save Vehicle')}
                   </Button>
                 </DialogFooter>
               </form>
@@ -583,13 +579,12 @@ export default function VehiclesEnhanced() {
         </Dialog>
 
       <div className="grid grid-cols-12 gap-6">
-        {/* Vehicle List */}
         <div className="col-span-4 space-y-4">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-900 dark:text-white/50" />
             <Input
               type="text"
-              placeholder="Search vehicles..."
+              placeholder={t('vehicles.searchVehicles', 'Search vehicles...')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10"
@@ -618,7 +613,7 @@ export default function VehiclesEnhanced() {
                           <Badge variant="outline" className="text-xs">{vehicle.engineType}</Badge>
                         )}
                         {vehicle.mileage && (
-                          <Badge variant="outline" className="text-xs">{vehicle.mileage.toLocaleString()} mi</Badge>
+                          <Badge variant="outline" className="text-xs">{vehicle.mileage.toLocaleString()} {t('vehicles.mi', 'mi')}</Badge>
                         )}
                       </div>
                     </div>
@@ -629,31 +624,30 @@ export default function VehiclesEnhanced() {
           </div>
         </div>
 
-        {/* Vehicle Details with Tabs */}
         <div className="col-span-8">
           {selectedVehicle ? (
             <Tabs value={activeTab} onValueChange={setActiveTab}>
               <TabsList className="grid w-full grid-cols-6">
-                <TabsTrigger value="overview" data-testid="tab-overview">Overview</TabsTrigger>
+                <TabsTrigger value="overview" data-testid="tab-overview">{t('vehicles.overview', 'Overview')}</TabsTrigger>
                 <TabsTrigger value="history" data-testid="tab-history">
                   <Clock className="w-4 h-4 mr-1" />
-                  History
+                  {t('vehicles.history', 'History')}
                 </TabsTrigger>
                 <TabsTrigger value="maintenance" data-testid="tab-maintenance">
                   <Wrench className="w-4 h-4 mr-1" />
-                  Maintenance
+                  {t('vehicles.maintenance', 'Maintenance')}
                 </TabsTrigger>
                 <TabsTrigger value="reminders" data-testid="tab-reminders">
                   <Bell className="w-4 h-4 mr-1" />
-                  Reminders
+                  {t('vehicles.reminders', 'Reminders')}
                 </TabsTrigger>
                 <TabsTrigger value="warranty" data-testid="tab-warranty">
                   <Shield className="w-4 h-4 mr-1" />
-                  Warranty
+                  {t('vehicles.warranty', 'Warranty')}
                 </TabsTrigger>
                 <TabsTrigger value="photos" data-testid="tab-photos">
                   <Image className="w-4 h-4 mr-1" />
-                  Photos
+                  {t('vehicles.photos', 'Photos')}
                 </TabsTrigger>
               </TabsList>
 
@@ -661,32 +655,32 @@ export default function VehiclesEnhanced() {
                 <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
                   <CardHeader>
                     <CardTitle className="text-gray-900 dark:text-white">{selectedVehicle.year} {selectedVehicle.make} {selectedVehicle.model}</CardTitle>
-                    <CardDescription className="text-gray-900 dark:text-white/60">Vehicle Information</CardDescription>
+                    <CardDescription className="text-gray-900 dark:text-white/60">{t('vehicles.vehicleInformation', 'Vehicle Information')}</CardDescription>
                   </CardHeader>
                   <CardContent className="grid grid-cols-2 gap-4">
                     <div>
-                      <p className="text-sm text-gray-600">License Plate</p>
+                      <p className="text-sm text-gray-600">{t('vehicles.licensePlate', 'License Plate')}</p>
                       <p className="font-medium">{selectedVehicle.licensePlate}</p>
                     </div>
                     <div>
-                      <p className="text-sm text-gray-600">VIN</p>
-                      <p className="font-medium">{selectedVehicle.vin || "N/A"}</p>
+                      <p className="text-sm text-gray-600">{t('vehicles.vin', 'VIN')}</p>
+                      <p className="font-medium">{selectedVehicle.vin || t('common.notAvailable', 'N/A')}</p>
                     </div>
                     <div>
-                      <p className="text-sm text-gray-600">Color</p>
-                      <p className="font-medium">{selectedVehicle.color || "N/A"}</p>
+                      <p className="text-sm text-gray-600">{t('vehicles.color', 'Color')}</p>
+                      <p className="font-medium">{selectedVehicle.color || t('common.notAvailable', 'N/A')}</p>
                     </div>
                     <div>
-                      <p className="text-sm text-gray-600">Mileage</p>
-                      <p className="font-medium">{selectedVehicle.mileage?.toLocaleString() || "0"} miles</p>
+                      <p className="text-sm text-gray-600">{t('vehicles.mileage', 'Mileage')}</p>
+                      <p className="font-medium">{selectedVehicle.mileage?.toLocaleString() || "0"} {t('vehicles.miles', 'miles')}</p>
                     </div>
                     <div>
-                      <p className="text-sm text-gray-600">Engine Type</p>
-                      <p className="font-medium">{selectedVehicle.engineType || "N/A"}</p>
+                      <p className="text-sm text-gray-600">{t('vehicles.engineType', 'Engine Type')}</p>
+                      <p className="font-medium">{selectedVehicle.engineType || t('common.notAvailable', 'N/A')}</p>
                     </div>
                     <div>
-                      <p className="text-sm text-gray-600">Transmission</p>
-                      <p className="font-medium">{selectedVehicle.transmissionType || "N/A"}</p>
+                      <p className="text-sm text-gray-600">{t('vehicles.transmission', 'Transmission')}</p>
+                      <p className="font-medium">{selectedVehicle.transmissionType || t('common.notAvailable', 'N/A')}</p>
                     </div>
                   </CardContent>
                 </Card>
@@ -695,12 +689,12 @@ export default function VehiclesEnhanced() {
               <TabsContent value="history" className="mt-4">
                 <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
                   <CardHeader>
-                    <CardTitle className="text-gray-900 dark:text-white">Service History Timeline</CardTitle>
-                    <CardDescription className="text-gray-900 dark:text-white/60">Complete service history for this vehicle</CardDescription>
+                    <CardTitle className="text-gray-900 dark:text-white">{t('vehicles.serviceHistoryTimeline', 'Service History Timeline')}</CardTitle>
+                    <CardDescription className="text-gray-900 dark:text-white/60">{t('vehicles.completeServiceHistory', 'Complete service history for this vehicle')}</CardDescription>
                   </CardHeader>
                   <CardContent>
                     {serviceHistory.length === 0 ? (
-                      <p className="text-center text-gray-900 dark:text-white/60 py-8">No service history recorded yet</p>
+                      <p className="text-center text-gray-900 dark:text-white/60 py-8">{t('vehicles.noServiceHistory', 'No service history recorded yet')}</p>
                     ) : (
                       <div className="space-y-4">
                         {serviceHistory.map((service) => (
@@ -711,7 +705,7 @@ export default function VehiclesEnhanced() {
                                 <p className="text-sm text-gray-600">{service.description}</p>
                                 {service.serviceDate && (
                                   <p className="text-xs text-gray-900 dark:text-white/60 mt-1">
-                                    {format(new Date(service.serviceDate), 'PPP')} • {service.mileageAtService?.toLocaleString()} miles
+                                    {format(new Date(service.serviceDate), 'PPP')} • {service.mileageAtService?.toLocaleString()} {t('vehicles.miles', 'miles')}
                                   </p>
                                 )}
                               </div>
@@ -730,12 +724,12 @@ export default function VehiclesEnhanced() {
               <TabsContent value="maintenance" className="mt-4">
                 <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
                   <CardHeader>
-                    <CardTitle className="text-gray-900 dark:text-white">Maintenance Schedule</CardTitle>
-                    <CardDescription className="text-gray-900 dark:text-white/60">Upcoming and scheduled maintenance items</CardDescription>
+                    <CardTitle className="text-gray-900 dark:text-white">{t('vehicles.maintenanceSchedule', 'Maintenance Schedule')}</CardTitle>
+                    <CardDescription className="text-gray-900 dark:text-white/60">{t('vehicles.upcomingMaintenance', 'Upcoming and scheduled maintenance items')}</CardDescription>
                   </CardHeader>
                   <CardContent>
                     {maintenanceSchedules.length === 0 ? (
-                      <p className="text-center text-gray-900 dark:text-white/60 py-8">No maintenance schedules configured</p>
+                      <p className="text-center text-gray-900 dark:text-white/60 py-8">{t('vehicles.noMaintenanceSchedules', 'No maintenance schedules configured')}</p>
                     ) : (
                       <div className="space-y-3">
                         {maintenanceSchedules.map((schedule) => (
@@ -746,15 +740,15 @@ export default function VehiclesEnhanced() {
                                 <p className="text-sm text-gray-600">{schedule.description}</p>
                                 <div className="flex gap-4 mt-2 text-xs text-gray-900 dark:text-white/60">
                                   {schedule.nextDueDate && (
-                                    <span>Due: {format(new Date(schedule.nextDueDate), 'PP')}</span>
+                                    <span>{t('vehicles.due', 'Due')}: {format(new Date(schedule.nextDueDate), 'PP')}</span>
                                   )}
                                   {schedule.nextDueMileage && (
-                                    <span>At: {schedule.nextDueMileage.toLocaleString()} miles</span>
+                                    <span>{t('vehicles.at', 'At')}: {schedule.nextDueMileage.toLocaleString()} {t('vehicles.miles', 'miles')}</span>
                                   )}
                                 </div>
                               </div>
                               <Badge variant={schedule.isActive ? "default" : "secondary"}>
-                                {schedule.isActive ? "Active" : "Inactive"}
+                                {schedule.isActive ? t('common.active', 'Active') : t('common.inactive', 'Inactive')}
                               </Badge>
                             </div>
                           </div>
@@ -768,12 +762,12 @@ export default function VehiclesEnhanced() {
               <TabsContent value="reminders" className="mt-4">
                 <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
                   <CardHeader>
-                    <CardTitle className="text-gray-900 dark:text-white">Service Reminders</CardTitle>
-                    <CardDescription className="text-gray-900 dark:text-white/60">Automated reminders for upcoming services</CardDescription>
+                    <CardTitle className="text-gray-900 dark:text-white">{t('vehicles.serviceReminders', 'Service Reminders')}</CardTitle>
+                    <CardDescription className="text-gray-900 dark:text-white/60">{t('vehicles.automatedReminders', 'Automated reminders for upcoming services')}</CardDescription>
                   </CardHeader>
                   <CardContent>
                     {serviceReminders.length === 0 ? (
-                      <p className="text-center text-gray-900 dark:text-white/60 py-8">No service reminders set</p>
+                      <p className="text-center text-gray-900 dark:text-white/60 py-8">{t('vehicles.noReminders', 'No service reminders set')}</p>
                     ) : (
                       <div className="space-y-3">
                         {serviceReminders.map((reminder) => (
@@ -784,10 +778,10 @@ export default function VehiclesEnhanced() {
                                 <p className="text-sm text-gray-600">{reminder.reminderMessage}</p>
                                 <div className="flex gap-4 mt-2 text-xs text-gray-900 dark:text-white/60">
                                   {reminder.triggerDate && (
-                                    <span>Trigger: {format(new Date(reminder.triggerDate), 'PP')}</span>
+                                    <span>{t('vehicles.trigger', 'Trigger')}: {format(new Date(reminder.triggerDate), 'PP')}</span>
                                   )}
                                   {reminder.triggerMileage && (
-                                    <span>At: {reminder.triggerMileage.toLocaleString()} miles</span>
+                                    <span>{t('vehicles.at', 'At')}: {reminder.triggerMileage.toLocaleString()} {t('vehicles.miles', 'miles')}</span>
                                   )}
                                 </div>
                               </div>
@@ -806,45 +800,45 @@ export default function VehiclesEnhanced() {
               <TabsContent value="warranty" className="mt-4">
                 <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
                   <CardHeader>
-                    <CardTitle className="text-gray-900 dark:text-white">Warranty Information</CardTitle>
-                    <CardDescription className="text-gray-900 dark:text-white/60">Vehicle warranty details and coverage</CardDescription>
+                    <CardTitle className="text-gray-900 dark:text-white">{t('vehicles.warrantyInformation', 'Warranty Information')}</CardTitle>
+                    <CardDescription className="text-gray-900 dark:text-white/60">{t('vehicles.warrantyDetails', 'Vehicle warranty details and coverage')}</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     {selectedVehicle.warrantyProvider ? (
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <p className="text-sm text-gray-600">Provider</p>
+                          <p className="text-sm text-gray-600">{t('vehicles.provider', 'Provider')}</p>
                           <p className="font-medium">{selectedVehicle.warrantyProvider}</p>
                         </div>
                         <div>
-                          <p className="text-sm text-gray-600">Type</p>
-                          <p className="font-medium">{selectedVehicle.warrantyType || "N/A"}</p>
+                          <p className="text-sm text-gray-600">{t('common.type', 'Type')}</p>
+                          <p className="font-medium">{selectedVehicle.warrantyType || t('common.notAvailable', 'N/A')}</p>
                         </div>
                         <div>
-                          <p className="text-sm text-gray-600">Expiration Date</p>
+                          <p className="text-sm text-gray-600">{t('vehicles.expirationDate', 'Expiration Date')}</p>
                           <p className="font-medium">
                             {selectedVehicle.warrantyEndDate
                               ? format(new Date(selectedVehicle.warrantyEndDate), 'PP')
-                              : "N/A"}
+                              : t('common.notAvailable', 'N/A')}
                           </p>
                         </div>
                         <div>
-                          <p className="text-sm text-gray-600">Mileage Limit</p>
+                          <p className="text-sm text-gray-600">{t('vehicles.mileageLimit', 'Mileage Limit')}</p>
                           <p className="font-medium">
                             {selectedVehicle.warrantyMileageLimit
-                              ? `${selectedVehicle.warrantyMileageLimit.toLocaleString()} miles`
-                              : "N/A"}
+                              ? `${selectedVehicle.warrantyMileageLimit.toLocaleString()} ${t('vehicles.miles', 'miles')}`
+                              : t('common.notAvailable', 'N/A')}
                           </p>
                         </div>
                         {selectedVehicle.warrantyNotes && (
                           <div className="col-span-2">
-                            <p className="text-sm text-gray-600">Notes</p>
+                            <p className="text-sm text-gray-600">{t('common.notes', 'Notes')}</p>
                             <p className="font-medium">{selectedVehicle.warrantyNotes}</p>
                           </div>
                         )}
                       </div>
                     ) : (
-                      <p className="text-center text-gray-900 dark:text-white/60 py-8">No warranty information available</p>
+                      <p className="text-center text-gray-900 dark:text-white/60 py-8">{t('vehicles.noWarrantyInfo', 'No warranty information available')}</p>
                     )}
                   </CardContent>
                 </Card>
@@ -853,8 +847,8 @@ export default function VehiclesEnhanced() {
               <TabsContent value="photos" className="mt-4">
                 <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
                   <CardHeader>
-                    <CardTitle className="text-gray-900 dark:text-white">Vehicle Photos</CardTitle>
-                    <CardDescription className="text-gray-900 dark:text-white/60">Photo gallery for this vehicle</CardDescription>
+                    <CardTitle className="text-gray-900 dark:text-white">{t('vehicles.vehiclePhotos', 'Vehicle Photos')}</CardTitle>
+                    <CardDescription className="text-gray-900 dark:text-white/60">{t('vehicles.photoGallery', 'Photo gallery for this vehicle')}</CardDescription>
                   </CardHeader>
                   <CardContent>
                     {selectedVehicle.photos && selectedVehicle.photos.length > 0 ? (
@@ -863,13 +857,13 @@ export default function VehiclesEnhanced() {
                           <img
                             key={index}
                             src={photo}
-                            alt={`Vehicle photo ${index + 1}`}
+                            alt={`${t('vehicles.vehiclePhoto', 'Vehicle photo')} ${index + 1}`}
                             className="rounded-lg object-cover w-full h-48"
                           />
                         ))}
                       </div>
                     ) : (
-                      <p className="text-center text-gray-900 dark:text-white/60 py-8">No photos uploaded yet</p>
+                      <p className="text-center text-gray-900 dark:text-white/60 py-8">{t('vehicles.noPhotos', 'No photos uploaded yet')}</p>
                     )}
                   </CardContent>
                 </Card>
@@ -879,8 +873,8 @@ export default function VehiclesEnhanced() {
             <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark h-full flex items-center justify-center">
               <CardContent className="text-center py-16">
                 <Car className="w-16 h-16 text-gray-900 dark:text-white/50 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold mb-2">No Vehicle Selected</h3>
-                <p className="text-gray-600">Select a vehicle from the list to view details</p>
+                <h3 className="text-lg font-semibold mb-2">{t('vehicles.noVehicleSelected', 'No Vehicle Selected')}</h3>
+                <p className="text-gray-600">{t('vehicles.selectVehicleFromList', 'Select a vehicle from the list to view details')}</p>
               </CardContent>
             </Card>
           )}

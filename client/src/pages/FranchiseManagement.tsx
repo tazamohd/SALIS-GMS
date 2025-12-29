@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -73,6 +74,7 @@ type RevenueSharingRule = {
 };
 
 export default function FranchiseManagement() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("groups");
   const [showGroupDialog, setShowGroupDialog] = useState(false);
@@ -150,12 +152,12 @@ export default function FranchiseManagement() {
     mutationFn: (data: InsertFranchiseGroup) => apiRequest("/api/franchise-groups", "POST", data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/franchise-groups"] });
-      toast({ title: "Franchise group created successfully" });
+      toast({ title: t('franchise.groupCreatedSuccess', 'Franchise group created successfully') });
       setShowGroupDialog(false);
       groupForm.reset();
     },
     onError: (error: Error) => {
-      toast({ title: "Error creating franchise group", description: error.message, variant: "destructive" });
+      toast({ title: t('franchise.errorCreatingGroup', 'Error creating franchise group'), description: error.message, variant: "destructive" });
     },
   });
 
@@ -163,13 +165,13 @@ export default function FranchiseManagement() {
     mutationFn: ({ id, data }: { id: string; data: Partial<InsertFranchiseGroup> }) => apiRequest(`/api/franchise-groups/${id}`, "PATCH", data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/franchise-groups"] });
-      toast({ title: "Franchise group updated successfully" });
+      toast({ title: t('franchise.groupUpdatedSuccess', 'Franchise group updated successfully') });
       setShowGroupDialog(false);
       setEditingGroup(null);
       groupForm.reset();
     },
     onError: (error: Error) => {
-      toast({ title: "Error updating franchise group", description: error.message, variant: "destructive" });
+      toast({ title: t('franchise.errorUpdatingGroup', 'Error updating franchise group'), description: error.message, variant: "destructive" });
     },
   });
 
@@ -177,10 +179,10 @@ export default function FranchiseManagement() {
     mutationFn: (id: string) => apiRequest(`/api/franchise-groups/${id}`, "DELETE"),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/franchise-groups"] });
-      toast({ title: "Franchise group deleted successfully" });
+      toast({ title: t('franchise.groupDeletedSuccess', 'Franchise group deleted successfully') });
     },
     onError: (error: Error) => {
-      toast({ title: "Error deleting franchise group", description: error.message, variant: "destructive" });
+      toast({ title: t('franchise.errorDeletingGroup', 'Error deleting franchise group'), description: error.message, variant: "destructive" });
     },
   });
 
@@ -188,12 +190,12 @@ export default function FranchiseManagement() {
     mutationFn: (data: InsertFranchiseContract) => apiRequest("/api/franchise-contracts", "POST", data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/franchise-contracts"] });
-      toast({ title: "Franchise contract created successfully" });
+      toast({ title: t('franchise.contractCreatedSuccess', 'Franchise contract created successfully') });
       setShowContractDialog(false);
       contractForm.reset();
     },
     onError: (error: Error) => {
-      toast({ title: "Error creating franchise contract", description: error.message, variant: "destructive" });
+      toast({ title: t('franchise.errorCreatingContract', 'Error creating franchise contract'), description: error.message, variant: "destructive" });
     },
   });
 
@@ -201,25 +203,25 @@ export default function FranchiseManagement() {
     mutationFn: ({ id, data }: { id: string; data: Partial<InsertFranchiseContract> }) => apiRequest(`/api/franchise-contracts/${id}`, "PATCH", data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/franchise-contracts"] });
-      toast({ title: "Franchise contract updated successfully" });
+      toast({ title: t('franchise.contractUpdatedSuccess', 'Franchise contract updated successfully') });
       setShowContractDialog(false);
       setEditingContract(null);
       contractForm.reset();
     },
     onError: (error: Error) => {
-      toast({ title: "Error updating franchise contract", description: error.message, variant: "destructive" });
+      toast({ title: t('franchise.errorUpdatingContract', 'Error updating franchise contract'), description: error.message, variant: "destructive" });
     },
   });
 
   const createKpiMutation = useMutation({
     mutationFn: (data: InsertFranchiseKpi) => apiRequest("/api/franchise-kpis", "POST", data),
     onSuccess: () => {
-      toast({ title: "Franchise KPI created successfully" });
+      toast({ title: t('franchise.kpiCreatedSuccess', 'Franchise KPI created successfully') });
       setShowKpiDialog(false);
       kpiForm.reset();
     },
     onError: (error: Error) => {
-      toast({ title: "Error creating franchise KPI", description: error.message, variant: "destructive" });
+      toast({ title: t('franchise.errorCreatingKpi', 'Error creating franchise KPI'), description: error.message, variant: "destructive" });
     },
   });
 
@@ -227,12 +229,12 @@ export default function FranchiseManagement() {
     mutationFn: (data: InsertRevenueSharingRule) => apiRequest("/api/revenue-sharing-rules", "POST", data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/revenue-sharing-rules"] });
-      toast({ title: "Revenue sharing rule created successfully" });
+      toast({ title: t('franchise.ruleCreatedSuccess', 'Revenue sharing rule created successfully') });
       setShowRuleDialog(false);
       ruleForm.reset();
     },
     onError: (error: Error) => {
-      toast({ title: "Error creating revenue sharing rule", description: error.message, variant: "destructive" });
+      toast({ title: t('franchise.errorCreatingRule', 'Error creating revenue sharing rule'), description: error.message, variant: "destructive" });
     },
   });
 
@@ -297,10 +299,17 @@ export default function FranchiseManagement() {
     };
     const config = statusColors[status] || { bg: 'bg-gray-100 dark:bg-gray-800', text: 'text-gray-700 dark:text-gray-300', icon: '○' };
 
+    const statusLabels: { [key: string]: string } = {
+      draft: t('common.draft', 'Draft'),
+      active: t('common.active', 'Active'),
+      pending: t('common.pending', 'Pending'),
+      expired: t('franchise.expired', 'Expired'),
+    };
+
     return (
       <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${config.bg} ${config.text}`} data-testid={`status-${status}`}>
         <span>{config.icon}</span>
-        {status.charAt(0).toUpperCase() + status.slice(1)}
+        {statusLabels[status] || status.charAt(0).toUpperCase() + status.slice(1)}
       </span>
     );
   };
@@ -308,15 +317,15 @@ export default function FranchiseManagement() {
   const tabsConfig = [
     {
       id: "groups",
-      label: "Franchise Groups",
+      label: t('franchise.franchiseGroups', 'Franchise Groups'),
       icon: Building2,
       content: (
         <div className="space-y-4">
           <div className="flex justify-between items-center">
-            <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">Franchise Groups</h2>
+            <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">{t('franchise.franchiseGroups', 'Franchise Groups')}</h2>
             <Button onClick={() => { setEditingGroup(null); groupForm.reset(); setShowGroupDialog(true); }} data-testid="button-add-group">
               <Plus className="h-4 w-4 mr-2" />
-              Add Franchise Group
+              {t('franchise.addFranchiseGroup', 'Add Franchise Group')}
             </Button>
           </div>
 
@@ -325,20 +334,20 @@ export default function FranchiseManagement() {
               <Table>
                 <TableHeader>
                   <TableRow className="border-border dark:border-border">
-                    <TableHead className="text-foreground dark:text-foreground">Name</TableHead>
-                    <TableHead className="text-foreground dark:text-foreground">Headquarters</TableHead>
-                    <TableHead className="text-foreground dark:text-foreground">Status</TableHead>
-                    <TableHead className="text-foreground dark:text-foreground text-right">Actions</TableHead>
+                    <TableHead className="text-foreground dark:text-foreground">{t('franchise.name', 'Name')}</TableHead>
+                    <TableHead className="text-foreground dark:text-foreground">{t('franchise.headquarters', 'Headquarters')}</TableHead>
+                    <TableHead className="text-foreground dark:text-foreground">{t('common.status', 'Status')}</TableHead>
+                    <TableHead className="text-foreground dark:text-foreground text-right">{t('common.actions', 'Actions')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {groupsLoading ? (
                     <TableRow>
-                      <TableCell colSpan={4} className="text-center text-muted-foreground dark:text-muted-foreground">Loading...</TableCell>
+                      <TableCell colSpan={4} className="text-center text-muted-foreground dark:text-muted-foreground">{t('common.loading', 'Loading...')}</TableCell>
                     </TableRow>
                   ) : franchiseGroups.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={4} className="text-center text-muted-foreground dark:text-muted-foreground">No franchise groups found</TableCell>
+                      <TableCell colSpan={4} className="text-center text-muted-foreground dark:text-muted-foreground">{t('franchise.noFranchiseGroupsFound', 'No franchise groups found')}</TableCell>
                     </TableRow>
                   ) : (
                     franchiseGroups.map((group) => (
@@ -360,9 +369,9 @@ export default function FranchiseManagement() {
                         </TableCell>
                         <TableCell>
                           {group.isActive ? (
-                            <Badge variant="default" data-testid="status-active">Active</Badge>
+                            <Badge variant="default" data-testid="status-active">{t('common.active', 'Active')}</Badge>
                           ) : (
-                            <Badge variant="secondary" data-testid="status-inactive">Inactive</Badge>
+                            <Badge variant="secondary" data-testid="status-inactive">{t('common.inactive', 'Inactive')}</Badge>
                           )}
                         </TableCell>
                         <TableCell className="text-right space-x-2">
@@ -385,15 +394,15 @@ export default function FranchiseManagement() {
     },
     {
       id: "contracts",
-      label: "Contracts",
+      label: t('franchise.contracts', 'Contracts'),
       icon: FileText,
       content: (
         <div className="space-y-4">
           <div className="flex justify-between items-center">
-            <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">Franchise Contracts</h2>
+            <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">{t('franchise.franchiseContracts', 'Franchise Contracts')}</h2>
             <Button onClick={() => { setEditingContract(null); contractForm.reset(); setShowContractDialog(true); }} data-testid="button-add-contract">
               <Plus className="h-4 w-4 mr-2" />
-              Add Contract
+              {t('franchise.addContract', 'Add Contract')}
             </Button>
           </div>
 
@@ -402,21 +411,21 @@ export default function FranchiseManagement() {
               <Table>
                 <TableHeader>
                   <TableRow className="border-border dark:border-border">
-                    <TableHead className="text-foreground dark:text-foreground">Contract #</TableHead>
-                    <TableHead className="text-foreground dark:text-foreground">Period</TableHead>
-                    <TableHead className="text-foreground dark:text-foreground">Fees</TableHead>
-                    <TableHead className="text-foreground dark:text-foreground">Status</TableHead>
-                    <TableHead className="text-foreground dark:text-foreground text-right">Actions</TableHead>
+                    <TableHead className="text-foreground dark:text-foreground">{t('franchise.contractNumber', 'Contract #')}</TableHead>
+                    <TableHead className="text-foreground dark:text-foreground">{t('franchise.period', 'Period')}</TableHead>
+                    <TableHead className="text-foreground dark:text-foreground">{t('franchise.fees', 'Fees')}</TableHead>
+                    <TableHead className="text-foreground dark:text-foreground">{t('common.status', 'Status')}</TableHead>
+                    <TableHead className="text-foreground dark:text-foreground text-right">{t('common.actions', 'Actions')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {contractsLoading ? (
                     <TableRow>
-                      <TableCell colSpan={5} className="text-center text-muted-foreground dark:text-muted-foreground">Loading...</TableCell>
+                      <TableCell colSpan={5} className="text-center text-muted-foreground dark:text-muted-foreground">{t('common.loading', 'Loading...')}</TableCell>
                     </TableRow>
                   ) : franchiseContracts.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={5} className="text-center text-muted-foreground dark:text-muted-foreground">No franchise contracts found</TableCell>
+                      <TableCell colSpan={5} className="text-center text-muted-foreground dark:text-muted-foreground">{t('franchise.noFranchiseContractsFound', 'No franchise contracts found')}</TableCell>
                     </TableRow>
                   ) : (
                     franchiseContracts.map((contract) => (
@@ -424,13 +433,13 @@ export default function FranchiseManagement() {
                         <TableCell className="text-foreground dark:text-foreground font-medium">{contract.contractNumber}</TableCell>
                         <TableCell className="text-foreground dark:text-foreground">
                           <div className="text-sm">
-                            {new Date(contract.startDate).toLocaleDateString()} - {contract.endDate ? new Date(contract.endDate).toLocaleDateString() : "Ongoing"}
+                            {new Date(contract.startDate).toLocaleDateString()} - {contract.endDate ? new Date(contract.endDate).toLocaleDateString() : t('franchise.ongoing', 'Ongoing')}
                           </div>
                         </TableCell>
                         <TableCell className="text-foreground dark:text-foreground">
                           <div className="text-sm">
-                            {contract.royaltyPercentage && <div>Royalty: {contract.royaltyPercentage}%</div>}
-                            {contract.marketingFeePercentage && <div className="text-muted-foreground dark:text-muted-foreground">Marketing: {contract.marketingFeePercentage}%</div>}
+                            {contract.royaltyPercentage && <div>{t('franchise.royalty', 'Royalty')}: {contract.royaltyPercentage}%</div>}
+                            {contract.marketingFeePercentage && <div className="text-muted-foreground dark:text-muted-foreground">{t('franchise.marketing', 'Marketing')}: {contract.marketingFeePercentage}%</div>}
                           </div>
                         </TableCell>
                         <TableCell>{getStatusBadge(contract.status || "active")}</TableCell>
@@ -451,25 +460,25 @@ export default function FranchiseManagement() {
     },
     {
       id: "kpis",
-      label: "KPIs",
+      label: t('franchise.kpis', 'KPIs'),
       icon: TrendingUp,
       content: (
         <div className="space-y-4">
           <div className="flex justify-between items-center">
-            <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">Franchise KPIs</h2>
+            <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">{t('franchise.franchiseKpis', 'Franchise KPIs')}</h2>
             <Button onClick={() => { setEditingKpi(null); kpiForm.reset(); setShowKpiDialog(true); }} data-testid="button-add-kpi">
               <Plus className="h-4 w-4 mr-2" />
-              Add KPI Report
+              {t('franchise.addKpiReport', 'Add KPI Report')}
             </Button>
           </div>
 
           <Card className="border border-gray-200 dark:border-salis-gray-dark bg-white dark:bg-salis-black">
             <CardHeader>
-              <CardTitle className="text-foreground dark:text-foreground">Performance Metrics</CardTitle>
-              <CardDescription className="text-muted-foreground dark:text-muted-foreground">Track franchise performance across key metrics</CardDescription>
+              <CardTitle className="text-foreground dark:text-foreground">{t('franchise.performanceMetrics', 'Performance Metrics')}</CardTitle>
+              <CardDescription className="text-muted-foreground dark:text-muted-foreground">{t('franchise.trackFranchisePerformance', 'Track franchise performance across key metrics')}</CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground dark:text-muted-foreground">Select a branch to view KPI reports</p>
+              <p className="text-sm text-muted-foreground dark:text-muted-foreground">{t('franchise.selectBranchToViewKpi', 'Select a branch to view KPI reports')}</p>
             </CardContent>
           </Card>
         </div>
@@ -477,25 +486,25 @@ export default function FranchiseManagement() {
     },
     {
       id: "revenue",
-      label: "Revenue Sharing",
+      label: t('franchise.revenueSharing', 'Revenue Sharing'),
       icon: DollarSign,
       content: (
         <div className="space-y-4">
           <div className="flex justify-between items-center">
-            <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">Revenue Sharing Rules</h2>
+            <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">{t('franchise.revenueSharingRules', 'Revenue Sharing Rules')}</h2>
             <Button onClick={() => { setEditingRule(null); ruleForm.reset(); setShowRuleDialog(true); }} data-testid="button-add-rule">
               <Plus className="h-4 w-4 mr-2" />
-              Add Revenue Rule
+              {t('franchise.addRevenueRule', 'Add Revenue Rule')}
             </Button>
           </div>
 
           <Card className="border border-gray-200 dark:border-salis-gray-dark bg-white dark:bg-salis-black">
             <CardHeader>
-              <CardTitle className="text-foreground dark:text-foreground">Revenue Distribution</CardTitle>
-              <CardDescription className="text-muted-foreground dark:text-muted-foreground">Manage revenue sharing agreements between franchisor and franchisees</CardDescription>
+              <CardTitle className="text-foreground dark:text-foreground">{t('franchise.revenueDistribution', 'Revenue Distribution')}</CardTitle>
+              <CardDescription className="text-muted-foreground dark:text-muted-foreground">{t('franchise.manageRevenueSharingAgreements', 'Manage revenue sharing agreements between franchisor and franchisees')}</CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground dark:text-muted-foreground">No revenue sharing rules configured</p>
+              <p className="text-sm text-muted-foreground dark:text-muted-foreground">{t('franchise.noRevenueSharingRulesConfigured', 'No revenue sharing rules configured')}</p>
             </CardContent>
           </Card>
         </div>
@@ -506,8 +515,8 @@ export default function FranchiseManagement() {
   return (
     <>
       <TabsPageLayout
-        title="Franchise Command Center"
-        description="Manage franchise groups, contracts, KPIs, and revenue sharing across your network"
+        title={t('franchise.franchiseCommandCenter', 'Franchise Command Center')}
+        description={t('franchise.franchiseCommandCenterDescription', 'Manage franchise groups, contracts, KPIs, and revenue sharing across your network')}
         icon={Building2}
         tabs={tabsConfig}
         activeTab={activeTab}
@@ -517,9 +526,9 @@ export default function FranchiseManagement() {
       <Dialog open={showGroupDialog} onOpenChange={setShowGroupDialog}>
         <DialogContent className="bg-background dark:bg-background border-border dark:border-border max-w-2xl">
           <DialogHeader>
-            <DialogTitle className="text-foreground dark:text-foreground">{editingGroup ? "Edit Franchise Group" : "Add Franchise Group"}</DialogTitle>
+            <DialogTitle className="text-foreground dark:text-foreground">{editingGroup ? t('franchise.editFranchiseGroup', 'Edit Franchise Group') : t('franchise.addFranchiseGroup', 'Add Franchise Group')}</DialogTitle>
             <DialogDescription className="text-muted-foreground dark:text-muted-foreground">
-              {editingGroup ? "Update franchise group information" : "Create a new franchise group"}
+              {editingGroup ? t('franchise.updateGroupInfo', 'Update franchise group information') : t('franchise.createNewGroup', 'Create a new franchise group')}
             </DialogDescription>
           </DialogHeader>
           <Form {...groupForm}>
@@ -529,9 +538,9 @@ export default function FranchiseManagement() {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-foreground dark:text-foreground">Group Name</FormLabel>
+                    <FormLabel className="text-foreground dark:text-foreground">{t('franchise.groupName', 'Group Name')}</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="Enter group name" data-testid="input-group-name" className="bg-background dark:bg-background text-foreground dark:text-foreground border-input dark:border-input" />
+                      <Input {...field} placeholder={t('franchise.enterGroupName', 'Enter group name')} data-testid="input-group-name" className="bg-background dark:bg-background text-foreground dark:text-foreground border-input dark:border-input" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -542,9 +551,9 @@ export default function FranchiseManagement() {
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-foreground dark:text-foreground">Description</FormLabel>
+                    <FormLabel className="text-foreground dark:text-foreground">{t('common.description', 'Description')}</FormLabel>
                     <FormControl>
-                      <Textarea {...field} value={field.value || ""} placeholder="Enter description" data-testid="input-group-description" className="bg-background dark:bg-background text-foreground dark:text-foreground border-input dark:border-input" />
+                      <Textarea {...field} value={field.value || ""} placeholder={t('franchise.enterDescription', 'Enter description')} data-testid="input-group-description" className="bg-background dark:bg-background text-foreground dark:text-foreground border-input dark:border-input" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -556,9 +565,9 @@ export default function FranchiseManagement() {
                   name="headquarters"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-foreground dark:text-foreground">Headquarters</FormLabel>
+                      <FormLabel className="text-foreground dark:text-foreground">{t('franchise.headquarters', 'Headquarters')}</FormLabel>
                       <FormControl>
-                        <Input {...field} value={field.value || ""} placeholder="Enter headquarters location" data-testid="input-group-headquarters" className="bg-background dark:bg-background text-foreground dark:text-foreground border-input dark:border-input" />
+                        <Input {...field} value={field.value || ""} placeholder={t('franchise.enterHeadquartersLocation', 'Enter headquarters location')} data-testid="input-group-headquarters" className="bg-background dark:bg-background text-foreground dark:text-foreground border-input dark:border-input" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -569,7 +578,7 @@ export default function FranchiseManagement() {
                   name="totalBranches"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-foreground dark:text-foreground">Total Branches</FormLabel>
+                      <FormLabel className="text-foreground dark:text-foreground">{t('franchise.totalBranches', 'Total Branches')}</FormLabel>
                       <FormControl>
                         <Input {...field} value={field.value ?? ""} type="number" placeholder="0" data-testid="input-group-branches" className="bg-background dark:bg-background text-foreground dark:text-foreground border-input dark:border-input" onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)} />
                       </FormControl>
@@ -580,10 +589,10 @@ export default function FranchiseManagement() {
               </div>
               <DialogFooter>
                 <Button type="button" variant="outline" onClick={() => setShowGroupDialog(false)} className="border-input dark:border-input text-foreground dark:text-foreground">
-                  Cancel
+                  {t('common.cancel', 'Cancel')}
                 </Button>
                 <Button type="submit" disabled={createGroupMutation.isPending || updateGroupMutation.isPending} data-testid="button-submit-group">
-                  {editingGroup ? "Update" : "Create"} Group
+                  {editingGroup ? t('common.update', 'Update') : t('common.create', 'Create')} {t('franchise.group', 'Group')}
                 </Button>
               </DialogFooter>
             </form>
@@ -594,9 +603,9 @@ export default function FranchiseManagement() {
       <Dialog open={showContractDialog} onOpenChange={setShowContractDialog}>
         <DialogContent className="bg-background dark:bg-background border-border dark:border-border max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-foreground dark:text-foreground">{editingContract ? "Edit Contract" : "Add Franchise Contract"}</DialogTitle>
+            <DialogTitle className="text-foreground dark:text-foreground">{editingContract ? t('franchise.editContract', 'Edit Contract') : t('franchise.addFranchiseContract', 'Add Franchise Contract')}</DialogTitle>
             <DialogDescription className="text-muted-foreground dark:text-muted-foreground">
-              {editingContract ? "Update contract information" : "Create a new franchise contract"}
+              {editingContract ? t('franchise.updateContractInfo', 'Update contract information') : t('franchise.createNewContract', 'Create a new franchise contract')}
             </DialogDescription>
           </DialogHeader>
           <Form {...contractForm}>
@@ -606,7 +615,7 @@ export default function FranchiseManagement() {
                 name="contractNumber"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-foreground dark:text-foreground">Contract Number</FormLabel>
+                    <FormLabel className="text-foreground dark:text-foreground">{t('franchise.contractNumber', 'Contract Number')}</FormLabel>
                     <FormControl>
                       <Input {...field} placeholder="FC-2024-001" data-testid="input-contract-number" className="bg-background dark:bg-background text-foreground dark:text-foreground border-input dark:border-input" />
                     </FormControl>
@@ -620,7 +629,7 @@ export default function FranchiseManagement() {
                   name="royaltyPercentage"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-foreground dark:text-foreground">Royalty %</FormLabel>
+                      <FormLabel className="text-foreground dark:text-foreground">{t('franchise.royaltyPercentage', 'Royalty %')}</FormLabel>
                       <FormControl>
                         <Input {...field} value={field.value || ""} type="number" step="0.01" placeholder="5.00" data-testid="input-royalty" className="bg-background dark:bg-background text-foreground dark:text-foreground border-input dark:border-input" />
                       </FormControl>
@@ -633,7 +642,7 @@ export default function FranchiseManagement() {
                   name="marketingFeePercentage"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-foreground dark:text-foreground">Marketing Fee %</FormLabel>
+                      <FormLabel className="text-foreground dark:text-foreground">{t('franchise.marketingFeePercentage', 'Marketing Fee %')}</FormLabel>
                       <FormControl>
                         <Input {...field} value={field.value || ""} type="number" step="0.01" placeholder="2.00" data-testid="input-marketing-fee" className="bg-background dark:bg-background text-foreground dark:text-foreground border-input dark:border-input" />
                       </FormControl>
@@ -647,18 +656,18 @@ export default function FranchiseManagement() {
                 name="status"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-foreground dark:text-foreground">Status</FormLabel>
+                    <FormLabel className="text-foreground dark:text-foreground">{t('common.status', 'Status')}</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value || undefined}>
                       <FormControl>
                         <SelectTrigger data-testid="select-contract-status" className="bg-background dark:bg-background text-foreground dark:text-foreground border-input dark:border-input">
-                          <SelectValue placeholder="Select status" />
+                          <SelectValue placeholder={t('franchise.selectStatus', 'Select status')} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent className="bg-background dark:bg-background border-border dark:border-border">
-                        <SelectItem value="draft" className="text-foreground dark:text-foreground">Draft</SelectItem>
-                        <SelectItem value="pending" className="text-foreground dark:text-foreground">Pending</SelectItem>
-                        <SelectItem value="active" className="text-foreground dark:text-foreground">Active</SelectItem>
-                        <SelectItem value="expired" className="text-foreground dark:text-foreground">Expired</SelectItem>
+                        <SelectItem value="draft" className="text-foreground dark:text-foreground">{t('common.draft', 'Draft')}</SelectItem>
+                        <SelectItem value="pending" className="text-foreground dark:text-foreground">{t('common.pending', 'Pending')}</SelectItem>
+                        <SelectItem value="active" className="text-foreground dark:text-foreground">{t('common.active', 'Active')}</SelectItem>
+                        <SelectItem value="expired" className="text-foreground dark:text-foreground">{t('franchise.expired', 'Expired')}</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -667,10 +676,10 @@ export default function FranchiseManagement() {
               />
               <DialogFooter>
                 <Button type="button" variant="outline" onClick={() => setShowContractDialog(false)} className="border-input dark:border-input text-foreground dark:text-foreground">
-                  Cancel
+                  {t('common.cancel', 'Cancel')}
                 </Button>
                 <Button type="submit" disabled={createContractMutation.isPending || updateContractMutation.isPending} data-testid="button-submit-contract">
-                  {editingContract ? "Update" : "Create"} Contract
+                  {editingContract ? t('common.update', 'Update') : t('common.create', 'Create')} {t('franchise.contract', 'Contract')}
                 </Button>
               </DialogFooter>
             </form>

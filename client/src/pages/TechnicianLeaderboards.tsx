@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -7,6 +8,7 @@ import { Trophy, Award, Target, TrendingUp, Star, Zap, Medal } from "lucide-reac
 import { StandardPageLayout } from "@/components/layouts";
 
 export default function TechnicianLeaderboards() {
+  const { t } = useTranslation();
   const { data: usersData } = useQuery({ queryKey: ["/api/users"] });
   const { data: jobCardsData } = useQuery({ queryKey: ["/api/job-cards"] });
 
@@ -29,10 +31,10 @@ export default function TechnicianLeaderboards() {
   }).sort((a, b) => b.points - a.points);
 
   const badges = [
-    { name: "Speed Demon", icon: Zap, description: "Complete 5 jobs in one day", color: "text-yellow-500" },
-    { name: "Quality Master", icon: Star, description: "Perfect 5-star rating streak", color: "text-purple-500" },
-    { name: "Revenue King", icon: Trophy, description: "Generate $10k+ in one month", color: "text-green-500" },
-    { name: "Efficiency Expert", icon: Target, description: "95%+ efficiency for 30 days", color: "text-blue-500" },
+    { name: t('leaderboards.badges.speedDemon', 'Speed Demon'), icon: Zap, description: t('leaderboards.badges.speedDemonDesc', 'Complete 5 jobs in one day'), color: "text-yellow-500" },
+    { name: t('leaderboards.badges.qualityMaster', 'Quality Master'), icon: Star, description: t('leaderboards.badges.qualityMasterDesc', 'Perfect 5-star rating streak'), color: "text-purple-500" },
+    { name: t('leaderboards.badges.revenueKing', 'Revenue King'), icon: Trophy, description: t('leaderboards.badges.revenueKingDesc', 'Generate $10k+ in one month'), color: "text-green-500" },
+    { name: t('leaderboards.badges.efficiencyExpert', 'Efficiency Expert'), icon: Target, description: t('leaderboards.badges.efficiencyExpertDesc', '95%+ efficiency for 30 days'), color: "text-blue-500" },
   ];
 
   const getRankIcon = (index: number) => {
@@ -44,8 +46,8 @@ export default function TechnicianLeaderboards() {
 
   return (
     <StandardPageLayout
-      title="Technician Leaderboards"
-      description="Performance rankings, achievements, badges, and gamification challenges"
+      title={t('leaderboards.title', 'Technician Leaderboards')}
+      description={t('leaderboards.description', 'Performance rankings, achievements, badges, and gamification challenges')}
       icon={Trophy}
     >
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -55,7 +57,7 @@ export default function TechnicianLeaderboards() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Trophy className="h-5 w-5 text-yellow-500" />
-                Overall Leaderboard
+                {t('leaderboards.overallLeaderboard', 'Overall Leaderboard')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -84,7 +86,7 @@ export default function TechnicianLeaderboards() {
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">
                             <h3 className="font-semibold text-gray-900 dark:text-white">
-                              {tech.name || `Technician ${index + 1}`}
+                              {tech.name || `${t('leaderboards.technician', 'Technician')} ${index + 1}`}
                             </h3>
                             <Badge className="bg-blue-600">#{index + 1}</Badge>
                             {tech.badges > 0 && (
@@ -96,22 +98,22 @@ export default function TechnicianLeaderboards() {
                           </div>
                           <div className="grid grid-cols-3 gap-4 text-sm">
                             <div>
-                              <p className="text-gray-600 dark:text-gray-400">Points</p>
+                              <p className="text-gray-600 dark:text-gray-400">{t('leaderboards.points', 'Points')}</p>
                               <p className="font-semibold text-gray-900 dark:text-white" data-testid={`text-points-${tech.id}`}>{tech.points}</p>
                             </div>
                             <div>
-                              <p className="text-gray-600 dark:text-gray-400">Jobs</p>
+                              <p className="text-gray-600 dark:text-gray-400">{t('leaderboards.jobs', 'Jobs')}</p>
                               <p className="font-semibold text-gray-900 dark:text-white" data-testid={`text-jobs-${tech.id}`}>{tech.jobsCompleted}</p>
                             </div>
                             <div>
-                              <p className="text-gray-600 dark:text-gray-400">Revenue</p>
+                              <p className="text-gray-600 dark:text-gray-400">{t('leaderboards.revenue', 'Revenue')}</p>
                               <p className="font-semibold text-green-600" data-testid={`text-revenue-${tech.id}`}>${tech.revenue.toLocaleString()}</p>
                             </div>
                           </div>
                         </div>
 
                         <div className="text-right">
-                          <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Efficiency</p>
+                          <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t('leaderboards.efficiency', 'Efficiency')}</p>
                           <div className="flex items-center gap-2">
                             <Progress value={tech.efficiency} className="w-24" />
                             <span className="text-sm font-semibold text-gray-900 dark:text-white">
@@ -134,7 +136,7 @@ export default function TechnicianLeaderboards() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Award className="h-5 w-5 text-purple-600" />
-                Achievement Badges
+                {t('leaderboards.achievementBadges', 'Achievement Badges')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -169,31 +171,31 @@ export default function TechnicianLeaderboards() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Target className="h-5 w-5 text-orange-600" />
-                Active Challenges
+                {t('leaderboards.activeChallenges', 'Active Challenges')}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 <div className="p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
                   <h4 className="font-semibold text-gray-900 dark:text-white mb-2">
-                    Weekend Warrior
+                    {t('leaderboards.challenges.weekendWarrior', 'Weekend Warrior')}
                   </h4>
                   <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-                    Complete 10 jobs this weekend
+                    {t('leaderboards.challenges.weekendWarriorDesc', 'Complete 10 jobs this weekend')}
                   </p>
                   <Progress value={60} className="mb-1" />
-                  <p className="text-xs text-gray-500 dark:text-gray-400">6/10 jobs completed</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">{t('leaderboards.challenges.jobsCompleted', '6/10 jobs completed')}</p>
                 </div>
 
                 <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                   <h4 className="font-semibold text-gray-900 dark:text-white mb-2">
-                    Customer Satisfaction
+                    {t('leaderboards.challenges.customerSatisfaction', 'Customer Satisfaction')}
                   </h4>
                   <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-                    Maintain 4.8+ star rating for 7 days
+                    {t('leaderboards.challenges.customerSatisfactionDesc', 'Maintain 4.8+ star rating for 7 days')}
                   </p>
                   <Progress value={85} className="mb-1" />
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Day 6/7</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">{t('leaderboards.challenges.dayProgress', 'Day 6/7')}</p>
                 </div>
               </div>
             </CardContent>

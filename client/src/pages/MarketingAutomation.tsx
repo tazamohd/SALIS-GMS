@@ -3,6 +3,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useTranslation } from "react-i18next";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -28,6 +29,7 @@ const campaignSchema = z.object({
 type CampaignFormData = z.infer<typeof campaignSchema>;
 
 export default function MarketingAutomation() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [selectedTab, setSelectedTab] = useState("campaigns");
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
@@ -75,12 +77,12 @@ export default function MarketingAutomation() {
     }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/marketing-campaigns"] });
-      toast({ title: "Success", description: "Campaign created successfully" });
+      toast({ title: t('common.success', 'Success'), description: t('marketing.campaignCreated', 'Campaign created successfully') });
       setIsCreateDialogOpen(false);
       form.reset();
     },
     onError: () => {
-      toast({ title: "Error", description: "Failed to create campaign", variant: "destructive" });
+      toast({ title: t('common.error', 'Error'), description: t('marketing.campaignCreateError', 'Failed to create campaign'), variant: "destructive" });
     }
   });
 
@@ -89,7 +91,7 @@ export default function MarketingAutomation() {
       apiRequest("PATCH", `/api/marketing-campaigns/${id}`, { status }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/marketing-campaigns"] });
-      toast({ title: "Success", description: "Campaign updated successfully" });
+      toast({ title: t('common.success', 'Success'), description: t('marketing.campaignUpdated', 'Campaign updated successfully') });
     }
   });
 
@@ -97,7 +99,7 @@ export default function MarketingAutomation() {
     mutationFn: (id: string) => apiRequest("DELETE", `/api/marketing-campaigns/${id}`, undefined),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/marketing-campaigns"] });
-      toast({ title: "Success", description: "Campaign deleted successfully" });
+      toast({ title: t('common.success', 'Success'), description: t('marketing.campaignDeleted', 'Campaign deleted successfully') });
     }
   });
 
@@ -125,43 +127,43 @@ export default function MarketingAutomation() {
   const campaignsContent = (
     <Card className="border-gray-200 dark:border-salis-gray-light bg-white dark:bg-[#010101]">
       <CardHeader>
-        <CardTitle className="font-montserrat text-gray-900 dark:text-white">Campaign Management</CardTitle>
+        <CardTitle className="font-montserrat text-gray-900 dark:text-white">{t('marketing.campaignManagement', 'Campaign Management')}</CardTitle>
         <CardDescription className="font-poppins text-gray-600 dark:text-salis-gray-light">
-          Create and manage marketing campaigns
+          {t('marketing.campaignManagementDesc', 'Create and manage marketing campaigns')}
         </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="flex gap-4 mb-4">
           <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="w-[200px]" data-testid="select-status-filter">
-              <SelectValue placeholder="Filter by status" />
+              <SelectValue placeholder={t('marketing.filterByStatus', 'Filter by status')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Statuses</SelectItem>
-              <SelectItem value="draft">Draft</SelectItem>
-              <SelectItem value="scheduled">Scheduled</SelectItem>
-              <SelectItem value="sending">Sending</SelectItem>
-              <SelectItem value="sent">Sent</SelectItem>
-              <SelectItem value="completed">Completed</SelectItem>
+              <SelectItem value="">{t('marketing.allStatuses', 'All Statuses')}</SelectItem>
+              <SelectItem value="draft">{t('common.draft', 'Draft')}</SelectItem>
+              <SelectItem value="scheduled">{t('marketing.scheduled', 'Scheduled')}</SelectItem>
+              <SelectItem value="sending">{t('marketing.sending', 'Sending')}</SelectItem>
+              <SelectItem value="sent">{t('marketing.sent', 'Sent')}</SelectItem>
+              <SelectItem value="completed">{t('common.completed', 'Completed')}</SelectItem>
             </SelectContent>
           </Select>
 
           <Select value={typeFilter} onValueChange={setTypeFilter}>
             <SelectTrigger className="w-[200px]" data-testid="select-type-filter">
-              <SelectValue placeholder="Filter by type" />
+              <SelectValue placeholder={t('marketing.filterByType', 'Filter by type')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Types</SelectItem>
-              <SelectItem value="email">Email</SelectItem>
-              <SelectItem value="sms">SMS</SelectItem>
+              <SelectItem value="">{t('marketing.allTypes', 'All Types')}</SelectItem>
+              <SelectItem value="email">{t('marketing.email', 'Email')}</SelectItem>
+              <SelectItem value="sms">{t('marketing.sms', 'SMS')}</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
         {campaignsLoading ? (
-          <p className="text-gray-600 dark:text-salis-gray font-poppins" data-testid="text-loading">Loading campaigns...</p>
+          <p className="text-gray-600 dark:text-salis-gray font-poppins" data-testid="text-loading">{t('common.loading', 'Loading...')}</p>
         ) : campaigns.length === 0 ? (
-          <p className="text-gray-600 dark:text-salis-gray font-poppins" data-testid="text-no-campaigns">No campaigns found</p>
+          <p className="text-gray-600 dark:text-salis-gray font-poppins" data-testid="text-no-campaigns">{t('marketing.noCampaigns', 'No campaigns found')}</p>
         ) : (
           <div className="grid gap-4">
             {campaigns.map((campaign: any) => (
@@ -184,29 +186,29 @@ export default function MarketingAutomation() {
                         </Badge>
                       </div>
                       <p className="text-sm text-gray-600 dark:text-salis-gray-light font-poppins mb-3" data-testid={`text-campaign-subject-${campaign.id}`}>
-                        {campaign.subject || "No subject"}
+                        {campaign.subject || t('marketing.noSubject', 'No subject')}
                       </p>
                       <div className="grid grid-cols-4 gap-4 text-sm">
                         <div>
-                          <p className="text-gray-600 dark:text-salis-gray-light font-poppins">Recipients</p>
+                          <p className="text-gray-600 dark:text-salis-gray-light font-poppins">{t('marketing.recipients', 'Recipients')}</p>
                           <p className="font-semibold text-gray-900 dark:text-white" data-testid={`text-recipients-${campaign.id}`}>
                             {campaign.totalRecipients ?? 0}
                           </p>
                         </div>
                         <div>
-                          <p className="text-gray-600 dark:text-salis-gray-light font-poppins">Sent</p>
+                          <p className="text-gray-600 dark:text-salis-gray-light font-poppins">{t('marketing.sent', 'Sent')}</p>
                           <p className="font-semibold text-gray-900 dark:text-white" data-testid={`text-sent-${campaign.id}`}>
                             {campaign.sentCount ?? 0}
                           </p>
                         </div>
                         <div>
-                          <p className="text-gray-600 dark:text-salis-gray-light font-poppins">Delivered</p>
+                          <p className="text-gray-600 dark:text-salis-gray-light font-poppins">{t('marketing.delivered', 'Delivered')}</p>
                           <p className="font-semibold text-gray-900 dark:text-white" data-testid={`text-delivered-${campaign.id}`}>
                             {campaign.deliveredCount ?? 0}
                           </p>
                         </div>
                         <div>
-                          <p className="text-gray-600 dark:text-salis-gray-light font-poppins">Opened</p>
+                          <p className="text-gray-600 dark:text-salis-gray-light font-poppins">{t('marketing.opened', 'Opened')}</p>
                           <p className="font-semibold text-gray-900 dark:text-white" data-testid={`text-opened-${campaign.id}`}>
                             {campaign.openedCount ?? 0}
                           </p>
@@ -232,14 +234,14 @@ export default function MarketingAutomation() {
                         variant="outline"
                         onClick={(e) => {
                           e.stopPropagation();
-                          if (confirm("Delete this campaign?")) {
+                          if (confirm(t('marketing.confirmDeleteCampaign', 'Delete this campaign?'))) {
                             deleteCampaignMutation.mutate(campaign.id);
                           }
                         }}
                         className="border-gray-200 dark:border-salis-gray-dark"
                         data-testid={`button-delete-${campaign.id}`}
                       >
-                        Delete
+                        {t('common.delete', 'Delete')}
                       </Button>
                     </div>
                   </div>
@@ -255,15 +257,15 @@ export default function MarketingAutomation() {
   const analyticsContent = (
     <Card className="border-gray-200 dark:border-salis-gray-light bg-white dark:bg-[#010101]">
       <CardHeader>
-        <CardTitle className="font-montserrat text-gray-900 dark:text-white">Campaign Analytics</CardTitle>
+        <CardTitle className="font-montserrat text-gray-900 dark:text-white">{t('marketing.campaignAnalytics', 'Campaign Analytics')}</CardTitle>
         <CardDescription className="font-poppins text-gray-600 dark:text-salis-gray-light">
-          {selectedCampaign ? `Analytics for: ${selectedCampaign.name}` : "Select a campaign to view analytics"}
+          {selectedCampaign ? t('marketing.analyticsFor', 'Analytics for: {{name}}', { name: selectedCampaign.name }) : t('marketing.selectCampaignForAnalytics', 'Select a campaign to view analytics')}
         </CardDescription>
       </CardHeader>
       <CardContent>
         {!selectedCampaign ? (
           <p className="text-gray-600 dark:text-salis-gray font-poppins text-center py-8" data-testid="text-no-campaign-selected">
-            Click on a campaign from the Campaigns tab to view its analytics
+            {t('marketing.clickCampaignForAnalytics', 'Click on a campaign from the Campaigns tab to view its analytics')}
           </p>
         ) : analytics ? (
           <div className="space-y-6">
@@ -273,7 +275,7 @@ export default function MarketingAutomation() {
                   <div className="flex items-center gap-3">
                     <Users className="h-8 w-8 text-gray-600 dark:text-salis-gray-light" />
                     <div>
-                      <p className="text-sm text-gray-600 dark:text-salis-gray-light font-poppins">Total Recipients</p>
+                      <p className="text-sm text-gray-600 dark:text-salis-gray-light font-poppins">{t('marketing.totalRecipients', 'Total Recipients')}</p>
                       <p className="text-2xl font-bold text-gray-900 dark:text-white" data-testid="text-total-recipients">
                         {analytics.totalRecipients}
                       </p>
@@ -287,7 +289,7 @@ export default function MarketingAutomation() {
                   <div className="flex items-center gap-3">
                     <TrendingUp className="h-8 w-8 text-gray-600 dark:text-salis-gray-light" />
                     <div>
-                      <p className="text-sm text-gray-600 dark:text-salis-gray-light font-poppins">Delivery Rate</p>
+                      <p className="text-sm text-gray-600 dark:text-salis-gray-light font-poppins">{t('marketing.deliveryRate', 'Delivery Rate')}</p>
                       <p className="text-2xl font-bold text-gray-900 dark:text-white" data-testid="text-delivery-rate">
                         {analytics.deliveryRate}%
                       </p>
@@ -301,7 +303,7 @@ export default function MarketingAutomation() {
                   <div className="flex items-center gap-3">
                     <Eye className="h-8 w-8 text-gray-600 dark:text-salis-gray-light" />
                     <div>
-                      <p className="text-sm text-gray-600 dark:text-salis-gray-light font-poppins">Open Rate</p>
+                      <p className="text-sm text-gray-600 dark:text-salis-gray-light font-poppins">{t('marketing.openRate', 'Open Rate')}</p>
                       <p className="text-2xl font-bold text-gray-900 dark:text-white" data-testid="text-open-rate">
                         {analytics.openRate}%
                       </p>
@@ -315,7 +317,7 @@ export default function MarketingAutomation() {
                   <div className="flex items-center gap-3">
                     <MousePointer className="h-8 w-8 text-gray-600 dark:text-salis-gray-light" />
                     <div>
-                      <p className="text-sm text-gray-600 dark:text-salis-gray-light font-poppins">Click Rate</p>
+                      <p className="text-sm text-gray-600 dark:text-salis-gray-light font-poppins">{t('marketing.clickRate', 'Click Rate')}</p>
                       <p className="text-2xl font-bold text-gray-900 dark:text-white" data-testid="text-click-rate">
                         {analytics.clickRate}%
                       </p>
@@ -327,19 +329,19 @@ export default function MarketingAutomation() {
 
             <div className="grid grid-cols-3 gap-4">
               <div className="text-center p-4 border border-gray-200 dark:border-salis-gray-light rounded-lg">
-                <p className="text-sm text-gray-600 dark:text-salis-gray-light font-poppins mb-2">Sent</p>
+                <p className="text-sm text-gray-600 dark:text-salis-gray-light font-poppins mb-2">{t('marketing.sent', 'Sent')}</p>
                 <p className="text-3xl font-bold text-gray-900 dark:text-white" data-testid="text-analytics-sent">
                   {analytics.sentCount}
                 </p>
               </div>
               <div className="text-center p-4 border border-gray-200 dark:border-salis-gray-light rounded-lg">
-                <p className="text-sm text-gray-600 dark:text-salis-gray-light font-poppins mb-2">Delivered</p>
+                <p className="text-sm text-gray-600 dark:text-salis-gray-light font-poppins mb-2">{t('marketing.delivered', 'Delivered')}</p>
                 <p className="text-3xl font-bold text-gray-900 dark:text-white" data-testid="text-analytics-delivered">
                   {analytics.deliveredCount}
                 </p>
               </div>
               <div className="text-center p-4 border border-gray-200 dark:border-salis-gray-light rounded-lg">
-                <p className="text-sm text-gray-600 dark:text-salis-gray-light font-poppins mb-2">Opened</p>
+                <p className="text-sm text-gray-600 dark:text-salis-gray-light font-poppins mb-2">{t('marketing.opened', 'Opened')}</p>
                 <p className="text-3xl font-bold text-gray-900 dark:text-white" data-testid="text-analytics-opened">
                   {analytics.openedCount}
                 </p>
@@ -347,7 +349,7 @@ export default function MarketingAutomation() {
             </div>
           </div>
         ) : (
-          <p className="text-gray-600 dark:text-salis-gray font-poppins" data-testid="text-loading-analytics">Loading analytics...</p>
+          <p className="text-gray-600 dark:text-salis-gray font-poppins" data-testid="text-loading-analytics">{t('marketing.loadingAnalytics', 'Loading analytics...')}</p>
         )}
       </CardContent>
     </Card>
@@ -356,19 +358,19 @@ export default function MarketingAutomation() {
   return (
     <>
       <TabsPageLayout
-        title="Marketing Automation"
-        description="Manage email and SMS campaigns, track analytics, and engage customers"
+        title={t('nav.marketing_automation', 'Marketing Automation')}
+        description={t('marketing.pageDescription', 'Manage email and SMS campaigns, track analytics, and engage customers')}
         icon={Mail}
         tabs={[
           {
             id: "campaigns",
-            label: "Campaigns",
+            label: t('marketing.campaigns', 'Campaigns'),
             icon: Mail,
             content: campaignsContent,
           },
           {
             id: "analytics",
-            label: "Analytics",
+            label: t('marketing.analytics', 'Analytics'),
             icon: BarChart3,
             content: analyticsContent,
           },
@@ -382,7 +384,7 @@ export default function MarketingAutomation() {
             data-testid="button-create-campaign"
           >
             <Mail className="mr-2 h-4 w-4" />
-            Create Campaign
+            {t('marketing.createCampaign', 'Create Campaign')}
           </Button>
         }
       />
@@ -390,9 +392,9 @@ export default function MarketingAutomation() {
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
         <DialogContent className="sm:max-w-[600px] bg-white dark:bg-[#010101] border-gray-200 dark:border-salis-gray-dark">
           <DialogHeader>
-            <DialogTitle className="font-montserrat text-gray-900 dark:text-white">Create Marketing Campaign</DialogTitle>
+            <DialogTitle className="font-montserrat text-gray-900 dark:text-white">{t('marketing.createMarketingCampaign', 'Create Marketing Campaign')}</DialogTitle>
             <DialogDescription className="font-poppins text-gray-600 dark:text-salis-gray-light">
-              Create a new email or SMS campaign to engage your customers
+              {t('marketing.createCampaignDesc', 'Create a new email or SMS campaign to engage your customers')}
             </DialogDescription>
           </DialogHeader>
           <Form {...form}>
@@ -402,9 +404,9 @@ export default function MarketingAutomation() {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-gray-900 dark:text-white font-poppins">Campaign Name</FormLabel>
+                    <FormLabel className="text-gray-900 dark:text-white font-poppins">{t('marketing.campaignName', 'Campaign Name')}</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="Summer Sale 2024" data-testid="input-campaign-name" className="bg-white dark:bg-[#010101]" />
+                      <Input {...field} placeholder={t('marketing.campaignNamePlaceholder', 'Summer Sale 2024')} data-testid="input-campaign-name" className="bg-white dark:bg-[#010101]" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -416,16 +418,16 @@ export default function MarketingAutomation() {
                 name="campaignType"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-gray-900 dark:text-white font-poppins">Campaign Type</FormLabel>
+                    <FormLabel className="text-gray-900 dark:text-white font-poppins">{t('marketing.campaignType', 'Campaign Type')}</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger data-testid="select-campaign-type">
-                          <SelectValue placeholder="Select type" />
+                          <SelectValue placeholder={t('marketing.selectType', 'Select type')} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="email">Email</SelectItem>
-                        <SelectItem value="sms">SMS</SelectItem>
+                        <SelectItem value="email">{t('marketing.email', 'Email')}</SelectItem>
+                        <SelectItem value="sms">{t('marketing.sms', 'SMS')}</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -438,9 +440,9 @@ export default function MarketingAutomation() {
                 name="subject"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-gray-900 dark:text-white font-poppins">Subject (Email only)</FormLabel>
+                    <FormLabel className="text-gray-900 dark:text-white font-poppins">{t('marketing.subjectEmailOnly', 'Subject (Email only)')}</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="Get 20% off your next service!" data-testid="input-subject" className="bg-white dark:bg-[#010101]" />
+                      <Input {...field} placeholder={t('marketing.subjectPlaceholder', 'Get 20% off your next service!')} data-testid="input-subject" className="bg-white dark:bg-[#010101]" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -452,9 +454,9 @@ export default function MarketingAutomation() {
                 name="messageContent"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-gray-900 dark:text-white font-poppins">Message Content</FormLabel>
+                    <FormLabel className="text-gray-900 dark:text-white font-poppins">{t('marketing.messageContent', 'Message Content')}</FormLabel>
                     <FormControl>
-                      <Textarea {...field} placeholder="Enter your campaign message..." rows={5} data-testid="input-message-content" className="bg-white dark:bg-[#010101]" />
+                      <Textarea {...field} placeholder={t('marketing.messageContentPlaceholder', 'Enter your campaign message...')} rows={5} data-testid="input-message-content" className="bg-white dark:bg-[#010101]" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -466,16 +468,16 @@ export default function MarketingAutomation() {
                 name="status"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-gray-900 dark:text-white font-poppins">Status</FormLabel>
+                    <FormLabel className="text-gray-900 dark:text-white font-poppins">{t('common.status', 'Status')}</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger data-testid="select-status">
-                          <SelectValue placeholder="Select status" />
+                          <SelectValue placeholder={t('marketing.selectStatus', 'Select status')} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="draft">Draft</SelectItem>
-                        <SelectItem value="scheduled">Scheduled</SelectItem>
+                        <SelectItem value="draft">{t('common.draft', 'Draft')}</SelectItem>
+                        <SelectItem value="scheduled">{t('marketing.scheduled', 'Scheduled')}</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -488,7 +490,7 @@ export default function MarketingAutomation() {
                 name="scheduledFor"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-gray-900 dark:text-white font-poppins">Schedule For (Optional)</FormLabel>
+                    <FormLabel className="text-gray-900 dark:text-white font-poppins">{t('marketing.scheduleForOptional', 'Schedule For (Optional)')}</FormLabel>
                     <FormControl>
                       <Input {...field} type="datetime-local" data-testid="input-scheduled-for" className="bg-white dark:bg-[#010101]" />
                     </FormControl>
@@ -505,15 +507,15 @@ export default function MarketingAutomation() {
                   className="border-gray-200 dark:border-salis-gray-dark"
                   data-testid="button-cancel-campaign"
                 >
-                  Cancel
+                  {t('common.cancel', 'Cancel')}
                 </Button>
                 <Button
                   type="submit"
                   disabled={createCampaignMutation.isPending}
-                  className="bg-salis-black hover:bg-salis-gray-dark text-white dark:bg-salis-black dark:hover:bg-salis-gray-dark"
+                  className="bg-salis-black hover:bg-salis-gray-dark text-white"
                   data-testid="button-submit-campaign"
                 >
-                  {createCampaignMutation.isPending ? "Creating..." : "Create Campaign"}
+                  {createCampaignMutation.isPending ? t('common.loading', 'Loading...') : t('marketing.createCampaign', 'Create Campaign')}
                 </Button>
               </DialogFooter>
             </form>

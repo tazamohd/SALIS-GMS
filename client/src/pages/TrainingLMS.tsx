@@ -3,6 +3,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useTranslation } from "react-i18next";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -50,6 +51,7 @@ type CertificationFormData = z.infer<typeof certificationSchema>;
 type AttemptFormData = z.infer<typeof attemptSchema>;
 
 export default function TrainingLMS() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [selectedTab, setSelectedTab] = useState("modules");
   const [isModuleDialogOpen, setIsModuleDialogOpen] = useState(false);
@@ -109,12 +111,12 @@ export default function TrainingLMS() {
     mutationFn: (data: ModuleFormData) => apiRequest("POST", "/api/training/modules", data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/training/modules"] });
-      toast({ title: "Success", description: "Training module created" });
+      toast({ title: t('common.success', 'Success'), description: t('training.moduleCreated', 'Training module created') });
       setIsModuleDialogOpen(false);
       moduleForm.reset();
     },
     onError: () => {
-      toast({ title: "Error", description: "Failed to create module", variant: "destructive" });
+      toast({ title: t('common.error', 'Error'), description: t('training.failedToCreateModule', 'Failed to create module'), variant: "destructive" });
     }
   });
 
@@ -122,12 +124,12 @@ export default function TrainingLMS() {
     mutationFn: (data: CertificationFormData) => apiRequest("POST", "/api/training/certifications", data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/training/certifications"] });
-      toast({ title: "Success", description: "Certification created" });
+      toast({ title: t('common.success', 'Success'), description: t('training.certificationCreated', 'Certification created') });
       setIsCertDialogOpen(false);
       certForm.reset();
     },
     onError: () => {
-      toast({ title: "Error", description: "Failed to create certification", variant: "destructive" });
+      toast({ title: t('common.error', 'Error'), description: t('training.failedToCreateCertification', 'Failed to create certification'), variant: "destructive" });
     }
   });
 
@@ -135,12 +137,12 @@ export default function TrainingLMS() {
     mutationFn: (data: AttemptFormData) => apiRequest("POST", "/api/training/attempts", data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/training/attempts"] });
-      toast({ title: "Success", description: "Attempt recorded" });
+      toast({ title: t('common.success', 'Success'), description: t('training.attemptRecorded', 'Attempt recorded') });
       setIsAttemptDialogOpen(false);
       attemptForm.reset();
     },
     onError: () => {
-      toast({ title: "Error", description: "Failed to record attempt", variant: "destructive" });
+      toast({ title: t('common.error', 'Error'), description: t('training.failedToRecordAttempt', 'Failed to record attempt'), variant: "destructive" });
     }
   });
 
@@ -148,16 +150,16 @@ export default function TrainingLMS() {
     <div className="space-y-4">
           <Card className="border-salis-gray-light dark:border-salis-gray-dark bg-white dark:bg-[#010101]">
             <CardHeader>
-              <CardTitle className="font-montserrat text-salis-black dark:text-white">Training Modules</CardTitle>
+              <CardTitle className="font-montserrat text-salis-black dark:text-white">{t('training.trainingModules', 'Training Modules')}</CardTitle>
               <CardDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
-                All available training modules and courses
+                {t('training.allAvailableModules', 'All available training modules and courses')}
               </CardDescription>
             </CardHeader>
             <CardContent>
               {modulesLoading ? (
-                <p className="text-salis-gray font-poppins" data-testid="text-loading">Loading modules...</p>
+                <p className="text-salis-gray font-poppins" data-testid="text-loading">{t('training.loadingModules', 'Loading modules...')}</p>
               ) : modules.length === 0 ? (
-                <p className="text-salis-gray font-poppins" data-testid="text-no-modules">No training modules found</p>
+                <p className="text-salis-gray font-poppins" data-testid="text-no-modules">{t('training.noModulesFound', 'No training modules found')}</p>
               ) : (
                 <div className="grid gap-4">
                   {modules.map((module: any) => (
@@ -170,20 +172,20 @@ export default function TrainingLMS() {
                                 {module.moduleName}
                               </h3>
                               <Badge className={module.difficulty === "beginner" ? "bg-green-500 text-white" : module.difficulty === "intermediate" ? "bg-yellow-500 text-white" : "bg-red-500 text-white"} data-testid={`badge-difficulty-${module.id}`}>
-                                {module.difficulty}
+                                {module.difficulty === "beginner" ? t('training.difficulty.beginner', 'Beginner') : module.difficulty === "intermediate" ? t('training.difficulty.intermediate', 'Intermediate') : t('training.difficulty.advanced', 'Advanced')}
                               </Badge>
                               {module.isActive && (
                                 <Badge className="bg-salis-black text-white" data-testid={`badge-active-${module.id}`}>
-                                  Active
+                                  {t('common.active', 'Active')}
                                 </Badge>
                               )}
                             </div>
                             <p className="text-sm text-salis-gray dark:text-salis-gray-light font-poppins mb-2" data-testid={`text-module-description-${module.id}`}>
-                              {module.description || "No description"}
+                              {module.description || t('training.noDescription', 'No description')}
                             </p>
                             <div className="flex gap-4 text-sm text-salis-gray dark:text-salis-gray-light">
-                              {module.category && <span data-testid={`text-category-${module.id}`}>Category: {module.category}</span>}
-                              {module.duration && <span data-testid={`text-duration-${module.id}`}>Duration: {module.duration} min</span>}
+                              {module.category && <span data-testid={`text-category-${module.id}`}>{t('common.category', 'Category')}: {module.category}</span>}
+                              {module.duration && <span data-testid={`text-duration-${module.id}`}>{t('training.duration', 'Duration')}: {module.duration} {t('training.minutes', 'min')}</span>}
                             </div>
                           </div>
                         </div>
@@ -206,21 +208,21 @@ export default function TrainingLMS() {
           data-testid="button-create-certification"
         >
           <Award className="mr-2 h-4 w-4" />
-          Create Certification
+          {t('training.createCertification', 'Create Certification')}
         </Button>
       </div>
           <Card className="border-salis-gray-light dark:border-salis-gray-dark bg-white dark:bg-[#010101]">
             <CardHeader>
-              <CardTitle className="font-montserrat text-salis-black dark:text-white">Certifications</CardTitle>
+              <CardTitle className="font-montserrat text-salis-black dark:text-white">{t('training.certifications', 'Certifications')}</CardTitle>
               <CardDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
-                Available certifications and their requirements
+                {t('training.availableCertifications', 'Available certifications and their requirements')}
               </CardDescription>
             </CardHeader>
             <CardContent>
               {certificationsLoading ? (
-                <p className="text-salis-gray font-poppins" data-testid="text-loading-certifications">Loading certifications...</p>
+                <p className="text-salis-gray font-poppins" data-testid="text-loading-certifications">{t('training.loadingCertifications', 'Loading certifications...')}</p>
               ) : certifications.length === 0 ? (
-                <p className="text-salis-gray font-poppins" data-testid="text-no-certifications">No certifications found</p>
+                <p className="text-salis-gray font-poppins" data-testid="text-no-certifications">{t('training.noCertificationsFound', 'No certifications found')}</p>
               ) : (
                 <div className="grid gap-4">
                   {certifications.map((cert: any) => (
@@ -233,16 +235,16 @@ export default function TrainingLMS() {
                           </h3>
                           {cert.isActive && (
                             <Badge className="bg-salis-black text-white" data-testid={`badge-cert-active-${cert.id}`}>
-                              Active
+                              {t('common.active', 'Active')}
                             </Badge>
                           )}
                         </div>
                         <p className="text-sm text-salis-gray dark:text-salis-gray-light font-poppins mb-2" data-testid={`text-cert-description-${cert.id}`}>
-                          {cert.description || "No description"}
+                          {cert.description || t('training.noDescription', 'No description')}
                         </p>
                         <div className="flex gap-4 text-sm text-salis-gray dark:text-salis-gray-light">
-                          <span data-testid={`text-passing-score-${cert.id}`}>Passing Score: {cert.passingScore}%</span>
-                          {cert.validityPeriod && <span data-testid={`text-validity-${cert.id}`}>Valid for: {cert.validityPeriod} days</span>}
+                          <span data-testid={`text-passing-score-${cert.id}`}>{t('training.passingScore', 'Passing Score')}: {cert.passingScore}%</span>
+                          {cert.validityPeriod && <span data-testid={`text-validity-${cert.id}`}>{t('training.validFor', 'Valid for')}: {cert.validityPeriod} {t('training.days', 'days')}</span>}
                         </div>
                       </CardContent>
                     </Card>
@@ -263,30 +265,30 @@ export default function TrainingLMS() {
           data-testid="button-record-attempt"
         >
           <Users className="mr-2 h-4 w-4" />
-          Record Attempt
+          {t('training.recordAttempt', 'Record Attempt')}
         </Button>
       </div>
           <Card className="border-salis-gray-light dark:border-salis-gray-dark bg-white dark:bg-[#010101]">
             <CardHeader>
-              <CardTitle className="font-montserrat text-salis-black dark:text-white">Certification Attempts</CardTitle>
+              <CardTitle className="font-montserrat text-salis-black dark:text-white">{t('training.certificationAttempts', 'Certification Attempts')}</CardTitle>
               <CardDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
-                Employee certification attempts and results
+                {t('training.employeeCertificationAttempts', 'Employee certification attempts and results')}
               </CardDescription>
             </CardHeader>
             <CardContent>
               {attemptsLoading ? (
-                <p className="text-salis-gray font-poppins" data-testid="text-loading-attempts">Loading attempts...</p>
+                <p className="text-salis-gray font-poppins" data-testid="text-loading-attempts">{t('training.loadingAttempts', 'Loading attempts...')}</p>
               ) : attempts.length === 0 ? (
-                <p className="text-salis-gray font-poppins" data-testid="text-no-attempts">No attempts found</p>
+                <p className="text-salis-gray font-poppins" data-testid="text-no-attempts">{t('training.noAttemptsFound', 'No attempts found')}</p>
               ) : (
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>User</TableHead>
-                      <TableHead>Certification</TableHead>
-                      <TableHead>Score</TableHead>
-                      <TableHead>Result</TableHead>
-                      <TableHead>Date</TableHead>
+                      <TableHead>{t('training.user', 'User')}</TableHead>
+                      <TableHead>{t('training.certification', 'Certification')}</TableHead>
+                      <TableHead>{t('training.score', 'Score')}</TableHead>
+                      <TableHead>{t('training.result', 'Result')}</TableHead>
+                      <TableHead>{t('common.date', 'Date')}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -297,11 +299,11 @@ export default function TrainingLMS() {
                         <TableCell data-testid={`text-score-${attempt.id}`}>{attempt.score}%</TableCell>
                         <TableCell>
                           <Badge className={attempt.passed ? "bg-green-500 text-white" : "bg-red-500 text-white"} data-testid={`badge-result-${attempt.id}`}>
-                            {attempt.passed ? "Passed" : "Failed"}
+                            {attempt.passed ? t('training.passed', 'Passed') : t('training.failed', 'Failed')}
                           </Badge>
                         </TableCell>
                         <TableCell data-testid={`text-date-${attempt.id}`}>
-                          {attempt.attemptDate ? new Date(attempt.attemptDate).toLocaleDateString() : "N/A"}
+                          {attempt.attemptDate ? new Date(attempt.attemptDate).toLocaleDateString() : t('common.na', 'N/A')}
                         </TableCell>
                       </TableRow>
                     ))}
@@ -316,11 +318,11 @@ export default function TrainingLMS() {
   return (
     <>
       <TabsPageLayout
-        title="Training & Certification LMS"
-        description="Manage training modules, certifications, and employee progress"
+        title={t('training.title', 'Training & Certification LMS')}
+        description={t('training.description', 'Manage training modules, certifications, and employee progress')}
         icon={GraduationCap}
         primaryAction={{
-          label: "Create Module",
+          label: t('training.createModule', 'Create Module'),
           icon: BookMarked,
           onClick: () => setIsModuleDialogOpen(true),
           testId: "button-create-module"
@@ -328,19 +330,19 @@ export default function TrainingLMS() {
         tabs={[
           {
             id: "modules",
-            label: "Modules",
+            label: t('training.modules', 'Modules'),
             icon: BookMarked,
             content: modulesContent
           },
           {
             id: "certifications",
-            label: "Certifications",
+            label: t('training.certifications', 'Certifications'),
             icon: Award,
             content: certificationsContent
           },
           {
             id: "attempts",
-            label: "Attempts",
+            label: t('training.attempts', 'Attempts'),
             icon: Users,
             content: attemptsContent
           }
@@ -352,9 +354,9 @@ export default function TrainingLMS() {
       <Dialog open={isModuleDialogOpen} onOpenChange={setIsModuleDialogOpen}>
         <DialogContent className="bg-white dark:bg-salis-black">
           <DialogHeader>
-            <DialogTitle className="font-montserrat text-salis-black dark:text-white">Create Training Module</DialogTitle>
+            <DialogTitle className="font-montserrat text-salis-black dark:text-white">{t('training.createTrainingModule', 'Create Training Module')}</DialogTitle>
             <DialogDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
-              Add a new training module
+              {t('training.addNewModule', 'Add a new training module')}
             </DialogDescription>
           </DialogHeader>
           <Form {...moduleForm}>
@@ -364,9 +366,9 @@ export default function TrainingLMS() {
                 name="moduleName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Module Name</FormLabel>
+                    <FormLabel>{t('training.moduleName', 'Module Name')}</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="Safety Procedures 101" data-testid="input-module-name" />
+                      <Input {...field} placeholder={t('training.moduleNamePlaceholder', 'Safety Procedures 101')} data-testid="input-module-name" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -377,9 +379,9 @@ export default function TrainingLMS() {
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Description</FormLabel>
+                    <FormLabel>{t('common.description', 'Description')}</FormLabel>
                     <FormControl>
-                      <Textarea {...field} placeholder="Module description..." data-testid="input-module-description" />
+                      <Textarea {...field} placeholder={t('training.moduleDescriptionPlaceholder', 'Module description...')} data-testid="input-module-description" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -391,17 +393,17 @@ export default function TrainingLMS() {
                   name="difficulty"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Difficulty</FormLabel>
+                      <FormLabel>{t('training.difficultyLabel', 'Difficulty')}</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger data-testid="select-difficulty">
-                            <SelectValue placeholder="Select difficulty" />
+                            <SelectValue placeholder={t('training.selectDifficulty', 'Select difficulty')} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="beginner">Beginner</SelectItem>
-                          <SelectItem value="intermediate">Intermediate</SelectItem>
-                          <SelectItem value="advanced">Advanced</SelectItem>
+                          <SelectItem value="beginner">{t('training.difficulty.beginner', 'Beginner')}</SelectItem>
+                          <SelectItem value="intermediate">{t('training.difficulty.intermediate', 'Intermediate')}</SelectItem>
+                          <SelectItem value="advanced">{t('training.difficulty.advanced', 'Advanced')}</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -413,7 +415,7 @@ export default function TrainingLMS() {
                   name="duration"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Duration (minutes)</FormLabel>
+                      <FormLabel>{t('training.durationMinutes', 'Duration (minutes)')}</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -429,7 +431,7 @@ export default function TrainingLMS() {
               </div>
               <DialogFooter>
                 <Button type="submit" disabled={createModuleMutation.isPending} data-testid="button-submit-module">
-                  {createModuleMutation.isPending ? "Creating..." : "Create Module"}
+                  {createModuleMutation.isPending ? t('training.creating', 'Creating...') : t('training.createModule', 'Create Module')}
                 </Button>
               </DialogFooter>
             </form>
@@ -440,9 +442,9 @@ export default function TrainingLMS() {
       <Dialog open={isCertDialogOpen} onOpenChange={setIsCertDialogOpen}>
         <DialogContent className="bg-white dark:bg-salis-black">
           <DialogHeader>
-            <DialogTitle className="font-montserrat text-salis-black dark:text-white">Create Certification</DialogTitle>
+            <DialogTitle className="font-montserrat text-salis-black dark:text-white">{t('training.createCertification', 'Create Certification')}</DialogTitle>
             <DialogDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
-              Add a new certification program
+              {t('training.addNewCertification', 'Add a new certification program')}
             </DialogDescription>
           </DialogHeader>
           <Form {...certForm}>
@@ -452,9 +454,9 @@ export default function TrainingLMS() {
                 name="certificationName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Certification Name</FormLabel>
+                    <FormLabel>{t('training.certificationName', 'Certification Name')}</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="Master Technician" data-testid="input-cert-name" />
+                      <Input {...field} placeholder={t('training.certNamePlaceholder', 'Master Technician')} data-testid="input-cert-name" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -465,9 +467,9 @@ export default function TrainingLMS() {
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Description</FormLabel>
+                    <FormLabel>{t('common.description', 'Description')}</FormLabel>
                     <FormControl>
-                      <Textarea {...field} placeholder="Certification description..." data-testid="input-cert-description" />
+                      <Textarea {...field} placeholder={t('training.certDescriptionPlaceholder', 'Certification description...')} data-testid="input-cert-description" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -479,7 +481,7 @@ export default function TrainingLMS() {
                   name="passingScore"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Passing Score (%)</FormLabel>
+                      <FormLabel>{t('training.passingScorePercent', 'Passing Score (%)')}</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -497,7 +499,7 @@ export default function TrainingLMS() {
                   name="validityPeriod"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Validity (days)</FormLabel>
+                      <FormLabel>{t('training.validityDays', 'Validity (days)')}</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -513,7 +515,7 @@ export default function TrainingLMS() {
               </div>
               <DialogFooter>
                 <Button type="submit" disabled={createCertMutation.isPending} data-testid="button-submit-certification">
-                  {createCertMutation.isPending ? "Creating..." : "Create Certification"}
+                  {createCertMutation.isPending ? t('training.creating', 'Creating...') : t('training.createCertification', 'Create Certification')}
                 </Button>
               </DialogFooter>
             </form>
@@ -524,9 +526,9 @@ export default function TrainingLMS() {
       <Dialog open={isAttemptDialogOpen} onOpenChange={setIsAttemptDialogOpen}>
         <DialogContent className="bg-white dark:bg-salis-black">
           <DialogHeader>
-            <DialogTitle className="font-montserrat text-salis-black dark:text-white">Record Certification Attempt</DialogTitle>
+            <DialogTitle className="font-montserrat text-salis-black dark:text-white">{t('training.recordCertificationAttempt', 'Record Certification Attempt')}</DialogTitle>
             <DialogDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
-              Record an employee's certification attempt
+              {t('training.recordEmployeeAttempt', "Record an employee's certification attempt")}
             </DialogDescription>
           </DialogHeader>
           <Form {...attemptForm}>
@@ -536,11 +538,11 @@ export default function TrainingLMS() {
                 name="certificationId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Certification</FormLabel>
+                    <FormLabel>{t('training.certification', 'Certification')}</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger data-testid="select-certification">
-                          <SelectValue placeholder="Select certification" />
+                          <SelectValue placeholder={t('training.selectCertification', 'Select certification')} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -560,9 +562,9 @@ export default function TrainingLMS() {
                 name="userId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>User ID</FormLabel>
+                    <FormLabel>{t('training.userId', 'User ID')}</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="User identifier" data-testid="input-attempt-user-id" />
+                      <Input {...field} placeholder={t('training.userIdPlaceholder', 'User identifier')} data-testid="input-attempt-user-id" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -573,7 +575,7 @@ export default function TrainingLMS() {
                 name="score"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Score (%)</FormLabel>
+                    <FormLabel>{t('training.scorePercent', 'Score (%)')}</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
@@ -588,7 +590,7 @@ export default function TrainingLMS() {
               />
               <DialogFooter>
                 <Button type="submit" disabled={createAttemptMutation.isPending} data-testid="button-submit-attempt">
-                  {createAttemptMutation.isPending ? "Recording..." : "Record Attempt"}
+                  {createAttemptMutation.isPending ? t('training.recording', 'Recording...') : t('training.recordAttempt', 'Record Attempt')}
                 </Button>
               </DialogFooter>
             </form>

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,6 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { TabsPageLayout } from "@/components/layouts";
 
 export default function DigitalSignage() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [openDisplayDialog, setOpenDisplayDialog] = useState(false);
 
@@ -39,16 +41,16 @@ export default function DigitalSignage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/signage/displays"] });
       toast({
-        title: "Success",
-        description: "Display created successfully",
+        title: t('common.success', 'Success'),
+        description: t('signage.displayCreatedSuccessfully', 'Display created successfully'),
       });
       setOpenDisplayDialog(false);
     },
     onError: (error: any) => {
       toast({
         variant: "destructive",
-        title: "Error",
-        description: error.message || "Failed to create display",
+        title: t('common.error', 'Error'),
+        description: error.message || t('signage.failedToCreateDisplay', 'Failed to create display'),
       });
     },
   });
@@ -77,7 +79,7 @@ export default function DigitalSignage() {
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Total Displays</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">{t('signage.totalDisplays', 'Total Displays')}</p>
               <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="stat-total-displays">{stats.totalDisplays}</h3>
             </div>
             <Monitor className="h-12 w-12 text-blue-600" />
@@ -88,7 +90,7 @@ export default function DigitalSignage() {
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Active</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">{t('common.active', 'Active')}</p>
               <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="stat-active-displays">{stats.activeDisplays}</h3>
             </div>
             <Play className="h-12 w-12 text-green-600" />
@@ -99,7 +101,7 @@ export default function DigitalSignage() {
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Total Content</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">{t('signage.totalContent', 'Total Content')}</p>
               <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="stat-total-content">{stats.totalContent}</h3>
             </div>
             <Monitor className="h-12 w-12 text-purple-600" />
@@ -110,7 +112,7 @@ export default function DigitalSignage() {
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Active Content</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">{t('signage.activeContent', 'Active Content')}</p>
               <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="stat-active-content">{stats.activeContent}</h3>
             </div>
             <Play className="h-12 w-12 text-yellow-600" />
@@ -123,16 +125,16 @@ export default function DigitalSignage() {
   const displaysTab = (
     <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
       <CardHeader>
-        <CardTitle>Displays</CardTitle>
+        <CardTitle>{t('signage.displays', 'Displays')}</CardTitle>
       </CardHeader>
       <CardContent>
         {loadingDisplays ? (
           <div className="text-center py-8">
-            <p className="text-gray-600 dark:text-gray-400">Loading displays...</p>
+            <p className="text-gray-600 dark:text-gray-400">{t('signage.loadingDisplays', 'Loading displays...')}</p>
           </div>
         ) : displays.length === 0 ? (
           <div className="text-center py-8">
-            <p className="text-gray-600 dark:text-gray-400">No displays configured yet. Add a display to get started.</p>
+            <p className="text-gray-600 dark:text-gray-400">{t('signage.noDisplaysConfigured', 'No displays configured yet. Add a display to get started.')}</p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -147,7 +149,7 @@ export default function DigitalSignage() {
                 <div className="flex items-center gap-3">
                   <Badge>{display.displayType?.replace("_", " ")}</Badge>
                   <Badge variant={display.isActive ? "default" : "secondary"}>
-                    {display.isActive ? "Active" : "Inactive"}
+                    {display.isActive ? t('common.active', 'Active') : t('common.inactive', 'Inactive')}
                   </Badge>
                 </div>
               </div>
@@ -161,25 +163,25 @@ export default function DigitalSignage() {
   const contentTab = (
     <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
       <CardHeader>
-        <CardTitle>Content</CardTitle>
+        <CardTitle>{t('signage.content', 'Content')}</CardTitle>
       </CardHeader>
       <CardContent>
         {loadingContent ? (
           <div className="text-center py-8">
-            <p className="text-gray-600 dark:text-gray-400">Loading content...</p>
+            <p className="text-gray-600 dark:text-gray-400">{t('signage.loadingContent', 'Loading content...')}</p>
           </div>
         ) : content.length === 0 ? (
           <div className="text-center py-8">
-            <p className="text-gray-600 dark:text-gray-400">No content created yet. Add content to your displays.</p>
+            <p className="text-gray-600 dark:text-gray-400">{t('signage.noContentCreated', 'No content created yet. Add content to your displays.')}</p>
           </div>
         ) : (
           <div className="space-y-3">
             {content.map((item: any) => (
               <div key={item.id} className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-800 rounded-lg" data-testid={`content-${item.id}`}>
                 <div className="flex-1">
-                  <h3 className="font-semibold text-gray-900 dark:text-white">{item.title || "Untitled Content"}</h3>
+                  <h3 className="font-semibold text-gray-900 dark:text-white">{item.title || t('signage.untitledContent', 'Untitled Content')}</h3>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    {item.displayName} • {item.duration}s duration
+                    {item.displayName} • {item.duration}{t('signage.secondsDuration', 's duration')}
                   </p>
                 </div>
                 <Badge>{item.contentType?.replace("_", " ")}</Badge>
@@ -193,11 +195,11 @@ export default function DigitalSignage() {
 
   return (
     <TabsPageLayout
-      title="Digital Signage"
-      description="Manage waiting room displays and content"
+      title={t('signage.digitalSignage', 'Digital Signage')}
+      description={t('signage.manageWaitingRoomDisplays', 'Manage waiting room displays and content')}
       icon={Monitor}
       primaryAction={{
-        label: "Add Display",
+        label: t('signage.addDisplay', 'Add Display'),
         icon: Plus,
         onClick: () => setOpenDisplayDialog(true),
         testId: "button-add-display",
@@ -206,24 +208,24 @@ export default function DigitalSignage() {
       tabs={[
         {
           id: "displays",
-          label: "Displays",
+          label: t('signage.displays', 'Displays'),
           icon: Monitor,
           content: displaysTab,
         },
         {
           id: "content",
-          label: "Content",
+          label: t('signage.content', 'Content'),
           icon: Play,
           content: contentTab,
         },
         {
           id: "settings",
-          label: "Settings",
+          label: t('common.settings', 'Settings'),
           icon: Settings,
           content: (
             <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
               <CardContent className="p-6 text-center text-gray-600 dark:text-gray-400">
-                Settings coming soon
+                {t('common.comingSoon', 'Settings coming soon')}
               </CardContent>
             </Card>
           ),
@@ -234,36 +236,36 @@ export default function DigitalSignage() {
       <Dialog open={openDisplayDialog} onOpenChange={setOpenDisplayDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Add New Display</DialogTitle>
+            <DialogTitle>{t('signage.addNewDisplay', 'Add New Display')}</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleCreateDisplay} className="space-y-4">
             <div>
-              <Label htmlFor="name">Display Name</Label>
-              <Input id="name" name="name" required placeholder="Waiting Room Main" />
+              <Label htmlFor="name">{t('signage.displayName', 'Display Name')}</Label>
+              <Input id="name" name="name" required placeholder={t('signage.waitingRoomMain', 'Waiting Room Main')} />
             </div>
             <div>
-              <Label htmlFor="location">Location</Label>
-              <Input id="location" name="location" required placeholder="Waiting Room" />
+              <Label htmlFor="location">{t('signage.location', 'Location')}</Label>
+              <Input id="location" name="location" required placeholder={t('signage.waitingRoom', 'Waiting Room')} />
             </div>
             <div>
-              <Label htmlFor="displayType">Display Type</Label>
+              <Label htmlFor="displayType">{t('signage.displayType', 'Display Type')}</Label>
               <Select name="displayType" required>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select type" />
+                  <SelectValue placeholder={t('signage.selectType', 'Select type')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="mixed">Mixed Content</SelectItem>
-                  <SelectItem value="service_status">Service Status</SelectItem>
-                  <SelectItem value="promotions">Promotions</SelectItem>
+                  <SelectItem value="mixed">{t('signage.mixedContent', 'Mixed Content')}</SelectItem>
+                  <SelectItem value="service_status">{t('signage.serviceStatus', 'Service Status')}</SelectItem>
+                  <SelectItem value="promotions">{t('signage.promotions', 'Promotions')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <Label htmlFor="resolution">Resolution</Label>
+              <Label htmlFor="resolution">{t('signage.resolution', 'Resolution')}</Label>
               <Input id="resolution" name="resolution" required placeholder="1920x1080" />
             </div>
             <Button type="submit" disabled={createDisplayMutation.isPending} className="w-full">
-              Create Display
+              {t('signage.createDisplay', 'Create Display')}
             </Button>
           </form>
         </DialogContent>

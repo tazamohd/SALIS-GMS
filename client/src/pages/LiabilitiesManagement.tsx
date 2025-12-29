@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Link } from "wouter";
+import { useTranslation } from "react-i18next";
 import { TabsPageLayout } from "@/components/layouts/TabsPageLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -145,6 +146,7 @@ const paymentSchedule = [
 ];
 
 export default function LiabilitiesManagement() {
+  const { t } = useTranslation();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
@@ -184,13 +186,13 @@ export default function LiabilitiesManagement() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "Current":
-        return <Badge className="bg-green-600">Current</Badge>;
+        return <Badge className="bg-green-600">{t('liabilities.current', 'Current')}</Badge>;
       case "Due Soon":
-        return <Badge className="bg-yellow-600">Due Soon</Badge>;
+        return <Badge className="bg-yellow-600">{t('liabilities.dueSoon', 'Due Soon')}</Badge>;
       case "Overdue":
-        return <Badge className="bg-red-600">Overdue</Badge>;
+        return <Badge className="bg-red-600">{t('liabilities.overdue', 'Overdue')}</Badge>;
       case "Accrued":
-        return <Badge variant="outline">Accrued</Badge>;
+        return <Badge variant="outline">{t('liabilities.accrued', 'Accrued')}</Badge>;
       default:
         return <Badge variant="secondary">{status}</Badge>;
     }
@@ -201,47 +203,47 @@ export default function LiabilitiesManagement() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card data-testid="card-total-liabilities">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Total Liabilities</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t('liabilities.totalLiabilities', 'Total Liabilities')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-red-600">
               SAR {totalLiabilities.toLocaleString()}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">إجمالي الخصوم</p>
+            <p className="text-xs text-muted-foreground mt-1">{t('liabilities.totalLiabilitiesAr', 'إجمالي الخصوم')}</p>
           </CardContent>
         </Card>
 
         <Card data-testid="card-current-liabilities">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Current Liabilities</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t('liabilities.currentLiabilities', 'Current Liabilities')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-orange-600">
               SAR {currentLiabilities.toLocaleString()}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">الخصوم المتداولة</p>
+            <p className="text-xs text-muted-foreground mt-1">{t('liabilities.currentLiabilitiesAr', 'الخصوم المتداولة')}</p>
           </CardContent>
         </Card>
 
         <Card data-testid="card-longterm-liabilities">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Long-term Liabilities</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t('liabilities.longTermLiabilities', 'Long-term Liabilities')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-blue-600">
               SAR {longTermLiabilities.toLocaleString()}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">الخصوم طويلة الأجل</p>
+            <p className="text-xs text-muted-foreground mt-1">{t('liabilities.longTermLiabilitiesAr', 'الخصوم طويلة الأجل')}</p>
           </CardContent>
         </Card>
 
         <Card data-testid="card-monthly-obligations">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Monthly Obligations</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t('liabilities.monthlyObligations', 'Monthly Obligations')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">SAR 17,083</div>
-            <p className="text-xs text-muted-foreground mt-1">الالتزامات الشهرية</p>
+            <p className="text-xs text-muted-foreground mt-1">{t('liabilities.monthlyObligationsAr', 'الالتزامات الشهرية')}</p>
           </CardContent>
         </Card>
       </div>
@@ -250,20 +252,20 @@ export default function LiabilitiesManagement() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>Liabilities Register</CardTitle>
-              <CardDescription>سجل الخصوم والالتزامات - All company obligations</CardDescription>
+              <CardTitle>{t('liabilities.liabilitiesRegister', 'Liabilities Register')}</CardTitle>
+              <CardDescription>{t('liabilities.liabilitiesRegisterDesc', 'سجل الخصوم والالتزامات - All company obligations')}</CardDescription>
             </div>
             <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
               <DialogTrigger asChild>
                 <Button data-testid="button-add-liability">
                   <Plus className="h-4 w-4 mr-2" />
-                  Add Liability
+                  {t('liabilities.addLiability', 'Add Liability')}
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-2xl" data-testid="modal-add-liability">
                 <DialogHeader>
-                  <DialogTitle>Add New Liability</DialogTitle>
-                  <DialogDescription>إضافة التزام جديد - Record a new obligation</DialogDescription>
+                  <DialogTitle>{t('liabilities.addNewLiability', 'Add New Liability')}</DialogTitle>
+                  <DialogDescription>{t('liabilities.addNewLiabilityDesc', 'إضافة التزام جديد - Record a new obligation')}</DialogDescription>
                 </DialogHeader>
                 <Form {...form}>
                   <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -273,9 +275,9 @@ export default function LiabilitiesManagement() {
                         name="name"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Liability Name</FormLabel>
+                            <FormLabel>{t('liabilities.liabilityName', 'Liability Name')}</FormLabel>
                             <FormControl>
-                              <Input {...field} placeholder="Enter name" data-testid="input-liability-name" />
+                              <Input {...field} placeholder={t('liabilities.enterName', 'Enter name')} data-testid="input-liability-name" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -286,20 +288,20 @@ export default function LiabilitiesManagement() {
                         name="type"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Type</FormLabel>
+                            <FormLabel>{t('common.type', 'Type')}</FormLabel>
                             <Select onValueChange={field.onChange} value={field.value}>
                               <FormControl>
                                 <SelectTrigger data-testid="select-liability-type">
-                                  <SelectValue placeholder="Select type" />
+                                  <SelectValue placeholder={t('liabilities.selectType', 'Select type')} />
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                <SelectItem value="Long-term Loan">Long-term Loan</SelectItem>
-                                <SelectItem value="Accounts Payable">Accounts Payable</SelectItem>
-                                <SelectItem value="Mortgage">Mortgage</SelectItem>
-                                <SelectItem value="Tax Liability">Tax Liability</SelectItem>
-                                <SelectItem value="Provision">Provision</SelectItem>
-                                <SelectItem value="Accrued Expense">Accrued Expense</SelectItem>
+                                <SelectItem value="Long-term Loan">{t('liabilities.longTermLoan', 'Long-term Loan')}</SelectItem>
+                                <SelectItem value="Accounts Payable">{t('liabilities.accountsPayable', 'Accounts Payable')}</SelectItem>
+                                <SelectItem value="Mortgage">{t('liabilities.mortgage', 'Mortgage')}</SelectItem>
+                                <SelectItem value="Tax Liability">{t('liabilities.taxLiability', 'Tax Liability')}</SelectItem>
+                                <SelectItem value="Provision">{t('liabilities.provision', 'Provision')}</SelectItem>
+                                <SelectItem value="Accrued Expense">{t('liabilities.accruedExpense', 'Accrued Expense')}</SelectItem>
                               </SelectContent>
                             </Select>
                             <FormMessage />
@@ -311,9 +313,9 @@ export default function LiabilitiesManagement() {
                         name="creditor"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Creditor</FormLabel>
+                            <FormLabel>{t('liabilities.creditor', 'Creditor')}</FormLabel>
                             <FormControl>
-                              <Input {...field} placeholder="Enter creditor name" data-testid="input-creditor" />
+                              <Input {...field} placeholder={t('liabilities.enterCreditorName', 'Enter creditor name')} data-testid="input-creditor" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -324,7 +326,7 @@ export default function LiabilitiesManagement() {
                         name="amount"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Amount (SAR)</FormLabel>
+                            <FormLabel>{t('liabilities.amountSAR', 'Amount (SAR)')}</FormLabel>
                             <FormControl>
                               <Input {...field} type="number" placeholder="0.00" data-testid="input-amount" />
                             </FormControl>
@@ -337,7 +339,7 @@ export default function LiabilitiesManagement() {
                         name="dueDate"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Due Date</FormLabel>
+                            <FormLabel>{t('liabilities.dueDate', 'Due Date')}</FormLabel>
                             <FormControl>
                               <Input {...field} type="date" data-testid="input-due-date" />
                             </FormControl>
@@ -350,7 +352,7 @@ export default function LiabilitiesManagement() {
                         name="interestRate"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Interest Rate (%)</FormLabel>
+                            <FormLabel>{t('liabilities.interestRate', 'Interest Rate (%)')}</FormLabel>
                             <FormControl>
                               <Input {...field} type="number" placeholder="0.00" data-testid="input-interest-rate" />
                             </FormControl>
@@ -363,18 +365,18 @@ export default function LiabilitiesManagement() {
                         name="paymentFrequency"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Payment Frequency</FormLabel>
+                            <FormLabel>{t('liabilities.paymentFrequency', 'Payment Frequency')}</FormLabel>
                             <Select onValueChange={field.onChange} value={field.value}>
                               <FormControl>
                                 <SelectTrigger data-testid="select-frequency">
-                                  <SelectValue placeholder="Select frequency" />
+                                  <SelectValue placeholder={t('liabilities.selectFrequency', 'Select frequency')} />
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                <SelectItem value="Monthly">Monthly</SelectItem>
-                                <SelectItem value="Quarterly">Quarterly</SelectItem>
-                                <SelectItem value="Annually">Annually</SelectItem>
-                                <SelectItem value="On Demand">On Demand</SelectItem>
+                                <SelectItem value="Monthly">{t('liabilities.monthly', 'Monthly')}</SelectItem>
+                                <SelectItem value="Quarterly">{t('liabilities.quarterly', 'Quarterly')}</SelectItem>
+                                <SelectItem value="Annually">{t('liabilities.annually', 'Annually')}</SelectItem>
+                                <SelectItem value="On Demand">{t('liabilities.onDemand', 'On Demand')}</SelectItem>
                               </SelectContent>
                             </Select>
                             <FormMessage />
@@ -384,9 +386,9 @@ export default function LiabilitiesManagement() {
                     </div>
                     <div className="flex justify-end gap-2">
                       <Button type="button" variant="outline" onClick={() => setIsAddDialogOpen(false)}>
-                        Cancel
+                        {t('common.cancel', 'Cancel')}
                       </Button>
-                      <Button type="submit" data-testid="button-save-liability">Save Liability</Button>
+                      <Button type="submit" data-testid="button-save-liability">{t('liabilities.saveLiability', 'Save Liability')}</Button>
                     </div>
                   </form>
                 </Form>
@@ -399,7 +401,7 @@ export default function LiabilitiesManagement() {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search liabilities..."
+                placeholder={t('liabilities.searchLiabilities', 'Search liabilities...')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
@@ -408,33 +410,33 @@ export default function LiabilitiesManagement() {
             </div>
             <Select value={typeFilter} onValueChange={setTypeFilter}>
               <SelectTrigger className="w-48" data-testid="select-filter-type">
-                <SelectValue placeholder="Filter by type" />
+                <SelectValue placeholder={t('liabilities.filterByType', 'Filter by type')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Types</SelectItem>
-                <SelectItem value="Long-term Loan">Long-term Loan</SelectItem>
-                <SelectItem value="Accounts Payable">Accounts Payable</SelectItem>
-                <SelectItem value="Mortgage">Mortgage</SelectItem>
-                <SelectItem value="Tax Liability">Tax Liability</SelectItem>
-                <SelectItem value="Provision">Provision</SelectItem>
+                <SelectItem value="all">{t('liabilities.allTypes', 'All Types')}</SelectItem>
+                <SelectItem value="Long-term Loan">{t('liabilities.longTermLoan', 'Long-term Loan')}</SelectItem>
+                <SelectItem value="Accounts Payable">{t('liabilities.accountsPayable', 'Accounts Payable')}</SelectItem>
+                <SelectItem value="Mortgage">{t('liabilities.mortgage', 'Mortgage')}</SelectItem>
+                <SelectItem value="Tax Liability">{t('liabilities.taxLiability', 'Tax Liability')}</SelectItem>
+                <SelectItem value="Provision">{t('liabilities.provision', 'Provision')}</SelectItem>
               </SelectContent>
             </Select>
             <Button variant="outline" data-testid="button-export-liabilities">
               <Download className="h-4 w-4 mr-2" />
-              Export
+              {t('common.export', 'Export')}
             </Button>
           </div>
 
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Liability</TableHead>
-                <TableHead>Creditor</TableHead>
-                <TableHead>Original Amount</TableHead>
-                <TableHead>Balance</TableHead>
-                <TableHead>Interest</TableHead>
-                <TableHead>Due Date</TableHead>
-                <TableHead>Status</TableHead>
+                <TableHead>{t('liabilities.liability', 'Liability')}</TableHead>
+                <TableHead>{t('liabilities.creditor', 'Creditor')}</TableHead>
+                <TableHead>{t('liabilities.originalAmount', 'Original Amount')}</TableHead>
+                <TableHead>{t('liabilities.balance', 'Balance')}</TableHead>
+                <TableHead>{t('liabilities.interest', 'Interest')}</TableHead>
+                <TableHead>{t('liabilities.dueDate', 'Due Date')}</TableHead>
+                <TableHead>{t('common.status', 'Status')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -463,8 +465,8 @@ export default function LiabilitiesManagement() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Related Financial Modules</CardTitle>
-          <CardDescription>الوحدات المالية ذات الصلة - Quick access to balance sheet items</CardDescription>
+          <CardTitle>{t('liabilities.relatedFinancialModules', 'Related Financial Modules')}</CardTitle>
+          <CardDescription>{t('liabilities.relatedFinancialModulesDesc', 'الوحدات المالية ذات الصلة - Quick access to balance sheet items')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -475,11 +477,11 @@ export default function LiabilitiesManagement() {
                     <Building2 className="h-8 w-8 text-green-600" />
                     <ExternalLink className="h-4 w-4 text-muted-foreground" />
                   </div>
-                  <CardTitle className="text-lg">Assets Management</CardTitle>
-                  <CardDescription>الأصول</CardDescription>
+                  <CardTitle className="text-lg">{t('liabilities.assetsManagement', 'Assets Management')}</CardTitle>
+                  <CardDescription>{t('liabilities.assetsManagementAr', 'الأصول')}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm text-muted-foreground">Track and manage all company assets and depreciation</p>
+                  <p className="text-sm text-muted-foreground">{t('liabilities.assetsManagementDesc', 'Track and manage all company assets and depreciation')}</p>
                 </CardContent>
               </Card>
             </Link>
@@ -491,11 +493,11 @@ export default function LiabilitiesManagement() {
                     <Wallet className="h-8 w-8 text-blue-600" />
                     <ExternalLink className="h-4 w-4 text-muted-foreground" />
                   </div>
-                  <CardTitle className="text-lg">Equity Management</CardTitle>
-                  <CardDescription>حقوق الملكية</CardDescription>
+                  <CardTitle className="text-lg">{t('liabilities.equityManagement', 'Equity Management')}</CardTitle>
+                  <CardDescription>{t('liabilities.equityManagementAr', 'حقوق الملكية')}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm text-muted-foreground">Track owner's equity, capital, and retained earnings</p>
+                  <p className="text-sm text-muted-foreground">{t('liabilities.equityManagementDesc', 'Track owner\'s equity, capital, and retained earnings')}</p>
                 </CardContent>
               </Card>
             </Link>
@@ -510,39 +512,39 @@ export default function LiabilitiesManagement() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card data-testid="card-total-loans">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Total Loans</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t('liabilities.totalLoans', 'Total Loans')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-blue-600">SAR 1,395,000</div>
-            <p className="text-xs text-muted-foreground mt-1">إجمالي القروض</p>
+            <p className="text-xs text-muted-foreground mt-1">{t('liabilities.totalLoansAr', 'إجمالي القروض')}</p>
           </CardContent>
         </Card>
 
         <Card data-testid="card-monthly-payments">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Monthly Payments</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t('liabilities.monthlyPayments', 'Monthly Payments')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-orange-600">SAR 17,083</div>
-            <p className="text-xs text-muted-foreground mt-1">الأقساط الشهرية</p>
+            <p className="text-xs text-muted-foreground mt-1">{t('liabilities.monthlyPaymentsAr', 'الأقساط الشهرية')}</p>
           </CardContent>
         </Card>
 
         <Card data-testid="card-interest-expense">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Annual Interest</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t('liabilities.annualInterest', 'Annual Interest')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-red-600">SAR 64,275</div>
-            <p className="text-xs text-muted-foreground mt-1">مصروف الفوائد السنوي</p>
+            <p className="text-xs text-muted-foreground mt-1">{t('liabilities.annualInterestAr', 'مصروف الفوائد السنوي')}</p>
           </CardContent>
         </Card>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Active Loans</CardTitle>
-          <CardDescription>القروض النشطة - Loan details and repayment status</CardDescription>
+          <CardTitle>{t('liabilities.activeLoans', 'Active Loans')}</CardTitle>
+          <CardDescription>{t('liabilities.activeLoansDesc', 'القروض النشطة - Loan details and repayment status')}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {sampleLiabilities
@@ -558,28 +560,28 @@ export default function LiabilitiesManagement() {
                 </div>
                 <div className="grid grid-cols-4 gap-4 mb-4">
                   <div>
-                    <p className="text-xs text-muted-foreground">Original Amount</p>
+                    <p className="text-xs text-muted-foreground">{t('liabilities.originalAmount', 'Original Amount')}</p>
                     <p className="font-medium">SAR {loan.originalAmount.toLocaleString()}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-muted-foreground">Remaining Balance</p>
+                    <p className="text-xs text-muted-foreground">{t('liabilities.remainingBalance', 'Remaining Balance')}</p>
                     <p className="font-medium text-red-600">SAR {loan.remainingBalance.toLocaleString()}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-muted-foreground">Monthly Payment</p>
+                    <p className="text-xs text-muted-foreground">{t('liabilities.monthlyPayment', 'Monthly Payment')}</p>
                     <p className="font-medium">SAR {loan.monthlyPayment.toLocaleString()}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-muted-foreground">Interest Rate</p>
+                    <p className="text-xs text-muted-foreground">{t('liabilities.interestRateLabel', 'Interest Rate')}</p>
                     <p className="font-medium">{loan.interestRate}%</p>
                   </div>
                 </div>
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span>Repayment Progress</span>
-                    <span>{Math.round((1 - loan.remainingBalance / loan.originalAmount) * 100)}%</span>
+                    <span>{t('liabilities.repaymentProgress', 'Repayment Progress')}</span>
+                    <span>{Math.round(((loan.originalAmount - loan.remainingBalance) / loan.originalAmount) * 100)}%</span>
                   </div>
-                  <Progress value={(1 - loan.remainingBalance / loan.originalAmount) * 100} />
+                  <Progress value={((loan.originalAmount - loan.remainingBalance) / loan.originalAmount) * 100} className="h-2" />
                 </div>
               </div>
             ))}
@@ -592,191 +594,46 @@ export default function LiabilitiesManagement() {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>Payment Schedule</CardTitle>
-              <CardDescription>جدول السداد - Upcoming payment obligations</CardDescription>
-            </div>
-            <Button variant="outline" data-testid="button-export-schedule">
-              <Download className="h-4 w-4 mr-2" />
-              Export Schedule
-            </Button>
-          </div>
+          <CardTitle>{t('liabilities.paymentSchedule', 'Payment Schedule')}</CardTitle>
+          <CardDescription>{t('liabilities.paymentScheduleDesc', 'جدول السداد - Upcoming payment obligations')}</CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Month</TableHead>
-                <TableHead>Loan Payments</TableHead>
-                <TableHead>Payables</TableHead>
-                <TableHead>Taxes</TableHead>
-                <TableHead>Total Due</TableHead>
+                <TableHead>{t('liabilities.month', 'Month')}</TableHead>
+                <TableHead>{t('liabilities.loans', 'Loans')}</TableHead>
+                <TableHead>{t('liabilities.payables', 'Payables')}</TableHead>
+                <TableHead>{t('liabilities.taxes', 'Taxes')}</TableHead>
+                <TableHead>{t('common.total', 'Total')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {paymentSchedule.map((row, index) => (
+              {paymentSchedule.map((schedule, index) => (
                 <TableRow key={index} data-testid={`row-schedule-${index}`}>
-                  <TableCell className="font-medium">{row.month}</TableCell>
-                  <TableCell>SAR {row.loans.toLocaleString()}</TableCell>
-                  <TableCell>SAR {row.payables.toLocaleString()}</TableCell>
-                  <TableCell>SAR {row.taxes.toLocaleString()}</TableCell>
-                  <TableCell className="font-bold text-red-600">SAR {row.total.toLocaleString()}</TableCell>
+                  <TableCell className="font-medium">{schedule.month}</TableCell>
+                  <TableCell>SAR {schedule.loans.toLocaleString()}</TableCell>
+                  <TableCell>SAR {schedule.payables.toLocaleString()}</TableCell>
+                  <TableCell>SAR {schedule.taxes.toLocaleString()}</TableCell>
+                  <TableCell className="font-bold">SAR {schedule.total.toLocaleString()}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </CardContent>
       </Card>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5 text-red-600" />
-              Overdue Obligations
-            </CardTitle>
-            <CardDescription>الالتزامات المتأخرة</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between p-3 bg-red-50 dark:bg-red-900/20 rounded-lg" data-testid="card-overdue-vat">
-                <div>
-                  <p className="font-medium">VAT Payable - Q4 2024</p>
-                  <p className="text-sm text-muted-foreground">Due: Jan 31, 2024</p>
-                </div>
-                <div className="text-right">
-                  <p className="font-bold text-red-600">SAR 28,500</p>
-                  <Badge className="bg-red-600">Overdue</Badge>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Clock className="h-5 w-5 text-yellow-600" />
-              Due Soon
-            </CardTitle>
-            <CardDescription>مستحقة قريباً - Within 30 days</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg" data-testid="card-due-soon-supplier">
-                <div>
-                  <p className="font-medium">AutoParts Co - Supplier Credit</p>
-                  <p className="text-sm text-muted-foreground">Due: Feb 28, 2024</p>
-                </div>
-                <div className="text-right">
-                  <p className="font-bold text-yellow-600">SAR 45,000</p>
-                  <Badge className="bg-yellow-600">Due Soon</Badge>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    </div>
-  );
-
-  const analysisTab = (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card data-testid="card-debt-equity-ratio">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Debt to Equity Ratio</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">0.65</div>
-            <p className="text-xs text-green-600 mt-1">Healthy range</p>
-          </CardContent>
-        </Card>
-
-        <Card data-testid="card-current-ratio">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Current Ratio</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">2.15</div>
-            <p className="text-xs text-green-600 mt-1">Good liquidity</p>
-          </CardContent>
-        </Card>
-
-        <Card data-testid="card-interest-coverage">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Interest Coverage</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">4.8x</div>
-            <p className="text-xs text-green-600 mt-1">Strong coverage</p>
-          </CardContent>
-        </Card>
-
-        <Card data-testid="card-debt-service">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Debt Service Ratio</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">1.35</div>
-            <p className="text-xs text-green-600 mt-1">Adequate</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Liability Composition</CardTitle>
-          <CardDescription>تكوين الخصوم - Breakdown by type</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div data-testid="bar-mortgage">
-              <div className="flex justify-between mb-1">
-                <span className="text-sm font-medium">Mortgage</span>
-                <span className="text-sm text-muted-foreground">SAR 1,250,000 (77%)</span>
-              </div>
-              <Progress value={77} className="h-3" />
-            </div>
-            <div data-testid="bar-equipment-loan">
-              <div className="flex justify-between mb-1">
-                <span className="text-sm font-medium">Equipment Loans</span>
-                <span className="text-sm text-muted-foreground">SAR 145,000 (9%)</span>
-              </div>
-              <Progress value={9} className="h-3" />
-            </div>
-            <div data-testid="bar-provisions">
-              <div className="flex justify-between mb-1">
-                <span className="text-sm font-medium">Provisions</span>
-                <span className="text-sm text-muted-foreground">SAR 185,000 (11%)</span>
-              </div>
-              <Progress value={11} className="h-3" />
-            </div>
-            <div data-testid="bar-payables">
-              <div className="flex justify-between mb-1">
-                <span className="text-sm font-medium">Accounts Payable & Taxes</span>
-                <span className="text-sm text-muted-foreground">SAR 73,500 (3%)</span>
-              </div>
-              <Progress value={3} className="h-3" />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-6">
       <TabsPageLayout
-        title="Liabilities & Obligations"
-        description="الخصوم و الالتزامات - Manage company debts, loans, and financial obligations"
-        defaultTab="payables"
+        title={t('liabilities.liabilitiesManagement', 'Liabilities Management')}
+        subtitle={t('liabilities.liabilitiesManagementSubtitle', 'إدارة الخصوم - Track and manage company obligations and debts')}
         tabs={[
-          { id: "payables", label: "All Liabilities", icon: FileText, content: payablesTab },
-          { id: "loans", label: "Loans", icon: Landmark, content: loansTab },
-          { id: "schedule", label: "Payment Schedule", icon: Calendar, content: scheduleTab },
-          { id: "analysis", label: "Analysis", icon: TrendingUp, content: analysisTab },
+          { id: "payables", label: t('liabilities.payables', 'Payables'), icon: CreditCard, content: payablesTab },
+          { id: "loans", label: t('liabilities.loans', 'Loans'), icon: Landmark, content: loansTab },
+          { id: "schedule", label: t('liabilities.schedule', 'Schedule'), icon: Calendar, content: scheduleTab },
         ]}
       />
     </div>
