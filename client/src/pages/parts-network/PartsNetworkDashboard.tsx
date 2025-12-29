@@ -189,11 +189,11 @@ export default function PartsNetworkDashboard() {
 
       {/* Quick Actions */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-        <Card className="bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-800 hover:border-gray-400 dark:hover:border-gray-600 transition-colors">
+        <Card className="bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 hover:shadow-md transition-all">
           <CardContent className="p-6">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-gray-900 dark:bg-white rounded-xl">
-                <Send className="h-6 w-6 text-white dark:text-gray-900" />
+              <div className="p-3 bg-gray-100 dark:bg-gray-800 rounded-xl">
+                <Send className="h-6 w-6 text-gray-700 dark:text-gray-300" />
               </div>
               <div className="flex-1">
                 <h3 className="font-bold text-lg text-gray-900 dark:text-white">Request Quotation</h3>
@@ -209,18 +209,18 @@ export default function PartsNetworkDashboard() {
           </CardContent>
         </Card>
 
-        <Card className="bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-800 hover:border-gray-400 dark:hover:border-gray-600 transition-colors">
+        <Card className="bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 hover:shadow-md transition-all">
           <CardContent className="p-6">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-gray-900 dark:bg-white rounded-xl">
-                <Inbox className="h-6 w-6 text-white dark:text-gray-900" />
+              <div className="p-3 bg-gray-100 dark:bg-gray-800 rounded-xl">
+                <Inbox className="h-6 w-6 text-gray-700 dark:text-gray-300" />
               </div>
               <div className="flex-1">
                 <h3 className="font-bold text-lg text-gray-900 dark:text-white">View Incoming Requests</h3>
                 <p className="text-sm text-gray-500 dark:text-gray-400">Respond to quotation requests from garages</p>
               </div>
               <Link href="/parts-network/incoming-requests">
-                <Button variant="outline" className="border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800" data-testid="btn-view-incoming">
+                <Button className="bg-gray-900 hover:bg-gray-800 text-white dark:bg-white dark:hover:bg-gray-100 dark:text-gray-900" data-testid="btn-view-incoming">
                   View Requests
                   <ArrowUpRight className="ml-2 h-4 w-4" />
                 </Button>
