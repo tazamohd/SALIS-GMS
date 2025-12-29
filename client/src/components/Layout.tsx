@@ -87,6 +87,7 @@ import { Input } from "@/components/ui/input";
 import { useAuth } from "@/hooks/useAuth";
 import { NotificationBell } from "@/components/NotificationBell";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { ArabicLanguageToggle } from "@/components/ArabicLanguageToggle";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { QuickActionsModal } from "@/components/QuickActionsModal";
 import { SkipLink } from "@/components/SkipLink";
@@ -401,6 +402,7 @@ export function Layout({ children }: LayoutProps) {
                 {navigator.platform.includes("Mac") ? "⌘K" : "Ctrl+K"}
               </kbd>
             </Button>
+            <ArabicLanguageToggle />
             <LanguageSwitcher />
             <ThemeToggle />
             <NotificationBell />
