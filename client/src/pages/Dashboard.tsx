@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { BarChart3, Clock, AlertCircle, CheckCircle, Wrench, TrendingUp, Users, DollarSign, Package, FileText, Car, CalendarDays, Activity, Zap, ArrowUpRight, ArrowDownRight } from "lucide-react";
+import { BarChart3, Clock, AlertCircle, CheckCircle, Wrench, TrendingUp, Users, DollarSign, Package, FileText, Car, CalendarDays, Activity, Zap, ArrowUpRight, ArrowDownRight, Sparkles, Target, Award, Flame, Timer, ShieldCheck, Gauge, CircleDot } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { Link } from "wouter";
@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { TaskDetailsDialog } from "@/components/TaskDetailsDialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/hooks/useAuth";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend, LineChart, Line, Area, AreaChart } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend, Area, AreaChart } from "recharts";
 import type { JobCard, User, Invoice, SparePart } from "@shared/schema";
 
 interface DashboardStats {
@@ -142,441 +142,485 @@ export function Dashboard() {
   const isTechnician = role === 'TECHNICIAN';
 
   return (
-    <div className="p-6 space-y-6 bg-gray-50 dark:bg-salis-black min-h-screen">
-      {/* Header Section */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-montserrat font-bold text-gray-900 dark:text-white flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600">
-              <BarChart3 className="w-7 h-7 text-white" />
-            </div>
-            {t('dashboard.title', 'Dashboard')}
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1 font-poppins">
-            {t('common.welcome', 'Welcome back')}, {(user as any)?.fullName || (user as any)?.username || (user as any)?.displayName || (user as any)?.email?.split('@')[0] || 'User'}
-          </p>
-        </div>
-        <div className="flex gap-3">
-          <Button variant="outline" className="gap-2" asChild>
-            <Link href="/job-cards">
-              <FileText className="w-4 h-4" />
-              {t('dashboard.newJobCard', 'New Job Card')}
-            </Link>
-          </Button>
-          <Button className="gap-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700" asChild>
-            <Link href="/vehicles">
-              <Car className="w-4 h-4" />
-              {t('dashboard.addVehicle', 'Add Vehicle')}
-            </Link>
-          </Button>
-        </div>
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Animated Background */}
+      <div className="fixed inset-0 -z-10">
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900 dark:from-black dark:via-purple-950/30 dark:to-black"></div>
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
       </div>
 
-      {/* Large Colorful Metric Cards - Primary Row */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {/* Total Revenue Card */}
-        <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]" data-testid="card-revenue">
-          <CardContent className="p-6">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-emerald-100 text-sm font-medium mb-1">{t('dashboard.totalRevenue', 'Total Revenue')}</p>
-                <h3 className="text-3xl font-bold font-montserrat">${totalRevenue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h3>
-                <div className="flex items-center gap-1 mt-2 text-emerald-100">
-                  <ArrowUpRight className="w-4 h-4" />
-                  <span className="text-sm">+12.5% {t('dashboard.fromLastMonth', 'from last month')}</span>
+      <div className="relative p-6 space-y-8">
+        {/* Hero Header */}
+        <div className="relative">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+            <div className="space-y-2">
+              <div className="flex items-center gap-3">
+                <div className="relative">
+                  <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl blur-lg opacity-75 animate-pulse"></div>
+                  <div className="relative p-3 rounded-2xl bg-gradient-to-r from-purple-600 to-pink-600 shadow-2xl">
+                    <Sparkles className="w-8 h-8 text-white" />
+                  </div>
+                </div>
+                <div>
+                  <h1 className="text-4xl md:text-5xl font-montserrat font-black bg-gradient-to-r from-white via-purple-200 to-pink-200 bg-clip-text text-transparent">
+                    {t('dashboard.title', 'Dashboard')}
+                  </h1>
+                  <p className="text-purple-300/80 font-light">
+                    {t('common.welcome', 'Welcome back')}, <span className="font-semibold text-white">{(user as any)?.fullName || (user as any)?.username || 'User'}</span>
+                  </p>
                 </div>
               </div>
-              <div className="p-3 bg-white/20 rounded-xl">
-                <DollarSign className="w-8 h-8" />
-              </div>
             </div>
-            <div className="absolute -bottom-4 -right-4 w-24 h-24 bg-white/10 rounded-full"></div>
-            <div className="absolute -bottom-8 -right-8 w-32 h-32 bg-white/5 rounded-full"></div>
-          </CardContent>
-        </Card>
-
-        {/* Active Jobs Card */}
-        <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]" data-testid="card-active-jobs">
-          <CardContent className="p-6">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-blue-100 text-sm font-medium mb-1">{t('dashboard.activeJobs', 'Active Jobs')}</p>
-                <h3 className="text-3xl font-bold font-montserrat">{repairCount + checkInCount}</h3>
-                <div className="flex items-center gap-2 mt-2">
-                  <Badge className="bg-white/20 text-white border-0 text-xs">{checkInCount} {t('common.pending', 'Pending')}</Badge>
-                  <Badge className="bg-white/20 text-white border-0 text-xs">{repairCount} {t('dashboard.inProgress', 'In Progress')}</Badge>
-                </div>
-              </div>
-              <div className="p-3 bg-white/20 rounded-xl">
-                <Wrench className="w-8 h-8" />
-              </div>
+            <div className="flex gap-3">
+              <Button className="relative group overflow-hidden bg-white/10 backdrop-blur-xl border border-white/20 hover:bg-white/20 text-white shadow-xl" asChild>
+                <Link href="/job-cards">
+                  <div className="absolute inset-0 bg-gradient-to-r from-purple-600/50 to-pink-600/50 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                  <FileText className="w-4 h-4 mr-2 relative z-10" />
+                  <span className="relative z-10">{t('dashboard.newJobCard', 'New Job Card')}</span>
+                </Link>
+              </Button>
+              <Button className="relative group overflow-hidden bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-xl shadow-purple-500/25" asChild>
+                <Link href="/vehicles">
+                  <Car className="w-4 h-4 mr-2" />
+                  {t('dashboard.addVehicle', 'Add Vehicle')}
+                </Link>
+              </Button>
             </div>
-            <div className="absolute -bottom-4 -right-4 w-24 h-24 bg-white/10 rounded-full"></div>
-          </CardContent>
-        </Card>
-
-        {/* Customers Card */}
-        <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-violet-500 to-purple-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]" data-testid="card-customers">
-          <CardContent className="p-6">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-violet-100 text-sm font-medium mb-1">{t('dashboard.totalCustomers', 'Total Customers')}</p>
-                <h3 className="text-3xl font-bold font-montserrat">{activeCustomersCount}</h3>
-                <div className="flex items-center gap-1 mt-2 text-violet-100">
-                  <ArrowUpRight className="w-4 h-4" />
-                  <span className="text-sm">+8 {t('dashboard.newThisWeek', 'new this week')}</span>
-                </div>
-              </div>
-              <div className="p-3 bg-white/20 rounded-xl">
-                <Users className="w-8 h-8" />
-              </div>
-            </div>
-            <div className="absolute -bottom-4 -right-4 w-24 h-24 bg-white/10 rounded-full"></div>
-          </CardContent>
-        </Card>
-
-        {/* Inventory Card */}
-        <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-amber-500 to-orange-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]" data-testid="card-inventory">
-          <CardContent className="p-6">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-amber-100 text-sm font-medium mb-1">{t('dashboard.partsInventory', 'Parts Inventory')}</p>
-                <h3 className="text-3xl font-bold font-montserrat">{inventoryPercentage}%</h3>
-                <div className="w-full bg-white/20 rounded-full h-2 mt-3">
-                  <div className="bg-white rounded-full h-2 transition-all duration-500" style={{ width: `${inventoryPercentage}%` }}></div>
-                </div>
-                <p className="text-amber-100 text-xs mt-1">{inStockParts} / {totalInventoryItems} {t('dashboard.inStock', 'in stock')}</p>
-              </div>
-              <div className="p-3 bg-white/20 rounded-xl">
-                <Package className="w-8 h-8" />
-              </div>
-            </div>
-            <div className="absolute -bottom-4 -right-4 w-24 h-24 bg-white/10 rounded-full"></div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Secondary Status Cards Row */}
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-        <Card className="border border-yellow-200 dark:border-yellow-900/50 bg-gradient-to-br from-yellow-50 to-yellow-100 dark:from-yellow-900/20 dark:to-yellow-800/20 hover:shadow-md transition-all" data-testid="card-check-in">
-          <CardContent className="p-4 text-center">
-            <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-yellow-500/20 flex items-center justify-center">
-              <Clock className="w-6 h-6 text-yellow-600 dark:text-yellow-400" />
-            </div>
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-white">{checkInCount}</h3>
-            <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">{t('dashboard.checkIn', 'Check-In')}</p>
-          </CardContent>
-        </Card>
-
-        <Card className="border border-blue-200 dark:border-blue-900/50 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 hover:shadow-md transition-all" data-testid="card-repair">
-          <CardContent className="p-4 text-center">
-            <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-blue-500/20 flex items-center justify-center">
-              <Wrench className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-            </div>
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-white">{repairCount}</h3>
-            <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">{t('dashboard.repair', 'Repair')}</p>
-          </CardContent>
-        </Card>
-
-        <Card className="border border-purple-200 dark:border-purple-900/50 bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 hover:shadow-md transition-all" data-testid="card-quality">
-          <CardContent className="p-4 text-center">
-            <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-purple-500/20 flex items-center justify-center">
-              <AlertCircle className="w-6 h-6 text-purple-600 dark:text-purple-400" />
-            </div>
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-white">{qualityCheckCount}</h3>
-            <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">{t('dashboard.qualityCheck', 'Quality Check')}</p>
-          </CardContent>
-        </Card>
-
-        <Card className="border border-green-200 dark:border-green-900/50 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 hover:shadow-md transition-all" data-testid="card-completion">
-          <CardContent className="p-4 text-center">
-            <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-green-500/20 flex items-center justify-center">
-              <CheckCircle className="w-6 h-6 text-green-600 dark:text-green-400" />
-            </div>
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-white">{completionCount}</h3>
-            <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">{t('dashboard.completed', 'Completed')}</p>
-          </CardContent>
-        </Card>
-
-        <Card className="border border-teal-200 dark:border-teal-900/50 bg-gradient-to-br from-teal-50 to-teal-100 dark:from-teal-900/20 dark:to-teal-800/20 hover:shadow-md transition-all" data-testid="card-delivered">
-          <CardContent className="p-4 text-center">
-            <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-teal-500/20 flex items-center justify-center">
-              <Car className="w-6 h-6 text-teal-600 dark:text-teal-400" />
-            </div>
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-white">{deliveredCount}</h3>
-            <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">{t('dashboard.delivered', 'Delivered')}</p>
-          </CardContent>
-        </Card>
-
-        <Card className="border border-rose-200 dark:border-rose-900/50 bg-gradient-to-br from-rose-50 to-rose-100 dark:from-rose-900/20 dark:to-rose-800/20 hover:shadow-md transition-all" data-testid="card-total-jobs">
-          <CardContent className="p-4 text-center">
-            <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-rose-500/20 flex items-center justify-center">
-              <Activity className="w-6 h-6 text-rose-600 dark:text-rose-400" />
-            </div>
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-white">{jobCards?.length || 0}</h3>
-            <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">{t('dashboard.totalJobs', 'Total Jobs')}</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Charts Section */}
-      {!isTechnician && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card className="border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900/50 shadow-sm" data-testid="card-revenue-chart">
-            <CardHeader className="pb-2">
-              <CardTitle className="font-montserrat text-lg text-gray-900 dark:text-white flex items-center gap-2">
-                <div className="p-2 rounded-lg bg-emerald-100 dark:bg-emerald-900/30">
-                  <TrendingUp className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-                </div>
-                {t('dashboard.revenuePerMonth', 'Revenue per Month')}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {statsLoading ? (
-                <div className="h-[250px] flex items-center justify-center text-gray-500">{t('common.loading', 'Loading...')}</div>
-              ) : dashboardStats?.revenue && dashboardStats.revenue.length > 0 ? (
-                <ResponsiveContainer width="100%" height={250}>
-                  <AreaChart data={dashboardStats.revenue}>
-                    <defs>
-                      <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
-                        <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
-                      </linearGradient>
-                    </defs>
-                    <XAxis dataKey="month" tick={{ fontSize: 11 }} stroke="#9ca3af" />
-                    <YAxis tick={{ fontSize: 11 }} stroke="#9ca3af" tickFormatter={(v) => `$${v.toLocaleString()}`} />
-                    <Tooltip 
-                      formatter={(value: number) => [`$${value.toLocaleString()}`, 'Revenue']}
-                      contentStyle={{ backgroundColor: '#1f2937', border: 'none', borderRadius: '8px' }}
-                      labelStyle={{ color: '#fff' }}
-                    />
-                    <Area type="monotone" dataKey="revenue" stroke="#10b981" strokeWidth={2} fill="url(#revenueGradient)" />
-                  </AreaChart>
-                </ResponsiveContainer>
-              ) : (
-                <div className="h-[250px] flex items-center justify-center text-gray-500 dark:text-gray-400 text-sm">
-                  {t('dashboard.noRevenueData', 'No revenue data available')}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          <Card className="border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900/50 shadow-sm" data-testid="card-status-chart">
-            <CardHeader className="pb-2">
-              <CardTitle className="font-montserrat text-lg text-gray-900 dark:text-white flex items-center gap-2">
-                <div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/30">
-                  <BarChart3 className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                </div>
-                {t('dashboard.jobsByStatus', 'Jobs by Status')}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {statsLoading ? (
-                <div className="h-[250px] flex items-center justify-center text-gray-500">{t('common.loading', 'Loading...')}</div>
-              ) : dashboardStats?.jobStatus && dashboardStats.jobStatus.length > 0 ? (
-                <ResponsiveContainer width="100%" height={250}>
-                  <PieChart>
-                    <Pie
-                      data={dashboardStats.jobStatus}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={50}
-                      outerRadius={90}
-                      paddingAngle={3}
-                      dataKey="value"
-                      nameKey="name"
-                      label={({ name, value }) => `${name}: ${value}`}
-                      labelLine={false}
-                    >
-                      {dashboardStats.jobStatus.map((_, index) => (
-                        <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip 
-                      contentStyle={{ backgroundColor: '#1f2937', border: 'none', borderRadius: '8px' }}
-                      labelStyle={{ color: '#fff' }}
-                    />
-                    <Legend wrapperStyle={{ fontSize: '12px' }} />
-                  </PieChart>
-                </ResponsiveContainer>
-              ) : (
-                <div className="h-[250px] flex items-center justify-center text-gray-500 dark:text-gray-400 text-sm">
-                  {t('dashboard.noJobStatusData', 'No job status data available')}
-                </div>
-              )}
-            </CardContent>
-          </Card>
+          </div>
         </div>
-      )}
 
-      {/* Quick Stats Summary */}
-      <Card className="border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900/50 shadow-sm" data-testid="card-summary">
-        <CardContent className="p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white flex items-center gap-2">
-              <Zap className="w-5 h-5 text-yellow-500" />
-              {t('dashboard.quickStats', 'Quick Stats')}
-            </h2>
-            <Badge variant="outline" className="text-xs">{t('dashboard.allTime', 'All Time')}</Badge>
-          </div>
-          
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            <div className="text-center p-4 rounded-xl bg-gray-50 dark:bg-gray-800/50">
-              <p className="text-4xl font-montserrat font-bold text-gray-900 dark:text-white">{jobCards?.length || 0}</p>
-              <p className="text-sm font-poppins text-gray-600 dark:text-gray-400 mt-1">{t('dashboard.totalJobs', 'Total Jobs')}</p>
+        {/* Main Metrics - Glassmorphism Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {/* Revenue Card */}
+          <div className="group relative" data-testid="card-revenue">
+            <div className="absolute -inset-0.5 bg-gradient-to-r from-emerald-600 to-teal-600 rounded-3xl blur opacity-50 group-hover:opacity-75 transition duration-500"></div>
+            <div className="relative h-full backdrop-blur-xl bg-white/10 dark:bg-black/30 rounded-3xl p-6 border border-white/20 shadow-2xl">
+              <div className="flex items-start justify-between">
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <div className="p-2 rounded-xl bg-emerald-500/20">
+                      <DollarSign className="w-5 h-5 text-emerald-400" />
+                    </div>
+                    <span className="text-emerald-300/80 text-sm font-medium">{t('dashboard.totalRevenue', 'Total Revenue')}</span>
+                  </div>
+                  <div className="space-y-1">
+                    <h3 className="text-3xl font-black text-white font-montserrat">
+                      ${totalRevenue.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                    </h3>
+                    <div className="flex items-center gap-1 text-emerald-400">
+                      <ArrowUpRight className="w-4 h-4" />
+                      <span className="text-xs font-medium">+12.5%</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="relative">
+                  <div className="absolute inset-0 bg-emerald-500/30 rounded-full blur-xl"></div>
+                  <div className="relative w-16 h-16 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center shadow-lg">
+                    <TrendingUp className="w-8 h-8 text-white" />
+                  </div>
+                </div>
+              </div>
+              <div className="mt-4 h-1 bg-white/10 rounded-full overflow-hidden">
+                <div className="h-full bg-gradient-to-r from-emerald-400 to-teal-400 rounded-full w-[75%] animate-pulse"></div>
+              </div>
             </div>
-            <div className="text-center p-4 rounded-xl bg-gray-50 dark:bg-gray-800/50">
-              <p className="text-4xl font-montserrat font-bold text-gray-900 dark:text-white">{invoices.length}</p>
-              <p className="text-sm font-poppins text-gray-600 dark:text-gray-400 mt-1">{t('dashboard.totalInvoices', 'Total Invoices')}</p>
-            </div>
-            <div className="text-center p-4 rounded-xl bg-gray-50 dark:bg-gray-800/50">
-              <p className="text-4xl font-montserrat font-bold text-gray-900 dark:text-white">{activeCustomersCount}</p>
-              <p className="text-sm font-poppins text-gray-600 dark:text-gray-400 mt-1">{t('dashboard.customers', 'Customers')}</p>
-            </div>
-            <div className="text-center p-4 rounded-xl bg-gray-50 dark:bg-gray-800/50">
-              <p className="text-4xl font-montserrat font-bold text-gray-900 dark:text-white">{spareParts.length}</p>
-              <p className="text-sm font-poppins text-gray-600 dark:text-gray-400 mt-1">{t('dashboard.partsCatalog', 'Parts in Catalog')}</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Latest Tasks Table */}
-      <Card className="border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900/50 shadow-sm" data-testid="card-tasks">
-        <CardContent className="p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white flex items-center gap-2">
-              <FileText className="w-5 h-5 text-blue-500" />
-              {t('dashboard.latestTasks', 'Latest Tasks')}
-            </h2>
-            <Button variant="outline" size="sm" className="gap-2" data-testid="button-view-all" asChild>
-              <Link href="/job-cards">
-                {t('common.viewAll', 'View All')}
-                <ArrowUpRight className="w-4 h-4" />
-              </Link>
-            </Button>
           </div>
 
-          <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700">
-            <table className="w-full text-sm">
-              <thead className="bg-gray-50 dark:bg-gray-800/50">
-                <tr className="border-b border-gray-200 dark:border-gray-700">
-                  <th className="text-left py-3 px-4 font-poppins font-semibold text-xs text-gray-700 dark:text-gray-300">{t('table.id', 'ID')}</th>
-                  <th className="text-left py-3 px-4 font-poppins font-semibold text-xs text-gray-700 dark:text-gray-300">{t('table.service', 'Service')}</th>
-                  <th className="text-left py-3 px-4 font-poppins font-semibold text-xs text-gray-700 dark:text-gray-300">{t('table.customer', 'Customer')}</th>
-                  <th className="text-left py-3 px-4 font-poppins font-semibold text-xs text-gray-700 dark:text-gray-300">{t('table.vehicle', 'Vehicle')}</th>
-                  <th className="text-left py-3 px-4 font-poppins font-semibold text-xs text-gray-700 dark:text-gray-300">{t('common.status', 'Status')}</th>
-                  <th className="text-left py-3 px-4 font-poppins font-semibold text-xs text-gray-700 dark:text-gray-300">{t('table.priority', 'Priority')}</th>
-                  <th className="text-left py-3 px-4 font-poppins font-semibold text-xs text-gray-700 dark:text-gray-300">{t('common.date', 'Date')}</th>
-                  <th className="text-left py-3 px-4 font-poppins font-semibold text-xs text-gray-700 dark:text-gray-300">{t('common.actions', 'Action')}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {isLoading ? (
-                  <tr>
-                    <td colSpan={8} className="py-8 text-center">
-                      <div className="animate-pulse text-gray-700 dark:text-gray-300">{t('common.loading', 'Loading...')}</div>
-                    </td>
-                  </tr>
-                ) : latestTasks.length === 0 ? (
-                  <tr>
-                    <td colSpan={8} className="py-8 text-center text-gray-500 dark:text-gray-500">{t('dashboard.noTasksAvailable', 'No tasks available')}</td>
-                  </tr>
+          {/* Active Jobs Card */}
+          <div className="group relative" data-testid="card-active-jobs">
+            <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-600 to-cyan-600 rounded-3xl blur opacity-50 group-hover:opacity-75 transition duration-500"></div>
+            <div className="relative h-full backdrop-blur-xl bg-white/10 dark:bg-black/30 rounded-3xl p-6 border border-white/20 shadow-2xl">
+              <div className="flex items-start justify-between">
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <div className="p-2 rounded-xl bg-blue-500/20">
+                      <Wrench className="w-5 h-5 text-blue-400" />
+                    </div>
+                    <span className="text-blue-300/80 text-sm font-medium">{t('dashboard.activeJobs', 'Active Jobs')}</span>
+                  </div>
+                  <div className="space-y-1">
+                    <h3 className="text-3xl font-black text-white font-montserrat">{repairCount + checkInCount}</h3>
+                    <div className="flex gap-2">
+                      <Badge className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30 text-xs">{checkInCount} pending</Badge>
+                      <Badge className="bg-blue-500/20 text-blue-300 border-blue-500/30 text-xs">{repairCount} active</Badge>
+                    </div>
+                  </div>
+                </div>
+                <div className="relative">
+                  <div className="absolute inset-0 bg-blue-500/30 rounded-full blur-xl"></div>
+                  <div className="relative w-16 h-16 rounded-full bg-gradient-to-br from-blue-400 to-cyan-500 flex items-center justify-center shadow-lg">
+                    <Gauge className="w-8 h-8 text-white" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Customers Card */}
+          <div className="group relative" data-testid="card-customers">
+            <div className="absolute -inset-0.5 bg-gradient-to-r from-violet-600 to-purple-600 rounded-3xl blur opacity-50 group-hover:opacity-75 transition duration-500"></div>
+            <div className="relative h-full backdrop-blur-xl bg-white/10 dark:bg-black/30 rounded-3xl p-6 border border-white/20 shadow-2xl">
+              <div className="flex items-start justify-between">
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <div className="p-2 rounded-xl bg-violet-500/20">
+                      <Users className="w-5 h-5 text-violet-400" />
+                    </div>
+                    <span className="text-violet-300/80 text-sm font-medium">{t('dashboard.totalCustomers', 'Customers')}</span>
+                  </div>
+                  <div className="space-y-1">
+                    <h3 className="text-3xl font-black text-white font-montserrat">{activeCustomersCount}</h3>
+                    <div className="flex items-center gap-1 text-violet-400">
+                      <Award className="w-4 h-4" />
+                      <span className="text-xs font-medium">+8 this week</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="relative">
+                  <div className="absolute inset-0 bg-violet-500/30 rounded-full blur-xl"></div>
+                  <div className="relative w-16 h-16 rounded-full bg-gradient-to-br from-violet-400 to-purple-500 flex items-center justify-center shadow-lg">
+                    <Target className="w-8 h-8 text-white" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Inventory Card */}
+          <div className="group relative" data-testid="card-inventory">
+            <div className="absolute -inset-0.5 bg-gradient-to-r from-amber-600 to-orange-600 rounded-3xl blur opacity-50 group-hover:opacity-75 transition duration-500"></div>
+            <div className="relative h-full backdrop-blur-xl bg-white/10 dark:bg-black/30 rounded-3xl p-6 border border-white/20 shadow-2xl">
+              <div className="flex items-start justify-between">
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <div className="p-2 rounded-xl bg-amber-500/20">
+                      <Package className="w-5 h-5 text-amber-400" />
+                    </div>
+                    <span className="text-amber-300/80 text-sm font-medium">{t('dashboard.partsInventory', 'Inventory')}</span>
+                  </div>
+                  <div className="space-y-1">
+                    <h3 className="text-3xl font-black text-white font-montserrat">{inventoryPercentage}%</h3>
+                    <p className="text-amber-300/70 text-xs">{inStockParts}/{totalInventoryItems} in stock</p>
+                  </div>
+                </div>
+                <div className="relative">
+                  <div className="absolute inset-0 bg-amber-500/30 rounded-full blur-xl"></div>
+                  <div className="relative w-16 h-16">
+                    <svg className="w-16 h-16 transform -rotate-90">
+                      <circle cx="32" cy="32" r="28" stroke="rgba(255,255,255,0.1)" strokeWidth="8" fill="none" />
+                      <circle cx="32" cy="32" r="28" stroke="url(#inventoryGradient)" strokeWidth="8" fill="none" 
+                        strokeDasharray={`${inventoryPercentage * 1.76} 176`} strokeLinecap="round" />
+                      <defs>
+                        <linearGradient id="inventoryGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                          <stop offset="0%" stopColor="#f59e0b" />
+                          <stop offset="100%" stopColor="#ea580c" />
+                        </linearGradient>
+                      </defs>
+                    </svg>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <ShieldCheck className="w-6 h-6 text-amber-400" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Status Pipeline - Neon Style */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          {[
+            { icon: Clock, label: t('dashboard.checkIn', 'Check-In'), value: checkInCount, color: 'from-yellow-500 to-amber-500', glow: 'yellow' },
+            { icon: Wrench, label: t('dashboard.repair', 'In Repair'), value: repairCount, color: 'from-blue-500 to-indigo-500', glow: 'blue' },
+            { icon: AlertCircle, label: t('dashboard.qualityCheck', 'QC'), value: qualityCheckCount, color: 'from-purple-500 to-violet-500', glow: 'purple' },
+            { icon: CheckCircle, label: t('dashboard.completed', 'Done'), value: completionCount, color: 'from-green-500 to-emerald-500', glow: 'green' },
+            { icon: Car, label: t('dashboard.delivered', 'Delivered'), value: deliveredCount, color: 'from-teal-500 to-cyan-500', glow: 'teal' },
+            { icon: Activity, label: t('dashboard.totalJobs', 'Total'), value: jobCards?.length || 0, color: 'from-rose-500 to-pink-500', glow: 'rose' },
+          ].map((item, index) => (
+            <div key={index} className="group relative" data-testid={`card-status-${index}`}>
+              <div className={`absolute inset-0 bg-gradient-to-r ${item.color} rounded-2xl blur-lg opacity-30 group-hover:opacity-60 transition-all duration-300`}></div>
+              <div className="relative backdrop-blur-xl bg-white/5 dark:bg-black/20 rounded-2xl p-4 border border-white/10 hover:border-white/30 transition-all hover:scale-105 hover:-translate-y-1 duration-300">
+                <div className="flex flex-col items-center text-center space-y-3">
+                  <div className={`p-3 rounded-xl bg-gradient-to-r ${item.color} shadow-lg`}>
+                    <item.icon className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h4 className="text-3xl font-black text-white font-montserrat">{item.value}</h4>
+                    <p className="text-white/60 text-xs font-medium mt-1">{item.label}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Charts Section */}
+        {!isTechnician && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Revenue Chart */}
+            <div className="group relative" data-testid="card-revenue-chart">
+              <div className="absolute -inset-0.5 bg-gradient-to-r from-emerald-600/50 to-teal-600/50 rounded-3xl blur opacity-30"></div>
+              <div className="relative backdrop-blur-xl bg-white/5 dark:bg-black/20 rounded-3xl p-6 border border-white/10 shadow-2xl">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="p-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500">
+                    <TrendingUp className="w-5 h-5 text-white" />
+                  </div>
+                  <h3 className="text-xl font-bold text-white">{t('dashboard.revenuePerMonth', 'Revenue Trend')}</h3>
+                </div>
+                {statsLoading ? (
+                  <div className="h-[280px] flex items-center justify-center">
+                    <div className="w-8 h-8 border-4 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin"></div>
+                  </div>
+                ) : dashboardStats?.revenue && dashboardStats.revenue.length > 0 ? (
+                  <ResponsiveContainer width="100%" height={280}>
+                    <AreaChart data={dashboardStats.revenue}>
+                      <defs>
+                        <linearGradient id="revenueGrad" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#10b981" stopOpacity={0.4}/>
+                          <stop offset="100%" stopColor="#10b981" stopOpacity={0}/>
+                        </linearGradient>
+                      </defs>
+                      <XAxis dataKey="month" tick={{ fill: '#9ca3af', fontSize: 11 }} axisLine={false} tickLine={false} />
+                      <YAxis tick={{ fill: '#9ca3af', fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${v/1000}k`} />
+                      <Tooltip 
+                        formatter={(value: number) => [`$${value.toLocaleString()}`, 'Revenue']}
+                        contentStyle={{ backgroundColor: 'rgba(17,24,39,0.9)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', backdropFilter: 'blur(10px)' }}
+                        labelStyle={{ color: '#fff' }}
+                      />
+                      <Area type="monotone" dataKey="revenue" stroke="#10b981" strokeWidth={3} fill="url(#revenueGrad)" />
+                    </AreaChart>
+                  </ResponsiveContainer>
                 ) : (
-                  latestTasks.map((task) => {
-                    const serviceConfig = getServiceTypeBadge(task.serviceType);
-                    const statusConfig = getStatusBadge(task.status);
-                    const priorityConfig = getPriorityBadge(task.priority);
-                    const vehicleInfo = task.vehicleInfo as any;
-                    
-                    return (
-                      <tr key={task.id} className="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors" data-testid={`row-task-${task.id}`}>
-                        <td className="py-3 px-4 font-mono text-xs font-semibold text-gray-900 dark:text-white">
-                          #{shortenId(task.id)}
-                        </td>
-                        <td className="py-3 px-4">
-                          <Badge className={`${serviceConfig.bg} ${serviceConfig.text} border-0 text-xs font-medium`}>
-                            {serviceConfig.icon} {serviceConfig.label}
-                          </Badge>
-                        </td>
-                        <td className="py-3 px-4 font-poppins text-sm text-gray-700 dark:text-gray-300">
-                          {vehicleInfo?.customerName || vehicleInfo?.owner || 'N/A'}
-                        </td>
-                        <td className="py-3 px-4 font-poppins text-sm text-gray-700 dark:text-gray-300">
-                          {vehicleInfo?.make} {vehicleInfo?.model}
-                        </td>
-                        <td className="py-3 px-4">
-                          <Badge className={`${statusConfig.bg} ${statusConfig.text} border-0 text-xs font-medium`} data-testid={`badge-status-${task.id}`}>
-                            {statusConfig.icon} {statusConfig.label}
-                          </Badge>
-                        </td>
-                        <td className="py-3 px-4">
-                          <Badge className={`${priorityConfig.bg} ${priorityConfig.text} border-0 text-xs font-medium shadow-sm`} data-testid={`badge-priority-${task.id}`}>
-                            {priorityConfig.icon} {priorityConfig.label.toUpperCase()}
-                          </Badge>
-                        </td>
-                        <td className="py-3 px-4 font-poppins text-xs text-gray-600 dark:text-gray-400">
-                          {task.createdAt ? new Date(task.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'N/A'}
-                        </td>
-                        <td className="py-3 px-4">
-                          <Button 
-                            size="sm" 
-                            variant="outline" 
-                            onClick={() => handleViewTask(task)}
-                            className="h-7 px-3 text-xs"
-                            data-testid={`button-view-${task.id}`}
-                          >
-                            {t('common.view', 'View')}
-                          </Button>
-                        </td>
-                      </tr>
-                    );
-                  })
+                  <div className="h-[280px] flex items-center justify-center text-white/40">
+                    {t('dashboard.noRevenueData', 'No revenue data available')}
+                  </div>
                 )}
-              </tbody>
-            </table>
-          </div>
-
-          {totalPages > 1 && (
-            <div className="flex items-center justify-between mt-4">
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => goToPage(currentPage - 1)}
-                disabled={currentPage === 1}
-                className="h-8 px-3 text-xs"
-                data-testid="button-previous"
-              >
-                ← {t('common.previous', 'Prev')}
-              </Button>
-              <div className="flex gap-1">
-                {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => i + 1).map((page) => (
-                  <Button 
-                    key={page} 
-                    variant={page === currentPage ? 'default' : 'outline'} 
-                    size="sm"
-                    className="h-8 w-8 p-0 text-xs"
-                    onClick={() => goToPage(page)}
-                    data-testid={`button-page-${page}`}
-                  >
-                    {page}
-                  </Button>
-                ))}
               </div>
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => goToPage(currentPage + 1)}
-                disabled={currentPage === totalPages}
-                className="h-8 px-3 text-xs"
-                data-testid="button-next"
-              >
-                {t('common.next', 'Next')} →
-              </Button>
             </div>
-          )}
-        </CardContent>
-      </Card>
+
+            {/* Jobs Status Chart */}
+            <div className="group relative" data-testid="card-status-chart">
+              <div className="absolute -inset-0.5 bg-gradient-to-r from-violet-600/50 to-purple-600/50 rounded-3xl blur opacity-30"></div>
+              <div className="relative backdrop-blur-xl bg-white/5 dark:bg-black/20 rounded-3xl p-6 border border-white/10 shadow-2xl">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="p-2 rounded-xl bg-gradient-to-r from-violet-500 to-purple-500">
+                    <BarChart3 className="w-5 h-5 text-white" />
+                  </div>
+                  <h3 className="text-xl font-bold text-white">{t('dashboard.jobsByStatus', 'Job Distribution')}</h3>
+                </div>
+                {statsLoading ? (
+                  <div className="h-[280px] flex items-center justify-center">
+                    <div className="w-8 h-8 border-4 border-violet-500/30 border-t-violet-500 rounded-full animate-spin"></div>
+                  </div>
+                ) : dashboardStats?.jobStatus && dashboardStats.jobStatus.length > 0 ? (
+                  <ResponsiveContainer width="100%" height={280}>
+                    <PieChart>
+                      <Pie
+                        data={dashboardStats.jobStatus}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={60}
+                        outerRadius={100}
+                        paddingAngle={4}
+                        dataKey="value"
+                        nameKey="name"
+                      >
+                        {dashboardStats.jobStatus.map((_, index) => (
+                          <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} stroke="none" />
+                        ))}
+                      </Pie>
+                      <Tooltip 
+                        contentStyle={{ backgroundColor: 'rgba(17,24,39,0.9)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }}
+                        labelStyle={{ color: '#fff' }}
+                      />
+                      <Legend wrapperStyle={{ color: '#9ca3af', fontSize: '12px' }} />
+                    </PieChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="h-[280px] flex items-center justify-center text-white/40">
+                    {t('dashboard.noJobStatusData', 'No job data available')}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Quick Stats */}
+        <div className="group relative">
+          <div className="absolute -inset-0.5 bg-gradient-to-r from-pink-600/30 via-purple-600/30 to-blue-600/30 rounded-3xl blur"></div>
+          <div className="relative backdrop-blur-xl bg-white/5 dark:bg-black/20 rounded-3xl p-6 border border-white/10 shadow-2xl">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-xl bg-gradient-to-r from-pink-500 to-purple-500">
+                  <Zap className="w-5 h-5 text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-white">{t('dashboard.quickStats', 'Performance Overview')}</h3>
+              </div>
+              <Badge className="bg-white/10 text-white/80 border-white/20">{t('dashboard.allTime', 'All Time')}</Badge>
+            </div>
+            
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {[
+                { label: t('dashboard.totalJobs', 'Total Jobs'), value: jobCards?.length || 0, icon: FileText, color: 'from-blue-500 to-cyan-500' },
+                { label: t('dashboard.totalInvoices', 'Invoices'), value: invoices.length, icon: DollarSign, color: 'from-emerald-500 to-teal-500' },
+                { label: t('dashboard.customers', 'Customers'), value: activeCustomersCount, icon: Users, color: 'from-violet-500 to-purple-500' },
+                { label: t('dashboard.partsCatalog', 'Parts'), value: spareParts.length, icon: Package, color: 'from-amber-500 to-orange-500' },
+              ].map((stat, index) => (
+                <div key={index} className="relative group/stat">
+                  <div className={`absolute inset-0 bg-gradient-to-r ${stat.color} rounded-2xl blur opacity-20 group-hover/stat:opacity-40 transition-opacity`}></div>
+                  <div className="relative p-5 rounded-2xl bg-white/5 border border-white/10 text-center hover:bg-white/10 transition-all">
+                    <div className={`w-12 h-12 mx-auto mb-3 rounded-xl bg-gradient-to-r ${stat.color} flex items-center justify-center`}>
+                      <stat.icon className="w-6 h-6 text-white" />
+                    </div>
+                    <h4 className="text-3xl font-black text-white font-montserrat">{stat.value}</h4>
+                    <p className="text-white/50 text-sm mt-1">{stat.label}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Latest Tasks */}
+        <div className="group relative" data-testid="card-tasks">
+          <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-600/30 to-purple-600/30 rounded-3xl blur"></div>
+          <div className="relative backdrop-blur-xl bg-white/5 dark:bg-black/20 rounded-3xl border border-white/10 shadow-2xl overflow-hidden">
+            <div className="p-6 border-b border-white/10">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-xl bg-gradient-to-r from-blue-500 to-purple-500">
+                    <Flame className="w-5 h-5 text-white" />
+                  </div>
+                  <h3 className="text-xl font-bold text-white">{t('dashboard.latestTasks', 'Recent Jobs')}</h3>
+                </div>
+                <Button className="bg-white/10 hover:bg-white/20 text-white border-white/20" variant="outline" size="sm" asChild>
+                  <Link href="/job-cards">
+                    {t('common.viewAll', 'View All')}
+                    <ArrowUpRight className="w-4 h-4 ml-2" />
+                  </Link>
+                </Button>
+              </div>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-white/10 bg-white/5">
+                    <th className="text-left py-4 px-6 text-white/60 text-xs font-semibold uppercase tracking-wider">{t('table.id', 'ID')}</th>
+                    <th className="text-left py-4 px-6 text-white/60 text-xs font-semibold uppercase tracking-wider">{t('table.service', 'Service')}</th>
+                    <th className="text-left py-4 px-6 text-white/60 text-xs font-semibold uppercase tracking-wider">{t('table.customer', 'Customer')}</th>
+                    <th className="text-left py-4 px-6 text-white/60 text-xs font-semibold uppercase tracking-wider">{t('table.vehicle', 'Vehicle')}</th>
+                    <th className="text-left py-4 px-6 text-white/60 text-xs font-semibold uppercase tracking-wider">{t('common.status', 'Status')}</th>
+                    <th className="text-left py-4 px-6 text-white/60 text-xs font-semibold uppercase tracking-wider">{t('table.priority', 'Priority')}</th>
+                    <th className="text-left py-4 px-6 text-white/60 text-xs font-semibold uppercase tracking-wider">{t('common.actions', 'Action')}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {isLoading ? (
+                    <tr>
+                      <td colSpan={7} className="py-12 text-center">
+                        <div className="w-8 h-8 mx-auto border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin"></div>
+                      </td>
+                    </tr>
+                  ) : latestTasks.length === 0 ? (
+                    <tr>
+                      <td colSpan={7} className="py-12 text-center text-white/40">{t('dashboard.noTasksAvailable', 'No tasks available')}</td>
+                    </tr>
+                  ) : (
+                    latestTasks.map((task, index) => {
+                      const serviceConfig = getServiceTypeBadge(task.serviceType);
+                      const statusConfig = getStatusBadge(task.status);
+                      const priorityConfig = getPriorityBadge(task.priority);
+                      const vehicleInfo = task.vehicleInfo as any;
+                      
+                      return (
+                        <tr key={task.id} className="border-b border-white/5 hover:bg-white/5 transition-colors" data-testid={`row-task-${task.id}`}>
+                          <td className="py-4 px-6">
+                            <span className="font-mono text-sm font-bold text-purple-400">#{shortenId(task.id)}</span>
+                          </td>
+                          <td className="py-4 px-6">
+                            <Badge className={`${serviceConfig.bg} ${serviceConfig.text} border-0`}>
+                              {serviceConfig.icon} {serviceConfig.label}
+                            </Badge>
+                          </td>
+                          <td className="py-4 px-6 text-white/80 text-sm">
+                            {vehicleInfo?.customerName || vehicleInfo?.owner || 'N/A'}
+                          </td>
+                          <td className="py-4 px-6 text-white/60 text-sm">
+                            {vehicleInfo?.make} {vehicleInfo?.model}
+                          </td>
+                          <td className="py-4 px-6">
+                            <Badge className={`${statusConfig.bg} ${statusConfig.text} border-0`}>
+                              {statusConfig.icon} {statusConfig.label}
+                            </Badge>
+                          </td>
+                          <td className="py-4 px-6">
+                            <Badge className={`${priorityConfig.bg} ${priorityConfig.text} border-0 shadow-lg`}>
+                              {priorityConfig.icon} {priorityConfig.label.toUpperCase()}
+                            </Badge>
+                          </td>
+                          <td className="py-4 px-6">
+                            <Button 
+                              size="sm" 
+                              onClick={() => handleViewTask(task)}
+                              className="bg-white/10 hover:bg-white/20 text-white border-white/20"
+                              variant="outline"
+                            >
+                              {t('common.view', 'View')}
+                            </Button>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            {totalPages > 1 && (
+              <div className="p-4 border-t border-white/10 flex items-center justify-between">
+                <Button 
+                  variant="outline"
+                  size="sm"
+                  onClick={() => goToPage(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className="bg-white/10 hover:bg-white/20 text-white border-white/20 disabled:opacity-30"
+                >
+                  ← {t('common.previous', 'Prev')}
+                </Button>
+                <div className="flex gap-2">
+                  {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => i + 1).map((page) => (
+                    <Button 
+                      key={page} 
+                      size="sm"
+                      onClick={() => goToPage(page)}
+                      className={page === currentPage 
+                        ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white border-0' 
+                        : 'bg-white/10 hover:bg-white/20 text-white border-white/20'
+                      }
+                      variant={page === currentPage ? 'default' : 'outline'}
+                    >
+                      {page}
+                    </Button>
+                  ))}
+                </div>
+                <Button 
+                  variant="outline"
+                  size="sm"
+                  onClick={() => goToPage(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className="bg-white/10 hover:bg-white/20 text-white border-white/20 disabled:opacity-30"
+                >
+                  {t('common.next', 'Next')} →
+                </Button>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
 
       <TaskDetailsDialog 
         open={taskDetailsOpen}
