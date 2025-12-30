@@ -104,7 +104,7 @@ export function DataTable<T extends Record<string, any>>({
   return (
     <div className={cn("space-y-4", className)}>
       {/* Table Container */}
-      <div className="bg-white dark:bg-gray-800 rounded-2xl border border-purple-200 dark:border-purple-800/50 shadow-sm overflow-hidden">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl border border-blue-200 dark:border-blue-800/50 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <Table className={cn(stickyHeader && "table-sticky-header")}>
             <TableHeader>
@@ -115,7 +115,7 @@ export function DataTable<T extends Record<string, any>>({
                       className={cn(
                         "text-gray-700 dark:text-gray-300 text-xs font-semibold uppercase tracking-wider py-4 px-6",
                         column.className,
-                        column.sortable && "cursor-pointer hover:text-purple-600 dark:hover:text-purple-400"
+                        column.sortable && "cursor-pointer hover:text-blue-600 dark:hover:text-cyan-400"
                       )}
                       onClick={() => column.sortable && handleSort(column.key)}
                       data-testid={`table-header-${column.key}`}
@@ -123,7 +123,7 @@ export function DataTable<T extends Record<string, any>>({
                       <div className="flex items-center gap-2">
                         {column.label}
                         {column.sortable && sortKey === column.key && (
-                          <span className="text-purple-600 dark:text-purple-400" aria-label={`Sorted ${sortOrder}ending`}>
+                          <span className="text-blue-600 dark:text-cyan-400" aria-label={`Sorted ${sortOrder}ending`}>
                             {sortOrder === "asc" ? "↑" : "↓"}
                           </span>
                         )}
@@ -175,7 +175,7 @@ export function DataTable<T extends Record<string, any>>({
               size="sm"
               onClick={() => pagination.onPageChange(pagination.currentPage - 1)}
               disabled={pagination.currentPage === 1}
-              className="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-white border-gray-300 dark:border-gray-600 disabled:opacity-30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2"
+              className="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-white border-gray-300 dark:border-gray-600 disabled:opacity-30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
               data-testid="pagination-previous"
             >
               <ChevronLeft className="w-4 h-4 mr-1" />
@@ -191,9 +191,9 @@ export function DataTable<T extends Record<string, any>>({
                     size="sm"
                     onClick={() => pagination.onPageChange(page)}
                     className={cn(
-                      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2",
+                      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2",
                       page === pagination.currentPage
-                        ? "bg-purple-600 text-white border-0"
+                        ? "bg-gradient-to-r from-blue-600 to-cyan-600 text-white border-0"
                         : "bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-white border-gray-300 dark:border-gray-600"
                     )}
                     variant={page === pagination.currentPage ? "default" : "outline"}
@@ -210,7 +210,7 @@ export function DataTable<T extends Record<string, any>>({
               size="sm"
               onClick={() => pagination.onPageChange(pagination.currentPage + 1)}
               disabled={pagination.currentPage === pagination.totalPages}
-              className="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-white border-gray-300 dark:border-gray-600 disabled:opacity-30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2"
+              className="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-white border-gray-300 dark:border-gray-600 disabled:opacity-30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
               data-testid="pagination-next"
             >
               Next

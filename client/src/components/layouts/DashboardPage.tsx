@@ -24,35 +24,35 @@ interface DashboardPageProps {
 }
 
 const colorSchemes: Record<string, { gradient: string; bg: string; border: string; text: string }> = {
-  purple: {
-    gradient: 'from-purple-500 to-purple-600',
-    bg: 'bg-purple-100 dark:bg-purple-900/50',
-    border: 'border-purple-200 dark:border-purple-800',
-    text: 'text-purple-700 dark:text-purple-400'
+  blue: {
+    gradient: 'from-blue-500 to-blue-600',
+    bg: 'bg-blue-100 dark:bg-blue-900/50',
+    border: 'border-blue-200 dark:border-blue-800',
+    text: 'text-blue-700 dark:text-blue-400'
   },
-  pink: {
-    gradient: 'from-pink-500 to-pink-600',
-    bg: 'bg-pink-100 dark:bg-pink-900/50',
-    border: 'border-pink-200 dark:border-pink-800',
-    text: 'text-pink-700 dark:text-pink-400'
+  cyan: {
+    gradient: 'from-cyan-500 to-cyan-600',
+    bg: 'bg-cyan-100 dark:bg-cyan-900/50',
+    border: 'border-cyan-200 dark:border-cyan-800',
+    text: 'text-cyan-700 dark:text-cyan-400'
   },
-  fuchsia: {
-    gradient: 'from-fuchsia-500 to-fuchsia-600',
-    bg: 'bg-fuchsia-100 dark:bg-fuchsia-900/50',
-    border: 'border-fuchsia-200 dark:border-fuchsia-800',
-    text: 'text-fuchsia-700 dark:text-fuchsia-400'
+  sky: {
+    gradient: 'from-sky-500 to-sky-600',
+    bg: 'bg-sky-100 dark:bg-sky-900/50',
+    border: 'border-sky-200 dark:border-sky-800',
+    text: 'text-sky-700 dark:text-sky-400'
   },
-  violet: {
-    gradient: 'from-violet-500 to-violet-600',
-    bg: 'bg-violet-100 dark:bg-violet-900/50',
-    border: 'border-violet-200 dark:border-violet-800',
-    text: 'text-violet-700 dark:text-violet-400'
+  orange: {
+    gradient: 'from-orange-500 to-orange-600',
+    bg: 'bg-orange-100 dark:bg-orange-900/50',
+    border: 'border-orange-200 dark:border-orange-800',
+    text: 'text-orange-700 dark:text-orange-400'
   },
-  rose: {
-    gradient: 'from-rose-500 to-rose-600',
-    bg: 'bg-rose-100 dark:bg-rose-900/50',
-    border: 'border-rose-200 dark:border-rose-800',
-    text: 'text-rose-700 dark:text-rose-400'
+  slate: {
+    gradient: 'from-slate-500 to-slate-600',
+    bg: 'bg-slate-100 dark:bg-slate-900/50',
+    border: 'border-slate-200 dark:border-slate-800',
+    text: 'text-slate-700 dark:text-slate-400'
   },
 };
 
