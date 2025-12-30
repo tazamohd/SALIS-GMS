@@ -90,6 +90,98 @@ Dedicated backend API and documentation for three cross-platform React Native ap
 ## Saudi Arabia Compliance Stack
 VAT registration, ZATCA certification, Zakat settings, Arabic company details, TRN validation, Hijri calendar conversion, localized PDF/Excel export services, Twilio SMS integration.
 
+## Arabic Language Support (100% Coverage)
+Complete Arabic translation support across all 178 pages using react-i18next.
+
+**Infrastructure**:
+- `client/src/i18n/locales/ar.json` - Arabic translations with 2000+ translation keys
+- `client/src/components/ArabicLanguageToggle.tsx` - Language switcher component
+- RTL (Right-to-Left) layout support when Arabic is active
+
+**Translated Module Categories**:
+
+### Accounting & Finance (25+ pages)
+- Chart of Accounts, General Ledger, Journal Entries, Trial Balance
+- Balance Sheet, Income Statement, Cash Flow Statement
+- Accounts Payable, Accounts Receivable, Bank Account Management
+- Budget Management, Capital Management, Assets Management
+- Liabilities Management, Equity Management, Retained Earnings
+- Cost Centers, Loss Account, Partners Current Account
+- Financial Settings, Payment Gateway Simulator, Payments
+
+### HR & Team Management (15+ pages)
+- Staff Directory, Staff Performance Review, Technician Portal
+- Technician Leaderboards, Technician Performance, Productivity Tracker
+- Timesheet Management, Time Clock Payroll, Training LMS
+- Shift Scheduling, Staff Scheduling, Leave Requests
+- Wearable Integration (for technicians)
+
+### Customer & CRM (10+ pages)
+- Customer Profiles, Customer Feedback, Customer Portal
+- Loyalty Program, Referral Program, Appointment Reminders
+- Service Reminders, Video Consultations, Video Estimates
+
+### Vehicle Management (10+ pages)
+- Vehicles, Vehicles Enhanced, VIN Decoder
+- Vehicle Health Monitoring, Telematics Integration
+- Tire Management, Fleet Management, Vehicle Check-In
+
+### Inventory & Parts (10+ pages)
+- Inventory, Parts Availability, Parts Auto Reorder
+- Smart Parts Recommender, Smart Inventory Forecasting
+- Vendor Supplier Portal, Barcode Scanner
+
+### Service & Operations (15+ pages)
+- Job Cards, Estimates, Invoices, Service Templates
+- Workshop Calendar, Service Bay Dashboard, Task Management
+- Quality Control, Smart Assignment, Smart Damage Assessment
+
+### Analytics & Reporting (10+ pages)
+- Dashboard, Business Intelligence Dashboard, Performance Analytics
+- Business Heat Maps, Custom Report Builder
+- Profit Margin Analysis, Revenue Reports
+
+### AI & Emerging Technologies (20+ pages)
+- AI Automation, AI Chatbot Assistant, AI Scheduling, AI Service Advisor
+- Predictive Diagnostics, Predictive Demand Forecasting
+- ML Fraud Detection, Neural Network Prediction
+- AR Repair Guide, VR Showroom, Digital Twin Viewer
+- Blockchain Service History, Smart Contracts
+- IoT Dashboard, Edge Computing Diagnostics
+- Computer Vision QC, Voice Commands, Voice Command Interface
+
+### Compliance & Safety (8+ pages)
+- Compliance Management, ZATCA Settings, VAT Settings, Zakat Settings
+- ISO Quality Management, Environmental Compliance
+- Safety Incidents, Equipment Calibration
+
+### Diagnostics & Hardware (10+ pages)
+- Diagnostics OBD Hub, OBD Diagnostic Viewer, OEM Software Subscriptions
+- Digital Signage, Security Cameras, Kiosk Check-In
+- Drone Inspection, Mobile Device Management
+
+### Marketing & Communication (8+ pages)
+- Marketing Automation, Marketing Hub
+- Social Media Integration, Social Media Monitoring
+- Google My Business, Email Marketing, Call Center
+
+### Enterprise & Franchise (5+ pages)
+- Franchise Command Center, Multi-Location Dashboard
+- Globalization Layer, Emerging Technologies, Next Gen Technologies
+
+### System & Settings (10+ pages)
+- User Settings, System Settings, Integrations
+- Data Import Export, Document OCR, Knowledge Base
+- Sustainable Energy Monitoring
+
+**Translation Pattern**:
+All pages use `useTranslation` hook from react-i18next with fallback English text:
+```typescript
+import { useTranslation } from 'react-i18next';
+const { t } = useTranslation();
+// Usage: t('namespace.key', 'English fallback')
+```
+
 ## Test Credentials
 | Email | Password | Role |
 |-------|----------|------|
