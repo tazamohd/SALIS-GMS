@@ -476,10 +476,10 @@ export default function Vehicles() {
         title={t('vehicles.title', 'Vehicles')}
         description={t('vehicles.description', 'Manage customer vehicles and service history')}
         icon={Car}
-        actionButtons={actionButtons}
-      >
+    >
+        {actionButtons}
         <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-gray-100"></div>
+          <div className="w-8 h-8 border-4 border-purple-200 dark:border-purple-500/30 border-t-purple-500 rounded-full animate-spin"></div>
         </div>
       </StandardPageLayout>
     );
@@ -490,118 +490,128 @@ export default function Vehicles() {
       title={t('vehicles.title', 'Vehicles')}
       description={t('vehicles.description', 'Manage customer vehicles and service history')}
       icon={Car}
-      actionButtons={actionButtons}
     >
-      <div className="space-y-6">
-        <div className="relative w-96">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-600 dark:text-gray-400" />
-          <Input
-            type="text"
-            placeholder={t('vehicles.searchVehicles', 'Search vehicles...')}
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 border-gray-200 dark:border-salis-gray-dark"
-            data-testid="input-search-vehicles"
-          />
+      {actionButtons}
+      <div className="space-y-6 mt-6">
+        {/* Search Bar */}
+        <div className="group relative max-w-md">
+          <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-2xl blur opacity-50"></div>
+          <div className="relative backdrop-blur-xl bg-white/70 dark:bg-black/20 rounded-xl border border-purple-200/50 dark:border-white/10 shadow-lg">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-purple-500 dark:text-purple-400" />
+            <Input
+              type="text"
+              placeholder={t('vehicles.searchVehicles', 'Search vehicles...')}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 bg-transparent border-0 focus:ring-0"
+              data-testid="input-search-vehicles"
+            />
+          </div>
         </div>
 
         {filteredVehicles.length === 0 ? (
           <div className="text-center py-12">
-            <Car className="w-12 h-12 mx-auto text-gray-600 dark:text-gray-400 mb-4" />
-            <p className="font-['Poppins',Helvetica] text-gray-600 dark:text-gray-400">
+            <Car className="w-12 h-12 mx-auto text-purple-500 dark:text-purple-400 mb-4" />
+            <p className="text-gray-600 dark:text-gray-400">
               {searchQuery ? t('vehicles.noVehiclesMatchingSearch', 'No vehicles found matching your search') : t('vehicles.noVehiclesYet', 'No vehicles added yet')}
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredVehicles.map((vehicle) => {
               const customer = customers.find(c => c.id === vehicle.customerId);
               
               return (
                 <div
                   key={vehicle.id}
-                  className="bg-white dark:bg-salis-black border border-gray-200 dark:border-salis-gray-dark rounded-lg p-6 hover:shadow-md transition-shadow"
+                  className="group relative"
                   data-testid={`card-vehicle-${vehicle.id}`}
                 >
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center">
-                        <Car className="w-6 h-6 text-gray-700 dark:text-gray-300" />
+                  <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-3xl blur opacity-40 group-hover:opacity-60 transition-all duration-300"></div>
+                  <div className="relative backdrop-blur-xl bg-white/70 dark:bg-black/20 rounded-3xl p-6 border border-blue-200/50 dark:border-white/10 shadow-xl hover:shadow-2xl transition-all hover:scale-[1.02] hover:-translate-y-1 duration-300">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex items-center gap-3">
+                        <div className="relative">
+                          <div className="absolute inset-0 bg-blue-500/30 rounded-xl blur-lg"></div>
+                          <div className="relative w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center shadow-lg">
+                            <Car className="w-6 h-6 text-white" />
+                          </div>
+                        </div>
+                        <div>
+                          <h3 className="font-bold text-gray-900 dark:text-white">
+                            {vehicle.make} {vehicle.model}
+                          </h3>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">
+                            {vehicle.year}
+                          </p>
+                        </div>
                       </div>
-                      <div>
-                        <h3 className="font-['Poppins',Helvetica] font-semibold text-gray-900 dark:text-white">
-                          {vehicle.make} {vehicle.model}
-                        </h3>
-                        <p className="font-['Poppins',Helvetica] text-sm text-gray-600 dark:text-gray-400">
-                          {vehicle.year}
-                        </p>
-                      </div>
+                      {vehicle.isActive && (
+                        <Badge className="bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-500/30">{t('common.active', 'Active')}</Badge>
+                      )}
                     </div>
-                    {vehicle.isActive && (
-                      <Badge className="bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100">{t('common.active', 'Active')}</Badge>
-                    )}
-                  </div>
 
-                  <div className="space-y-2 mb-4">
-                    <div className="flex justify-between">
-                      <span className="font-['Poppins',Helvetica] text-sm text-gray-600 dark:text-gray-400">{t('vehicles.owner', 'Owner')}:</span>
-                      <span className="font-['Poppins',Helvetica] text-sm text-gray-900 dark:text-white">
-                        {customer?.fullName || t('common.unknown', 'Unknown')}
-                      </span>
+                    <div className="space-y-2 mb-4">
+                      <div className="flex justify-between">
+                        <span className="text-sm text-gray-600 dark:text-gray-400">{t('vehicles.owner', 'Owner')}:</span>
+                        <span className="text-sm text-gray-900 dark:text-white">
+                          {customer?.fullName || t('common.unknown', 'Unknown')}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm text-gray-600 dark:text-gray-400">{t('vehicles.license', 'License')}:</span>
+                        <span className="text-sm text-gray-900 dark:text-white font-medium">
+                          {vehicle.licensePlate}
+                        </span>
+                      </div>
+                      {vehicle.vin && (
+                        <div className="flex justify-between">
+                          <span className="text-sm text-gray-600 dark:text-gray-400">{t('vehicles.vin', 'VIN')}:</span>
+                          <span className="text-sm text-gray-900 dark:text-white truncate max-w-[150px]">
+                            {vehicle.vin}
+                          </span>
+                        </div>
+                      )}
+                      {vehicle.mileage && vehicle.mileage > 0 && (
+                        <div className="flex justify-between">
+                          <span className="text-sm text-gray-600 dark:text-gray-400">{t('vehicles.mileage', 'Mileage')}:</span>
+                          <span className="text-sm text-gray-900 dark:text-white">
+                            {vehicle.mileage.toLocaleString()} km
+                          </span>
+                        </div>
+                      )}
+                      {vehicle.engineType && (
+                        <div className="flex justify-between">
+                          <span className="text-sm text-gray-600 dark:text-gray-400">{t('vehicles.engine', 'Engine')}:</span>
+                          <span className="text-sm text-gray-900 dark:text-white capitalize">
+                            {vehicle.engineType}
+                          </span>
+                        </div>
+                      )}
                     </div>
-                    <div className="flex justify-between">
-                      <span className="font-['Poppins',Helvetica] text-sm text-gray-600 dark:text-gray-400">{t('vehicles.license', 'License')}:</span>
-                      <span className="font-['Poppins',Helvetica] text-sm text-gray-900 dark:text-white font-medium">
-                        {vehicle.licensePlate}
-                      </span>
-                    </div>
-                    {vehicle.vin && (
-                      <div className="flex justify-between">
-                        <span className="font-['Poppins',Helvetica] text-sm text-gray-600 dark:text-gray-400">{t('vehicles.vin', 'VIN')}:</span>
-                        <span className="font-['Poppins',Helvetica] text-sm text-gray-900 dark:text-white truncate max-w-[150px]">
-                          {vehicle.vin}
-                        </span>
-                      </div>
-                    )}
-                    {vehicle.mileage && vehicle.mileage > 0 && (
-                      <div className="flex justify-between">
-                        <span className="font-['Poppins',Helvetica] text-sm text-gray-600 dark:text-gray-400">{t('vehicles.mileage', 'Mileage')}:</span>
-                        <span className="font-['Poppins',Helvetica] text-sm text-gray-900 dark:text-white">
-                          {vehicle.mileage.toLocaleString()} km
-                        </span>
-                      </div>
-                    )}
-                    {vehicle.engineType && (
-                      <div className="flex justify-between">
-                        <span className="font-['Poppins',Helvetica] text-sm text-gray-600 dark:text-gray-400">{t('vehicles.engine', 'Engine')}:</span>
-                        <span className="font-['Poppins',Helvetica] text-sm text-gray-900 dark:text-white capitalize">
-                          {vehicle.engineType}
-                        </span>
-                      </div>
-                    )}
-                  </div>
 
-                  <div className="flex gap-2 pt-4 border-t border-gray-200 dark:border-salis-gray-dark">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleEdit(vehicle)}
-                      className="flex-1"
-                      data-testid={`button-edit-${vehicle.id}`}
-                    >
-                      <Edit className="w-4 h-4 mr-2" />
-                      {t('common.edit', 'Edit')}
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleDelete(vehicle.id)}
-                      className="flex-1 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800"
-                      data-testid={`button-delete-${vehicle.id}`}
-                    >
-                      <Trash2 className="w-4 h-4 mr-2" />
-                      {t('common.delete', 'Delete')}
-                    </Button>
+                    <div className="flex gap-2 pt-4 border-t border-gray-200/50 dark:border-white/10">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleEdit(vehicle)}
+                        className="flex-1 bg-white/80 dark:bg-white/10 border-purple-200 dark:border-white/20 hover:bg-purple-50 dark:hover:bg-white/20 text-purple-700 dark:text-white"
+                        data-testid={`button-edit-${vehicle.id}`}
+                      >
+                        <Edit className="w-4 h-4 mr-2" />
+                        {t('common.edit', 'Edit')}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleDelete(vehicle.id)}
+                        className="flex-1 bg-white/80 dark:bg-white/10 border-red-200 dark:border-red-500/30 hover:bg-red-50 dark:hover:bg-red-500/20 text-red-600 dark:text-red-400"
+                        data-testid={`button-delete-${vehicle.id}`}
+                      >
+                        <Trash2 className="w-4 h-4 mr-2" />
+                        {t('common.delete', 'Delete')}
+                      </Button>
+                    </div>
                   </div>
                 </div>
               );
