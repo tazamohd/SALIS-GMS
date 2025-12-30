@@ -47,13 +47,12 @@ export function FilterBar({
     filters.some((f) => f.value && f.value !== "all" && f.value !== "");
 
   return (
-    <div className={cn("group relative", className)} data-testid="filter-bar">
-      <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-2xl blur opacity-50"></div>
-      <div className="relative flex flex-col sm:flex-row gap-3 p-4 backdrop-blur-xl bg-white/70 dark:bg-black/20 border border-purple-200/50 dark:border-white/10 rounded-2xl shadow-lg">
+    <div className={cn("", className)} data-testid="filter-bar">
+      <div className="flex flex-col sm:flex-row gap-3 p-4 bg-white dark:bg-gray-800 border border-purple-200 dark:border-purple-800/50 rounded-2xl shadow-sm">
         {onSearchChange && (
           <div className="relative flex-1 min-w-[200px]">
             <Search
-              className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-purple-500 dark:text-purple-400"
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-purple-600 dark:text-purple-400"
               aria-hidden="true"
             />
             <Input
@@ -61,7 +60,7 @@ export function FilterBar({
               placeholder={searchPlaceholder}
               value={searchValue}
               onChange={(e) => onSearchChange(e.target.value)}
-              className="pl-9 bg-white/80 dark:bg-white/10 border-purple-200 dark:border-white/20 focus:ring-purple-500 focus:border-purple-500"
+              className="pl-9 bg-white dark:bg-gray-900 border-purple-200 dark:border-purple-700 focus:ring-purple-500 focus:border-purple-500"
               data-testid="filter-search-input"
               aria-label="Search"
             />
@@ -75,7 +74,7 @@ export function FilterBar({
             onValueChange={filter.onChange}
           >
             <SelectTrigger
-              className="w-full sm:w-[180px] bg-white/80 dark:bg-white/10 border-purple-200 dark:border-white/20 focus:ring-purple-500"
+              className="w-full sm:w-[180px] bg-white dark:bg-gray-900 border-purple-200 dark:border-purple-700 focus:ring-purple-500"
               data-testid={`filter-${filter.id}`}
               aria-label={filter.label}
             >
@@ -99,7 +98,7 @@ export function FilterBar({
           <Button
             variant="outline"
             onClick={onClearFilters}
-            className="bg-white/80 dark:bg-white/10 border-purple-200 dark:border-white/20 hover:bg-purple-50 dark:hover:bg-white/20 text-purple-700 dark:text-white whitespace-nowrap"
+            className="bg-white dark:bg-gray-900 border-purple-300 dark:border-purple-700 hover:bg-purple-50 dark:hover:bg-purple-900/30 text-purple-700 dark:text-purple-300 whitespace-nowrap focus-visible:ring-purple-500"
             data-testid="filter-clear-button"
           >
             <X className="mr-2 h-4 w-4" />

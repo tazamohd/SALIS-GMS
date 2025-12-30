@@ -104,7 +104,7 @@ export function DataTable<T extends Record<string, any>>({
   return (
     <div className={cn("space-y-4", className)}>
       {/* Table Container */}
-      <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl border border-purple-200 dark:border-purple-800/50 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <Table className={cn(stickyHeader && "table-sticky-header")}>
             <TableHeader>

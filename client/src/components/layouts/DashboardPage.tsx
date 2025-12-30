@@ -24,32 +24,32 @@ interface DashboardPageProps {
 }
 
 const colorSchemes: Record<string, { gradient: string; bg: string; border: string; text: string }> = {
-  emerald: {
-    gradient: 'from-emerald-500 to-teal-500',
-    bg: 'bg-emerald-100 dark:bg-emerald-900/50',
-    border: 'border-emerald-200 dark:border-emerald-800',
-    text: 'text-emerald-700 dark:text-emerald-400'
+  purple: {
+    gradient: 'from-purple-500 to-purple-600',
+    bg: 'bg-purple-100 dark:bg-purple-900/50',
+    border: 'border-purple-200 dark:border-purple-800',
+    text: 'text-purple-700 dark:text-purple-400'
   },
-  blue: {
-    gradient: 'from-blue-500 to-cyan-500',
-    bg: 'bg-blue-100 dark:bg-blue-900/50',
-    border: 'border-blue-200 dark:border-blue-800',
-    text: 'text-blue-700 dark:text-blue-400'
+  pink: {
+    gradient: 'from-pink-500 to-pink-600',
+    bg: 'bg-pink-100 dark:bg-pink-900/50',
+    border: 'border-pink-200 dark:border-pink-800',
+    text: 'text-pink-700 dark:text-pink-400'
+  },
+  fuchsia: {
+    gradient: 'from-fuchsia-500 to-fuchsia-600',
+    bg: 'bg-fuchsia-100 dark:bg-fuchsia-900/50',
+    border: 'border-fuchsia-200 dark:border-fuchsia-800',
+    text: 'text-fuchsia-700 dark:text-fuchsia-400'
   },
   violet: {
-    gradient: 'from-violet-500 to-purple-500',
+    gradient: 'from-violet-500 to-violet-600',
     bg: 'bg-violet-100 dark:bg-violet-900/50',
     border: 'border-violet-200 dark:border-violet-800',
     text: 'text-violet-700 dark:text-violet-400'
   },
-  amber: {
-    gradient: 'from-amber-500 to-orange-500',
-    bg: 'bg-amber-100 dark:bg-amber-900/50',
-    border: 'border-amber-200 dark:border-amber-800',
-    text: 'text-amber-700 dark:text-amber-400'
-  },
   rose: {
-    gradient: 'from-rose-500 to-pink-500',
+    gradient: 'from-rose-500 to-rose-600',
     bg: 'bg-rose-100 dark:bg-rose-900/50',
     border: 'border-rose-200 dark:border-rose-800',
     text: 'text-rose-700 dark:text-rose-400'
