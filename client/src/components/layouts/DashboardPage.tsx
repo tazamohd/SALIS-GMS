@@ -26,33 +26,33 @@ interface DashboardPageProps {
 const colorSchemes: Record<string, { gradient: string; bg: string; border: string; text: string }> = {
   emerald: {
     gradient: 'from-emerald-500 to-teal-500',
-    bg: 'bg-emerald-100 dark:bg-emerald-500/20',
-    border: 'border-emerald-200/50 dark:border-white/20',
-    text: 'text-emerald-600 dark:text-emerald-400'
+    bg: 'bg-emerald-100 dark:bg-emerald-900/50',
+    border: 'border-emerald-200 dark:border-emerald-800',
+    text: 'text-emerald-700 dark:text-emerald-400'
   },
   blue: {
     gradient: 'from-blue-500 to-cyan-500',
-    bg: 'bg-blue-100 dark:bg-blue-500/20',
-    border: 'border-blue-200/50 dark:border-white/20',
-    text: 'text-blue-600 dark:text-blue-400'
+    bg: 'bg-blue-100 dark:bg-blue-900/50',
+    border: 'border-blue-200 dark:border-blue-800',
+    text: 'text-blue-700 dark:text-blue-400'
   },
   violet: {
     gradient: 'from-violet-500 to-purple-500',
-    bg: 'bg-violet-100 dark:bg-violet-500/20',
-    border: 'border-violet-200/50 dark:border-white/20',
-    text: 'text-violet-600 dark:text-violet-400'
+    bg: 'bg-violet-100 dark:bg-violet-900/50',
+    border: 'border-violet-200 dark:border-violet-800',
+    text: 'text-violet-700 dark:text-violet-400'
   },
   amber: {
     gradient: 'from-amber-500 to-orange-500',
-    bg: 'bg-amber-100 dark:bg-amber-500/20',
-    border: 'border-amber-200/50 dark:border-white/20',
-    text: 'text-amber-600 dark:text-amber-400'
+    bg: 'bg-amber-100 dark:bg-amber-900/50',
+    border: 'border-amber-200 dark:border-amber-800',
+    text: 'text-amber-700 dark:text-amber-400'
   },
   rose: {
     gradient: 'from-rose-500 to-pink-500',
-    bg: 'bg-rose-100 dark:bg-rose-500/20',
-    border: 'border-rose-200/50 dark:border-white/20',
-    text: 'text-rose-600 dark:text-rose-400'
+    bg: 'bg-rose-100 dark:bg-rose-900/50',
+    border: 'border-rose-200 dark:border-rose-800',
+    text: 'text-rose-700 dark:text-rose-400'
   },
 };
 
@@ -81,15 +81,11 @@ export function DashboardPage({
           return (
             <div
               key={idx}
-              className="group relative"
+              className="group"
               data-testid={`metric-card-${idx}`}
             >
               <div className={cn(
-                "absolute -inset-0.5 bg-gradient-to-r rounded-3xl blur opacity-40 dark:opacity-50 group-hover:opacity-60 dark:group-hover:opacity-75 transition duration-500",
-                scheme.gradient
-              )}></div>
-              <div className={cn(
-                "relative h-full backdrop-blur-xl bg-white/70 dark:bg-black/30 rounded-3xl p-6 border shadow-xl",
+                "h-full bg-white dark:bg-gray-800 rounded-2xl p-6 border shadow-sm hover:shadow-md transition-shadow duration-200",
                 scheme.border
               )}>
                 <div className="flex items-start justify-between">

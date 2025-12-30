@@ -527,15 +527,11 @@ export default function Vehicles() {
                   className="group relative"
                   data-testid={`card-vehicle-${vehicle.id}`}
                 >
-                  <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-3xl blur opacity-40 group-hover:opacity-60 transition-all duration-300"></div>
-                  <div className="relative backdrop-blur-xl bg-white/70 dark:bg-black/20 rounded-3xl p-6 border border-blue-200/50 dark:border-white/10 shadow-xl hover:shadow-2xl transition-all hover:scale-[1.02] hover:-translate-y-1 duration-300">
+                  <div className="relative bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow duration-200">
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex items-center gap-3">
-                        <div className="relative">
-                          <div className="absolute inset-0 bg-blue-500/30 rounded-xl blur-lg"></div>
-                          <div className="relative w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center shadow-lg">
-                            <Car className="w-6 h-6 text-white" />
-                          </div>
+                        <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/50 rounded-xl flex items-center justify-center">
+                          <Car className="w-6 h-6 text-purple-600 dark:text-purple-400" />
                         </div>
                         <div>
                           <h3 className="font-bold text-gray-900 dark:text-white">
@@ -590,12 +586,12 @@ export default function Vehicles() {
                       )}
                     </div>
 
-                    <div className="flex gap-2 pt-4 border-t border-gray-200/50 dark:border-white/10">
+                    <div className="flex gap-2 pt-4 border-t border-gray-200 dark:border-gray-700">
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => handleEdit(vehicle)}
-                        className="flex-1 bg-white/80 dark:bg-white/10 border-purple-200 dark:border-white/20 hover:bg-purple-50 dark:hover:bg-white/20 text-purple-700 dark:text-white"
+                        className="flex-1 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-900 dark:text-white"
                         data-testid={`button-edit-${vehicle.id}`}
                       >
                         <Edit className="w-4 h-4 mr-2" />
@@ -605,7 +601,7 @@ export default function Vehicles() {
                         variant="outline"
                         size="sm"
                         onClick={() => handleDelete(vehicle.id)}
-                        className="flex-1 bg-white/80 dark:bg-white/10 border-red-200 dark:border-red-500/30 hover:bg-red-50 dark:hover:bg-red-500/20 text-red-600 dark:text-red-400"
+                        className="flex-1 bg-white dark:bg-gray-800 border-red-300 dark:border-red-700 hover:bg-red-50 dark:hover:bg-red-900/30 text-red-700 dark:text-red-400"
                         data-testid={`button-delete-${vehicle.id}`}
                       >
                         <Trash2 className="w-4 h-4 mr-2" />

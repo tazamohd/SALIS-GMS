@@ -32,25 +32,25 @@ export function PageHeader({
         <div className="flex items-center gap-3">
           {Icon ? (
             <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl blur-lg opacity-50 dark:opacity-75 animate-pulse"></div>
-              <div className="relative p-3 rounded-2xl bg-gradient-to-r from-purple-600 to-pink-600 shadow-2xl shadow-purple-500/25">
+              <div className="absolute inset-0 bg-purple-600 rounded-xl blur-md opacity-30 dark:opacity-40 motion-safe:animate-pulse motion-safe:[animation-duration:4s]"></div>
+              <div className="relative p-3 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 shadow-lg">
                 <Icon className="h-6 w-6 text-white" aria-hidden="true" />
               </div>
             </div>
           ) : (
             <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl blur-lg opacity-50 dark:opacity-75 animate-pulse"></div>
-              <div className="relative p-3 rounded-2xl bg-gradient-to-r from-purple-600 to-pink-600 shadow-2xl shadow-purple-500/25">
+              <div className="absolute inset-0 bg-purple-600 rounded-xl blur-md opacity-30 dark:opacity-40 motion-safe:animate-pulse motion-safe:[animation-duration:4s]"></div>
+              <div className="relative p-3 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 shadow-lg">
                 <Sparkles className="h-6 w-6 text-white" aria-hidden="true" />
               </div>
             </div>
           )}
           <div>
-            <h1 className="text-3xl md:text-4xl font-montserrat font-black bg-gradient-to-r from-gray-900 via-purple-800 to-pink-800 dark:from-white dark:via-purple-200 dark:to-pink-200 bg-clip-text text-transparent">
+            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">
               {title}
             </h1>
             {description && (
-              <p className="mt-1 text-sm text-purple-600/80 dark:text-purple-300/80">
+              <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">
                 {description}
               </p>
             )}
@@ -65,10 +65,10 @@ export function PageHeader({
                 onClick={action.onClick}
                 variant={action.variant || "default"}
                 className={cn(
-                  "btn-touch focus-visible-ring shadow-lg transition-all duration-300",
+                  "btn-touch focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 shadow-md transition-all duration-200",
                   action.variant === "outline" || action.variant === "secondary"
-                    ? "bg-white/80 dark:bg-white/10 backdrop-blur-xl border-purple-200 dark:border-white/20 hover:bg-purple-50 dark:hover:bg-white/20 text-purple-700 dark:text-white"
-                    : "bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-purple-500/25"
+                    ? "bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-900 dark:text-white"
+                    : "bg-purple-600 hover:bg-purple-700 text-white"
                 )}
                 data-testid={`page-header-action-${index}`}
               >

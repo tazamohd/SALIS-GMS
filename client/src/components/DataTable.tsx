@@ -81,7 +81,7 @@ export function DataTable<T extends Record<string, any>>({
     return (
       <div className={cn("space-y-3", className)} data-testid="table-loading">
         {[...Array(5)].map((_, i) => (
-          <Skeleton key={i} className="h-16 w-full rounded-xl bg-purple-100/50 dark:bg-white/5" />
+          <Skeleton key={i} className="h-16 w-full rounded-xl bg-gray-100 dark:bg-gray-800" />
         ))}
       </div>
     );
@@ -103,19 +103,17 @@ export function DataTable<T extends Record<string, any>>({
 
   return (
     <div className={cn("space-y-4", className)}>
-      {/* Glassmorphism Table Container */}
-      <div className="group relative">
-        <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-3xl blur opacity-50"></div>
-        <div className="relative backdrop-blur-xl bg-white/70 dark:bg-black/20 rounded-3xl border border-blue-200/50 dark:border-white/10 shadow-xl overflow-hidden">
-          <div className="overflow-x-auto">
-            <Table className={cn(stickyHeader && "table-sticky-header")}>
-              <TableHeader>
-                <TableRow className="border-b border-gray-200/50 dark:border-white/10 bg-gray-50/50 dark:bg-white/5">
+      {/* Table Container */}
+      <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+        <div className="overflow-x-auto">
+          <Table className={cn(stickyHeader && "table-sticky-header")}>
+            <TableHeader>
+              <TableRow className="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
                   {columns.map((column) => (
                     <TableHead
                       key={column.key}
                       className={cn(
-                        "text-gray-600 dark:text-white/60 text-xs font-semibold uppercase tracking-wider py-4 px-6",
+                        "text-gray-700 dark:text-gray-300 text-xs font-semibold uppercase tracking-wider py-4 px-6",
                         column.className,
                         column.sortable && "cursor-pointer hover:text-purple-600 dark:hover:text-purple-400"
                       )}
@@ -139,7 +137,7 @@ export function DataTable<T extends Record<string, any>>({
                   <TableRow
                     key={rowIndex}
                     className={cn(
-                      "border-b border-gray-100 dark:border-white/5 hover:bg-purple-50/50 dark:hover:bg-white/5 transition-colors",
+                      "border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors",
                       onRowClick && "cursor-pointer"
                     )}
                     onClick={() => onRowClick?.(item)}
@@ -155,7 +153,7 @@ export function DataTable<T extends Record<string, any>>({
                     {columns.map((column) => (
                       <TableCell
                         key={column.key}
-                        className={cn("py-4 px-6 text-gray-800 dark:text-white/80", column.className)}
+                        className={cn("py-4 px-6 text-gray-900 dark:text-gray-100", column.className)}
                         data-testid={`table-cell-${rowIndex}-${column.key}`}
                       >
                         {column.render
@@ -169,57 +167,57 @@ export function DataTable<T extends Record<string, any>>({
             </Table>
           </div>
 
-          {/* Pagination */}
-          {pagination && pagination.totalPages > 1 && (
-            <div className="p-4 border-t border-gray-200/50 dark:border-white/10 flex items-center justify-between">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => pagination.onPageChange(pagination.currentPage - 1)}
-                disabled={pagination.currentPage === 1}
-                className="bg-white dark:bg-white/10 hover:bg-gray-50 dark:hover:bg-white/20 text-gray-700 dark:text-white border-gray-200 dark:border-white/20 disabled:opacity-30"
-                data-testid="pagination-previous"
-              >
-                <ChevronLeft className="w-4 h-4 mr-1" />
-                Prev
-              </Button>
-              
-              <div className="flex gap-2">
-                {[...Array(Math.min(pagination.totalPages, 5))].map((_, i) => {
-                  const page = i + 1;
-                  return (
-                    <Button
-                      key={page}
-                      size="sm"
-                      onClick={() => pagination.onPageChange(page)}
-                      className={
-                        page === pagination.currentPage
-                          ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white border-0"
-                          : "bg-white dark:bg-white/10 hover:bg-gray-50 dark:hover:bg-white/20 text-gray-700 dark:text-white border-gray-200 dark:border-white/20"
-                      }
-                      variant={page === pagination.currentPage ? "default" : "outline"}
-                      data-testid={`pagination-page-${page}`}
-                    >
-                      {page}
-                    </Button>
-                  );
-                })}
-              </div>
-              
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => pagination.onPageChange(pagination.currentPage + 1)}
-                disabled={pagination.currentPage === pagination.totalPages}
-                className="bg-white dark:bg-white/10 hover:bg-gray-50 dark:hover:bg-white/20 text-gray-700 dark:text-white border-gray-200 dark:border-white/20 disabled:opacity-30"
-                data-testid="pagination-next"
-              >
-                Next
-                <ChevronRight className="w-4 h-4 ml-1" />
-              </Button>
+        {/* Pagination */}
+        {pagination && pagination.totalPages > 1 && (
+          <div className="p-4 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => pagination.onPageChange(pagination.currentPage - 1)}
+              disabled={pagination.currentPage === 1}
+              className="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-white border-gray-300 dark:border-gray-600 disabled:opacity-30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2"
+              data-testid="pagination-previous"
+            >
+              <ChevronLeft className="w-4 h-4 mr-1" />
+              Prev
+            </Button>
+            
+            <div className="flex gap-2">
+              {[...Array(Math.min(pagination.totalPages, 5))].map((_, i) => {
+                const page = i + 1;
+                return (
+                  <Button
+                    key={page}
+                    size="sm"
+                    onClick={() => pagination.onPageChange(page)}
+                    className={cn(
+                      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2",
+                      page === pagination.currentPage
+                        ? "bg-purple-600 text-white border-0"
+                        : "bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-white border-gray-300 dark:border-gray-600"
+                    )}
+                    variant={page === pagination.currentPage ? "default" : "outline"}
+                    data-testid={`pagination-page-${page}`}
+                  >
+                    {page}
+                  </Button>
+                );
+              })}
             </div>
-          )}
-        </div>
+            
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => pagination.onPageChange(pagination.currentPage + 1)}
+              disabled={pagination.currentPage === pagination.totalPages}
+              className="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-white border-gray-300 dark:border-gray-600 disabled:opacity-30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2"
+              data-testid="pagination-next"
+            >
+              Next
+              <ChevronRight className="w-4 h-4 ml-1" />
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );
