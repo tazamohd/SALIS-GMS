@@ -10462,3 +10462,86 @@ export const insertArSessionLogSchema = createInsertSchema(arSessionLogs).omit({
 export type ArDevicePairing = typeof arDevicePairings.$inferSelect;
 export type InsertArDevicePairing = typeof arDevicePairings.$inferInsert;
 export const insertArDevicePairingSchema = createInsertSchema(arDevicePairings).omit({ id: true, createdAt: true });
+
+// ==========================================
+// MODULE: Dynamic Pricing Suggestions
+// ==========================================
+
+// Market pricing data for services by region/vehicle type
+export const marketPricingData = pgTable("market_pricing_data", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id),
+  region: varchar("region", { length: 100 }).notNull(),
+  city: varchar("city", { length: 100 }),
+  serviceCategory: varchar("service_category", { length: 100 }).notNull(),
+  serviceType: varchar("service_type", { length: 255 }).notNull(),
+  vehicleClass: varchar("vehicle_class", { length: 50 }),
+  vehicleMake: varchar("vehicle_make", { length: 100 }),
+  minPrice: decimal("min_price", { precision: 12, scale: 2 }).notNull(),
+  maxPrice: decimal("max_price", { precision: 12, scale: 2 }).notNull(),
+  avgPrice: decimal("avg_price", { precision: 12, scale: 2 }).notNull(),
+  medianPrice: decimal("median_price", { precision: 12, scale: 2 }),
+  sampleSize: integer("sample_size").default(0),
+  dataSource: varchar("data_source", { length: 100 }),
+  effectiveDate: date("effective_date").notNull(),
+  expiryDate: date("expiry_date"),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Vehicle-specific pricing factors
+export const vehiclePricingFactors = pgTable("vehicle_pricing_factors", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id),
+  vehicleMake: varchar("vehicle_make", { length: 100 }).notNull(),
+  vehicleModel: varchar("vehicle_model", { length: 100 }),
+  yearStart: integer("year_start"),
+  yearEnd: integer("year_end"),
+  complexityFactor: decimal("complexity_factor", { precision: 5, scale: 2 }).default("1.00"),
+  partsAvailabilityFactor: decimal("parts_availability_factor", { precision: 5, scale: 2 }).default("1.00"),
+  laborIntensityFactor: decimal("labor_intensity_factor", { precision: 5, scale: 2 }).default("1.00"),
+  luxuryPremiumFactor: decimal("luxury_premium_factor", { precision: 5, scale: 2 }).default("1.00"),
+  notes: text("notes"),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Pricing suggestions generated for job cards
+export const dynamicPricingSuggestions = pgTable("dynamic_pricing_suggestions", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  jobCardId: uuid("job_card_id").references(() => jobCards.id),
+  vehicleId: uuid("vehicle_id").references(() => vehicles.id),
+  serviceType: varchar("service_type", { length: 255 }).notNull(),
+  basePrice: decimal("base_price", { precision: 12, scale: 2 }).notNull(),
+  suggestedPrice: decimal("suggested_price", { precision: 12, scale: 2 }).notNull(),
+  minRecommendedPrice: decimal("min_recommended_price", { precision: 12, scale: 2 }),
+  maxRecommendedPrice: decimal("max_recommended_price", { precision: 12, scale: 2 }),
+  confidenceScore: decimal("confidence_score", { precision: 5, scale: 2 }),
+  appliedRules: jsonb("applied_rules").default([]),
+  vehicleFactors: jsonb("vehicle_factors").default({}),
+  marketDataUsed: jsonb("market_data_used").default({}),
+  competitorPrices: jsonb("competitor_prices").default([]),
+  profitMarginEstimate: decimal("profit_margin_estimate", { precision: 5, scale: 2 }),
+  status: varchar("status", { length: 50 }).default("pending"),
+  acceptedPrice: decimal("accepted_price", { precision: 12, scale: 2 }),
+  acceptedBy: varchar("accepted_by").references(() => users.id),
+  acceptedAt: timestamp("accepted_at"),
+  feedback: text("feedback"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Type exports for Dynamic Pricing module
+export type MarketPricingData = typeof marketPricingData.$inferSelect;
+export type InsertMarketPricingData = typeof marketPricingData.$inferInsert;
+export const insertMarketPricingDataSchema = createInsertSchema(marketPricingData).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type VehiclePricingFactor = typeof vehiclePricingFactors.$inferSelect;
+export type InsertVehiclePricingFactor = typeof vehiclePricingFactors.$inferInsert;
+export const insertVehiclePricingFactorSchema = createInsertSchema(vehiclePricingFactors).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type DynamicPricingSuggestion = typeof dynamicPricingSuggestions.$inferSelect;
+export type InsertDynamicPricingSuggestion = typeof dynamicPricingSuggestions.$inferInsert;
+export const insertDynamicPricingSuggestionSchema = createInsertSchema(dynamicPricingSuggestions).omit({ id: true, createdAt: true });
