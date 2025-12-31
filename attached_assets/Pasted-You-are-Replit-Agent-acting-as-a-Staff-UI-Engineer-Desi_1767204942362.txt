@@ -1,0 +1,158 @@
+You are Replit Agent acting as a Staff UI Engineer + Design System Lead.
+
+MISSION (ABSOLUTE)
+Redesign + refactor the entire SaaS web app UI/UX to match the brand system using ONLY logo-derived colors, and apply BOTH Dark Mode + Light Mode across ALL pages, sub-pages, nested flows, and ALL UI states.
+This is NOT a theme overlay. This is a FULL UI REBUILD at the component level.
+
+HARD RULE: PAGE-BY-PAGE FULL ELEMENT REDESIGN (NO EXCEPTIONS)
+For EVERY route/page/sub-page you discover, you MUST refactor and standardize ALL elements on that page, including:
+- Typography: font family, font size, line height, letter spacing, weight, label casing
+- Colors: every text color, background, border, divider, status color (logo-only palette)
+- Icons: unify icon style, size, stroke, and alignment
+- Buttons: primary gradient, secondary outline, disabled/loading states
+- Forms: inputs, selects, date pickers, validation messages, helper text, focus rings
+- Tables: sticky headers, row hover actions, density, status pills, sorting/filter UI
+- Charts/Diagrams: palette restrictions, consistent chart cards, tooltips, legends, L→R animations
+- Modals/Drawers: spacing, typography, buttons, close actions, overlays
+- Empty/Loading/Error states: standardized components, linear loaders (no spinners)
+- Layout: consistent grid, spacing scale, card system, page header system
+NOTHING can remain “old style” or inconsistent.
+
+If ANY page contains even one legacy element (old font, old color, mismatched icon, random spacing), it is considered NOT DONE.
+
+NON-STOP EXECUTION RULES
+- Do not ask me questions.
+- No TODOs.
+- If ambiguous, decide best assumption and proceed.
+- Keep going until all pages are fully redesigned and verified in both themes.
+
+CRITICAL INPUTS
+There are archive files in the workspace (e.g., .rar, docs.zip, screenshots.zip).
+- Extract and run the real app.
+- Use screenshots as “what exists” inventory if available.
+- Use docs as functional context.
+
+LOGO-ONLY COLOR POLICY (ZERO EXCEPTIONS)
+Allowed colors ONLY:
+- Deep Blue: #0A5ED7
+- Bright Blue: #0BB3FF
+- Deep Navy: #0B1F3B
+- Dark BG: #0E1117
+- Card Surface Dark: #151A23
+- Border Dark: #232A36
+- Text Primary Dark: #E6EAF0
+- Text Muted Dark: #9BA4B0
+- Silver Light: #E6E9ED
+- Cool Gray Light: #C9D1DA
+- Graphite Gray: #2A2F3A
+- Accent Orange (ONLY warnings/decisions/critical CTAs): #F97316
+
+Forbidden:
+- NO green/red/yellow/purple/pink/teal.
+- NO extra grays.
+- NO random hex colors.
+- No “success green” – use Blue/Gray semantics instead.
+
+SEMANTIC RULES
+- Blue = data / active / progress / selected
+- Orange = warnings / decisions / risk / critical CTA ONLY
+- Gray/Navy/Silver = structure, surfaces, borders
+
+TYPOGRAPHY (STRICT)
+- UI Font: Inter (fallback SF Pro / IBM Plex Sans)
+- Metrics: JetBrains Mono or Inter Mono
+Provide a consistent type scale:
+- H1: 28–32px, bold, tight tracking
+- H2: 20–24px, medium
+- H3: 16–18px, medium
+- Body: 14–15px, regular
+- Label: 11–12px, uppercase, muted
+Apply across ALL pages.
+
+DESIGN DIRECTION: OPTION B (SMART WORKFLOW STUDIO)
+- Workflow-first layout
+- Horizontal progress pipelines
+- Modular calm cards
+- Drawers for filters and details (reduce page jumps)
+
+GLOBAL LAYOUT (REQUIRED)
+- Sidebar: icon-first, collapsible
+- Topbar: search, notifications, user, theme toggle
+- Main: modular cards
+- Optional right IntelRail: activity/alerts/team/context (collapsible)
+
+THEME SYSTEM (MANDATORY)
+- Implement with CSS variables design tokens.
+- Toggle in topbar, persisted in localStorage.
+- Dark: #0E1117 bg, #151A23 surfaces, #232A36 borders, #E6EAF0 text.
+- Light: #E6E9ED bg, white/cool-gray surfaces, #C9D1DA borders, #2A2F3A text.
+Layout must not change between themes.
+
+MOTION
+- Page transitions: slide + fade
+- Hover: slight lift + blue border glow
+- Loading: thin linear progress bars only
+- Charts animate left→right
+- No spinners
+
+COMPONENTS (MUST CENTRALIZE)
+Build/refactor into shared library:
+- AppShell (Sidebar + Topbar + Content + IntelRail)
+- PageHeader (title, breadcrumb optional, actions, filters)
+- Buttons (Primary gradient, Secondary outline, Critical orange)
+- Card
+- StatusPill
+- FormField set (Input, Select, Date, Textarea, Validation)
+- DataTable
+- ChartCard (title + metric + delta + chart)
+- Drawer
+- Modal
+- Toast
+- EmptyState
+- LinearLoader
+
+REQUIRED SCREEN PATTERNS (APPLY TO ALL EXISTING PAGES)
+- Login / Onboarding
+- Dashboard
+- Analytics
+- Workflow Builder
+- Management Tables
+- Settings/Admin
+PLUS any other pages discovered must be redesigned fully.
+
+MANDATORY DELIVERABLES
+1) /docs/ui-coverage-checklist.md
+Must list EVERY route/page/sub-page and confirm:
+- All elements redesigned (yes/no)
+- Dark verified (yes/no)
+- Light verified (yes/no)
+
+2) /docs/design-system.md
+- Tokens
+- Typography scale
+- Component rules
+- Logo-only palette policy
+
+3) /docs/component-map.md
+- Components list and which screens use them
+
+EXECUTION PROCESS (STRICT)
+1) Extract archives, identify real app, run it.
+2) Inventory routes/pages (including subpages, modals, dynamic routes).
+3) Implement tokens + theme system + global typography.
+4) Build shared components.
+5) Page-by-page refactor:
+   For each page: replace layout -> replace components -> update charts/tables -> verify states -> mark checklist.
+6) Final audit:
+   - Search codebase for forbidden colors/classes and remove.
+   - Search for hex codes not in allowed palette and replace with tokens.
+   - Ensure every page is verified in both dark and light.
+
+STOP CONDITION
+You stop ONLY when:
+- EVERY route is redesigned and checked off
+- EVERY element is updated (typography, color, icons, components)
+- BOTH themes verified
+- Forbidden color scan is clean
+
+START NOW. DO NOT STOP.

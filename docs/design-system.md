@@ -29,29 +29,40 @@
 | Text Primary | `#E6EAF0` | Main text |
 | Text Muted | `#9BA4B0` | Secondary text |
 
-### Light Mode
+### Light Mode (Logo-Only Palette)
 | Token | Hex | Usage |
 |-------|-----|-------|
-| Background | `#F8FAFC` | Page background |
-| Surface | `#FFFFFF` | Cards, panels |
-| Border | `#E2E8F0` | Borders, dividers |
-| Text Primary | `#0F172A` | Main text |
-| Text Muted | `#64748B` | Secondary text |
+| Background | `#E6E9ED` | Silver Light - Page background |
+| Surface | `#FFFFFF` | White - Cards, panels |
+| Border | `#C9D1DA` | Cool Gray Light - Borders, dividers |
+| Text Primary | `#2A2F3A` | Graphite Gray - Main text |
+| Text Muted | `#6B7280` | Muted text |
 
-## Typography
+### Forbidden Colors
+- NO green/red/yellow/purple/pink/teal
+- NO extra grays not in palette
+- NO random hex colors
+- NO "success green" – use Blue semantics instead
+
+### Semantic Rules
+- **Blue** = data / active / progress / selected / success
+- **Orange** = warnings / decisions / risk / critical CTA ONLY
+- **Gray/Navy/Silver** = structure, surfaces, borders
+
+## Typography (Strict Scale)
 
 ### Fonts
-- **Montserrat**: Headings (H1-H6), display text
-- **Poppins**: Body text, labels
-- **Inter**: UI elements, system text
+- **Inter**: Primary UI font (fallback: SF Pro, IBM Plex Sans)
 - **JetBrains Mono**: Numbers, metrics, code
 
 ### Hierarchy
-- H1: 2.5rem, bold, tight tracking
-- H2: 2rem, semibold
-- H3: 1.5rem, medium
-- Body: 1rem, regular
-- Labels: 0.75rem, uppercase, muted
+| Level | Size | Weight | Tracking | Usage |
+|-------|------|--------|----------|-------|
+| H1 | 28-32px | Bold (700) | -0.03em | Page titles |
+| H2 | 20-24px | Medium (500) | -0.02em | Section headers |
+| H3 | 16-18px | Medium (500) | -0.02em | Card titles |
+| Body | 14-15px | Regular (400) | normal | Content text |
+| Label | 11-12px | Medium (500) | 0.025em | Form labels, captions |
 
 ## Components
 
