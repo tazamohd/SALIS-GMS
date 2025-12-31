@@ -137,6 +137,7 @@ import WorkshopCalendar from "@/pages/WorkshopCalendar";
 import ComputerVisionQC from "@/pages/ComputerVisionQC";
 import SmartPartsRecommender from "@/pages/SmartPartsRecommender";
 import DynamicPricing from "@/pages/DynamicPricing";
+import VehicleTracking from "@/pages/VehicleTracking";
 import DigitalTwinViewer from "@/pages/DigitalTwinViewer";
 import DroneInspection from "@/pages/DroneInspection";
 import MLFraudDetection from "@/pages/MLFraudDetection";
@@ -1125,6 +1126,11 @@ function Router() {
       <Route path="/dynamic-pricing">
         <Layout>
           <DynamicPricing />
+        </Layout>
+      </Route>
+      <Route path="/vehicle-tracking">
+        <Layout>
+          <VehicleTracking />
         </Layout>
       </Route>
       <Route path="/digital-twin-viewer">

@@ -136,6 +136,7 @@ export const navigationConfig: NavGroup[] = [
       { title: "VIN Decoder", href: "/vin-decoder", icon: Fingerprint },
       { title: "Fleet Management", href: "/fleet-management", icon: Truck },
       { title: "Fleet Tracking", href: "/fleet-tracking", icon: MapPin },
+      { title: "Vehicle Tracking", href: "/vehicle-tracking", icon: MapPin },
       { title: "Loaner Vehicles", href: "/loaner-vehicles", icon: Key },
     ],
   },
