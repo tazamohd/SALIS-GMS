@@ -778,13 +778,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const limit = 5; // Limit per category
       
       // Search customers
-      const customers = await storage.getUsers();
+      const customers = await storage.getCustomers();
       const matchingCustomers = customers
-        .filter((c: any) => c.userType === 'customer' && (
+        .filter((c: any) => 
           c.fullName?.toLowerCase().includes(query) ||
           c.email?.toLowerCase().includes(query) ||
           c.phone?.includes(query)
-        ))
+        )
         .slice(0, limit);
       matchingCustomers.forEach((c: any) => {
         results.push({
