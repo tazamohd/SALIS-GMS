@@ -73,9 +73,8 @@ export function TabsPageLayout({
         className="w-full"
       >
         <div className="group relative mb-6">
-          <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-2xl blur opacity-50"></div>
           <TabsList 
-            className="relative grid w-full backdrop-blur-xl bg-white/70 dark:bg-black/30 rounded-2xl p-1 border border-purple-200/50 dark:border-white/10 shadow-lg" 
+            className="relative grid w-full backdrop-blur-xl bg-white dark:bg-[#151A23] rounded-xl p-1 border border-[#E2E8F0] dark:border-[#232A36] shadow-lg" 
             style={{ gridTemplateColumns: `repeat(${tabs.length}, minmax(0, 1fr))` }}
           >
             {tabs.map((tab) => (
@@ -83,7 +82,7 @@ export function TabsPageLayout({
                 key={tab.id}
                 value={tab.id}
                 data-testid={`tab-${tab.id}`}
-                className="relative rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white data-[state=active]:shadow-lg transition-all"
+                className="relative rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#0A5ED7] data-[state=active]:to-[#0BB3FF] data-[state=active]:text-white data-[state=active]:shadow-lg transition-all text-[#64748B] dark:text-[#9BA4B0] hover:text-[#0A5ED7] dark:hover:text-[#0BB3FF]"
               >
                 {tab.icon && <tab.icon className="mr-2 h-4 w-4" />}
                 {tab.label}
