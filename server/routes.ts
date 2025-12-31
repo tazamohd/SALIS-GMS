@@ -21477,6 +21477,57 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ==================== 3D Parts Models API ====================
+
+  app.get('/api/parts-3d-models', async (req, res) => {
+    try {
+      const result = await db.execute(sql`
+        SELECT 
+          id,
+          part_name as "partName",
+          part_number as "partNumber",
+          category,
+          manufacturer,
+          model_file_url as "modelFileUrl",
+          texture_file_url as "textureFileUrl",
+          file_size as "fileSize",
+          polygon_count as "polygonCount",
+          compatibility,
+          explosion_view_url as "explosionViewUrl",
+          annotations,
+          view_count as "viewCount",
+          download_count as "downloadCount",
+          is_public as "isPublic",
+          uploaded_by as "uploadedBy",
+          created_at as "createdAt",
+          updated_at as "updatedAt"
+        FROM parts_3d_models 
+        WHERE is_public = true 
+        ORDER BY view_count DESC
+      `);
+      res.json(result.rows || []);
+    } catch (error: any) {
+      console.error("Error fetching 3D parts models:", error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.get('/api/parts-3d-models/:id', async (req, res) => {
+    try {
+      const result = await db.execute(sql`SELECT * FROM parts_3d_models WHERE id = ${req.params.id}`);
+      if (result.rows && result.rows.length > 0) {
+        // Increment view count
+        await db.execute(sql`UPDATE parts_3d_models SET view_count = view_count + 1 WHERE id = ${req.params.id}`);
+        res.json(result.rows[0]);
+      } else {
+        res.status(404).json({ message: "Part not found" });
+      }
+    } catch (error: any) {
+      console.error("Error fetching 3D part model:", error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
   const httpServer = createServer(app);
   
   // Initialize WebSocket server for chat

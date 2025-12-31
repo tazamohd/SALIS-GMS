@@ -264,7 +264,7 @@ export default function Interactive3DParts() {
   const lastMousePos = useRef({ x: 0, y: 0 });
 
   const { data: partsFromApi, isLoading } = useQuery<Part3DModel[]>({
-    queryKey: ["/api/emerging-tech/3d-models"],
+    queryKey: ["/api/parts-3d-models"],
   });
 
   const parts: Part3DModel[] = (partsFromApi && Array.isArray(partsFromApi) && partsFromApi.length > 0) ? partsFromApi : sampleParts;
