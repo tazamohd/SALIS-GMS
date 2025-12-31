@@ -520,19 +520,19 @@ export function Dashboard() {
                       const vehicleInfo = task.vehicleInfo as any;
                       
                       return (
-                        <tr key={task.id} className="border-b border-gray-100 dark:border-white/5 hover:bg-purple-50/50 dark:hover:bg-white/5 transition-colors" data-testid={`row-task-${task.id}`}>
+                        <tr key={task.id} className="border-b border-[#E2E8F0] dark:border-[#232A36] hover:bg-[#0A5ED7]/5 dark:hover:bg-[#0BB3FF]/5 transition-colors" data-testid={`row-task-${task.id}`}>
                           <td className="py-4 px-6">
-                            <span className="font-mono text-sm font-bold text-purple-600 dark:text-purple-400">#{shortenId(task.id)}</span>
+                            <span className="font-mono text-sm font-bold text-[#0A5ED7] dark:text-[#0BB3FF]">#{shortenId(task.id)}</span>
                           </td>
                           <td className="py-4 px-6">
                             <Badge className={`${serviceConfig.bg} ${serviceConfig.text} border-0`}>
                               {serviceConfig.icon} {serviceConfig.label}
                             </Badge>
                           </td>
-                          <td className="py-4 px-6 text-gray-800 dark:text-white/80 text-sm">
+                          <td className="py-4 px-6 text-[#0F172A] dark:text-[#E6EAF0] text-sm">
                             {vehicleInfo?.customerName || vehicleInfo?.owner || 'N/A'}
                           </td>
-                          <td className="py-4 px-6 text-gray-600 dark:text-white/60 text-sm">
+                          <td className="py-4 px-6 text-[#64748B] dark:text-[#9BA4B0] text-sm">
                             {vehicleInfo?.make} {vehicleInfo?.model}
                           </td>
                           <td className="py-4 px-6">
@@ -549,7 +549,7 @@ export function Dashboard() {
                             <Button 
                               size="sm" 
                               onClick={() => handleViewTask(task)}
-                              className="bg-purple-100 dark:bg-white/10 hover:bg-purple-200 dark:hover:bg-white/20 text-purple-700 dark:text-white border-purple-200 dark:border-white/20"
+                              className="bg-[#0A5ED7]/10 dark:bg-[#0BB3FF]/10 hover:bg-[#0A5ED7]/20 dark:hover:bg-[#0BB3FF]/20 text-[#0A5ED7] dark:text-[#0BB3FF] border-[#0A5ED7]/30 dark:border-[#0BB3FF]/30"
                               variant="outline"
                             >
                               {t('common.view', 'View')}
@@ -564,13 +564,13 @@ export function Dashboard() {
             </div>
 
             {totalPages > 1 && (
-              <div className="p-4 border-t border-gray-200/50 dark:border-white/10 flex items-center justify-between">
+              <div className="p-4 border-t border-[#E2E8F0] dark:border-[#232A36] flex items-center justify-between">
                 <Button 
                   variant="outline"
                   size="sm"
                   onClick={() => goToPage(currentPage - 1)}
                   disabled={currentPage === 1}
-                  className="bg-white dark:bg-white/10 hover:bg-gray-50 dark:hover:bg-white/20 text-gray-700 dark:text-white border-gray-200 dark:border-white/20 disabled:opacity-30"
+                  className="bg-white dark:bg-[#151A23] hover:bg-[#0A5ED7]/5 dark:hover:bg-[#0BB3FF]/10 text-[#0F172A] dark:text-[#E6EAF0] border-[#E2E8F0] dark:border-[#232A36] disabled:opacity-30"
                 >
                   ← {t('common.previous', 'Prev')}
                 </Button>
@@ -581,8 +581,8 @@ export function Dashboard() {
                       size="sm"
                       onClick={() => goToPage(page)}
                       className={page === currentPage 
-                        ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white border-0' 
-                        : 'bg-white dark:bg-white/10 hover:bg-gray-50 dark:hover:bg-white/20 text-gray-700 dark:text-white border-gray-200 dark:border-white/20'
+                        ? 'bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white border-0' 
+                        : 'bg-white dark:bg-[#151A23] hover:bg-[#0A5ED7]/5 dark:hover:bg-[#0BB3FF]/10 text-[#0F172A] dark:text-[#E6EAF0] border-[#E2E8F0] dark:border-[#232A36]'
                       }
                       variant={page === currentPage ? 'default' : 'outline'}
                     >
@@ -595,7 +595,7 @@ export function Dashboard() {
                   size="sm"
                   onClick={() => goToPage(currentPage + 1)}
                   disabled={currentPage === totalPages}
-                  className="bg-white dark:bg-white/10 hover:bg-gray-50 dark:hover:bg-white/20 text-gray-700 dark:text-white border-gray-200 dark:border-white/20 disabled:opacity-30"
+                  className="bg-white dark:bg-[#151A23] hover:bg-[#0A5ED7]/5 dark:hover:bg-[#0BB3FF]/10 text-[#0F172A] dark:text-[#E6EAF0] border-[#E2E8F0] dark:border-[#232A36] disabled:opacity-30"
                 >
                   {t('common.next', 'Next')} →
                 </Button>

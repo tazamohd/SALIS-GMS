@@ -3,7 +3,6 @@ import {
   ClipboardCheck,
   UserIcon,
   LogOut,
-  Search,
   Calendar,
   Users,
   ShoppingCart,
@@ -90,6 +89,7 @@ import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { ArabicLanguageToggle } from "@/components/ArabicLanguageToggle";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { QuickActionsModal } from "@/components/QuickActionsModal";
+import { SmartSearch } from "@/components/SmartSearch";
 import { SkipLink } from "@/components/SkipLink";
 import { OfflineIndicator } from "@/components/OfflineIndicator";
 import {
@@ -385,14 +385,10 @@ export function Layout({ children }: LayoutProps) {
 
             <div className="flex-1" />
 
-            {/* Search Bar */}
-            <div className="hidden md:block relative w-full max-w-md">
-              <Search className="absolute left-2.5 top-1/2 transform -translate-y-1/2 w-3.5 h-3.5 text-[#64748B] dark:text-[#9BA4B0]" />
-              <Input
-                type="text"
-                placeholder={t("common.search")}
-                className="pl-9 h-9 bg-[#F8FAFC] dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0F172A] dark:text-[#E6EAF0] text-sm placeholder:text-[#64748B] dark:placeholder:text-[#9BA4B0] focus:border-[#0A5ED7] dark:focus:border-[#0BB3FF] focus:ring-[#0A5ED7] dark:focus:ring-[#0BB3FF] font-poppins"
-                data-testid="input-search"
+            {/* Smart Search Bar */}
+            <div className="hidden md:block">
+              <SmartSearch 
+                placeholder={t("common.smartSearch", "Search customers, vehicles, parts...")}
               />
             </div>
             <Button
