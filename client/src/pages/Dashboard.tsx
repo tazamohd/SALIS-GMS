@@ -67,7 +67,7 @@ export function Dashboard() {
     retry: false,
   });
 
-  const PIE_COLORS = ['#f59e0b', '#3b82f6', '#22c55e', '#ef4444', '#8b5cf6'];
+  const PIE_COLORS = ['#0A5ED7', '#0BB3FF', '#22c55e', '#F97316', '#64748B'];
 
   const checkInCount = (jobCards?.filter(jc => jc.status === 'pending') ?? []).length;
   const repairCount = (jobCards?.filter(jc => jc.status === 'in_progress') ?? []).length;
@@ -142,47 +142,43 @@ export function Dashboard() {
 
   return (
     <div className="min-h-screen relative overflow-hidden">
-      {/* Animated Background - Light & Dark Modes */}
+      {/* Brand Background - Clean Dark/Light Theme */}
       <div className="fixed inset-0 -z-10">
-        {/* Light mode background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-purple-50/50 to-blue-50 dark:from-black dark:via-purple-950/30 dark:to-black"></div>
-        {/* Light mode decorative elements */}
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-purple-200/40 dark:bg-purple-500/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-blue-200/40 dark:bg-blue-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
-        <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-emerald-200/30 dark:bg-emerald-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute inset-0 bg-[#F8FAFC] dark:bg-[#0E1117]"></div>
+        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-gradient-to-bl from-[#0A5ED7]/5 to-transparent dark:from-[#0BB3FF]/5 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-gradient-to-tr from-[#0BB3FF]/5 to-transparent dark:from-[#0A5ED7]/5 rounded-full blur-3xl"></div>
       </div>
 
       <div className="relative p-6 space-y-8">
-        {/* Hero Header */}
+        {/* Hero Header - Brand Design */}
         <div className="relative">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
             <div className="space-y-2">
               <div className="flex items-center gap-3">
                 <div className="relative">
-                  <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl blur-lg opacity-50 dark:opacity-75 animate-pulse"></div>
-                  <div className="relative p-3 rounded-2xl bg-gradient-to-r from-purple-600 to-pink-600 shadow-2xl shadow-purple-500/25">
+                  <div className="absolute inset-0 bg-[#0A5ED7] rounded-2xl blur-lg opacity-30 dark:opacity-40"></div>
+                  <div className="relative p-3 rounded-2xl bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] shadow-2xl shadow-[#0A5ED7]/25">
                     <Sparkles className="w-8 h-8 text-white" />
                   </div>
                 </div>
                 <div>
-                  <h1 className="text-4xl md:text-5xl font-montserrat font-black bg-gradient-to-r from-gray-900 via-purple-800 to-pink-800 dark:from-white dark:via-purple-200 dark:to-pink-200 bg-clip-text text-transparent">
+                  <h1 className="text-4xl md:text-5xl font-montserrat font-black bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] bg-clip-text text-transparent">
                     {t('dashboard.title', 'Dashboard')}
                   </h1>
-                  <p className="text-purple-600/80 dark:text-purple-300/80 font-light">
-                    {t('common.welcome', 'Welcome back')}, <span className="font-semibold text-gray-900 dark:text-white">{(user as any)?.fullName || (user as any)?.username || 'User'}</span>
+                  <p className="text-[#64748B] dark:text-[#9BA4B0] font-light">
+                    {t('common.welcome', 'Welcome back')}, <span className="font-semibold text-[#0F172A] dark:text-white">{(user as any)?.fullName || (user as any)?.username || 'User'}</span>
                   </p>
                 </div>
               </div>
             </div>
             <div className="flex gap-3">
-              <Button className="relative group overflow-hidden bg-white/80 dark:bg-white/10 backdrop-blur-xl border border-purple-200 dark:border-white/20 hover:bg-purple-50 dark:hover:bg-white/20 text-purple-700 dark:text-white shadow-lg" asChild>
+              <Button className="relative group overflow-hidden bg-white dark:bg-[#151A23] backdrop-blur-xl border border-[#E2E8F0] dark:border-[#232A36] hover:bg-[#0A5ED7]/5 dark:hover:bg-[#0BB3FF]/10 text-[#0A5ED7] dark:text-[#0BB3FF] shadow-lg" asChild>
                 <Link href="/job-cards">
-                  <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 to-pink-600/10 dark:from-purple-600/50 dark:to-pink-600/50 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                   <FileText className="w-4 h-4 mr-2 relative z-10" />
                   <span className="relative z-10">{t('dashboard.newJobCard', 'New Job Card')}</span>
                 </Link>
               </Button>
-              <Button className="relative group overflow-hidden bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-xl shadow-purple-500/25" asChild>
+              <Button className="relative group overflow-hidden bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952C0] hover:to-[#0AA3EE] text-white shadow-xl shadow-[#0A5ED7]/25" asChild>
                 <Link href="/vehicles">
                   <Car className="w-4 h-4 mr-2" />
                   {t('dashboard.addVehicle', 'Add Vehicle')}
@@ -192,34 +188,32 @@ export function Dashboard() {
           </div>
         </div>
 
-        {/* Main Metrics - Glassmorphism Cards */}
+        {/* Main Metrics - Brand Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {/* Revenue Card */}
           <div className="group relative" data-testid="card-revenue">
-            <div className="absolute -inset-0.5 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-3xl blur opacity-40 dark:opacity-50 group-hover:opacity-60 dark:group-hover:opacity-75 transition duration-500"></div>
-            <div className="relative h-full backdrop-blur-xl bg-white/70 dark:bg-black/30 rounded-3xl p-6 border border-emerald-200/50 dark:border-white/20 shadow-xl">
+            <div className="relative h-full bg-white dark:bg-[#151A23] rounded-2xl p-6 border border-[#E2E8F0] dark:border-[#232A36] shadow-sm hover:shadow-lg hover:border-[#0A5ED7]/30 dark:hover:border-[#0BB3FF]/30 transition-all duration-200">
               <div className="flex items-start justify-between">
                 <div className="space-y-3">
                   <div className="flex items-center gap-2">
-                    <div className="p-2 rounded-xl bg-emerald-100 dark:bg-emerald-500/20">
-                      <DollarSign className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                    <div className="p-2 rounded-xl bg-[#0A5ED7]/10 dark:bg-[#0A5ED7]/20">
+                      <DollarSign className="w-5 h-5 text-[#0A5ED7] dark:text-[#0BB3FF]" />
                     </div>
-                    <span className="text-emerald-700 dark:text-emerald-300/80 text-sm font-medium">{t('dashboard.totalRevenue', 'Total Revenue')}</span>
+                    <span className="text-[#64748B] dark:text-[#9BA4B0] text-sm font-medium">{t('dashboard.totalRevenue', 'Total Revenue')}</span>
                   </div>
                   <div className="space-y-1">
-                    <h3 className="text-3xl font-black text-gray-900 dark:text-white font-montserrat">
+                    <h3 className="text-3xl font-black text-[#0F172A] dark:text-white font-montserrat">
                       ${totalRevenue.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
                     </h3>
-                    <div className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
+                    <div className="flex items-center gap-1 text-[#22c55e]">
                       <ArrowUpRight className="w-4 h-4" />
                       <span className="text-xs font-medium">+12.5%</span>
                     </div>
                   </div>
                 </div>
                 <div className="relative">
-                  <div className="absolute inset-0 bg-emerald-400/30 dark:bg-emerald-500/30 rounded-full blur-xl"></div>
-                  <div className="relative w-16 h-16 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center shadow-lg shadow-emerald-500/30">
-                    <TrendingUp className="w-8 h-8 text-white" />
+                  <div className="relative w-14 h-14 rounded-full bg-gradient-to-br from-[#0A5ED7] to-[#0BB3FF] flex items-center justify-center shadow-lg shadow-[#0A5ED7]/20">
+                    <TrendingUp className="w-7 h-7 text-white" />
                   </div>
                 </div>
               </div>
@@ -231,28 +225,26 @@ export function Dashboard() {
 
           {/* Active Jobs Card */}
           <div className="group relative" data-testid="card-active-jobs">
-            <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-3xl blur opacity-40 dark:opacity-50 group-hover:opacity-60 dark:group-hover:opacity-75 transition duration-500"></div>
-            <div className="relative h-full backdrop-blur-xl bg-white/70 dark:bg-black/30 rounded-3xl p-6 border border-blue-200/50 dark:border-white/20 shadow-xl">
+            <div className="relative h-full bg-white dark:bg-[#151A23] rounded-2xl p-6 border border-[#E2E8F0] dark:border-[#232A36] shadow-sm hover:shadow-lg hover:border-[#0BB3FF]/30 dark:hover:border-[#0BB3FF]/30 transition-all duration-200">
               <div className="flex items-start justify-between">
                 <div className="space-y-3">
                   <div className="flex items-center gap-2">
-                    <div className="p-2 rounded-xl bg-blue-100 dark:bg-blue-500/20">
-                      <Wrench className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                    <div className="p-2 rounded-xl bg-[#0BB3FF]/10 dark:bg-[#0BB3FF]/20">
+                      <Wrench className="w-5 h-5 text-[#0BB3FF]" />
                     </div>
-                    <span className="text-blue-700 dark:text-blue-300/80 text-sm font-medium">{t('dashboard.activeJobs', 'Active Jobs')}</span>
+                    <span className="text-[#64748B] dark:text-[#9BA4B0] text-sm font-medium">{t('dashboard.activeJobs', 'Active Jobs')}</span>
                   </div>
                   <div className="space-y-1">
-                    <h3 className="text-3xl font-black text-gray-900 dark:text-white font-montserrat">{repairCount + checkInCount}</h3>
+                    <h3 className="text-3xl font-black text-[#0F172A] dark:text-white font-montserrat">{repairCount + checkInCount}</h3>
                     <div className="flex gap-2">
-                      <Badge className="bg-yellow-100 dark:bg-yellow-500/20 text-yellow-700 dark:text-yellow-300 border-yellow-300 dark:border-yellow-500/30 text-xs">{checkInCount} pending</Badge>
-                      <Badge className="bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-blue-300 border-blue-300 dark:border-blue-500/30 text-xs">{repairCount} active</Badge>
+                      <Badge className="bg-[#F97316]/10 text-[#F97316] border-[#F97316]/30 text-xs">{checkInCount} pending</Badge>
+                      <Badge className="bg-[#0BB3FF]/10 text-[#0BB3FF] border-[#0BB3FF]/30 text-xs">{repairCount} active</Badge>
                     </div>
                   </div>
                 </div>
                 <div className="relative">
-                  <div className="absolute inset-0 bg-blue-400/30 dark:bg-blue-500/30 rounded-full blur-xl"></div>
-                  <div className="relative w-16 h-16 rounded-full bg-gradient-to-br from-blue-400 to-cyan-500 flex items-center justify-center shadow-lg shadow-blue-500/30">
-                    <Gauge className="w-8 h-8 text-white" />
+                  <div className="relative w-14 h-14 rounded-full bg-gradient-to-br from-[#0BB3FF] to-[#06B6D4] flex items-center justify-center shadow-lg shadow-[#0BB3FF]/20">
+                    <Gauge className="w-7 h-7 text-white" />
                   </div>
                 </div>
               </div>
@@ -261,28 +253,26 @@ export function Dashboard() {
 
           {/* Customers Card */}
           <div className="group relative" data-testid="card-customers">
-            <div className="absolute -inset-0.5 bg-gradient-to-r from-violet-500 to-purple-500 rounded-3xl blur opacity-40 dark:opacity-50 group-hover:opacity-60 dark:group-hover:opacity-75 transition duration-500"></div>
-            <div className="relative h-full backdrop-blur-xl bg-white/70 dark:bg-black/30 rounded-3xl p-6 border border-violet-200/50 dark:border-white/20 shadow-xl">
+            <div className="relative h-full bg-white dark:bg-[#151A23] rounded-2xl p-6 border border-[#E2E8F0] dark:border-[#232A36] shadow-sm hover:shadow-lg hover:border-[#0B1F3B]/30 dark:hover:border-[#E6EAF0]/30 transition-all duration-200">
               <div className="flex items-start justify-between">
                 <div className="space-y-3">
                   <div className="flex items-center gap-2">
-                    <div className="p-2 rounded-xl bg-violet-100 dark:bg-violet-500/20">
-                      <Users className="w-5 h-5 text-violet-600 dark:text-violet-400" />
+                    <div className="p-2 rounded-xl bg-[#0B1F3B]/10 dark:bg-[#E6EAF0]/10">
+                      <Users className="w-5 h-5 text-[#0B1F3B] dark:text-[#E6EAF0]" />
                     </div>
-                    <span className="text-violet-700 dark:text-violet-300/80 text-sm font-medium">{t('dashboard.totalCustomers', 'Customers')}</span>
+                    <span className="text-[#64748B] dark:text-[#9BA4B0] text-sm font-medium">{t('dashboard.totalCustomers', 'Customers')}</span>
                   </div>
                   <div className="space-y-1">
-                    <h3 className="text-3xl font-black text-gray-900 dark:text-white font-montserrat">{activeCustomersCount}</h3>
-                    <div className="flex items-center gap-1 text-violet-600 dark:text-violet-400">
+                    <h3 className="text-3xl font-black text-[#0F172A] dark:text-white font-montserrat">{activeCustomersCount}</h3>
+                    <div className="flex items-center gap-1 text-[#0A5ED7] dark:text-[#0BB3FF]">
                       <Award className="w-4 h-4" />
                       <span className="text-xs font-medium">+8 this week</span>
                     </div>
                   </div>
                 </div>
                 <div className="relative">
-                  <div className="absolute inset-0 bg-violet-400/30 dark:bg-violet-500/30 rounded-full blur-xl"></div>
-                  <div className="relative w-16 h-16 rounded-full bg-gradient-to-br from-violet-400 to-purple-500 flex items-center justify-center shadow-lg shadow-violet-500/30">
-                    <Target className="w-8 h-8 text-white" />
+                  <div className="relative w-14 h-14 rounded-full bg-gradient-to-br from-[#0B1F3B] to-[#1e3a5f] flex items-center justify-center shadow-lg shadow-[#0B1F3B]/20">
+                    <Target className="w-7 h-7 text-white" />
                   </div>
                 </div>
               </div>
@@ -291,37 +281,35 @@ export function Dashboard() {
 
           {/* Inventory Card */}
           <div className="group relative" data-testid="card-inventory">
-            <div className="absolute -inset-0.5 bg-gradient-to-r from-amber-500 to-orange-500 rounded-3xl blur opacity-40 dark:opacity-50 group-hover:opacity-60 dark:group-hover:opacity-75 transition duration-500"></div>
-            <div className="relative h-full backdrop-blur-xl bg-white/70 dark:bg-black/30 rounded-3xl p-6 border border-amber-200/50 dark:border-white/20 shadow-xl">
+            <div className="relative h-full bg-white dark:bg-[#151A23] rounded-2xl p-6 border border-[#E2E8F0] dark:border-[#232A36] shadow-sm hover:shadow-lg hover:border-[#F97316]/30 dark:hover:border-[#F97316]/30 transition-all duration-200">
               <div className="flex items-start justify-between">
                 <div className="space-y-3">
                   <div className="flex items-center gap-2">
-                    <div className="p-2 rounded-xl bg-amber-100 dark:bg-amber-500/20">
-                      <Package className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+                    <div className="p-2 rounded-xl bg-[#F97316]/10 dark:bg-[#F97316]/20">
+                      <Package className="w-5 h-5 text-[#F97316]" />
                     </div>
-                    <span className="text-amber-700 dark:text-amber-300/80 text-sm font-medium">{t('dashboard.partsInventory', 'Inventory')}</span>
+                    <span className="text-[#64748B] dark:text-[#9BA4B0] text-sm font-medium">{t('dashboard.partsInventory', 'Inventory')}</span>
                   </div>
                   <div className="space-y-1">
-                    <h3 className="text-3xl font-black text-gray-900 dark:text-white font-montserrat">{inventoryPercentage}%</h3>
-                    <p className="text-amber-600 dark:text-amber-300/70 text-xs">{inStockParts}/{totalInventoryItems} in stock</p>
+                    <h3 className="text-3xl font-black text-[#0F172A] dark:text-white font-montserrat">{inventoryPercentage}%</h3>
+                    <p className="text-[#F97316] text-xs">{inStockParts}/{totalInventoryItems} in stock</p>
                   </div>
                 </div>
                 <div className="relative">
-                  <div className="absolute inset-0 bg-amber-400/30 dark:bg-amber-500/30 rounded-full blur-xl"></div>
-                  <div className="relative w-16 h-16">
-                    <svg className="w-16 h-16 transform -rotate-90">
-                      <circle cx="32" cy="32" r="28" stroke="rgba(245,158,11,0.2)" strokeWidth="8" fill="none" />
-                      <circle cx="32" cy="32" r="28" stroke="url(#inventoryGradient)" strokeWidth="8" fill="none" 
-                        strokeDasharray={`${inventoryPercentage * 1.76} 176`} strokeLinecap="round" />
+                  <div className="relative w-14 h-14">
+                    <svg className="w-14 h-14 transform -rotate-90">
+                      <circle cx="28" cy="28" r="24" stroke="rgba(249,115,22,0.2)" strokeWidth="6" fill="none" />
+                      <circle cx="28" cy="28" r="24" stroke="url(#inventoryGradient)" strokeWidth="6" fill="none" 
+                        strokeDasharray={`${inventoryPercentage * 1.5} 150`} strokeLinecap="round" />
                       <defs>
                         <linearGradient id="inventoryGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                          <stop offset="0%" stopColor="#f59e0b" />
-                          <stop offset="100%" stopColor="#ea580c" />
+                          <stop offset="0%" stopColor="#F97316" />
+                          <stop offset="100%" stopColor="#FB923C" />
                         </linearGradient>
                       </defs>
                     </svg>
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <ShieldCheck className="w-6 h-6 text-amber-500 dark:text-amber-400" />
+                      <ShieldCheck className="w-5 h-5 text-[#F97316]" />
                     </div>
                   </div>
                 </div>
@@ -330,26 +318,25 @@ export function Dashboard() {
           </div>
         </div>
 
-        {/* Status Pipeline */}
+        {/* Status Pipeline - Brand Colors */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           {[
-            { icon: Clock, label: t('dashboard.checkIn', 'Check-In'), value: checkInCount, color: 'from-yellow-400 to-amber-500', bgLight: 'bg-yellow-50', borderLight: 'border-yellow-200' },
-            { icon: Wrench, label: t('dashboard.repair', 'In Repair'), value: repairCount, color: 'from-blue-400 to-indigo-500', bgLight: 'bg-blue-50', borderLight: 'border-blue-200' },
-            { icon: AlertCircle, label: t('dashboard.qualityCheck', 'QC'), value: qualityCheckCount, color: 'from-purple-400 to-violet-500', bgLight: 'bg-purple-50', borderLight: 'border-purple-200' },
-            { icon: CheckCircle, label: t('dashboard.completed', 'Done'), value: completionCount, color: 'from-green-400 to-emerald-500', bgLight: 'bg-green-50', borderLight: 'border-green-200' },
-            { icon: Car, label: t('dashboard.delivered', 'Delivered'), value: deliveredCount, color: 'from-teal-400 to-cyan-500', bgLight: 'bg-teal-50', borderLight: 'border-teal-200' },
-            { icon: Activity, label: t('dashboard.totalJobs', 'Total'), value: jobCards?.length || 0, color: 'from-rose-400 to-pink-500', bgLight: 'bg-rose-50', borderLight: 'border-rose-200' },
+            { icon: Clock, label: t('dashboard.checkIn', 'Check-In'), value: checkInCount, color: 'from-[#F97316] to-[#FB923C]', bgColor: 'bg-[#F97316]/10' },
+            { icon: Wrench, label: t('dashboard.repair', 'In Repair'), value: repairCount, color: 'from-[#0A5ED7] to-[#0BB3FF]', bgColor: 'bg-[#0A5ED7]/10' },
+            { icon: AlertCircle, label: t('dashboard.qualityCheck', 'QC'), value: qualityCheckCount, color: 'from-[#0BB3FF] to-[#06B6D4]', bgColor: 'bg-[#0BB3FF]/10' },
+            { icon: CheckCircle, label: t('dashboard.completed', 'Done'), value: completionCount, color: 'from-[#22c55e] to-[#10b981]', bgColor: 'bg-[#22c55e]/10' },
+            { icon: Car, label: t('dashboard.delivered', 'Delivered'), value: deliveredCount, color: 'from-[#0B1F3B] to-[#1e3a5f]', bgColor: 'bg-[#0B1F3B]/10 dark:bg-[#E6EAF0]/10' },
+            { icon: Activity, label: t('dashboard.totalJobs', 'Total'), value: jobCards?.length || 0, color: 'from-[#64748B] to-[#94A3B8]', bgColor: 'bg-[#64748B]/10' },
           ].map((item, index) => (
             <div key={index} className="group relative" data-testid={`card-status-${index}`}>
-              <div className={`absolute inset-0 bg-gradient-to-r ${item.color} rounded-2xl blur-lg opacity-20 dark:opacity-30 group-hover:opacity-40 dark:group-hover:opacity-60 transition-all duration-300`}></div>
-              <div className={`relative backdrop-blur-xl ${item.bgLight} dark:bg-black/20 rounded-2xl p-4 border ${item.borderLight} dark:border-white/10 hover:border-opacity-100 dark:hover:border-white/30 transition-all hover:scale-105 hover:-translate-y-1 duration-300 shadow-lg`}>
+              <div className={`relative bg-white dark:bg-[#151A23] rounded-2xl p-4 border border-[#E2E8F0] dark:border-[#232A36] hover:border-[#0A5ED7]/30 dark:hover:border-[#0BB3FF]/30 transition-all hover:-translate-y-1 duration-300 shadow-sm hover:shadow-lg`}>
                 <div className="flex flex-col items-center text-center space-y-3">
                   <div className={`p-3 rounded-xl bg-gradient-to-r ${item.color} shadow-lg`}>
-                    <item.icon className="w-6 h-6 text-white" />
+                    <item.icon className="w-5 h-5 text-white" />
                   </div>
                   <div>
-                    <h4 className="text-3xl font-black text-gray-900 dark:text-white font-montserrat">{item.value}</h4>
-                    <p className="text-gray-600 dark:text-white/60 text-xs font-medium mt-1">{item.label}</p>
+                    <h4 className="text-2xl font-black text-[#0F172A] dark:text-white font-montserrat">{item.value}</h4>
+                    <p className="text-[#64748B] dark:text-[#9BA4B0] text-xs font-medium mt-1">{item.label}</p>
                   </div>
                 </div>
               </div>
@@ -362,39 +349,38 @@ export function Dashboard() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Revenue Chart */}
             <div className="group relative" data-testid="card-revenue-chart">
-              <div className="absolute -inset-0.5 bg-gradient-to-r from-emerald-500/30 to-teal-500/30 rounded-3xl blur opacity-50"></div>
-              <div className="relative backdrop-blur-xl bg-white/70 dark:bg-black/20 rounded-3xl p-6 border border-emerald-200/50 dark:border-white/10 shadow-xl">
+              <div className="relative bg-white dark:bg-[#151A23] rounded-2xl p-6 border border-[#E2E8F0] dark:border-[#232A36] shadow-sm">
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="p-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 shadow-lg shadow-emerald-500/25">
+                  <div className="p-2 rounded-xl bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] shadow-lg shadow-[#0A5ED7]/25">
                     <TrendingUp className="w-5 h-5 text-white" />
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">{t('dashboard.revenuePerMonth', 'Revenue Trend')}</h3>
+                  <h3 className="text-xl font-bold text-[#0F172A] dark:text-white">{t('dashboard.revenuePerMonth', 'Revenue Trend')}</h3>
                 </div>
                 {statsLoading ? (
                   <div className="h-[280px] flex items-center justify-center">
-                    <div className="w-8 h-8 border-4 border-emerald-200 dark:border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin"></div>
+                    <div className="w-8 h-8 border-4 border-[#0A5ED7]/20 border-t-[#0A5ED7] rounded-full animate-spin"></div>
                   </div>
                 ) : dashboardStats?.revenue && dashboardStats.revenue.length > 0 ? (
                   <ResponsiveContainer width="100%" height={280}>
                     <AreaChart data={dashboardStats.revenue}>
                       <defs>
                         <linearGradient id="revenueGrad" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor="#10b981" stopOpacity={0.4}/>
-                          <stop offset="100%" stopColor="#10b981" stopOpacity={0}/>
+                          <stop offset="0%" stopColor="#0A5ED7" stopOpacity={0.4}/>
+                          <stop offset="100%" stopColor="#0A5ED7" stopOpacity={0}/>
                         </linearGradient>
                       </defs>
-                      <XAxis dataKey="month" tick={{ fill: '#6b7280', fontSize: 11 }} axisLine={false} tickLine={false} />
-                      <YAxis tick={{ fill: '#6b7280', fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${v/1000}k`} />
+                      <XAxis dataKey="month" tick={{ fill: '#64748B', fontSize: 11 }} axisLine={false} tickLine={false} />
+                      <YAxis tick={{ fill: '#64748B', fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${v/1000}k`} />
                       <Tooltip 
                         formatter={(value: number) => [`$${value.toLocaleString()}`, 'Revenue']}
-                        contentStyle={{ backgroundColor: 'rgba(255,255,255,0.95)', border: '1px solid rgba(0,0,0,0.1)', borderRadius: '12px', boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}
-                        labelStyle={{ color: '#1f2937' }}
+                        contentStyle={{ backgroundColor: 'rgba(255,255,255,0.95)', border: '1px solid #E2E8F0', borderRadius: '12px', boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}
+                        labelStyle={{ color: '#0F172A' }}
                       />
-                      <Area type="monotone" dataKey="revenue" stroke="#10b981" strokeWidth={3} fill="url(#revenueGrad)" />
+                      <Area type="monotone" dataKey="revenue" stroke="#0A5ED7" strokeWidth={3} fill="url(#revenueGrad)" />
                     </AreaChart>
                   </ResponsiveContainer>
                 ) : (
-                  <div className="h-[280px] flex items-center justify-center text-gray-500 dark:text-white/40">
+                  <div className="h-[280px] flex items-center justify-center text-[#64748B] dark:text-[#9BA4B0]">
                     {t('dashboard.noRevenueData', 'No revenue data available')}
                   </div>
                 )}
@@ -403,17 +389,16 @@ export function Dashboard() {
 
             {/* Jobs Status Chart */}
             <div className="group relative" data-testid="card-status-chart">
-              <div className="absolute -inset-0.5 bg-gradient-to-r from-violet-500/30 to-purple-500/30 rounded-3xl blur opacity-50"></div>
-              <div className="relative backdrop-blur-xl bg-white/70 dark:bg-black/20 rounded-3xl p-6 border border-violet-200/50 dark:border-white/10 shadow-xl">
+              <div className="relative bg-white dark:bg-[#151A23] rounded-2xl p-6 border border-[#E2E8F0] dark:border-[#232A36] shadow-sm">
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="p-2 rounded-xl bg-gradient-to-r from-violet-500 to-purple-500 shadow-lg shadow-violet-500/25">
+                  <div className="p-2 rounded-xl bg-gradient-to-r from-[#0BB3FF] to-[#06B6D4] shadow-lg shadow-[#0BB3FF]/25">
                     <BarChart3 className="w-5 h-5 text-white" />
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">{t('dashboard.jobsByStatus', 'Job Distribution')}</h3>
+                  <h3 className="text-xl font-bold text-[#0F172A] dark:text-white">{t('dashboard.jobsByStatus', 'Job Distribution')}</h3>
                 </div>
                 {statsLoading ? (
                   <div className="h-[280px] flex items-center justify-center">
-                    <div className="w-8 h-8 border-4 border-violet-200 dark:border-violet-500/30 border-t-violet-500 rounded-full animate-spin"></div>
+                    <div className="w-8 h-8 border-4 border-[#0BB3FF]/20 border-t-[#0BB3FF] rounded-full animate-spin"></div>
                   </div>
                 ) : dashboardStats?.jobStatus && dashboardStats.jobStatus.length > 0 ? (
                   <ResponsiveContainer width="100%" height={280}>
@@ -433,14 +418,14 @@ export function Dashboard() {
                         ))}
                       </Pie>
                       <Tooltip 
-                        contentStyle={{ backgroundColor: 'rgba(255,255,255,0.95)', border: '1px solid rgba(0,0,0,0.1)', borderRadius: '12px', boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}
-                        labelStyle={{ color: '#1f2937' }}
+                        contentStyle={{ backgroundColor: 'rgba(255,255,255,0.95)', border: '1px solid #E2E8F0', borderRadius: '12px', boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}
+                        labelStyle={{ color: '#0F172A' }}
                       />
-                      <Legend wrapperStyle={{ color: '#6b7280', fontSize: '12px' }} />
+                      <Legend wrapperStyle={{ color: '#64748B', fontSize: '12px' }} />
                     </PieChart>
                   </ResponsiveContainer>
                 ) : (
-                  <div className="h-[280px] flex items-center justify-center text-gray-500 dark:text-white/40">
+                  <div className="h-[280px] flex items-center justify-center text-[#64748B] dark:text-[#9BA4B0]">
                     {t('dashboard.noJobStatusData', 'No job data available')}
                   </div>
                 )}
@@ -449,35 +434,33 @@ export function Dashboard() {
           </div>
         )}
 
-        {/* Quick Stats */}
+        {/* Quick Stats - Brand Design */}
         <div className="group relative">
-          <div className="absolute -inset-0.5 bg-gradient-to-r from-pink-500/20 via-purple-500/20 to-blue-500/20 rounded-3xl blur"></div>
-          <div className="relative backdrop-blur-xl bg-white/70 dark:bg-black/20 rounded-3xl p-6 border border-purple-200/50 dark:border-white/10 shadow-xl">
+          <div className="relative bg-white dark:bg-[#151A23] rounded-2xl p-6 border border-[#E2E8F0] dark:border-[#232A36] shadow-sm">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-xl bg-gradient-to-r from-pink-500 to-purple-500 shadow-lg shadow-pink-500/25">
+                <div className="p-2 rounded-xl bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] shadow-lg shadow-[#0A5ED7]/25">
                   <Zap className="w-5 h-5 text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white">{t('dashboard.quickStats', 'Performance Overview')}</h3>
+                <h3 className="text-xl font-bold text-[#0F172A] dark:text-white">{t('dashboard.quickStats', 'Performance Overview')}</h3>
               </div>
-              <Badge className="bg-purple-100 dark:bg-white/10 text-purple-700 dark:text-white/80 border-purple-200 dark:border-white/20">{t('dashboard.allTime', 'All Time')}</Badge>
+              <Badge className="bg-[#0A5ED7]/10 text-[#0A5ED7] dark:text-[#0BB3FF] border-[#0A5ED7]/30">{t('dashboard.allTime', 'All Time')}</Badge>
             </div>
             
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {[
-                { label: t('dashboard.totalJobs', 'Total Jobs'), value: jobCards?.length || 0, icon: FileText, color: 'from-blue-500 to-cyan-500', bgLight: 'bg-blue-50' },
-                { label: t('dashboard.totalInvoices', 'Invoices'), value: invoices.length, icon: DollarSign, color: 'from-emerald-500 to-teal-500', bgLight: 'bg-emerald-50' },
-                { label: t('dashboard.customers', 'Customers'), value: activeCustomersCount, icon: Users, color: 'from-violet-500 to-purple-500', bgLight: 'bg-violet-50' },
-                { label: t('dashboard.partsCatalog', 'Parts'), value: spareParts.length, icon: Package, color: 'from-amber-500 to-orange-500', bgLight: 'bg-amber-50' },
+                { label: t('dashboard.totalJobs', 'Total Jobs'), value: jobCards?.length || 0, icon: FileText, color: 'from-[#0A5ED7] to-[#0BB3FF]' },
+                { label: t('dashboard.totalInvoices', 'Invoices'), value: invoices.length, icon: DollarSign, color: 'from-[#22c55e] to-[#10b981]' },
+                { label: t('dashboard.customers', 'Customers'), value: activeCustomersCount, icon: Users, color: 'from-[#0B1F3B] to-[#1e3a5f]' },
+                { label: t('dashboard.partsCatalog', 'Parts'), value: spareParts.length, icon: Package, color: 'from-[#F97316] to-[#FB923C]' },
               ].map((stat, index) => (
                 <div key={index} className="relative group/stat">
-                  <div className={`absolute inset-0 bg-gradient-to-r ${stat.color} rounded-2xl blur opacity-10 dark:opacity-20 group-hover/stat:opacity-30 dark:group-hover/stat:opacity-40 transition-opacity`}></div>
-                  <div className={`relative p-5 rounded-2xl ${stat.bgLight} dark:bg-white/5 border border-gray-200/50 dark:border-white/10 text-center hover:bg-white dark:hover:bg-white/10 transition-all shadow-lg`}>
+                  <div className={`relative p-5 rounded-2xl bg-[#F8FAFC] dark:bg-[#0E1117] border border-[#E2E8F0] dark:border-[#232A36] text-center hover:border-[#0A5ED7]/30 dark:hover:border-[#0BB3FF]/30 transition-all shadow-sm hover:shadow-lg`}>
                     <div className={`w-12 h-12 mx-auto mb-3 rounded-xl bg-gradient-to-r ${stat.color} flex items-center justify-center shadow-lg`}>
                       <stat.icon className="w-6 h-6 text-white" />
                     </div>
-                    <h4 className="text-3xl font-black text-gray-900 dark:text-white font-montserrat">{stat.value}</h4>
-                    <p className="text-gray-600 dark:text-white/50 text-sm mt-1">{stat.label}</p>
+                    <h4 className="text-3xl font-black text-[#0F172A] dark:text-white font-montserrat">{stat.value}</h4>
+                    <p className="text-[#64748B] dark:text-[#9BA4B0] text-sm mt-1">{stat.label}</p>
                   </div>
                 </div>
               ))}
@@ -485,19 +468,18 @@ export function Dashboard() {
           </div>
         </div>
 
-        {/* Latest Tasks */}
+        {/* Latest Tasks - Brand Design */}
         <div className="group relative" data-testid="card-tasks">
-          <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-3xl blur"></div>
-          <div className="relative backdrop-blur-xl bg-white/70 dark:bg-black/20 rounded-3xl border border-blue-200/50 dark:border-white/10 shadow-xl overflow-hidden">
-            <div className="p-6 border-b border-gray-200/50 dark:border-white/10">
+          <div className="relative bg-white dark:bg-[#151A23] rounded-2xl border border-[#E2E8F0] dark:border-[#232A36] shadow-sm overflow-hidden">
+            <div className="p-6 border-b border-[#E2E8F0] dark:border-[#232A36]">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-xl bg-gradient-to-r from-blue-500 to-purple-500 shadow-lg shadow-blue-500/25">
+                  <div className="p-2 rounded-xl bg-gradient-to-r from-[#F97316] to-[#FB923C] shadow-lg shadow-[#F97316]/25">
                     <Flame className="w-5 h-5 text-white" />
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">{t('dashboard.latestTasks', 'Recent Jobs')}</h3>
+                  <h3 className="text-xl font-bold text-[#0F172A] dark:text-white">{t('dashboard.latestTasks', 'Recent Jobs')}</h3>
                 </div>
-                <Button className="bg-purple-100 dark:bg-white/10 hover:bg-purple-200 dark:hover:bg-white/20 text-purple-700 dark:text-white border-purple-200 dark:border-white/20" variant="outline" size="sm" asChild>
+                <Button className="bg-[#0A5ED7]/10 hover:bg-[#0A5ED7]/20 text-[#0A5ED7] dark:text-[#0BB3FF] border-[#0A5ED7]/30" variant="outline" size="sm" asChild>
                   <Link href="/job-cards">
                     {t('common.viewAll', 'View All')}
                     <ArrowUpRight className="w-4 h-4 ml-2" />
@@ -509,21 +491,21 @@ export function Dashboard() {
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-gray-200/50 dark:border-white/10 bg-gray-50/50 dark:bg-white/5">
-                    <th className="text-left py-4 px-6 text-gray-600 dark:text-white/60 text-xs font-semibold uppercase tracking-wider">{t('table.id', 'ID')}</th>
-                    <th className="text-left py-4 px-6 text-gray-600 dark:text-white/60 text-xs font-semibold uppercase tracking-wider">{t('table.service', 'Service')}</th>
-                    <th className="text-left py-4 px-6 text-gray-600 dark:text-white/60 text-xs font-semibold uppercase tracking-wider">{t('table.customer', 'Customer')}</th>
-                    <th className="text-left py-4 px-6 text-gray-600 dark:text-white/60 text-xs font-semibold uppercase tracking-wider">{t('table.vehicle', 'Vehicle')}</th>
-                    <th className="text-left py-4 px-6 text-gray-600 dark:text-white/60 text-xs font-semibold uppercase tracking-wider">{t('common.status', 'Status')}</th>
-                    <th className="text-left py-4 px-6 text-gray-600 dark:text-white/60 text-xs font-semibold uppercase tracking-wider">{t('table.priority', 'Priority')}</th>
-                    <th className="text-left py-4 px-6 text-gray-600 dark:text-white/60 text-xs font-semibold uppercase tracking-wider">{t('common.actions', 'Action')}</th>
+                  <tr className="border-b border-[#E2E8F0] dark:border-[#232A36] bg-[#F8FAFC] dark:bg-[#0E1117]">
+                    <th className="text-left py-4 px-6 text-[#64748B] dark:text-[#9BA4B0] text-xs font-semibold uppercase tracking-wider">{t('table.id', 'ID')}</th>
+                    <th className="text-left py-4 px-6 text-[#64748B] dark:text-[#9BA4B0] text-xs font-semibold uppercase tracking-wider">{t('table.service', 'Service')}</th>
+                    <th className="text-left py-4 px-6 text-[#64748B] dark:text-[#9BA4B0] text-xs font-semibold uppercase tracking-wider">{t('table.customer', 'Customer')}</th>
+                    <th className="text-left py-4 px-6 text-[#64748B] dark:text-[#9BA4B0] text-xs font-semibold uppercase tracking-wider">{t('table.vehicle', 'Vehicle')}</th>
+                    <th className="text-left py-4 px-6 text-[#64748B] dark:text-[#9BA4B0] text-xs font-semibold uppercase tracking-wider">{t('common.status', 'Status')}</th>
+                    <th className="text-left py-4 px-6 text-[#64748B] dark:text-[#9BA4B0] text-xs font-semibold uppercase tracking-wider">{t('table.priority', 'Priority')}</th>
+                    <th className="text-left py-4 px-6 text-[#64748B] dark:text-[#9BA4B0] text-xs font-semibold uppercase tracking-wider">{t('common.actions', 'Action')}</th>
                   </tr>
                 </thead>
                 <tbody>
                   {isLoading ? (
                     <tr>
                       <td colSpan={7} className="py-12 text-center">
-                        <div className="w-8 h-8 mx-auto border-4 border-purple-200 dark:border-purple-500/30 border-t-purple-500 rounded-full animate-spin"></div>
+                        <div className="w-8 h-8 mx-auto border-4 border-[#0A5ED7]/20 border-t-[#0A5ED7] rounded-full animate-spin"></div>
                       </td>
                     </tr>
                   ) : latestTasks.length === 0 ? (
