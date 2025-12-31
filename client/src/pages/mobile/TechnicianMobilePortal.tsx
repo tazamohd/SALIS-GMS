@@ -33,6 +33,8 @@ import {
   Timer,
   FileText,
   Zap,
+  RotateCw,
+  ArrowRight,
 } from "lucide-react";
 import { format, differenceInSeconds } from "date-fns";
 import type { JobCard, User as UserType, TechnicianProfile } from "@shared/schema";
@@ -77,9 +79,10 @@ export default function TechnicianMobilePortal() {
     enabled: !!currentUser?.id,
   });
 
+  const vehicleInfo = selectedJob?.vehicleInfo as { vin?: string; licensePlate?: string } | undefined;
   const { data: vehicleHistory } = useQuery<any[]>({
-    queryKey: ['/api/vehicles', selectedJob?.vehicleId, 'history'],
-    enabled: !!selectedJob?.vehicleId,
+    queryKey: ['/api/vehicles/history', vehicleInfo?.vin || vehicleInfo?.licensePlate],
+    enabled: !!(vehicleInfo?.vin || vehicleInfo?.licensePlate),
   });
 
   const updateStatusMutation = useMutation({
@@ -680,6 +683,127 @@ export default function TechnicianMobilePortal() {
               </CardContent>
             </Card>
           </TabsContent>
+
+          <TabsContent value="rotation" className="mt-4 pb-20">
+            <Card className="bg-white dark:bg-[#151A23] border-[#C9D1DA] dark:border-[#232A36]">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg flex items-center gap-2 text-[#2A2F3A] dark:text-[#E6EAF0]">
+                  <RotateCw className="h-5 w-5 text-[#0A5ED7]" />
+                  {t('technician.featureRotation', 'Feature Rotation')}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="p-4 bg-gradient-to-r from-[#0A5ED7]/10 to-[#0BB3FF]/10 border border-[#0A5ED7]/30 rounded-lg">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs text-[#6B7280] uppercase tracking-wide">Current Rotation</span>
+                    <Badge className="bg-[#0A5ED7] text-white">Active</Badge>
+                  </div>
+                  <h3 className="text-lg font-bold text-[#0A5ED7]">Engine Diagnostics</h3>
+                  <p className="text-sm text-[#6B7280] mt-1">Jan 1 - Jan 15, 2025</p>
+                  <Progress value={60} className="mt-3 h-2" />
+                  <p className="text-xs text-[#6B7280] mt-1">9 of 15 days completed</p>
+                </div>
+
+                <div>
+                  <h4 className="text-sm font-medium text-[#6B7280] mb-3">Rotation Schedule</h4>
+                  <div className="space-y-2">
+                    {[
+                      { feature: 'Engine Diagnostics', dates: 'Jan 1-15', status: 'current', progress: 60 },
+                      { feature: 'Brake Systems', dates: 'Jan 16-31', status: 'upcoming', progress: 0 },
+                      { feature: 'Electrical & Wiring', dates: 'Feb 1-15', status: 'upcoming', progress: 0 },
+                      { feature: 'Transmission Service', dates: 'Feb 16-28', status: 'upcoming', progress: 0 },
+                    ].map((rotation, i) => (
+                      <div
+                        key={i}
+                        className={`p-3 rounded-lg flex items-center justify-between ${
+                          rotation.status === 'current'
+                            ? 'bg-[#0A5ED7]/10 border border-[#0A5ED7]/30'
+                            : 'bg-[#E6E9ED] dark:bg-[#0E1117]'
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className={`w-2 h-2 rounded-full ${
+                            rotation.status === 'current' ? 'bg-[#0A5ED7]' : 'bg-[#C9D1DA]'
+                          }`} />
+                          <div>
+                            <p className={`text-sm font-medium ${
+                              rotation.status === 'current' 
+                                ? 'text-[#0A5ED7]' 
+                                : 'text-[#2A2F3A] dark:text-[#E6EAF0]'
+                            }`}>
+                              {rotation.feature}
+                            </p>
+                            <p className="text-xs text-[#6B7280]">{rotation.dates}</p>
+                          </div>
+                        </div>
+                        {rotation.status === 'current' && (
+                          <span className="text-xs text-[#0A5ED7] font-medium">{rotation.progress}%</span>
+                        )}
+                        {rotation.status === 'upcoming' && (
+                          <ArrowRight className="h-4 w-4 text-[#C9D1DA]" />
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="text-sm font-medium text-[#6B7280] mb-3">Skills Development</h4>
+                  <div className="grid grid-cols-2 gap-2">
+                    {[
+                      { skill: 'OBD Scanning', level: 85, trend: '+5%' },
+                      { skill: 'Fault Analysis', level: 70, trend: '+12%' },
+                      { skill: 'Calibration', level: 45, trend: '+8%' },
+                      { skill: 'Reporting', level: 90, trend: '+3%' },
+                    ].map((skill, i) => (
+                      <div
+                        key={i}
+                        className="p-3 bg-[#E6E9ED] dark:bg-[#0E1117] rounded-lg"
+                      >
+                        <div className="flex justify-between items-start mb-2">
+                          <span className="text-xs font-medium text-[#2A2F3A] dark:text-[#E6EAF0]">
+                            {skill.skill}
+                          </span>
+                          <span className="text-xs text-[#0A5ED7]">{skill.trend}</span>
+                        </div>
+                        <Progress value={skill.level} className="h-1.5" />
+                        <p className="text-xs text-[#6B7280] mt-1">{skill.level}%</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="text-sm font-medium text-[#6B7280] mb-3">Completed Rotations</h4>
+                  <div className="space-y-2">
+                    {[
+                      { feature: 'Oil & Fluids', completedDate: 'Dec 15, 2024', jobsCompleted: 42, rating: 4.8 },
+                      { feature: 'Suspension Work', completedDate: 'Nov 30, 2024', jobsCompleted: 35, rating: 4.6 },
+                      { feature: 'AC Systems', completedDate: 'Nov 15, 2024', jobsCompleted: 28, rating: 4.9 },
+                    ].map((history, i) => (
+                      <div
+                        key={i}
+                        className="p-3 bg-[#E6E9ED] dark:bg-[#0E1117] rounded-lg"
+                      >
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <p className="text-sm font-medium text-[#2A2F3A] dark:text-[#E6EAF0]">
+                              {history.feature}
+                            </p>
+                            <p className="text-xs text-[#6B7280]">{history.completedDate}</p>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-sm font-bold text-[#0A5ED7]">{history.jobsCompleted} jobs</p>
+                            <p className="text-xs text-[#6B7280]">★ {history.rating}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
         </Tabs>
       </div>
 
@@ -729,38 +853,46 @@ export default function TechnicianMobilePortal() {
         </DialogContent>
       </Dialog>
 
-      <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-[#151A23] border-t border-[#C9D1DA] dark:border-[#232A36] px-4 py-2 flex justify-around">
+      <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-[#151A23] border-t border-[#C9D1DA] dark:border-[#232A36] px-2 py-2 flex justify-around">
         <button
           onClick={() => setActiveTab('jobs')}
-          className={`flex flex-col items-center p-2 ${activeTab === 'jobs' ? 'text-[#0A5ED7]' : 'text-[#6B7280]'}`}
+          className={`flex flex-col items-center p-1.5 ${activeTab === 'jobs' ? 'text-[#0A5ED7]' : 'text-[#6B7280]'}`}
           data-testid="nav-jobs"
         >
           <Wrench className="h-5 w-5" />
-          <span className="text-xs mt-1">Jobs</span>
+          <span className="text-[10px] mt-0.5">Jobs</span>
         </button>
         <button
           onClick={() => setActiveTab('timer')}
-          className={`flex flex-col items-center p-2 ${activeTab === 'timer' ? 'text-[#0A5ED7]' : 'text-[#6B7280]'}`}
+          className={`flex flex-col items-center p-1.5 ${activeTab === 'timer' ? 'text-[#0A5ED7]' : 'text-[#6B7280]'}`}
           data-testid="nav-timer"
         >
           <Timer className="h-5 w-5" />
-          <span className="text-xs mt-1">Timer</span>
+          <span className="text-[10px] mt-0.5">Timer</span>
         </button>
         <button
           onClick={() => setActiveTab('skills')}
-          className={`flex flex-col items-center p-2 ${activeTab === 'skills' ? 'text-[#0A5ED7]' : 'text-[#6B7280]'}`}
+          className={`flex flex-col items-center p-1.5 ${activeTab === 'skills' ? 'text-[#0A5ED7]' : 'text-[#6B7280]'}`}
           data-testid="nav-skills"
         >
           <Award className="h-5 w-5" />
-          <span className="text-xs mt-1">Skills</span>
+          <span className="text-[10px] mt-0.5">Skills</span>
+        </button>
+        <button
+          onClick={() => setActiveTab('rotation')}
+          className={`flex flex-col items-center p-1.5 ${activeTab === 'rotation' ? 'text-[#0A5ED7]' : 'text-[#6B7280]'}`}
+          data-testid="nav-rotation"
+        >
+          <RotateCw className="h-5 w-5" />
+          <span className="text-[10px] mt-0.5">Rotation</span>
         </button>
         <button
           onClick={() => setActiveTab('schedule')}
-          className={`flex flex-col items-center p-2 ${activeTab === 'schedule' ? 'text-[#0A5ED7]' : 'text-[#6B7280]'}`}
+          className={`flex flex-col items-center p-1.5 ${activeTab === 'schedule' ? 'text-[#0A5ED7]' : 'text-[#6B7280]'}`}
           data-testid="nav-schedule"
         >
           <Calendar className="h-5 w-5" />
-          <span className="text-xs mt-1">Schedule</span>
+          <span className="text-[10px] mt-0.5">Schedule</span>
         </button>
       </div>
     </div>
