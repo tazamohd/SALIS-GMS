@@ -20677,13 +20677,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }));
       
       // Query 2: Sum invoice totals grouped by month (last 12 months)
-      // Use NULLIF and REGEXP_REPLACE to safely parse varchar amounts with potential symbols
+      // Cast numeric totalAmount to decimal and sum directly
       const revenueByMonth = await db
         .select({
           month: sql<string>`TO_CHAR(${invoices.invoiceDate}, 'Mon')`,
           monthNum: sql<number>`EXTRACT(MONTH FROM ${invoices.invoiceDate})`,
           year: sql<number>`EXTRACT(YEAR FROM ${invoices.invoiceDate})`,
-          revenue: sql<string>`COALESCE(SUM(NULLIF(REGEXP_REPLACE(${invoices.totalAmount}, '[^0-9.]', '', 'g'), '')::DECIMAL), 0)`,
+          revenue: sql<string>`COALESCE(SUM(${invoices.totalAmount}::DECIMAL), 0)`,
         })
         .from(invoices)
         .where(sql`${invoices.invoiceDate} >= NOW() - INTERVAL '12 months'`)
