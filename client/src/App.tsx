@@ -40,6 +40,7 @@ import TechnicianProfile from "@/pages/technician/Profile";
 import TechnicianAttendance from "@/pages/technician/Attendance";
 import TechnicianServiceGuides from "@/pages/technician/ServiceGuides";
 import TechnicianSoftware from "@/pages/technician/TechnicalSoftware";
+import TechnicianMobilePortal from "@/pages/mobile/TechnicianMobilePortal";
 import { PurchaseAgentLayout } from "@/components/PurchaseAgentLayout";
 import PurchaseAgentDashboard from "@/pages/purchase-agent/Dashboard";
 import PurchaseAgentOrders from "@/pages/purchase-agent/Orders";
@@ -543,6 +544,9 @@ function Router() {
         <TechnicianLayout>
           <TechnicianSoftware />
         </TechnicianLayout>
+      </Route>
+      <Route path="/technician-mobile">
+        <TechnicianMobilePortal />
       </Route>
 
       {/* Purchase Agent Portal Routes */}
