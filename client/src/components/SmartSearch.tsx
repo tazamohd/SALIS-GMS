@@ -24,9 +24,9 @@ interface SmartSearchProps {
 const typeConfig = {
   customer: { icon: Users, label: "Customer", color: "bg-[#0A5ED7]/10 text-[#0A5ED7] dark:text-[#0BB3FF]" },
   vehicle: { icon: Car, label: "Vehicle", color: "bg-[#0BB3FF]/10 text-[#0BB3FF]" },
-  part: { icon: Package, label: "Part", color: "bg-[#F97316]/10 text-[#F97316]" },
+  part: { icon: Package, label: "Part", color: "bg-[#0B1F3B]/10 text-[#0B1F3B] dark:bg-[#E6EAF0]/10 dark:text-[#E6EAF0]" },
   invoice: { icon: FileText, label: "Invoice", color: "bg-[#22c55e]/10 text-[#22c55e]" },
-  jobcard: { icon: Wrench, label: "Job Card", color: "bg-[#0B1F3B]/10 text-[#0B1F3B] dark:text-[#E6EAF0]" },
+  jobcard: { icon: Wrench, label: "Job Card", color: "bg-[#0A5ED7]/15 text-[#0A5ED7] dark:text-[#0BB3FF]" },
   appointment: { icon: Calendar, label: "Appointment", color: "bg-[#64748B]/10 text-[#64748B] dark:text-[#9BA4B0]" },
 };
 
