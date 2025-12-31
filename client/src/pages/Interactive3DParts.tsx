@@ -356,14 +356,14 @@ export default function Interactive3DParts() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0E1117] p-4 md:p-6">
+    <div className="min-h-screen bg-[#E6E9ED] dark:bg-[#0E1117] p-4 md:p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] bg-clip-text text-transparent font-poppins">
+            <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] bg-clip-text text-transparent" style={{ fontFamily: 'Inter, sans-serif', letterSpacing: '-0.03em' }}>
               {t("interactive3d.title", "Interactive 3D Parts Viewer")}
             </h1>
-            <p className="text-[#64748B] dark:text-[#9BA4B0] mt-1">
+            <p className="text-[#6B7280] dark:text-[#9BA4B0] mt-1" style={{ fontFamily: 'Inter, sans-serif' }}>
               {t("interactive3d.subtitle", "Explore, identify, and order vehicle parts with interactive 3D models")}
             </p>
           </div>
@@ -372,7 +372,7 @@ export default function Interactive3DParts() {
               variant="outline"
               size="sm"
               onClick={() => setViewMode(viewMode === "grid" ? "list" : "grid")}
-              className="border-[#E2E8F0] dark:border-[#232A36]"
+              className="border-[#C9D1DA] dark:border-[#232A36]"
               data-testid="button-toggle-view"
             >
               <Grid3X3 className="h-4 w-4" />
@@ -382,30 +382,30 @@ export default function Interactive3DParts() {
 
         <div className="flex flex-col lg:flex-row gap-6">
           <div className="lg:w-1/3 space-y-4">
-            <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+            <Card className="bg-white dark:bg-[#151A23] border-[#C9D1DA] dark:border-[#232A36]">
               <CardHeader className="pb-3">
-                <CardTitle className="text-lg text-[#0F172A] dark:text-[#E6EAF0]">
+                <CardTitle className="text-lg text-[#2A2F3A] dark:text-[#E6EAF0]">
                   {t("interactive3d.partsCatalog", "Parts Catalog")}
                 </CardTitle>
-                <CardDescription className="text-[#64748B] dark:text-[#9BA4B0]">
+                <CardDescription className="text-[#6B7280] dark:text-[#9BA4B0]">
                   {t("interactive3d.selectPart", "Select a part to view in 3D")}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#64748B]" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#6B7280]" />
                   <Input
                     placeholder={t("interactive3d.searchParts", "Search parts...")}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-10 bg-[#F8FAFC] dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
+                    className="pl-10 bg-[#E6E9ED] dark:bg-[#0E1117] border-[#C9D1DA] dark:border-[#232A36]"
                     data-testid="input-search-parts"
                   />
                 </div>
                 
                 <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                  <SelectTrigger className="bg-[#F8FAFC] dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-category">
-                    <Filter className="h-4 w-4 mr-2 text-[#64748B]" />
+                  <SelectTrigger className="bg-[#E6E9ED] dark:bg-[#0E1117] border-[#C9D1DA] dark:border-[#232A36]" data-testid="select-category">
+                    <Filter className="h-4 w-4 mr-2 text-[#6B7280]" />
                     <SelectValue placeholder="All Categories" />
                   </SelectTrigger>
                   <SelectContent>
@@ -424,7 +424,7 @@ export default function Interactive3DParts() {
                       <Skeleton key={i} className="h-20 w-full" />
                     ))
                   ) : filteredParts.length === 0 ? (
-                    <div className="text-center py-8 text-[#64748B] dark:text-[#9BA4B0]">
+                    <div className="text-center py-8 text-[#6B7280] dark:text-[#9BA4B0]">
                       <Package className="h-12 w-12 mx-auto mb-2 opacity-50" />
                       <p>{t("interactive3d.noPartsFound", "No parts found")}</p>
                     </div>
@@ -441,7 +441,7 @@ export default function Interactive3DParts() {
                           className={`w-full p-3 rounded-lg border transition-all text-left ${
                             selectedPart?.id === part.id
                               ? "border-[#0A5ED7] bg-gradient-to-r from-[#0A5ED7]/10 to-[#0BB3FF]/10"
-                              : "border-[#E2E8F0] dark:border-[#232A36] hover:border-[#0A5ED7]/50 hover:bg-[#F8FAFC] dark:hover:bg-[#1A1F2A]"
+                              : "border-[#C9D1DA] dark:border-[#232A36] hover:border-[#0A5ED7]/50 hover:bg-[#E6E9ED] dark:hover:bg-[#1A1F2A]"
                           }`}
                           data-testid={`button-part-${part.id}`}
                         >
@@ -449,7 +449,7 @@ export default function Interactive3DParts() {
                             <div className={`p-2 rounded-lg ${
                               selectedPart?.id === part.id
                                 ? "bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF]"
-                                : "bg-[#F1F5F9] dark:bg-[#232A36]"
+                                : "bg-[#E6E9ED] dark:bg-[#232A36]"
                             }`}>
                               <CategoryIcon className={`h-5 w-5 ${
                                 selectedPart?.id === part.id
@@ -458,17 +458,17 @@ export default function Interactive3DParts() {
                               }`} />
                             </div>
                             <div className="flex-1 min-w-0">
-                              <h4 className="font-medium text-sm text-[#0F172A] dark:text-[#E6EAF0] truncate">
+                              <h4 className="font-medium text-sm text-[#2A2F3A] dark:text-[#E6EAF0] truncate">
                                 {part.partName}
                               </h4>
-                              <p className="text-xs text-[#64748B] dark:text-[#9BA4B0]">
+                              <p className="text-xs text-[#6B7280] dark:text-[#9BA4B0]">
                                 {part.partNumber}
                               </p>
                               <div className="flex items-center gap-2 mt-1">
-                                <Badge variant="secondary" className="text-xs bg-[#F1F5F9] dark:bg-[#232A36] text-[#0A5ED7] dark:text-[#0BB3FF]">
+                                <Badge variant="secondary" className="text-xs bg-[#E6E9ED] dark:bg-[#232A36] text-[#0A5ED7] dark:text-[#0BB3FF]">
                                   {part.category}
                                 </Badge>
-                                <span className="text-xs text-[#94A3B8]">
+                                <span className="text-xs text-[#9BA4B0]">
                                   {part.manufacturer}
                                 </span>
                               </div>
@@ -484,16 +484,16 @@ export default function Interactive3DParts() {
           </div>
 
           <div className="lg:w-2/3 space-y-4">
-            <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+            <Card className="bg-white dark:bg-[#151A23] border-[#C9D1DA] dark:border-[#232A36]">
               <CardHeader className="pb-2 flex flex-row items-center justify-between">
                 <div>
-                  <CardTitle className="text-lg text-[#0F172A] dark:text-[#E6EAF0]">
+                  <CardTitle className="text-lg text-[#2A2F3A] dark:text-[#E6EAF0]">
                     {selectedPart
                       ? selectedPart.partName
                       : t("interactive3d.viewer", "3D Viewer")}
                   </CardTitle>
                   {selectedPart && (
-                    <CardDescription className="text-[#64748B] dark:text-[#9BA4B0]">
+                    <CardDescription className="text-[#6B7280] dark:text-[#9BA4B0]">
                       {selectedPart.partNumber} • {selectedPart.manufacturer}
                     </CardDescription>
                   )}
@@ -515,7 +515,7 @@ export default function Interactive3DParts() {
               <CardContent className="p-0">
                 <div
                   ref={viewerRef}
-                  className="relative h-[400px] bg-gradient-to-br from-[#F8FAFC] to-[#E2E8F0] dark:from-[#0E1117] dark:to-[#151A23] rounded-b-lg overflow-hidden cursor-grab active:cursor-grabbing"
+                  className="relative h-[400px] bg-gradient-to-br from-[#E6E9ED] to-[#C9D1DA] dark:from-[#0E1117] dark:to-[#151A23] rounded-b-lg overflow-hidden cursor-grab active:cursor-grabbing"
                   onMouseDown={handleMouseDown}
                   onMouseMove={handleMouseMove}
                   onMouseUp={handleMouseUp}
@@ -600,7 +600,7 @@ export default function Interactive3DParts() {
                       </div>
                     </div>
                   ) : (
-                    <div className="absolute inset-0 flex flex-col items-center justify-center text-[#64748B] dark:text-[#9BA4B0]">
+                    <div className="absolute inset-0 flex flex-col items-center justify-center text-[#6B7280] dark:text-[#9BA4B0]">
                       <Box className="h-16 w-16 mb-4 opacity-50" />
                       <p className="text-lg font-medium">
                         {t("interactive3d.selectPartPrompt", "Select a part to view in 3D")}
@@ -613,7 +613,7 @@ export default function Interactive3DParts() {
 
                   {selectedPart && (
                     <>
-                      <div className="absolute bottom-4 left-4 flex items-center gap-2 bg-white/80 dark:bg-[#151A23]/80 backdrop-blur-sm rounded-lg p-1 border border-[#E2E8F0] dark:border-[#232A36]">
+                      <div className="absolute bottom-4 left-4 flex items-center gap-2 bg-white/80 dark:bg-[#151A23]/80 backdrop-blur-sm rounded-lg p-1 border border-[#C9D1DA] dark:border-[#232A36]">
                         <Button
                           variant="ghost"
                           size="sm"
@@ -632,7 +632,7 @@ export default function Interactive3DParts() {
                         >
                           <Hand className="h-4 w-4" />
                         </Button>
-                        <div className="w-px h-6 bg-[#E2E8F0] dark:bg-[#232A36]" />
+                        <div className="w-px h-6 bg-[#C9D1DA] dark:bg-[#232A36]" />
                         <Button
                           variant="ghost"
                           size="sm"
@@ -649,7 +649,7 @@ export default function Interactive3DParts() {
                         >
                           <ZoomOut className="h-4 w-4" />
                         </Button>
-                        <div className="w-px h-6 bg-[#E2E8F0] dark:bg-[#232A36]" />
+                        <div className="w-px h-6 bg-[#C9D1DA] dark:bg-[#232A36]" />
                         <Button
                           variant="ghost"
                           size="sm"
@@ -660,7 +660,7 @@ export default function Interactive3DParts() {
                         </Button>
                       </div>
 
-                      <div className="absolute bottom-4 right-4 flex items-center gap-2 bg-white/80 dark:bg-[#151A23]/80 backdrop-blur-sm rounded-lg p-1 border border-[#E2E8F0] dark:border-[#232A36]">
+                      <div className="absolute bottom-4 right-4 flex items-center gap-2 bg-white/80 dark:bg-[#151A23]/80 backdrop-blur-sm rounded-lg p-1 border border-[#C9D1DA] dark:border-[#232A36]">
                         <Button
                           variant="ghost"
                           size="sm"
@@ -692,8 +692,8 @@ export default function Interactive3DParts() {
                         )}
                       </div>
 
-                      <div className="absolute top-4 right-4 bg-white/80 dark:bg-[#151A23]/80 backdrop-blur-sm rounded-lg px-3 py-2 border border-[#E2E8F0] dark:border-[#232A36]">
-                        <div className="flex items-center gap-4 text-xs text-[#64748B] dark:text-[#9BA4B0]">
+                      <div className="absolute top-4 right-4 bg-white/80 dark:bg-[#151A23]/80 backdrop-blur-sm rounded-lg px-3 py-2 border border-[#C9D1DA] dark:border-[#232A36]">
+                        <div className="flex items-center gap-4 text-xs text-[#6B7280] dark:text-[#9BA4B0]">
                           <span>Zoom: {Math.round(zoom * 100)}%</span>
                           <span>X: {Math.round(rotation.x)}°</span>
                           <span>Y: {Math.round(rotation.y)}°</span>
@@ -706,15 +706,15 @@ export default function Interactive3DParts() {
             </Card>
 
             {selectedPart && (
-              <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+              <Card className="bg-white dark:bg-[#151A23] border-[#C9D1DA] dark:border-[#232A36]">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-lg text-[#0F172A] dark:text-[#E6EAF0]">
+                  <CardTitle className="text-lg text-[#2A2F3A] dark:text-[#E6EAF0]">
                     {t("interactive3d.partDetails", "Part Details")}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <Tabs defaultValue="specs" className="w-full">
-                    <TabsList className="grid w-full grid-cols-3 bg-[#F1F5F9] dark:bg-[#0E1117]">
+                    <TabsList className="grid w-full grid-cols-3 bg-[#E6E9ED] dark:bg-[#0E1117]">
                       <TabsTrigger value="specs" data-testid="tab-specs">
                         {t("interactive3d.specifications", "Specifications")}
                       </TabsTrigger>
@@ -727,27 +727,27 @@ export default function Interactive3DParts() {
                     </TabsList>
                     <TabsContent value="specs" className="mt-4">
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <div className="bg-[#F8FAFC] dark:bg-[#0E1117] p-3 rounded-lg">
-                          <p className="text-xs text-[#64748B] dark:text-[#9BA4B0]">Part Number</p>
-                          <p className="text-sm font-medium text-[#0F172A] dark:text-[#E6EAF0]">
+                        <div className="bg-[#E6E9ED] dark:bg-[#0E1117] p-3 rounded-lg">
+                          <p className="text-xs text-[#6B7280] dark:text-[#9BA4B0]">Part Number</p>
+                          <p className="text-sm font-medium text-[#2A2F3A] dark:text-[#E6EAF0]">
                             {selectedPart.partNumber || "N/A"}
                           </p>
                         </div>
-                        <div className="bg-[#F8FAFC] dark:bg-[#0E1117] p-3 rounded-lg">
-                          <p className="text-xs text-[#64748B] dark:text-[#9BA4B0]">Manufacturer</p>
-                          <p className="text-sm font-medium text-[#0F172A] dark:text-[#E6EAF0]">
+                        <div className="bg-[#E6E9ED] dark:bg-[#0E1117] p-3 rounded-lg">
+                          <p className="text-xs text-[#6B7280] dark:text-[#9BA4B0]">Manufacturer</p>
+                          <p className="text-sm font-medium text-[#2A2F3A] dark:text-[#E6EAF0]">
                             {selectedPart.manufacturer || "N/A"}
                           </p>
                         </div>
-                        <div className="bg-[#F8FAFC] dark:bg-[#0E1117] p-3 rounded-lg">
-                          <p className="text-xs text-[#64748B] dark:text-[#9BA4B0]">Category</p>
-                          <p className="text-sm font-medium text-[#0F172A] dark:text-[#E6EAF0] capitalize">
+                        <div className="bg-[#E6E9ED] dark:bg-[#0E1117] p-3 rounded-lg">
+                          <p className="text-xs text-[#6B7280] dark:text-[#9BA4B0]">Category</p>
+                          <p className="text-sm font-medium text-[#2A2F3A] dark:text-[#E6EAF0] capitalize">
                             {selectedPart.category || "N/A"}
                           </p>
                         </div>
-                        <div className="bg-[#F8FAFC] dark:bg-[#0E1117] p-3 rounded-lg">
-                          <p className="text-xs text-[#64748B] dark:text-[#9BA4B0]">Polygon Count</p>
-                          <p className="text-sm font-medium text-[#0F172A] dark:text-[#E6EAF0]">
+                        <div className="bg-[#E6E9ED] dark:bg-[#0E1117] p-3 rounded-lg">
+                          <p className="text-xs text-[#6B7280] dark:text-[#9BA4B0]">Polygon Count</p>
+                          <p className="text-sm font-medium text-[#2A2F3A] dark:text-[#E6EAF0]">
                             {selectedPart.polygonCount?.toLocaleString() || "N/A"}
                           </p>
                         </div>
@@ -755,43 +755,51 @@ export default function Interactive3DParts() {
                     </TabsContent>
                     <TabsContent value="compatibility" className="mt-4">
                       <div className="space-y-3">
-                        {selectedPart.compatibility?.makes && (
+                        {selectedPart.compatibility?.brands && (
                           <div className="flex flex-wrap gap-2">
-                            <span className="text-sm text-[#64748B] dark:text-[#9BA4B0]">Makes:</span>
-                            {selectedPart.compatibility.makes.map((make: string) => (
-                              <Badge key={make} variant="secondary" className="bg-[#0A5ED7]/10 text-[#0A5ED7] dark:text-[#0BB3FF]">
-                                {make}
+                            <span className="text-sm text-[#6B7280] dark:text-[#9BA4B0]">Brands:</span>
+                            {selectedPart.compatibility.brands.map((brand: string) => (
+                              <Badge key={brand} variant="secondary" className="bg-[#0A5ED7]/10 text-[#0A5ED7] dark:text-[#0BB3FF]">
+                                {brand}
                               </Badge>
                             ))}
                           </div>
                         )}
-                        {selectedPart.compatibility?.years && (
+                        {selectedPart.compatibility?.classes && (
                           <div className="flex flex-wrap gap-2">
-                            <span className="text-sm text-[#64748B] dark:text-[#9BA4B0]">Years:</span>
-                            {selectedPart.compatibility.years.map((year: string) => (
-                              <Badge key={year} variant="outline" className="border-[#0A5ED7]/30">
-                                {year}
+                            <span className="text-sm text-[#6B7280] dark:text-[#9BA4B0]">Vehicle Classes:</span>
+                            {selectedPart.compatibility.classes.map((vehicleClass: string) => (
+                              <Badge key={vehicleClass} variant="outline" className="border-[#0A5ED7]/30 text-[#0A5ED7]">
+                                {vehicleClass}
                               </Badge>
                             ))}
+                          </div>
+                        )}
+                        {selectedPart.compatibility?.modelYears && (
+                          <div className="flex flex-wrap gap-2">
+                            <span className="text-sm text-[#6B7280] dark:text-[#9BA4B0]">Model Years:</span>
+                            <span className="text-sm text-[#2A2F3A] dark:text-[#E6EAF0]">
+                              {selectedPart.compatibility.modelYears[0]} - {selectedPart.compatibility.modelYears[selectedPart.compatibility.modelYears.length - 1]}
+                            </span>
                           </div>
                         )}
                       </div>
                     </TabsContent>
                     <TabsContent value="stats" className="mt-4">
                       <div className="grid grid-cols-2 gap-4">
-                        <div className="bg-[#F8FAFC] dark:bg-[#0E1117] p-4 rounded-lg text-center">
+                        <div className="bg-[#E6E9ED] dark:bg-[#0E1117] p-4 rounded-lg text-center">
                           <Eye className="h-6 w-6 mx-auto mb-2 text-[#0A5ED7] dark:text-[#0BB3FF]" />
-                          <p className="text-2xl font-bold text-[#0F172A] dark:text-[#E6EAF0]">
+                          <p className="text-2xl font-bold text-[#2A2F3A] dark:text-[#E6EAF0]">
                             {selectedPart.viewCount?.toLocaleString() || 0}
                           </p>
-                          <p className="text-xs text-[#64748B] dark:text-[#9BA4B0]">Total Views</p>
+                          <p className="text-xs text-[#6B7280] dark:text-[#9BA4B0]">Total Views</p>
                         </div>
-                        <div className="bg-[#F8FAFC] dark:bg-[#0E1117] p-4 rounded-lg text-center">
+                        <div className="bg-[#E6E9ED] dark:bg-[#0E1117] p-4 rounded-lg text-center">
                           <Download className="h-6 w-6 mx-auto mb-2 text-[#0A5ED7] dark:text-[#0BB3FF]" />
-                          <p className="text-2xl font-bold text-[#0F172A] dark:text-[#E6EAF0]">
+                          <p className="text-2xl font-bold text-[#2A2F3A] dark:text-[#E6EAF0]">
                             {selectedPart.downloadCount?.toLocaleString() || 0}
                           </p>
-                          <p className="text-xs text-[#64748B] dark:text-[#9BA4B0]">Downloads</p>
+                          <p className="text-xs text-[#6B7280] dark:text-[#9BA4B0]">Downloads</p>
                         </div>
                       </div>
                     </TabsContent>
