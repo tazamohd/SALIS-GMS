@@ -240,7 +240,7 @@ export function Layout({ children }: LayoutProps) {
   return (
     <>
       <SkipLink />
-      <div className="flex h-screen bg-white dark:bg-salis-black">
+      <div className="flex h-screen bg-[#F8FAFC] dark:bg-[#0E1117]">
         {/* Mobile Menu Overlay */}
         {mobileMenuOpen && (
           <div
@@ -253,11 +253,11 @@ export function Layout({ children }: LayoutProps) {
           />
         )}
 
-        {/* Sidebar - Resizable Design */}
+        {/* Sidebar - Brand Design System */}
         <aside
           className={`
         fixed lg:static inset-y-0 left-0 z-50 relative
-        bg-white dark:bg-salis-black border-r border-gray-200 dark:border-salis-gray-dark flex flex-col
+        bg-white dark:bg-[#0B1F3B] border-r border-[#E2E8F0] dark:border-[#232A36] flex flex-col
         transition-transform duration-300 ease-in-out
         w-[280px] max-w-[85vw] lg:max-w-none
         ${mobileMenuOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
@@ -274,12 +274,12 @@ export function Layout({ children }: LayoutProps) {
           `}</style>
           {/* Resize Handle */}
           <div
-            className="absolute right-0 top-0 bottom-0 w-1 cursor-col-resize hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors z-10 hidden lg:block"
+            className="absolute right-0 top-0 bottom-0 w-1 cursor-col-resize hover:bg-[#0A5ED7] dark:hover:bg-[#0BB3FF] transition-colors z-10 hidden lg:block"
             onMouseDown={() => setIsResizing(true)}
             data-testid="sidebar-resize-handle"
           >
-            <div className="absolute right-0 top-1/2 -translate-y-1/2 -translate-x-1/2 p-1 rounded bg-gray-200 dark:bg-gray-700 opacity-0 hover:opacity-100 transition-opacity">
-              <GripVertical className="w-3 h-3 text-gray-500" />
+            <div className="absolute right-0 top-1/2 -translate-y-1/2 -translate-x-1/2 p-1 rounded bg-[#E2E8F0] dark:bg-[#232A36] opacity-0 hover:opacity-100 transition-opacity">
+              <GripVertical className="w-3 h-3 text-[#64748B] dark:text-[#9BA4B0]" />
             </div>
           </div>
           {/* Navigation - Compact */}
@@ -302,15 +302,15 @@ export function Layout({ children }: LayoutProps) {
                       className="w-full"
                       data-testid={`nav-group-${groupLabel.toLowerCase().replace(/\s+/g, "-")}`}
                     >
-                      <div className="flex items-center justify-start gap-2 pl-2 pr-2 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-salis-gray-dark transition-colors group">
-                        <span className="font-poppins font-bold text-[11px] uppercase text-gray-700 dark:text-gray-300 tracking-wide leading-tight text-left whitespace-nowrap">
+                      <div className="flex items-center justify-start gap-2 pl-2 pr-2 py-2 rounded-md hover:bg-[#0A5ED7]/10 dark:hover:bg-[#0BB3FF]/10 transition-colors group">
+                        <span className="font-poppins font-bold text-[11px] uppercase text-[#64748B] dark:text-[#9BA4B0] tracking-wide leading-tight text-left whitespace-nowrap">
                           {groupLabel}
                         </span>
                         <div className="flex-1" />
                         {isExpanded ? (
-                          <ChevronDown className="w-3 h-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-300" />
+                          <ChevronDown className="w-3 h-3 text-[#64748B] dark:text-[#9BA4B0] group-hover:text-[#0A5ED7] dark:group-hover:text-[#0BB3FF]" />
                         ) : (
-                          <ChevronRight className="w-3 h-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-300" />
+                          <ChevronRight className="w-3 h-3 text-[#64748B] dark:text-[#9BA4B0] group-hover:text-[#0A5ED7] dark:group-hover:text-[#0BB3FF]" />
                         )}
                       </div>
                     </CollapsibleTrigger>
@@ -326,8 +326,8 @@ export function Layout({ children }: LayoutProps) {
                               onClick={() => setMobileMenuOpen(false)}
                               className={`flex items-center gap-2 pl-6 pr-3 py-1.5 rounded-md transition-all duration-200 cursor-pointer ${
                                 isActive
-                                  ? "bg-salis-black dark:bg-white text-white dark:text-salis-black shadow-md"
-                                  : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-salis-gray-dark hover:text-salis-black dark:hover:text-white"
+                                  ? "bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white shadow-md"
+                                  : "text-[#0F172A] dark:text-[#E6EAF0] hover:bg-[#0A5ED7]/10 dark:hover:bg-[#0BB3FF]/10 hover:text-[#0A5ED7] dark:hover:text-[#0BB3FF]"
                               }`}
                               data-testid={`nav-item-${item.label.toLowerCase().replace(/\s+/g, "-")}`}
                             >
@@ -346,13 +346,13 @@ export function Layout({ children }: LayoutProps) {
             </div>
           </nav>
 
-          {/* Logout - Compact */}
-          <div className="p-3 border-t border-gray-200 dark:border-salis-gray-dark">
+          {/* Logout */}
+          <div className="p-3 border-t border-[#E2E8F0] dark:border-[#232A36]">
             <Button
               onClick={handleLogout}
               variant="ghost"
               size="sm"
-              className="w-full justify-start text-gray-700 dark:text-gray-300 hover:text-salis-black dark:hover:text-white hover:bg-gray-100 dark:hover:bg-salis-gray-dark h-8"
+              className="w-full justify-start text-[#F97316] hover:text-white hover:bg-[#F97316] dark:hover:bg-[#F97316] h-8 transition-colors"
               data-testid="button-logout"
             >
               <LogOut className="w-4 h-4 mr-2" />
@@ -365,13 +365,13 @@ export function Layout({ children }: LayoutProps) {
 
         {/* Main Content */}
         <div className="flex-1 flex flex-col lg:ml-0">
-          {/* Header - Monochrome */}
-          <header className="h-14 bg-white dark:bg-salis-black border-b border-gray-200 dark:border-salis-gray-dark px-4 sm:px-6 flex items-center gap-3 shadow-sm">
+          {/* Header - Brand Design */}
+          <header className="h-14 bg-white dark:bg-[#0B1F3B] border-b border-[#E2E8F0] dark:border-[#232A36] px-4 sm:px-6 flex items-center gap-3 shadow-sm">
             {/* Mobile Menu Toggle */}
             <Button
               variant="ghost"
               size="icon"
-              className="lg:hidden text-gray-700 dark:text-gray-300 hover:text-salis-black dark:hover:text-white h-8 w-8"
+              className="lg:hidden text-[#0F172A] dark:text-[#E6EAF0] hover:text-[#0A5ED7] dark:hover:text-[#0BB3FF] h-8 w-8"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               aria-label="Toggle mobile menu"
               data-testid="button-mobile-menu"
@@ -385,13 +385,13 @@ export function Layout({ children }: LayoutProps) {
 
             <div className="flex-1" />
 
-            {/* Search Bar - Compact */}
+            {/* Search Bar */}
             <div className="hidden md:block relative w-full max-w-md">
-              <Search className="absolute left-2.5 top-1/2 transform -translate-y-1/2 w-3.5 h-3.5 text-gray-400 dark:text-gray-500" />
+              <Search className="absolute left-2.5 top-1/2 transform -translate-y-1/2 w-3.5 h-3.5 text-[#64748B] dark:text-[#9BA4B0]" />
               <Input
                 type="text"
                 placeholder={t("common.search")}
-                className="pl-9 h-9 bg-gray-50 dark:bg-salis-gray-dark border-gray-200 dark:border-salis-gray text-gray-900 dark:text-white text-sm placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-salis-black dark:focus:border-white focus:ring-salis-black dark:focus:ring-white font-poppins"
+                className="pl-9 h-9 bg-[#F8FAFC] dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0F172A] dark:text-[#E6EAF0] text-sm placeholder:text-[#64748B] dark:placeholder:text-[#9BA4B0] focus:border-[#0A5ED7] dark:focus:border-[#0BB3FF] focus:ring-[#0A5ED7] dark:focus:ring-[#0BB3FF] font-poppins"
                 data-testid="input-search"
               />
             </div>
@@ -399,12 +399,12 @@ export function Layout({ children }: LayoutProps) {
               variant="outline"
               size="sm"
               onClick={() => setQuickActionsOpen(true)}
-              className="gap-2 h-9 border-gray-300 dark:border-salis-gray text-gray-700 dark:text-gray-300 hover:bg-salis-black dark:hover:bg-white hover:text-white dark:hover:text-salis-black transition-colors font-poppins"
+              className="gap-2 h-9 border-[#E2E8F0] dark:border-[#232A36] text-[#0F172A] dark:text-[#E6EAF0] hover:bg-gradient-to-r hover:from-[#0A5ED7] hover:to-[#0BB3FF] hover:text-white hover:border-transparent transition-all font-poppins"
               data-testid="button-quick-actions"
             >
               <Zap className="w-3.5 h-3.5" />
               <span className="hidden sm:inline text-xs">{t("common.quick_actions", "Quick Actions")}</span>
-              <kbd className="hidden sm:inline-flex px-1 py-0.5 bg-gray-100 dark:bg-salis-gray-dark border border-gray-300 dark:border-salis-gray rounded text-[10px] font-mono text-gray-600 dark:text-gray-400">
+              <kbd className="hidden sm:inline-flex px-1 py-0.5 bg-[#F8FAFC] dark:bg-[#0E1117] border border-[#E2E8F0] dark:border-[#232A36] rounded text-[10px] font-mono text-[#64748B] dark:text-[#9BA4B0]">
                 {navigator.platform.includes("Mac") ? "⌘K" : "Ctrl+K"}
               </kbd>
             </Button>
