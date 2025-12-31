@@ -48,11 +48,11 @@ export function FilterBar({
 
   return (
     <div className={cn("", className)} data-testid="filter-bar">
-      <div className="flex flex-col sm:flex-row gap-3 p-4 bg-white dark:bg-gray-800 border border-blue-200 dark:border-blue-800/50 rounded-2xl shadow-sm">
+      <div className="flex flex-col sm:flex-row gap-3 p-4 bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36] rounded-2xl shadow-sm">
         {onSearchChange && (
           <div className="relative flex-1 min-w-[200px]">
             <Search
-              className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-blue-600 dark:text-cyan-400"
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#0A5ED7] dark:text-[#0BB3FF]"
               aria-hidden="true"
             />
             <Input
@@ -60,7 +60,7 @@ export function FilterBar({
               placeholder={searchPlaceholder}
               value={searchValue}
               onChange={(e) => onSearchChange(e.target.value)}
-              className="pl-9 bg-white dark:bg-gray-900 border-blue-200 dark:border-blue-700 focus:ring-blue-500 focus:border-blue-500"
+              className="pl-9 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] focus:ring-[#0A5ED7] focus:border-[#0A5ED7]"
               data-testid="filter-search-input"
               aria-label="Search"
             />
@@ -74,7 +74,7 @@ export function FilterBar({
             onValueChange={filter.onChange}
           >
             <SelectTrigger
-              className="w-full sm:w-[180px] bg-white dark:bg-gray-900 border-blue-200 dark:border-blue-700 focus:ring-blue-500"
+              className="w-full sm:w-[180px] bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] focus:ring-[#0A5ED7]"
               data-testid={`filter-${filter.id}`}
               aria-label={filter.label}
             >
@@ -98,7 +98,7 @@ export function FilterBar({
           <Button
             variant="outline"
             onClick={onClearFilters}
-            className="bg-white dark:bg-gray-900 border-blue-300 dark:border-blue-700 hover:bg-blue-50 dark:hover:bg-blue-900/30 text-blue-700 dark:text-cyan-300 whitespace-nowrap focus-visible:ring-blue-500"
+            className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] hover:bg-[#0A5ED7]/5 dark:hover:bg-[#0BB3FF]/10 text-[#0A5ED7] dark:text-[#0BB3FF] whitespace-nowrap focus-visible:ring-[#0A5ED7]"
             data-testid="filter-clear-button"
           >
             <X className="mr-2 h-4 w-4" />

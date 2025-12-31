@@ -25,34 +25,34 @@ interface DashboardPageProps {
 
 const colorSchemes: Record<string, { gradient: string; bg: string; border: string; text: string }> = {
   blue: {
-    gradient: 'from-blue-500 to-blue-600',
-    bg: 'bg-blue-100 dark:bg-blue-900/50',
-    border: 'border-blue-200 dark:border-blue-800',
-    text: 'text-blue-700 dark:text-blue-400'
+    gradient: 'from-[#0A5ED7] to-[#0BB3FF]',
+    bg: 'bg-[#0A5ED7]/10 dark:bg-[#0A5ED7]/20',
+    border: 'border-[#0A5ED7]/20 dark:border-[#0BB3FF]/30',
+    text: 'text-[#0A5ED7] dark:text-[#0BB3FF]'
   },
   cyan: {
-    gradient: 'from-cyan-500 to-cyan-600',
-    bg: 'bg-cyan-100 dark:bg-cyan-900/50',
-    border: 'border-cyan-200 dark:border-cyan-800',
-    text: 'text-cyan-700 dark:text-cyan-400'
+    gradient: 'from-[#0BB3FF] to-[#06B6D4]',
+    bg: 'bg-[#0BB3FF]/10 dark:bg-[#0BB3FF]/20',
+    border: 'border-[#0BB3FF]/20 dark:border-[#0BB3FF]/30',
+    text: 'text-[#0BB3FF] dark:text-[#0BB3FF]'
   },
-  sky: {
-    gradient: 'from-sky-500 to-sky-600',
-    bg: 'bg-sky-100 dark:bg-sky-900/50',
-    border: 'border-sky-200 dark:border-sky-800',
-    text: 'text-sky-700 dark:text-sky-400'
+  navy: {
+    gradient: 'from-[#0B1F3B] to-[#1e3a5f]',
+    bg: 'bg-[#0B1F3B]/10 dark:bg-[#0B1F3B]/30',
+    border: 'border-[#0B1F3B]/20 dark:border-[#1e3a5f]/30',
+    text: 'text-[#0B1F3B] dark:text-[#E6EAF0]'
   },
   orange: {
-    gradient: 'from-orange-500 to-orange-600',
-    bg: 'bg-orange-100 dark:bg-orange-900/50',
-    border: 'border-orange-200 dark:border-orange-800',
-    text: 'text-orange-700 dark:text-orange-400'
+    gradient: 'from-[#F97316] to-[#FB923C]',
+    bg: 'bg-[#F97316]/10 dark:bg-[#F97316]/20',
+    border: 'border-[#F97316]/20 dark:border-[#F97316]/30',
+    text: 'text-[#F97316] dark:text-[#FB923C]'
   },
   slate: {
-    gradient: 'from-slate-500 to-slate-600',
-    bg: 'bg-slate-100 dark:bg-slate-900/50',
-    border: 'border-slate-200 dark:border-slate-800',
-    text: 'text-slate-700 dark:text-slate-400'
+    gradient: 'from-[#64748B] to-[#94A3B8]',
+    bg: 'bg-[#64748B]/10 dark:bg-[#64748B]/20',
+    border: 'border-[#64748B]/20 dark:border-[#64748B]/30',
+    text: 'text-[#64748B] dark:text-[#9BA4B0]'
   },
 };
 
@@ -85,8 +85,7 @@ export function DashboardPage({
               data-testid={`metric-card-${idx}`}
             >
               <div className={cn(
-                "h-full bg-white dark:bg-gray-800 rounded-2xl p-6 border shadow-sm hover:shadow-md transition-shadow duration-200",
-                scheme.border
+                "h-full bg-white dark:bg-[#151A23] rounded-2xl p-6 border border-[#E2E8F0] dark:border-[#232A36] shadow-sm hover:shadow-lg hover:border-[#0A5ED7]/30 dark:hover:border-[#0BB3FF]/30 transition-all duration-200",
               )}>
                 <div className="flex items-start justify-between">
                   <div className="space-y-3">

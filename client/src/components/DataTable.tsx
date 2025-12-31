@@ -104,18 +104,18 @@ export function DataTable<T extends Record<string, any>>({
   return (
     <div className={cn("space-y-4", className)}>
       {/* Table Container */}
-      <div className="bg-white dark:bg-gray-800 rounded-2xl border border-blue-200 dark:border-blue-800/50 shadow-sm overflow-hidden">
+      <div className="bg-white dark:bg-[#151A23] rounded-2xl border border-[#E2E8F0] dark:border-[#232A36] shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <Table className={cn(stickyHeader && "table-sticky-header")}>
             <TableHeader>
-              <TableRow className="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
+              <TableRow className="border-b border-[#E2E8F0] dark:border-[#232A36] bg-[#F8FAFC] dark:bg-[#0E1117]">
                   {columns.map((column) => (
                     <TableHead
                       key={column.key}
                       className={cn(
-                        "text-gray-700 dark:text-gray-300 text-xs font-semibold uppercase tracking-wider py-4 px-6",
+                        "text-[#64748B] dark:text-[#9BA4B0] text-xs font-semibold uppercase tracking-wider py-4 px-6",
                         column.className,
-                        column.sortable && "cursor-pointer hover:text-blue-600 dark:hover:text-cyan-400"
+                        column.sortable && "cursor-pointer hover:text-[#0A5ED7] dark:hover:text-[#0BB3FF]"
                       )}
                       onClick={() => column.sortable && handleSort(column.key)}
                       data-testid={`table-header-${column.key}`}
@@ -123,7 +123,7 @@ export function DataTable<T extends Record<string, any>>({
                       <div className="flex items-center gap-2">
                         {column.label}
                         {column.sortable && sortKey === column.key && (
-                          <span className="text-blue-600 dark:text-cyan-400" aria-label={`Sorted ${sortOrder}ending`}>
+                          <span className="text-[#0A5ED7] dark:text-[#0BB3FF]" aria-label={`Sorted ${sortOrder}ending`}>
                             {sortOrder === "asc" ? "↑" : "↓"}
                           </span>
                         )}
@@ -137,7 +137,7 @@ export function DataTable<T extends Record<string, any>>({
                   <TableRow
                     key={rowIndex}
                     className={cn(
-                      "border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors",
+                      "border-b border-[#E2E8F0] dark:border-[#232A36] hover:bg-[#0A5ED7]/5 dark:hover:bg-[#0BB3FF]/5 transition-colors",
                       onRowClick && "cursor-pointer"
                     )}
                     onClick={() => onRowClick?.(item)}
@@ -153,7 +153,7 @@ export function DataTable<T extends Record<string, any>>({
                     {columns.map((column) => (
                       <TableCell
                         key={column.key}
-                        className={cn("py-4 px-6 text-gray-900 dark:text-gray-100", column.className)}
+                        className={cn("py-4 px-6 text-[#0F172A] dark:text-[#E6EAF0]", column.className)}
                         data-testid={`table-cell-${rowIndex}-${column.key}`}
                       >
                         {column.render
@@ -169,13 +169,13 @@ export function DataTable<T extends Record<string, any>>({
 
         {/* Pagination */}
         {pagination && pagination.totalPages > 1 && (
-          <div className="p-4 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
+          <div className="p-4 border-t border-[#E2E8F0] dark:border-[#232A36] flex items-center justify-between">
             <Button
               variant="outline"
               size="sm"
               onClick={() => pagination.onPageChange(pagination.currentPage - 1)}
               disabled={pagination.currentPage === 1}
-              className="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-white border-gray-300 dark:border-gray-600 disabled:opacity-30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+              className="bg-white dark:bg-[#151A23] hover:bg-[#0A5ED7]/5 dark:hover:bg-[#0BB3FF]/10 text-[#0F172A] dark:text-[#E6EAF0] border-[#E2E8F0] dark:border-[#232A36] disabled:opacity-30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0A5ED7] focus-visible:ring-offset-2"
               data-testid="pagination-previous"
             >
               <ChevronLeft className="w-4 h-4 mr-1" />
@@ -191,10 +191,10 @@ export function DataTable<T extends Record<string, any>>({
                     size="sm"
                     onClick={() => pagination.onPageChange(page)}
                     className={cn(
-                      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2",
+                      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0A5ED7] focus-visible:ring-offset-2",
                       page === pagination.currentPage
-                        ? "bg-gradient-to-r from-blue-600 to-cyan-600 text-white border-0"
-                        : "bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-white border-gray-300 dark:border-gray-600"
+                        ? "bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white border-0"
+                        : "bg-white dark:bg-[#151A23] hover:bg-[#0A5ED7]/5 dark:hover:bg-[#0BB3FF]/10 text-[#0F172A] dark:text-[#E6EAF0] border-[#E2E8F0] dark:border-[#232A36]"
                     )}
                     variant={page === pagination.currentPage ? "default" : "outline"}
                     data-testid={`pagination-page-${page}`}
@@ -210,7 +210,7 @@ export function DataTable<T extends Record<string, any>>({
               size="sm"
               onClick={() => pagination.onPageChange(pagination.currentPage + 1)}
               disabled={pagination.currentPage === pagination.totalPages}
-              className="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-white border-gray-300 dark:border-gray-600 disabled:opacity-30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+              className="bg-white dark:bg-[#151A23] hover:bg-[#0A5ED7]/5 dark:hover:bg-[#0BB3FF]/10 text-[#0F172A] dark:text-[#E6EAF0] border-[#E2E8F0] dark:border-[#232A36] disabled:opacity-30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0A5ED7] focus-visible:ring-offset-2"
               data-testid="pagination-next"
             >
               Next

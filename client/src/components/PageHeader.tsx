@@ -32,15 +32,15 @@ export function PageHeader({
         <div className="flex items-center gap-3">
           {Icon ? (
             <div className="relative">
-              <div className="absolute inset-0 bg-blue-600 rounded-xl blur-md opacity-30 dark:opacity-40 motion-safe:animate-pulse motion-safe:[animation-duration:4s]"></div>
-              <div className="relative p-3 rounded-xl bg-gradient-to-br from-blue-500 via-blue-600 to-cyan-500 shadow-lg">
+              <div className="absolute inset-0 bg-[#0A5ED7] rounded-xl blur-md opacity-20 dark:opacity-30"></div>
+              <div className="relative p-3 rounded-xl bg-gradient-to-br from-[#0A5ED7] to-[#0BB3FF] shadow-lg">
                 <Icon className="h-6 w-6 text-white" aria-hidden="true" />
               </div>
             </div>
           ) : (
             <div className="relative">
-              <div className="absolute inset-0 bg-blue-600 rounded-xl blur-md opacity-30 dark:opacity-40 motion-safe:animate-pulse motion-safe:[animation-duration:4s]"></div>
-              <div className="relative p-3 rounded-xl bg-gradient-to-br from-blue-500 via-blue-600 to-cyan-500 shadow-lg">
+              <div className="absolute inset-0 bg-[#0A5ED7] rounded-xl blur-md opacity-20 dark:opacity-30"></div>
+              <div className="relative p-3 rounded-xl bg-gradient-to-br from-[#0A5ED7] to-[#0BB3FF] shadow-lg">
                 <Sparkles className="h-6 w-6 text-white" aria-hidden="true" />
               </div>
             </div>
@@ -65,10 +65,10 @@ export function PageHeader({
                 onClick={action.onClick}
                 variant={action.variant || "default"}
                 className={cn(
-                  "btn-touch focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 shadow-md transition-all duration-200",
+                  "btn-touch focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0A5ED7] focus-visible:ring-offset-2 shadow-md transition-all duration-200",
                   action.variant === "outline" || action.variant === "secondary"
-                    ? "bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-900 dark:text-white"
-                    : "bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white"
+                    ? "bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36] hover:bg-gray-50 dark:hover:bg-[#1a2030] text-[#0F172A] dark:text-[#E6EAF0]"
+                    : "bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952C0] hover:to-[#0AA3EE] text-white"
                 )}
                 data-testid={`page-header-action-${index}`}
               >

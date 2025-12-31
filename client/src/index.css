@@ -12,7 +12,34 @@
 }
 
 :root {
-  /* SALIS AUTO Brand Colors - Monochrome Palette */
+  /* SALIS AUTO Brand Design System */
+  
+  /* Primary Brand Colors - Blue Gradient */
+  --salis-blue-start: #0A5ED7;
+  --salis-blue-end: #0BB3FF;
+  --salis-blue-gradient: linear-gradient(135deg, #0A5ED7 0%, #0BB3FF 100%);
+  
+  /* Deep Navy */
+  --salis-navy: #0B1F3B;
+  
+  /* Accent Orange - for decisions/warnings/CTAs */
+  --salis-orange: #F97316;
+  
+  /* Dark Mode Neutrals */
+  --salis-bg-dark: #0E1117;
+  --salis-surface-dark: #151A23;
+  --salis-border-dark: #232A36;
+  --salis-text-primary-dark: #E6EAF0;
+  --salis-text-muted-dark: #9BA4B0;
+  
+  /* Light Mode Neutrals */
+  --salis-bg-light: #F8FAFC;
+  --salis-surface-light: #FFFFFF;
+  --salis-border-light: #E2E8F0;
+  --salis-text-primary-light: #0F172A;
+  --salis-text-muted-light: #64748B;
+  
+  /* Legacy compatibility */
   --salis-black: #010101;
   --salis-white: #FFFFFF;
   --salis-gray: #6B7280;
@@ -212,69 +239,75 @@
 
 @layer base {
   :root {
-    /* SALIS AUTO shadcn Theme Colors - Light Mode (Monochrome) */
-    --background: 0 0% 100%;  /* White */
-    --foreground: 0 0% 0%;  /* Black */
+    /* SALIS AUTO Brand Theme - Light Mode */
+    --background: 210 40% 98%;  /* #F8FAFC */
+    --foreground: 222 47% 11%;  /* #0F172A */
 
-    --muted: 0 0% 96%;  /* Very light gray */
-    --muted-foreground: 0 0% 45%;  /* Medium gray */
+    --muted: 210 40% 96%;  /* Light slate */
+    --muted-foreground: 215 16% 47%;  /* #64748B */
 
-    --accent: 0 0% 96%;  /* Very light gray */
-    --accent-foreground: 0 0% 0%;  /* Black */
+    --accent: 210 40% 96%;  /* Light slate */
+    --accent-foreground: 222 47% 11%;  /* Dark slate */
 
     --popover: 0 0% 100%;  /* White */
-    --popover-foreground: 0 0% 0%;  /* Black */
+    --popover-foreground: 222 47% 11%;  /* Dark slate */
 
-    --border: 0 0% 90%;  /* Light gray border */
-    --input: 0 0% 90%;  /* Light gray */
+    --border: 214 32% 91%;  /* #E2E8F0 */
+    --input: 214 32% 91%;  /* Light border */
 
     --card: 0 0% 100%;  /* White */
-    --card-foreground: 0 0% 0%;  /* Black */
+    --card-foreground: 222 47% 11%;  /* Dark slate */
 
-    --primary: 0 0% 0%;  /* Black */
+    /* Primary Blue - Brand Color */
+    --primary: 214 90% 44%;  /* #0A5ED7 */
     --primary-foreground: 0 0% 100%;  /* White */
 
-    --secondary: 0 0% 50%;  /* 50% Black */
+    /* Secondary - Cyan Blue */
+    --secondary: 197 100% 52%;  /* #0BB3FF */
     --secondary-foreground: 0 0% 100%;  /* White */
 
-    --destructive: 0 84% 60%;  /* Red for errors */
+    /* Destructive/Warning Orange - Accent */
+    --destructive: 24 95% 53%;  /* #F97316 */
     --destructive-foreground: 0 0% 100%;  /* White */
 
-    --ring: 0 0% 50%;  /* 50% Black */
+    --ring: 214 90% 44%;  /* Blue ring */
 
     --radius: 0.5rem;
   }
 
   .dark {
-    /* SALIS AUTO shadcn Theme Colors - Dark Mode (Monochrome) */
-    --background: 0 0% 5%;  /* Near black */
-    --foreground: 0 0% 100%;  /* White */
+    /* SALIS AUTO Brand Theme - Dark Mode */
+    --background: 220 20% 5%;  /* #0E1117 */
+    --foreground: 220 20% 93%;  /* #E6EAF0 */
 
-    --muted: 0 0% 15%;  /* Dark gray */
-    --muted-foreground: 0 0% 65%;  /* Light gray */
+    --muted: 220 15% 13%;  /* #151A23 */
+    --muted-foreground: 217 14% 65%;  /* #9BA4B0 */
 
-    --accent: 0 0% 15%;  /* Dark gray */
-    --accent-foreground: 0 0% 100%;  /* White */
+    --accent: 220 15% 13%;  /* Surface card */
+    --accent-foreground: 220 20% 93%;  /* Light text */
 
-    --popover: 0 0% 5%;  /* Near black */
-    --popover-foreground: 0 0% 100%;  /* White */
+    --popover: 220 15% 13%;  /* #151A23 */
+    --popover-foreground: 220 20% 93%;  /* Light text */
 
-    --border: 0 0% 20%;  /* Dark gray border */
-    --input: 0 0% 20%;  /* Dark gray */
+    --border: 220 12% 18%;  /* #232A36 */
+    --input: 220 12% 18%;  /* Dark border */
 
-    --card: 0 0% 5%;  /* Near black */
-    --card-foreground: 0 0% 100%;  /* White */
+    --card: 220 15% 13%;  /* #151A23 */
+    --card-foreground: 220 20% 93%;  /* Light text */
 
-    --primary: 0 0% 100%;  /* White */
-    --primary-foreground: 0 0% 0%;  /* Black */
+    /* Primary Blue - Brand Color */
+    --primary: 197 100% 52%;  /* #0BB3FF - lighter blue for dark mode */
+    --primary-foreground: 220 20% 5%;  /* Dark bg */
 
-    --secondary: 0 0% 50%;  /* 50% Black/Gray */
+    /* Secondary - Gradient Blue Start */
+    --secondary: 214 90% 44%;  /* #0A5ED7 */
     --secondary-foreground: 0 0% 100%;  /* White */
 
-    --destructive: 0 63% 50%;  /* Red for errors */
+    /* Destructive/Warning Orange */
+    --destructive: 24 95% 53%;  /* #F97316 */
     --destructive-foreground: 0 0% 100%;  /* White */
 
-    --ring: 0 0% 50%;  /* 50% Black/Gray */
+    --ring: 197 100% 52%;  /* Cyan ring */
 
     --radius: 0.5rem;
   }
@@ -315,31 +348,94 @@
 }
 
 @layer components {
-  /* SALIS AUTO Gradient Text Utility (Grayscale gradient) */
+  /* SALIS AUTO Gradient Text Utility - Brand Blue */
   .text-gradient-salis {
-    background: linear-gradient(90deg, #000000 0%, #505050 50%, #808080 100%);
+    background: linear-gradient(135deg, #0A5ED7 0%, #0BB3FF 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
   }
   
-  /* SALIS AUTO Button Variants */
+  /* SALIS AUTO Primary Button - Gradient Blue */
   .btn-primary {
-    background-color: #010101;
+    background: linear-gradient(135deg, #0A5ED7 0%, #0BB3FF 100%);
     color: #FFFFFF;
+    border: none;
+    transition: all 0.2s ease;
   }
   
   .btn-primary:hover {
-    background-color: #1a1a1a;
+    background: linear-gradient(135deg, #0952C0 0%, #0AA3EE 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(10, 94, 215, 0.3);
   }
   
+  /* SALIS AUTO Secondary Button - Outline Blue */
   .btn-secondary {
-    background-color: #808080;
-    color: #FFFFFF;
+    background-color: transparent;
+    color: #0A5ED7;
+    border: 1.5px solid #0A5ED7;
   }
   
   .btn-secondary:hover {
-    background-color: #6a6a6a;
+    background-color: rgba(10, 94, 215, 0.1);
+  }
+  
+  /* SALIS AUTO Danger/Critical Button - Orange */
+  .btn-danger {
+    background-color: #F97316;
+    color: #FFFFFF;
+  }
+  
+  .btn-danger:hover {
+    background-color: #EA580C;
+  }
+  
+  /* Brand Card Styles */
+  .brand-card {
+    @apply rounded-xl border transition-all duration-200;
+    background-color: var(--salis-surface-light);
+    border-color: var(--salis-border-light);
+  }
+  
+  .dark .brand-card {
+    background-color: var(--salis-surface-dark);
+    border-color: var(--salis-border-dark);
+  }
+  
+  .brand-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(10, 94, 215, 0.1);
+  }
+  
+  /* Status Pills */
+  .status-pill {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+  
+  .status-pill-blue {
+    background-color: rgba(10, 94, 215, 0.1);
+    color: #0A5ED7;
+  }
+  
+  .dark .status-pill-blue {
+    background-color: rgba(11, 179, 255, 0.15);
+    color: #0BB3FF;
+  }
+  
+  .status-pill-orange {
+    background-color: rgba(249, 115, 22, 0.1);
+    color: #F97316;
+  }
+  
+  .status-pill-gray {
+    background-color: rgba(107, 114, 128, 0.1);
+    color: #6B7280;
+  }
+  
+  .dark .status-pill-gray {
+    background-color: rgba(155, 164, 176, 0.15);
+    color: #9BA4B0;
   }
   
   /* Enhanced Typography Utilities */

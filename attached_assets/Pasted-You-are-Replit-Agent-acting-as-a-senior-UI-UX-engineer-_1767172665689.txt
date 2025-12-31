@@ -1,0 +1,149 @@
+You are Replit Agent acting as a senior UI/UX engineer + design system owner.
+
+GOAL
+Redesign and refactor the entire SaaS web app UI/UX to match the provided brand system, and apply BOTH Dark Mode + Light Mode across ALL pages, sub-pages, and nested flows (forms, tables, modals, drawers, charts, empty states). No screen should remain unstyled or inconsistent.
+
+NON-STOP EXECUTION RULES
+- Do not ask me any questions.
+- If something is ambiguous, choose the best assumption and continue.
+- Work iteratively: implement system → refactor shared components → apply to every page route → verify coverage.
+- Do not leave TODO placeholders. If data is missing, use realistic mock data structures.
+- Keep UI consistent, scalable, and production-ready.
+
+DESIGN SYSTEM (MUST FOLLOW EXACTLY)
+1) Color System
+Primary:
+- Gradient Blue: #0A5ED7 → #0BB3FF (use for primary actions, highlights, key charts)
+- Deep Navy: #0B1F3B (dark mode depth / headers)
+
+Neutrals (Dark):
+- Background Dark: #0E1117
+- Surface Card: #151A23
+- Border: #232A36
+- Text Primary: #E6EAF0
+- Text Muted: #9BA4B0
+
+Accent:
+- Action Orange: #F97316 (use sparingly for decisions/warnings/critical CTAs only)
+
+Rules:
+- Blue = data
+- Orange = decisions / warnings / CTAs
+- Do NOT introduce random colors. Limit chart palettes to brand-safe shades.
+
+2) Typography
+- Primary: Inter (fallback SF Pro / IBM Plex Sans)
+- Numbers/Metrics: JetBrains Mono or Inter Mono
+Hierarchy:
+- H1 bold + tight tracking
+- H2–H4 medium
+- Body regular with high contrast
+- Labels uppercase, small, muted
+
+3) Layout System (Desktop)
+- Left vertical sidebar (icon-first, collapsible)
+- Top bar: search + notifications + user menu
+- Main content: modular cards
+- Optional right-side insight panel (collapsible) for team/activity/alerts
+
+4) Core Screens to Fully Implement
+A) Login / Onboarding
+- Dark background, centered logo with subtle gradient glow
+- Minimal form, one strong CTA
+
+B) Main Dashboard (Hero)
+- KPI cards (big numbers)
+- trends line charts
+- status blocks (use orange ONLY here when risky/blocked)
+- recent activity feed
+
+C) Analytics / Data Pages
+- full-width charts
+- daily/weekly/monthly toggle
+- filters slide from right (drawer)
+- export buttons (PDF/CSV)
+- chart motion: animate left → right
+
+D) Workflow / Automation Builder
+- step-based pipeline OR node-based
+- horizontal pipelines
+- progress follows an S-curve feel (visual flow)
+- each step is a card with status
+
+E) Tables & Management Screens
+- dense but readable
+- sticky headers
+- inline actions (hover only)
+- status pills (blue/orange/gray)
+
+F) Settings / Admin
+- split layout: left categories, right content
+- minimal color; only blue highlights
+- “control room” feel
+
+5) Components Library (Non-negotiable)
+- Buttons: primary (gradient), secondary (outline), danger/critical (orange)
+- Cards: subtle depth, no heavy shadows
+- Badges/pills: rounded, low contrast
+- Modals: centered, tight
+- Toasts: top-right, auto-dismiss
+- Empty states: icon + short sentence
+- Loading: thin linear progress (no spinners)
+
+6) Motion & Micro-Interactions
+- page transitions: slide + fade
+- hover: slight lift + border glow
+- charts animate on data change
+- keep motion subtle (enterprise SaaS)
+
+THEME REQUIREMENTS (CRITICAL)
+- Implement a robust theme system with two themes: DARK and LIGHT.
+- Use CSS variables (design tokens) so every component automatically adapts.
+- Provide a theme toggle in the top bar and persist preference (localStorage).
+- Light theme must be clean: off-white backgrounds, soft borders, same brand blues and orange usage rules.
+- Validate contrast/accessibility.
+
+IMPLEMENTATION REQUIREMENTS (TECH)
+- Use React + Tailwind + shadcn/ui where available.
+- Create a “design tokens” file (CSS variables) and a “components” layer.
+- Refactor duplicated UI into reusable components: Sidebar, Topbar, KPI Card, DataTable, ChartCard, Drawer, Modal, EmptyState.
+- Ensure responsive layouts: desktop-first, mobile-friendly (collapse sidebar, stack cards).
+
+SCOPE COVERAGE (MUST DO)
+1) Inventory all routes/pages:
+- Parse routing config and list every page + subpage + modal route if any.
+- Create a checklist file: /docs/ui-coverage-checklist.md
+  Include: route, page name, components used, status (done/pending), dark/light verified.
+
+2) Apply redesign to ALL pages:
+- Every page: consistent spacing, typography, cards, forms, tables, buttons.
+- Every form: validation states (error/success), disabled states, helper text.
+- Every table: sticky header, hover actions, sorting, status pills.
+- Every chart: brand palette and left-to-right animation.
+
+3) Replace any random colors/fonts with tokens.
+4) Ensure consistent icon style and spacing scale.
+
+DELIVERABLES (MUST OUTPUT)
+- ✅ Fully redesigned UI across all screens
+- ✅ Dark + Light theme implemented + toggle + persistence
+- ✅ /docs/ui-coverage-checklist.md filled and complete
+- ✅ /docs/design-system.md documenting tokens + components + usage rules
+- ✅ /docs/component-map.md mapping components to screens
+- ✅ Before/After screenshots (or at minimum a short visual verification note per major screen)
+- ✅ No broken layouts, no unstyled screens, no dead links
+
+INPUT FILES
+There is a docs.zip available in the workspace. Extract it and use it as a reference for:
+- pages list, modules, requirements, UI sections, and any existing design notes.
+If conflicts exist, prioritize this prompt’s design system and apply best judgement.
+
+EXECUTION PLAN (FOLLOW)
+1) Scan routes and generate page inventory + checklist
+2) Implement design tokens + theme toggle (dark/light)
+3) Build/refactor core layout components (Sidebar/Topbar/RightPanel)
+4) Build/refactor core UI components (KPI, table, chart cards, forms)
+5) Apply to screens in this order: Login → Dashboard → Tables → Analytics → Workflow Builder → Settings → Remaining pages
+6) Final pass: ensure every route is covered; dark/light verified; consistent visuals
+
+Start now. Do not stop until every route is covered.
