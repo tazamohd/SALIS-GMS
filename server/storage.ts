@@ -699,6 +699,15 @@ import {
   type InsertArSessionLog,
   type ArDevicePairing,
   type InsertArDevicePairing,
+  marketPricingData,
+  vehiclePricingFactors,
+  dynamicPricingSuggestions,
+  type MarketPricingData,
+  type InsertMarketPricingData,
+  type VehiclePricingFactor,
+  type InsertVehiclePricingFactor,
+  type DynamicPricingSuggestion,
+  type InsertDynamicPricingSuggestion,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, or, inArray, and, gte, lte, ilike, sql, isNull, gt } from "drizzle-orm";
@@ -1991,6 +2000,24 @@ export interface IStorage {
   createArDevicePairing(data: InsertArDevicePairing): Promise<ArDevicePairing>;
   updateArDevicePairing(id: string, data: Partial<ArDevicePairing>): Promise<ArDevicePairing>;
   deleteArDevicePairing(id: string): Promise<void>;
+
+  // Dynamic Pricing Module
+  getMarketPricingData(garageId?: string, filters?: { region?: string; serviceType?: string; vehicleClass?: string }): Promise<MarketPricingData[]>;
+  getMarketPricingDataItem(id: string): Promise<MarketPricingData | undefined>;
+  createMarketPricingData(data: InsertMarketPricingData): Promise<MarketPricingData>;
+  updateMarketPricingData(id: string, data: Partial<MarketPricingData>): Promise<MarketPricingData>;
+  deleteMarketPricingData(id: string): Promise<void>;
+  getVehiclePricingFactors(garageId?: string, vehicleMake?: string): Promise<VehiclePricingFactor[]>;
+  getVehiclePricingFactor(id: string): Promise<VehiclePricingFactor | undefined>;
+  createVehiclePricingFactor(data: InsertVehiclePricingFactor): Promise<VehiclePricingFactor>;
+  updateVehiclePricingFactor(id: string, data: Partial<VehiclePricingFactor>): Promise<VehiclePricingFactor>;
+  deleteVehiclePricingFactor(id: string): Promise<void>;
+  getDynamicPricingSuggestions(garageId: string, filters?: { vehicleId?: string; status?: string }): Promise<DynamicPricingSuggestion[]>;
+  getDynamicPricingSuggestion(id: string): Promise<DynamicPricingSuggestion | undefined>;
+  createDynamicPricingSuggestion(data: InsertDynamicPricingSuggestion): Promise<DynamicPricingSuggestion>;
+  updateDynamicPricingSuggestion(id: string, data: Partial<DynamicPricingSuggestion>): Promise<DynamicPricingSuggestion>;
+  deleteDynamicPricingSuggestion(id: string): Promise<void>;
+  calculateDynamicPrice(params: { serviceType: string; vehicleMake?: string; vehicleYear?: number; vehicleClass?: string; region?: string }): Promise<{ basePrice: number; suggestedPrice: number; minPrice: number; maxPrice: number; factors: any; confidence: number }>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -11171,6 +11198,205 @@ export class DatabaseStorage implements IStorage {
 
   async deleteArDevicePairing(id: string): Promise<void> {
     await db.delete(arDevicePairings).where(eq(arDevicePairings.id, id));
+  }
+
+  // Dynamic Pricing Module implementations
+  async getMarketPricingData(garageId?: string, filters?: { region?: string; serviceType?: string; vehicleClass?: string }): Promise<MarketPricingData[]> {
+    const conditions: any[] = [eq(marketPricingData.isActive, true)];
+    if (garageId) conditions.push(eq(marketPricingData.garageId, garageId));
+    if (filters?.region) conditions.push(eq(marketPricingData.region, filters.region));
+    if (filters?.serviceType) conditions.push(eq(marketPricingData.serviceType, filters.serviceType));
+    if (filters?.vehicleClass) conditions.push(eq(marketPricingData.vehicleClass, filters.vehicleClass));
+    
+    return await db.select().from(marketPricingData)
+      .where(conditions.length > 1 ? and(...conditions) : conditions[0])
+      .orderBy(desc(marketPricingData.effectiveDate));
+  }
+
+  async getMarketPricingDataItem(id: string): Promise<MarketPricingData | undefined> {
+    const [item] = await db.select().from(marketPricingData)
+      .where(eq(marketPricingData.id, id));
+    return item;
+  }
+
+  async createMarketPricingData(data: InsertMarketPricingData): Promise<MarketPricingData> {
+    const [item] = await db.insert(marketPricingData).values(data).returning();
+    return item;
+  }
+
+  async updateMarketPricingData(id: string, data: Partial<MarketPricingData>): Promise<MarketPricingData> {
+    const [item] = await db.update(marketPricingData)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(marketPricingData.id, id))
+      .returning();
+    return item;
+  }
+
+  async deleteMarketPricingData(id: string): Promise<void> {
+    await db.delete(marketPricingData).where(eq(marketPricingData.id, id));
+  }
+
+  async getVehiclePricingFactors(garageId?: string, vehicleMake?: string): Promise<VehiclePricingFactor[]> {
+    const conditions: any[] = [eq(vehiclePricingFactors.isActive, true)];
+    if (garageId) conditions.push(or(eq(vehiclePricingFactors.garageId, garageId), isNull(vehiclePricingFactors.garageId)));
+    if (vehicleMake) conditions.push(eq(vehiclePricingFactors.vehicleMake, vehicleMake));
+    
+    return await db.select().from(vehiclePricingFactors)
+      .where(conditions.length > 1 ? and(...conditions) : conditions[0])
+      .orderBy(vehiclePricingFactors.vehicleMake);
+  }
+
+  async getVehiclePricingFactor(id: string): Promise<VehiclePricingFactor | undefined> {
+    const [factor] = await db.select().from(vehiclePricingFactors)
+      .where(eq(vehiclePricingFactors.id, id));
+    return factor;
+  }
+
+  async createVehiclePricingFactor(data: InsertVehiclePricingFactor): Promise<VehiclePricingFactor> {
+    const [factor] = await db.insert(vehiclePricingFactors).values(data).returning();
+    return factor;
+  }
+
+  async updateVehiclePricingFactor(id: string, data: Partial<VehiclePricingFactor>): Promise<VehiclePricingFactor> {
+    const [factor] = await db.update(vehiclePricingFactors)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(vehiclePricingFactors.id, id))
+      .returning();
+    return factor;
+  }
+
+  async deleteVehiclePricingFactor(id: string): Promise<void> {
+    await db.delete(vehiclePricingFactors).where(eq(vehiclePricingFactors.id, id));
+  }
+
+  async getDynamicPricingSuggestions(garageId: string, filters?: { vehicleId?: string; status?: string }): Promise<DynamicPricingSuggestion[]> {
+    const conditions: any[] = [eq(dynamicPricingSuggestions.garageId, garageId)];
+    if (filters?.vehicleId) conditions.push(eq(dynamicPricingSuggestions.vehicleId, filters.vehicleId));
+    if (filters?.status) conditions.push(eq(dynamicPricingSuggestions.status, filters.status));
+    
+    return await db.select().from(dynamicPricingSuggestions)
+      .where(conditions.length > 1 ? and(...conditions) : conditions[0])
+      .orderBy(desc(dynamicPricingSuggestions.createdAt));
+  }
+
+  async getDynamicPricingSuggestion(id: string): Promise<DynamicPricingSuggestion | undefined> {
+    const [suggestion] = await db.select().from(dynamicPricingSuggestions)
+      .where(eq(dynamicPricingSuggestions.id, id));
+    return suggestion;
+  }
+
+  async createDynamicPricingSuggestion(data: InsertDynamicPricingSuggestion): Promise<DynamicPricingSuggestion> {
+    const [suggestion] = await db.insert(dynamicPricingSuggestions).values(data).returning();
+    return suggestion;
+  }
+
+  async updateDynamicPricingSuggestion(id: string, data: Partial<DynamicPricingSuggestion>): Promise<DynamicPricingSuggestion> {
+    const [suggestion] = await db.update(dynamicPricingSuggestions)
+      .set(data)
+      .where(eq(dynamicPricingSuggestions.id, id))
+      .returning();
+    return suggestion;
+  }
+
+  async deleteDynamicPricingSuggestion(id: string): Promise<void> {
+    await db.delete(dynamicPricingSuggestions).where(eq(dynamicPricingSuggestions.id, id));
+  }
+
+  async calculateDynamicPrice(params: { 
+    serviceType: string; 
+    vehicleMake?: string; 
+    vehicleYear?: number; 
+    vehicleClass?: string; 
+    region?: string 
+  }): Promise<{ 
+    basePrice: number; 
+    suggestedPrice: number; 
+    minPrice: number; 
+    maxPrice: number; 
+    factors: any; 
+    confidence: number 
+  }> {
+    const region = params.region || 'saudi_arabia';
+    const vehicleClass = params.vehicleClass || 'standard';
+    
+    const marketData = await db.select().from(marketPricingData)
+      .where(and(
+        eq(marketPricingData.serviceType, params.serviceType),
+        eq(marketPricingData.region, region),
+        eq(marketPricingData.isActive, true),
+        or(
+          eq(marketPricingData.vehicleClass, vehicleClass),
+          isNull(marketPricingData.vehicleClass)
+        )
+      ))
+      .limit(1);
+
+    let basePrice = 500;
+    let minPrice = 400;
+    let maxPrice = 600;
+    let confidence = 50;
+
+    if (marketData.length > 0) {
+      basePrice = parseFloat(marketData[0].avgPrice);
+      minPrice = parseFloat(marketData[0].minPrice);
+      maxPrice = parseFloat(marketData[0].maxPrice);
+      confidence = Math.min(95, 60 + (marketData[0].sampleSize || 0) / 10);
+    }
+
+    let adjustmentFactor = 1.0;
+    const appliedFactors: any = {};
+
+    if (params.vehicleMake) {
+      const vehicleFactors = await db.select().from(vehiclePricingFactors)
+        .where(and(
+          eq(vehiclePricingFactors.vehicleMake, params.vehicleMake),
+          eq(vehiclePricingFactors.isActive, true)
+        ))
+        .limit(1);
+
+      if (vehicleFactors.length > 0) {
+        const factor = vehicleFactors[0];
+        const complexity = parseFloat(factor.complexityFactor || '1.00');
+        const parts = parseFloat(factor.partsAvailabilityFactor || '1.00');
+        const labor = parseFloat(factor.laborIntensityFactor || '1.00');
+        const luxury = parseFloat(factor.luxuryPremiumFactor || '1.00');
+        
+        adjustmentFactor = (complexity + parts + labor + luxury) / 4;
+        appliedFactors.vehicleMake = params.vehicleMake;
+        appliedFactors.complexityFactor = complexity;
+        appliedFactors.partsAvailabilityFactor = parts;
+        appliedFactors.laborIntensityFactor = labor;
+        appliedFactors.luxuryPremiumFactor = luxury;
+        confidence = Math.min(95, confidence + 10);
+      }
+    }
+
+    if (params.vehicleYear) {
+      const currentYear = new Date().getFullYear();
+      const vehicleAge = currentYear - params.vehicleYear;
+      if (vehicleAge > 10) {
+        adjustmentFactor *= 1.15;
+        appliedFactors.ageAdjustment = 1.15;
+        appliedFactors.vehicleAge = vehicleAge;
+      } else if (vehicleAge > 5) {
+        adjustmentFactor *= 1.05;
+        appliedFactors.ageAdjustment = 1.05;
+        appliedFactors.vehicleAge = vehicleAge;
+      }
+    }
+
+    const suggestedPrice = Math.round(basePrice * adjustmentFactor * 100) / 100;
+    const adjustedMin = Math.round(minPrice * adjustmentFactor * 100) / 100;
+    const adjustedMax = Math.round(maxPrice * adjustmentFactor * 100) / 100;
+
+    return {
+      basePrice,
+      suggestedPrice,
+      minPrice: adjustedMin,
+      maxPrice: adjustedMax,
+      factors: appliedFactors,
+      confidence
+    };
   }
 }
 
