@@ -88,38 +88,38 @@ export function Dashboard() {
 
   const getServiceTypeBadge = (serviceType: string) => {
     const types: { [key: string]: { bg: string; text: string; icon: string } } = {
-      'maintenance': { bg: 'bg-blue-100 dark:bg-blue-900/30', text: 'text-blue-700 dark:text-blue-300', icon: '🔧' },
-      'repair': { bg: 'bg-orange-100 dark:bg-orange-900/30', text: 'text-orange-700 dark:text-orange-300', icon: '⚙️' },
-      'diagnostic': { bg: 'bg-purple-100 dark:bg-purple-900/30', text: 'text-purple-700 dark:text-purple-300', icon: '🔍' },
-      'inspection': { bg: 'bg-green-100 dark:bg-green-900/30', text: 'text-green-700 dark:text-green-300', icon: '✓' },
-      'body_work': { bg: 'bg-pink-100 dark:bg-pink-900/30', text: 'text-pink-700 dark:text-pink-300', icon: '🎨' },
-      'tire_service': { bg: 'bg-indigo-100 dark:bg-indigo-900/30', text: 'text-indigo-700 dark:text-indigo-300', icon: '⭕' },
+      'maintenance': { bg: 'bg-[#0A5ED7]/10 dark:bg-[#0A5ED7]/20', text: 'text-[#0A5ED7] dark:text-[#0BB3FF]', icon: '🔧' },
+      'repair': { bg: 'bg-[#F97316]/10 dark:bg-[#F97316]/20', text: 'text-[#F97316]', icon: '⚙️' },
+      'diagnostic': { bg: 'bg-[#0BB3FF]/10 dark:bg-[#0BB3FF]/20', text: 'text-[#0BB3FF]', icon: '🔍' },
+      'inspection': { bg: 'bg-[#22c55e]/10 dark:bg-[#22c55e]/20', text: 'text-[#22c55e]', icon: '✓' },
+      'body_work': { bg: 'bg-[#0B1F3B]/10 dark:bg-[#E6EAF0]/10', text: 'text-[#0B1F3B] dark:text-[#E6EAF0]', icon: '🎨' },
+      'tire_service': { bg: 'bg-[#64748B]/10 dark:bg-[#64748B]/20', text: 'text-[#64748B] dark:text-[#9BA4B0]', icon: '⭕' },
     };
-    const config = types[serviceType.toLowerCase().replace(/\s+/g, '_')] || { bg: 'bg-gray-100 dark:bg-gray-800', text: 'text-gray-700 dark:text-gray-300', icon: '📋' };
+    const config = types[serviceType.toLowerCase().replace(/\s+/g, '_')] || { bg: 'bg-[#64748B]/10 dark:bg-[#64748B]/20', text: 'text-[#64748B] dark:text-[#9BA4B0]', icon: '📋' };
     return { ...config, label: serviceType };
   };
 
   const getStatusBadge = (status: string) => {
     const statusColors: { [key: string]: { bg: string; text: string; icon: string } } = {
-      'pending': { bg: 'bg-yellow-100 dark:bg-yellow-900/30', text: 'text-yellow-700 dark:text-yellow-300', icon: '⏳' },
-      'assigned': { bg: 'bg-cyan-100 dark:bg-cyan-900/30', text: 'text-cyan-700 dark:text-cyan-300', icon: '👤' },
-      'in_progress': { bg: 'bg-blue-100 dark:bg-blue-900/30', text: 'text-blue-700 dark:text-blue-300', icon: '🔄' },
-      'completed': { bg: 'bg-green-100 dark:bg-green-900/30', text: 'text-green-700 dark:text-green-300', icon: '✅' },
-      'delivered': { bg: 'bg-teal-100 dark:bg-teal-900/30', text: 'text-teal-700 dark:text-teal-300', icon: '🚗' },
-      'cancelled': { bg: 'bg-red-100 dark:bg-red-900/30', text: 'text-red-700 dark:text-red-300', icon: '❌' },
+      'pending': { bg: 'bg-[#F97316]/10 dark:bg-[#F97316]/20', text: 'text-[#F97316]', icon: '⏳' },
+      'assigned': { bg: 'bg-[#0BB3FF]/10 dark:bg-[#0BB3FF]/20', text: 'text-[#0BB3FF]', icon: '👤' },
+      'in_progress': { bg: 'bg-[#0A5ED7]/10 dark:bg-[#0A5ED7]/20', text: 'text-[#0A5ED7] dark:text-[#0BB3FF]', icon: '🔄' },
+      'completed': { bg: 'bg-[#22c55e]/10 dark:bg-[#22c55e]/20', text: 'text-[#22c55e]', icon: '✅' },
+      'delivered': { bg: 'bg-[#0B1F3B]/10 dark:bg-[#E6EAF0]/10', text: 'text-[#0B1F3B] dark:text-[#E6EAF0]', icon: '🚗' },
+      'cancelled': { bg: 'bg-[#ef4444]/10 dark:bg-[#ef4444]/20', text: 'text-[#ef4444]', icon: '❌' },
     };
-    const config = statusColors[status] || { bg: 'bg-gray-100 dark:bg-gray-800', text: 'text-gray-700 dark:text-gray-300', icon: '○' };
+    const config = statusColors[status] || { bg: 'bg-[#64748B]/10 dark:bg-[#64748B]/20', text: 'text-[#64748B] dark:text-[#9BA4B0]', icon: '○' };
     return { ...config, label: status };
   };
 
   const getPriorityBadge = (priority: string) => {
     const priorityColors: { [key: string]: { bg: string; text: string; icon: string } } = {
-      'urgent': { bg: 'bg-red-500 dark:bg-red-600', text: 'text-white', icon: '🔥' },
-      'high': { bg: 'bg-orange-500 dark:bg-orange-600', text: 'text-white', icon: '⚡' },
-      'medium': { bg: 'bg-yellow-500 dark:bg-yellow-600', text: 'text-white', icon: '⭐' },
-      'low': { bg: 'bg-green-500 dark:bg-green-600', text: 'text-white', icon: '💚' },
+      'urgent': { bg: 'bg-[#ef4444] dark:bg-[#dc2626]', text: 'text-white', icon: '🔥' },
+      'high': { bg: 'bg-[#F97316] dark:bg-[#ea580c]', text: 'text-white', icon: '⚡' },
+      'medium': { bg: 'bg-[#0BB3FF] dark:bg-[#0891b2]', text: 'text-white', icon: '⭐' },
+      'low': { bg: 'bg-[#22c55e] dark:bg-[#16a34a]', text: 'text-white', icon: '💚' },
     };
-    const config = priorityColors[priority] || { bg: 'bg-gray-500', text: 'text-white', icon: '○' };
+    const config = priorityColors[priority] || { bg: 'bg-[#64748B]', text: 'text-white', icon: '○' };
     return { ...config, label: priority };
   };
 
@@ -217,8 +217,8 @@ export function Dashboard() {
                   </div>
                 </div>
               </div>
-              <div className="mt-4 h-1 bg-emerald-100 dark:bg-white/10 rounded-full overflow-hidden">
-                <div className="h-full bg-gradient-to-r from-emerald-400 to-teal-400 rounded-full w-[75%]"></div>
+              <div className="mt-4 h-1 bg-[#0A5ED7]/10 dark:bg-[#0BB3FF]/10 rounded-full overflow-hidden">
+                <div className="h-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] rounded-full w-[75%]"></div>
               </div>
             </div>
           </div>
