@@ -136,6 +136,7 @@ import LoyaltyProgram from "@/pages/LoyaltyProgram";
 import WorkshopCalendar from "@/pages/WorkshopCalendar";
 import ComputerVisionQC from "@/pages/ComputerVisionQC";
 import SmartPartsRecommender from "@/pages/SmartPartsRecommender";
+import DynamicPricing from "@/pages/DynamicPricing";
 import DigitalTwinViewer from "@/pages/DigitalTwinViewer";
 import DroneInspection from "@/pages/DroneInspection";
 import MLFraudDetection from "@/pages/MLFraudDetection";
@@ -1119,6 +1120,11 @@ function Router() {
       <Route path="/smart-parts-recommender">
         <Layout>
           <SmartPartsRecommender />
+        </Layout>
+      </Route>
+      <Route path="/dynamic-pricing">
+        <Layout>
+          <DynamicPricing />
         </Layout>
       </Route>
       <Route path="/digital-twin-viewer">

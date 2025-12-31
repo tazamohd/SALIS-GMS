@@ -178,6 +178,7 @@ export const navigationConfig: NavGroup[] = [
       { title: "Smart Parts", href: "/smart-parts-recommendations", icon: Package },
       { title: "AI Parts Recommender", href: "/smart-parts-recommender", icon: Brain },
       { title: "Intelligent Price Optimizer", href: "/intelligent-price-optimizer", icon: Target },
+      { title: "Dynamic Pricing", href: "/dynamic-pricing", icon: TrendingUp },
     ],
   },
   {
