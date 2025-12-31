@@ -25,6 +25,21 @@ import {
 } from "lucide-react";
 import type { ServiceBay, BayOccupancySession, Vehicle, JobCard } from "@shared/schema";
 
+const BRAND_COLORS = {
+  primary: '#0A5ED7',
+  secondary: '#0BB3FF',
+  navy: '#0B1F3B',
+  orange: '#F97316',
+  success: '#10B981',
+  accent: '#6366F1',
+  darkBg: '#0E1117',
+  darkSurface: '#151A23',
+  darkBorder: '#232A36',
+  lightBg: '#F8FAFC',
+  lightSurface: '#FFFFFF',
+  lightBorder: '#E2E8F0',
+};
+
 interface BayWithSession extends ServiceBay {
   currentSession?: BayOccupancySession & {
     vehicle?: Vehicle;
@@ -142,23 +157,23 @@ export default function ServiceBayDashboard() {
 
   const getBayStatusColor = (status: string) => {
     switch (status) {
-      case 'available': return 'bg-green-500';
-      case 'occupied': return 'bg-blue-500';
-      case 'maintenance': return 'bg-yellow-500';
-      case 'reserved': return 'bg-purple-500';
-      case 'cleaning': return 'bg-orange-500';
-      default: return 'bg-gray-500';
+      case 'available': return 'bg-[#10B981]';
+      case 'occupied': return 'bg-[#0A5ED7]';
+      case 'maintenance': return 'bg-[#F97316]';
+      case 'reserved': return 'bg-[#6366F1]';
+      case 'cleaning': return 'bg-[#0BB3FF]';
+      default: return 'bg-[#64748B]';
     }
   };
 
   const getBayStatusIcon = (status: string) => {
     switch (status) {
-      case 'available': return <CheckCircle2 className="w-4 h-4" />;
-      case 'occupied': return <Car className="w-4 h-4" />;
-      case 'maintenance': return <Wrench className="w-4 h-4" />;
-      case 'reserved': return <Clock className="w-4 h-4" />;
-      case 'cleaning': return <RefreshCw className="w-4 h-4" />;
-      default: return <XCircle className="w-4 h-4" />;
+      case 'available': return <CheckCircle2 className="w-4 h-4 text-[#10B981]" />;
+      case 'occupied': return <Car className="w-4 h-4 text-[#0A5ED7]" />;
+      case 'maintenance': return <Wrench className="w-4 h-4 text-[#F97316]" />;
+      case 'reserved': return <Clock className="w-4 h-4 text-[#6366F1]" />;
+      case 'cleaning': return <RefreshCw className="w-4 h-4 text-[#0BB3FF]" />;
+      default: return <XCircle className="w-4 h-4 text-[#64748B]" />;
     }
   };
 
@@ -185,25 +200,25 @@ export default function ServiceBayDashboard() {
       label: t('serviceBay.totalBays', 'Total Bays'),
       value: statistics?.totalBays || 0,
       icon: Wrench,
-      color: "text-blue-500",
+      color: "text-[#0A5ED7]",
     },
     {
       label: t('serviceBay.occupied', 'Occupied'),
       value: statistics?.occupiedBays || 0,
       icon: Car,
-      color: "text-green-500",
+      color: "text-[#0BB3FF]",
     },
     {
       label: t('serviceBay.available', 'Available'),
       value: statistics?.availableBays || 0,
       icon: CheckCircle2,
-      color: "text-emerald-500",
+      color: "text-[#10B981]",
     },
     {
       label: t('serviceBay.todaySessions', "Today's Sessions"),
       value: statistics?.todayCompletedSessions || 0,
       icon: TrendingUp,
-      color: "text-purple-500",
+      color: "text-[#6366F1]",
     },
   ];
 
@@ -228,18 +243,29 @@ export default function ServiceBayDashboard() {
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div className="flex items-center gap-4">
             <Select value={selectedBayType} onValueChange={setSelectedBayType}>
-              <SelectTrigger className="w-48" data-testid="select-bay-type">
+              <SelectTrigger 
+                className="w-48 bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" 
+                data-testid="select-bay-type"
+              >
                 <SelectValue placeholder={t('serviceBay.filterByType', 'Filter by type')} />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                 {bayTypes.map((type) => (
-                  <SelectItem key={type.value} value={type.value}>
+                  <SelectItem 
+                    key={type.value} 
+                    value={type.value}
+                    className="text-[#0B1F3B] dark:text-white hover:bg-[#0A5ED7]/10 focus:bg-[#0A5ED7]/10"
+                  >
                     {type.label}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
-            <Badge variant={isConnected ? "default" : "destructive"} className="flex items-center gap-1" data-testid="badge-connection-status">
+            <Badge 
+              variant={isConnected ? "default" : "destructive"} 
+              className={`flex items-center gap-1 ${isConnected ? 'bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white border-0' : 'bg-[#F97316] text-white border-0'}`}
+              data-testid="badge-connection-status"
+            >
               <Zap className="w-3 h-3" />
               {isConnected ? t('serviceBay.live', 'Live') : t('serviceBay.disconnected', 'Disconnected')}
             </Badge>
@@ -248,130 +274,137 @@ export default function ServiceBayDashboard() {
             variant="outline" 
             onClick={() => refetchBays()}
             disabled={loadingBays}
+            className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#0A5ED7]/10 hover:border-[#0A5ED7]"
             data-testid="button-refresh-bays"
           >
-            <RefreshCw className={`w-4 h-4 mr-2 ${loadingBays ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-4 h-4 mr-2 text-[#0A5ED7] ${loadingBays ? 'animate-spin' : ''}`} />
             {t('common.refresh', 'Refresh')}
           </Button>
         </div>
 
-        <Card>
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Activity className="w-5 h-5" />
+            <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
+              <Activity className="w-5 h-5 text-[#0A5ED7]" />
               {t('serviceBay.occupancyOverview', 'Occupancy Overview')}
             </CardTitle>
-            <CardDescription>{t('serviceBay.workshopCapacity', 'Current workshop capacity utilization')}</CardDescription>
+            <CardDescription className="text-[#64748B] dark:text-gray-400">{t('serviceBay.workshopCapacity', 'Current workshop capacity utilization')}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">{t('serviceBay.overallOccupancy', 'Overall Occupancy')}</span>
-                <span className="text-sm text-muted-foreground" data-testid="text-occupancy-rate">{occupancyRate}%</span>
+                <span className="text-sm font-medium text-[#0B1F3B] dark:text-white">{t('serviceBay.overallOccupancy', 'Overall Occupancy')}</span>
+                <span className="text-sm font-bold text-[#0A5ED7]" data-testid="text-occupancy-rate">{occupancyRate}%</span>
               </div>
-              <Progress value={occupancyRate} className="h-3" data-testid="progress-occupancy" />
+              <div className="relative h-3 w-full rounded-full bg-[#E2E8F0] dark:bg-[#232A36] overflow-hidden">
+                <div 
+                  className="h-full rounded-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] transition-all duration-500"
+                  style={{ width: `${occupancyRate}%` }}
+                  data-testid="progress-occupancy"
+                />
+              </div>
               <div className="grid grid-cols-2 md:grid-cols-5 gap-4 pt-4">
-                <div className="text-center" data-testid="stat-available">
-                  <div className="flex items-center justify-center gap-1 text-green-500 mb-1">
+                <div className="text-center p-3 rounded-lg bg-[#10B981]/10 dark:bg-[#10B981]/20 border border-[#10B981]/30" data-testid="stat-available">
+                  <div className="flex items-center justify-center gap-1 text-[#10B981] mb-1">
                     <CheckCircle2 className="w-4 h-4" />
                     <span className="text-sm font-medium">{t('serviceBay.available', 'Available')}</span>
                   </div>
-                  <span className="text-2xl font-bold" data-testid="text-available-count">{statistics?.availableBays || 0}</span>
+                  <span className="text-2xl font-bold text-[#0B1F3B] dark:text-white" data-testid="text-available-count">{statistics?.availableBays || 0}</span>
                 </div>
-                <div className="text-center" data-testid="stat-occupied">
-                  <div className="flex items-center justify-center gap-1 text-blue-500 mb-1">
+                <div className="text-center p-3 rounded-lg bg-[#0A5ED7]/10 dark:bg-[#0A5ED7]/20 border border-[#0A5ED7]/30" data-testid="stat-occupied">
+                  <div className="flex items-center justify-center gap-1 text-[#0A5ED7] mb-1">
                     <Car className="w-4 h-4" />
                     <span className="text-sm font-medium">{t('serviceBay.occupied', 'Occupied')}</span>
                   </div>
-                  <span className="text-2xl font-bold" data-testid="text-occupied-count">{statistics?.occupiedBays || 0}</span>
+                  <span className="text-2xl font-bold text-[#0B1F3B] dark:text-white" data-testid="text-occupied-count">{statistics?.occupiedBays || 0}</span>
                 </div>
-                <div className="text-center" data-testid="stat-maintenance">
-                  <div className="flex items-center justify-center gap-1 text-yellow-500 mb-1">
+                <div className="text-center p-3 rounded-lg bg-[#F97316]/10 dark:bg-[#F97316]/20 border border-[#F97316]/30" data-testid="stat-maintenance">
+                  <div className="flex items-center justify-center gap-1 text-[#F97316] mb-1">
                     <Wrench className="w-4 h-4" />
                     <span className="text-sm font-medium">{t('serviceBay.maintenance', 'Maintenance')}</span>
                   </div>
-                  <span className="text-2xl font-bold" data-testid="text-maintenance-count">{statistics?.maintenanceBays || 0}</span>
+                  <span className="text-2xl font-bold text-[#0B1F3B] dark:text-white" data-testid="text-maintenance-count">{statistics?.maintenanceBays || 0}</span>
                 </div>
-                <div className="text-center" data-testid="stat-avg-time">
-                  <div className="flex items-center justify-center gap-1 text-purple-500 mb-1">
+                <div className="text-center p-3 rounded-lg bg-[#6366F1]/10 dark:bg-[#6366F1]/20 border border-[#6366F1]/30" data-testid="stat-avg-time">
+                  <div className="flex items-center justify-center gap-1 text-[#6366F1] mb-1">
                     <Timer className="w-4 h-4" />
                     <span className="text-sm font-medium">{t('serviceBay.avgTime', 'Avg. Time')}</span>
                   </div>
-                  <span className="text-2xl font-bold" data-testid="text-avg-duration">{formatDuration(statistics?.avgSessionDuration || 0)}</span>
+                  <span className="text-2xl font-bold text-[#0B1F3B] dark:text-white" data-testid="text-avg-duration">{formatDuration(statistics?.avgSessionDuration || 0)}</span>
                 </div>
-                <div className="text-center" data-testid="stat-today">
-                  <div className="flex items-center justify-center gap-1 text-indigo-500 mb-1">
+                <div className="text-center p-3 rounded-lg bg-gradient-to-r from-[#0A5ED7]/10 to-[#0BB3FF]/10 dark:from-[#0A5ED7]/20 dark:to-[#0BB3FF]/20 border border-[#0A5ED7]/30" data-testid="stat-today">
+                  <div className="flex items-center justify-center gap-1 text-[#0BB3FF] mb-1">
                     <TrendingUp className="w-4 h-4" />
                     <span className="text-sm font-medium">{t('serviceBay.today', 'Today')}</span>
                   </div>
-                  <span className="text-2xl font-bold" data-testid="text-today-count">{statistics?.todayCompletedSessions || 0}</span>
+                  <span className="text-2xl font-bold text-[#0B1F3B] dark:text-white" data-testid="text-today-count">{statistics?.todayCompletedSessions || 0}</span>
                 </div>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Wrench className="w-5 h-5" />
+            <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
+              <Wrench className="w-5 h-5 text-[#0A5ED7]" />
               {t('serviceBay.serviceBays', 'Service Bays')} ({filteredBays.length})
             </CardTitle>
-            <CardDescription>{t('serviceBay.clickForActions', 'Click on a bay for quick actions')}</CardDescription>
+            <CardDescription className="text-[#64748B] dark:text-gray-400">{t('serviceBay.clickForActions', 'Click on a bay for quick actions')}</CardDescription>
           </CardHeader>
           <CardContent>
             {loadingBays ? (
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
                 {[...Array(12)].map((_, i) => (
-                  <div key={i} className="h-32 bg-muted animate-pulse rounded-lg" />
+                  <div key={i} className="h-32 bg-[#E2E8F0] dark:bg-[#232A36] animate-pulse rounded-lg" />
                 ))}
               </div>
             ) : filteredBays.length === 0 ? (
               <div className="text-center py-12">
-                <Wrench className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-                <p className="text-muted-foreground">{t('serviceBay.noBaysFound', 'No service bays found')}</p>
-                <p className="text-sm text-muted-foreground mt-1">{t('serviceBay.configureBays', 'Configure bays in system settings')}</p>
+                <Wrench className="w-12 h-12 mx-auto text-[#64748B] mb-4" />
+                <p className="text-[#0B1F3B] dark:text-white font-medium">{t('serviceBay.noBaysFound', 'No service bays found')}</p>
+                <p className="text-sm text-[#64748B] mt-1">{t('serviceBay.configureBays', 'Configure bays in system settings')}</p>
               </div>
             ) : (
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
                 {filteredBays.map((bay) => (
                   <div
                     key={bay.id}
-                    className={`relative p-4 rounded-lg border-2 transition-all hover:shadow-lg cursor-pointer ${
-                      bay.status === 'occupied' ? 'border-blue-500 bg-blue-500/10' :
-                      bay.status === 'available' ? 'border-green-500 bg-green-500/10' :
-                      bay.status === 'maintenance' ? 'border-yellow-500 bg-yellow-500/10' :
-                      'border-gray-500 bg-gray-500/10'
+                    className={`relative p-4 rounded-lg border-2 transition-all hover:shadow-lg cursor-pointer bg-white dark:bg-[#151A23] ${
+                      bay.status === 'occupied' ? 'border-[#0A5ED7] bg-[#0A5ED7]/5 dark:bg-[#0A5ED7]/10' :
+                      bay.status === 'available' ? 'border-[#10B981] bg-[#10B981]/5 dark:bg-[#10B981]/10' :
+                      bay.status === 'maintenance' ? 'border-[#F97316] bg-[#F97316]/5 dark:bg-[#F97316]/10' :
+                      'border-[#64748B] bg-[#64748B]/5 dark:bg-[#64748B]/10'
                     }`}
                     data-testid={`bay-card-${bay.id}`}
                   >
                     <div className={`absolute top-2 right-2 w-3 h-3 rounded-full ${getBayStatusColor(bay.status || 'unknown')} ${bay.status === 'occupied' ? 'animate-pulse' : ''}`} />
                     
                     <div className="text-center mb-2">
-                      <h3 className="font-bold text-lg">{bay.bayNumber}</h3>
-                      <p className="text-xs text-muted-foreground capitalize">{bay.bayType}</p>
+                      <h3 className="font-bold text-lg text-[#0B1F3B] dark:text-white">{bay.bayNumber}</h3>
+                      <p className="text-xs text-[#64748B] capitalize">{bay.bayType}</p>
                     </div>
                     
                     <div className="flex items-center justify-center gap-1 mb-2">
                       {getBayStatusIcon(bay.status || 'unknown')}
-                      <span className="text-sm capitalize">{bay.status}</span>
+                      <span className="text-sm capitalize text-[#0B1F3B] dark:text-gray-300">{bay.status}</span>
                     </div>
                     
                     {bay.currentSession && (
-                      <div className="text-xs text-center space-y-1 border-t pt-2 mt-2">
+                      <div className="text-xs text-center space-y-1 border-t border-[#E2E8F0] dark:border-[#232A36] pt-2 mt-2">
                         {bay.currentSession.vehicle && (
-                          <p className="font-medium truncate" title={bay.currentSession.vehicle.licensePlate || ''}>
+                          <p className="font-medium text-[#0B1F3B] dark:text-white truncate" title={bay.currentSession.vehicle.licensePlate || ''}>
                             {bay.currentSession.vehicle.licensePlate}
                           </p>
                         )}
-                        <p className="text-muted-foreground flex items-center justify-center gap-1">
-                          <Clock className="w-3 h-3" />
+                        <p className="text-[#64748B] flex items-center justify-center gap-1">
+                          <Clock className="w-3 h-3 text-[#0A5ED7]" />
                           {getSessionDuration(bay.currentSession.startTime!)}
                         </p>
                         <Button
                           size="sm"
                           variant="outline"
-                          className="w-full mt-2 h-7 text-xs"
+                          className="w-full mt-2 h-7 text-xs border-[#F97316] text-[#F97316] hover:bg-[#F97316]/10 dark:border-[#F97316] dark:text-[#F97316]"
                           onClick={(e) => {
                             e.stopPropagation();
                             endSessionMutation.mutate(bay.currentSession!.id);
@@ -388,8 +421,7 @@ export default function ServiceBayDashboard() {
                       <div className="text-center mt-2">
                         <Button
                           size="sm"
-                          variant="default"
-                          className="w-full h-7 text-xs"
+                          className="w-full h-7 text-xs bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white border-0 hover:opacity-90"
                           onClick={(e) => {
                             e.stopPropagation();
                             startSessionMutation.mutate({ bayId: bay.id });
@@ -407,7 +439,7 @@ export default function ServiceBayDashboard() {
                         <Button
                           size="sm"
                           variant="outline"
-                          className="w-full h-7 text-xs"
+                          className="w-full h-7 text-xs border-[#10B981] text-[#10B981] hover:bg-[#10B981]/10 dark:border-[#10B981] dark:text-[#10B981]"
                           onClick={(e) => {
                             e.stopPropagation();
                             updateBayStatusMutation.mutate({ bayId: bay.id, status: 'available' });
