@@ -128,6 +128,7 @@ import KioskCheckIn from "@/pages/KioskCheckIn";
 import SecurityCameras from "@/pages/SecurityCameras";
 import LicensePlateRecognition from "@/pages/LicensePlateRecognition";
 import EmergingTechnologies from "@/pages/EmergingTechnologies";
+import Interactive3DParts from "@/pages/Interactive3DParts";
 import NextGenTechnologies from "@/pages/NextGenTechnologies";
 import IoTDashboard from "@/pages/IoTDashboard";
 import ServiceBayDashboard from "@/pages/ServiceBayDashboard";
@@ -1081,6 +1082,11 @@ function Router() {
       <Route path="/emerging-technologies">
         <Layout>
           <EmergingTechnologies />
+        </Layout>
+      </Route>
+      <Route path="/interactive-3d-parts">
+        <Layout>
+          <Interactive3DParts />
         </Layout>
       </Route>
       <Route path="/nextgen-technologies">

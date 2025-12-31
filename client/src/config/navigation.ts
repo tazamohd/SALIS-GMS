@@ -349,6 +349,7 @@ export const navigationConfig: NavGroup[] = [
     icon: Monitor,
     minPlan: 'PRO',
     items: [
+      { title: "3D Parts Viewer", href: "/interactive-3d-parts", icon: Package },
       { title: "AR Repair Guide", href: "/ar-repair-guide", icon: Monitor },
       { title: "AR Overlay", href: "/ar-overlay", icon: ScanLine },
       { title: "VR Showroom", href: "/vr-showroom", icon: Monitor },
