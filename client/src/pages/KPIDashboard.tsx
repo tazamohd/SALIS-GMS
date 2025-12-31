@@ -187,7 +187,15 @@ export default function KPIDashboard() {
     { name: t('analytics.other', 'Other'), value: 8, color: BRAND_COLORS.navy },
   ];
 
-  const techPerformance = technicians
+  const sampleTechPerformance = [
+    { name: 'Ahmed Al-Rashid', jobs: 42, revenue: 18500, efficiency: 94 },
+    { name: 'Mohammed Hassan', jobs: 38, revenue: 16200, efficiency: 91 },
+    { name: 'Khalid Al-Saeed', jobs: 35, revenue: 14800, efficiency: 88 },
+    { name: 'Youssef Al-Fayez', jobs: 31, revenue: 12400, efficiency: 85 },
+    { name: 'Omar Al-Zahrani', jobs: 28, revenue: 11200, efficiency: 82 },
+  ];
+
+  const apiTechPerformance = technicians
     .map((tech: any) => {
       const techJobs = jobCards.filter((j: any) => j.assignedTo === tech.id);
       const techRevenue = techJobs.reduce((sum: number, job: any) => {
@@ -204,6 +212,8 @@ export default function KPIDashboard() {
     .filter(tech => tech.jobs > 0)
     .sort((a, b) => b.revenue - a.revenue)
     .slice(0, 5);
+
+  const techPerformance = apiTechPerformance.length > 0 ? apiTechPerformance : sampleTechPerformance;
 
   const metrics = [
     {

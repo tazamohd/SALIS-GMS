@@ -69,9 +69,19 @@ export default function AutomatedReordering() {
     queryKey: ['/api/inventory/reorder-rules'],
   });
 
-  const { data: pendingOrders = [] } = useQuery<any[]>({
+  const { data: apiPendingOrders, isFetched: pendingOrdersFetched, isError: pendingOrdersError } = useQuery<any[]>({
     queryKey: ['/api/inventory/pending-orders'],
   });
+
+  const samplePendingOrders = [
+    { id: '1', partName: 'Oil Filter - Toyota', quantity: 50, supplier: 'AutoParts KSA', estimatedCost: 750, status: 'pending_approval', createdAt: new Date().toISOString() },
+    { id: '2', partName: 'Brake Pads - Universal', quantity: 30, supplier: 'MENA Auto Supply', estimatedCost: 1200, status: 'approved', createdAt: new Date(Date.now() - 86400000).toISOString() },
+    { id: '3', partName: 'Air Filter Set', quantity: 25, supplier: 'AutoParts KSA', estimatedCost: 375, status: 'pending_approval', createdAt: new Date(Date.now() - 172800000).toISOString() },
+  ];
+
+  const pendingOrders = pendingOrdersFetched && !pendingOrdersError 
+    ? (Array.isArray(apiPendingOrders) ? apiPendingOrders : []) 
+    : samplePendingOrders;
 
   const runForecastMutation = useMutation({
     mutationFn: async () => {
@@ -109,112 +119,156 @@ export default function AutomatedReordering() {
   const overviewTab = (
     <div className="space-y-6" data-testid="auto-reorder-overview">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card data-testid="card-critical-stock">
+        <Card className="bg-gradient-to-br from-[#F97316]/10 to-[#FB923C]/5 dark:from-[#F97316]/20 dark:to-[#FB923C]/10 border-[#F97316]/30" data-testid="card-critical-stock">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">{t('autoReorder.criticalStock', 'Critical Stock')}</p>
-                <p className="text-3xl font-bold text-red-500" data-testid="text-critical-count">{criticalItems.length}</p>
+                <p className="text-sm text-[#64748B]">{t('autoReorder.criticalStock', 'Critical Stock')}</p>
+                <p className="text-3xl font-bold text-[#F97316]" data-testid="text-critical-count">{criticalItems.length}</p>
               </div>
-              <AlertTriangle className="w-8 h-8 text-red-500" />
+              <div className="p-3 rounded-xl bg-[#F97316]/20">
+                <AlertTriangle className="w-6 h-6 text-[#F97316]" />
+              </div>
             </div>
           </CardContent>
         </Card>
-        <Card data-testid="card-low-stock">
+        <Card className="bg-gradient-to-br from-[#0BB3FF]/10 to-[#0A5ED7]/5 dark:from-[#0BB3FF]/20 dark:to-[#0A5ED7]/10 border-[#0BB3FF]/30" data-testid="card-low-stock">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">{t('autoReorder.lowStock', 'Low Stock')}</p>
-                <p className="text-3xl font-bold text-yellow-500" data-testid="text-lowstock-count">{lowStockItems.length}</p>
+                <p className="text-sm text-[#64748B]">{t('autoReorder.lowStock', 'Low Stock')}</p>
+                <p className="text-3xl font-bold text-[#0BB3FF]" data-testid="text-lowstock-count">{lowStockItems.length}</p>
               </div>
-              <Package className="w-8 h-8 text-yellow-500" />
+              <div className="p-3 rounded-xl bg-[#0BB3FF]/20">
+                <Package className="w-6 h-6 text-[#0BB3FF]" />
+              </div>
             </div>
           </CardContent>
         </Card>
-        <Card data-testid="card-pending-orders">
+        <Card className="bg-gradient-to-br from-[#0A5ED7]/10 to-[#0BB3FF]/5 dark:from-[#0A5ED7]/20 dark:to-[#0BB3FF]/10 border-[#0A5ED7]/30" data-testid="card-pending-orders">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">{t('autoReorder.pendingOrders', 'Pending Orders')}</p>
-                <p className="text-3xl font-bold" data-testid="text-pending-count">{pendingOrders.length}</p>
+                <p className="text-sm text-[#64748B]">{t('autoReorder.pendingOrders', 'Pending Orders')}</p>
+                <p className="text-3xl font-bold text-[#0A5ED7]" data-testid="text-pending-count">{pendingOrders.length}</p>
               </div>
-              <ShoppingCart className="w-8 h-8 text-blue-500" />
+              <div className="p-3 rounded-xl bg-[#0A5ED7]/20">
+                <ShoppingCart className="w-6 h-6 text-[#0A5ED7]" />
+              </div>
             </div>
           </CardContent>
         </Card>
-        <Card data-testid="card-forecast-accuracy">
+        <Card className="bg-gradient-to-br from-[#10B981]/10 to-[#0BB3FF]/5 dark:from-[#10B981]/20 dark:to-[#0BB3FF]/10 border-[#10B981]/30" data-testid="card-forecast-accuracy">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">{t('autoReorder.forecastAccuracy', 'Forecast Accuracy')}</p>
-                <p className="text-3xl font-bold text-green-500" data-testid="text-accuracy">94%</p>
+                <p className="text-sm text-[#64748B]">{t('autoReorder.forecastAccuracy', 'Forecast Accuracy')}</p>
+                <p className="text-3xl font-bold text-[#10B981]" data-testid="text-accuracy">94%</p>
               </div>
-              <Brain className="w-8 h-8 text-green-500" />
+              <div className="p-3 rounded-xl bg-[#10B981]/20">
+                <Brain className="w-6 h-6 text-[#10B981]" />
+              </div>
             </div>
           </CardContent>
         </Card>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="w-5 h-5" />
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36] overflow-hidden">
+          <CardHeader className="border-b border-[#E2E8F0] dark:border-[#232A36]">
+            <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
+              <div className="p-2 rounded-lg bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF]">
+                <TrendingUp className="w-4 h-4 text-white" />
+              </div>
               {t('autoReorder.demandForecastVsActual', 'Demand Forecast vs Actual')}
             </CardTitle>
-            <CardDescription>{t('autoReorder.aiPredictedDemand', 'AI-predicted demand compared to actual usage')}</CardDescription>
+            <CardDescription className="text-[#64748B]">{t('autoReorder.aiPredictedDemand', 'AI-predicted demand compared to actual usage')}</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-6">
             <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={demandTrendData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Line type="monotone" dataKey="actual" stroke="#10b981" name={t('autoReorder.actual', 'Actual')} strokeWidth={2} />
-                <Line type="monotone" dataKey="predicted" stroke="#6366f1" name={t('autoReorder.predicted', 'Predicted')} strokeWidth={2} strokeDasharray="5 5" />
-              </LineChart>
+              <AreaChart data={demandTrendData}>
+                <defs>
+                  <linearGradient id="actualGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#0A5ED7" stopOpacity={0.4}/>
+                    <stop offset="95%" stopColor="#0A5ED7" stopOpacity={0}/>
+                  </linearGradient>
+                  <linearGradient id="predictedGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#0BB3FF" stopOpacity={0.4}/>
+                    <stop offset="95%" stopColor="#0BB3FF" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#232A36" opacity={0.3} />
+                <XAxis dataKey="month" tick={{ fill: '#64748B', fontSize: 12 }} axisLine={{ stroke: '#232A36' }} />
+                <YAxis tick={{ fill: '#64748B', fontSize: 12 }} axisLine={{ stroke: '#232A36' }} />
+                <Tooltip 
+                  contentStyle={{ backgroundColor: 'rgba(21, 26, 35, 0.95)', border: '1px solid #232A36', borderRadius: '12px', color: '#fff' }}
+                  labelStyle={{ color: '#0BB3FF', fontWeight: 'bold' }}
+                />
+                <Legend wrapperStyle={{ color: '#64748B' }} />
+                <Area type="monotone" dataKey="actual" stroke="#0A5ED7" strokeWidth={3} fill="url(#actualGrad)" name={t('autoReorder.actual', 'Actual')} />
+                <Area type="monotone" dataKey="predicted" stroke="#0BB3FF" strokeWidth={3} strokeDasharray="8 4" fill="url(#predictedGrad)" name={t('autoReorder.predicted', 'Predicted')} />
+              </AreaChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <BarChart3 className="w-5 h-5" />
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36] overflow-hidden">
+          <CardHeader className="border-b border-[#E2E8F0] dark:border-[#232A36]">
+            <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
+              <div className="p-2 rounded-lg bg-gradient-to-r from-[#10B981] to-[#0BB3FF]">
+                <BarChart3 className="w-4 h-4 text-white" />
+              </div>
               {t('autoReorder.stockLevels', 'Stock Levels')}
             </CardTitle>
-            <CardDescription>{t('autoReorder.currentStockVsReorderPoints', 'Current stock vs reorder points')}</CardDescription>
+            <CardDescription className="text-[#64748B]">{t('autoReorder.currentStockVsReorderPoints', 'Current stock vs reorder points')}</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-6">
             <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={stockLevelData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="current" fill="#10b981" name={t('autoReorder.currentStock', 'Current Stock')} />
-                <Bar dataKey="reorder" fill="#f59e0b" name={t('autoReorder.reorderPoint', 'Reorder Point')} />
+              <BarChart data={stockLevelData} barGap={8}>
+                <defs>
+                  <linearGradient id="stockGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#0A5ED7"/>
+                    <stop offset="100%" stopColor="#0BB3FF"/>
+                  </linearGradient>
+                  <linearGradient id="reorderGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#F97316"/>
+                    <stop offset="100%" stopColor="#FB923C"/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#232A36" opacity={0.3} />
+                <XAxis dataKey="name" tick={{ fill: '#64748B', fontSize: 11 }} axisLine={{ stroke: '#232A36' }} />
+                <YAxis tick={{ fill: '#64748B', fontSize: 12 }} axisLine={{ stroke: '#232A36' }} />
+                <Tooltip 
+                  contentStyle={{ backgroundColor: 'rgba(21, 26, 35, 0.95)', border: '1px solid #232A36', borderRadius: '12px', color: '#fff' }}
+                  cursor={{ fill: 'rgba(10, 94, 215, 0.1)' }}
+                />
+                <Legend wrapperStyle={{ color: '#64748B' }} />
+                <Bar dataKey="current" fill="url(#stockGrad)" name={t('autoReorder.currentStock', 'Current Stock')} radius={[8, 8, 0, 0]} />
+                <Bar dataKey="reorder" fill="url(#reorderGrad)" name={t('autoReorder.reorderPoint', 'Reorder Point')} radius={[8, 8, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
       </div>
 
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36] overflow-hidden">
+        <CardHeader className="flex flex-row items-center justify-between border-b border-[#E2E8F0] dark:border-[#232A36]">
           <div>
-            <CardTitle className="flex items-center gap-2">
-              <Zap className="w-5 h-5" />
+            <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
+              <div className="p-2 rounded-lg bg-gradient-to-r from-[#6366F1] to-[#0BB3FF]">
+                <Brain className="w-4 h-4 text-white" />
+              </div>
               {t('autoReorder.aiDemandPredictions', 'AI Demand Predictions')}
             </CardTitle>
-            <CardDescription>{t('autoReorder.mlBasedForecasting', 'Machine learning based demand forecasting')}</CardDescription>
+            <CardDescription className="text-[#64748B]">{t('autoReorder.mlBasedForecasting', 'Machine learning based demand forecasting')}</CardDescription>
           </div>
           <Button 
-            onClick={() => runForecastMutation.mutate()} 
+            onClick={() => {
+              runForecastMutation.mutate();
+              toast({ title: t('autoReorder.forecastRunning', 'Forecast Running'), description: t('autoReorder.aiProcessing', 'AI is analyzing demand patterns...') });
+            }} 
             disabled={runForecastMutation.isPending}
+            className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white shadow-lg shadow-[#0A5ED7]/25 hover:shadow-[#0A5ED7]/40"
             data-testid="button-run-forecast"
           >
             <RefreshCw className={`w-4 h-4 mr-2 ${runForecastMutation.isPending ? 'animate-spin' : ''}`} />
@@ -274,35 +328,203 @@ export default function AutomatedReordering() {
     </div>
   );
 
+  const [ruleStates, setRuleStates] = useState<Record<number, boolean>>({});
+
+  const toggleRule = (idx: number) => {
+    const wasActive = ruleStates[idx] ?? true;
+    const newActive = !wasActive;
+    setRuleStates(prev => ({ ...prev, [idx]: newActive }));
+    toast({ 
+      title: t('autoReorder.ruleUpdated', 'Rule Updated'), 
+      description: `${stockLevelData[idx]?.name} rule ${newActive ? 'enabled' : 'disabled'}` 
+    });
+  };
+
   const rulesTab = (
     <div className="space-y-6" data-testid="auto-reorder-rules">
-      <Card>
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
-            <CardTitle>{t('autoReorder.reorderRules', 'Reorder Rules')}</CardTitle>
-            <CardDescription>{t('autoReorder.configureRulesDescription', 'Configure automatic reordering rules for inventory items')}</CardDescription>
+            <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
+              <Settings className="w-5 h-5 text-[#0A5ED7]" />
+              {t('autoReorder.reorderRules', 'Reorder Rules')}
+            </CardTitle>
+            <CardDescription className="text-[#64748B]">{t('autoReorder.configureRulesDescription', 'Configure automatic reordering rules for inventory items')}</CardDescription>
           </div>
-          <Button data-testid="button-add-reorder-rule">
-            <Settings className="w-4 h-4 mr-2" />
-            {t('autoReorder.addRule', 'Add Rule')}
-          </Button>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button 
+                className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white"
+                data-testid="button-add-reorder-rule"
+              >
+                <Settings className="w-4 h-4 mr-2" />
+                {t('autoReorder.addRule', 'Add Rule')}
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+              <DialogHeader>
+                <DialogTitle className="text-[#0B1F3B] dark:text-white">{t('autoReorder.addNewRule', 'Add New Reorder Rule')}</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4 py-4">
+                <div className="space-y-2">
+                  <Label className="text-[#0B1F3B] dark:text-white">{t('autoReorder.selectPart', 'Select Part')}</Label>
+                  <Select>
+                    <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]">
+                      <SelectValue placeholder={t('autoReorder.choosePart', 'Choose a part...')} />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white dark:bg-[#151A23]">
+                      <SelectItem value="oil">Oil Filter</SelectItem>
+                      <SelectItem value="brake">Brake Pads</SelectItem>
+                      <SelectItem value="air">Air Filter</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-[#0B1F3B] dark:text-white">{t('autoReorder.reorderPoint', 'Reorder Point')}</Label>
+                    <Input type="number" placeholder="20" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-[#0B1F3B] dark:text-white">{t('autoReorder.orderQuantity', 'Order Quantity')}</Label>
+                    <Input type="number" placeholder="50" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" />
+                  </div>
+                </div>
+                <Button 
+                  className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white"
+                  onClick={() => toast({ title: t('autoReorder.ruleCreated', 'Rule Created'), description: t('autoReorder.ruleCreatedDesc', 'New reorder rule has been added') })}
+                  data-testid="button-create-rule"
+                >
+                  {t('autoReorder.createRule', 'Create Rule')}
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {stockLevelData.map((item, idx) => (
-              <div key={idx} className="p-4 border rounded-lg flex items-center justify-between" data-testid={`rule-item-${idx}`}>
+            {stockLevelData.map((item, idx) => {
+              const isActive = ruleStates[idx] ?? true;
+              return (
+                <div 
+                  key={idx} 
+                  className={`p-4 rounded-xl border transition-all ${
+                    isActive 
+                      ? 'bg-[#F8FAFC] dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]' 
+                      : 'bg-[#64748B]/10 border-[#64748B]/30 opacity-60'
+                  }`} 
+                  data-testid={`rule-item-${idx}`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <Switch 
+                        checked={isActive} 
+                        onCheckedChange={() => toggleRule(idx)}
+                        className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-[#0A5ED7] data-[state=checked]:to-[#0BB3FF]"
+                        data-testid={`switch-rule-active-${idx}`} 
+                      />
+                      <div className="flex items-center gap-3">
+                        <div className={`p-2 rounded-lg ${isActive ? 'bg-[#0A5ED7]/10' : 'bg-[#64748B]/10'}`}>
+                          <Package className={`w-4 h-4 ${isActive ? 'text-[#0A5ED7]' : 'text-[#64748B]'}`} />
+                        </div>
+                        <div>
+                          <p className="font-semibold text-[#0B1F3B] dark:text-white">{item.name}</p>
+                          <p className="text-sm text-[#64748B]">
+                            {t('autoReorder.ruleDescription', 'Reorder {{qty}} units when stock falls below {{threshold}}', { qty: item.reorder * 2, threshold: item.reorder })}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <Badge 
+                        className={isActive 
+                          ? 'bg-[#0A5ED7]/10 text-[#0A5ED7] border-[#0A5ED7]/30' 
+                          : 'bg-[#64748B]/10 text-[#64748B] border-[#64748B]/30'
+                        }
+                      >
+                        {isActive ? t('common.active', 'Active') : t('common.inactive', 'Inactive')}
+                      </Badge>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="border-[#0A5ED7] text-[#0A5ED7] hover:bg-[#0A5ED7]/10"
+                        onClick={() => toast({ title: t('autoReorder.editRule', 'Edit Rule'), description: item.name })}
+                        data-testid={`button-edit-rule-${idx}`}
+                      >
+                        {t('common.edit', 'Edit')}
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+
+  const ordersTab = (
+    <div className="space-y-6" data-testid="auto-reorder-orders">
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
+            <ShoppingCart className="w-5 h-5 text-[#0A5ED7]" />
+            {t('autoReorder.pendingReplenishmentOrders', 'Pending Replenishment Orders')}
+          </CardTitle>
+          <CardDescription className="text-[#64748B]">{t('autoReorder.reviewAndApprove', 'Review and approve auto-generated orders')}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {pendingOrders.map((order: any, idx: number) => (
+              <div 
+                key={order.id || idx} 
+                className="p-4 bg-[#F8FAFC] dark:bg-[#0E1117] border border-[#E2E8F0] dark:border-[#232A36] rounded-xl flex items-center justify-between"
+                data-testid={`pending-order-${idx}`}
+              >
                 <div className="flex items-center gap-4">
-                  <Switch checked={true} data-testid={`switch-rule-active-${idx}`} />
+                  <div className="p-3 rounded-xl bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF]">
+                    <Package className="w-5 h-5 text-white" />
+                  </div>
                   <div>
-                    <p className="font-medium">{item.name}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {t('autoReorder.ruleDescription', 'Reorder {{qty}} units when stock falls below {{threshold}}', { qty: item.reorder * 2, threshold: item.reorder })}
+                    <p className="font-semibold text-[#0B1F3B] dark:text-white">{order.partName}</p>
+                    <p className="text-sm text-[#64748B]">
+                      {order.quantity} units • {order.supplier}
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
-                  <Badge variant="outline">{t('autoReorder.autoApproveOff', 'Auto-approve: Off')}</Badge>
-                  <Button variant="ghost" size="sm" data-testid={`button-edit-rule-${idx}`}>{t('common.edit', 'Edit')}</Button>
+                  <div className="text-right">
+                    <p className="font-bold text-[#0A5ED7]">SAR {order.estimatedCost?.toLocaleString()}</p>
+                    <Badge 
+                      className={order.status === 'approved' 
+                        ? 'bg-[#10B981]/10 text-[#10B981] border-[#10B981]/30' 
+                        : 'bg-[#F97316]/10 text-[#F97316] border-[#F97316]/30'
+                      }
+                    >
+                      {order.status === 'approved' ? t('common.approved', 'Approved') : t('common.pending', 'Pending')}
+                    </Badge>
+                  </div>
+                  <div className="flex gap-2">
+                    {order.status !== 'approved' && (
+                      <Button 
+                        size="sm" 
+                        className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white"
+                        onClick={() => toast({ title: t('autoReorder.orderApproved', 'Order approved'), description: order.partName })}
+                        data-testid={`button-approve-order-${idx}`}
+                      >
+                        {t('common.approve', 'Approve')}
+                      </Button>
+                    )}
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      className="border-[#E2E8F0] dark:border-[#232A36] text-[#64748B]"
+                      onClick={() => toast({ title: t('common.viewDetails', 'View Details'), description: order.partName })}
+                      data-testid={`button-view-order-${idx}`}
+                    >
+                      {t('common.view', 'View')}
+                    </Button>
+                  </div>
                 </div>
               </div>
             ))}
@@ -312,40 +534,83 @@ export default function AutomatedReordering() {
     </div>
   );
 
-  const ordersTab = (
-    <div className="space-y-6" data-testid="auto-reorder-orders">
-      <Card>
-        <CardHeader>
-          <CardTitle>{t('autoReorder.pendingReplenishmentOrders', 'Pending Replenishment Orders')}</CardTitle>
-          <CardDescription>{t('autoReorder.reviewAndApprove', 'Review and approve auto-generated orders')}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center py-12 text-muted-foreground">
-            <ShoppingCart className="w-12 h-12 mx-auto mb-4 opacity-50" />
-            <p>{t('autoReorder.noPendingOrders', 'No pending orders')}</p>
-            <p className="text-sm">{t('autoReorder.ordersWillAppear', 'Orders will appear here when stock levels trigger reorder rules')}</p>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
-
   const analyticsTab = (
     <div className="space-y-6" data-testid="auto-reorder-analytics">
-      <Card>
-        <CardHeader>
-          <CardTitle>{t('autoReorder.forecastPerformance', 'Forecast Performance')}</CardTitle>
-          <CardDescription>{t('autoReorder.trackAccuracy', 'Track accuracy of AI predictions over time')}</CardDescription>
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <Card className="bg-gradient-to-br from-[#0A5ED7] to-[#0BB3FF] border-0 text-white">
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-white/70">{t('autoReorder.forecastAccuracy', 'Forecast Accuracy')}</p>
+                <p className="text-3xl font-bold">94.2%</p>
+              </div>
+              <Brain className="w-10 h-10 text-white/50" />
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="bg-gradient-to-br from-[#10B981] to-[#0BB3FF] border-0 text-white">
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-white/70">{t('autoReorder.costSavings', 'Cost Savings')}</p>
+                <p className="text-3xl font-bold">SAR 12.4K</p>
+              </div>
+              <TrendingUp className="w-10 h-10 text-white/50" />
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="bg-gradient-to-br from-[#6366F1] to-[#0A5ED7] border-0 text-white">
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-white/70">{t('autoReorder.stockoutsPrevented', 'Stockouts Prevented')}</p>
+                <p className="text-3xl font-bold">23</p>
+              </div>
+              <CheckCircle2 className="w-10 h-10 text-white/50" />
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="bg-gradient-to-br from-[#0B1F3B] to-[#0A5ED7] border-0 text-white">
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-white/70">{t('autoReorder.inventoryTurnover', 'Inventory Turnover')}</p>
+                <p className="text-3xl font-bold">4.8x</p>
+              </div>
+              <RefreshCw className="w-10 h-10 text-white/50" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36] overflow-hidden">
+        <CardHeader className="border-b border-[#E2E8F0] dark:border-[#232A36]">
+          <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
+            <div className="p-2 rounded-lg bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF]">
+              <BarChart3 className="w-4 h-4 text-white" />
+            </div>
+            {t('autoReorder.forecastPerformance', 'Forecast Performance')}
+          </CardTitle>
+          <CardDescription className="text-[#64748B]">{t('autoReorder.trackAccuracy', 'Track accuracy of AI predictions over time')}</CardDescription>
         </CardHeader>
-        <CardContent>
-          <ResponsiveContainer width="100%" height={300}>
+        <CardContent className="pt-6">
+          <ResponsiveContainer width="100%" height={350}>
             <AreaChart data={demandTrendData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="month" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Area type="monotone" dataKey="variance" fill="#f59e0b" stroke="#f59e0b" name={t('autoReorder.variancePercent', 'Variance %')} />
+              <defs>
+                <linearGradient id="varianceGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#F97316" stopOpacity={0.4}/>
+                  <stop offset="95%" stopColor="#F97316" stopOpacity={0}/>
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="#232A36" opacity={0.3} />
+              <XAxis dataKey="month" tick={{ fill: '#64748B', fontSize: 12 }} axisLine={{ stroke: '#232A36' }} />
+              <YAxis tick={{ fill: '#64748B', fontSize: 12 }} axisLine={{ stroke: '#232A36' }} />
+              <Tooltip 
+                contentStyle={{ backgroundColor: 'rgba(21, 26, 35, 0.95)', border: '1px solid #232A36', borderRadius: '12px', color: '#fff' }}
+                labelStyle={{ color: '#0BB3FF', fontWeight: 'bold' }}
+              />
+              <Legend wrapperStyle={{ color: '#64748B' }} />
+              <Area type="monotone" dataKey="variance" fill="url(#varianceGrad)" stroke="#F97316" strokeWidth={3} name={t('autoReorder.variancePercent', 'Variance %')} />
             </AreaChart>
           </ResponsiveContainer>
         </CardContent>

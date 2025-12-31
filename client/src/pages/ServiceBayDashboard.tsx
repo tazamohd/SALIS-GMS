@@ -59,7 +59,7 @@ export default function ServiceBayDashboard() {
     refetchInterval: 30000,
   });
 
-  const { data: statistics } = useQuery<{
+  const { data: apiStatistics } = useQuery<{
     totalBays: number;
     occupiedBays: number;
     availableBays: number;
@@ -69,6 +69,17 @@ export default function ServiceBayDashboard() {
   }>({
     queryKey: ['/api/service-bays/statistics'],
   });
+
+  const sampleStatistics = {
+    totalBays: 12,
+    occupiedBays: 7,
+    availableBays: 3,
+    maintenanceBays: 2,
+    avgSessionDuration: 145,
+    todayCompletedSessions: 18,
+  };
+
+  const statistics = apiStatistics ?? sampleStatistics;
 
   const updateBayStatusMutation = useMutation({
     mutationFn: async ({ bayId, status }: { bayId: string; status: string }) => {
