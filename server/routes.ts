@@ -20963,6 +20963,385 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ==================== Real-Time Vehicle Tracking API ====================
+
+  app.get('/api/vehicle-tracking', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user?.garageId;
+      const data = await storage.getVehicleTrackingData(garageId);
+      res.json(data);
+    } catch (error: any) {
+      console.error("Error fetching vehicle tracking data:", error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.get('/api/vehicle-tracking/:vehicleId', isAuthenticated, async (req, res) => {
+    try {
+      const data = await storage.getVehicleTrackingByVehicleId(req.params.vehicleId);
+      if (!data) {
+        return res.status(404).json({ message: "No tracking data found for this vehicle" });
+      }
+      res.json(data);
+    } catch (error: any) {
+      console.error("Error fetching vehicle tracking:", error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post('/api/vehicle-tracking', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user?.garageId;
+      const { vehicleId, latitude, longitude, speed, heading, engineStatus, fuelLevel, odometer, isMoving, deviceId } = req.body;
+      
+      if (!vehicleId) {
+        return res.status(400).json({ message: "Vehicle ID is required" });
+      }
+
+      const data = await storage.upsertVehicleTracking(vehicleId, {
+        garageId,
+        vehicleId,
+        latitude,
+        longitude,
+        speed,
+        heading,
+        engineStatus,
+        fuelLevel,
+        odometer,
+        isMoving,
+        deviceId,
+      });
+
+      await storage.createVehicleTrackingHistory({
+        vehicleId,
+        latitude,
+        longitude,
+        speed,
+        heading,
+        engineStatus,
+        odometer,
+        eventType: isMoving ? 'moving' : 'stationary',
+      });
+
+      res.json(data);
+    } catch (error: any) {
+      console.error("Error updating vehicle tracking:", error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.get('/api/vehicle-tracking/:vehicleId/history', isAuthenticated, async (req, res) => {
+    try {
+      const limit = parseInt(req.query.limit as string) || 100;
+      const history = await storage.getVehicleTrackingHistory(req.params.vehicleId, limit);
+      res.json(history);
+    } catch (error: any) {
+      console.error("Error fetching tracking history:", error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // ==================== Service Reminders API ====================
+
+  app.get('/api/service-reminders/due', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user?.garageId;
+      const reminders = await storage.getServiceRemindersDue(garageId);
+      res.json(reminders);
+    } catch (error: any) {
+      console.error("Error fetching due reminders:", error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.get('/api/service-reminders/vehicle/:vehicleId', isAuthenticated, async (req, res) => {
+    try {
+      const reminders = await storage.getServiceRemindersByVehicle(req.params.vehicleId);
+      res.json(reminders);
+    } catch (error: any) {
+      console.error("Error fetching vehicle reminders:", error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.get('/api/service-reminders/customer/:customerId', isAuthenticated, async (req, res) => {
+    try {
+      const reminders = await storage.getServiceRemindersByCustomer(req.params.customerId);
+      res.json(reminders);
+    } catch (error: any) {
+      console.error("Error fetching customer reminders:", error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.patch('/api/service-reminders/:id/status', isAuthenticated, async (req, res) => {
+    try {
+      const { status } = req.body;
+      if (!['pending', 'sent', 'acknowledged', 'completed', 'snoozed'].includes(status)) {
+        return res.status(400).json({ message: "Invalid status" });
+      }
+      const reminder = await storage.updateServiceReminderStatus(req.params.id, status);
+      res.json(reminder);
+    } catch (error: any) {
+      console.error("Error updating reminder status:", error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post('/api/service-reminders/generate', isAuthenticated, async (req: any, res) => {
+    try {
+      const reminders = await storage.generateAutoServiceReminders();
+      res.json({ generated: reminders.length, reminders });
+    } catch (error: any) {
+      console.error("Error generating reminders:", error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // ==================== Service Reminder Templates API ====================
+
+  app.get('/api/service-reminder-templates', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user?.garageId;
+      const templates = await storage.getServiceReminderTemplates(garageId);
+      res.json(templates);
+    } catch (error: any) {
+      console.error("Error fetching reminder templates:", error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.get('/api/service-reminder-templates/:id', isAuthenticated, async (req, res) => {
+    try {
+      const template = await storage.getServiceReminderTemplate(req.params.id);
+      if (!template) {
+        return res.status(404).json({ message: "Template not found" });
+      }
+      res.json(template);
+    } catch (error: any) {
+      console.error("Error fetching template:", error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post('/api/service-reminder-templates', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user?.garageId;
+      const template = await storage.createServiceReminderTemplate({ ...req.body, garageId });
+      res.status(201).json(template);
+    } catch (error: any) {
+      console.error("Error creating template:", error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.patch('/api/service-reminder-templates/:id', isAuthenticated, async (req, res) => {
+    try {
+      const template = await storage.updateServiceReminderTemplate(req.params.id, req.body);
+      res.json(template);
+    } catch (error: any) {
+      console.error("Error updating template:", error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.delete('/api/service-reminder-templates/:id', isAuthenticated, async (req, res) => {
+    try {
+      await storage.deleteServiceReminderTemplate(req.params.id);
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error("Error deleting template:", error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // ==================== Push Subscriptions API ====================
+
+  app.get('/api/push-subscriptions', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.id;
+      const subscriptions = await storage.getPushSubscriptions(userId);
+      res.json(subscriptions);
+    } catch (error: any) {
+      console.error("Error fetching push subscriptions:", error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post('/api/push-subscriptions', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.id;
+      const { endpoint, p256dh, auth, deviceType, deviceName, browserInfo } = req.body;
+      
+      if (!endpoint) {
+        return res.status(400).json({ message: "Endpoint is required" });
+      }
+
+      const subscription = await storage.createPushSubscription({
+        userId,
+        endpoint,
+        p256dh,
+        auth,
+        deviceType,
+        deviceName,
+        browserInfo,
+      });
+      res.status(201).json(subscription);
+    } catch (error: any) {
+      console.error("Error creating push subscription:", error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.delete('/api/push-subscriptions/:id', isAuthenticated, async (req, res) => {
+    try {
+      await storage.deletePushSubscription(req.params.id);
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error("Error deleting push subscription:", error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // ==================== Push Notifications API ====================
+
+  app.get('/api/push-notifications', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.id;
+      const { status, type } = req.query;
+      const notifications = await storage.getPushNotifications({ 
+        userId, 
+        status: status as string, 
+        type: type as string 
+      });
+      res.json(notifications);
+    } catch (error: any) {
+      console.error("Error fetching notifications:", error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.get('/api/push-notifications/unread-count', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.id;
+      const count = await storage.getUnreadNotificationCount(userId);
+      res.json({ count });
+    } catch (error: any) {
+      console.error("Error fetching unread count:", error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post('/api/push-notifications', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user?.garageId;
+      const { title, body, notificationType, userId, customerId, priority, data, relatedEntityType, relatedEntityId } = req.body;
+      
+      if (!title || !body || !notificationType) {
+        return res.status(400).json({ message: "Title, body, and notification type are required" });
+      }
+
+      const notification = await storage.createPushNotification({
+        garageId,
+        userId,
+        customerId,
+        title,
+        body,
+        notificationType,
+        priority: priority || 'normal',
+        data,
+        relatedEntityType,
+        relatedEntityId,
+      });
+      res.status(201).json(notification);
+    } catch (error: any) {
+      console.error("Error creating notification:", error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.patch('/api/push-notifications/:id/read', isAuthenticated, async (req, res) => {
+    try {
+      const notification = await storage.markNotificationAsRead(req.params.id);
+      res.json(notification);
+    } catch (error: any) {
+      console.error("Error marking notification as read:", error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.patch('/api/push-notifications/:id/clicked', isAuthenticated, async (req, res) => {
+    try {
+      const notification = await storage.markNotificationAsClicked(req.params.id);
+      res.json(notification);
+    } catch (error: any) {
+      console.error("Error marking notification as clicked:", error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post('/api/push-notifications/:id/send', isAuthenticated, async (req, res) => {
+    try {
+      const notification = await storage.sendPushNotification(req.params.id);
+      res.json(notification);
+    } catch (error: any) {
+      console.error("Error sending notification:", error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // ==================== Notification Preferences API ====================
+
+  app.get('/api/notification-preferences', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.id;
+      const prefs = await storage.getNotificationPreferences(userId);
+      if (!prefs) {
+        return res.json({
+          pushEnabled: true,
+          emailEnabled: true,
+          smsEnabled: true,
+          serviceReminders: true,
+          appointmentReminders: true,
+          statusUpdates: true,
+          promotions: false,
+          vehicleAlerts: true,
+        });
+      }
+      res.json(prefs);
+    } catch (error: any) {
+      console.error("Error fetching notification preferences:", error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.put('/api/notification-preferences', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.id;
+      const prefs = await storage.upsertNotificationPreferences({ ...req.body, userId });
+      res.json(prefs);
+    } catch (error: any) {
+      console.error("Error updating notification preferences:", error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // ==================== Send Browser Push Notification (Demo) ====================
+
+  app.post('/api/send-browser-notification', isAuthenticated, async (req: any, res) => {
+    try {
+      const { title, body, icon, tag, data } = req.body;
+      res.json({ 
+        success: true, 
+        message: "Browser notification payload ready",
+        notification: { title, body, icon, tag, data }
+      });
+    } catch (error: any) {
+      console.error("Error preparing browser notification:", error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
   const httpServer = createServer(app);
   
   // Initialize WebSocket server for chat
