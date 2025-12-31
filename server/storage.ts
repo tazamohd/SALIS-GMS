@@ -708,9 +708,27 @@ import {
   type InsertVehiclePricingFactor,
   type DynamicPricingSuggestion,
   type InsertDynamicPricingSuggestion,
+  vehicleTracking,
+  vehicleTrackingHistory,
+  serviceReminderTemplates,
+  pushSubscriptions,
+  pushNotifications,
+  notificationPreferences,
+  type VehicleTracking,
+  type InsertVehicleTracking,
+  type VehicleTrackingHistory,
+  type InsertVehicleTrackingHistory,
+  type ServiceReminderTemplate,
+  type InsertServiceReminderTemplate,
+  type PushSubscription,
+  type InsertPushSubscription,
+  type PushNotification,
+  type InsertPushNotification,
+  type NotificationPreference,
+  type InsertNotificationPreference,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, or, inArray, and, gte, lte, ilike, sql, isNull, gt } from "drizzle-orm";
+import { eq, desc, asc, or, inArray, and, gte, lte, ilike, sql, isNull, gt } from "drizzle-orm";
 import { createHash, randomUUID } from "crypto";
 
 // Interface for storage operations
@@ -11397,6 +11415,309 @@ export class DatabaseStorage implements IStorage {
       factors: appliedFactors,
       confidence
     };
+  }
+
+  // ==================== Vehicle Tracking ====================
+
+  async getVehicleTrackingData(garageId?: string): Promise<VehicleTracking[]> {
+    const conditions: any[] = [];
+    if (garageId) conditions.push(eq(vehicleTracking.garageId, garageId));
+    
+    return conditions.length > 0 
+      ? await db.select().from(vehicleTracking).where(and(...conditions))
+      : await db.select().from(vehicleTracking);
+  }
+
+  async getVehicleTrackingByVehicleId(vehicleId: string): Promise<VehicleTracking | undefined> {
+    const [tracking] = await db.select().from(vehicleTracking)
+      .where(eq(vehicleTracking.vehicleId, vehicleId));
+    return tracking;
+  }
+
+  async createVehicleTracking(data: InsertVehicleTracking): Promise<VehicleTracking> {
+    const [tracking] = await db.insert(vehicleTracking).values(data).returning();
+    return tracking;
+  }
+
+  async updateVehicleTracking(vehicleId: string, data: Partial<VehicleTracking>): Promise<VehicleTracking> {
+    const [tracking] = await db.update(vehicleTracking)
+      .set({ ...data, lastSeenAt: new Date() })
+      .where(eq(vehicleTracking.vehicleId, vehicleId))
+      .returning();
+    return tracking;
+  }
+
+  async upsertVehicleTracking(vehicleId: string, data: InsertVehicleTracking): Promise<VehicleTracking> {
+    const existing = await this.getVehicleTrackingByVehicleId(vehicleId);
+    if (existing) {
+      return await this.updateVehicleTracking(vehicleId, data);
+    } else {
+      return await this.createVehicleTracking({ ...data, vehicleId });
+    }
+  }
+
+  async getVehicleTrackingHistory(vehicleId: string, limit: number = 100): Promise<VehicleTrackingHistory[]> {
+    return await db.select().from(vehicleTrackingHistory)
+      .where(eq(vehicleTrackingHistory.vehicleId, vehicleId))
+      .orderBy(desc(vehicleTrackingHistory.recordedAt))
+      .limit(limit);
+  }
+
+  async createVehicleTrackingHistory(data: InsertVehicleTrackingHistory): Promise<VehicleTrackingHistory> {
+    const [history] = await db.insert(vehicleTrackingHistory).values(data).returning();
+    return history;
+  }
+
+  // ==================== Service Reminders Extended ====================
+
+  async getServiceRemindersDue(garageId?: string): Promise<ServiceReminder[]> {
+    const now = new Date();
+    const conditions: any[] = [
+      eq(serviceReminders.status, 'pending'),
+      eq(serviceReminders.isActive, true),
+      lte(serviceReminders.triggerDate, now)
+    ];
+    if (garageId) conditions.push(eq(serviceReminders.garageId, garageId));
+    
+    return await db.select().from(serviceReminders)
+      .where(and(...conditions))
+      .orderBy(asc(serviceReminders.triggerDate));
+  }
+
+  async getServiceRemindersByVehicle(vehicleId: string): Promise<ServiceReminder[]> {
+    return await db.select().from(serviceReminders)
+      .where(eq(serviceReminders.vehicleId, vehicleId))
+      .orderBy(desc(serviceReminders.createdAt));
+  }
+
+  async getServiceRemindersByCustomer(customerId: string): Promise<ServiceReminder[]> {
+    return await db.select().from(serviceReminders)
+      .where(eq(serviceReminders.customerId, customerId))
+      .orderBy(desc(serviceReminders.createdAt));
+  }
+
+  async updateServiceReminderStatus(id: string, status: string): Promise<ServiceReminder> {
+    const [reminder] = await db.update(serviceReminders)
+      .set({ status, updatedAt: new Date(), sentAt: status === 'sent' ? new Date() : undefined })
+      .where(eq(serviceReminders.id, id))
+      .returning();
+    return reminder;
+  }
+
+  // ==================== Service Reminder Templates ====================
+
+  async getServiceReminderTemplates(garageId?: string): Promise<ServiceReminderTemplate[]> {
+    const conditions: any[] = [eq(serviceReminderTemplates.isActive, true)];
+    if (garageId) conditions.push(eq(serviceReminderTemplates.garageId, garageId));
+    
+    return await db.select().from(serviceReminderTemplates)
+      .where(conditions.length > 1 ? and(...conditions) : conditions[0])
+      .orderBy(asc(serviceReminderTemplates.name));
+  }
+
+  async getServiceReminderTemplate(id: string): Promise<ServiceReminderTemplate | undefined> {
+    const [template] = await db.select().from(serviceReminderTemplates)
+      .where(eq(serviceReminderTemplates.id, id));
+    return template;
+  }
+
+  async createServiceReminderTemplate(data: InsertServiceReminderTemplate): Promise<ServiceReminderTemplate> {
+    const [template] = await db.insert(serviceReminderTemplates).values(data).returning();
+    return template;
+  }
+
+  async updateServiceReminderTemplate(id: string, data: Partial<ServiceReminderTemplate>): Promise<ServiceReminderTemplate> {
+    const [template] = await db.update(serviceReminderTemplates)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(serviceReminderTemplates.id, id))
+      .returning();
+    return template;
+  }
+
+  async deleteServiceReminderTemplate(id: string): Promise<void> {
+    await db.update(serviceReminderTemplates)
+      .set({ isActive: false })
+      .where(eq(serviceReminderTemplates.id, id));
+  }
+
+  // ==================== Push Subscriptions ====================
+
+  async getPushSubscriptions(userId?: string, customerId?: string): Promise<PushSubscription[]> {
+    const conditions: any[] = [eq(pushSubscriptions.isActive, true)];
+    if (userId) conditions.push(eq(pushSubscriptions.userId, userId));
+    if (customerId) conditions.push(eq(pushSubscriptions.customerId, customerId));
+    
+    return await db.select().from(pushSubscriptions)
+      .where(conditions.length > 1 ? and(...conditions) : conditions[0])
+      .orderBy(desc(pushSubscriptions.lastUsedAt));
+  }
+
+  async getPushSubscription(id: string): Promise<PushSubscription | undefined> {
+    const [subscription] = await db.select().from(pushSubscriptions)
+      .where(eq(pushSubscriptions.id, id));
+    return subscription;
+  }
+
+  async createPushSubscription(data: InsertPushSubscription): Promise<PushSubscription> {
+    const [subscription] = await db.insert(pushSubscriptions).values(data).returning();
+    return subscription;
+  }
+
+  async updatePushSubscription(id: string, data: Partial<PushSubscription>): Promise<PushSubscription> {
+    const [subscription] = await db.update(pushSubscriptions)
+      .set({ ...data, lastUsedAt: new Date() })
+      .where(eq(pushSubscriptions.id, id))
+      .returning();
+    return subscription;
+  }
+
+  async deletePushSubscription(id: string): Promise<void> {
+    await db.update(pushSubscriptions)
+      .set({ isActive: false })
+      .where(eq(pushSubscriptions.id, id));
+  }
+
+  // ==================== Push Notifications ====================
+
+  async getPushNotifications(filters?: { userId?: string; customerId?: string; status?: string; type?: string }): Promise<PushNotification[]> {
+    const conditions: any[] = [];
+    if (filters?.userId) conditions.push(eq(pushNotifications.userId, filters.userId));
+    if (filters?.customerId) conditions.push(eq(pushNotifications.customerId, filters.customerId));
+    if (filters?.status) conditions.push(eq(pushNotifications.status, filters.status));
+    if (filters?.type) conditions.push(eq(pushNotifications.notificationType, filters.type));
+    
+    return conditions.length > 0
+      ? await db.select().from(pushNotifications).where(and(...conditions)).orderBy(desc(pushNotifications.createdAt)).limit(100)
+      : await db.select().from(pushNotifications).orderBy(desc(pushNotifications.createdAt)).limit(100);
+  }
+
+  async getPushNotification(id: string): Promise<PushNotification | undefined> {
+    const [notification] = await db.select().from(pushNotifications)
+      .where(eq(pushNotifications.id, id));
+    return notification;
+  }
+
+  async createPushNotification(data: InsertPushNotification): Promise<PushNotification> {
+    const [notification] = await db.insert(pushNotifications).values(data).returning();
+    return notification;
+  }
+
+  async updatePushNotification(id: string, data: Partial<PushNotification>): Promise<PushNotification> {
+    const [notification] = await db.update(pushNotifications)
+      .set(data)
+      .where(eq(pushNotifications.id, id))
+      .returning();
+    return notification;
+  }
+
+  async markNotificationAsRead(id: string): Promise<PushNotification> {
+    const [notification] = await db.update(pushNotifications)
+      .set({ status: 'read', readAt: new Date() })
+      .where(eq(pushNotifications.id, id))
+      .returning();
+    return notification;
+  }
+
+  async markNotificationAsClicked(id: string): Promise<PushNotification> {
+    const [notification] = await db.update(pushNotifications)
+      .set({ status: 'clicked', clickedAt: new Date() })
+      .where(eq(pushNotifications.id, id))
+      .returning();
+    return notification;
+  }
+
+  async sendPushNotification(notificationId: string): Promise<PushNotification> {
+    const [notification] = await db.update(pushNotifications)
+      .set({ status: 'sent', sentAt: new Date() })
+      .where(eq(pushNotifications.id, notificationId))
+      .returning();
+    return notification;
+  }
+
+  async getUnreadNotificationCount(userId?: string, customerId?: string): Promise<number> {
+    const conditions: any[] = [
+      or(eq(pushNotifications.status, 'pending'), eq(pushNotifications.status, 'sent'))
+    ];
+    if (userId) conditions.push(eq(pushNotifications.userId, userId));
+    if (customerId) conditions.push(eq(pushNotifications.customerId, customerId));
+    
+    const result = await db.select({ count: sql<number>`count(*)` })
+      .from(pushNotifications)
+      .where(and(...conditions));
+    
+    return Number(result[0]?.count || 0);
+  }
+
+  // ==================== Notification Preferences ====================
+
+  async getNotificationPreferences(userId?: string, customerId?: string): Promise<NotificationPreference | undefined> {
+    const conditions: any[] = [];
+    if (userId) conditions.push(eq(notificationPreferences.userId, userId));
+    if (customerId) conditions.push(eq(notificationPreferences.customerId, customerId));
+    
+    if (conditions.length === 0) return undefined;
+    
+    const [prefs] = await db.select().from(notificationPreferences)
+      .where(conditions.length > 1 ? and(...conditions) : conditions[0]);
+    return prefs;
+  }
+
+  async upsertNotificationPreferences(data: InsertNotificationPreference): Promise<NotificationPreference> {
+    const existing = await this.getNotificationPreferences(data.userId || undefined, data.customerId || undefined);
+    
+    if (existing) {
+      const [updated] = await db.update(notificationPreferences)
+        .set({ ...data, updatedAt: new Date() })
+        .where(eq(notificationPreferences.id, existing.id))
+        .returning();
+      return updated;
+    } else {
+      const [created] = await db.insert(notificationPreferences).values(data).returning();
+      return created;
+    }
+  }
+
+  // ==================== Auto Service Reminder Generation ====================
+
+  async generateAutoServiceReminders(): Promise<ServiceReminder[]> {
+    const templates = await this.getServiceReminderTemplates();
+    const vehicles = await this.getVehicles();
+    const generatedReminders: ServiceReminder[] = [];
+    
+    for (const template of templates) {
+      for (const vehicle of vehicles) {
+        if (template.vehicleMakes && template.vehicleMakes.length > 0) {
+          if (!template.vehicleMakes.includes(vehicle.make || '')) continue;
+        }
+        
+        const existingReminders = await this.getServiceRemindersByVehicle(vehicle.id);
+        const hasActiveReminder = existingReminders.some(r => 
+          r.maintenanceScheduleId?.toString() === template.serviceType && 
+          (r.status === 'pending' || r.status === 'sent')
+        );
+        
+        if (!hasActiveReminder && template.intervalDays) {
+          const dueDate = new Date();
+          dueDate.setDate(dueDate.getDate() + template.intervalDays - (template.advanceNoticeDays || 7));
+          
+          const [reminder] = await db.insert(serviceReminders).values({
+            vehicleId: vehicle.id,
+            customerId: vehicle.customerId,
+            reminderType: 'scheduled',
+            reminderTitle: template.name,
+            reminderMessage: template.messageTemplate || `${template.name} is due for your ${vehicle.make} ${vehicle.model}`,
+            triggerDate: dueDate,
+            advanceDays: template.advanceNoticeDays || 7,
+            status: 'pending',
+            isActive: true,
+          }).returning();
+          
+          generatedReminders.push(reminder);
+        }
+      }
+    }
+    
+    return generatedReminders;
   }
 }
 
