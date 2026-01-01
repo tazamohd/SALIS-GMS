@@ -369,6 +369,7 @@ export const navigationConfig: NavGroup[] = [
     items: [
       { title: "AI Automation", href: "/ai-automation", icon: Brain },
       { title: "Call Center", href: "/call-center", icon: Radio },
+      { title: "Support Chat", href: "/support-chat-dashboard", icon: MessageSquare },
       { title: "Parts Availability", href: "/parts-availability", icon: RefreshCw },
       { title: "AI Chatbot", href: "/ai-chatbot", icon: MessageSquare },
       { title: "AI Chatbot Assistant", href: "/ai-chatbot-assistant", icon: Brain },

@@ -92,6 +92,7 @@ import { QuickActionsModal } from "@/components/QuickActionsModal";
 import { SmartSearch } from "@/components/SmartSearch";
 import { SkipLink } from "@/components/SkipLink";
 import { OfflineIndicator } from "@/components/OfflineIndicator";
+import { CustomerChatWidget } from "@/components/CustomerChatWidget";
 import {
   Collapsible,
   CollapsibleContent,
@@ -428,6 +429,9 @@ export function Layout({ children }: LayoutProps) {
 
         {/* Offline Indicator */}
         <OfflineIndicator />
+
+        {/* Customer Chat Widget */}
+        <CustomerChatWidget />
       </div>
     </>
   );

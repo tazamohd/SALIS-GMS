@@ -28,6 +28,7 @@ import InventoryManagement from "@/pages/InventoryManagement";
 import { PartsAvailability } from "@/pages/PartsAvailability";
 import { SmartAssignment } from "@/pages/SmartAssignment";
 import CallCenter from "@/pages/CallCenter";
+import SupportChatDashboard from "@/pages/SupportChatDashboard";
 import { TechnicianPortal } from "@/pages/TechnicianPortal";
 import TechnicianManagement from "@/pages/TechnicianManagement";
 import { TechnicianLayout } from "@/components/TechnicianLayout";
@@ -494,6 +495,11 @@ function Router() {
       <Route path="/call-center">
         <Layout>
           <CallCenter />
+        </Layout>
+      </Route>
+      <Route path="/support-chat-dashboard">
+        <Layout>
+          <SupportChatDashboard />
         </Layout>
       </Route>
       <Route path="/suppliers">
