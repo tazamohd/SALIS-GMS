@@ -107,10 +107,10 @@ export default function VehicleHealthMonitoring() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "critical": return "text-red-600 dark:text-red-400 bg-red-500/10 border-red-200 dark:border-red-900";
-      case "warning": return "text-yellow-600 dark:text-yellow-400 bg-yellow-500/10 border-yellow-200 dark:border-yellow-900";
-      case "healthy": return "text-green-600 dark:text-green-400 bg-green-500/10 border-green-200 dark:border-green-900";
-      default: return "text-blue-600 dark:text-blue-400 bg-blue-500/10 border-blue-200 dark:border-blue-900";
+      case "critical": return "text-[#F97316] bg-[#F97316]/10 border-[#F97316]/20";
+      case "warning": return "text-[#F97316] bg-[#F97316]/10 border-[#F97316]/20";
+      case "healthy": return "text-green-600 dark:text-green-400 bg-green-500/10 border-green-500/20";
+      default: return "text-[#0A5ED7] bg-[#0A5ED7]/10 border-[#0A5ED7]/20";
     }
   };
 
@@ -139,18 +139,18 @@ export default function VehicleHealthMonitoring() {
       icon={Activity}
     >
       <div className="space-y-6">
-        <Card className="border-gray-200 dark:border-gray-800 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20" data-testid="card-health-score">
+        <Card className="border-[#E2E8F0] dark:border-[#232A36] bg-gradient-to-br from-[#0A5ED7]/5 to-[#0BB3FF]/5 dark:from-[#0A5ED7]/10 dark:to-[#0BB3FF]/10" data-testid="card-health-score">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <div className="w-20 h-20 rounded-full bg-white dark:bg-gray-900 flex items-center justify-center shadow-lg">
-                  <Car className="w-10 h-10 text-blue-600 dark:text-blue-400" />
+                <div className="w-20 h-20 rounded-full bg-gradient-to-r from-[#0A5ED7]/20 to-[#0BB3FF]/20 flex items-center justify-center shadow-lg">
+                  <Car className="w-10 h-10 text-[#0A5ED7]" />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">{t('vehicleHealth.overallHealthScore', 'Overall Health Score')}</p>
+                  <p className="text-sm text-[#64748B]">{t('vehicleHealth.overallHealthScore', 'Overall Health Score')}</p>
                   <div className="flex items-baseline gap-2">
-                    <p className="text-4xl font-bold text-gray-900 dark:text-white" data-testid="text-health-score">{healthScore}</p>
-                    <p className="text-gray-500">/100</p>
+                    <p className="text-4xl font-bold text-[#0B1F3B] dark:text-white" data-testid="text-health-score">{healthScore}</p>
+                    <p className="text-[#64748B]">/100</p>
                   </div>
                   <p className="text-sm text-green-600 dark:text-green-400 mt-1" data-testid="text-health-trend">
                     <TrendingUp className="w-4 h-4 inline mr-1" />
@@ -160,12 +160,12 @@ export default function VehicleHealthMonitoring() {
               </div>
               
               <div className="text-right space-y-2">
-                <Badge variant="outline" className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-200" data-testid="badge-health-status">
+                <Badge className="bg-green-500/10 text-green-600 dark:text-green-400 border-0" data-testid="badge-health-status">
                   {t('common.healthy', 'Healthy')}
                 </Badge>
                 <div>
-                  <p className="text-xs text-gray-500">{t('vehicleHealth.connectedSince', 'Connected Since')}</p>
-                  <p className="text-sm font-medium text-gray-900 dark:text-white" data-testid="text-connection-time">10:00 AM</p>
+                  <p className="text-xs text-[#64748B]">{t('vehicleHealth.connectedSince', 'Connected Since')}</p>
+                  <p className="text-sm font-medium text-[#0B1F3B] dark:text-white" data-testid="text-connection-time">10:00 AM</p>
                 </div>
                 <div className="flex items-center gap-1 text-green-600 dark:text-green-400" data-testid="badge-live-status">
                   <Radio className="w-3 h-3 animate-pulse" />
@@ -184,7 +184,7 @@ export default function VehicleHealthMonitoring() {
           {sensors.map((sensor, idx) => {
             const Icon = sensor.icon;
             return (
-              <Card key={idx} className={`border ${getStatusColor(sensor.status)}`} data-testid={`card-sensor-${idx}`}>
+              <Card key={idx} className={`border bg-white dark:bg-[#151A23] ${getStatusColor(sensor.status)}`} data-testid={`card-sensor-${idx}`}>
                 <CardContent className="pt-6">
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center gap-3">
@@ -192,23 +192,23 @@ export default function VehicleHealthMonitoring() {
                         <Icon className="w-5 h-5" />
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-gray-900 dark:text-white" data-testid={`text-sensor-name-${idx}`}>
+                        <p className="text-sm font-medium text-[#0B1F3B] dark:text-white" data-testid={`text-sensor-name-${idx}`}>
                           {sensor.name}
                         </p>
-                        <p className="text-xs text-gray-500" data-testid={`text-sensor-range-${idx}`}>{sensor.healthy}</p>
+                        <p className="text-xs text-[#64748B]" data-testid={`text-sensor-range-${idx}`}>{sensor.healthy}</p>
                       </div>
                     </div>
-                    <Badge variant="outline" className={getStatusColor(sensor.status)} data-testid={`badge-sensor-status-${idx}`}>
+                    <Badge variant="outline" className={`${getStatusColor(sensor.status)} border`} data-testid={`badge-sensor-status-${idx}`}>
                       {getStatusLabel(sensor.status)}
                     </Badge>
                   </div>
                   
                   <div className="flex items-baseline justify-between mb-2">
-                    <p className="text-2xl font-bold text-gray-900 dark:text-white" data-testid={`text-sensor-value-${idx}`}>
+                    <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white" data-testid={`text-sensor-value-${idx}`}>
                       {sensor.value}
                     </p>
                     <span className={`text-sm ${
-                      sensor.trend.startsWith("+") ? "text-red-600" : "text-green-600"
+                      sensor.trend.startsWith("+") ? "text-[#F97316]" : "text-green-600"
                     }`} data-testid={`text-sensor-trend-${idx}`}>
                       {sensor.trend}
                     </span>
@@ -221,16 +221,16 @@ export default function VehicleHealthMonitoring() {
           })}
         </div>
 
-        <Card className="border-gray-200 dark:border-gray-800">
+        <Card className="border-[#E2E8F0] dark:border-[#232A36] bg-white dark:bg-[#151A23]">
           <CardHeader>
-            <CardTitle>{t('vehicleHealth.liveSensorTelemetry', 'Live Sensor Telemetry')}</CardTitle>
-            <CardDescription>
+            <CardTitle className="text-[#0B1F3B] dark:text-white">{t('vehicleHealth.liveSensorTelemetry', 'Live Sensor Telemetry')}</CardTitle>
+            <CardDescription className="text-[#64748B]">
               {t('vehicleHealth.realTimeMonitoring', 'Real-time monitoring of critical vehicle systems')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="temp" className="w-full">
-              <TabsList className="grid w-full grid-cols-4">
+              <TabsList className="grid w-full grid-cols-4 bg-[#F8FAFC] dark:bg-[#0E1117]">
                 <TabsTrigger value="temp" data-testid="tab-temperature">{t('vehicleHealth.temperature', 'Temperature')}</TabsTrigger>
                 <TabsTrigger value="pressure" data-testid="tab-pressure">{t('vehicleHealth.pressure', 'Pressure')}</TabsTrigger>
                 <TabsTrigger value="rpm" data-testid="tab-rpm">{t('vehicleHealth.rpm', 'RPM')}</TabsTrigger>
@@ -240,22 +240,23 @@ export default function VehicleHealthMonitoring() {
               <TabsContent value="temp" className="space-y-4">
                 <ResponsiveContainer width="100%" height={300}>
                   <AreaChart data={sensorData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                    <XAxis dataKey="time" stroke="#9CA3AF" />
-                    <YAxis stroke="#9CA3AF" domain={[190, 215]} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
+                    <XAxis dataKey="time" stroke="#64748B" />
+                    <YAxis stroke="#64748B" domain={[190, 215]} />
                     <Tooltip 
                       contentStyle={{ 
-                        backgroundColor: '#1F2937', 
-                        border: '1px solid #374151',
-                        borderRadius: '8px'
+                        backgroundColor: '#151A23', 
+                        border: '1px solid #232A36',
+                        borderRadius: '8px',
+                        color: '#fff'
                       }}
                     />
                     <Area 
                       type="monotone" 
                       dataKey="temp" 
-                      stroke="#EF4444" 
-                      fill="#FEE2E2" 
-                      fillOpacity={0.3}
+                      stroke="#F97316" 
+                      fill="#F97316" 
+                      fillOpacity={0.2}
                       name={t('vehicleHealth.engineTempF', 'Engine Temp (°F)')}
                     />
                   </AreaChart>
@@ -265,23 +266,24 @@ export default function VehicleHealthMonitoring() {
               <TabsContent value="pressure" className="space-y-4">
                 <ResponsiveContainer width="100%" height={300}>
                   <LineChart data={sensorData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                    <XAxis dataKey="time" stroke="#9CA3AF" />
-                    <YAxis stroke="#9CA3AF" domain={[25, 35]} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
+                    <XAxis dataKey="time" stroke="#64748B" />
+                    <YAxis stroke="#64748B" domain={[25, 35]} />
                     <Tooltip 
                       contentStyle={{ 
-                        backgroundColor: '#1F2937', 
-                        border: '1px solid #374151',
-                        borderRadius: '8px'
+                        backgroundColor: '#151A23', 
+                        border: '1px solid #232A36',
+                        borderRadius: '8px',
+                        color: '#fff'
                       }}
                     />
                     <Line 
                       type="monotone" 
                       dataKey="pressure" 
-                      stroke="#3B82F6" 
+                      stroke="#0A5ED7" 
                       strokeWidth={2}
                       name={t('vehicleHealth.oilPressurePSI', 'Oil Pressure (PSI)')}
-                      dot={{ r: 4 }}
+                      dot={{ r: 4, fill: '#0A5ED7' }}
                     />
                   </LineChart>
                 </ResponsiveContainer>
@@ -290,22 +292,23 @@ export default function VehicleHealthMonitoring() {
               <TabsContent value="rpm" className="space-y-4">
                 <ResponsiveContainer width="100%" height={300}>
                   <AreaChart data={sensorData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                    <XAxis dataKey="time" stroke="#9CA3AF" />
-                    <YAxis stroke="#9CA3AF" domain={[2000, 3000]} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
+                    <XAxis dataKey="time" stroke="#64748B" />
+                    <YAxis stroke="#64748B" domain={[2000, 3000]} />
                     <Tooltip 
                       contentStyle={{ 
-                        backgroundColor: '#1F2937', 
-                        border: '1px solid #374151',
-                        borderRadius: '8px'
+                        backgroundColor: '#151A23', 
+                        border: '1px solid #232A36',
+                        borderRadius: '8px',
+                        color: '#fff'
                       }}
                     />
                     <Area 
                       type="monotone" 
                       dataKey="rpm" 
-                      stroke="#8B5CF6" 
-                      fill="#EDE9FE" 
-                      fillOpacity={0.3}
+                      stroke="#0BB3FF" 
+                      fill="#0BB3FF" 
+                      fillOpacity={0.2}
                       name={t('vehicleHealth.engineRPM', 'Engine RPM')}
                     />
                   </AreaChart>
@@ -315,14 +318,15 @@ export default function VehicleHealthMonitoring() {
               <TabsContent value="voltage" className="space-y-4">
                 <ResponsiveContainer width="100%" height={300}>
                   <LineChart data={sensorData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                    <XAxis dataKey="time" stroke="#9CA3AF" />
-                    <YAxis stroke="#9CA3AF" domain={[13, 15]} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
+                    <XAxis dataKey="time" stroke="#64748B" />
+                    <YAxis stroke="#64748B" domain={[13, 15]} />
                     <Tooltip 
                       contentStyle={{ 
-                        backgroundColor: '#1F2937', 
-                        border: '1px solid #374151',
-                        borderRadius: '8px'
+                        backgroundColor: '#151A23', 
+                        border: '1px solid #232A36',
+                        borderRadius: '8px',
+                        color: '#fff'
                       }}
                     />
                     <Line 
@@ -331,7 +335,7 @@ export default function VehicleHealthMonitoring() {
                       stroke="#10B981" 
                       strokeWidth={2}
                       name={t('vehicleHealth.batteryVoltageV', 'Battery Voltage (V)')}
-                      dot={{ r: 4 }}
+                      dot={{ r: 4, fill: '#10B981' }}
                     />
                   </LineChart>
                 </ResponsiveContainer>
@@ -340,10 +344,10 @@ export default function VehicleHealthMonitoring() {
           </CardContent>
         </Card>
 
-        <Card className="border-gray-200 dark:border-gray-800">
+        <Card className="border-[#E2E8F0] dark:border-[#232A36] bg-white dark:bg-[#151A23]">
           <CardHeader>
-            <CardTitle>{t('vehicleHealth.activeAlerts', 'Active Alerts & Recommendations')}</CardTitle>
-            <CardDescription>
+            <CardTitle className="text-[#0B1F3B] dark:text-white">{t('vehicleHealth.activeAlerts', 'Active Alerts & Recommendations')}</CardTitle>
+            <CardDescription className="text-[#64748B]">
               {t('vehicleHealth.iotNotifications', 'IoT-triggered notifications and predictive maintenance suggestions')}
             </CardDescription>
           </CardHeader>
@@ -352,7 +356,7 @@ export default function VehicleHealthMonitoring() {
               {alerts.map((alert, idx) => {
                 const Icon = getSeverityIcon(alert.severity);
                 return (
-                  <Card key={idx} className={`border ${getStatusColor(alert.severity)}`} data-testid={`card-alert-${idx}`}>
+                  <Card key={idx} className={`border bg-white dark:bg-[#151A23] ${getStatusColor(alert.severity)}`} data-testid={`card-alert-${idx}`}>
                     <CardContent className="pt-4">
                       <div className="flex items-start gap-3">
                         <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${getStatusColor(alert.severity)}`}>
@@ -360,17 +364,17 @@ export default function VehicleHealthMonitoring() {
                         </div>
                         <div className="flex-1">
                           <div className="flex items-start justify-between mb-1">
-                            <h4 className="font-semibold text-gray-900 dark:text-white" data-testid={`text-alert-title-${idx}`}>
+                            <h4 className="font-semibold text-[#0B1F3B] dark:text-white" data-testid={`text-alert-title-${idx}`}>
                               {alert.title}
                             </h4>
-                            <span className="text-xs text-gray-500" data-testid={`text-alert-time-${idx}`}>{alert.time}</span>
+                            <span className="text-xs text-[#64748B]" data-testid={`text-alert-time-${idx}`}>{alert.time}</span>
                           </div>
-                          <p className="text-sm text-gray-600 dark:text-gray-400 mb-2" data-testid={`text-alert-description-${idx}`}>
+                          <p className="text-sm text-[#64748B] mb-2" data-testid={`text-alert-description-${idx}`}>
                             {alert.description}
                           </p>
                           <div className="flex items-center gap-2">
-                            <Zap className="w-3 h-3 text-blue-600 dark:text-blue-400" />
-                            <p className="text-xs font-medium text-blue-600 dark:text-blue-400" data-testid={`text-alert-action-${idx}`}>
+                            <Zap className="w-3 h-3 text-[#0A5ED7]" />
+                            <p className="text-xs font-medium text-[#0A5ED7]" data-testid={`text-alert-action-${idx}`}>
                               {alert.action}
                             </p>
                           </div>

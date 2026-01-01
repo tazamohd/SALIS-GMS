@@ -77,61 +77,68 @@ export default function TelematicsIntegration() {
 
   const getSeverityBadge = (severity: string) => {
     const colors: Record<string, string> = {
-      low: "bg-blue-500 text-white",
-      medium: "bg-yellow-500 text-white",
-      high: "bg-orange-500 text-white",
-      critical: "bg-red-600 text-white",
+      low: "bg-[#0A5ED7]/10 text-[#0A5ED7]",
+      medium: "bg-[#F97316]/10 text-[#F97316]",
+      high: "bg-[#F97316]/10 text-[#F97316]",
+      critical: "bg-red-500/10 text-red-600",
     };
-    return colors[severity] || "bg-salis-gray text-white";
+    return colors[severity] || "bg-[#64748B]/10 text-[#64748B]";
   };
 
   const feedsContent = (
     <div className="space-y-4">
-          <Card className="border-salis-gray-light dark:border-salis-gray-dark bg-white dark:bg-[#010101]">
+          <Card className="border-[#E2E8F0] dark:border-[#232A36] bg-white dark:bg-[#151A23]">
             <CardHeader>
-              <CardTitle className="font-montserrat text-salis-black dark:text-white">{t('telematics.realTimeFeeds', 'Real-Time Telemetry Feeds')}</CardTitle>
-              <CardDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
+              <CardTitle className="text-[#0B1F3B] dark:text-white">{t('telematics.realTimeFeeds', 'Real-Time Telemetry Feeds')}</CardTitle>
+              <CardDescription className="text-[#64748B]">
                 {t('telematics.liveVehicleData', 'Live vehicle location and sensor data')}
               </CardDescription>
             </CardHeader>
             <CardContent>
               {feedsLoading ? (
-                <p className="text-salis-gray font-poppins" data-testid="text-loading">{t('common.loading', 'Loading feeds...')}</p>
+                <p className="text-[#64748B]" data-testid="text-loading">{t('common.loading', 'Loading feeds...')}</p>
               ) : feeds.length === 0 ? (
-                <p className="text-salis-gray font-poppins" data-testid="text-no-feeds">{t('telematics.noFeeds', 'No telemetry feeds available')}</p>
+                <div className="text-center py-12">
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-r from-[#0A5ED7]/20 to-[#0BB3FF]/20 flex items-center justify-center mx-auto mb-4">
+                    <Activity className="h-8 w-8 text-[#0A5ED7]" />
+                  </div>
+                  <p className="text-[#64748B]" data-testid="text-no-feeds">{t('telematics.noFeeds', 'No telemetry feeds available')}</p>
+                </div>
               ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>{t('telematics.vehicle', 'Vehicle')}</TableHead>
-                      <TableHead>{t('telematics.device', 'Device')}</TableHead>
-                      <TableHead>{t('telematics.location', 'Location')}</TableHead>
-                      <TableHead>{t('telematics.speed', 'Speed')}</TableHead>
-                      <TableHead>{t('telematics.fuelLevel', 'Fuel Level')}</TableHead>
-                      <TableHead>{t('telematics.timestamp', 'Timestamp')}</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {feeds.map((feed: any) => (
-                      <TableRow key={feed.id} data-testid={`row-feed-${feed.id}`}>
-                        <TableCell className="font-medium" data-testid={`text-vehicle-${feed.id}`}>{feed.vehicleId || t('common.notAvailable', 'N/A')}</TableCell>
-                        <TableCell data-testid={`text-device-${feed.id}`}>{feed.deviceId || t('common.notAvailable', 'N/A')}</TableCell>
-                        <TableCell data-testid={`text-location-${feed.id}`}>
-                          {feed.latitude && feed.longitude ? `${feed.latitude.toFixed(6)}, ${feed.longitude.toFixed(6)}` : t('common.unknown', 'Unknown')}
-                        </TableCell>
-                        <TableCell data-testid={`text-speed-${feed.id}`}>
-                          {feed.speed !== null && feed.speed !== undefined ? `${feed.speed} ${t('telematics.mph', 'mph')}` : t('common.notAvailable', 'N/A')}
-                        </TableCell>
-                        <TableCell data-testid={`text-fuel-${feed.id}`}>
-                          {feed.fuelLevel !== null && feed.fuelLevel !== undefined ? `${feed.fuelLevel}%` : t('common.notAvailable', 'N/A')}
-                        </TableCell>
-                        <TableCell data-testid={`text-timestamp-${feed.id}`}>
-                          {feed.timestamp ? new Date(feed.timestamp).toLocaleString() : t('common.notAvailable', 'N/A')}
-                        </TableCell>
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="border-[#E2E8F0] dark:border-[#232A36]">
+                        <TableHead className="text-[#64748B]">{t('telematics.vehicle', 'Vehicle')}</TableHead>
+                        <TableHead className="text-[#64748B]">{t('telematics.device', 'Device')}</TableHead>
+                        <TableHead className="text-[#64748B]">{t('telematics.location', 'Location')}</TableHead>
+                        <TableHead className="text-[#64748B]">{t('telematics.speed', 'Speed')}</TableHead>
+                        <TableHead className="text-[#64748B]">{t('telematics.fuelLevel', 'Fuel Level')}</TableHead>
+                        <TableHead className="text-[#64748B]">{t('telematics.timestamp', 'Timestamp')}</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                    </TableHeader>
+                    <TableBody>
+                      {feeds.map((feed: any) => (
+                        <TableRow key={feed.id} className="border-[#E2E8F0] dark:border-[#232A36]" data-testid={`row-feed-${feed.id}`}>
+                          <TableCell className="font-medium text-[#0B1F3B] dark:text-white" data-testid={`text-vehicle-${feed.id}`}>{feed.vehicleId || t('common.notAvailable', 'N/A')}</TableCell>
+                          <TableCell className="text-[#64748B]" data-testid={`text-device-${feed.id}`}>{feed.deviceId || t('common.notAvailable', 'N/A')}</TableCell>
+                          <TableCell className="text-[#64748B]" data-testid={`text-location-${feed.id}`}>
+                            {feed.latitude && feed.longitude ? `${feed.latitude.toFixed(6)}, ${feed.longitude.toFixed(6)}` : t('common.unknown', 'Unknown')}
+                          </TableCell>
+                          <TableCell className="text-[#64748B]" data-testid={`text-speed-${feed.id}`}>
+                            {feed.speed !== null && feed.speed !== undefined ? `${feed.speed} ${t('telematics.mph', 'mph')}` : t('common.notAvailable', 'N/A')}
+                          </TableCell>
+                          <TableCell className="text-[#64748B]" data-testid={`text-fuel-${feed.id}`}>
+                            {feed.fuelLevel !== null && feed.fuelLevel !== undefined ? `${feed.fuelLevel}%` : t('common.notAvailable', 'N/A')}
+                          </TableCell>
+                          <TableCell className="text-[#64748B]" data-testid={`text-timestamp-${feed.id}`}>
+                            {feed.timestamp ? new Date(feed.timestamp).toLocaleString() : t('common.notAvailable', 'N/A')}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
               )}
             </CardContent>
           </Card>
@@ -140,43 +147,48 @@ export default function TelematicsIntegration() {
 
   const alertsContent = (
     <div className="space-y-4">
-          <Card className="border-salis-gray-light dark:border-salis-gray-dark bg-white dark:bg-[#010101]">
+          <Card className="border-[#E2E8F0] dark:border-[#232A36] bg-white dark:bg-[#151A23]">
             <CardHeader>
-              <CardTitle className="font-montserrat text-salis-black dark:text-white">{t('telematics.alerts', 'Telematics Alerts')}</CardTitle>
-              <CardDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
+              <CardTitle className="text-[#0B1F3B] dark:text-white">{t('telematics.alerts', 'Telematics Alerts')}</CardTitle>
+              <CardDescription className="text-[#64748B]">
                 {t('telematics.vehicleAlerts', 'Vehicle alerts and notifications')}
               </CardDescription>
             </CardHeader>
             <CardContent>
               {alertsLoading ? (
-                <p className="text-salis-gray font-poppins" data-testid="text-loading-alerts">{t('telematics.loadingAlerts', 'Loading alerts...')}</p>
+                <p className="text-[#64748B]" data-testid="text-loading-alerts">{t('telematics.loadingAlerts', 'Loading alerts...')}</p>
               ) : alerts.length === 0 ? (
-                <p className="text-salis-gray font-poppins" data-testid="text-no-alerts">{t('telematics.noAlerts', 'No alerts found')}</p>
+                <div className="text-center py-12">
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-r from-[#0A5ED7]/20 to-[#0BB3FF]/20 flex items-center justify-center mx-auto mb-4">
+                    <AlertTriangle className="h-8 w-8 text-[#0A5ED7]" />
+                  </div>
+                  <p className="text-[#64748B]" data-testid="text-no-alerts">{t('telematics.noAlerts', 'No alerts found')}</p>
+                </div>
               ) : (
                 <div className="grid gap-4">
                   {alerts.map((alert: any) => (
-                    <Card key={alert.id} className="border-salis-gray-light dark:border-salis-gray-dark" data-testid={`card-alert-${alert.id}`}>
+                    <Card key={alert.id} className="border-[#E2E8F0] dark:border-[#232A36] bg-[#F8FAFC] dark:bg-[#0E1117]" data-testid={`card-alert-${alert.id}`}>
                       <CardContent className="p-6">
                         <div className="flex justify-between items-start">
                           <div className="flex-1">
                             <div className="flex items-center gap-3 mb-2">
-                              <AlertTriangle className={`h-5 w-5 ${alert.severity === "critical" ? "text-red-600" : "text-orange-500"}`} />
-                              <h3 className="text-lg font-montserrat font-medium text-salis-black dark:text-white" data-testid={`text-alert-type-${alert.id}`}>
+                              <AlertTriangle className={`h-5 w-5 ${alert.severity === "critical" ? "text-red-600" : "text-[#F97316]"}`} />
+                              <h3 className="text-lg font-medium text-[#0B1F3B] dark:text-white" data-testid={`text-alert-type-${alert.id}`}>
                                 {alert.alertType.replace(/_/g, " ").toUpperCase()}
                               </h3>
                               <Badge className={getSeverityBadge(alert.severity)} data-testid={`badge-severity-${alert.id}`}>
                                 {alert.severity}
                               </Badge>
                               {alert.isResolved && (
-                                <Badge className="bg-green-500 text-white" data-testid={`badge-resolved-${alert.id}`}>
+                                <Badge className="bg-green-500/10 text-green-600" data-testid={`badge-resolved-${alert.id}`}>
                                   {t('telematics.resolved', 'Resolved')}
                                 </Badge>
                               )}
                             </div>
-                            <p className="text-sm text-salis-gray dark:text-salis-gray-light font-poppins mb-2" data-testid={`text-alert-message-${alert.id}`}>
+                            <p className="text-sm text-[#64748B] mb-2" data-testid={`text-alert-message-${alert.id}`}>
                               {alert.message}
                             </p>
-                            <div className="flex gap-4 text-sm text-salis-gray dark:text-salis-gray-light">
+                            <div className="flex gap-4 text-sm text-[#64748B]">
                               <span data-testid={`text-alert-vehicle-${alert.id}`}>{t('telematics.vehicle', 'Vehicle')}: {alert.vehicleId}</span>
                               <span data-testid={`text-alert-timestamp-${alert.id}`}>
                                 {new Date(alert.timestamp).toLocaleString()}
@@ -187,7 +199,7 @@ export default function TelematicsIntegration() {
                             <Button
                               size="sm"
                               onClick={() => resolveAlertMutation.mutate(alert.id)}
-                              className="bg-green-500 hover:bg-green-600 text-white"
+                              className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white"
                               data-testid={`button-resolve-${alert.id}`}
                             >
                               {t('telematics.resolve', 'Resolve')}
@@ -235,10 +247,10 @@ export default function TelematicsIntegration() {
       />
       
       <Dialog open={isAlertDialogOpen} onOpenChange={setIsAlertDialogOpen}>
-        <DialogContent className="bg-white dark:bg-salis-black">
+        <DialogContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <DialogHeader>
-            <DialogTitle className="font-montserrat text-salis-black dark:text-white">{t('telematics.createTelematicsAlert', 'Create Telematics Alert')}</DialogTitle>
-            <DialogDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
+            <DialogTitle className="text-[#0B1F3B] dark:text-white">{t('telematics.createTelematicsAlert', 'Create Telematics Alert')}</DialogTitle>
+            <DialogDescription className="text-[#64748B]">
               {t('telematics.createNewAlert', 'Create a new vehicle alert')}
             </DialogDescription>
           </DialogHeader>
@@ -249,9 +261,9 @@ export default function TelematicsIntegration() {
                 name="vehicleId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('telematics.vehicleId', 'Vehicle ID')}</FormLabel>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('telematics.vehicleId', 'Vehicle ID')}</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="VEH-12345" data-testid="input-vehicle-id" />
+                      <Input {...field} placeholder="VEH-12345" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="input-vehicle-id" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -263,11 +275,11 @@ export default function TelematicsIntegration() {
                   name="alertType"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('telematics.alertType', 'Alert Type')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('telematics.alertType', 'Alert Type')}</FormLabel>
                       <FormControl>
                         <select
                           {...field}
-                          className="flex h-10 w-full rounded-md border border-salis-gray-light bg-white dark:bg-salis-black px-3 py-2 text-sm"
+                          className="flex h-10 w-full rounded-md border border-[#E2E8F0] dark:border-[#232A36] bg-white dark:bg-[#0E1117] px-3 py-2 text-sm text-[#0B1F3B] dark:text-white"
                           data-testid="select-alert-type"
                         >
                           <option value="speeding">{t('telematics.speeding', 'Speeding')}</option>
@@ -288,11 +300,11 @@ export default function TelematicsIntegration() {
                   name="severity"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('telematics.severity', 'Severity')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('telematics.severity', 'Severity')}</FormLabel>
                       <FormControl>
                         <select
                           {...field}
-                          className="flex h-10 w-full rounded-md border border-salis-gray-light bg-white dark:bg-salis-black px-3 py-2 text-sm"
+                          className="flex h-10 w-full rounded-md border border-[#E2E8F0] dark:border-[#232A36] bg-white dark:bg-[#0E1117] px-3 py-2 text-sm text-[#0B1F3B] dark:text-white"
                           data-testid="select-severity"
                         >
                           <option value="low">{t('telematics.low', 'Low')}</option>
@@ -311,9 +323,9 @@ export default function TelematicsIntegration() {
                 name="message"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('telematics.message', 'Message')}</FormLabel>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('telematics.message', 'Message')}</FormLabel>
                     <FormControl>
-                      <Textarea {...field} placeholder={t('telematics.alertDescriptionPlaceholder', 'Alert description...')} data-testid="input-message" />
+                      <Textarea {...field} placeholder={t('telematics.alertDescriptionPlaceholder', 'Alert description...')} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="input-message" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -325,13 +337,14 @@ export default function TelematicsIntegration() {
                   name="latitude"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('telematics.latitudeOptional', 'Latitude (optional)')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('telematics.latitudeOptional', 'Latitude (optional)')}</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
                           type="number"
                           step="0.000001"
                           onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                          className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                           data-testid="input-latitude"
                         />
                       </FormControl>
@@ -344,13 +357,14 @@ export default function TelematicsIntegration() {
                   name="longitude"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('telematics.longitudeOptional', 'Longitude (optional)')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('telematics.longitudeOptional', 'Longitude (optional)')}</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
                           type="number"
                           step="0.000001"
                           onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                          className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                           data-testid="input-longitude"
                         />
                       </FormControl>
@@ -360,7 +374,7 @@ export default function TelematicsIntegration() {
                 />
               </div>
               <DialogFooter>
-                <Button type="submit" disabled={createAlertMutation.isPending} data-testid="button-submit-alert">
+                <Button type="submit" disabled={createAlertMutation.isPending} className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952C1] hover:to-[#0AA3E8] text-white" data-testid="button-submit-alert">
                   {createAlertMutation.isPending ? t('telematics.creating', 'Creating...') : t('telematics.createAlert', 'Create Alert')}
                 </Button>
               </DialogFooter>

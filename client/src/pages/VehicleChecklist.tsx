@@ -153,11 +153,11 @@ export default function VehicleChecklist() {
 
   const getStatusBadge = (status: string) => {
     const statusMap: Record<string, string> = {
-      in_progress: "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300",
-      completed: "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300",
-      pending_review: "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300",
+      in_progress: "bg-[#0A5ED7]/10 text-[#0A5ED7]",
+      completed: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
+      pending_review: "bg-[#F97316]/10 text-[#F97316]",
     };
-    return statusMap[status] || "bg-gray-100 dark:bg-gray-900/30 text-gray-700 dark:text-gray-300";
+    return statusMap[status] || "bg-[#64748B]/10 text-[#64748B]";
   };
 
   const getStatusLabel = (status: string) => {
@@ -172,13 +172,13 @@ export default function VehicleChecklist() {
   const getItemStatusIcon = (status: string) => {
     switch (status) {
       case "pass":
-        return <CheckCircle2 className="w-5 h-5 text-green-500" />;
+        return <CheckCircle2 className="w-5 h-5 text-emerald-500" />;
       case "fail":
-        return <AlertTriangle className="w-5 h-5 text-red-500" />;
+        return <AlertTriangle className="w-5 h-5 text-[#F97316]" />;
       case "na":
-        return <Circle className="w-5 h-5 text-gray-400" />;
+        return <Circle className="w-5 h-5 text-[#64748B]" />;
       default:
-        return <Clock className="w-5 h-5 text-yellow-500" />;
+        return <Clock className="w-5 h-5 text-[#0A5ED7]" />;
     }
   };
 
@@ -193,40 +193,40 @@ export default function VehicleChecklist() {
   const categories = Array.from(new Set(defaultChecklistItems.map((item) => item.category)));
 
   return (
-    <div className="p-6 space-y-6 bg-gray-50 dark:bg-salis-gray-dark/30 min-h-screen">
+    <div className="p-6 space-y-6 bg-[#F8FAFC] dark:bg-[#0E1117] min-h-screen">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="font-montserrat font-bold text-2xl text-gray-900 dark:text-white">
+          <h1 className="font-montserrat font-bold text-2xl text-[#0B1F3B] dark:text-white">
             {t('vehicles.vehicleChecklist', 'Vehicle Checklist')}
           </h1>
-          <p className="font-poppins text-sm text-gray-600 dark:text-gray-400 mt-1">
+          <p className="font-poppins text-sm text-[#64748B] mt-1">
             {t('vehicles.comprehensiveVehicleInspectionChecklists', 'Comprehensive vehicle inspection checklists for quality assurance')}
           </p>
         </div>
         <Dialog open={isNewChecklistOpen} onOpenChange={setIsNewChecklistOpen}>
           <DialogTrigger asChild>
             <Button
-              className="bg-gray-900 hover:bg-gray-800 dark:bg-white dark:hover:bg-gray-100 text-white dark:text-gray-900"
+              className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952b8] hover:to-[#09a0e6] text-white shadow-lg"
               data-testid="button-new-checklist"
             >
               <Plus className="w-4 h-4 mr-2" />
               {t('vehicles.newChecklist', 'New Checklist')}
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-md">
+          <DialogContent className="max-w-md bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <DialogHeader>
-              <DialogTitle className="font-montserrat">{t('vehicles.startNewChecklist', 'Start New Checklist')}</DialogTitle>
+              <DialogTitle className="font-montserrat text-[#0B1F3B] dark:text-white">{t('vehicles.startNewChecklist', 'Start New Checklist')}</DialogTitle>
             </DialogHeader>
             <div className="space-y-4 pt-4">
               <div>
-                <label className="font-poppins text-sm text-gray-700 dark:text-gray-300">
+                <label className="font-poppins text-sm text-[#0B1F3B] dark:text-white">
                   {t('vehicles.selectVehicle', 'Select Vehicle')}
                 </label>
                 <Select>
-                  <SelectTrigger className="mt-1">
+                  <SelectTrigger className="mt-1 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white">
                     <SelectValue placeholder={t('vehicles.chooseVehicle', 'Choose a vehicle')} />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                     <SelectItem value="v1">ABC-1234 - Toyota Camry 2023</SelectItem>
                     <SelectItem value="v2">XYZ-5678 - Honda Accord 2022</SelectItem>
                     <SelectItem value="v3">DEF-9012 - BMW X5 2023</SelectItem>
@@ -234,14 +234,14 @@ export default function VehicleChecklist() {
                 </Select>
               </div>
               <div>
-                <label className="font-poppins text-sm text-gray-700 dark:text-gray-300">
+                <label className="font-poppins text-sm text-[#0B1F3B] dark:text-white">
                   {t('vehicles.assignTechnician', 'Assign Technician')}
                 </label>
                 <Select>
-                  <SelectTrigger className="mt-1">
+                  <SelectTrigger className="mt-1 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white">
                     <SelectValue placeholder={t('vehicles.chooseTechnician', 'Choose a technician')} />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                     <SelectItem value="t1">Ahmed Hassan</SelectItem>
                     <SelectItem value="t2">Mohammed Ali</SelectItem>
                     <SelectItem value="t3">Khalid Omar</SelectItem>
@@ -249,7 +249,7 @@ export default function VehicleChecklist() {
                 </Select>
               </div>
               <Button
-                className="w-full bg-gray-900 hover:bg-gray-800 dark:bg-white dark:hover:bg-gray-100 text-white dark:text-gray-900"
+                className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952b8] hover:to-[#09a0e6] text-white"
                 onClick={() => {
                   setIsNewChecklistOpen(false);
                   toast({ title: t('vehicles.checklistCreated', 'Checklist created'), description: t('vehicles.newVehicleChecklistStarted', 'New vehicle checklist has been started') });
@@ -262,24 +262,24 @@ export default function VehicleChecklist() {
         </Dialog>
       </div>
 
-      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardContent className="p-4">
           <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
             <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#64748B]" />
               <Input
                 placeholder={t('vehicles.searchByPlateVehicleTechnician', 'Search by plate, vehicle, or technician...')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 font-poppins"
+                className="pl-10 font-poppins bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                 data-testid="input-search-checklist"
               />
             </div>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-[180px]" data-testid="select-status-filter">
+              <SelectTrigger className="w-[180px] bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="select-status-filter">
                 <SelectValue placeholder={t('vehicles.filterByStatus', 'Filter by status')} />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                 <SelectItem value="all">{t('vehicles.allStatus', 'All Status')}</SelectItem>
                 <SelectItem value="in_progress">{t('common.inProgress', 'In Progress')}</SelectItem>
                 <SelectItem value="completed">{t('common.completed', 'Completed')}</SelectItem>
@@ -292,7 +292,7 @@ export default function VehicleChecklist() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-1 space-y-4">
-          <h2 className="font-poppins font-semibold text-sm text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+          <h2 className="font-poppins font-semibold text-sm text-[#64748B] uppercase tracking-wider">
             {t('vehicles.recentChecklists', 'Recent Checklists')} ({filteredChecklists.length})
           </h2>
           {filteredChecklists.map((checklist) => {
@@ -300,8 +300,8 @@ export default function VehicleChecklist() {
             return (
               <Card
                 key={checklist.id}
-                className={`bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark cursor-pointer transition-all hover:shadow-md ${
-                  selectedChecklist?.id === checklist.id ? "ring-2 ring-gray-900 dark:ring-white" : ""
+                className={`bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36] cursor-pointer transition-all hover:shadow-md ${
+                  selectedChecklist?.id === checklist.id ? "ring-2 ring-[#0A5ED7]" : ""
                 }`}
                 onClick={() => setSelectedChecklist(checklist)}
                 data-testid={`card-checklist-${checklist.id}`}
@@ -309,34 +309,34 @@ export default function VehicleChecklist() {
                 <CardContent className="p-4">
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center gap-2">
-                      <Car className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-                      <span className="font-montserrat font-bold text-sm text-gray-900 dark:text-white">
+                      <Car className="w-5 h-5 text-[#0A5ED7]" />
+                      <span className="font-montserrat font-bold text-sm text-[#0B1F3B] dark:text-white">
                         {checklist.vehiclePlate}
                       </span>
                     </div>
-                    <Badge className={`${getStatusBadge(checklist.status)} text-xs`}>
+                    <Badge className={`${getStatusBadge(checklist.status)} text-xs border-0`}>
                       {getStatusLabel(checklist.status)}
                     </Badge>
                   </div>
-                  <p className="font-poppins text-sm text-gray-700 dark:text-gray-300">
+                  <p className="font-poppins text-sm text-[#0B1F3B] dark:text-white">
                     {checklist.vehicleMake} {checklist.vehicleModel}
                   </p>
-                  <div className="flex items-center gap-2 mt-2 text-xs text-gray-600 dark:text-gray-400">
+                  <div className="flex items-center gap-2 mt-2 text-xs text-[#64748B]">
                     <User className="w-3 h-3" />
                     <span className="font-poppins">{checklist.technicianName}</span>
                   </div>
-                  <div className="flex items-center gap-2 mt-1 text-xs text-gray-600 dark:text-gray-400">
+                  <div className="flex items-center gap-2 mt-1 text-xs text-[#64748B]">
                     <Calendar className="w-3 h-3" />
                     <span className="font-poppins">{format(new Date(checklist.checklistDate), "MMM dd, yyyy")}</span>
                   </div>
                   <div className="mt-3">
-                    <div className="flex justify-between text-xs font-poppins text-gray-600 dark:text-gray-400 mb-1">
+                    <div className="flex justify-between text-xs font-poppins text-[#64748B] mb-1">
                       <span>{t('vehicles.progress', 'Progress')}</span>
                       <span>{stats.percentage}%</span>
                     </div>
-                    <div className="w-full bg-gray-200 dark:bg-salis-gray-dark rounded-full h-2">
+                    <div className="w-full bg-[#E2E8F0] dark:bg-[#232A36] rounded-full h-2">
                       <div
-                        className="bg-gray-900 dark:bg-white rounded-full h-2 transition-all"
+                        className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] rounded-full h-2 transition-all"
                         style={{ width: `${stats.percentage}%` }}
                       />
                     </div>
@@ -349,15 +349,15 @@ export default function VehicleChecklist() {
 
         <div className="lg:col-span-2">
           {selectedChecklist ? (
-            <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
-              <CardHeader className="border-b border-gray-200 dark:border-salis-gray-dark">
+            <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+              <CardHeader className="border-b border-[#E2E8F0] dark:border-[#232A36]">
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle className="font-montserrat text-xl text-gray-900 dark:text-white flex items-center gap-2">
-                      <ClipboardList className="w-5 h-5" />
+                    <CardTitle className="font-montserrat text-xl text-[#0B1F3B] dark:text-white flex items-center gap-2">
+                      <ClipboardList className="w-5 h-5 text-[#0A5ED7]" />
                       {selectedChecklist.vehiclePlate} - {t('vehicles.inspectionChecklist', 'Inspection Checklist')}
                     </CardTitle>
-                    <p className="font-poppins text-sm text-gray-600 dark:text-gray-400 mt-1">
+                    <p className="font-poppins text-sm text-[#64748B] mt-1">
                       {selectedChecklist.vehicleMake} {selectedChecklist.vehicleModel}
                     </p>
                   </div>
@@ -365,7 +365,7 @@ export default function VehicleChecklist() {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="h-8 px-3"
+                      className="h-8 px-3 border-[#0A5ED7] text-[#0A5ED7] hover:bg-[#0A5ED7]/10"
                       data-testid="button-print-checklist"
                     >
                       <Printer className="w-4 h-4 mr-1" />
@@ -373,7 +373,7 @@ export default function VehicleChecklist() {
                     </Button>
                     <Button
                       size="sm"
-                      className="h-8 px-3 bg-gray-900 hover:bg-gray-800 dark:bg-white dark:hover:bg-gray-100 text-white dark:text-gray-900"
+                      className="h-8 px-3 bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952b8] hover:to-[#09a0e6] text-white"
                       data-testid="button-save-checklist"
                     >
                       <Save className="w-4 h-4 mr-1" />
@@ -387,22 +387,22 @@ export default function VehicleChecklist() {
                     return (
                       <>
                         <div className="text-center">
-                          <div className="font-montserrat font-bold text-2xl text-gray-900 dark:text-white">
+                          <div className="font-montserrat font-bold text-2xl text-[#0B1F3B] dark:text-white">
                             {stats.completed}/{stats.total}
                           </div>
-                          <div className="font-poppins text-xs text-gray-600 dark:text-gray-400">{t('vehicles.inspected', 'Inspected')}</div>
+                          <div className="font-poppins text-xs text-[#64748B]">{t('vehicles.inspected', 'Inspected')}</div>
                         </div>
                         <div className="text-center">
-                          <div className="font-montserrat font-bold text-2xl text-green-600 dark:text-green-400">
+                          <div className="font-montserrat font-bold text-2xl text-emerald-600 dark:text-emerald-400">
                             {stats.passed}
                           </div>
-                          <div className="font-poppins text-xs text-gray-600 dark:text-gray-400">{t('vehicles.passed', 'Passed')}</div>
+                          <div className="font-poppins text-xs text-[#64748B]">{t('vehicles.passed', 'Passed')}</div>
                         </div>
                         <div className="text-center">
-                          <div className="font-montserrat font-bold text-2xl text-red-600 dark:text-red-400">
+                          <div className="font-montserrat font-bold text-2xl text-[#F97316]">
                             {stats.failed}
                           </div>
-                          <div className="font-poppins text-xs text-gray-600 dark:text-gray-400">{t('vehicles.failed', 'Failed')}</div>
+                          <div className="font-poppins text-xs text-[#64748B]">{t('vehicles.failed', 'Failed')}</div>
                         </div>
                       </>
                     );
@@ -412,7 +412,7 @@ export default function VehicleChecklist() {
               <CardContent className="p-4 max-h-[600px] overflow-y-auto">
                 {categories.map((category) => (
                   <div key={category} className="mb-6">
-                    <h3 className="font-poppins font-semibold text-sm text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-3 pb-2 border-b border-gray-200 dark:border-salis-gray-dark">
+                    <h3 className="font-poppins font-semibold text-sm text-[#64748B] uppercase tracking-wider mb-3 pb-2 border-b border-[#E2E8F0] dark:border-[#232A36]">
                       {category}
                     </h3>
                     <div className="space-y-3">
@@ -421,24 +421,24 @@ export default function VehicleChecklist() {
                         .map((item) => (
                           <div
                             key={item.id}
-                            className="flex items-start gap-3 p-3 rounded-lg bg-gray-50 dark:bg-salis-gray-dark/30 hover:bg-gray-100 dark:hover:bg-salis-gray-dark/50 transition-colors"
+                            className="flex items-start gap-3 p-3 rounded-lg bg-[#F8FAFC] dark:bg-[#0E1117] hover:bg-[#E2E8F0]/50 dark:hover:bg-[#232A36]/50 transition-colors"
                           >
                             <div className="mt-0.5">{getItemStatusIcon(item.status)}</div>
                             <div className="flex-1">
-                              <p className="font-poppins text-sm text-gray-900 dark:text-white">
+                              <p className="font-poppins text-sm text-[#0B1F3B] dark:text-white">
                                 {item.item}
                               </p>
                               {item.notes && (
-                                <p className="font-poppins text-xs text-red-600 dark:text-red-400 mt-1">
+                                <p className="font-poppins text-xs text-[#F97316] mt-1">
                                   {t('common.notes', 'Note')}: {item.notes}
                                 </p>
                               )}
                             </div>
                             <Select defaultValue={item.status}>
-                              <SelectTrigger className="w-24 h-8 text-xs">
+                              <SelectTrigger className="w-24 h-8 text-xs bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]">
                                 <SelectValue />
                               </SelectTrigger>
-                              <SelectContent>
+                              <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                                 <SelectItem value="pending">{t('common.pending', 'Pending')}</SelectItem>
                                 <SelectItem value="pass">{t('vehicles.pass', 'Pass')}</SelectItem>
                                 <SelectItem value="fail">{t('vehicles.fail', 'Fail')}</SelectItem>
@@ -453,13 +453,15 @@ export default function VehicleChecklist() {
               </CardContent>
             </Card>
           ) : (
-            <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark h-full min-h-[400px] flex items-center justify-center">
+            <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36] h-full min-h-[400px] flex items-center justify-center">
               <div className="text-center p-8">
-                <ClipboardList className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-                <h3 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white mb-2">
+                <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] rounded-full flex items-center justify-center">
+                  <ClipboardList className="w-10 h-10 text-white" />
+                </div>
+                <h3 className="font-montserrat font-semibold text-lg text-[#0B1F3B] dark:text-white mb-2">
                   {t('vehicles.selectChecklist', 'Select a Checklist')}
                 </h3>
-                <p className="font-poppins text-sm text-gray-600 dark:text-gray-400">
+                <p className="font-poppins text-sm text-[#64748B]">
                   {t('vehicles.chooseVehicleChecklistToViewEdit', 'Choose a vehicle checklist from the list to view and edit inspection items')}
                 </p>
               </div>

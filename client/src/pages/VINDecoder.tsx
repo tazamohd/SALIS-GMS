@@ -44,9 +44,9 @@ export default function VINDecoder() {
     >
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-1">
-          <Card className="bg-white dark:bg-salis-black">
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardHeader>
-              <CardTitle>{t('vinDecoder.enterVin', 'Enter VIN')}</CardTitle>
+              <CardTitle className="text-[#0B1F3B] dark:text-white">{t('vinDecoder.enterVin', 'Enter VIN')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
@@ -56,15 +56,15 @@ export default function VINDecoder() {
                   onChange={(e) => setVin(e.target.value.toUpperCase())}
                   maxLength={17}
                   data-testid="input-vin"
-                  className="font-mono text-lg"
+                  className="font-mono text-lg bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                 />
-                <p className="text-xs text-gray-500 dark:text-gray-400">
+                <p className="text-xs text-[#64748B]">
                   {vin.length}/17 {t('vinDecoder.characters', 'characters')}
                 </p>
               </div>
 
               <Button
-                className="w-full bg-blue-600 hover:bg-blue-700"
+                className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952C1] hover:to-[#0AA3E8] text-white"
                 onClick={handleDecode}
                 disabled={vin.length !== 17 || decodeMutation.isPending}
                 data-testid="button-decode-vin"
@@ -73,18 +73,18 @@ export default function VINDecoder() {
                 {decodeMutation.isPending ? t('vinDecoder.decoding', 'Decoding...') : t('vinDecoder.decodeVin', 'Decode VIN')}
               </Button>
 
-              <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
-                <h3 className="font-semibold text-gray-900 dark:text-white mb-2">{t('vinDecoder.sampleVins', 'Sample VINs')}</h3>
+              <div className="pt-4 border-t border-[#E2E8F0] dark:border-[#232A36]">
+                <h3 className="font-semibold text-[#0B1F3B] dark:text-white mb-2">{t('vinDecoder.sampleVins', 'Sample VINs')}</h3>
                 <div className="space-y-2">
                   <button
-                    className="w-full text-left p-2 text-sm bg-gray-50 dark:bg-gray-800 rounded hover:bg-gray-100 dark:hover:bg-gray-700 font-mono"
+                    className="w-full text-left p-2 text-sm bg-[#F8FAFC] dark:bg-[#0E1117] rounded border border-[#E2E8F0] dark:border-[#232A36] hover:border-[#0A5ED7] dark:hover:border-[#0BB3FF] font-mono text-[#0B1F3B] dark:text-white transition-colors"
                     onClick={() => setVin("1HGBH41JXMN109186")}
                     data-testid="sample-vin-1"
                   >
                     1HGBH41JXMN109186
                   </button>
                   <button
-                    className="w-full text-left p-2 text-sm bg-gray-50 dark:bg-gray-800 rounded hover:bg-gray-100 dark:hover:bg-gray-700 font-mono"
+                    className="w-full text-left p-2 text-sm bg-[#F8FAFC] dark:bg-[#0E1117] rounded border border-[#E2E8F0] dark:border-[#232A36] hover:border-[#0A5ED7] dark:hover:border-[#0BB3FF] font-mono text-[#0B1F3B] dark:text-white transition-colors"
                     onClick={() => setVin("5UXWX7C5*BA")}
                     data-testid="sample-vin-2"
                   >
@@ -98,19 +98,21 @@ export default function VINDecoder() {
 
         <div className="lg:col-span-2">
           {!vehicleData ? (
-            <Card className="bg-white dark:bg-salis-black h-full flex items-center justify-center min-h-96">
+            <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36] h-full flex items-center justify-center min-h-96">
               <CardContent className="text-center">
-                <Car className="h-20 w-20 mx-auto mb-4 text-gray-300 dark:text-gray-600" />
-                <p className="text-gray-500 dark:text-gray-400">{t('vinDecoder.enterVinToSee', 'Enter a VIN to see vehicle details')}</p>
+                <div className="w-16 h-16 rounded-full bg-gradient-to-r from-[#0A5ED7]/20 to-[#0BB3FF]/20 flex items-center justify-center mx-auto mb-4">
+                  <Car className="h-8 w-8 text-[#0A5ED7]" />
+                </div>
+                <p className="text-[#64748B]">{t('vinDecoder.enterVinToSee', 'Enter a VIN to see vehicle details')}</p>
               </CardContent>
             </Card>
           ) : (
             <div className="space-y-4">
-              <Card className="bg-white dark:bg-salis-black">
+              <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                 <CardHeader>
-                  <CardTitle className="flex items-center justify-between">
+                  <CardTitle className="flex items-center justify-between text-[#0B1F3B] dark:text-white">
                     <span>{t('vinDecoder.vehicleInformation', 'Vehicle Information')}</span>
-                    <Badge className="bg-green-500">
+                    <Badge className="bg-green-500/10 text-green-600 dark:text-green-400 border-0">
                       <CheckCircle className="h-3 w-3 mr-1" />
                       {t('vinDecoder.decoded', 'Decoded')}
                     </Badge>
@@ -118,39 +120,39 @@ export default function VINDecoder() {
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                      <p className="text-sm text-gray-600 dark:text-gray-400">{t('vehicles.make', 'Make')}</p>
-                      <p className="text-lg font-semibold text-gray-900 dark:text-white" data-testid="text-make">
+                    <div className="p-4 bg-gradient-to-r from-[#0A5ED7]/10 to-[#0BB3FF]/10 rounded-lg border border-[#0A5ED7]/20">
+                      <p className="text-sm text-[#64748B]">{t('vehicles.make', 'Make')}</p>
+                      <p className="text-lg font-semibold text-[#0B1F3B] dark:text-white" data-testid="text-make">
                         {extractValue(results, "Make")}
                       </p>
                     </div>
-                    <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                      <p className="text-sm text-gray-600 dark:text-gray-400">{t('vehicles.model', 'Model')}</p>
-                      <p className="text-lg font-semibold text-gray-900 dark:text-white" data-testid="text-model">
+                    <div className="p-4 bg-gradient-to-r from-[#0A5ED7]/10 to-[#0BB3FF]/10 rounded-lg border border-[#0A5ED7]/20">
+                      <p className="text-sm text-[#64748B]">{t('vehicles.model', 'Model')}</p>
+                      <p className="text-lg font-semibold text-[#0B1F3B] dark:text-white" data-testid="text-model">
                         {extractValue(results, "Model")}
                       </p>
                     </div>
-                    <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                      <p className="text-sm text-gray-600 dark:text-gray-400">{t('vehicles.year', 'Year')}</p>
-                      <p className="text-lg font-semibold text-gray-900 dark:text-white" data-testid="text-year">
+                    <div className="p-4 bg-green-500/10 rounded-lg border border-green-500/20">
+                      <p className="text-sm text-[#64748B]">{t('vehicles.year', 'Year')}</p>
+                      <p className="text-lg font-semibold text-[#0B1F3B] dark:text-white" data-testid="text-year">
                         {extractValue(results, "Model Year")}
                       </p>
                     </div>
-                    <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                      <p className="text-sm text-gray-600 dark:text-gray-400">{t('vehicles.bodyType', 'Body Type')}</p>
-                      <p className="text-lg font-semibold text-gray-900 dark:text-white" data-testid="text-body-type">
+                    <div className="p-4 bg-green-500/10 rounded-lg border border-green-500/20">
+                      <p className="text-sm text-[#64748B]">{t('vehicles.bodyType', 'Body Type')}</p>
+                      <p className="text-lg font-semibold text-[#0B1F3B] dark:text-white" data-testid="text-body-type">
                         {extractValue(results, "Body Class")}
                       </p>
                     </div>
-                    <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
-                      <p className="text-sm text-gray-600 dark:text-gray-400">{t('vehicles.engine', 'Engine')}</p>
-                      <p className="text-lg font-semibold text-gray-900 dark:text-white" data-testid="text-engine">
+                    <div className="p-4 bg-purple-500/10 rounded-lg border border-purple-500/20">
+                      <p className="text-sm text-[#64748B]">{t('vehicles.engine', 'Engine')}</p>
+                      <p className="text-lg font-semibold text-[#0B1F3B] dark:text-white" data-testid="text-engine">
                         {extractValue(results, "Engine Number of Cylinders")} {t('vehicles.cylinders', 'Cyl')}
                       </p>
                     </div>
-                    <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
-                      <p className="text-sm text-gray-600 dark:text-gray-400">{t('vehicles.fuelType', 'Fuel Type')}</p>
-                      <p className="text-lg font-semibold text-gray-900 dark:text-white" data-testid="text-fuel-type">
+                    <div className="p-4 bg-purple-500/10 rounded-lg border border-purple-500/20">
+                      <p className="text-sm text-[#64748B]">{t('vehicles.fuelType', 'Fuel Type')}</p>
+                      <p className="text-lg font-semibold text-[#0B1F3B] dark:text-white" data-testid="text-fuel-type">
                         {extractValue(results, "Fuel Type - Primary")}
                       </p>
                     </div>
@@ -158,25 +160,30 @@ export default function VINDecoder() {
                 </CardContent>
               </Card>
 
-              <Card className="bg-white dark:bg-salis-black">
+              <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <AlertTriangle className="h-5 w-5 text-orange-600" />
+                  <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
+                    <AlertTriangle className="h-5 w-5 text-[#F97316]" />
                     {t('vinDecoder.safetyRecalls', 'Safety & Recalls')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="p-4 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
+                  <div className="p-4 bg-[#F97316]/10 rounded-lg border border-[#F97316]/20">
                     <div className="flex items-start gap-3">
-                      <Info className="h-5 w-5 text-orange-600 flex-shrink-0 mt-0.5" />
+                      <Info className="h-5 w-5 text-[#F97316] flex-shrink-0 mt-0.5" />
                       <div>
-                        <p className="font-semibold text-gray-900 dark:text-white mb-1">
+                        <p className="font-semibold text-[#0B1F3B] dark:text-white mb-1">
                           {t('vinDecoder.checkNhtsa', 'Check NHTSA for Active Recalls')}
                         </p>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                        <p className="text-sm text-[#64748B]">
                           {t('vinDecoder.visitSaferCar', 'Visit safercar.gov to check for active safety recalls on this vehicle')}
                         </p>
-                        <Button variant="outline" className="mt-2" size="sm" data-testid="button-check-recalls">
+                        <Button 
+                          variant="outline" 
+                          className="mt-2 border-[#0A5ED7] text-[#0A5ED7] hover:bg-[#0A5ED7]/10" 
+                          size="sm" 
+                          data-testid="button-check-recalls"
+                        >
                           {t('vinDecoder.checkRecalls', 'Check Recalls on NHTSA')}
                         </Button>
                       </div>

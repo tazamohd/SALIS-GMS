@@ -199,16 +199,16 @@ export default function Vehicles() {
     <Dialog open={isDialogOpen} onOpenChange={handleDialogClose}>
       <DialogTrigger asChild>
         <Button
-          className="bg-gray-800 dark:bg-gray-200 hover:bg-gray-900 dark:hover:bg-gray-300 text-white dark:text-black"
+          className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952b8] hover:to-[#09a0e6] text-white shadow-lg"
           data-testid="button-add-vehicle"
         >
           <Plus className="w-4 h-4 mr-2" />
           {t('vehicles.addVehicle', 'Add Vehicle')}
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[600px]" data-testid="modal-vehicle-form">
+      <DialogContent className="sm:max-w-[600px] bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="modal-vehicle-form">
         <DialogHeader>
-          <DialogTitle className="font-['Poppins',Helvetica] font-semibold text-xl text-gray-900 dark:text-white">
+          <DialogTitle className="font-['Poppins',Helvetica] font-semibold text-xl text-[#0B1F3B] dark:text-white">
             {editingVehicle ? t('vehicles.editVehicle', 'Edit Vehicle') : t('vehicles.addNewVehicle', 'Add New Vehicle')}
           </DialogTitle>
         </DialogHeader>
@@ -220,14 +220,14 @@ export default function Vehicles() {
               name="customerId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t('vehicles.customer', 'Customer')} *</FormLabel>
+                  <FormLabel className="text-[#0B1F3B] dark:text-white">{t('vehicles.customer', 'Customer')} *</FormLabel>
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
-                      <SelectTrigger data-testid="select-customer">
+                      <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="select-customer">
                         <SelectValue placeholder={t('vehicles.selectCustomer', 'Select customer')} />
                       </SelectTrigger>
                     </FormControl>
-                    <SelectContent>
+                    <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                       {customers.map((customer) => (
                         <SelectItem key={customer.id} value={customer.id}>
                           {customer.fullName || customer.email}
@@ -246,11 +246,12 @@ export default function Vehicles() {
                 name="make"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('vehicles.make', 'Make')} *</FormLabel>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('vehicles.make', 'Make')} *</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
                         placeholder="Toyota"
+                        className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                         data-testid="input-make"
                       />
                     </FormControl>
@@ -264,11 +265,12 @@ export default function Vehicles() {
                 name="model"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('vehicles.model', 'Model')} *</FormLabel>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('vehicles.model', 'Model')} *</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
                         placeholder="Camry"
+                        className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                         data-testid="input-model"
                       />
                     </FormControl>
@@ -284,13 +286,14 @@ export default function Vehicles() {
                 name="year"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('vehicles.year', 'Year')} *</FormLabel>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('vehicles.year', 'Year')} *</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
                         type="number"
                         placeholder="2024"
                         onChange={(e) => field.onChange(parseInt(e.target.value))}
+                        className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                         data-testid="input-year"
                       />
                     </FormControl>
@@ -304,11 +307,12 @@ export default function Vehicles() {
                 name="licensePlate"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('vehicles.licensePlate', 'License Plate')} *</FormLabel>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('vehicles.licensePlate', 'License Plate')} *</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
                         placeholder="ABC-1234"
+                        className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                         data-testid="input-license-plate"
                       />
                     </FormControl>
@@ -324,12 +328,13 @@ export default function Vehicles() {
                 name="vin"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('vehicles.vin', 'VIN')}</FormLabel>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('vehicles.vin', 'VIN')}</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
                         placeholder="1HGBH41JXMN109186"
                         value={field.value || ""}
+                        className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                         data-testid="input-vin"
                       />
                     </FormControl>
@@ -343,12 +348,13 @@ export default function Vehicles() {
                 name="color"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('vehicles.color', 'Color')}</FormLabel>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('vehicles.color', 'Color')}</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
                         placeholder={t('vehicles.white', 'White')}
                         value={field.value || ""}
+                        className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                         data-testid="input-color"
                       />
                     </FormControl>
@@ -364,14 +370,14 @@ export default function Vehicles() {
                 name="engineType"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('vehicles.engineType', 'Engine Type')}</FormLabel>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('vehicles.engineType', 'Engine Type')}</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value || ""}>
                       <FormControl>
-                        <SelectTrigger data-testid="select-engine-type">
+                        <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="select-engine-type">
                           <SelectValue placeholder={t('vehicles.selectEngineType', 'Select engine type')} />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent>
+                      <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                         <SelectItem value="gasoline">{t('vehicles.gasoline', 'Gasoline')}</SelectItem>
                         <SelectItem value="diesel">{t('vehicles.diesel', 'Diesel')}</SelectItem>
                         <SelectItem value="electric">{t('vehicles.electric', 'Electric')}</SelectItem>
@@ -388,14 +394,14 @@ export default function Vehicles() {
                 name="transmissionType"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('vehicles.transmission', 'Transmission')}</FormLabel>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('vehicles.transmission', 'Transmission')}</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value || ""}>
                       <FormControl>
-                        <SelectTrigger data-testid="select-transmission">
+                        <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="select-transmission">
                           <SelectValue placeholder={t('vehicles.selectTransmission', 'Select transmission')} />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent>
+                      <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                         <SelectItem value="automatic">{t('vehicles.automatic', 'Automatic')}</SelectItem>
                         <SelectItem value="manual">{t('vehicles.manual', 'Manual')}</SelectItem>
                       </SelectContent>
@@ -411,7 +417,7 @@ export default function Vehicles() {
               name="mileage"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t('vehicles.mileage', 'Mileage')}</FormLabel>
+                  <FormLabel className="text-[#0B1F3B] dark:text-white">{t('vehicles.mileage', 'Mileage')}</FormLabel>
                   <FormControl>
                     <Input
                       {...field}
@@ -419,6 +425,7 @@ export default function Vehicles() {
                       placeholder="50000"
                       onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
                       value={field.value || 0}
+                      className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                       data-testid="input-mileage"
                     />
                   </FormControl>
@@ -432,12 +439,13 @@ export default function Vehicles() {
               name="notes"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t('common.notes', 'Notes')}</FormLabel>
+                  <FormLabel className="text-[#0B1F3B] dark:text-white">{t('common.notes', 'Notes')}</FormLabel>
                   <FormControl>
                     <Textarea
                       {...field}
                       placeholder={t('vehicles.additionalNotes', 'Additional notes...')}
                       value={field.value || ""}
+                      className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                       data-testid="input-notes"
                     />
                   </FormControl>
@@ -451,13 +459,14 @@ export default function Vehicles() {
                 type="button"
                 variant="outline"
                 onClick={handleDialogClose}
+                className="border-[#0A5ED7] text-[#0A5ED7] hover:bg-[#0A5ED7]/10"
                 data-testid="button-cancel"
               >
                 {t('common.cancel', 'Cancel')}
               </Button>
               <Button
                 type="submit"
-                className="bg-gray-800 dark:bg-gray-200 hover:bg-gray-900 dark:hover:bg-gray-300 text-white dark:text-black"
+                className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952b8] hover:to-[#09a0e6] text-white"
                 disabled={createMutation.isPending || updateMutation.isPending}
                 data-testid="button-save-vehicle"
               >
@@ -479,7 +488,7 @@ export default function Vehicles() {
     >
         {actionButtons}
         <div className="flex items-center justify-center h-64">
-          <div className="w-8 h-8 border-4 border-purple-200 dark:border-purple-500/30 border-t-purple-500 rounded-full animate-spin"></div>
+          <div className="w-8 h-8 border-4 border-[#0A5ED7]/30 border-t-[#0A5ED7] rounded-full animate-spin"></div>
         </div>
       </StandardPageLayout>
     );
@@ -493,17 +502,15 @@ export default function Vehicles() {
     >
       {actionButtons}
       <div className="space-y-6 mt-6">
-        {/* Search Bar */}
-        <div className="group relative max-w-md">
-          <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-2xl blur opacity-50"></div>
-          <div className="relative backdrop-blur-xl bg-white/70 dark:bg-black/20 rounded-xl border border-purple-200/50 dark:border-white/10 shadow-lg">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-purple-500 dark:text-purple-400" />
+        <div className="relative max-w-md">
+          <div className="relative bg-white dark:bg-[#0E1117] rounded-xl border border-[#E2E8F0] dark:border-[#232A36] shadow-sm">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#64748B]" />
             <Input
               type="text"
               placeholder={t('vehicles.searchVehicles', 'Search vehicles...')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 bg-transparent border-0 focus:ring-0"
+              className="pl-10 bg-transparent border-0 focus:ring-0 text-[#0B1F3B] dark:text-white"
               data-testid="input-search-vehicles"
             />
           </div>
@@ -511,8 +518,10 @@ export default function Vehicles() {
 
         {filteredVehicles.length === 0 ? (
           <div className="text-center py-12">
-            <Car className="w-12 h-12 mx-auto text-purple-500 dark:text-purple-400 mb-4" />
-            <p className="text-gray-600 dark:text-gray-400">
+            <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] rounded-full flex items-center justify-center">
+              <Car className="w-10 h-10 text-white" />
+            </div>
+            <p className="text-[#64748B]">
               {searchQuery ? t('vehicles.noVehiclesMatchingSearch', 'No vehicles found matching your search') : t('vehicles.noVehiclesYet', 'No vehicles added yet')}
             </p>
           </div>
@@ -527,84 +536,84 @@ export default function Vehicles() {
                   className="group relative"
                   data-testid={`card-vehicle-${vehicle.id}`}
                 >
-                  <div className="relative bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow duration-200">
+                  <div className="relative bg-white dark:bg-[#151A23] rounded-2xl p-6 border border-[#E2E8F0] dark:border-[#232A36] shadow-sm hover:shadow-md transition-shadow duration-200">
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/50 rounded-xl flex items-center justify-center">
-                          <Car className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+                        <div className="w-12 h-12 bg-[#0A5ED7]/10 rounded-xl flex items-center justify-center">
+                          <Car className="w-6 h-6 text-[#0A5ED7]" />
                         </div>
                         <div>
-                          <h3 className="font-bold text-gray-900 dark:text-white">
+                          <h3 className="font-bold text-[#0B1F3B] dark:text-white">
                             {vehicle.make} {vehicle.model}
                           </h3>
-                          <p className="text-sm text-gray-600 dark:text-gray-400">
+                          <p className="text-sm text-[#64748B]">
                             {vehicle.year}
                           </p>
                         </div>
                       </div>
                       {vehicle.isActive && (
-                        <Badge className="bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-500/30">{t('common.active', 'Active')}</Badge>
+                        <Badge className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-0">{t('common.active', 'Active')}</Badge>
                       )}
                     </div>
 
                     <div className="space-y-2 mb-4">
                       <div className="flex justify-between">
-                        <span className="text-sm text-gray-600 dark:text-gray-400">{t('vehicles.owner', 'Owner')}:</span>
-                        <span className="text-sm text-gray-900 dark:text-white">
+                        <span className="text-sm text-[#64748B]">{t('vehicles.owner', 'Owner')}:</span>
+                        <span className="text-sm text-[#0B1F3B] dark:text-white">
                           {customer?.fullName || t('common.unknown', 'Unknown')}
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-sm text-gray-600 dark:text-gray-400">{t('vehicles.license', 'License')}:</span>
-                        <span className="text-sm text-gray-900 dark:text-white font-medium">
+                        <span className="text-sm text-[#64748B]">{t('vehicles.license', 'License')}:</span>
+                        <span className="text-sm text-[#0B1F3B] dark:text-white font-medium">
                           {vehicle.licensePlate}
                         </span>
                       </div>
                       {vehicle.vin && (
                         <div className="flex justify-between">
-                          <span className="text-sm text-gray-600 dark:text-gray-400">{t('vehicles.vin', 'VIN')}:</span>
-                          <span className="text-sm text-gray-900 dark:text-white truncate max-w-[150px]">
+                          <span className="text-sm text-[#64748B]">{t('vehicles.vin', 'VIN')}:</span>
+                          <span className="text-sm text-[#0B1F3B] dark:text-white truncate max-w-[150px]">
                             {vehicle.vin}
                           </span>
                         </div>
                       )}
                       {vehicle.mileage && vehicle.mileage > 0 && (
                         <div className="flex justify-between">
-                          <span className="text-sm text-gray-600 dark:text-gray-400">{t('vehicles.mileage', 'Mileage')}:</span>
-                          <span className="text-sm text-gray-900 dark:text-white">
+                          <span className="text-sm text-[#64748B]">{t('vehicles.mileage', 'Mileage')}:</span>
+                          <span className="text-sm text-[#0B1F3B] dark:text-white">
                             {vehicle.mileage.toLocaleString()} km
                           </span>
                         </div>
                       )}
                       {vehicle.engineType && (
                         <div className="flex justify-between">
-                          <span className="text-sm text-gray-600 dark:text-gray-400">{t('vehicles.engine', 'Engine')}:</span>
-                          <span className="text-sm text-gray-900 dark:text-white capitalize">
+                          <span className="text-sm text-[#64748B]">{t('vehicles.engine', 'Engine')}:</span>
+                          <span className="text-sm text-[#0B1F3B] dark:text-white capitalize">
                             {vehicle.engineType}
                           </span>
                         </div>
                       )}
                     </div>
 
-                    <div className="flex gap-2 pt-4 border-t border-gray-200 dark:border-gray-700">
+                    <div className="flex gap-2 pt-4 border-t border-[#E2E8F0] dark:border-[#232A36]">
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => handleEdit(vehicle)}
-                        className="flex-1 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-900 dark:text-white"
-                        data-testid={`button-edit-${vehicle.id}`}
+                        className="flex-1 border-[#0A5ED7] text-[#0A5ED7] hover:bg-[#0A5ED7]/10"
+                        data-testid={`button-edit-vehicle-${vehicle.id}`}
                       >
-                        <Edit className="w-4 h-4 mr-2" />
+                        <Edit className="w-4 h-4 mr-1" />
                         {t('common.edit', 'Edit')}
                       </Button>
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => handleDelete(vehicle.id)}
-                        className="flex-1 bg-white dark:bg-gray-800 border-red-300 dark:border-red-700 hover:bg-red-50 dark:hover:bg-red-900/30 text-red-700 dark:text-red-400"
-                        data-testid={`button-delete-${vehicle.id}`}
+                        className="flex-1 border-[#F97316] text-[#F97316] hover:bg-[#F97316]/10"
+                        data-testid={`button-delete-vehicle-${vehicle.id}`}
                       >
-                        <Trash2 className="w-4 h-4 mr-2" />
+                        <Trash2 className="w-4 h-4 mr-1" />
                         {t('common.delete', 'Delete')}
                       </Button>
                     </div>

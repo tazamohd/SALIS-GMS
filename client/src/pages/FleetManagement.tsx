@@ -433,7 +433,7 @@ export default function FleetManagement() {
   const renderFleetGroupsContent = () => (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h2 className="text-xl font-semibold text-salis-black dark:text-white">
+        <h2 className="text-xl font-semibold text-[#0B1F3B] dark:text-white">
           {t('vehicles.fleetGroups', 'Fleet Groups')}
         </h2>
         <Button
@@ -442,7 +442,7 @@ export default function FleetManagement() {
             groupForm.reset();
             setIsGroupDialogOpen(true);
           }}
-          className="bg-salis-black dark:bg-white text-white dark:text-salis-black"
+          className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952b8] hover:to-[#09a0e6] text-white shadow-lg"
           data-testid="button-create-fleet-group"
         >
           <Plus className="mr-2 h-4 w-4" />
@@ -450,46 +450,50 @@ export default function FleetManagement() {
         </Button>
       </div>
 
-      <div className="border border-salis-gray-light dark:border-salis-gray-dark rounded-lg">
+      <div className="border border-[#E2E8F0] dark:border-[#232A36] rounded-lg bg-white dark:bg-[#151A23]">
         <Table>
           <TableHeader>
-            <TableRow className="bg-salis-gray-light dark:bg-salis-gray-dark">
-              <TableHead className="text-salis-black dark:text-white">{t('vehicles.fleetName', 'Fleet Name')}</TableHead>
-              <TableHead className="text-salis-black dark:text-white">{t('vehicles.company', 'Company')}</TableHead>
-              <TableHead className="text-salis-black dark:text-white">{t('vehicles.contactPerson', 'Contact Person')}</TableHead>
-              <TableHead className="text-salis-black dark:text-white">{t('vehicles.contactEmail', 'Contact Email')}</TableHead>
-              <TableHead className="text-salis-black dark:text-white">{t('common.discount', 'Discount')}</TableHead>
-              <TableHead className="text-salis-black dark:text-white">{t('common.status', 'Status')}</TableHead>
-              <TableHead className="text-salis-black dark:text-white text-right">{t('common.actions', 'Actions')}</TableHead>
+            <TableRow className="bg-[#F8FAFC] dark:bg-[#0E1117] border-b border-[#E2E8F0] dark:border-[#232A36]">
+              <TableHead className="text-[#0B1F3B] dark:text-white font-semibold">{t('vehicles.fleetName', 'Fleet Name')}</TableHead>
+              <TableHead className="text-[#0B1F3B] dark:text-white font-semibold">{t('vehicles.company', 'Company')}</TableHead>
+              <TableHead className="text-[#0B1F3B] dark:text-white font-semibold">{t('vehicles.contactPerson', 'Contact Person')}</TableHead>
+              <TableHead className="text-[#0B1F3B] dark:text-white font-semibold">{t('vehicles.contactEmail', 'Contact Email')}</TableHead>
+              <TableHead className="text-[#0B1F3B] dark:text-white font-semibold">{t('common.discount', 'Discount')}</TableHead>
+              <TableHead className="text-[#0B1F3B] dark:text-white font-semibold">{t('common.status', 'Status')}</TableHead>
+              <TableHead className="text-[#0B1F3B] dark:text-white font-semibold text-right">{t('common.actions', 'Actions')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {groupsLoading ? (
               <TableRow>
-                <TableCell colSpan={7} className="text-center text-salis-gray">
+                <TableCell colSpan={7} className="text-center text-[#64748B]">
                   {t('vehicles.loadingFleetGroups', 'Loading fleet groups...')}
                 </TableCell>
               </TableRow>
             ) : fleetGroups.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="text-center text-salis-gray">
-                  {t('vehicles.noFleetGroupsFound', 'No fleet groups found. Create one to get started.')}
+                <TableCell colSpan={7} className="text-center text-[#64748B] py-8">
+                  <div className="flex flex-col items-center">
+                    <div className="w-16 h-16 mb-4 bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] rounded-full flex items-center justify-center">
+                      <Building2 className="w-8 h-8 text-white" />
+                    </div>
+                    {t('vehicles.noFleetGroupsFound', 'No fleet groups found. Create one to get started.')}
+                  </div>
                 </TableCell>
               </TableRow>
             ) : (
               fleetGroups.map((group) => (
-                <TableRow key={group.id} className="border-b border-salis-gray-light dark:border-salis-gray-dark" data-testid={`row-fleet-group-${group.id}`}>
-                  <TableCell className="font-medium text-salis-black dark:text-white">
+                <TableRow key={group.id} className="border-b border-[#E2E8F0] dark:border-[#232A36] hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]" data-testid={`row-fleet-group-${group.id}`}>
+                  <TableCell className="font-medium text-[#0B1F3B] dark:text-white">
                     {group.fleetName}
                   </TableCell>
-                  <TableCell className="text-salis-gray">{group.companyName || "—"}</TableCell>
-                  <TableCell className="text-salis-gray">{group.contactPerson || "—"}</TableCell>
-                  <TableCell className="text-salis-gray">{group.contactEmail || "—"}</TableCell>
-                  <TableCell className="text-salis-gray">{group.discountPercentage}%</TableCell>
+                  <TableCell className="text-[#64748B]">{group.companyName || "—"}</TableCell>
+                  <TableCell className="text-[#64748B]">{group.contactPerson || "—"}</TableCell>
+                  <TableCell className="text-[#64748B]">{group.contactEmail || "—"}</TableCell>
+                  <TableCell className="text-[#64748B]">{group.discountPercentage}%</TableCell>
                   <TableCell>
                     <Badge
-                      variant={group.isActive ? "default" : "secondary"}
-                      className={group.isActive ? "bg-salis-black dark:bg-white text-white dark:text-salis-black" : ""}
+                      className={group.isActive ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-0" : "bg-[#64748B]/10 text-[#64748B] border-0"}
                     >
                       {group.isActive ? t('common.active', 'Active') : t('common.inactive', 'Inactive')}
                     </Badge>
@@ -500,6 +504,7 @@ export default function FleetManagement() {
                         variant="outline"
                         size="sm"
                         onClick={() => handleEditGroup(group)}
+                        className="border-[#0A5ED7] text-[#0A5ED7] hover:bg-[#0A5ED7]/10"
                         data-testid={`button-edit-fleet-group-${group.id}`}
                       >
                         <Pencil className="h-4 w-4" />
@@ -508,6 +513,7 @@ export default function FleetManagement() {
                         variant="outline"
                         size="sm"
                         onClick={() => deleteGroupMutation.mutate(group.id)}
+                        className="border-[#F97316] text-[#F97316] hover:bg-[#F97316]/10"
                         data-testid={`button-delete-fleet-group-${group.id}`}
                       >
                         <Trash2 className="h-4 w-4" />
@@ -526,15 +532,15 @@ export default function FleetManagement() {
   const renderFleetVehiclesContent = () => (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h2 className="text-xl font-semibold text-salis-black dark:text-white">
+        <h2 className="text-xl font-semibold text-[#0B1F3B] dark:text-white">
           {t('vehicles.fleetVehicles', 'Fleet Vehicles')}
         </h2>
         <div className="flex gap-4">
           <Select value={selectedGroupId} onValueChange={setSelectedGroupId}>
-            <SelectTrigger className="w-64" data-testid="select-vehicle-fleet-group">
+            <SelectTrigger className="w-64 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="select-vehicle-fleet-group">
               <SelectValue placeholder={t('vehicles.selectFleetGroup', 'Select Fleet Group')} />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
               {fleetGroups.map((group) => (
                 <SelectItem key={group.id} value={group.id}>
                   {group.fleetName}
@@ -548,7 +554,7 @@ export default function FleetManagement() {
               vehicleForm.reset({ fleetGroupId: selectedGroupId });
               setIsVehicleDialogOpen(true);
             }}
-            className="bg-salis-black dark:bg-white text-white dark:text-salis-black"
+            className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952b8] hover:to-[#09a0e6] text-white shadow-lg"
             disabled={!selectedGroupId}
             data-testid="button-add-fleet-vehicle"
           >
@@ -558,45 +564,55 @@ export default function FleetManagement() {
         </div>
       </div>
 
-      <div className="border border-salis-gray-light dark:border-salis-gray-dark rounded-lg">
+      <div className="border border-[#E2E8F0] dark:border-[#232A36] rounded-lg bg-white dark:bg-[#151A23]">
         <Table>
           <TableHeader>
-            <TableRow className="bg-salis-gray-light dark:bg-salis-gray-dark">
-              <TableHead className="text-salis-black dark:text-white">{t('vehicles.vehicle', 'Vehicle')}</TableHead>
-              <TableHead className="text-salis-black dark:text-white">{t('vehicles.makeModel', 'Make/Model')}</TableHead>
-              <TableHead className="text-salis-black dark:text-white">{t('vehicles.licensePlate', 'License Plate')}</TableHead>
-              <TableHead className="text-salis-black dark:text-white">{t('vehicles.avgMonthlyMileage', 'Avg. Monthly Mileage')}</TableHead>
-              <TableHead className="text-salis-black dark:text-white">{t('vehicles.assignedDate', 'Assigned Date')}</TableHead>
-              <TableHead className="text-salis-black dark:text-white text-right">{t('common.actions', 'Actions')}</TableHead>
+            <TableRow className="bg-[#F8FAFC] dark:bg-[#0E1117] border-b border-[#E2E8F0] dark:border-[#232A36]">
+              <TableHead className="text-[#0B1F3B] dark:text-white font-semibold">{t('vehicles.vehicle', 'Vehicle')}</TableHead>
+              <TableHead className="text-[#0B1F3B] dark:text-white font-semibold">{t('vehicles.makeModel', 'Make/Model')}</TableHead>
+              <TableHead className="text-[#0B1F3B] dark:text-white font-semibold">{t('vehicles.licensePlate', 'License Plate')}</TableHead>
+              <TableHead className="text-[#0B1F3B] dark:text-white font-semibold">{t('vehicles.avgMonthlyMileage', 'Avg. Monthly Mileage')}</TableHead>
+              <TableHead className="text-[#0B1F3B] dark:text-white font-semibold">{t('vehicles.assignedDate', 'Assigned Date')}</TableHead>
+              <TableHead className="text-[#0B1F3B] dark:text-white font-semibold text-right">{t('common.actions', 'Actions')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {!selectedGroupId ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center text-salis-gray">
-                  {t('vehicles.selectFleetGroupToViewVehicles', 'Select a fleet group to view vehicles')}
+                <TableCell colSpan={6} className="text-center text-[#64748B] py-8">
+                  <div className="flex flex-col items-center">
+                    <div className="w-16 h-16 mb-4 bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] rounded-full flex items-center justify-center">
+                      <Car className="w-8 h-8 text-white" />
+                    </div>
+                    {t('vehicles.selectFleetGroupToViewVehicles', 'Select a fleet group to view vehicles')}
+                  </div>
                 </TableCell>
               </TableRow>
             ) : fleetVehicles.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center text-salis-gray">
-                  {t('vehicles.noVehiclesAssignedToFleet', 'No vehicles assigned to this fleet group')}
+                <TableCell colSpan={6} className="text-center text-[#64748B] py-8">
+                  <div className="flex flex-col items-center">
+                    <div className="w-16 h-16 mb-4 bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] rounded-full flex items-center justify-center">
+                      <Car className="w-8 h-8 text-white" />
+                    </div>
+                    {t('vehicles.noVehiclesAssignedToFleet', 'No vehicles assigned to this fleet group')}
+                  </div>
                 </TableCell>
               </TableRow>
             ) : (
               fleetVehicles.map((vehicle: any) => (
-                <TableRow key={vehicle.fleetVehicle.id} className="border-b border-salis-gray-light dark:border-salis-gray-dark" data-testid={`row-fleet-vehicle-${vehicle.fleetVehicle.id}`}>
-                  <TableCell className="font-medium text-salis-black dark:text-white">
+                <TableRow key={vehicle.fleetVehicle.id} className="border-b border-[#E2E8F0] dark:border-[#232A36] hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]" data-testid={`row-fleet-vehicle-${vehicle.fleetVehicle.id}`}>
+                  <TableCell className="font-medium text-[#0B1F3B] dark:text-white">
                     {vehicle.vehicle?.year} {vehicle.vehicle?.make} {vehicle.vehicle?.model}
                   </TableCell>
-                  <TableCell className="text-salis-gray">
+                  <TableCell className="text-[#64748B]">
                     {vehicle.vehicle?.make} {vehicle.vehicle?.model}
                   </TableCell>
-                  <TableCell className="text-salis-gray">{vehicle.vehicle?.licensePlate || "—"}</TableCell>
-                  <TableCell className="text-salis-gray">
+                  <TableCell className="text-[#64748B]">{vehicle.vehicle?.licensePlate || "—"}</TableCell>
+                  <TableCell className="text-[#64748B]">
                     {vehicle.fleetVehicle.averageMonthlyMileage ? `${vehicle.fleetVehicle.averageMonthlyMileage.toLocaleString()} km` : "—"}
                   </TableCell>
-                  <TableCell className="text-salis-gray">
+                  <TableCell className="text-[#64748B]">
                     {vehicle.fleetVehicle.assignedDate ? format(new Date(vehicle.fleetVehicle.assignedDate), "MMM dd, yyyy") : "—"}
                   </TableCell>
                   <TableCell className="text-right">
@@ -605,6 +621,7 @@ export default function FleetManagement() {
                         variant="outline"
                         size="sm"
                         onClick={() => handleEditVehicle(vehicle)}
+                        className="border-[#0A5ED7] text-[#0A5ED7] hover:bg-[#0A5ED7]/10"
                         data-testid={`button-edit-fleet-vehicle-${vehicle.fleetVehicle.id}`}
                       >
                         <Pencil className="h-4 w-4" />
@@ -613,6 +630,7 @@ export default function FleetManagement() {
                         variant="outline"
                         size="sm"
                         onClick={() => deleteVehicleMutation.mutate(vehicle.fleetVehicle.id)}
+                        className="border-[#F97316] text-[#F97316] hover:bg-[#F97316]/10"
                         data-testid={`button-delete-fleet-vehicle-${vehicle.fleetVehicle.id}`}
                       >
                         <Trash2 className="h-4 w-4" />
@@ -653,12 +671,12 @@ export default function FleetManagement() {
       />
 
       <Dialog open={isGroupDialogOpen} onOpenChange={setIsGroupDialogOpen}>
-        <DialogContent className="sm:max-w-[600px]">
+        <DialogContent className="sm:max-w-[600px] bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <DialogHeader>
-            <DialogTitle>
+            <DialogTitle className="text-[#0B1F3B] dark:text-white">
               {editingGroupId ? t('vehicles.editFleetGroup', 'Edit Fleet Group') : t('vehicles.createFleetGroup', 'Create Fleet Group')}
             </DialogTitle>
-            <DialogDescription>
+            <DialogDescription className="text-[#64748B]">
               {t('vehicles.fleetGroupDescription', 'Manage fleet group information and settings')}
             </DialogDescription>
           </DialogHeader>
@@ -669,9 +687,9 @@ export default function FleetManagement() {
                 name="fleetName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('vehicles.fleetName', 'Fleet Name')}</FormLabel>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('vehicles.fleetName', 'Fleet Name')}</FormLabel>
                     <FormControl>
-                      <Input {...field} data-testid="input-fleet-name" />
+                      <Input {...field} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="input-fleet-name" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -682,9 +700,9 @@ export default function FleetManagement() {
                 name="companyName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('vehicles.companyName', 'Company Name')}</FormLabel>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('vehicles.companyName', 'Company Name')}</FormLabel>
                     <FormControl>
-                      <Input {...field} value={field.value || ""} data-testid="input-company-name" />
+                      <Input {...field} value={field.value || ""} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="input-company-name" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -696,9 +714,9 @@ export default function FleetManagement() {
                   name="contactPerson"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('vehicles.contactPerson', 'Contact Person')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('vehicles.contactPerson', 'Contact Person')}</FormLabel>
                       <FormControl>
-                        <Input {...field} value={field.value || ""} data-testid="input-contact-person" />
+                        <Input {...field} value={field.value || ""} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="input-contact-person" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -709,9 +727,9 @@ export default function FleetManagement() {
                   name="contactEmail"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('vehicles.contactEmail', 'Contact Email')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('vehicles.contactEmail', 'Contact Email')}</FormLabel>
                       <FormControl>
-                        <Input {...field} type="email" value={field.value || ""} data-testid="input-contact-email" />
+                        <Input {...field} type="email" value={field.value || ""} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="input-contact-email" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -723,19 +741,19 @@ export default function FleetManagement() {
                 name="discountPercentage"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('vehicles.discountPercentage', 'Discount Percentage')}</FormLabel>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('vehicles.discountPercentage', 'Discount Percentage')}</FormLabel>
                     <FormControl>
-                      <Input {...field} type="number" step="0.1" data-testid="input-discount" />
+                      <Input {...field} type="number" step="0.1" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="input-discount" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
               <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => setIsGroupDialogOpen(false)}>
+                <Button type="button" variant="outline" onClick={() => setIsGroupDialogOpen(false)} className="border-[#0A5ED7] text-[#0A5ED7] hover:bg-[#0A5ED7]/10">
                   {t('common.cancel', 'Cancel')}
                 </Button>
-                <Button type="submit" disabled={groupMutation.isPending}>
+                <Button type="submit" disabled={groupMutation.isPending} className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952b8] hover:to-[#09a0e6] text-white">
                   {groupMutation.isPending ? t('common.saving', 'Saving...') : t('common.save', 'Save')}
                 </Button>
               </DialogFooter>
@@ -745,9 +763,9 @@ export default function FleetManagement() {
       </Dialog>
 
       <Dialog open={isVehicleDialogOpen} onOpenChange={setIsVehicleDialogOpen}>
-        <DialogContent className="sm:max-w-[500px]">
+        <DialogContent className="sm:max-w-[500px] bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <DialogHeader>
-            <DialogTitle>
+            <DialogTitle className="text-[#0B1F3B] dark:text-white">
               {editingVehicleId ? t('vehicles.editFleetVehicle', 'Edit Fleet Vehicle') : t('vehicles.addFleetVehicle', 'Add Fleet Vehicle')}
             </DialogTitle>
           </DialogHeader>
@@ -758,14 +776,14 @@ export default function FleetManagement() {
                 name="vehicleId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('vehicles.vehicle', 'Vehicle')}</FormLabel>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('vehicles.vehicle', 'Vehicle')}</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
-                        <SelectTrigger data-testid="select-vehicle">
+                        <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="select-vehicle">
                           <SelectValue placeholder={t('vehicles.selectVehicle', 'Select vehicle')} />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent>
+                      <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                         {allVehicles.map((v: any) => (
                           <SelectItem key={v.id} value={v.id}>
                             {v.year} {v.make} {v.model} - {v.licensePlate}
@@ -782,19 +800,19 @@ export default function FleetManagement() {
                 name="averageMonthlyMileage"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('vehicles.avgMonthlyMileage', 'Average Monthly Mileage')}</FormLabel>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('vehicles.avgMonthlyMileage', 'Average Monthly Mileage')}</FormLabel>
                     <FormControl>
-                      <Input {...field} type="number" data-testid="input-mileage" />
+                      <Input {...field} type="number" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="input-mileage" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
               <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => setIsVehicleDialogOpen(false)}>
+                <Button type="button" variant="outline" onClick={() => setIsVehicleDialogOpen(false)} className="border-[#0A5ED7] text-[#0A5ED7] hover:bg-[#0A5ED7]/10">
                   {t('common.cancel', 'Cancel')}
                 </Button>
-                <Button type="submit" disabled={vehicleMutation.isPending}>
+                <Button type="submit" disabled={vehicleMutation.isPending} className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952b8] hover:to-[#09a0e6] text-white">
                   {vehicleMutation.isPending ? t('common.saving', 'Saving...') : t('common.save', 'Save')}
                 </Button>
               </DialogFooter>
